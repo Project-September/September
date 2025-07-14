@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 5855297743485364338}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.381}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -41,7 +41,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
       propertyPath: m_LocalPosition.y
@@ -61,11 +61,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -137,8 +137,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.95445436, y: 1.1510028, z: 0.05643752}
-  m_Center: {x: 0.000000029802322, y: 0.5755014, z: 0}
+  m_Size: {x: 0.5862084, y: 0.67181784, z: 0.05643752}
+  m_Center: {x: 0, y: 0.33677635, z: 0}
 --- !u!114 &1767096008057728453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,6 +189,6 @@ MonoBehaviour:
         _characterType: 4
         _warpDestination: {fileID: 0}
         _warpDuration: 0.5
-        _warpPosition: {fileID: 5855297743485364338}
+        _warpPosition: {fileID: 0}
         _warpInSoundName: Painting_Warp_In
         _warpOutSoundName: Painting_Warp_Out

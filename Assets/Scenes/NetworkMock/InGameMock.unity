@@ -137,6 +137,10 @@ PrefabInstance:
       value: 0.42
       objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 1474187221}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
       objectReference: {fileID: 1474187220}
@@ -215,6 +219,11 @@ Transform:
 --- !u!1 &196039147 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6296887427717845871, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+  m_PrefabInstance: {fileID: 196039145}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &196039148 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8622633798683331281, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
   m_PrefabInstance: {fileID: 196039145}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &212486369
@@ -397,7 +406,6 @@ MonoBehaviour:
   _crySE: Pteranodon_cry
   _flapSE: Pteranodon_Flapping_1
   _moveSpeed: 5
-  _targetBlendValue: 0.01
   references:
     version: 2
     RefIds: []
@@ -795,6 +803,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.34
       objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 1636136030}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
@@ -1618,6 +1630,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 597424540228789946}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
       objectReference: {fileID: 597424540228789945}
@@ -1636,6 +1652,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4264672226570498562, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
   m_PrefabInstance: {fileID: 1382101168}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1382101171 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6458095848071322053, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+  m_PrefabInstance: {fileID: 1382101168}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1474187219
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1652,6 +1673,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.454
       objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 196039148}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
@@ -1716,6 +1741,11 @@ PrefabInstance:
 --- !u!1 &1474187220 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6296887427717845871, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+  m_PrefabInstance: {fileID: 1474187219}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1474187221 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8622633798683331281, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
   m_PrefabInstance: {fileID: 1474187219}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1474187224 stripped
@@ -1933,6 +1963,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.381
       objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 740668968}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
@@ -2306,6 +2340,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 2024697705}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
       objectReference: {fileID: 2024697703}
@@ -2327,6 +2365,11 @@ Transform:
 --- !u!1 &1864694296 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3948263822443002454, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+  m_PrefabInstance: {fileID: 1864694294}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1864694297 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3855226410729490456, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
   m_PrefabInstance: {fileID: 1864694294}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1895192364
@@ -2507,6 +2550,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 1864694297}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
       objectReference: {fileID: 1864694296}
@@ -2527,6 +2574,11 @@ GameObject:
 --- !u!4 &2024697704 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4431785762032050412, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+  m_PrefabInstance: {fileID: 2024697702}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2024697705 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3855226410729490456, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
   m_PrefabInstance: {fileID: 2024697702}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2061446864
@@ -2638,6 +2690,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: managedReferences[3302172163222274141]._warpPosition
+      value: 
+      objectReference: {fileID: 1382101171}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpDestination
       value: 
       objectReference: {fileID: 1382101170}
@@ -2649,6 +2705,11 @@ PrefabInstance:
 --- !u!1 &597424540228789945 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4264672226570498562, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+  m_PrefabInstance: {fileID: 597424540228789944}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &597424540228789946 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6458095848071322053, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
   m_PrefabInstance: {fileID: 597424540228789944}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1138071394686765466
