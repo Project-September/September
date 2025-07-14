@@ -7,7 +7,6 @@ namespace Ingame.Tanihira
     public class FormationManager : MonoBehaviour
     {
         [SerializeField] private Transform _firstFormationTransform;
-        [SerializeField] private float _formationOffset;
         [SerializeField] private float _offsetZ;
         private List<FriendBase> _friendsList = new List<FriendBase>();
         private List<Transform> _friendsDestinationList = new List<Transform>();

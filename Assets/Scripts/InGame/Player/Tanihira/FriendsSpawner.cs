@@ -7,7 +7,6 @@ namespace InGame.Tanihira
     public class FriendsSpawner : NetworkBehaviour
     {
         [Header("初期友達の設定")]
-        [SerializeField] private Transform _firstSpawnPosition;
         [SerializeField] private FriendType[] _friendsTypes;
         [SerializeField] private FriendDatabase _friendDatabase;
         [SerializeField] private FormationManager _formationManager;
