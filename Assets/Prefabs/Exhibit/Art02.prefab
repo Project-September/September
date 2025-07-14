@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 8622633798683331281}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: 0, z: 0.454}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -176,7 +176,7 @@ MonoBehaviour:
         _characterType: 4
         _warpDestination: {fileID: 0}
         _warpDuration: 0.5
-        _warpPosition: {fileID: 8622633798683331281}
+        _warpPosition: {fileID: 0}
         _warpInSoundName: Painting_Warp_In
         _warpOutSoundName: Painting_Warp_Out
 --- !u!4 &6640796709864507861 stripped
