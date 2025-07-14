@@ -1,5 +1,6 @@
 using Fusion;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace InGame.Player
 {
@@ -16,9 +17,11 @@ namespace InGame.Player
                 _defaultMaterials[i] = _renderers[i].materials;
             }
         }
+
         [Rpc]
-        public void Rpc_SetOpticalCamouflageMaterial()
+        public void Rpc_StartOpticalCamouflage()
         {
+            //  光学迷彩用のマテリアルに変更
             for (int i = 0; i < _renderers.Length; i++)
             {
                 var mats = _renderers[i].materials;
@@ -27,22 +30,17 @@ namespace InGame.Player
                     mats[j] = _opticalCamouflageMaterial;
                 }
                 _renderers[i].materials = mats;
+                _renderers[i].shadowCastingMode = ShadowCastingMode.Off;
             }
         }
         [Rpc]
-        public void Rpc_ResetMaterial()
+        public void Rpc_StopOpticalCamouflage()
         {
+            //  最初に割り当てられていたマテリアルに戻す
             for (int i = 0; i < _renderers.Length; i++)
             {
                 _renderers[i].materials = _defaultMaterials[i];
-            }
-        }
-        [Rpc]
-        public void Rpc_SetNullMaterial()
-        {
-            for (int i = 0; i < _renderers.Length; i++)
-            {
-                _renderers[i].materials = null;
+                _renderers[i].shadowCastingMode = ShadowCastingMode.On;
             }
         }
     }
