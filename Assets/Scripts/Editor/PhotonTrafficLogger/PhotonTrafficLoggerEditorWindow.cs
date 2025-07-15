@@ -90,7 +90,7 @@ public class PhotonTrafficLoggerEditorWindow : EditorWindow
         // Show current log files count
         if (logDirExists)
         {
-            int logFileCount = Directory.GetFiles(_settings.LogOutputPath, "*.json").Length;
+            var logFileCount = Directory.GetFiles(_settings.LogOutputPath, "*.json").Length;
             EditorGUILayout.LabelField($"Current log files: {logFileCount}");
         }
 
@@ -163,8 +163,8 @@ public class PhotonTrafficLoggerEditorWindow : EditorWindow
         {
             if (Directory.Exists(_settings.LogOutputPath))
             {
-                string[] logFiles = Directory.GetFiles(_settings.LogOutputPath, "*.json");
-                foreach (string file in logFiles)
+                var logFiles = Directory.GetFiles(_settings.LogOutputPath, "*.json");
+                foreach (var file in logFiles)
                 {
                     File.Delete(file);
                 }

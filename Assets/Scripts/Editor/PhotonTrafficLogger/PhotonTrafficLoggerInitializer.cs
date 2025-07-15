@@ -8,8 +8,8 @@ using Fusion.Statistics;
 public class PhotonTrafficLoggerInitializer
 {
     // 現状のインゲームシーン名
-    private const string INGAME_SCENE_NAME = "InGameMock";
-    private const string DEV_INGAME_SCENE_NAME = "InGameMock";
+    private const string InGameSceneName = "InGameMock";
+    private const string DevInGameSceneName = "InGameMock";
 
     static PhotonTrafficLoggerInitializer()
     {
@@ -48,7 +48,7 @@ public class PhotonTrafficLoggerInitializer
 
     private static bool IsInGameScene(string sceneName)
     {
-        return sceneName == INGAME_SCENE_NAME || sceneName == DEV_INGAME_SCENE_NAME;
+        return sceneName == InGameSceneName || sceneName == DevInGameSceneName;
     }
 
     private static void InitializeTrafficLogger()

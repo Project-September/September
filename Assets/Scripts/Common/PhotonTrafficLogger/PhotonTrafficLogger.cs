@@ -92,7 +92,7 @@ public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
         if (!IsLogging) return;
 
         // Update caller information
-        string fullCallerName = $"{Path.GetFileNameWithoutExtension(callerFilePath)}.{callerName}";
+        var fullCallerName = $"{Path.GetFileNameWithoutExtension(callerFilePath)}.{callerName}";
         incomingData.callerName = fullCallerName;
         outgoingData.callerName = fullCallerName;
 
@@ -317,11 +317,11 @@ public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
     {
         try
         {
-            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
-            string fileName = $"realtime-{timestamp}.json";
-            string filePath = Path.Combine(_settings.LogOutputPath, fileName);
+            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var fileName = $"realtime-{timestamp}.json";
+            var filePath = Path.Combine(_settings.LogOutputPath, fileName);
 
-            string json = JsonConvert.SerializeObject(_realtimeLog, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(_realtimeLog, Formatting.Indented);
             File.WriteAllText(filePath, json);
 
             Debug.Log($"[PhotonTrafficLogger] Saved realtime log: {fileName} with {_realtimeLog.Count} entries");
@@ -355,11 +355,11 @@ public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
                 _accumulatedLog.Count
             );
 
-            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
-            string fileName = $"report-{timestamp}.json";
-            string filePath = Path.Combine(_settings.LogOutputPath, fileName);
+            var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var fileName = $"report-{timestamp}.json";
+            var filePath = Path.Combine(_settings.LogOutputPath, fileName);
 
-            string json = JsonConvert.SerializeObject(report, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(report, Formatting.Indented);
             File.WriteAllText(filePath, json);
 
             Debug.Log($"[PhotonTrafficLogger] Generated report: {fileName} with {_accumulatedLog.Count} entries");
@@ -378,17 +378,17 @@ public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
             return new TrafficStats(0, 0, 0, 0, 0, 0, 0);
         }
 
-        int totalMessages = dataList.Sum(x => x.totalMessageCount);
-        int totalBytes = dataList.Sum(x => x.totalPacketBytes);
-        int maxMessageSize = dataList.Max(x => x.longestMessageBytes);
-        int minMessageSize = dataList.Min(x => x.longestMessageBytes);
-        double averageMessageSize = totalMessages > 0 ? (double)totalBytes / totalMessages : 0;
+        var totalMessages = dataList.Sum(x => x.totalMessageCount);
+        var totalBytes = dataList.Sum(x => x.totalPacketBytes);
+        var maxMessageSize = dataList.Max(x => x.longestMessageBytes);
+        var minMessageSize = dataList.Min(x => x.longestMessageBytes);
+        var averageMessageSize = totalMessages > 0 ? (double)totalBytes / totalMessages : 0;
 
         var timeSpan = dataList.Last().timestamp - dataList.First().timestamp;
-        double seconds = timeSpan.TotalSeconds;
+        var seconds = timeSpan.TotalSeconds;
 
-        double averageMessagesPerSecond = seconds > 0 ? totalMessages / seconds : 0;
-        double averageBytesPerSecond = seconds > 0 ? totalBytes / seconds : 0;
+        var averageMessagesPerSecond = seconds > 0 ? totalMessages / seconds : 0;
+        var averageBytesPerSecond = seconds > 0 ? totalBytes / seconds : 0;
 
         return new TrafficStats(
             totalMessages,
@@ -406,13 +406,13 @@ public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
         try
         {
             var logFiles = Directory.GetFiles(_settings.LogOutputPath, "*.json")
-                .OrderBy(f => File.GetCreationTime(f))
+                .OrderBy(File.GetCreationTime)
                 .ToArray();
 
-            int filesToDelete = logFiles.Length - _settings.LogFileLimit;
+            var filesToDelete = logFiles.Length - _settings.LogFileLimit;
             if (filesToDelete > 0)
             {
-                for (int i = 0; i < filesToDelete; i++)
+                for (var i = 0; i < filesToDelete; i++)
                 {
                     File.Delete(logFiles[i]);
                 }
