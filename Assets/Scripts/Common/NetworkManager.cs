@@ -109,11 +109,5 @@ namespace September.Common
             await _networkRunner.UnloadScene("Field"); 
             await _networkRunner.LoadScene(_resultSceneName);
         }
-
-        public async UniTaskVoid RestartGame()
-        {
-            await _networkRunner.Shutdown();
-            SceneManager.LoadScene(0);
-        }
     }
 }
