@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Ingame.Tanihira
 {
@@ -9,6 +10,11 @@ namespace Ingame.Tanihira
             //目的地を設定
             if (_owner.Destination != null)
                 _owner.Agent.SetDestination(_owner.Destination.position);
+            
+            //agentが移動できるように設定
+            _owner.Agent.isStopped = false;
+            _owner.Agent.updatePosition = true;
+            _owner.Agent.updateRotation = true;
         }
 
         public override void OnExit()
@@ -18,9 +24,14 @@ namespace Ingame.Tanihira
 
         public override void OnUpdate()
         {
-            if (_owner.Destination == null || _owner.Agent.isOnNavMesh) return;
+            if (_owner.Destination == null || !_owner.Agent.isOnNavMesh) return;
 
-            _owner.Agent.SetDestination(_owner.Destination.position);
+            if (_owner.Destination.position != _owner.Agent.destination)
+            {
+                _owner.Agent.SetDestination(_owner.Destination.position);
+            }
+            
+            Debug.Log($"Speed: {_owner.Agent.speed}, Accel: {_owner.Agent.acceleration}");
         }
     }
 }

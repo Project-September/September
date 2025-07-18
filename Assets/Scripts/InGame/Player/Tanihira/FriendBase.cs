@@ -36,7 +36,7 @@ namespace Ingame.Tanihira
         [SerializeField] protected Animator _animator;
         [SerializeField] protected FriendStateMapping[] _friendStateMappings;
         [SerializeField] protected FriendState _initialState = FriendState.Idle;
-        [SerializeField, ReadOnly]protected Transform _destination;
+        [SerializeField] protected Transform _destination;
         private FormationManager _formationManager;
         
         protected NavMeshAgent _agent;
@@ -63,7 +63,7 @@ namespace Ingame.Tanihira
             {
                 Debug.LogError("NetworkRunnerがありません");
             }
-            if (!_networkRunner.IsServer) return;
+            //if (!_networkRunner.IsServer) return;
         }
         
         protected virtual void Start()
@@ -86,8 +86,14 @@ namespace Ingame.Tanihira
         /// </summary>
         protected virtual void InitializeStates()
         {
+            //アニメーションのルートモーションを不可
+            if (_animator)
+            {
+                _animator.applyRootMotion = false;
+            }
             _stateInstances = new FriendStateBase[System.Enum.GetValues(typeof(FriendState)).Length];
             
+            //ステート関連の初期化
             foreach (var mapping in _friendStateMappings)
             {
                 if (mapping.stateComponent == null)
@@ -105,9 +111,6 @@ namespace Ingame.Tanihira
                 }
                 
                 _stateInstances[index] = mapping.stateComponent;
-                
-                // 初期状態では全てのステートコンポーネントを無効化
-                mapping.stateComponent.enabled = false;
             }
         }
 
@@ -128,15 +131,13 @@ namespace Ingame.Tanihira
             if (_currentStateInstance != null)
             {
                 _currentStateInstance.OnExit();
-                _currentStateInstance.enabled = false;
             }
             
             // 新しいステートに変更
             _currentState = newState;
             _currentStateInstance = newStateComponent;
             
-            // 新しいステートのコンポーネントを有効化し、OnEnterを呼び出し
-            _currentStateInstance.enabled = true;
+            // 新しいステートのOnEnterを呼び出し
             _currentStateInstance.OnEnter();
         }
 
@@ -147,7 +148,13 @@ namespace Ingame.Tanihira
         {
             return _currentState;
         }
-        
+
+
+        [ContextMenu("ChangeDestination")]
+        public void ChangeDestination()
+        {
+            SetDestination(_destination);
+        }
         /// <summary>
         /// 目的地を変更する
         /// </summary>
