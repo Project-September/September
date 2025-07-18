@@ -10,23 +10,20 @@ namespace InGame.Interact
     [DisallowMultipleComponent]
     public class InteractableBase : NetworkBehaviour
     {
-        [SerializeField]
-        private SerializableDictionary<CharacterType, float> _requiredInteractTimeDictionary = new();
+        [SerializeField] private SerializableDictionary<CharacterType, float> _requiredInteractTimeDictionary = new();
 
-        [SerializeField]
-        private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
-        
-        [SerializeReference, SubclassSelector]
-        private List<CharacterInteractEffectBase> _characterEffects = new();
+        [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
+
+        [SerializeReference, SubclassSelector] private List<CharacterInteractEffectBase> _characterEffects = new();
 
 
-        [Networked]
-        public float LastInteractTime { get; set; } = -9999f;
-        
-        [Networked]
-        private float LastUsedCooldownTime { get; set; } = 0f;
+        [Networked] public float LastInteractTime { get; set; } = -9999f;
 
-        public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary => _requiredInteractTimeDictionary;
+        [Networked] private float LastUsedCooldownTime { get; set; } = 0f;
+
+        public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
+            _requiredInteractTimeDictionary;
+
         private CharacterInteractEffectBase _activeEffectBase;
 
         public void Interact(IInteractableContext context)
@@ -39,9 +36,13 @@ namespace InGame.Interact
                 Debug.Log($"[InteractableBase] OnValidateInteraction により拒否: {context.Interactor}");
                 return;
             }
+
             // クールダウン登録
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
+            
+            //All キャラタイプのクールダウン時間を優先して取得する
+            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
 
             // 実行
             OnInteract(context);
@@ -83,7 +84,7 @@ namespace InGame.Interact
 
             // All を優先し、特定キャラタイプの effect があれば上書きする
             var effect = _characterEffects
-                             .FirstOrDefault(e => e is { CharacterType: CharacterType.All }) 
+                             .FirstOrDefault(e => e is { CharacterType: CharacterType.All })
                          ?? _characterEffects.FirstOrDefault(e => e != null && e.CharacterType == charaType);
 
             if (effect != null)
@@ -97,7 +98,7 @@ namespace InGame.Interact
             }
         }
 
-        protected bool IsInCooldown()
+        public bool IsInCooldown()
         {
             var currentTime = Runner ? Runner.SimulationTime : Time.time;
             float timeSinceLast = currentTime - LastInteractTime;
@@ -154,15 +155,13 @@ namespace InGame.Interact
         public int Interactor { get; set; }
         public CharacterType CharacterType { get; set; }
     }
-    
+
     [Serializable]
     public class InteractEffectEntry
     {
         public CharacterType character;
 
-        [SerializeReference]
-        [SubclassSelector]
+        [SerializeReference] [SubclassSelector]
         public CharacterInteractEffectBase effect = new SimpleLogEffect();
     }
-
 }

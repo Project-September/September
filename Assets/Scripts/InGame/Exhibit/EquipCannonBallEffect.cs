@@ -11,9 +11,9 @@ namespace InGame.Exhibit
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            target.LastInteractTime = int.MaxValue; // リセット
+            target.LastInteractTime = int.MinValue; // リセット
             
-            _canonBallModel.Rpc_EquipToHand(context.Interactor);
+            _canonBallModel.EquipToInteractor(context.Interactor);
             _canonBallModel.OnCannonBallHit += (() => target.LastInteractTime = target.Runner.SimulationTime);
         }
         
