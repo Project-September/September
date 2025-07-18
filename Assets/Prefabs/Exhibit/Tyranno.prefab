@@ -6439,7 +6439,7 @@ Transform:
   m_GameObject: {fileID: 4591690568706846585}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 4.84, z: -3.07}
+  m_LocalPosition: {x: 0, y: 4.84, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8122,6 +8122,7 @@ GameObject:
   - component: {fileID: 8530606980210531306}
   - component: {fileID: 1586770802241551170}
   - component: {fileID: 7882330073764326687}
+  - component: {fileID: 6814084660203711119}
   m_Layer: 0
   m_Name: Tyranno
   m_TagString: Untagged
@@ -8192,7 +8193,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
@@ -8216,6 +8217,7 @@ MonoBehaviour:
   - {fileID: 5528080299047924652}
   - {fileID: 1586770802241551170}
   - {fileID: 7882330073764326687}
+  - {fileID: 6814084660203711119}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &5528080299047924652
 MonoBehaviour:
@@ -8303,16 +8305,17 @@ MonoBehaviour:
     keys: 030000000100000002000000
     values:
     - 1
-    - 5
+    - 1
     - 1
   _cooldownTimeDictionary:
     keys: 030000000100000002000000
     values:
     - 1
-    - 5
+    - 1
     - 1
   _characterEffects:
   - rid: 3872013951182831691
+  _LastInteractTime: -9999
   references:
     version: 2
     RefIds:
@@ -8323,12 +8326,20 @@ MonoBehaviour:
         _moveSpeed: 5
         _maxRotateValue: 500
         _moveVelocity: {x: 0, y: 0, z: 0}
-        _gravity: {x: 0, y: -20, z: 0}
+        _gravity: {x: 0, y: -50, z: 0}
         _groundNormal: {x: 0, y: 0, z: 0}
         _getOffPoint: {fileID: 2976718366034083368}
         _rayDirection: {x: 0, y: -1.5, z: 0}
         _rayDistance: 2
         _modelTransform: {fileID: 9115480591727808431}
+        _interactTime: 10
+        _points: []
+        _hitboxRadius: 0.2
+        _hitMask:
+          serializedVersion: 2
+          m_Bits: 0
+        _startFrame: 0
+        _endFrame: 34
 --- !u!114 &7882330073764326687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8344,9 +8355,22 @@ MonoBehaviour:
   Animator: {fileID: 1701702037370204521}
   ApplyTiming: 2
   SyncSettings: 79
-  StateHashes: 000000004eeb5158547a6bb24cf1e72e1eab980720e23b685928a8ce
-  TriggerHashes: 00000000
+  StateHashes: 000000004eeb5158547a6bb24cf1e72e1eab980720e23b685928a8ce0d286c404e865f43
+  TriggerHashes: 000000000d286c40
   TotalWords: 1
+--- !u!114 &6814084660203711119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6056286797189814286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8b4b7a1ddc847c4d953ffe5e06e9eb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 100
 --- !u!1 &6094436688019791440
 GameObject:
   m_ObjectHideFlags: 0
