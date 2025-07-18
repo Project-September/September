@@ -42,11 +42,7 @@ namespace InGame.Interact
             
             //All キャラタイプのクールダウン時間を優先して取得する
             LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
-                ? all
-                : _cooldownTimeDictionary.Dictionary.TryGetValue(charaType, out var specific)
-                    ? specific
-                    : 0f;
-
+                ? all : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
 
             // 実行
             OnInteract(context);
