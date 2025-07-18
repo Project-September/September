@@ -702,13 +702,37 @@ PrefabInstance:
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: managedReferences[3302172163222274142].Invoker
+      value: 
+      objectReference: {fileID: 677699897}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: managedReferences[3302172163222274142]._invoker
+      value: 
+      objectReference: {fileID: 677699897}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: managedReferences[3302172163222274142].EffectPos
+      value: 
+      objectReference: {fileID: 677699898}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: managedReferences[3302172163222274142].SoundName
+      value: Tutankhamun
+      objectReference: {fileID: 0}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
       propertyPath: managedReferences[3302172163222274142]._tutankhamenHead
       value: 
-      objectReference: {fileID: 7624085395205522358, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      objectReference: {fileID: 8639538251982876037, guid: 2644adf050ca8ae44bb76e4bbe841f87, type: 3}
     - target: {fileID: 5804073900053128395, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
       propertyPath: SortKey
       value: 3416732894
       objectReference: {fileID: 0}
+    - target: {fileID: 5804073900053128395, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5804073900053128395, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[1]'
+      value: 
+      objectReference: {fileID: 677699897}
     - target: {fileID: 8301522110719607552, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
       propertyPath: m_Name
       value: Tutankhamun
@@ -756,11 +780,38 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8301522110719607552, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 677699897}
   m_SourcePrefab: {fileID: 100100000, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
 --- !u!4 &677699895 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+  m_PrefabInstance: {fileID: 677699894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &677699896 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8301522110719607552, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+  m_PrefabInstance: {fileID: 677699894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &677699897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677699896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28de2b592c84f04a526c806d45b59b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tutankhamenHead: {fileID: 7704894711281665644, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+  _maskDuration: 5
+--- !u!1 &677699898 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1814807729897626833, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
   m_PrefabInstance: {fileID: 677699894}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &740668966
