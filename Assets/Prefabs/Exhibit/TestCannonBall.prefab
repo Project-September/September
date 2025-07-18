@@ -181,11 +181,11 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 04000000
     values:
-    - 0
+    - 5
   _cooldownTimeDictionary:
     keys: 04000000
     values:
-    - 0
+    - 60
   _characterEffects:
   - rid: 5083283266887483664
   _LastInteractTime: -9999
@@ -212,10 +212,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _model: {fileID: 4840829209715252854}
   _rigidbody: {fileID: 4885728260643230006}
-  _power: 3
+  _networkObject: {fileID: 5978312770890431326}
+  _networkRigidbody3D: {fileID: 4192184776908821714}
+  _power: 10
   _upwardForce: 1
   _damageAmount: 10
-  _startPosition: {x: 0, y: 0, z: 0}
+  _startPosition: {x: 0, y: -9.527, z: 19.326}
+  _maxFlightTime: 3
+  _isLaunching: 0
+  _launchElapsedTime: 0
 --- !u!54 &4885728260643230006
 Rigidbody:
   m_ObjectHideFlags: 0
