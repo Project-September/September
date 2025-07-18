@@ -80,7 +80,6 @@ namespace InGame.Interact
         protected virtual void OnInteract(IInteractableContext context)
         {
             var charaType = context.CharacterType;
-
             // All を優先し、特定キャラタイプの effect があれば上書きする
             var effect = _characterEffects
                              .FirstOrDefault(e => e is { CharacterType: CharacterType.All }) 
@@ -142,7 +141,7 @@ namespace InGame.Interact
         }
     }
 
-    public interface IInteractableContext
+    public interface IInteractableContext : INetworkStruct
     {
         int Interactor { get; }
         CharacterType CharacterType { get; set; }
