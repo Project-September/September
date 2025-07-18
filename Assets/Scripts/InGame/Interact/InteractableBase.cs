@@ -98,12 +98,10 @@ namespace InGame.Interact
             }
         }
 
-        protected bool IsInCooldown()
+        public bool IsInCooldown()
         {
             var currentTime = Runner ? Runner.SimulationTime : Time.time;
             float timeSinceLast = currentTime - LastInteractTime;
-            Debug.Log(
-                $"クールタイムチェック: 現在時間 {currentTime}, 最後のインタラクト時間 {LastInteractTime}, 経過時間 {timeSinceLast} クールタイム時間 {LastUsedCooldownTime}　インタラクト可能か: {timeSinceLast > LastUsedCooldownTime}");
             return timeSinceLast < LastUsedCooldownTime;
         }
 

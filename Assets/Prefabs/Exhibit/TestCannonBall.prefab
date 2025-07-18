@@ -185,7 +185,7 @@ MonoBehaviour:
   _cooldownTimeDictionary:
     keys: 04000000
     values:
-    - 60
+    - 10
   _characterEffects:
   - rid: 5083283266887483664
   _LastInteractTime: -9999
@@ -214,6 +214,7 @@ MonoBehaviour:
   _rigidbody: {fileID: 4885728260643230006}
   _networkObject: {fileID: 5978312770890431326}
   _networkRigidbody3D: {fileID: 4192184776908821714}
+  _interactableBase: {fileID: 782028490540396198}
   _power: 10
   _upwardForce: 1
   _damageAmount: 10

@@ -4,8 +4,10 @@ using System.Linq;
 using Fusion;
 using Fusion.Addons.Physics;
 using InGame.Health;
+using InGame.Interact;
 using InGame.Player;
 using September.Common;
+using UniRx;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -17,6 +19,8 @@ namespace InGame.Exhibit
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private NetworkObject _networkObject;
         [SerializeField] private NetworkRigidbody3D _networkRigidbody3D;
+        [SerializeField] private InteractableBase _interactableBase;
+
         [Header("設定")]
         [SerializeField] private float _power = 10f;
         [SerializeField] private float _upwardForce = 5f;
@@ -30,13 +34,21 @@ namespace InGame.Exhibit
         private int _equippedInteractor;
         private MeleeHitboxExecutor _meleeHitboxExecutor;
 
-
         public event Action OnCannonBallHit;
 
         public override void Spawned()
         {
             _networkRigidbody3D.RBIsKinematic = true;
             _meleeHitboxExecutor = new MeleeHitboxExecutor(new List<Transform>() { _model.transform }, hitboxRadius: _model.transform.localScale.x * 0.5f);
+
+            Observable.EveryUpdate()
+                .Select(_ => _interactableBase.IsInCooldown())
+                .DistinctUntilChanged()
+                .Subscribe(inCoolDown =>
+                {
+                    Debug.Log("クールダウン状態: " + inCoolDown);
+                    Rpc_SetCannonBallVisible(!inCoolDown); // クールダウン中は非表示
+                }).AddTo(this);
             
             _meleeHitboxExecutor.OnHit += hit =>
             {
@@ -105,7 +117,7 @@ namespace InGame.Exhibit
 
         private void Update()
         {
-            //Debug.Log($"is Kinematic{_rigidbody.isKinematic} 速度{_rigidbody.linearVelocity}");
+            
             if (Runner?.IsServer == false) return;
             
             if (_isLaunching && HasStateAuthority)
@@ -166,7 +178,7 @@ namespace InGame.Exhibit
         {
             if (_model != null)
             {
-                //_model.SetActive(isVisible);
+                _model.SetActive(isVisible);
             }
         }
     }
