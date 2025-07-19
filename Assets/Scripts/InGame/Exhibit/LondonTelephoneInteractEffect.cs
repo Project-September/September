@@ -1,6 +1,5 @@
 using Fusion;
 using InGame.Interact;
-using UnityEngine;
 
 namespace InGame.Exhibit
 {
@@ -11,8 +10,6 @@ namespace InGame.Exhibit
         
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            //var player = PlayerRef.FromEncoded(context.Interactor);
-            //Debug.Log(player);
             LondonTelephoneInteractRPC.RpcRequestInteraction(PlayerRef.FromEncoded(context.Interactor));
         }
 
