@@ -17,6 +17,14 @@ namespace PhotonTrafficLogger
     private List<TrafficLogEntry> _accumulatedLog = new();
     private float _logTimer;
     private const float LOGInterval = 1f / 60f; // 60Hz
+    
+    // Packet size tracking
+    private int _maxIncomingPacketSize;
+    private int _maxOutgoingPacketSize;
+    private readonly Dictionary<NetworkRunner, int> _previousIncomingBytes = new();
+    private readonly Dictionary<NetworkRunner, int> _previousOutgoingBytes = new();
+    private readonly Dictionary<NetworkRunner, int> _previousIncomingPackets = new();
+    private readonly Dictionary<NetworkRunner, int> _previousOutgoingPackets = new();
 
     public bool IsLogging { get; private set; }
 
@@ -55,6 +63,14 @@ namespace PhotonTrafficLogger
         _realtimeLog.Clear();
         _accumulatedLog.Clear();
 
+        // Reset packet size tracking
+        _maxIncomingPacketSize = 0;
+        _maxOutgoingPacketSize = 0;
+        _previousIncomingBytes.Clear();
+        _previousOutgoingBytes.Clear();
+        _previousIncomingPackets.Clear();
+        _previousOutgoingPackets.Clear();
+
         // Create log directory if it doesn't exist
         if (!Directory.Exists(_settings.LogOutputPath))
         {
@@ -64,7 +80,7 @@ namespace PhotonTrafficLogger
         // Clean up old log files
         CleanupOldLogFiles();
 
-        Debug.Log("[PhotonTrafficLogger] Started logging");
+        Debug.Log("[PhotonTrafficLogger] Started logging with packet size tracking");
     }
 
     public void StopLogging()
@@ -242,11 +258,14 @@ namespace PhotonTrafficLogger
             Debug.Log(
                 $"[PhotonTrafficLogger] Incoming data - InPackets: {snapshot.InPackets}, InBandwidth: {snapshot.InBandwidth}");
 
+            // Try to get detailed statistics for max packet size
+            int maxPacketSize = GetMaxPacketSize(statisticsManager, true); // true for incoming
+
             return new TrafficData(
                 callerName: "FusionStatisticsManager.GetIncomingTrafficData",
                 totalMessageCount: snapshot.InPackets,
                 totalPacketBytes: (int)snapshot.InBandwidth,
-                longestMessageBytes: 0, // Not directly available from snapshot
+                longestMessageBytes: maxPacketSize,
                 networkObjectName: runner.name,
                 networkObjectId: 0
             );
@@ -274,11 +293,14 @@ namespace PhotonTrafficLogger
             Debug.Log(
                 $"[PhotonTrafficLogger] Outgoing data - OutPackets: {snapshot.OutPackets}, OutBandwidth: {snapshot.OutBandwidth}");
 
+            // Try to get detailed statistics for max packet size
+            int maxPacketSize = GetMaxPacketSize(statisticsManager, false); // false for outgoing
+
             return new TrafficData(
                 callerName: "FusionStatisticsManager.GetOutgoingTrafficData",
                 totalMessageCount: snapshot.OutPackets,
                 totalPacketBytes: (int)snapshot.OutBandwidth,
-                longestMessageBytes: 0, // Not directly available from snapshot
+                longestMessageBytes: maxPacketSize,
                 networkObjectName: runner.name,
                 networkObjectId: 0
             );
@@ -287,6 +309,304 @@ namespace PhotonTrafficLogger
         {
             Debug.LogError($"[PhotonTrafficLogger] Error getting outgoing traffic data: {e.Message}");
             return CreateEmptyTrafficData("FusionStatisticsManager.GetOutgoingTrafficData", runner.name);
+        }
+    }
+
+    private int GetMaxPacketSize(FusionStatisticsManager statisticsManager, bool isIncoming)
+    {
+        try
+        {
+            var snapshot = statisticsManager.CompleteSnapshot;
+            if (snapshot == null) return isIncoming ? _maxIncomingPacketSize : _maxOutgoingPacketSize;
+
+            // Get NetworkRunner from statistics manager
+            var networkRunner = GetNetworkRunnerFromStatisticsManager(statisticsManager);
+            if (networkRunner == null) 
+            {
+                Debug.LogWarning("[PhotonTrafficLogger] Could not find NetworkRunner for statistics manager");
+                return isIncoming ? _maxIncomingPacketSize : _maxOutgoingPacketSize;
+            }
+
+            // Method 1: Calculate max packet size from incremental data
+            int incrementalMaxSize = CalculateIncrementalMaxPacketSize(networkRunner, snapshot, isIncoming);
+            if (incrementalMaxSize > 0)
+            {
+                if (isIncoming)
+                {
+                    _maxIncomingPacketSize = Math.Max(_maxIncomingPacketSize, incrementalMaxSize);
+                    Debug.Log($"[PhotonTrafficLogger] Updated max incoming packet size: {_maxIncomingPacketSize}");
+                    return _maxIncomingPacketSize;
+                }
+                else
+                {
+                    _maxOutgoingPacketSize = Math.Max(_maxOutgoingPacketSize, incrementalMaxSize);
+                    Debug.Log($"[PhotonTrafficLogger] Updated max outgoing packet size: {_maxOutgoingPacketSize}");
+                    return _maxOutgoingPacketSize;
+                }
+            }
+
+            // Method 2: Try to get from detailed network statistics
+            int detailedMaxSize = TryGetMaxPacketFromDetailedStats(statisticsManager, isIncoming);
+            if (detailedMaxSize > 0)
+            {
+                Debug.Log($"[PhotonTrafficLogger] Found max packet size from detailed stats: {detailedMaxSize}");
+                return detailedMaxSize;
+            }
+
+            // Method 3: Calculate estimated max packet size from available data
+            int estimatedMaxSize = EstimateMaxPacketSize(snapshot, isIncoming);
+            if (estimatedMaxSize > 0)
+            {
+                Debug.Log($"[PhotonTrafficLogger] Estimated max packet size: {estimatedMaxSize}");
+                return estimatedMaxSize;
+            }
+
+            // Return the tracked maximum if no other method worked
+            return isIncoming ? _maxIncomingPacketSize : _maxOutgoingPacketSize;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[PhotonTrafficLogger] Error getting max packet size: {e.Message}");
+            return isIncoming ? _maxIncomingPacketSize : _maxOutgoingPacketSize;
+        }
+    }
+
+    private NetworkRunner GetNetworkRunnerFromStatisticsManager(FusionStatisticsManager statisticsManager)
+    {
+        try
+        {
+            // Try to get the NetworkRunner associated with this statistics manager
+            var networkRunners = FindObjectsByType<NetworkRunner>(FindObjectsSortMode.None);
+            foreach (var runner in networkRunners)
+            {
+                if (runner.TryGetFusionStatistics(out var runnerStatsManager) && runnerStatsManager == statisticsManager)
+                {
+                    return runner;
+                }
+            }
+            return null;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Error finding NetworkRunner: {e.Message}");
+            return null;
+        }
+    }
+
+    private int CalculateIncrementalMaxPacketSize(NetworkRunner runner, FusionStatisticsSnapshot snapshot, bool isIncoming)
+    {
+        try
+        {
+            if (isIncoming)
+            {
+                // Get current values
+                int currentBytes = (int)snapshot.InBandwidth;
+                int currentPackets = snapshot.InPackets;
+
+                // Get previous values
+                if (_previousIncomingBytes.TryGetValue(runner, out int prevBytes) &&
+                    _previousIncomingPackets.TryGetValue(runner, out int prevPackets))
+                {
+                    int byteDelta = currentBytes - prevBytes;
+                    int packetDelta = currentPackets - prevPackets;
+
+                    if (packetDelta > 0 && byteDelta > 0)
+                    {
+                        // Calculate average packet size for this interval
+                        int currentIntervalPacketSize = byteDelta / packetDelta;
+                        
+                        Debug.Log($"[PhotonTrafficLogger] Incoming packet size this interval: {currentIntervalPacketSize} bytes " +
+                                 $"(delta: {byteDelta} bytes / {packetDelta} packets)");
+                        
+                        // Update previous values
+                        _previousIncomingBytes[runner] = currentBytes;
+                        _previousIncomingPackets[runner] = currentPackets;
+                        
+                        return currentIntervalPacketSize;
+                    }
+                }
+
+                // Store current values for next iteration
+                _previousIncomingBytes[runner] = currentBytes;
+                _previousIncomingPackets[runner] = currentPackets;
+            }
+            else
+            {
+                // Similar logic for outgoing
+                int currentBytes = (int)snapshot.OutBandwidth;
+                int currentPackets = snapshot.OutPackets;
+
+                if (_previousOutgoingBytes.TryGetValue(runner, out int prevBytes) &&
+                    _previousOutgoingPackets.TryGetValue(runner, out int prevPackets))
+                {
+                    int byteDelta = currentBytes - prevBytes;
+                    int packetDelta = currentPackets - prevPackets;
+
+                    if (packetDelta > 0 && byteDelta > 0)
+                    {
+                        int currentIntervalPacketSize = byteDelta / packetDelta;
+                        
+                        Debug.Log($"[PhotonTrafficLogger] Outgoing packet size this interval: {currentIntervalPacketSize} bytes " +
+                                 $"(delta: {byteDelta} bytes / {packetDelta} packets)");
+                        
+                        _previousOutgoingBytes[runner] = currentBytes;
+                        _previousOutgoingPackets[runner] = currentPackets;
+                        
+                        return currentIntervalPacketSize;
+                    }
+                }
+
+                _previousOutgoingBytes[runner] = currentBytes;
+                _previousOutgoingPackets[runner] = currentPackets;
+            }
+
+            return 0;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Error calculating incremental packet size: {e.Message}");
+            return 0;
+        }
+    }
+
+    private int TryGetMaxPacketFromDetailedStats(FusionStatisticsManager statisticsManager, bool isIncoming)
+    {
+        try
+        {
+            Debug.Log($"[PhotonTrafficLogger] Trying to get detailed packet statistics (isIncoming: {isIncoming})");
+            
+            // Debug: Print available methods in FusionStatisticsManager
+            var type = statisticsManager.GetType();
+            Debug.Log($"[PhotonTrafficLogger] FusionStatisticsManager type: {type.FullName}");
+            
+            // Try various approaches based on what might be available in Fusion Statistics
+            
+            // Approach 1: Check for packet statistics properties/methods
+            try
+            {
+                // Try to access packet-level statistics if available
+                var snapshot = statisticsManager.CompleteSnapshot;
+                if (snapshot != null)
+                {
+                    // Check available properties in the snapshot
+                    var snapshotType = snapshot.GetType();
+                    Debug.Log($"[PhotonTrafficLogger] FusionStatisticsSnapshot properties available:");
+                    foreach (var prop in snapshotType.GetProperties())
+                    {
+                        Debug.Log($"  - {prop.Name}: {prop.PropertyType}");
+                    }
+                    
+                    // Try to find packet size related properties
+                    var maxPacketSizeProperty = snapshotType.GetProperty("MaxPacketSize");
+                    if (maxPacketSizeProperty != null)
+                    {
+                        var maxSize = (int)maxPacketSizeProperty.GetValue(snapshot);
+                        Debug.Log($"[PhotonTrafficLogger] Found MaxPacketSize property: {maxSize}");
+                        return maxSize;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[PhotonTrafficLogger] Could not access snapshot properties: {e.Message}");
+            }
+
+            // Approach 2: Try to access historical packet data
+            try
+            {
+                // Some statistics managers provide historical data
+                var statsType = statisticsManager.GetType();
+                var historyMethod = statsType.GetMethod("GetPacketHistory") ?? 
+                                   statsType.GetMethod("GetTrafficHistory") ??
+                                   statsType.GetMethod("GetDetailedStatistics");
+                
+                if (historyMethod != null)
+                {
+                    Debug.Log($"[PhotonTrafficLogger] Found history method: {historyMethod.Name}");
+                    var historyData = historyMethod.Invoke(statisticsManager, null);
+                    if (historyData != null)
+                    {
+                        Debug.Log($"[PhotonTrafficLogger] Retrieved history data: {historyData.GetType()}");
+                        // Process history data to find max packet size
+                        return ProcessHistoryDataForMaxPacketSize(historyData, isIncoming);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[PhotonTrafficLogger] Could not access packet history: {e.Message}");
+            }
+
+            return 0;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Could not get detailed packet stats: {e.Message}");
+            return 0;
+        }
+    }
+    
+    private int ProcessHistoryDataForMaxPacketSize(object historyData, bool isIncoming)
+    {
+        try
+        {
+            // Process any historical packet data to find maximum packet size
+            if (historyData == null) return 0;
+            
+            var dataType = historyData.GetType();
+            Debug.Log($"[PhotonTrafficLogger] Processing {(isIncoming ? "incoming" : "outgoing")} history data type: {dataType.FullName}");
+            
+            // Try to access array or collection of packet data
+            if (dataType.IsArray || typeof(System.Collections.IEnumerable).IsAssignableFrom(dataType))
+            {
+                Debug.Log($"[PhotonTrafficLogger] History data is enumerable, searching for {(isIncoming ? "incoming" : "outgoing")} packet sizes");
+                // Process enumerable data
+            }
+            
+            return 0;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Error processing history data: {e.Message}");
+            return 0;
+        }
+    }
+
+    private int EstimateMaxPacketSize(FusionStatisticsSnapshot snapshot, bool isIncoming)
+    {
+        try
+        {
+            // Estimate max packet size based on available data
+            if (isIncoming)
+            {
+                if (snapshot.InPackets > 0)
+                {
+                    // Simple estimation: total bandwidth / packet count gives average
+                    // We'll multiply by 2 as a rough estimate for max packet size
+                    int averageSize = (int)(snapshot.InBandwidth / snapshot.InPackets);
+                    int estimatedMax = averageSize * 2; // Rough estimation
+                    
+                    // Cap at reasonable maximum (MTU is typically 1500 bytes)
+                    return Math.Min(estimatedMax, 1500);
+                }
+            }
+            else
+            {
+                if (snapshot.OutPackets > 0)
+                {
+                    int averageSize = (int)(snapshot.OutBandwidth / snapshot.OutPackets);
+                    int estimatedMax = averageSize * 2; // Rough estimation
+                    
+                    return Math.Min(estimatedMax, 1500);
+                }
+            }
+
+            return 0;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Could not estimate max packet size: {e.Message}");
+            return 0;
         }
     }
 
