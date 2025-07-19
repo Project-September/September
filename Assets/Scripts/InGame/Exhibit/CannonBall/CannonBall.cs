@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cinemachine;
 using Fusion;
 using Fusion.Addons.Physics;
 using InGame.Health;
@@ -41,19 +42,22 @@ namespace InGame.Exhibit
         [SerializeField] private int _damageAmount = 10;
         [SerializeField] private Vector3 _startPosition;
         [SerializeField] private float _maxFlightTime = 3f;
+        [SerializeField] private float _explosionRadius = 5f;
 
         [Header("デバッグ")]
         [SerializeField] private float _launchElapsedTime;
         [SerializeField] private bool _isAiming;
+        private MeleeHitboxExecutor _flyingHitBoxExecutor;
+        private MeleeHitboxExecutor _explodeHitBoxExecutor;
         private Transform _currentOwnerTransform;     // 投げ方向用
         private Transform _followTargetTransform;     // 見た目追従用
-        private bool _shouldFollow = false;
         private int _equippedInteractor;
-        private MeleeHitboxExecutor _meleeHitboxExecutor;
+        private bool _shouldFollow;
         [Networked] private CannonBallState State { get; set; }
         [SerializeField] CannonBallState DebugState;
         private EffectSpawner EffectSpawner => StaticServiceLocator.Instance.Get<EffectSpawner>();
         public event Action OnCannonBallHit;
+        
         public override void Spawned() => InitializeCannonBall();
         private void Update()
         {
@@ -61,8 +65,21 @@ namespace InGame.Exhibit
             CheckHit();
         }
 
-        public override void FixedUpdateNetwork() => GetFireInput();
-        
+        public override void FixedUpdateNetwork()
+        {
+            GetFireInput();
+            // if (GetInput(out PlayerInput input) && input.Buttons.IsSet(PlayerButtons.Aim))
+            // {
+            //     _isAiming = true;
+            //     //FOVを上げる
+            //     
+            // }
+            // else
+            // {
+            //     _isAiming = false;
+            // }
+        }
+
         private void LateUpdate()
         {
             ShowTrajectory();
@@ -85,7 +102,6 @@ namespace InGame.Exhibit
         private void InitializeCannonBall()
         {
             _networkRigidbody3D.RBIsKinematic = true;
-            _meleeHitboxExecutor = new MeleeHitboxExecutor(new List<Transform>() { _model.transform }, hitboxRadius: _model.transform.localScale.x * 0.5f);
 
             Observable.EveryUpdate()
                 .Select(_ => _interactableBase.IsInCooldown())
@@ -95,17 +111,36 @@ namespace InGame.Exhibit
                     State = inCoolDown ? CannonBallState.Resetting : CannonBallState.Idle;
                 }).AddTo(this);
 
+            _flyingHitBoxExecutor = new MeleeHitboxExecutor(new List<Transform>() { _model.transform }, hitboxRadius: _model.transform.localScale.x * 0.5f);
+            _flyingHitBoxExecutor.OnHit += OnHitSomething;
+            _explodeHitBoxExecutor = new MeleeHitboxExecutor(new List<Transform>() { transform }, hitboxRadius: _explosionRadius);
+            _explodeHitBoxExecutor.OnHit += OnExplodeHit;
+            
             State = CannonBallState.Idle;
-            _meleeHitboxExecutor.OnHit += OnHitSomething;
         }
 
         private void OnHitSomething(Collider hit)
         {
             //とんでいないとき、弾の見た目のコリジョンに当たった時、投げた人自身にあたったときはそのまま
-            if (State != CannonBallState.Launched || hit.gameObject == _model ||
+            if (State != CannonBallState.Launched || State == CannonBallState.Resetting || hit.gameObject == _model ||
                 hit.gameObject.GetComponentInParent<NetworkObject>()?.InputAuthority ==
                 _networkObject.InputAuthority) return;
-            
+
+            Debug.Log($"{transform.position} で爆発しました。");
+            EffectSpawner.RequestPlayOneShotEffect(EffectType.Explosion, transform.position, Quaternion.identity);
+            _flyingHitBoxExecutor.ExecuteHitCheck();
+            ResetCannonBall();
+            OnCannonBallHit?.Invoke();
+        }
+        
+        private void OnExplodeHit(Collider hit)
+        {
+            Debug.Log($"[CannonBall] {hit.gameObject.name} に当たりました。");
+            //とんでいないとき、弾の見た目のコリジョンに当たった時、投げた人自身にあたったときはそのまま
+            if (State != CannonBallState.Launched || State == CannonBallState.Resetting || hit.gameObject == _model ||
+                hit.gameObject.GetComponentInParent<NetworkObject>()?.InputAuthority ==
+                _networkObject.InputAuthority) return;
+
             //それ以外の何かに当たればぶつかった時の処理を行う。Damagableならダメージを与える
             if (hit.TryGetComponent<IDamageable>(out var damageable) &&
                 damageable.OwnerPlayerRef != PlayerRef.FromEncoded(_equippedInteractor))
@@ -114,11 +149,6 @@ namespace InGame.Exhibit
                     PlayerRef.FromEncoded(_equippedInteractor), damageable.OwnerPlayerRef);
                 damageable.TakeHit(ref hitData);
             }
-
-            Debug.Log($"{hit.gameObject.name} にヒット");
-            EffectSpawner.RequestPlayOneShotEffect(EffectType.Explosion, transform.position, Quaternion.identity);
-            ResetCannonBall();
-            OnCannonBallHit?.Invoke();
         }
 
         /// <summary>
@@ -158,7 +188,7 @@ namespace InGame.Exhibit
         private void CheckHit()
         {
             if (!HasStateAuthority || State != CannonBallState.Launched) return;
-            _meleeHitboxExecutor.Tick(Time.deltaTime);
+            _flyingHitBoxExecutor.Tick(Time.deltaTime);
 
             _launchElapsedTime += Time.deltaTime;
             if (_launchElapsedTime < _maxFlightTime) return;    // 飛行時間が最大を超えたらリセット
@@ -193,7 +223,7 @@ namespace InGame.Exhibit
             _networkRigidbody3D.RBIsKinematic = true;
             _networkRigidbody3D.Teleport(_startPosition);
 
-            _meleeHitboxExecutor.Init();
+            _flyingHitBoxExecutor.Init();
             State = CannonBallState.Resetting;
             _launchElapsedTime = 0f;
             _networkObject.RemoveInputAuthority();

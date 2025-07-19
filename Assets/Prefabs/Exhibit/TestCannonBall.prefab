@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6828188695797375861}
   - component: {fileID: 5889518820366247045}
+  - component: {fileID: 6249870148537539348}
   m_Layer: 0
   m_Name: Line
   m_TagString: Untagged
@@ -139,6 +140,21 @@ LineRenderer:
   m_UseWorldSpace: 0
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &6249870148537539348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3674208351796653040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c5571c07b1e87145aa2bcf2dcf63758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lineRenderer: {fileID: 5889518820366247045}
+  _segmentCount: 30
+  _timeStep: 0.1
 --- !u!1 &4840829209715252854
 GameObject:
   m_ObjectHideFlags: 0
@@ -357,17 +373,16 @@ MonoBehaviour:
   _networkRigidbody3D: {fileID: 4192184776908821714}
   _interactableBase: {fileID: 782028490540396198}
   _modelCollider: {fileID: 3260869786553538935}
+  _trajectoryVisualizer: {fileID: 0}
   _power: 10
   _upwardForce: 1
   _damageAmount: 10
   _startPosition: {x: 0, y: -9.527, z: 19.326}
   _maxFlightTime: 3
-  _lineRenderer: {fileID: 5889518820366247045}
-  _segmentCount: 30
-  _timeStep: 0.1
+  _explosionRadius: 213.68
   _launchElapsedTime: 0
-  _state: 0
   _isAiming: 0
+  DebugState: 0
 --- !u!54 &4885728260643230006
 Rigidbody:
   m_ObjectHideFlags: 0

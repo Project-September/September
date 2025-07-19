@@ -47,8 +47,8 @@ public class MeleeHitboxExecutor : IHitboxExecutor
             ExecuteHitCheck();
         }
     }
-
-    private void ExecuteHitCheck()
+    
+    public void ExecuteHitCheck()
     {
         if (_points.Count == 1)
         {
