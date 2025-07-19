@@ -34,6 +34,7 @@ namespace InGame.Player
             
             _cts = new CancellationTokenSource();
             _renderer = GetComponentInChildren<Renderer>();
+            _status = GetComponent<PlayerStatus>();
             _materialPropertyBlock = new MaterialPropertyBlock();
         }
 
