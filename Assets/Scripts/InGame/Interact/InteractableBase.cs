@@ -21,7 +21,7 @@ namespace InGame.Interact
 
         [Networked] private float LastUsedCooldownTime { get; set; } = 0f;
         
-        [Networked] private bool IsInteractable { get; set; } = true;
+        [Networked] public bool IsInteractable { get; set; } = true;
 
         public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
             _requiredInteractTimeDictionary;
