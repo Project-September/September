@@ -4,14 +4,19 @@ using UnityEngine;
 
 namespace Ingame.Tanihira
 {
-    [CreateAssetMenu(fileName = "FriendzStatus", menuName = "ScriptableObjects/FriendDatabase")]
+    [CreateAssetMenu(fileName = "FriendStatus", menuName = "ScriptableObjects/FriendStatus")]
     public class FriendStatus : ScriptableObject
     {
-        [Serializable]
-        public struct FriendData
-        {
-            public FriendType _type;
-            public GameObject _friendPrefab;
-        }
+        [SerializeField] private float _friendRotateSpeed;
+        [SerializeField] private float _friendMoveSpeed;
+        [SerializeField] private float _friendFormationMoveSpeed = 3.5f;
+        [SerializeField] private float _friendChaseSpeed;
+        [SerializeField] private float _attackPower;
+
+        public float FriendRotateSpeed => _friendRotateSpeed;
+        public float FriendMoveSpeed => _friendMoveSpeed;
+        public float FriendFormationSpeed => _friendFormationMoveSpeed;
+        public float FriendChaseSpeed => _friendChaseSpeed;
+        public float AttackPower => _attackPower;
     }
 }

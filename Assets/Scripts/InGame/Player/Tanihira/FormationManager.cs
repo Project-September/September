@@ -7,9 +7,7 @@ namespace Ingame.Tanihira
     public class FormationManager : MonoBehaviour
     {
         [SerializeField] private Transform _firstFormationTransform;
-        [SerializeField] private float _offsetZ;
         private List<FriendBase> _friendsList = new List<FriendBase>();
-        private List<Transform> _friendsDestinationList = new List<Transform>();
 
         private void Start()
         {
@@ -22,32 +20,16 @@ namespace Ingame.Tanihira
         /// </summary>
         /// <param name="friend"></param>
         public Transform Register(FriendBase friend)
-        {
-            _friendsList.Add(friend);
-            Transform newDestination;
-            
-            //先頭に登録された位置を返す
-            if (_friendsDestinationList.Count == 0)
+        {   
+            //先頭の位置を返す
+            if (_friendsList.Count == 0)
             {
-                _friendsDestinationList.Add(_firstFormationTransform);
+                _friendsList.Add(friend);
                 return _firstFormationTransform;
             }
-            else
+            else //最後尾のオブジェクトのTransformを返す
             {
-                //隊列の最後尾を取得
-                var lastPos = _friendsDestinationList.Last();
-                //オフセットを付けた位置
-                Vector3 offset = new Vector3(0, 0, -_offsetZ);
-                //新しいTransformを生成
-                GameObject destinationObj = new GameObject("Friend Destination");
-                newDestination = destinationObj.transform;
-                //同じ親に設定
-                destinationObj.transform.SetParent(_firstFormationTransform.parent);
-                //ローカル座標と配置
-                newDestination.position = lastPos.position + offset;
-                newDestination.position = _firstFormationTransform.position;
-                //リストに追加
-                _friendsDestinationList.Add(newDestination);
+                Transform newDestination = _friendsList.Last().gameObject.transform;
                 return newDestination;
             }
         }
@@ -62,11 +44,41 @@ namespace Ingame.Tanihira
             if (index >= 0)
             {
                 _friendsList.RemoveAt(index);
-                //対応するTransformも削除
-                if (index < _friendsDestinationList.Count && _friendsDestinationList[index] != _firstFormationTransform)
+                SortFormation();
+            }
+        }
+
+        /// <summary>
+        /// 先頭の友達を返すメソッド
+        /// </summary>
+        public FriendBase GetFirstFriend()
+        {
+            if( _friendsList.Count > 0)
+            {
+                return _friendsList.First();
+            }
+            
+            return null;
+        }
+
+        //隊列の整理をする
+
+        private void SortFormation()
+        {
+            if(_friendsList.Count > 0)
+            {
+                for(int i = 0; i < _friendsList.Count; i++)
                 {
-                    Destroy(_friendsDestinationList[index].gameObject);
-                    _friendsDestinationList.RemoveAt(index);
+                    FriendBase friend = _friendsList[i];
+
+                    if (i == 0) //先頭の場合
+                    {
+                        friend.SetDestination(_firstFormationTransform);
+                    }
+                    else
+                    {
+                        friend.SetDestination(_friendsList[i - 1].gameObject.transform);
+                    }
                 }
             }
         }

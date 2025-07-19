@@ -33,15 +33,15 @@ namespace Ingame.Tanihira
     /// </summary>
     public class FriendBase : NetworkBehaviour
     {
+        private FormationManager _formationManager;
+
         [SerializeField] protected Animator _animator;
         [SerializeField] protected FriendStateMapping[] _friendStateMappings;
         [SerializeField] protected FriendState _initialState = FriendState.Idle;
         [SerializeField] protected Transform _destination;
-        private FormationManager _formationManager;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
-        
         protected GameObject _ownerPlayer;
         
         //ステートマシン関連
@@ -63,7 +63,7 @@ namespace Ingame.Tanihira
             {
                 Debug.LogError("NetworkRunnerがありません");
             }
-            //if (!_networkRunner.IsServer) return;
+            if (!_networkRunner.IsServer) return;
         }
         
         protected virtual void Start()
