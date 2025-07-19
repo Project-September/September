@@ -20,6 +20,8 @@ namespace InGame.Interact
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
         [Networked] private float LastUsedCooldownTime { get; set; } = 0f;
+        
+        [Networked] private bool IsInteractable { get; set; } = true;
 
         public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
             _requiredInteractTimeDictionary;
@@ -55,18 +57,12 @@ namespace InGame.Interact
         public bool ValidateInteraction(IInteractableContext context)
         {
             var type = context.CharacterType;
-            if (IsInCooldown())
+            if (IsInCooldown() || !Object.isActiveAndEnabled || !IsInteractable || !OnValidateInteraction(context, type))
             {
                 return false;
             }
 
-            if (!Object.isActiveAndEnabled)
-            {
-                Debug.Log($"[InteractableBase] オブジェクトが非アクティブです: {context.Interactor}");
-                return false;
-            }
-
-            return OnValidateInteraction(context, type);
+            return true;
         }
 
         /// <summary>
