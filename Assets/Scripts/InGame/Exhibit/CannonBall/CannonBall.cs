@@ -122,16 +122,8 @@ namespace InGame.Exhibit
             State = CannonBallState.Idle;
         }
 
-        int counter = 0;
         private void OnHitSomething(Collider hit)
         {
-            if (counter == 2)
-            {
-                Debug.Log("<UNK>");
-            }
-            // デバッグ用にカウンターを表示
-            counter++;
-            
             //とんでいないとき、弾の見た目のコリジョンに当たった時、投げた人自身にあたったときはそのまま
             if (State != CannonBallState.Launched || State == CannonBallState.Resetting || hit.gameObject == _model ||
                 hit.gameObject.GetComponentInParent<NetworkObject>()?.InputAuthority ==
@@ -236,6 +228,10 @@ namespace InGame.Exhibit
 
             _flyingHitBoxExecutor.Init();
             State = CannonBallState.Resetting;
+            if (_interactableBase.LastInteractTime < 0f)
+            {   // クールダウン時間が設定されていない場合は、Observableを使わずに直接StateをIdleにする
+                State = CannonBallState.Idle;
+            }
             _launchElapsedTime = 0f;
             _networkObject.RemoveInputAuthority();
             Rpc_SetModelAdulationTarget();

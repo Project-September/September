@@ -118,6 +118,7 @@ namespace InGame.Interact
 
         public bool IsInCooldown()
         {
+            if (LastUsedCooldownTime <= 0f) return false;
             var currentTime = Runner ? Runner.SimulationTime : Time.time;
             float timeSinceLast = currentTime - LastInteractTime;
             return timeSinceLast < LastUsedCooldownTime;
