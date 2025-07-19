@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace PhotonTrafficLogger
 {
@@ -50,40 +51,43 @@ public class TrafficReport
     public DateTime reportStart;
     public DateTime reportEnd;
     public int totalEntries;
+    public System.Collections.Generic.Dictionary<string, object> methodStatistics;
     
     public TrafficReport(TrafficStats incoming, TrafficStats outgoing, 
-        DateTime start, DateTime end, int totalEntries)
+        DateTime start, DateTime end, int totalEntries, 
+        System.Collections.Generic.Dictionary<string, object> methodStats = null)
     {
         incomingStats = incoming;
         outgoingStats = outgoing;
         reportStart = start;
         reportEnd = end;
         this.totalEntries = totalEntries;
+        methodStatistics = methodStats ?? new System.Collections.Generic.Dictionary<string, object>();
     }
-}
+    }
 
-[Serializable]
-public class TrafficStats
-{
-    public int totalMessages;
-    public int totalBytes;
-    public int maxMessageSize;
-    public int minMessageSize;
-    public double averageMessageSize;
-    public double averageMessagesPerSecond;
-    public double averageBytesPerSecond;
-    
-    public TrafficStats(int totalMessages, int totalBytes, int maxMessageSize, 
-        int minMessageSize, double averageMessageSize, double averageMessagesPerSecond, 
-        double averageBytesPerSecond)
+    [Serializable]
+    public class TrafficStats
     {
-        this.totalMessages = totalMessages;
-        this.totalBytes = totalBytes;
-        this.maxMessageSize = maxMessageSize;
-        this.minMessageSize = minMessageSize;
-        this.averageMessageSize = averageMessageSize;
-        this.averageMessagesPerSecond = averageMessagesPerSecond;
-        this.averageBytesPerSecond = averageBytesPerSecond;
-    }
+        public int totalMessages;
+        public int totalBytes;
+        public int maxMessageSize;
+        public int minMessageSize;
+        public double averageMessageSize;
+        public double averageMessagesPerSecond;
+        public double averageBytesPerSecond;
+        
+        public TrafficStats(int totalMessages, int totalBytes, int maxMessageSize, 
+            int minMessageSize, double averageMessageSize, double averageMessagesPerSecond, 
+            double averageBytesPerSecond)
+        {
+            this.totalMessages = totalMessages;
+            this.totalBytes = totalBytes;
+            this.maxMessageSize = maxMessageSize;
+            this.minMessageSize = minMessageSize;
+            this.averageMessageSize = averageMessageSize;
+            this.averageMessagesPerSecond = averageMessagesPerSecond;
+            this.averageBytesPerSecond = averageBytesPerSecond;
+        }
     }
 }

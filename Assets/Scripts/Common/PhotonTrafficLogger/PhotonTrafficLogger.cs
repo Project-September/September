@@ -973,13 +973,23 @@ namespace PhotonTrafficLogger
 
             var incomingStats = CalculateStats(_accumulatedLog.Select(x => x.trafficIncoming));
             var outgoingStats = CalculateStats(_accumulatedLog.Select(x => x.trafficOutgoing));
+            
+            // Calculate method-specific statistics
+            var methodStats = CalculateMethodStatistics(_accumulatedLog);
+
+            // Convert methodStats to Dictionary<string, object> for serialization
+            var serializedMethodStats = methodStats.ToDictionary(
+                kvp => kvp.Key, 
+                kvp => (object)kvp.Value
+            );
 
             var report = new TrafficReport(
                 incomingStats,
                 outgoingStats,
                 _accumulatedLog.First().timestamp,
                 _accumulatedLog.Last().timestamp,
-                _accumulatedLog.Count
+                _accumulatedLog.Count,
+                serializedMethodStats
             );
 
             var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -989,7 +999,7 @@ namespace PhotonTrafficLogger
             var json = JsonConvert.SerializeObject(report, Formatting.Indented);
             File.WriteAllText(filePath, json);
 
-            Debug.Log($"[PhotonTrafficLogger] Generated report: {fileName} with {_accumulatedLog.Count} entries");
+            Debug.Log($"[PhotonTrafficLogger] Generated report: {fileName} with {_accumulatedLog.Count} entries and {methodStats.Count} unique methods");
         }
         catch (Exception e)
         {
@@ -1026,6 +1036,63 @@ namespace PhotonTrafficLogger
             averageMessagesPerSecond,
             averageBytesPerSecond
         );
+    }
+
+    private Dictionary<string, MethodTrafficStats> CalculateMethodStatistics(List<TrafficLogEntry> logEntries)
+    {
+        try
+        {
+            var methodStats = new Dictionary<string, MethodTrafficStats>();
+            
+            // Group log entries by caller method
+            var groupedByMethod = logEntries
+                .GroupBy(entry => entry.trafficIncoming.callerName ?? "Unknown")
+                .ToList();
+            
+            Debug.Log($"[PhotonTrafficLogger] Processing {groupedByMethod.Count} unique methods for statistics");
+            
+            foreach (var methodGroup in groupedByMethod)
+            {
+                var methodName = methodGroup.Key;
+                var entries = methodGroup.ToList();
+                
+                if (entries.Count == 0) continue;
+                
+                // Extract incoming and outgoing data for this method
+                var incomingData = entries.Select(e => e.trafficIncoming).ToList();
+                var outgoingData = entries.Select(e => e.trafficOutgoing).ToList();
+                
+                // Calculate statistics for this method
+                var incomingStats = CalculateStats(incomingData);
+                var outgoingStats = CalculateStats(outgoingData);
+                
+                // Get time range for this method
+                var firstEntry = entries.OrderBy(e => e.timestamp).First();
+                var lastEntry = entries.OrderBy(e => e.timestamp).Last();
+                
+                var methodStat = new MethodTrafficStats(
+                    methodName,
+                    entries.Count,
+                    incomingStats,
+                    outgoingStats,
+                    firstEntry.timestamp,
+                    lastEntry.timestamp
+                );
+                
+                methodStats[methodName] = methodStat;
+                
+                Debug.Log($"[PhotonTrafficLogger] Method '{methodName}': {entries.Count} calls, " +
+                         $"In: {incomingStats.totalMessages} msgs/{incomingStats.totalBytes} bytes, " +
+                         $"Out: {outgoingStats.totalMessages} msgs/{outgoingStats.totalBytes} bytes");
+            }
+            
+            return methodStats;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[PhotonTrafficLogger] Error calculating method statistics: {e.Message}");
+            return new Dictionary<string, MethodTrafficStats>();
+        }
     }
 
     private void CleanupOldLogFiles()
@@ -1074,6 +1141,32 @@ namespace PhotonTrafficLogger
         if (!hasFocus && IsLogging)
         {
             SaveRealtimeLog();
+        }
+    }
+
+    [Serializable]
+    public class MethodTrafficStats
+    {
+        public string methodName;
+        public int totalCalls;
+        public TrafficStats incomingStats;
+        public TrafficStats outgoingStats;
+        public DateTime FirstSeen;
+        public DateTime LastSeen;
+        public double callsPerSecond;
+        
+        public MethodTrafficStats(string method, int calls, TrafficStats incoming, TrafficStats outgoing,
+            DateTime first, DateTime last)
+        {
+            methodName = method;
+            totalCalls = calls;
+            incomingStats = incoming;
+            outgoingStats = outgoing;
+            FirstSeen = first;
+            LastSeen = last;
+            
+            var duration = (last - first).TotalSeconds;
+            callsPerSecond = duration > 0 ? calls / duration : 0;
         }
     }
     }
