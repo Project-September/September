@@ -47,6 +47,7 @@ namespace InGame.Exhibit
         [Header("デバッグ")]
         [SerializeField] private float _launchElapsedTime;
         [SerializeField] private bool _isAiming;
+        [SerializeField] private CannonBallState _cannonBallState = CannonBallState.Idle;
         private MeleeHitboxExecutor _flyingHitBoxExecutor;
         private MeleeHitboxExecutor _explodeHitBoxExecutor;
         private Transform _currentOwnerTransform;     // 投げ方向用
@@ -61,6 +62,10 @@ namespace InGame.Exhibit
         private void Update()
         {
             CheckHit();
+            if (Object && Object.IsValid)
+            {
+                _cannonBallState = State;
+            }
         }
 
         public override void FixedUpdateNetwork()

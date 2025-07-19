@@ -341,7 +341,7 @@ MonoBehaviour:
   _cooldownTimeDictionary:
     keys: 04000000
     values:
-    - 0
+    - 1
   _characterEffects:
   - rid: 5083283266887483664
   _LastInteractTime: -9999
@@ -382,6 +382,7 @@ MonoBehaviour:
   _explosionRadius: 5
   _launchElapsedTime: 0
   _isAiming: 0
+  _cannonBallState: 0
 --- !u!54 &4885728260643230006
 Rigidbody:
   m_ObjectHideFlags: 0
