@@ -1,6 +1,8 @@
 using System.Runtime.CompilerServices;
 
-public interface ITrafficLogger
+namespace PhotonTrafficLogger
+{
+    public interface ITrafficLogger
 {
     void LogTraffic(TrafficData incomingData, TrafficData outgoingData, 
         [CallerMemberName] string callerName = "", 
@@ -11,4 +13,5 @@ public interface ITrafficLogger
     void StopLogging();
     void ClearLogs();
     bool IsLogging { get; }
+    }
 }

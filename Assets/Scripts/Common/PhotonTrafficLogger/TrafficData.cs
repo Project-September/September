@@ -1,8 +1,10 @@
 using System;
 using System.Runtime.CompilerServices;
 
-[Serializable]
-public class TrafficData
+namespace PhotonTrafficLogger
+{
+    [Serializable]
+    public class TrafficData
 {
     public string callerName;
     public int totalMessageCount;
@@ -82,5 +84,6 @@ public class TrafficStats
         this.averageMessageSize = averageMessageSize;
         this.averageMessagesPerSecond = averageMessagesPerSecond;
         this.averageBytesPerSecond = averageBytesPerSecond;
+    }
     }
 }

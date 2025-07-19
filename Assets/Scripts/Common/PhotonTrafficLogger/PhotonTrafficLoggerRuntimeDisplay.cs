@@ -4,7 +4,9 @@ using UnityEngine;
 using Fusion;
 using Fusion.Statistics;
 
-public class PhotonTrafficLoggerRuntimeDisplay : MonoBehaviour
+namespace PhotonTrafficLogger
+{
+    public class PhotonTrafficLoggerRuntimeDisplay : MonoBehaviour
 {
     [Header("Runtime Display Settings")]
     [SerializeField] private bool showRuntimeDisplay = true;
@@ -303,5 +305,6 @@ public class PhotonTrafficLoggerRuntimeDisplay : MonoBehaviour
         {
             Debug.LogError($"[PhotonTrafficLoggerRuntimeDisplay] Failed to export data: {e.Message}");
         }
+    }
     }
 }

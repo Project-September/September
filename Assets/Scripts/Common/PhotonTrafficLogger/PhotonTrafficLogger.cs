@@ -8,7 +8,9 @@ using Fusion;
 using Fusion.Statistics;
 using Newtonsoft.Json;
 
-public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
+namespace PhotonTrafficLogger
+{
+    public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
 {
     private PhotonTrafficLoggerSettings _settings;
     private List<TrafficLogEntry> _realtimeLog = new();
@@ -448,5 +450,6 @@ public class PhotonTrafficLogger : MonoBehaviour, ITrafficLogger
         {
             SaveRealtimeLog();
         }
+    }
     }
 }
