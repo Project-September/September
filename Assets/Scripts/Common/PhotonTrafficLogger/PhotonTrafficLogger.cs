@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 using UnityEngine;
 using Fusion;
 using Fusion.Statistics;
 using Newtonsoft.Json;
+using Debug = UnityEngine.Debug;
 
 namespace PhotonTrafficLogger
 {
@@ -109,8 +111,13 @@ namespace PhotonTrafficLogger
     {
         if (!IsLogging) return;
 
-        // Update caller information
-        var fullCallerName = $"{Path.GetFileNameWithoutExtension(callerFilePath)}.{callerName}";
+        // Use stack trace based detection for external calls
+        var detailedCallerInfo = GetDetailedCallerInfo();
+        
+        var fullCallerName = !string.IsNullOrEmpty(detailedCallerInfo) 
+            ? detailedCallerInfo 
+            : $"External.{Path.GetFileNameWithoutExtension(callerFilePath)}.{callerName}";
+            
         incomingData.callerName = fullCallerName;
         outgoingData.callerName = fullCallerName;
 
@@ -135,6 +142,299 @@ namespace PhotonTrafficLogger
         {
             SaveRealtimeLog();
         }
+    }
+
+    private string GetContextualCallerInfo(NetworkRunner runner, TrafficData incomingData, TrafficData outgoingData)
+    {
+        try
+        {
+            // Create meaningful caller information based on NetworkRunner state and data patterns
+            var contextInfo = new List<string>();
+            
+            // Add NetworkRunner context
+            if (runner.IsServer)
+            {
+                contextInfo.Add("Server");
+            }
+            else if (runner.IsClient)
+            {
+                contextInfo.Add("Client");
+            }
+            
+            // Analyze traffic patterns to infer likely activity
+            bool hasIncomingTraffic = incomingData.totalMessageCount > 0 || incomingData.totalPacketBytes > 0;
+            bool hasOutgoingTraffic = outgoingData.totalMessageCount > 0 || outgoingData.totalPacketBytes > 0;
+            
+            if (hasIncomingTraffic && hasOutgoingTraffic)
+            {
+                contextInfo.Add("Bidirectional");
+            }
+            else if (hasIncomingTraffic)
+            {
+                contextInfo.Add("Receiving");
+            }
+            else if (hasOutgoingTraffic)
+            {
+                contextInfo.Add("Sending");
+            }
+            
+            // Try to infer activity type based on packet characteristics
+            var activityType = InferActivityType(incomingData, outgoingData);
+            if (!string.IsNullOrEmpty(activityType))
+            {
+                contextInfo.Add(activityType);
+            }
+            
+            // Check for active network objects
+            var activeObjects = GetActiveNetworkObjectInfo(runner);
+            if (!string.IsNullOrEmpty(activeObjects))
+            {
+                contextInfo.Add(activeObjects);
+            }
+            
+            var result = contextInfo.Count > 0 
+                ? $"NetworkActivity.{string.Join(".", contextInfo)}"
+                : "NetworkActivity.Unknown";
+                
+            Debug.Log($"[PhotonTrafficLogger] Generated contextual caller: {result}");
+            return result;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Error generating contextual caller info: {e.Message}");
+            return "NetworkActivity.Error";
+        }
+    }
+    
+    private string InferActivityType(TrafficData incomingData, TrafficData outgoingData)
+    {
+        // Infer activity type based on data patterns
+        int totalMessages = incomingData.totalMessageCount + outgoingData.totalMessageCount;
+        int totalBytes = incomingData.totalPacketBytes + outgoingData.totalPacketBytes;
+        
+        if (totalMessages == 0 && totalBytes == 0)
+        {
+            return "Idle";
+        }
+        
+        // Small, frequent packets - likely continuous updates
+        if (totalMessages > 5 && totalBytes < 1000)
+        {
+            return "ContinuousUpdate";
+        }
+        
+        // Large packets - likely significant state changes
+        if (totalBytes > 1000)
+        {
+            return "StateSync";
+        }
+        
+        // Medium traffic - likely gameplay events
+        if (totalMessages > 0 && totalBytes > 100)
+        {
+            return "GameplayEvent";
+        }
+        
+        return "LowActivity";
+    }
+    
+    private string GetActiveNetworkObjectInfo(NetworkRunner runner)
+    {
+        try
+        {
+            // Try to get information about active network objects
+            var networkObjects = FindObjectsByType<NetworkBehaviour>(FindObjectsSortMode.None);
+            var activeCount = networkObjects.Count(obj => obj != null && obj.Runner == runner);
+            
+            if (activeCount > 0)
+            {
+                // Check for specific types of network objects
+                var players = networkObjects.Count(obj => obj != null && obj.Runner == runner && 
+                                                  obj.GetType().Name.Contains("Player"));
+                
+                if (players > 0)
+                {
+                    return $"Players({players})";
+                }
+                
+                return $"Objects({activeCount})";
+            }
+            
+            return null;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Error getting network object info: {e.Message}");
+            return null;
+        }
+    }
+    
+    private void LogTrafficDirect(TrafficData incomingData, TrafficData outgoingData)
+    {
+        if (!IsLogging) return;
+
+        var logEntry = new TrafficLogEntry(incomingData, outgoingData);
+
+        // Add to both logs
+        _realtimeLog.Add(logEntry);
+        _accumulatedLog.Add(logEntry);
+
+        // Debug log for data collection
+        Debug.Log(
+            $"[PhotonTrafficLogger] Logged traffic data - In: {incomingData.totalMessageCount} msgs, {incomingData.totalPacketBytes} bytes | Out: {outgoingData.totalMessageCount} msgs, {outgoingData.totalPacketBytes} bytes");
+
+        // Log to console if enabled
+        if (_settings.ConsoleOutput)
+        {
+            LogToConsole(incomingData, outgoingData, incomingData.callerName);
+        }
+
+        // Save realtime log periodically
+        if (_realtimeLog.Count % 60 == 0) // Save every 60 entries (1 second at 60Hz)
+        {
+            SaveRealtimeLog();
+        }
+    }
+
+    private string GetDetailedCallerInfo()
+    {
+        try
+        {
+            var stackTrace = new StackTrace(true);
+            var frames = stackTrace.GetFrames();
+            
+            if (frames == null) 
+            {
+                Debug.LogWarning("[PhotonTrafficLogger] Stack trace frames are null");
+                return null;
+            }
+
+            string firstUserMethod = null;
+            
+            // Skip our own methods and look for meaningful caller
+            for (int i = 0; i < frames.Length; i++)
+            {
+                var frame = frames[i];
+                var method = frame.GetMethod();
+                
+                if (method == null) continue;
+                
+                var declaringType = method.DeclaringType;
+                if (declaringType == null) continue;
+                
+                var typeName = declaringType.Name;
+                var methodName = method.Name;
+                var namespaceName = declaringType.Namespace ?? "";
+                
+                // Skip our own PhotonTrafficLogger methods
+                if (typeName == "PhotonTrafficLogger") continue;
+                
+                // Skip system/unity internal methods
+                if (IsSystemMethod(namespaceName, typeName, methodName)) continue;
+                
+                var fileName = frame.GetFileName();
+                var lineNumber = frame.GetFileLineNumber();
+                
+                var shortFileName = !string.IsNullOrEmpty(fileName) 
+                    ? Path.GetFileNameWithoutExtension(fileName) 
+                    : typeName;
+                
+                var methodInfo = lineNumber > 0 
+                    ? $"{shortFileName}.{methodName}:{lineNumber}"
+                    : $"{shortFileName}.{methodName}";
+                
+                // Look for Fusion/Network related methods that might be sending packets
+                if (IsFusionNetworkMethod(namespaceName, typeName, methodName))
+                {
+                    return methodInfo;
+                }
+                
+                // Store first user code method as fallback
+                if (firstUserMethod == null && IsUserCode(namespaceName, typeName))
+                {
+                    firstUserMethod = methodInfo;
+                }
+            }
+            // Return first user method if no network method was found
+            return firstUserMethod;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PhotonTrafficLogger] Error getting detailed caller info: {e.Message}");
+            return null;
+        }
+    }
+    
+    private bool IsSystemMethod(string namespaceName, string typeName, string methodName)
+    {
+        // Skip Unity and system methods
+        return namespaceName.StartsWith("UnityEngine") ||
+               namespaceName.StartsWith("Unity.") ||
+               namespaceName.StartsWith("System") ||
+               namespaceName.StartsWith("Microsoft") ||
+               typeName.StartsWith("Runtime") ||
+               methodName.StartsWith("Internal") ||
+               methodName == "Update" ||
+               methodName == "FixedUpdate" ||
+               methodName == "LateUpdate";
+    }
+    
+    private bool IsFusionNetworkMethod(string namespaceName, string typeName, string methodName)
+    {
+        // Look for Fusion networking methods that likely send packets
+        if (namespaceName.StartsWith("Fusion") ||
+            typeName.Contains("Network") ||
+            typeName.Contains("RPC") ||
+            typeName.Contains("Spawn"))
+        {
+            return true;
+        }
+        
+        // Check method names that indicate network operations
+        if (methodName.Contains("RPC") ||
+            methodName.Contains("Send") ||
+            methodName.Contains("Sync") ||
+            methodName.Contains("Network") ||
+            methodName.Contains("Spawn") ||
+            methodName.Contains("Despawn") ||
+            methodName.Contains("Transfer") ||
+            methodName.Contains("Communicate"))
+        {
+            return true;
+        }
+        
+        // Check for game-specific networking patterns
+        if (typeName.Contains("Player") || 
+            typeName.Contains("Manager") ||
+            typeName.Contains("Controller"))
+        {
+            // Look for methods that might trigger network activity
+            if (methodName.Contains("Move") ||
+                methodName.Contains("Attack") ||
+                methodName.Contains("Action") ||
+                methodName.Contains("Input") ||
+                methodName.Contains("Update") ||
+                methodName.Contains("Execute") ||
+                methodName.Contains("Ability"))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    private bool IsUserCode(string namespaceName, string typeName)
+    {
+        // Identify user code (not system or Unity)
+        bool isUserCode = !namespaceName.StartsWith("UnityEngine") &&
+                         !namespaceName.StartsWith("Unity.") &&
+                         !namespaceName.StartsWith("System") &&
+                         !namespaceName.StartsWith("Microsoft") &&
+                         !namespaceName.StartsWith("Fusion.Statistics") &&
+                         !typeName.StartsWith("Runtime");
+        
+        return isUserCode;
     }
 
     private void AttachFusionStatsToNetworkObjects()
@@ -192,7 +492,12 @@ namespace PhotonTrafficLogger
                     var incomingData = GetIncomingTrafficData(statisticsManager, runner);
                     var outgoingData = GetOutgoingTrafficData(statisticsManager, runner);
 
-                    LogTraffic(incomingData, outgoingData);
+                    // Override caller information to provide more meaningful context
+                    var contextualCaller = GetContextualCallerInfo(runner, incomingData, outgoingData);
+                    incomingData.callerName = contextualCaller;
+                    outgoingData.callerName = contextualCaller;
+
+                    LogTrafficDirect(incomingData, outgoingData);
                 }
                 else
                 {
@@ -217,7 +522,7 @@ namespace PhotonTrafficLogger
             Debug.Log($"[PhotonTrafficLogger] Using fallback data collection from NetworkRunner: {runner.name}");
 
             var incomingData = new TrafficData(
-                callerName: "NetworkRunner.Fallback",
+                callerName: "NetworkActivity.Fallback.NoStatistics",
                 totalMessageCount: 0,
                 totalPacketBytes: 0,
                 longestMessageBytes: 0,
@@ -226,7 +531,7 @@ namespace PhotonTrafficLogger
             );
 
             var outgoingData = new TrafficData(
-                callerName: "NetworkRunner.Fallback",
+                callerName: "NetworkActivity.Fallback.NoStatistics",
                 totalMessageCount: 0,
                 totalPacketBytes: 0,
                 longestMessageBytes: 0,
@@ -234,7 +539,7 @@ namespace PhotonTrafficLogger
                 networkObjectId: 0
             );
 
-            LogTraffic(incomingData, outgoingData);
+            LogTrafficDirect(incomingData, outgoingData);
         }
         catch (Exception e)
         {
