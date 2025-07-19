@@ -54,14 +54,12 @@ namespace InGame.Exhibit
         private int _equippedInteractor;
         private bool _shouldFollow;
         [Networked] private CannonBallState State { get; set; }
-        [SerializeField] CannonBallState DebugState;
         private EffectSpawner EffectSpawner => StaticServiceLocator.Instance.Get<EffectSpawner>();
         public event Action OnCannonBallHit;
         
         public override void Spawned() => InitializeCannonBall();
         private void Update()
         {
-            if (Object && Object.IsValid) DebugState = State;
             CheckHit();
         }
 
@@ -119,32 +117,40 @@ namespace InGame.Exhibit
             State = CannonBallState.Idle;
         }
 
+        int counter = 0;
         private void OnHitSomething(Collider hit)
         {
+            if (counter == 2)
+            {
+                Debug.Log("<UNK>");
+            }
+            // デバッグ用にカウンターを表示
+            counter++;
+            
             //とんでいないとき、弾の見た目のコリジョンに当たった時、投げた人自身にあたったときはそのまま
             if (State != CannonBallState.Launched || State == CannonBallState.Resetting || hit.gameObject == _model ||
                 hit.gameObject.GetComponentInParent<NetworkObject>()?.InputAuthority ==
                 _networkObject.InputAuthority) return;
 
-            Debug.Log($"{transform.position} で爆発しました。");
+            
             EffectSpawner.RequestPlayOneShotEffect(EffectType.Explosion, transform.position, Quaternion.identity);
-            _flyingHitBoxExecutor.ExecuteHitCheck();
+            _explodeHitBoxExecutor.ExecuteHitCheck();
             ResetCannonBall();
             OnCannonBallHit?.Invoke();
         }
         
         private void OnExplodeHit(Collider hit)
         {
-            Debug.Log($"[CannonBall] {hit.gameObject.name} に当たりました。");
             //とんでいないとき、弾の見た目のコリジョンに当たった時、投げた人自身にあたったときはそのまま
             if (State != CannonBallState.Launched || State == CannonBallState.Resetting || hit.gameObject == _model ||
                 hit.gameObject.GetComponentInParent<NetworkObject>()?.InputAuthority ==
                 _networkObject.InputAuthority) return;
 
-            //それ以外の何かに当たればぶつかった時の処理を行う。Damagableならダメージを与える
-            if (hit.TryGetComponent<IDamageable>(out var damageable) &&
+            var root = hit.transform.root;
+            if (root.TryGetComponent<IDamageable>(out var damageable) &&
                 damageable.OwnerPlayerRef != PlayerRef.FromEncoded(_equippedInteractor))
             {
+                Debug.Log($"[CannonBall] ダメージを与えます: {damageable.OwnerPlayerRef}");
                 var hitData = new HitData(HitActionType.Damage, _damageAmount,
                     PlayerRef.FromEncoded(_equippedInteractor), damageable.OwnerPlayerRef);
                 damageable.TakeHit(ref hitData);

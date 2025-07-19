@@ -337,11 +337,11 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 04000000
     values:
-    - 5
+    - 1
   _cooldownTimeDictionary:
     keys: 04000000
     values:
-    - 10
+    - 0
   _characterEffects:
   - rid: 5083283266887483664
   _LastInteractTime: -9999
@@ -379,10 +379,9 @@ MonoBehaviour:
   _damageAmount: 10
   _startPosition: {x: 0, y: -9.527, z: 19.326}
   _maxFlightTime: 3
-  _explosionRadius: 213.68
+  _explosionRadius: 5
   _launchElapsedTime: 0
   _isAiming: 0
-  DebugState: 0
 --- !u!54 &4885728260643230006
 Rigidbody:
   m_ObjectHideFlags: 0
