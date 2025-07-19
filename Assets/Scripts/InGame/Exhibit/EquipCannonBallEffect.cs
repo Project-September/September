@@ -11,12 +11,11 @@ namespace InGame.Exhibit
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            target.IsInteractable = false;
+            target.LastInteractTime = int.MinValue;
             
             _canonBallModel.EquipToInteractor(context.Interactor);
             _canonBallModel.OnCannonBallHit += (() =>
             {
-                target.IsInteractable = true;
                 target.LastInteractTime = target.Runner.SimulationTime;
             });
         }

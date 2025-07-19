@@ -21,7 +21,10 @@ namespace InGame.Interact
 
         [Networked] private float LastUsedCooldownTime { get; set; } = 0f;
         
-        [Networked] public bool IsInteractable { get; set; } = true;
+        /// <summary>
+        /// 外部から強制的にインタラクト可能にするかどうかを設定するために使う
+        /// </summary>
+        [Networked] public bool ForceSetInteractable { get; set; } = true;
 
         public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
             _requiredInteractTimeDictionary;
@@ -57,7 +60,7 @@ namespace InGame.Interact
         public bool ValidateInteraction(IInteractableContext context)
         {
             var type = context.CharacterType;
-            if (IsInCooldown() || !Object.isActiveAndEnabled || !IsInteractable || !OnValidateInteraction(context, type))
+            if (IsInCooldown() || !Object.isActiveAndEnabled || !ForceSetInteractable || !OnValidateInteraction(context, type))
             {
                 return false;
             }
