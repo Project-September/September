@@ -2,5 +2,6 @@ public enum EffectType
 {
     Test,
     Warp,
-    Tutankhamen
+    Tutankhamen,
+    Explosion,
 }

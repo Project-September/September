@@ -2,7 +2,6 @@ using CRISound;
 using Fusion;
 using InGame.Interact;
 using InGame.Player;
-using NaughtyAttributes;
 using September.Common;
 using September.InGame.Common;
 using UnityEngine;
@@ -25,8 +24,7 @@ namespace InGame.Exhibit
         [Header("Camera Settings")]
         private CameraController _cameraController;
 
-        [Header("Animation Settings")]
-        [SerializeField,Label("アニメーション最低値")]private float _targetBlendValue = 0.01f;
+        private float _currentTargetValue;
         private Animator _animator;
         
         [Header("Network Settings")]
@@ -52,8 +50,9 @@ namespace InGame.Exhibit
                 Debug.LogError("Animator is null");
             
             _rigidbody = GetComponent<Rigidbody>(); 
-            _cameraController.Init(true); 
-        }
+            _cameraController.Init(true);
+            _currentTargetValue = 0;
+       }
 
        private void Start()
        {
@@ -91,7 +90,7 @@ namespace InGame.Exhibit
                 _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
             }
 
-            float clampedBlend = Mathf.Clamp(_currentBlendValue, 0.01f, 1f);
+            float clampedBlend = Mathf.Clamp(_currentBlendValue, _currentTargetValue, 1f);
             _animator.SetFloat(_flyStateBlend, clampedBlend);
         }
 
@@ -137,7 +136,8 @@ namespace InGame.Exhibit
         {
             if(!Runner.IsServer || OwnerPlayerRef != PlayerRef.None)
                 return;
-            
+
+            _currentTargetValue = 0.01f;
             OwnerPlayerRef = ownerPlayerRef;
             Object.AssignInputAuthority(OwnerPlayerRef);
             OnPlaySE(_crySE);
@@ -157,6 +157,7 @@ namespace InGame.Exhibit
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) 
                 return;
 
+            _currentTargetValue = 0f;
             OwnerPlayerRef = PlayerRef.None;
             Object.RemoveInputAuthority();
             
