@@ -7,6 +7,7 @@ using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
 using September.Common;
+using September.InGame.Effect;
 using UniRx;
 using UnityEngine;
 
@@ -14,6 +15,13 @@ namespace InGame.Exhibit
 {
     public class CannonBall : NetworkBehaviour
     {
+        public enum CannonBallState
+        {
+            Idle,
+            Launched,
+            Resetting
+        }
+        
         [Header("参照")]
         [SerializeField] private GameObject _model;
         [SerializeField] private Rigidbody _rigidbody;
@@ -28,13 +36,23 @@ namespace InGame.Exhibit
         [SerializeField] private Vector3 _startPosition;
         [SerializeField] private float _maxFlightTime = 3f; // 飛行最大時間（秒）
         
-        [SerializeField] private bool _isLaunching;
+        [Header("放物線描画設定")]
+        [SerializeField] private LineRenderer _lineRenderer;
+        [SerializeField] private int _segmentCount = 30;
+        [SerializeField] private float _timeStep = 0.1f;
+        
+        [Header("デバッグ")]
         [SerializeField] private float _launchElapsedTime;
+        [SerializeField] private CannonBallState _state = CannonBallState.Idle;
+        [SerializeField] private bool _isAiming = false;
         private Transform _currentOwnerTransform;
         private int _equippedInteractor;
         private MeleeHitboxExecutor _meleeHitboxExecutor;
+        private EffectSpawner EffectSpawner => StaticServiceLocator.Instance.Get<EffectSpawner>();
 
         public event Action OnCannonBallHit;
+
+       
 
         public override void Spawned()
         {
@@ -46,7 +64,7 @@ namespace InGame.Exhibit
                 .DistinctUntilChanged()
                 .Subscribe(inCoolDown =>
                 {
-                    Debug.Log("クールダウン状態: " + inCoolDown);
+                    _state = inCoolDown ? CannonBallState.Resetting : CannonBallState.Idle;
                     Rpc_SetCannonBallVisible(!inCoolDown); // クールダウン中は非表示
                 }).AddTo(this);
             
@@ -71,9 +89,10 @@ namespace InGame.Exhibit
                     didHitSomething = true;
                 }
 
-                if (didHitSomething)
+                if (didHitSomething && _state == CannonBallState.Launched)
                 {
                     Debug.Log( $"{hit.gameObject.name} にヒット");
+                    EffectSpawner.RequestPlayOneShotEffect(EffectType.Explosion, transform.position, Quaternion.identity);
                     Rpc_ResetCannonBall(); // 全体にリセット
                     OnCannonBallHit?.Invoke();
                 }
@@ -120,7 +139,7 @@ namespace InGame.Exhibit
             
             if (Runner?.IsServer == false) return;
             
-            if (_isLaunching && HasStateAuthority)
+            if (_state == CannonBallState.Launched && HasStateAuthority)
             {
                 _meleeHitboxExecutor.Tick(Time.deltaTime);
 
@@ -135,7 +154,7 @@ namespace InGame.Exhibit
 
         public override void FixedUpdateNetwork()
         {
-            if (!GetInput(out PlayerInput input) || _isLaunching) return;
+            if (!GetInput(out PlayerInput input) || _state == CannonBallState.Launched) return;
 
             if (input.Buttons.IsSet(PlayerButtons.Attack))
             {
@@ -156,7 +175,7 @@ namespace InGame.Exhibit
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void Rpc_Launch()
         {
-            _isLaunching = true;
+            _state = CannonBallState.Launched;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -167,7 +186,7 @@ namespace InGame.Exhibit
             
             Rpc_SetModelParent(-1);
             _meleeHitboxExecutor.Init();
-            _isLaunching = false;
+            _state = CannonBallState.Resetting;
             _launchElapsedTime = 0f;
             _networkObject.RemoveInputAuthority();
             Rpc_SetCannonBallVisible(false);
@@ -181,5 +200,55 @@ namespace InGame.Exhibit
                 _model.SetActive(isVisible);
             }
         }
+        
+        #region 放物線描画
+
+        private void LateUpdate()
+        {
+            if (_isAiming && _currentOwnerTransform)
+            {
+                ShowTrajectory();
+            }
+            else
+            {
+                _lineRenderer.enabled = false;
+            }
+        }
+
+        private void ShowTrajectory()
+        {
+            Vector3 startPos = _model.transform.position;
+            Vector3 forward = _currentOwnerTransform.forward;
+            Vector3 upward = _currentOwnerTransform.up;
+            Vector3 velocity = (forward + upward * _upwardForce).normalized * _power;
+
+            Vector3[] points = new Vector3[_segmentCount];
+            Vector3 currentPosition = startPos;
+            Vector3 currentVelocity = velocity;
+
+            for (int i = 0; i < _segmentCount; i++)
+            {
+                points[i] = currentPosition;
+
+                // 簡易物理シミュレーション
+                currentVelocity += Physics.gravity * _timeStep;
+                Vector3 nextPosition = currentPosition + currentVelocity * _timeStep;
+
+                // 衝突チェック（optional）
+                if (Physics.Linecast(currentPosition, nextPosition, out var hit))
+                {
+                    points[i + 1 >= _segmentCount ? i : i + 1] = hit.point;
+                    _lineRenderer.positionCount = i + 2;
+                    break;
+                }
+
+                currentPosition = nextPosition;
+            }
+
+            _lineRenderer.enabled = true;
+            _lineRenderer.SetPositions(points);
+        }
+
+        #endregion
     }
 }
