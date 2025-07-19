@@ -60,8 +60,27 @@ namespace InGame.Interact
         public bool ValidateInteraction(IInteractableContext context)
         {
             var type = context.CharacterType;
-            if (IsInCooldown() || !Object.isActiveAndEnabled || !ForceSetInteractable || !OnValidateInteraction(context, type))
+            if (IsInCooldown())
             {
+                Debug.LogError("[InteractableBase] クールダウン中のためインタラクトできません");
+                return false;
+            }
+
+            if (!Object.isActiveAndEnabled)
+            {
+                Debug.LogError($"[{name}] インタラクト可能なオブジェクトが無効です");
+                return false;
+            }
+            
+            if (!ForceSetInteractable)
+            {
+                Debug.LogError($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
+                return false;
+            }
+
+            if (!OnValidateInteraction(context, type))
+            {
+                Debug.LogError($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
                 return false;
             }
 

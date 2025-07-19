@@ -329,6 +329,7 @@ MonoBehaviour:
   _characterEffects:
   - rid: 5083283266887483664
   _LastInteractTime: -9999
+  _ForceSetInteractable: 1
   references:
     version: 2
     RefIds:
@@ -355,6 +356,7 @@ MonoBehaviour:
   _networkObject: {fileID: 5978312770890431326}
   _networkRigidbody3D: {fileID: 4192184776908821714}
   _interactableBase: {fileID: 782028490540396198}
+  _modelCollider: {fileID: 3260869786553538935}
   _power: 10
   _upwardForce: 1
   _damageAmount: 10
@@ -365,6 +367,7 @@ MonoBehaviour:
   _timeStep: 0.1
   _launchElapsedTime: 0
   _state: 0
+  _isAiming: 0
 --- !u!54 &4885728260643230006
 Rigidbody:
   m_ObjectHideFlags: 0

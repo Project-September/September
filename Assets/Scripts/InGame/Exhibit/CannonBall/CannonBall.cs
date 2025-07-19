@@ -13,48 +13,76 @@ using UnityEngine;
 
 namespace InGame.Exhibit
 {
+    /// <summary>
+    /// 大砲の砲丸を表現するクラス
+    /// </summary>
     public class CannonBall : NetworkBehaviour
     {
-        public enum CannonBallState
+        private enum CannonBallState
         {
             Idle,
+            Equipped,
             Launched,
             Resetting
         }
-        
+
         [Header("参照")]
         [SerializeField] private GameObject _model;
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private NetworkObject _networkObject;
         [SerializeField] private NetworkRigidbody3D _networkRigidbody3D;
         [SerializeField] private InteractableBase _interactableBase;
+        [SerializeField] private Collider _modelCollider;
+        [SerializeField] private TrajectoryVisualizer _trajectoryVisualizer;
 
         [Header("設定")]
         [SerializeField] private float _power = 10f;
         [SerializeField] private float _upwardForce = 5f;
         [SerializeField] private int _damageAmount = 10;
         [SerializeField] private Vector3 _startPosition;
-        [SerializeField] private float _maxFlightTime = 3f; // 飛行最大時間（秒）
-        
-        [Header("放物線描画設定")]
-        [SerializeField] private LineRenderer _lineRenderer;
-        [SerializeField] private int _segmentCount = 30;
-        [SerializeField] private float _timeStep = 0.1f;
-        
+        [SerializeField] private float _maxFlightTime = 3f;
+
         [Header("デバッグ")]
         [SerializeField] private float _launchElapsedTime;
-        [SerializeField] private CannonBallState _state = CannonBallState.Idle;
-        [SerializeField] private bool _isAiming = false;
-        private Transform _currentOwnerTransform;
+        [SerializeField] private bool _isAiming;
+        private Transform _currentOwnerTransform;     // 投げ方向用
+        private Transform _followTargetTransform;     // 見た目追従用
+        private bool _shouldFollow = false;
         private int _equippedInteractor;
         private MeleeHitboxExecutor _meleeHitboxExecutor;
+        [Networked] private CannonBallState State { get; set; }
+        [SerializeField] CannonBallState DebugState;
         private EffectSpawner EffectSpawner => StaticServiceLocator.Instance.Get<EffectSpawner>();
-
         public event Action OnCannonBallHit;
+        public override void Spawned() => InitializeCannonBall();
+        private void Update()
+        {
+            if (Object && Object.IsValid) DebugState = State;
+            CheckHit();
+        }
 
-       
+        public override void FixedUpdateNetwork() => GetFireInput();
+        
+        private void LateUpdate()
+        {
+            ShowTrajectory();
+            TrackModelToFollowTarget();
+            if (Object && Object.IsValid) _model.SetActive(State != CannonBallState.Resetting);
+        }
 
-        public override void Spawned()
+        public void EquipToInteractor(int interactor)
+        {
+            var playerRef = PlayerRef.FromEncoded(interactor);
+            _networkObject.AssignInputAuthority(playerRef);
+            State = CannonBallState.Equipped;
+            Rpc_SetModelAdulationTarget(interactor);
+        }
+
+        /// <summary>
+        /// 空中での固定、当たり判定クラスの生成、クールダウン開始＆終了時にStateを更新する処理の登録、何かに当たった時の処理の登録
+        /// を行う。
+        /// </summary>
+        private void InitializeCannonBall()
         {
             _networkRigidbody3D.RBIsKinematic = true;
             _meleeHitboxExecutor = new MeleeHitboxExecutor(new List<Transform>() { _model.transform }, hitboxRadius: _model.transform.localScale.x * 0.5f);
@@ -64,191 +92,138 @@ namespace InGame.Exhibit
                 .DistinctUntilChanged()
                 .Subscribe(inCoolDown =>
                 {
-                    _state = inCoolDown ? CannonBallState.Resetting : CannonBallState.Idle;
-                    Rpc_SetCannonBallVisible(!inCoolDown); // クールダウン中は非表示
+                    State = inCoolDown ? CannonBallState.Resetting : CannonBallState.Idle;
                 }).AddTo(this);
+
+            State = CannonBallState.Idle;
+            _meleeHitboxExecutor.OnHit += OnHitSomething;
+        }
+
+        private void OnHitSomething(Collider hit)
+        {
+            //とんでいないとき、弾の見た目のコリジョンに当たった時、投げた人自身にあたったときはそのまま
+            if (State != CannonBallState.Launched || hit.gameObject == _model ||
+                hit.gameObject.GetComponentInParent<NetworkObject>()?.InputAuthority ==
+                _networkObject.InputAuthority) return;
             
-            _meleeHitboxExecutor.OnHit += hit =>
+            //それ以外の何かに当たればぶつかった時の処理を行う。Damagableならダメージを与える
+            if (hit.TryGetComponent<IDamageable>(out var damageable) &&
+                damageable.OwnerPlayerRef != PlayerRef.FromEncoded(_equippedInteractor))
             {
-                var didHitSomething = false;
-                if (hit.gameObject == _model) return; // 自分自身には当たらないように
-                if (hit.TryGetComponent<IDamageable>(out var damageable))
-                {
-                    if (damageable.OwnerPlayerRef != PlayerRef.FromEncoded(_equippedInteractor))
-                    {
-                        var hitData = new HitData(HitActionType.Damage, _damageAmount, PlayerRef.FromEncoded(_equippedInteractor), damageable.OwnerPlayerRef);
-                        damageable.TakeHit(ref hitData);
-                        didHitSomething = true;
-                    }
-                }
-                else
-                {
-                    if (hit.gameObject.GetComponentInParent<NetworkObject>()?.InputAuthority == _networkObject.InputAuthority)
-                        return; // 自分のものには当たらないように
-                    // IDamageable ではないが何かに当たった場合もヒット扱い
-                    didHitSomething = true;
-                }
+                var hitData = new HitData(HitActionType.Damage, _damageAmount,
+                    PlayerRef.FromEncoded(_equippedInteractor), damageable.OwnerPlayerRef);
+                damageable.TakeHit(ref hitData);
+            }
 
-                if (didHitSomething && _state == CannonBallState.Launched)
-                {
-                    Debug.Log( $"{hit.gameObject.name} にヒット");
-                    EffectSpawner.RequestPlayOneShotEffect(EffectType.Explosion, transform.position, Quaternion.identity);
-                    Rpc_ResetCannonBall(); // 全体にリセット
-                    OnCannonBallHit?.Invoke();
-                }
-            };
+            Debug.Log($"{hit.gameObject.name} にヒット");
+            EffectSpawner.RequestPlayOneShotEffect(EffectType.Explosion, transform.position, Quaternion.identity);
+            ResetCannonBall();
+            OnCannonBallHit?.Invoke();
         }
 
-        public void EquipToInteractor(int interactor)
-        {
-            var playerRef = PlayerRef.FromEncoded(interactor);
-            _networkObject.AssignInputAuthority(playerRef);
-            Rpc_SetModelParent(interactor);
-        }
-
+        /// <summary>
+        /// モデルの追従先を設定するRPC。-1で見た目用オブジェクトが大砲の弾事態に追従する
+        /// それ以外の時は、指定されたインタラクターの手に追従する。
+        /// </summary>
+        /// <param name="interactor"></param>
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void Rpc_SetModelParent(int interactor)
+        private void Rpc_SetModelAdulationTarget(int interactor = -1)
         {
-            Debug.Log(interactor);
             if (interactor == -1)
             {
-                _model.transform.SetParent(transform);
-                _model.transform.localPosition = Vector3.zero;
+                _modelCollider.enabled = true;
+                _model.transform.position = transform.position;
+                _model.transform.rotation = transform.rotation;
                 _currentOwnerTransform = null;
+                _followTargetTransform = null;
                 _equippedInteractor = -1;
-                return;
-            }
-            
-            var playerRef = PlayerRef.FromEncoded(interactor);
-            if (Runner.TryGetPlayerObject(playerRef, out var playerObj))
-            {
-                var hand = playerObj.GetComponentInChildren<HandSocket>()?.Sockets.FirstOrDefault();
-                if (hand)
-                {
-                    _model.transform.SetParent(hand);
-                    _model.transform.localPosition = Vector3.zero;
-                    _model.transform.localRotation = Quaternion.identity;
-                    _currentOwnerTransform = playerObj.transform;
-                    _equippedInteractor = interactor;
-                }
-            }
-        }
-
-        private void Update()
-        {
-            
-            if (Runner?.IsServer == false) return;
-            
-            if (_state == CannonBallState.Launched && HasStateAuthority)
-            {
-                _meleeHitboxExecutor.Tick(Time.deltaTime);
-
-                _launchElapsedTime += Time.deltaTime;
-                if (_launchElapsedTime > _maxFlightTime)
-                {
-                    Rpc_ResetCannonBall();
-                    OnCannonBallHit?.Invoke(); // optional: 飛行時間オーバーでのエフェクトなど
-                }
-            }
-        }
-
-        public override void FixedUpdateNetwork()
-        {
-            if (!GetInput(out PlayerInput input) || _state == CannonBallState.Launched) return;
-
-            if (input.Buttons.IsSet(PlayerButtons.Attack))
-            {
-                _networkRigidbody3D.Teleport(_model.transform.position);
-                _networkRigidbody3D.RBIsKinematic = false;
-
-                // 斜め上方向に投げるベクトルを作成
-                var forward = _currentOwnerTransform.forward;
-                var upward = _currentOwnerTransform.up;
-                var throwDir = (forward + upward * _upwardForce).normalized;
-                _rigidbody.AddForce(throwDir * _power, ForceMode.Impulse);
-
-                Rpc_SetModelParent(-1);
-                Rpc_Launch();
-            }
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void Rpc_Launch()
-        {
-            _state = CannonBallState.Launched;
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void Rpc_ResetCannonBall()
-        {
-            _networkRigidbody3D.RBIsKinematic = true;
-            _networkRigidbody3D.Teleport(_startPosition);
-            
-            Rpc_SetModelParent(-1);
-            _meleeHitboxExecutor.Init();
-            _state = CannonBallState.Resetting;
-            _launchElapsedTime = 0f;
-            _networkObject.RemoveInputAuthority();
-            Rpc_SetCannonBallVisible(false);
-        }
-        
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void Rpc_SetCannonBallVisible(bool isVisible)
-        {
-            if (_model != null)
-            {
-                _model.SetActive(isVisible);
-            }
-        }
-        
-        #region 放物線描画
-
-        private void LateUpdate()
-        {
-            if (_isAiming && _currentOwnerTransform)
-            {
-                ShowTrajectory();
             }
             else
             {
-                _lineRenderer.enabled = false;
+                var playerRef = PlayerRef.FromEncoded(interactor);
+                if (!Runner.TryGetPlayerObject(playerRef, out var playerObj)) return;
+                var hand = playerObj.GetComponentInChildren<HandSocket>()?.Sockets.FirstOrDefault();
+                if (!hand) return;
+                _modelCollider.enabled = false;
+                _currentOwnerTransform = playerObj.transform;
+                _followTargetTransform = hand;
+                _equippedInteractor = interactor;
+                _shouldFollow = true;
             }
+        }
+
+        /// <summary>
+        /// ホストでとんでいるときだけ当たり判定を行う
+        /// </summary>
+        private void CheckHit()
+        {
+            if (!HasStateAuthority || State != CannonBallState.Launched) return;
+            _meleeHitboxExecutor.Tick(Time.deltaTime);
+
+            _launchElapsedTime += Time.deltaTime;
+            if (_launchElapsedTime < _maxFlightTime) return;    // 飛行時間が最大を超えたらリセット
+            ResetCannonBall();
+            OnCannonBallHit?.Invoke();
+        }
+
+        private void GetFireInput()
+        {
+            //入力がない、または攻撃ボタンが押されていない、またはすでに発射済みなら何もしない
+            if (!GetInput(out PlayerInput input) || !input.Buttons.IsSet(PlayerButtons.Attack) || State == CannonBallState.Launched) return;
+            if (!_currentOwnerTransform)
+            {
+                Debug.LogWarning("[CannonBall] 現在の所有者のTransformが設定されていません。");
+                return;
+            }
+
+            // 向きを先に計算
+            var forward = _currentOwnerTransform.forward;
+            var upward = _currentOwnerTransform.up;
+            var throwDir = (forward + upward * _upwardForce).normalized;
+            _networkRigidbody3D.Teleport(_model.transform.position);
+            _networkRigidbody3D.RBIsKinematic = false;
+            _rigidbody.AddForce(throwDir * _power, ForceMode.Impulse);
+
+            Rpc_SetModelAdulationTarget();
+            State = CannonBallState.Launched;
+        }
+
+        private void ResetCannonBall()
+        {
+            _networkRigidbody3D.RBIsKinematic = true;
+            _networkRigidbody3D.Teleport(_startPosition);
+
+            _meleeHitboxExecutor.Init();
+            State = CannonBallState.Resetting;
+            _launchElapsedTime = 0f;
+            _networkObject.RemoveInputAuthority();
+            Rpc_SetModelAdulationTarget();
         }
 
         private void ShowTrajectory()
         {
-            Vector3 startPos = _model.transform.position;
-            Vector3 forward = _currentOwnerTransform.forward;
-            Vector3 upward = _currentOwnerTransform.up;
-            Vector3 velocity = (forward + upward * _upwardForce).normalized * _power;
-
-            Vector3[] points = new Vector3[_segmentCount];
-            Vector3 currentPosition = startPos;
-            Vector3 currentVelocity = velocity;
-
-            for (int i = 0; i < _segmentCount; i++)
+            if (_isAiming && _currentOwnerTransform)
             {
-                points[i] = currentPosition;
+                var startPos = _model.transform.position;
+                var forward = _currentOwnerTransform.forward;
+                var upward = _currentOwnerTransform.up;
+                var velocity = (forward + upward * _upwardForce).normalized * _power;
 
-                // 簡易物理シミュレーション
-                currentVelocity += Physics.gravity * _timeStep;
-                Vector3 nextPosition = currentPosition + currentVelocity * _timeStep;
-
-                // 衝突チェック（optional）
-                if (Physics.Linecast(currentPosition, nextPosition, out var hit))
-                {
-                    points[i + 1 >= _segmentCount ? i : i + 1] = hit.point;
-                    _lineRenderer.positionCount = i + 2;
-                    break;
-                }
-
-                currentPosition = nextPosition;
+                _trajectoryVisualizer?.ShowTrajectory(startPos, velocity);
             }
-
-            _lineRenderer.enabled = true;
-            _lineRenderer.SetPositions(points);
+            else
+            {
+                _trajectoryVisualizer?.Hide();
+            }
         }
 
-        #endregion
+        private void TrackModelToFollowTarget()
+        {
+            if (_shouldFollow && _followTargetTransform)
+            {
+                _model.transform.position = _followTargetTransform.position;
+                _model.transform.rotation = _followTargetTransform.rotation;
+            }
+        }
     }
 }
