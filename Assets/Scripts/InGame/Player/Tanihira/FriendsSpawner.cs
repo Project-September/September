@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using Ingame.Tanihira;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace InGame.Tanihira
 {
@@ -11,8 +12,11 @@ namespace InGame.Tanihira
         [SerializeField] private FriendDatabase _friendDatabase;
         [SerializeField] private FormationManager _formationManager;
         [SerializeField] private GameObject _ownerPlayer;
+        [SerializeField] private NetworkRunner _networkRunner;
+        [SerializeField] private Transform _firstSpawnPoint;
+        [SerializeField] private float _navmeshSerchRadius = 5.0f;
 
-        public override void Spawned()
+        public void Start()
         {
             Initialize();
         }
@@ -20,10 +24,17 @@ namespace InGame.Tanihira
         //初期化処理
         private void Initialize()
         {
+            _networkRunner = FindFirstObjectByType<NetworkRunner>();
+            if (_networkRunner == null)
+            {
+                Debug.LogError("NetworkRunnerがありません");
+            }
+            if (!_networkRunner.IsServer) return;
+            
             //初期で登録されたフレンドを生成
             for (int i = 0; i < _friendsTypes.Length; i++)
             {
-                Transform pos = _ownerPlayer.transform;
+                Transform pos = _firstSpawnPoint;
                 pos.transform.position += new Vector3(i, 0, 0);
                 SpawnFriend(_friendsTypes[i], pos);
             }
@@ -38,7 +49,21 @@ namespace InGame.Tanihira
             
             if (prefab)
             {
-                FriendBase friend = Instantiate(prefab, spawnPosition.position, Quaternion.identity, null).GetComponent<FriendBase>();
+                Vector3 fixedPos = spawnPosition.position; 
+                NavMeshAgent navMeshAgent = prefab.GetComponent<NavMeshAgent>();
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(spawnPosition.position, out hit, _navmeshSerchRadius, NavMesh.AllAreas))
+                {
+                    // NavMesh上にワープ
+                    fixedPos = hit.position + Vector3.up * navMeshAgent.baseOffset;
+                }
+                else
+                {
+                    Debug.LogWarning($"{friendType} はNavMesh上にスポーンできませんでした");
+                }
+                
+                FriendBase friend = _networkRunner.Spawn(prefab, fixedPos, Quaternion.identity, null).GetComponent<FriendBase>();
+                
                 if (friend)
                 {
                     // フレンドにFormationManagerとownerPlayerを設定

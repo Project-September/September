@@ -3,4 +3,5 @@ using UnityEngine;
 
 public class PenguinFriends : FriendBase
 {
+    
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
@@ -39,6 +40,7 @@ namespace Ingame.Tanihira
         [SerializeField] protected FriendStateMapping[] _friendStateMappings;
         [SerializeField] protected FriendState _initialState = FriendState.Idle;
         [SerializeField] protected Transform _destination;
+        [SerializeField] protected FriendStatus _friendStatus;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -75,7 +77,7 @@ namespace Ingame.Tanihira
 
         public override void FixedUpdateNetwork()
         {
-            if (!_networkRunner.IsServer) return;
+            if (!_networkRunner.IsServer && !HasInputAuthority) return;
             
             // 現在のステートのUpdateを呼び出し
             _currentStateInstance?.OnUpdate();
@@ -102,7 +104,7 @@ namespace Ingame.Tanihira
                     continue;
                 }
                 
-                mapping.stateComponent.Initialize(this);
+                mapping.stateComponent.Initialize(this, _friendStatus);
                 int index = (int)mapping.stateType;
                 
                 if (_stateInstances[index] != null)
@@ -112,6 +114,9 @@ namespace Ingame.Tanihira
                 
                 _stateInstances[index] = mapping.stateComponent;
             }
+            
+            _agent.enabled = false;
+            _agent.enabled = true;
         }
 
         /// <summary>
