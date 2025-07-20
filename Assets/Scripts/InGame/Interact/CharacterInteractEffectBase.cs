@@ -8,7 +8,6 @@ namespace InGame.Interact
     public abstract class CharacterInteractEffectBase
     {
         protected CharacterInteractEffectBase () { }
-        
         [SerializeField]
         private CharacterType _characterType = CharacterType.All;
 
