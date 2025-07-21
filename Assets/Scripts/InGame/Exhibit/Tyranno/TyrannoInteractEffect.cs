@@ -25,6 +25,8 @@ namespace InGame.Exhibit
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
+            _networkRunner = target.Runner;
+            _interactable = target;
             var charaType = context.CharacterType;
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
             if (charaType == CharacterType.OkabeWright)
@@ -43,14 +45,14 @@ namespace InGame.Exhibit
             {
                 GetOff();
             }
+            _tyrannoInteractable.OnInteractFixedUpdate(playerInput,_networkRunner.DeltaTime);
         }
 
-
+   
         private bool CheckInteractEnd()
         {
             if (_interactTimer > _interactTime) return true;
-            if (!_tyrannoInteractable.IsAlive) return true;
-            return false;
+            return !_tyrannoInteractable.IsAlive;
         }
 
         private void GetOn(PlayerRef ownerPlayerRef)
@@ -74,6 +76,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.transform.position = _getOffPoint.position;
             _tyrannoInteractable.GetOff(_ownerPlayerRef);
             _isInteracting = false;
+            _interactTimer = 0;
             _ownerPlayerRef = PlayerRef.None;
             _interactable.EndInteract();
         }
