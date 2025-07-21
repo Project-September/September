@@ -49,9 +49,10 @@ namespace InGame.Exhibit
              CameraController = GetComponent<CameraController>();
              Animator = GetComponent<Animator>();
              Rigidbody.isKinematic = true;
+             _currentHealth = _maxHealth;
         }
         
-        private void CreateHitbox(PlayerRef playerRef)
+        private void CreateHitBox(PlayerRef playerRef)
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
             {
@@ -68,32 +69,21 @@ namespace InGame.Exhibit
             };
         }
         
-        public override void FixedUpdateNetwork()
-        {
-            if(!HasInputAuthority) return;
-            GetInput(out PlayerInput input);
-            OnInteractFixedUpdate(input,Runner.DeltaTime);
-        }
-        
-        
         /// <summary>
         /// 展示物に乗ってる間のUpdate関数
-        /// HasInputAuthorityでしか動かないので注意
         /// </summary>
-        protected virtual void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
+        public virtual void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
         {
-            
+          
         }
 
         private void LateUpdate()
         {
-            if (!HasInputAuthority) return;
-            
             if (GameInput.I.Player.Aim.triggered)
             {
                 CameraController.CameraReset();
             }
-            CameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
+            CameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(),Runner.DeltaTime);
         }
 
         /// <summary>
@@ -103,12 +93,11 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOn(PlayerRef playerRef,PlayerStatus playerStatus)
         {
-            if(!HasStateAuthority) return;
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
-            Rigidbody.isKinematic = false;
-            CreateHitbox(playerRef);
+            RPC_SetIsKinematic(playerRef,false);
+            CreateHitBox(playerRef);
             _status = playerStatus;
         }
         
@@ -118,10 +107,9 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
-            if(!HasStateAuthority) return;
             Object.RemoveInputAuthority();
             RPC_SetCameraPriority(playerRef,5);
-            Rigidbody.isKinematic = true;
+            RPC_SetIsKinematic(playerRef,true);
             Executor = null;
             _status = null;
         }
@@ -133,6 +121,11 @@ namespace InGame.Exhibit
             {
                 CameraController.SetCameraPriority(priority);
             }
+        }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_SetIsKinematic(PlayerRef player, bool kinematic)
+        {
+           Rigidbody.isKinematic = kinematic;
         }
         
         public void TakeHit(ref HitData hitData)
