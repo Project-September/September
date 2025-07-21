@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using NaughtyAttributes;
 using September.Common;
@@ -6,37 +9,64 @@ using UnityEngine;
 
 namespace InGame.Exhibit
 {
+    /// <summary>
+    /// ロンドンテレフォンインタラクトRPC送信処理
+    /// </summary>
     public class LondonTelephoneInteractRPCInvoker : NetworkBehaviour
     {
-        [SerializeField,Label("敵下に表示するEffect")] private ParticleSystem _rippleSpawnPositionsEffect;
+        [SerializeField,Label("Effect持続時間")] private float _interactTimer;
         
         private EffectSpawner _effectSpawner;
-        
+        private CancellationTokenSource _cts;
+
+        private void Awake()
+        {
+            _cts =  new CancellationTokenSource();
+        }
+
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
         public void RpcRequestInteraction(PlayerRef requestingPlayer)
         {
             // ここで他のプレイヤーに通知
             foreach (var player in Runner.ActivePlayers)
             {
-                Debug.Log($"{player} is interacted with {requestingPlayer}");
-                
                 if (player != requestingPlayer)
-                {
-                    ShowEffect(player);
+                { 
+                    ShowEffect(player).Forget();
                 }
             }
         }
 
-        private void ShowEffect(PlayerRef player)
+        private async UniTask ShowEffect(PlayerRef player)
         {
-            Runner.TryGetPlayerObject(player,out var playerObject);
-            // 実行されたPlayerの地面にEffectを任意の数再生する
+            if (!Runner.TryGetPlayerObject(player, out var playerObject))
+                return;
+            
             Vector3 effectPosition = playerObject.transform.position + Vector3.down * 0.5f;
             
             // Effect生成処理
-            _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
-            _effectSpawner?.RequestPlayOneShotEffect(EffectType.LondonTelephone, effectPosition,
+            InitEffectSpawner();
+            string effectId = GenerateEffectId();
+            
+            _effectSpawner?.RequestPlayLoopEffect(
+                effectId,
+                EffectType.LondonTelephone,
+                effectPosition,
                 new());
+            
+            // Effectを消す
+            await UniTask.Delay(TimeSpan.FromSeconds(_interactTimer),cancellationToken: _cts.Token);
+            _effectSpawner?.StopEffect(effectId);
+        }
+
+        private void InitEffectSpawner()
+        {
+            _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
+        }
+
+        private static string GenerateEffectId()
+        {
+            return DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
         }
     }
 }

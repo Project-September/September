@@ -1,9 +1,10 @@
+using System;
 using Fusion;
 using InGame.Interact;
 
 namespace InGame.Exhibit
 {
-    // ロンドンテレフォン実装クラス
+    [Serializable]
     public class LondonTelephoneInteractEffect : CharacterInteractEffectBase
     {
         public LondonTelephoneInteractRPCInvoker LondonTelephoneInteractRPC;
