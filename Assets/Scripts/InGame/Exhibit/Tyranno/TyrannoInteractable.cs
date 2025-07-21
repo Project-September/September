@@ -12,9 +12,12 @@ public class TyrannoInteractable : MountableExhibitBase
     [SerializeField] private Vector3 _rayDirection;
     [SerializeField] private float _rayDistance;
     [SerializeField] private Vector3 _gravity;
+    [SerializeField] private float _maxRotateValue;
     
     private bool _isGround;
     private bool _isAttacking;
+    
+    private float _hitDistance;
     
     public override void GetOn(PlayerRef playerRef, PlayerStatus playerStatus)
     {
@@ -25,12 +28,14 @@ public class TyrannoInteractable : MountableExhibitBase
     {
         base.GetOff(playerRef);
     }
-
-    protected override void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
+    
+    public override void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
     {
         CheckIsGround();
-        AddGravity(deltaTime);
-        Move(playerInput);
+        var moveDirection =  Move(playerInput);
+        moveDirection.y = 0;
+        Rotate(deltaTime,moveDirection);
+        AdsorptionOnGround();
         AnimationTrigger(playerInput);
         OnAttackUpdate(deltaTime);
     }
@@ -56,15 +61,9 @@ public class TyrannoInteractable : MountableExhibitBase
         }
     }
     
-    private void AddGravity(float deltaTime)
-    {
-        Rigidbody.AddForce(_gravity * deltaTime, ForceMode.Acceleration);
-    }
-    
     private void CheckIsGround()
     {
-        bool ray = Physics.Raycast(transform.position + Vector3.up, _rayDirection, out RaycastHit hit,
-            _rayDistance);
+        bool ray = Physics.Raycast(transform.position + Vector3.up, _rayDirection, out RaycastHit hit, _rayDistance);
         var normal = hit.normal;
         if (ray && Vector3.Angle(normal, Vector3.up) < 90)
         {
@@ -72,22 +71,41 @@ public class TyrannoInteractable : MountableExhibitBase
             _groundNormal = normal;
             return;
         }
-
-        if (!ray || Vector3.Angle(normal, Vector3.up) >= 90)
+        if(!ray || Vector3.Angle(normal, Vector3.up) >= 90)
         {
             _isGround = false;
-            _groundNormal = Vector3.up;
         }
     }
 
-    private void Move(PlayerInput playerInput)
+
+    private Vector3 Move(PlayerInput playerInput)
     {
         var inputMoveDirection = playerInput.MoveDirection;
-        if (playerInput.MoveDirection == Vector2.zero) return;
+        if (playerInput.MoveDirection == Vector2.zero) return Vector3.zero;
         Vector3 cameraForward = CameraController.GetCameraForward();
         Vector3 cameraRight = CameraController.GetCameraRight();
         Vector3 moveDirection = cameraForward * inputMoveDirection.y + cameraRight * inputMoveDirection.x;
-        var moveVeloity = Vector3.ProjectOnPlane(moveDirection, _groundNormal).normalized;
-        Rigidbody.linearVelocity = moveVeloity * _moveSpeed;
+        var moveVelocity = Vector3.ProjectOnPlane(moveDirection, _groundNormal).normalized;
+        Rigidbody.linearVelocity = moveVelocity * _moveSpeed;
+        return moveDirection;
+    }
+    
+    private void Rotate(float deltaTime,Vector3 moveDirection)
+    {
+        if(moveDirection == Vector3.zero) return;
+        var rot = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(moveDirection),
+            _maxRotateValue * deltaTime);
+        transform.rotation = rot;
+    }
+    
+    private void AdsorptionOnGround()
+    {
+        if (_isGround) return;
+        bool ray = Physics.Raycast(transform.position + Vector3.up, _rayDirection, out RaycastHit hit,
+            1.5f);
+        if (ray && hit.distance > 0)
+        {
+            transform.position =new Vector3(transform.position.x, hit.point.y, transform.position.z);
+        }
     }
 }
