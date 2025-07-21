@@ -4061,7 +4061,6 @@ GameObject:
   - component: {fileID: 4696835047651077404}
   - component: {fileID: 8280030354532500360}
   - component: {fileID: 6832979121235241093}
-  - component: {fileID: 7539084698470820809}
   - component: {fileID: 2669641259973139376}
   m_Layer: 0
   m_Name: Tyranno
@@ -4229,7 +4228,7 @@ CapsuleCollider:
   m_Radius: 0.71
   m_Height: 3.24
   m_Direction: 1
-  m_Center: {x: 0, y: 1.51, z: -0.98}
+  m_Center: {x: 0, y: 1.62, z: -0.98}
 --- !u!114 &8280030354532500360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4285,20 +4284,6 @@ MonoBehaviour:
   StateHashes: 000000004eeb5158547a6bb24cf1e72e1eab980720e23b685928a8ce0d286c404e865f43
   TriggerHashes: 000000000d286c40
   TotalWords: 1
---- !u!114 &7539084698470820809
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2963193554367290089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1541381998, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Guid:
-    RawGuidValue: 4a2facbe8555c2847b979f964b505979
 --- !u!114 &2669641259973139376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4311,8 +4296,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05d3b908be554f1498b8bb71ffb69021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cameraController: {fileID: 6096804243085714266}
-  _animator: {fileID: 669838142312738991}
   _points: []
   _hitboxRadius: 0.2
   _hitMask:
@@ -4327,6 +4310,7 @@ MonoBehaviour:
   _rayDirection: {x: 0, y: -1, z: 0}
   _rayDistance: 1
   _gravity: {x: 0, y: -20, z: 0}
+  _maxRotateValue: 0
 --- !u!1 &2975265495783566176
 GameObject:
   m_ObjectHideFlags: 0
