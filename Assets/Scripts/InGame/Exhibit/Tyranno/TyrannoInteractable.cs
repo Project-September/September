@@ -76,15 +76,26 @@ public class TyrannoInteractable : MountableExhibitBase
             _isGround = false;
         }
     }
-
-
+    
+    /// <summary> カメラ視点の移動入力を取得 </summary>
+    Vector2 GetMoveDirection(Vector2 moveInput, float cameraYaw)
+    {
+        float radYaw = -cameraYaw * Mathf.Deg2Rad;
+        return new Vector2(
+            moveInput.x * Mathf.Cos(radYaw) - moveInput.y * Mathf.Sin(radYaw),
+            moveInput.x * Mathf.Sin(radYaw) + moveInput.y * Mathf.Cos(radYaw)
+        );
+    }
+    
     private Vector3 Move(PlayerInput playerInput)
     {
         var inputMoveDirection = playerInput.MoveDirection;
         if (playerInput.MoveDirection == Vector2.zero) return Vector3.zero;
-        Vector3 cameraForward = CameraController.GetCameraForward();
-        Vector3 cameraRight = CameraController.GetCameraRight();
-        Vector3 moveDirection = cameraForward * inputMoveDirection.y + cameraRight * inputMoveDirection.x;
+        // Vector3 cameraForward = CameraController.GetCameraForward();
+        // Vector3 cameraRight = CameraController.GetCameraRight();
+        // Vector3 moveDirection = cameraForward * inputMoveDirection.y + cameraRight * inputMoveDirection.x;
+        var moveVector2 = GetMoveDirection(inputMoveDirection, playerInput.CameraYaw);
+        var moveDirection = new Vector3(moveVector2.x, 0, moveVector2.y);
         var moveVelocity = Vector3.ProjectOnPlane(moveDirection, _groundNormal).normalized;
         Rigidbody.linearVelocity = moveVelocity * _moveSpeed;
         return moveDirection;
