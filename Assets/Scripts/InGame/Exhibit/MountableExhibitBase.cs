@@ -29,9 +29,6 @@ namespace InGame.Exhibit
         #endregion
         
         #region DamageableParam
-        public Action OnDeath { get; set; }
-        
-        PlayerStatus _status;
         public bool IsAlive =>_currentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
 
@@ -95,16 +92,14 @@ namespace InGame.Exhibit
         /// <summary>
         /// インタラクト開始時の切り替え処理
         /// ホストでのみ実行される点に注意
-        /// TODO PlayerStatusの参照渡しの方法考える 
         /// </summary>
-        public virtual void GetOn(PlayerRef playerRef,PlayerStatus playerStatus)
+        public virtual void GetOn(PlayerRef playerRef)
         {
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
             RPC_SetIsKinematic(playerRef,false);
             CreateHitBox(playerRef);
-            _status = playerStatus;
         }
         
         /// <summary>
@@ -117,7 +112,6 @@ namespace InGame.Exhibit
             RPC_SetCameraPriority(playerRef,5);
             RPC_SetIsKinematic(playerRef,true);
             Executor = null;
-            _status = null;
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -142,7 +136,6 @@ namespace InGame.Exhibit
 
             if (HasStateAuthority)
             {
-                if (!IsAlive) OnDeath?.Invoke();
                 hitData.Executor?.HitExecution(hitData);
             }
         }
@@ -169,7 +162,7 @@ namespace InGame.Exhibit
             if (_isInvincible) return 0;
             var prevHealth = _currentHealth;
             _currentHealth = Mathf.Clamp(_currentHealth - damage, 0, _maxHealth);
-            return prevHealth - _status.CurrentHealth;
+            return prevHealth - _currentHealth;
         }
 
         int TakeHeal(int heal)
@@ -177,7 +170,7 @@ namespace InGame.Exhibit
             if (_isInvincible) return 0;
             var prevHealth = _currentHealth;
             _currentHealth = Mathf.Clamp(_currentHealth + heal, 0, _maxHealth);
-            return prevHealth - _status.CurrentHealth;
+            return prevHealth - _currentHealth;
         }
 
     }
