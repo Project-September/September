@@ -19,9 +19,9 @@ public class TyrannoInteractable : MountableExhibitBase
     
     private float _hitDistance;
     
-    public override void GetOn(PlayerRef playerRef, PlayerStatus playerStatus)
+    public override void GetOn(PlayerRef playerRef)
     {
-        base.GetOn(playerRef, playerStatus);
+        base.GetOn(playerRef);
     }
 
     public override void GetOff(PlayerRef playerRef)
@@ -118,5 +118,10 @@ public class TyrannoInteractable : MountableExhibitBase
         {
             transform.position =new Vector3(transform.position.x, hit.point.y, transform.position.z);
         }
+    }
+
+    public void IsInteractingAnimationTrigger(bool isInteracting)
+    {
+        Animator.SetBool("IsInteracting", isInteracting);
     }
 }
