@@ -63,9 +63,9 @@ namespace InGame.Exhibit
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
-            var status = _ownerPlayerManager.gameObject.GetComponent<PlayerStatus>();
-            _tyrannoInteractable.GetOn(ownerPlayerRef, status);
+            _tyrannoInteractable.GetOn(ownerPlayerRef);
             _isInteracting = true;
+            _tyrannoInteractable.IsInteractingAnimationTrigger(_isInteracting);
         }
 
         private void GetOff()
@@ -76,6 +76,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.transform.position = _getOffPoint.position;
             _tyrannoInteractable.GetOff(_ownerPlayerRef);
             _isInteracting = false;
+            _tyrannoInteractable.IsInteractingAnimationTrigger(_isInteracting);
             _interactTimer = 0;
             _ownerPlayerRef = PlayerRef.None;
             _interactable.EndInteract();
