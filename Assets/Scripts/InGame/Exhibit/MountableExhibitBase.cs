@@ -46,7 +46,11 @@ namespace InGame.Exhibit
         public override void Spawned()
         {
              Rigidbody = GetComponent<Rigidbody>();
-             CameraController = GetComponent<CameraController>();
+             if (TryGetComponent(out CameraController cameraController))
+             {
+                 CameraController = cameraController;
+                 cameraController.Init(true);
+             }
              Animator = GetComponent<Animator>();
              Rigidbody.isKinematic = true;
              _currentHealth = _maxHealth;
@@ -76,16 +80,18 @@ namespace InGame.Exhibit
         {
           
         }
-
+        
         private void LateUpdate()
         {
+            if(!HasInputAuthority) return;
+            
             if (GameInput.I.Player.Aim.triggered)
             {
                 CameraController.CameraReset();
             }
             CameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(),Runner.DeltaTime);
         }
-
+        
         /// <summary>
         /// インタラクト開始時の切り替え処理
         /// ホストでのみ実行される点に注意
