@@ -20,6 +20,11 @@ namespace InGame.Interact
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
         [Networked] private float LastUsedCooldownTime { get; set; } = 0f;
+        
+        /// <summary>
+        /// 外部から強制的にインタラクト可能にするかどうかを設定するために使う
+        /// </summary>
+        [Networked] public bool ForceSetInteractable { get; set; } = true;
 
         public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
             _requiredInteractTimeDictionary;
@@ -57,16 +62,29 @@ namespace InGame.Interact
             var type = context.CharacterType;
             if (IsInCooldown())
             {
+                //Debug.LogError("[InteractableBase] クールダウン中のためインタラクトできません");
                 return false;
             }
 
             if (!Object.isActiveAndEnabled)
             {
-                Debug.Log($"[InteractableBase] オブジェクトが非アクティブです: {context.Interactor}");
+                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが無効です");
+                return false;
+            }
+            
+            if (!ForceSetInteractable)
+            {
+                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
                 return false;
             }
 
-            return OnValidateInteraction(context, type);
+            if (!OnValidateInteraction(context, type))
+            {
+                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -100,6 +118,7 @@ namespace InGame.Interact
 
         public bool IsInCooldown()
         {
+            if (LastUsedCooldownTime <= 0f) return false;
             var currentTime = Runner ? Runner.SimulationTime : Time.time;
             float timeSinceLast = currentTime - LastInteractTime;
             return timeSinceLast < LastUsedCooldownTime;
