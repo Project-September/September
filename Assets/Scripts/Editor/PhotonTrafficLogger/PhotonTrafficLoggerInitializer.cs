@@ -158,7 +158,7 @@ public class PhotonTrafficLoggerInitializer
         {
             var displayType = System.Type.GetType("PhotonTrafficLogger.PhotonTrafficLoggerRuntimeDisplay") ??
                              System.Type.GetType("PhotonTrafficLogger.PhotonTrafficLoggerRuntimeDisplay, Assembly-CSharp") ??
-                             PhotonTrafficLoggerInitializer.FindTypeByName("PhotonTrafficLoggerRuntimeDisplay");
+                             FindTypeByName("PhotonTrafficLoggerRuntimeDisplay");
             if (displayType != null)
             {
                 loggerObject.AddComponent(displayType);
@@ -175,7 +175,7 @@ public class PhotonTrafficLoggerInitializer
 
 public class PhotonTrafficLoggerMenuItem
 {
-    [MenuItem("Tools/Photon Traffic Logger/Start Logging")]
+    [MenuItem("September/Photon Traffic Logger/Start Logging")]
     public static void StartLogging()
     {
         if (!Application.isPlaying)
@@ -222,7 +222,7 @@ public class PhotonTrafficLoggerMenuItem
         }
     }
 
-    [MenuItem("Tools/Photon Traffic Logger/Stop Logging")]
+    [MenuItem("September/Photon Traffic Logger/Stop Logging")]
     public static void StopLogging()
     {
         var loggerType = System.Type.GetType("PhotonTrafficLogger.PhotonTrafficLogger") ??
@@ -244,7 +244,7 @@ public class PhotonTrafficLoggerMenuItem
         }
     }
 
-    [MenuItem("Tools/Photon Traffic Logger/Clear Logs")]
+    [MenuItem("September/Photon Traffic Logger/Clear Logs")]
     public static void ClearLogs()
     {
         var loggerType = System.Type.GetType("PhotonTrafficLogger.PhotonTrafficLogger") ??
@@ -266,7 +266,7 @@ public class PhotonTrafficLoggerMenuItem
         }
     }
 
-    [MenuItem("Tools/Photon Traffic Logger/Attach FusionStats to NetworkRunner")]
+    [MenuItem("September/Photon Traffic Logger/Attach FusionStats to NetworkRunner")]
     public static void AttachFusionStatsToNetworkRunner()
     {
         if (!Application.isPlaying)
@@ -290,7 +290,7 @@ public class PhotonTrafficLoggerMenuItem
         Debug.Log($"Attached FusionStatistics to {attachedCount} NetworkRunners (Total: {networkRunners.Length})");
     }
 
-    [MenuItem("Tools/Photon Traffic Logger/Force Initialize Logger")]
+    [MenuItem("September/Photon Traffic Logger/Force Initialize Logger")]
     public static void ForceInitializeLogger()
     {
         if (!Application.isPlaying)
@@ -333,7 +333,7 @@ public class PhotonTrafficLoggerMenuItem
         Debug.Log($"[PhotonTrafficLoggerInitializer] Force initialized traffic logger in scene: {SceneManager.GetActiveScene().name}");
     }
 
-    [MenuItem("Tools/Photon Traffic Logger/Check Logger Status")]
+    [MenuItem("September/Photon Traffic Logger/Check Logger Status")]
     public static void CheckLoggerStatus()
     {
         var loggerType = System.Type.GetType("PhotonTrafficLogger.PhotonTrafficLogger") ??

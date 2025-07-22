@@ -9,7 +9,7 @@ namespace PhotonTrafficLogger
         private PhotonTrafficLoggerSettings _settings = new();
         private Vector2 _scrollPosition;
 
-        [MenuItem("Tools/Photon Traffic Logger Editor")]
+        [MenuItem("September/Photon Traffic Logger Editor")]
         public static void ShowWindow()
         {
             GetWindow<PhotonTrafficLoggerEditorWindow>("Photon Traffic Logger");
