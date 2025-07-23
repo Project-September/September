@@ -176,8 +176,11 @@ public class PhotonTrafficLoggerInitializer : MonoBehaviour
         Debug.Log(
             $"[PhotonTrafficLoggerInitializer] Created PhotonTrafficLogger GameObject and added component: {addedComponent}");
 
-        // Add runtime display component for development builds
-        if (Debug.isDebugBuild)
+        // Add runtime display component for development builds and editor
+        var shouldAddDisplay = Debug.isDebugBuild || Application.isEditor || !Application.isEditor;  // Always add in builds
+        Debug.Log($"[PhotonTrafficLoggerInitializer] Should add runtime display: {shouldAddDisplay} (Debug.isDebugBuild: {Debug.isDebugBuild}, Application.isEditor: {Application.isEditor})");
+        
+        if (shouldAddDisplay)
         {
             var displayType = System.Type.GetType("PhotonTrafficLogger.PhotonTrafficLoggerRuntimeDisplay") ??
                               System.Type.GetType(
@@ -185,7 +188,12 @@ public class PhotonTrafficLoggerInitializer : MonoBehaviour
                               FindTypeByName("PhotonTrafficLoggerRuntimeDisplay");
             if (displayType != null)
             {
-                loggerObject.AddComponent(displayType);
+                var displayComponent = loggerObject.AddComponent(displayType);
+                Debug.Log($"[PhotonTrafficLoggerInitializer] Added runtime display component: {displayComponent}");
+            }
+            else
+            {
+                Debug.LogWarning("[PhotonTrafficLoggerInitializer] PhotonTrafficLoggerRuntimeDisplay type not found");
             }
         }
 
