@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
@@ -376,3 +377,4 @@ public class PhotonTrafficLoggerMenuItem
         Debug.Log($"Is InGame Scene: {PhotonTrafficLoggerInitializer.IsInGameScene(SceneManager.GetActiveScene().name)}");
     }
 }
+#endif
