@@ -53,7 +53,7 @@ namespace PhotonTrafficLogger
             var newPath = EditorGUILayout.TextField(_settings.LogOutputPath);
             if (GUILayout.Button("Browse", GUILayout.Width(60)))
             {
-                string selectedPath =
+                var selectedPath =
                     EditorUtility.OpenFolderPanel("Select Log Output Directory", _settings.LogOutputPath, "");
                 if (!string.IsNullOrEmpty(selectedPath))
                 {
@@ -84,9 +84,9 @@ namespace PhotonTrafficLogger
             GUILayout.Label("Status Information", EditorStyles.boldLabel);
 
             // Check if log directory exists
-            bool logDirExists = Directory.Exists(_settings.LogOutputPath);
-            string statusText = logDirExists ? "✓ Log directory exists" : "✗ Log directory does not exist";
-            Color statusColor = logDirExists ? Color.green : Color.red;
+            var logDirExists = Directory.Exists(_settings.LogOutputPath);
+            var statusText = logDirExists ? "✓ Log directory exists" : "✗ Log directory does not exist";
+            var statusColor = logDirExists ? Color.green : Color.red;
 
             GUI.color = statusColor;
             EditorGUILayout.LabelField(statusText);
