@@ -309,12 +309,6 @@ namespace September.Editor.BugTicketsManager
                 return false;
             }
         }
-
-        public void SetGASUrl(string gasUrl)
-        {
-            // TODO: 実際の実装では設定可能にする
-            Debug.Log($"GAS URL would be set to: {gasUrl}");
-        }
     }
 }
 #endif

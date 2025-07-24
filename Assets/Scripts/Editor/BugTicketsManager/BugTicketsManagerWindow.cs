@@ -88,14 +88,6 @@ namespace September.Editor.BugTicketsManager
             {
                 TestGasConnection();
             }
-            
-            
-            // 設定ボタン
-            if (GUILayout.Button("Settings", EditorStyles.toolbarButton, GUILayout.Width(60)))
-            {
-                // TODO: 設定画面を開く
-                Debug.Log("Settings button clicked - Not implemented yet");
-            }
             GUI.enabled = true;
             
             EditorGUILayout.EndHorizontal();
