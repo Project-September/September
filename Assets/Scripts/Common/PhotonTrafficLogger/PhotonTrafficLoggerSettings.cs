@@ -10,7 +10,7 @@ namespace PhotonTrafficLogger
     private const string LOGFileLimitKey = "PhotonTrafficLogger.LogFileLimit";
     private const string EnabledKey = "PhotonTrafficLogger.Enabled";
 
-    [SerializeField] private bool consoleOutput = true;
+    [SerializeField] private bool consoleOutput;
     [SerializeField] private string logOutputPath = "";
     [SerializeField] private int logFileLimit = 10;
     [SerializeField] private bool enabled;
