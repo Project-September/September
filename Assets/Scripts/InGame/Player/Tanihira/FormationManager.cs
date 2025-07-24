@@ -7,12 +7,13 @@ namespace Ingame.Tanihira
     public class FormationManager : MonoBehaviour
     {
         [SerializeField] private Transform _firstFormationTransform;
+        [SerializeField] private float _formationOffset = 1f;
         private List<FriendBase> _friendsList = new List<FriendBase>();
+        private Transform _playerTransform;
 
         private void Start()
         {
-            if(!_firstFormationTransform)
-                Debug.LogError("First formation transform is not set");
+            _playerTransform = GetComponent<Transform>();
         }
 
         /// <summary>
@@ -20,22 +21,23 @@ namespace Ingame.Tanihira
         /// </summary>
         /// <param name="friend"></param>
         public Transform Register(FriendBase friend)
-        {   
+        {
             //先頭の位置を返す
             if (_friendsList.Count == 0)
             {
                 _friendsList.Add(friend);
-                return _firstFormationTransform;
+                return _playerTransform;
             }
             else //最後尾のオブジェクトのTransformを返す
             {
-                Transform newDestination = _friendsList.Last().gameObject.transform;
+                Transform newDestination = _friendsList.Last().FormationPos;
+                _friendsList.Add(friend);
                 return newDestination;
             }
         }
 
         /// <summary>
-        /// フレンドの削除処理
+        /// フレンドの隊列削除処理
         /// </summary>
         /// <param name="friend"></param>
         public void DeleteFriend(FriendBase friend)
@@ -73,11 +75,11 @@ namespace Ingame.Tanihira
 
                     if (i == 0) //先頭の場合
                     {
-                        friend.SetDestination(_firstFormationTransform);
+                        friend.SetDestination(_playerTransform);
                     }
                     else
                     {
-                        friend.SetDestination(_friendsList[i - 1].gameObject.transform);
+                        friend.SetDestination(_friendsList[i - 1].FormationPos);
                     }
                 }
             }

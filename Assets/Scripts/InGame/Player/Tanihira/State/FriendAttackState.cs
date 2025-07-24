@@ -2,31 +2,23 @@ using UnityEngine;
 
 namespace Ingame.Tanihira
 {
-    public class FriendAttackState : FriendStateBase
+    public class FriendAttackState : IFriendState
     {
-        [SerializeField] private float stopDistance = 3f;
-
-        public override void OnEnter()
+        public void OnEnter(FriendBase friend)
         {
-            _owner.Agent.isStopped = true; //Navmeshを止める
-            _owner.Animator?.SetTrigger("Attack"); // アニメーターにAttackトリガーがある前提
+            friend.Agent.isStopped = true; //Navmeshを止める
+            friend.Animator?.SetTrigger("Attack"); // アニメーターにAttackトリガーがある前提
         }
 
-        public override void OnExit()
+        public void OnExit(FriendBase friend)
         {
             //Navmeshを再開
-            _owner.Agent.isStopped = false;
+            friend.Agent.isStopped = false;
         }
 
-        public override void OnUpdate()
+        public void OnUpdate(FriendBase friend)
         {
-            if (_owner.Destination == null) return;
-
-            float distance = Vector3.Distance(_owner.transform.position, _owner.Destination.position);
-            if (distance > stopDistance)
-            {
-                _owner.ChangeState(FriendState.Chase);
-            }
+            
         }
     }
 }

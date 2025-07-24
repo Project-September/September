@@ -3,48 +3,43 @@ using UnityEngine.AI;
 
 namespace Ingame.Tanihira
 {
-    public class FriendMoveState : FriendStateBase
+    public class FriendMoveState : IFriendState
     {
-        public override void OnEnter()
+        public void OnEnter(FriendBase friend)
         {
-            if (!_owner.Agent.isOnNavMesh)
+            if (!friend.Agent.isOnNavMesh)
             {
                 Debug.LogWarning("AgentはまだNavMesh上にいません");
                 return;
             }
             
             //目的地を設定
-            if (_owner.Destination != null)
-                _owner.Agent.SetDestination(_owner.Destination.position);
+            if (friend.Destination != null)
+                friend.Agent.SetDestination(friend.Destination.position);
             
             //agentが移動できるように設定
-            _owner.Agent.enabled = true;
-            _owner.Agent.isStopped = false;
-            _owner.Agent.updatePosition = true;
-            _owner.Agent.updateRotation = true;
+            friend.Agent.enabled = true;
+            friend.Agent.isStopped = false;
+            friend.Agent.updatePosition = true;
+            friend.Agent.updateRotation = true;
             
             //移動時のステータスを設定
-            _owner.Agent.speed = _status.FriendFormationSpeed; 
+            friend.Agent.speed = friend.FriendStatus.FriendFormationSpeed; 
         }
 
-        public override void OnExit()
+        public void OnExit(FriendBase friend)
         {
             
         }
 
-        public override void OnUpdate()
+        public void OnUpdate(FriendBase friend)
         {
-            Debug.Log(_owner.Agent.isOnNavMesh);
-            if (_owner.Destination == null || !_owner.Agent.isOnNavMesh) return;
+            if (friend.Destination == null || !friend.Agent.isOnNavMesh) return;
 
-            if (_owner.Destination.position != _owner.Agent.destination)
-            {
-                _owner.Agent.SetDestination(_owner.Destination.position);
-            }
+            friend.Agent.SetDestination(friend.Destination.position);
             
             //速度に応じて、アニメーションを変化させる
-            _owner.Animator.SetFloat("MoveBlend", _owner.Agent.velocity.magnitude);
-            Debug.Log(_owner.Agent.velocity.magnitude);
+            friend.Animator.SetFloat("MoveBlend", friend.Agent.velocity.magnitude);
         }
     }
 }

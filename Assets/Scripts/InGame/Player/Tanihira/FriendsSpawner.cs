@@ -35,7 +35,8 @@ namespace InGame.Tanihira
             for (int i = 0; i < _friendsTypes.Length; i++)
             {
                 Transform pos = _firstSpawnPoint;
-                pos.transform.position += new Vector3(i, 0, 0);
+                //仮で３の間隔開けている（複数スポーンするときのオフセット）
+                pos.transform.position += new Vector3(i * 3, 0, 0);
                 SpawnFriend(_friendsTypes[i], pos);
             }
         }

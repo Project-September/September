@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,16 +21,6 @@ namespace Ingame.Tanihira
     }
     
     /// <summary>
-    /// ステートとMonoBehaviourの対応付けを行うクラス
-    /// </summary>
-    [System.Serializable]
-    public class FriendStateMapping
-    {
-        [SerializeField] public FriendState stateType;
-        [SerializeField] public FriendStateBase stateComponent;
-    }
-    
-    /// <summary>
     /// フレンド機能のベースクラス
     /// </summary>
     public class FriendBase : NetworkBehaviour
@@ -37,19 +28,18 @@ namespace Ingame.Tanihira
         private FormationManager _formationManager;
 
         [SerializeField] protected Animator _animator;
-        [SerializeField] protected FriendStateMapping[] _friendStateMappings;
+        [SerializeField] protected Dictionary<FriendState, IFriendState> _friendStateMappings = new Dictionary<FriendState, IFriendState>();
         [SerializeField] protected FriendState _initialState = FriendState.Idle;
-        [SerializeField] protected Transform _destination;
+        [SerializeField, ReadOnly] protected Transform _destination;
         [SerializeField] protected FriendStatus _friendStatus;
+        [SerializeField] protected Transform _formationPos;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
         protected GameObject _ownerPlayer;
-        
-        //ステートマシン関連
         protected FriendState _currentState;
-        protected FriendStateBase _currentStateInstance;
-        protected FriendStateBase[] _stateInstances;
+
+        private static int _spawnCount;
         
         // プロパティ
         public NavMeshAgent Agent => _agent;
@@ -57,6 +47,9 @@ namespace Ingame.Tanihira
         public FormationManager FormationManager => _formationManager;
         public Transform Destination => _destination;
         public NetworkRunner NetworkRunner => _networkRunner;
+        public Transform FormationPos => _formationPos;
+        public FriendStatus FriendStatus => _friendStatus;
+        public FriendState CurrentState => _currentState;
 
         protected virtual void Awake()
         {
@@ -80,7 +73,7 @@ namespace Ingame.Tanihira
             if (!_networkRunner.IsServer && !HasInputAuthority) return;
             
             // 現在のステートのUpdateを呼び出し
-            _currentStateInstance?.OnUpdate();
+            _friendStateMappings[_currentState]?.OnUpdate(this);
         }
 
         /// <summary>
@@ -93,27 +86,6 @@ namespace Ingame.Tanihira
             {
                 _animator.applyRootMotion = false;
             }
-            _stateInstances = new FriendStateBase[System.Enum.GetValues(typeof(FriendState)).Length];
-            
-            //ステート関連の初期化
-            foreach (var mapping in _friendStateMappings)
-            {
-                if (mapping.stateComponent == null)
-                {
-                    Debug.LogWarning($"ステート {mapping.stateType} のコンポーネントが設定されていません");
-                    continue;
-                }
-                
-                mapping.stateComponent.Initialize(this, _friendStatus);
-                int index = (int)mapping.stateType;
-                
-                if (_stateInstances[index] != null)
-                {
-                    Debug.LogWarning($"ステート {mapping.stateType} が重複して設定されています");
-                }
-                
-                _stateInstances[index] = mapping.stateComponent;
-            }
             
             _agent.enabled = false;
             _agent.enabled = true;
@@ -125,41 +97,22 @@ namespace Ingame.Tanihira
         /// <param name="newState">新しいステート</param>
         public virtual void ChangeState(FriendState newState)
         {
-            var newStateComponent = _stateInstances[(int)newState];
-            if (newStateComponent == null)
+            if (_friendStateMappings[newState] == null)
             {
                 Debug.LogWarning($"ステート {newState} が設定されていません");
                 return;
             }
             
             // 現在のステートのOnExitを呼び出し、コンポーネントを無効化
-            if (_currentStateInstance != null)
-            {
-                _currentStateInstance.OnExit();
-            }
+            _friendStateMappings[_currentState]?.OnExit(this);
             
             // 新しいステートに変更
             _currentState = newState;
-            _currentStateInstance = newStateComponent;
             
             // 新しいステートのOnEnterを呼び出し
-            _currentStateInstance.OnEnter();
+            _friendStateMappings[_currentState]?.OnEnter(this);
         }
-
-        /// <summary>
-        /// 現在のステートを取得
-        /// </summary>
-        public FriendState GetCurrentState()
-        {
-            return _currentState;
-        }
-
-
-        [ContextMenu("ChangeDestination")]
-        public void ChangeDestination()
-        {
-            SetDestination(_destination);
-        }
+        
         /// <summary>
         /// 目的地を変更する
         /// </summary>

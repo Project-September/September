@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8aa1651fed06a7a4d81c2ea44ba3eb7e, type: 3}
-  m_Name: FriendDatabase
+  m_Script: {fileID: 11500000, guid: d9bce80afb3ae2c45b56591a8effbdd4, type: 3}
+  m_Name: PenguinStatus
   m_EditorClassIdentifier: 
-  _friendDataList:
-  - _type: 0
-    _friendObject: {fileID: 7135928600159188868, guid: 29379b28fdebbbf4298e89ac512a6749, type: 3}
+  _friendRotateSpeed: 120
+  _friendMoveSpeed: 3.5
+  _friendFormationMoveSpeed: 3.5
+  _friendChaseSpeed: 5
+  _attackPower: 10
