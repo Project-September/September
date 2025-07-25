@@ -15,48 +15,38 @@ jobs:
               if: failure()
               shell: powershell
               run: |
+                $repository = "${{ github.repository }}"
+                $branch = "${{ github.ref_name }}"
+                $runId = "${{ github.run_id }}"
                 $webhookUrl = "${{ secrets.DISCORD_WEBHOOK_URL }}"
-                $payload = @{
-                  embeds = @(
-                    @{
-                      title = "🚨 ビルド失敗通知"
-                      description = "WinBuild ワークフローが失敗しました"
-                      color = 15158332
-                      fields = @(
-                        @{
-                          name = "リポジトリ"
-                          value = "${{ github.repository }}"
-                          inline = $true
+
+                $body = @"
+                {
+                  "embeds": [
+                    {
+                      "title": "🚨 Build Failed",
+                      "description": "WinBuild workflow has failed",
+                      "color": 15158332,
+                      "fields": [
+                        {
+                          "name": "Repository",
+                          "value": "$repository",
+                          "inline": true
                         },
-                        @{
-                          name = "ブランチ"
-                          value = "${{ github.ref_name }}"
-                          inline = $true
+                        {
+                          "name": "Branch",
+                          "value": "$branch",
+                          "inline": true
                         },
-                        @{
-                          name = "コミット"
-                          value = "[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
-                          inline = $true
-                        },
-                        @{
-                          name = "実行者"
-                          value = "${{ github.actor }}"
-                          inline = $true
-                        },
-                        @{
-                          name = "実行時刻"
-                          value = "${{ github.event.head_commit.timestamp }}"
-                          inline = $true
-                        },
-                        @{
-                          name = "ログを確認"
-                          value = "[GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-                          inline = $true
+                        {
+                          "name": "View Logs",
+                          "value": "[GitHub Actions](https://github.com/$repository/actions/runs/$runId)",
+                          "inline": true
                         }
-                      )
-                      timestamp = "${{ github.event.head_commit.timestamp }}"
+                      ]
                     }
-                  )
-                } | ConvertTo-Json -Depth 10
+                  ]
+                }
+                "@
                 
-                Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType "application/json"
+                Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json"
