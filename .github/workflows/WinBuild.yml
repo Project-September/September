@@ -11,7 +11,6 @@ jobs:
         steps:
             - name: Build
               run: ../../../build.cmd
-              continue-on-error: true
             - name: DiscordFailurePost
               if: failure()
               run: |
