@@ -14,4 +14,31 @@ jobs:
               continue-on-error: true
             - name: DiscordFailurePost
               if: failure()
-              run: echo "失敗時通知"
+              run: |
+                curl -H "Content-Type: application/json" \
+                -X POST \
+                -d '{
+                  "embeds": [{
+                    "title": "🚨 ビルド失敗通知",
+                    "description": "MacBuild ワークフローが失敗しました",
+                    "color": 15158332,
+                    "fields": [
+                      {
+                        "name": "リポジトリ",
+                        "value": "${{ github.repository }}",
+                        "inline": true
+                      },
+                      {
+                        "name": "ブランチ",
+                        "value": "${{ github.ref_name }}",
+                        "inline": true
+                      },
+                      {
+                        "name": "ログを確認",
+                        "value": "[GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                        "inline": true
+                      }
+                    ],
+                  }]
+                }' \
+                ${{ secrets.DISCORD_WEBHOOK_URL }}
