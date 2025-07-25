@@ -13,31 +13,50 @@ jobs:
               run: ../../../build.cmd
             - name: DiscordFailurePost
               if: failure()
+              shell: powershell
               run: |
-                curl -H "Content-Type: application/json" \
-                -X POST \
-                -d '{
-                  "embeds": [{
-                    "title": "🚨 ビルド失敗通知",
-                    "description": "WinBuild ワークフローが失敗しました",
-                    "color": 15158332,
-                    "fields": [
-                      {
-                        "name": "リポジトリ",
-                        "value": "${{ github.repository }}",
-                        "inline": true
-                      },
-                      {
-                        "name": "ブランチ",
-                        "value": "${{ github.ref_name }}",
-                        "inline": true
-                      },
-                      {
-                        "name": "ログを確認",
-                        "value": "[GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
-                        "inline": true
-                      }
-                    ],
-                  }]
-                }' \
-                ${{ secrets.DISCORD_WEBHOOK_URL }}
+                $webhookUrl = "${{ secrets.DISCORD_WEBHOOK_URL }}"
+                $payload = @{
+                  embeds = @(
+                    @{
+                      title = "🚨 ビルド失敗通知"
+                      description = "WinBuild ワークフローが失敗しました"
+                      color = 15158332
+                      fields = @(
+                        @{
+                          name = "リポジトリ"
+                          value = "${{ github.repository }}"
+                          inline = $true
+                        },
+                        @{
+                          name = "ブランチ"
+                          value = "${{ github.ref_name }}"
+                          inline = $true
+                        },
+                        @{
+                          name = "コミット"
+                          value = "[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+                          inline = $true
+                        },
+                        @{
+                          name = "実行者"
+                          value = "${{ github.actor }}"
+                          inline = $true
+                        },
+                        @{
+                          name = "実行時刻"
+                          value = "${{ github.event.head_commit.timestamp }}"
+                          inline = $true
+                        },
+                        @{
+                          name = "ログを確認"
+                          value = "[GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                          inline = $true
+                        }
+                      )
+                      timestamp = "${{ github.event.head_commit.timestamp }}"
+                    }
+                  )
+                } | ConvertTo-Json -Depth 10
+                
+                Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType "application/json"
