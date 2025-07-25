@@ -24,22 +24,22 @@ jobs:
                 {
                   "embeds": [
                     {
-                      "title": "ビルド失敗通知",
-                      "description": "WinBuild が失敗しました",
+                      "title": "Build Failed",
+                      "description": "WinBuild workflow has failed",
                       "color": 15158332,
                       "fields": [
                         {
-                          "name": "リポジトリ",
+                          "name": "Repository",
                           "value": "$repository",
                           "inline": true
                         },
                         {
-                          "name": "ブランチ",
+                          "name": "Branch",
                           "value": "$branch",
                           "inline": true
                         },
                         {
-                          "name": "ログを確認",
+                          "name": "View Logs",
                           "value": "[GitHub Actions](https://github.com/$repository/actions/runs/$runId)",
                           "inline": true
                         }
