@@ -18,22 +18,22 @@ jobs:
                 -X POST \
                 -d '{
                   "embeds": [{
-                    "title": "ビルド失敗通知",
-                    "description": "MacBuild ワークフローが失敗しました",
+                    "title": "Build Failed Notification",
+                    "description": "MacBuild workflow has failed",
                     "color": 15158332,
                     "fields": [
                       {
-                        "name": "リポジトリ",
+                        "name": "Repository",
                         "value": "${{ github.repository }}",
                         "inline": true
                       },
                       {
-                        "name": "ブランチ",
+                        "name": "Branch",
                         "value": "${{ github.ref_name }}",
                         "inline": true
                       },
                       {
-                        "name": "ログを確認",
+                        "name": "View Logs",
                         "value": "[GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                         "inline": true
                       }
