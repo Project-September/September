@@ -18,7 +18,7 @@ jobs:
                 -X POST \
                 -d '{
                   "embeds": [{
-                    "title": "🚨 ビルド失敗通知",
+                    "title": "ビルド失敗通知",
                     "description": "MacBuild ワークフローが失敗しました",
                     "color": 15158332,
                     "fields": [
