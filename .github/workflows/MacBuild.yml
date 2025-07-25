@@ -37,7 +37,7 @@ jobs:
                         "value": "[GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})",
                         "inline": true
                       }
-                    ],
+                    ]
                   }]
                 }' \
                 ${{ secrets.DISCORD_WEBHOOK_URL }}
