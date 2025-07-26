@@ -68,7 +68,8 @@ namespace InGame.Player.Ability
             {
                 OnHit = collider =>
                 {
-                    if (collider.TryGetComponent(out IDamageable damageable))
+                    var damageable = collider.GetComponentInParent<IDamageable>();
+                    if (damageable != null)
                     {
                         _alreadyHit.Add(damageable);
                     }
