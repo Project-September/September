@@ -38,6 +38,7 @@ namespace InGame.Common
 
         public void AddEffect(StatusEffectSpec effectSpec)
         {
+            Debug.Log($"AddEffect: {effectSpec}");
             var index = ActiveEffectSpecs.FindIndex(statusEffectSpec => statusEffectSpec.Spec.DefEffect == effectSpec.DefEffect);
 
             if (index == -1)
@@ -125,6 +126,12 @@ namespace InGame.Common
             {
                 BaseValue = value;
                 CalculationValue();
+            }
+
+            public void SetValue(float value)
+            {
+                Value = value;
+                OnValueChanged.OnNext(Value);
             }
 
             public Stat(float baseValue, List<ActiveStatusEffect> activeEffects)
@@ -323,11 +330,11 @@ namespace InGame.Common
             }
         }
 
-        public readonly struct StatusEffectSpec
+        public struct StatusEffectSpec
         {
             public readonly StatusEffect DefEffect;
             public readonly DurationType DurationType;
-            public readonly float Duration;
+            public float Duration;
             public readonly bool IsPeriodic;
             public readonly float Period;
             public readonly ModifierSpec[] Modifiers;
