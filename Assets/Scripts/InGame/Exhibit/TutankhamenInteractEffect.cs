@@ -1,135 +1,108 @@
 using System;
 using CRISound;
-using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Common;
 using InGame.Interact;
 using InGame.Player;
 using September.Common;
 using September.InGame.Effect;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace InGame.Exhibit
 {
     [Serializable]
     public class TutankhamenInteractEffect : CharacterInteractEffectBase
     {
-        public ParticleSystem _tutankhamenHead;
-        public string _soundName;
-        public GameObject _effectPos;
-        public float _maskDuration = 5f;
-        public float _boostMultiplier = 1.5f;
+        public TutankhamenInteractRPCInvoker Invoker;
+        public float EffectDuration;
+        public string SoundName;
+        public GameObject EffectPos;
+        public float BoostMultiplier = 1.5f;
 
+        [SerializeField] private StatusEffect _buffEffect;
+        
+        private float OriginalSpeedRate = -1f;
+        // 過剰Destroy防止
         private bool _isDestroyScheduled;
         private EffectSpawner _effectSpawner;
-        private ParticleSystem _instantiateMask;
-        private bool _isMaskAttached;
-        
-        private float _originalSpeedRate = -1f;
+        // Interact対象
         private NetworkObject _targetPlayerObject;
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             _isDestroyScheduled = false;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
-            
-            // Runnerからplayerを取得する
+
             if (target.Runner.TryGetPlayerObject(playerRef, out var playerNetworkObject))
             {
-                var playerStatus = playerNetworkObject.GetComponent<PlayerStatus>();
-                if (playerStatus != null && playerStatus.HasStateAuthority)
+                if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
                 {
-                    _originalSpeedRate = playerStatus.MaxSpeedRate;
-                    playerStatus.MaxSpeedRate = playerStatus.MaxSpeedRate * _boostMultiplier;
-                    Debug.Log($"Boosted SpeedRate: {playerStatus.MaxSpeedRate}");
-                }
+                    // Buffを付与
+                    // OriginalSpeedRate = playerStatus.MaxSpeedRate;
+                    // playerStatus.MaxSpeedRate *= BoostMultiplier;
 
-                _targetPlayerObject = playerNetworkObject; // 後で戻す対象を保持
+                    EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
+                    spec.Duration = EffectDuration;
+                    spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
+                    playerStatus.AddEffect(spec);
+                }
                 
-                PlayEffect(playerNetworkObject,target.transform.position);
+                _targetPlayerObject = playerNetworkObject;
+                Invoker.RPC_AttachHeadMask(playerNetworkObject, EffectDuration);
+                PlayEffect();
             }
+            else
+                Debug.LogError("Player not found");
         }
 
         public override void OnInteractUpdate(float deltaTime)
         {
-            if (!_isDestroyScheduled && _isMaskAttached)
-            {
-                _isDestroyScheduled = true;
-                DestroyMask().Forget();
-            }
+            if (_isDestroyScheduled || Invoker == null || !Invoker.IsMaskAttached) 
+                return;
+            
+            _isDestroyScheduled = true;
+            Invoker.RPC_DestroyMask();
+            RestorePlayerSpeed();
+        }
+
+        // Buffを初期値に戻す
+        private void RestorePlayerSpeed()
+        {
+            // if (_targetPlayerObject != null && _targetPlayerObject.TryGetComponent(out PlayerStatus playerStatus))
+            // {
+            //     if (playerStatus.HasStateAuthority && OriginalSpeedRate >= 0f)
+            //     {
+            //         playerStatus.MaxSpeedRate = OriginalSpeedRate;
+            //     }
+            // }
+            //
+            // OriginalSpeedRate = -1f;
+            _targetPlayerObject = null;
         }
 
         public override CharacterInteractEffectBase Clone()
         {
             return new TutankhamenInteractEffect
             {
-                _soundName = _soundName , 
-                _tutankhamenHead = _tutankhamenHead,
-                _effectPos = _effectPos,
-                _maskDuration = _maskDuration,
-                _boostMultiplier = _boostMultiplier,
+                Invoker = Invoker,
+                EffectDuration = EffectDuration,
+                SoundName = SoundName,
+                EffectPos = EffectPos,
+                OriginalSpeedRate = OriginalSpeedRate,
+                BoostMultiplier = BoostMultiplier,
+                _buffEffect = _buffEffect
             };
         }
 
-        private async UniTaskVoid DestroyMask()
-        {
-            await UniTask.Delay(TimeSpan.FromSeconds(_maskDuration));
-
-            if (_instantiateMask != null)
-            {
-                Object.Destroy(_instantiateMask.gameObject);
-                _instantiateMask = null;
-            }
-            _isMaskAttached = false;
-
-            // 🧠 ステータスを元に戻す処理
-            if (_targetPlayerObject != null && _targetPlayerObject.TryGetComponent(out PlayerStatus status))
-            {
-                if (status.HasStateAuthority && _originalSpeedRate >= 0f)
-                {
-                    status.MaxSpeedRate = _originalSpeedRate;
-                    Debug.Log($"Restored SpeedRate: {status.MaxSpeedRate}");
-                }
-            }
-
-            _targetPlayerObject = null;
-            _originalSpeedRate = -1f;
-        }
-
         // 非同期でAnimationを再生する
-        private void PlayEffect(NetworkObject player,Vector3 targetPos)
+        private void PlayEffect()
         {
             // Effect生成処理
             _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
-            
-            _effectSpawner?.RequestPlayOneShotEffect(EffectType.Tutankhamen, _effectPos.transform.position,
-                _effectPos.transform.rotation,_effectPos.transform);
+            _effectSpawner?.RequestPlayOneShotEffect(EffectType.Tutankhamen, EffectPos.transform.position,
+                EffectPos.transform.rotation,EffectPos.transform);
             // 音量再生
-            CRIAudio.PlaySE("Exhibit",_soundName);
-            AttachHeadMask(player);
-        }
-
-        // 仮面をかぶる処理
-        private void AttachHeadMask(NetworkObject player)
-        {
-            if(_tutankhamenHead == null)
-                return;
-            
-            // Playerの頭の位置を探す
-            Transform head = player.transform.Find("Head");
-            if (head == null)
-            {
-                Debug.LogError("AttachHeadMask head is null");
-                return;
-            }
-            
-            // 仮面をインスタンスして頭の子にする
-            _instantiateMask = Object.Instantiate(_tutankhamenHead, head);
-            _instantiateMask.transform.localPosition = Vector3.zero;
-            _instantiateMask.transform.localRotation = Quaternion.identity;
-            
-            _instantiateMask.Play();
-            _isMaskAttached = true;
+            CRIAudio.PlaySE("Exhibit",SoundName);
         }
     }
 }

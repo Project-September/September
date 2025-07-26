@@ -248,6 +248,8 @@ MonoBehaviour:
     - 10
   _characterEffects:
   - rid: 3302172163222274142
+  _LastInteractTime: -9999
+  _ForceSetInteractable: 1
   references:
     version: 2
     RefIds:
@@ -255,11 +257,12 @@ MonoBehaviour:
       type: {class: TutankhamenInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 4
-        _tutankhamenHead: {fileID: 8639538251982876037, guid: 2644adf050ca8ae44bb76e4bbe841f87, type: 3}
-        _soundName: Tutankhamun
-        _effectPos: {fileID: 1814807729897626833}
-        _maskDuration: 5
-        _boostMultiplier: 1.5
+        Invoker: {fileID: 0}
+        EffectDuration: 5
+        SoundName: Tutankhamun
+        EffectPos: {fileID: 1814807729897626833}
+        BoostMultiplier: 1.5
+        _buffEffect: {fileID: 11400000, guid: d03292c0d5fa02441a73a4c8a85c9066, type: 2}
 --- !u!1 &8946548731749455363
 GameObject:
   m_ObjectHideFlags: 0

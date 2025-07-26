@@ -14,6 +14,8 @@ namespace September.Common
 {
     public class PreparationState : ImtStateMachine<InGameManager>.State
     {
+        [SerializeField] private Transform[] _spawnPositions;
+        private int _spawnPositionIndex;
         protected internal override void OnEnter()
         {
             HideCursor();
@@ -33,6 +35,7 @@ namespace September.Common
             {
                 var player = await Context.Runner.SpawnAsync(
                     container.GetCharacterData(pair.Value.CharacterType).Prefab,
+                    GetSpawnPosition(),
                     inputAuthority: pair.Key);
                 Context.Runner.SetPlayerObject(pair.Key, player);
                 if (!Context.PlayerDataDic.ContainsKey(pair.Key))
@@ -45,6 +48,12 @@ namespace September.Common
             }
             Context.Register(StaticServiceLocator.Instance);
             StartTimer().Forget();
+        }
+        private Vector3 GetSpawnPosition()
+        {
+            var result = _spawnPositions[_spawnPositionIndex].position;
+            _spawnPositionIndex = (_spawnPositionIndex + 1) % _spawnPositions.Length;
+            return result;
         }
         private void SetUpUI()
         {
