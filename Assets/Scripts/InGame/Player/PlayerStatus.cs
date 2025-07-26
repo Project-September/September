@@ -14,7 +14,7 @@ namespace InGame.Player
         [Networked, HideInInspector, OnChangedRender(nameof(OnChangeHealth))] public int CurrentHealth { get; set; }
         private void OnChangeHealth() => _currentHealth.Value = CurrentHealth;
         public float MaxStamina { get; private set; }
-        public float MaxSpeedRate { get; set; } = 1;
+        public float MaxSpeedRate { get; private set; } = 1;
         [Networked, HideInInspector, OnChangedRender(nameof(OnChangeStamina))] public float CurrentStamina { get; set; }
         private void OnChangeStamina() => _currentStamina.Value = CurrentStamina;
         public float StaminaRegen { get; private set; }
@@ -55,10 +55,10 @@ namespace InGame.Player
                 _staminaRegenStat = new Stat(_param.StaminaRegen, ActiveEffectSpecs);
                 _attackDamageStat = new Stat(_param.AttackDamage, ActiveEffectSpecs);
                 
-                _speedStat.OnPostApplyEffect.Subscribe(value => MaxSpeedRate = value).AddTo(this);
-                _staminaStat.OnPostApplyEffect.Subscribe(value => CurrentStamina = value).AddTo(this);
-                _staminaRegenStat.OnPostApplyEffect.Subscribe(value => StaminaRegen = value).AddTo(this);
-                _attackDamageStat.OnPostApplyEffect.Subscribe(value => AttackDamage = (int)value).AddTo(this);
+                _speedStat.OnValueChanged.Subscribe(value => MaxSpeedRate = value).AddTo(this);
+                _staminaStat.OnValueChanged.Subscribe(value => CurrentStamina = value).AddTo(this);
+                _staminaRegenStat.OnValueChanged.Subscribe(value => StaminaRegen = value).AddTo(this);
+                _attackDamageStat.OnValueChanged.Subscribe(value => AttackDamage = (int)value).AddTo(this);
             }
         }
 
@@ -69,16 +69,16 @@ namespace InGame.Player
                 switch (modifier.StatType)
                 {
                     case StatType.Speed:
-                        _speedStat.SetBaseValue(Mathf.Max(0, _speedStat.Value));
+                        _speedStat.SetValue(Mathf.Max(0, _speedStat.Value));
                         break;
                     case StatType.Stamina:
                         _staminaStat.SetBaseValue(Mathf.Clamp(_staminaStat.Value, 0, MaxStamina));
                         break;
                     case StatType.StaminaRegen:
-                        _staminaRegenStat.SetBaseValue(Mathf.Max(0, _staminaRegenStat.Value));
+                        _staminaRegenStat.SetValue(Mathf.Max(0, _staminaRegenStat.Value));
                         break;
                     case StatType.AttackDamage:
-                        _attackDamageStat.SetBaseValue(Mathf.Max(0, _attackDamageStat.Value));
+                        _attackDamageStat.SetValue(Mathf.Max(0, _attackDamageStat.Value));
                         break;
                 }
             }
