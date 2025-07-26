@@ -25,6 +25,7 @@ namespace InGame.Exhibit
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
+            if(_isInteracting) return;
             _networkRunner = target.Runner;
             _interactable = target;
             var charaType = context.CharacterType;
