@@ -60,9 +60,10 @@ public class TyrannoInteractable : MountableExhibitBase
     {
         if(!_isAttacking) return;
         Executor?.Tick(deltaTime);
-        if (Executor.IsFinished)
+        if (Executor is { IsFinished: true })
         {
             _isAttacking = false;
+            Executor.Init();
         }
     }
     

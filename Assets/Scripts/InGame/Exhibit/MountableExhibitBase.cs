@@ -59,7 +59,8 @@ namespace InGame.Exhibit
             {
                 OnHit = collider =>
                 {
-                    if (collider.TryGetComponent(out IDamageable damageable))
+                    var damageable = collider.GetComponentInParent<IDamageable>();
+                    if (damageable != null)
                     {
                         var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
                             damageable.OwnerPlayerRef);
