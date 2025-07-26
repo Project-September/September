@@ -8,7 +8,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
     private readonly float _hitboxRadius;
     private readonly LayerMask _hitMask = default;
     private readonly HashSet<Collider> _alreadyHit = new();
-    private readonly RaycastHit[] _hitBuffer = new RaycastHit[32]; // バッファサイズは必要に応じて調整
+    private RaycastHit[] _hitBuffer = new RaycastHit[32]; // バッファサイズは必要に応じて調整
 
     private int _currentFrame;
     private readonly int _startFrame;
@@ -26,7 +26,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
     {
         _points = points ?? new List<Transform>();
         _hitboxRadius = hitboxRadius;
-        _hitMask = hitMask == default ? ~0 : hitMask;
+        _hitMask = hitMask == 0 ? ~0 : hitMask;
         _startFrame = startFrame;
         _endFrame = endFrame;
         _currentFrame = 0;
@@ -47,8 +47,18 @@ public class MeleeHitboxExecutor : IHitboxExecutor
             ExecuteHitCheck();
         }
     }
+    
+    public void SetHitBufferSize(int size)
+    {
+        const int minSize = 1;
+        const int maxSize = 100;
+        Debug.Assert(size is >= minSize and <= maxSize);
 
-    private void ExecuteHitCheck()
+        size = Mathf.Clamp(size, minSize, maxSize);
+        _hitBuffer = new RaycastHit[size];
+    }
+    
+    public void ExecuteHitCheck()
     {
         if (_points.Count == 1)
         {
@@ -73,6 +83,12 @@ public class MeleeHitboxExecutor : IHitboxExecutor
                     start, end, _hitboxRadius,
                     direction.normalized, _hitBuffer, distance,
                     _hitMask);
+                
+              
+                if (hitCount == _hitBuffer.Length)
+                {
+                    Debug.LogWarning($"[MeleeHitboxExecutor] ヒット数がバッファ上限（{_hitBuffer.Length}）に達しました。見逃しの可能性あり。");
+                }
 
                 for (int j = 0; j < hitCount; j++)
                 {
@@ -98,7 +114,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
 
     private void TrySphereCastSingle(Transform point)
     {
-        if (point == null) return;
+        if (!point) return;
 
         var origin = point.position;
         var direction = point.forward;
@@ -109,6 +125,11 @@ public class MeleeHitboxExecutor : IHitboxExecutor
         int hitCount = Physics.SphereCastNonAlloc(
             origin, _hitboxRadius, direction,
             _hitBuffer, fallbackDistance, _hitMask);
+        
+        if (hitCount == _hitBuffer.Length)
+        {
+            Debug.LogWarning($"[MeleeHitboxExecutor] ヒット数がバッファ上限（{_hitBuffer.Length}）に達しました。見逃しの可能性あり。");
+        }
 
         for (int j = 0; j < hitCount; j++)
         {

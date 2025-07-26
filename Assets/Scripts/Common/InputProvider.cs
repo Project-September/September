@@ -14,6 +14,7 @@ namespace September.Common
         Dash,
         Interact,
         Attack,
+        Aim,
         Ability1,
         Ability2,
     }
@@ -53,6 +54,8 @@ namespace September.Common
             playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
             playerInput.Buttons.Set(PlayerButtons.Attack, playerActions.Attack.IsPressed());
             playerInput.Buttons.Set(PlayerButtons.Ability1, playerActions.Ability1.IsPressed());
+            playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
+            playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
             playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
             if (_mainCamera == null)
             {

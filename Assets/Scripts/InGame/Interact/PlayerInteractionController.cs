@@ -37,7 +37,12 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
         }
-        
+
+        public override void Spawned()
+        {
+            _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType;
+        }
+
         private void Update()
         {
             if (!HasInputAuthority) return;
@@ -193,8 +198,10 @@ namespace InGame.Interact
         {
             if (!_focusedObj)
                 return _baseInteractTime;
-            float baseTime = _focusedObj.RequiredInteractTimeDictionary.Dictionary
-                .GetValueOrDefault(_characterType, _baseInteractTime);
+            var dict = _focusedObj.RequiredInteractTimeDictionary.Dictionary;
+            float baseTime =
+                dict.TryGetValue(CharacterType.All, out var allVal) ? allVal :
+                dict.GetValueOrDefault(_characterType, _baseInteractTime);
 
             float multiplier = 1f;
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Object.InputAuthority, out var playerData) &&

@@ -33,7 +33,7 @@ namespace InGame.Exhibit
         {
             if (player.TryGetComponent<PlayerRenderer>(out var playerRenderer))
             {
-                playerRenderer.Rpc_SetOpticalCamouflageMaterial();
+                playerRenderer.Rpc_StartOpticalCamouflage();
             }
         }
 
@@ -42,7 +42,7 @@ namespace InGame.Exhibit
             await UniTask.WaitForSeconds(_duration);
             if (player.TryGetComponent<PlayerRenderer>(out var playerRenderer))
             {
-                playerRenderer.Rpc_ResetMaterial();
+                playerRenderer.Rpc_StopOpticalCamouflage();
             }
         }
     }
