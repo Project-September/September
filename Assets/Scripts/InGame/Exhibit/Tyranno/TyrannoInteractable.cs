@@ -8,16 +8,20 @@ using UnityEngine;
 public class TyrannoInteractable : MountableExhibitBase
 {
     [SerializeField] private float _moveSpeed;
+    [SerializeField] private float _walkSpeed;
+    [SerializeField] private float _dashSpeed;
     [SerializeField] private Vector3 _groundNormal;
     [SerializeField] private Vector3 _rayDirection;
     [SerializeField] private float _rayDistance;
     [SerializeField] private Vector3 _gravity;
     [SerializeField] private float _maxRotateValue;
-    
+    [SerializeField] private float _runBlendDelay;
     private bool _isGround;
     private bool _isAttacking;
     
     private float _hitDistance;
+    
+    private float _movingTime;
     
     public override void GetOn(PlayerRef playerRef)
     {
@@ -32,17 +36,19 @@ public class TyrannoInteractable : MountableExhibitBase
     public override void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
     {
         CheckIsGround();
+        var time = CheckMovingTime(playerInput, deltaTime);
+        _moveSpeed = time > 0.95f ? _dashSpeed : _walkSpeed;
         var moveDirection =  Move(playerInput);
         moveDirection.y = 0;
         Rotate(deltaTime,moveDirection);
         AdsorptionOnGround();
+        Animator.SetFloat("Blend",time);      
         AnimationTrigger(playerInput);
         OnAttackUpdate(deltaTime);
     }
 
     private void AnimationTrigger(PlayerInput playerInput)
     {
-        Animator.SetBool("Run", playerInput.MoveDirection == Vector2.zero ? false : true);
         if (playerInput.Buttons.IsSet(PlayerButtons.Attack))
         {
             _isAttacking = true;
@@ -54,7 +60,6 @@ public class TyrannoInteractable : MountableExhibitBase
     {
         if(!_isAttacking) return;
         Executor?.Tick(deltaTime);
-        Debug.Log("Attacking");
         if (Executor.IsFinished)
         {
             _isAttacking = false;
@@ -91,14 +96,22 @@ public class TyrannoInteractable : MountableExhibitBase
     {
         var inputMoveDirection = playerInput.MoveDirection;
         if (playerInput.MoveDirection == Vector2.zero) return Vector3.zero;
-        // Vector3 cameraForward = CameraController.GetCameraForward();
-        // Vector3 cameraRight = CameraController.GetCameraRight();
-        // Vector3 moveDirection = cameraForward * inputMoveDirection.y + cameraRight * inputMoveDirection.x;
         var moveVector2 = GetMoveDirection(inputMoveDirection, playerInput.CameraYaw);
         var moveDirection = new Vector3(moveVector2.x, 0, moveVector2.y);
         var moveVelocity = Vector3.ProjectOnPlane(moveDirection, _groundNormal).normalized;
         Rigidbody.linearVelocity = moveVelocity * _moveSpeed;
         return moveDirection;
+    }
+
+    private float CheckMovingTime(PlayerInput playerInput,float deltaTime)
+    {
+        if (playerInput.MoveDirection == Vector2.zero)
+        {
+            _movingTime = 0f;
+            return 0f;
+        }
+        _movingTime += deltaTime;
+        return Mathf.Clamp(_movingTime / _runBlendDelay, 0f, 1f);
     }
     
     private void Rotate(float deltaTime,Vector3 moveDirection)
