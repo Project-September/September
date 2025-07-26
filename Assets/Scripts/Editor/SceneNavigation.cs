@@ -34,6 +34,13 @@ public static class SceneNavigation
         OpenScene(3);
     }
 
+    [MenuItem("Scene/Lobby")]
+    public static void Scene04()
+    {
+        EditorSceneManager.SaveOpenScenes();
+        OpenScene(4);
+    }
+
     private static void OpenScene(int sceneIndex)
     {
         string scenePath = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
