@@ -17,9 +17,8 @@ namespace September.Lobby
         [SerializeField] Button _startButton;
         [SerializeField] Button _quitButton;
         [SerializeField] Text _roomNameText;
-        [SerializeField] private GameObject _imgEnd;
-        [SerializeField] private GameObject _fadePanel;
-        [SerializeField] private RectTransform _logoTransform;
+        [SerializeField] private Image _fadePanel;
+        [SerializeField] private Transform _contentTransform;
         readonly Dictionary<PlayerRef, LobbyPlayerUI> _lobbyPlayerUIDic = new();
         
         public override void Spawned()
@@ -52,7 +51,7 @@ namespace September.Lobby
 
         private async UniTaskVoid OnClick()
         {
-            await NetworkManager.Instance.Fade(_blackFadeImage, _logoTransform);
+            await NetworkManager.Instance.Fade(_fadePanel);
             NetworkManager.Instance.StartGame().Forget();
         }
         
@@ -71,7 +70,7 @@ namespace September.Lobby
             }
             else
             {
-                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_otherUIPrefab, _contentTransform));
+               // _lobbyPlayerUIDic.Add(playerRef, Instantiate(_otherUIPrefab, _contentTransform));
             }
         }
 
