@@ -10,17 +10,18 @@ namespace InGame.Exhibit
     {
         [Header("Tutankhamen Settings")]
         [SerializeField] private GameObject _tutankhamenHead;
-        [SerializeField] private float _maskDuration = 5f;
         
+        private float _maskDuration = 5f;
         private GameObject _instantiateMask;
         private bool _isMaskAttached;
         
         public bool IsMaskAttached => _isMaskAttached;
 
         [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
-        public void RPC_AttachHeadMask(NetworkObject player)
+        public void RPC_AttachHeadMask(NetworkObject player, float duration)
         {
             AttachHeadMask(player);
+            _maskDuration = duration;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
