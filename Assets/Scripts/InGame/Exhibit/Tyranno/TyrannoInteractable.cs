@@ -22,17 +22,19 @@ public class TyrannoInteractable : MountableExhibitBase
     private float _hitDistance;
     
     private float _movingTime;
-    
+
     public override void GetOn(PlayerRef playerRef)
     {
         base.GetOn(playerRef);
+        HitAction += OnHit;
     }
 
     public override void GetOff(PlayerRef playerRef)
     {
         base.GetOff(playerRef);
+        HitAction -= OnHit;
     }
-    
+
     public override void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
     {
         CheckIsGround();
@@ -45,6 +47,12 @@ public class TyrannoInteractable : MountableExhibitBase
         Animator.SetFloat("Blend",time);      
         AnimationTrigger(playerInput);
         OnAttackUpdate(deltaTime);
+
+    }
+
+    private void OnHit()
+    {
+        Animator.SetTrigger("Hit");
     }
 
     private void AnimationTrigger(PlayerInput playerInput)

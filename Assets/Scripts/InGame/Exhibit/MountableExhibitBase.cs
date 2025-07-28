@@ -17,6 +17,8 @@ namespace InGame.Exhibit
 
         protected Rigidbody Rigidbody { get; private set; }
         
+        protected Action HitAction { get; set; }
+        
         #region AttackParam
 
         protected MeleeHitboxExecutor Executor;
@@ -151,6 +153,7 @@ namespace InGame.Exhibit
             if (hitData.HitActionType == HitActionType.Damage)
             {
                 hitData.Amount = TakeDamage(hitData.Amount);
+                HitAction?.Invoke();
             }
             else if (hitData.HitActionType == HitActionType.Heal)
             {
