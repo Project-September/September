@@ -66,7 +66,6 @@ namespace InGame.Exhibit
                     {
                         var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
                             damageable.OwnerPlayerRef);
-                        Debug.Log($"Hit --> {hitData.TargetRef}に{hitData.Amount}ダメージ");
                         damageable.TakeHit(ref hitData);
                     }
                 }
