@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Fusion;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace September.Common
 {
@@ -94,7 +96,43 @@ namespace September.Common
             
             await _networkRunner.LoadScene(_gameSceneName);
         }
-        
+
+        // ToDo : ここなんとかする
+        public async UniTask Fade(Image fadeImage, Image ruleImage)
+        {
+            // フェード背景を透明から黒へ
+            fadeImage.color = new Color(0, 0, 0, 0);
+            await fadeImage.DOFade(1f, 1f)
+                .SetEase(Ease.InOutQuad)
+                .AsyncWaitForCompletion();
+
+            // ルール画像を透明にしておく
+            ruleImage.color = new Color(1f, 1f, 1f, 0f);
+            ruleImage.gameObject.SetActive(true);
+
+            // フェードイン（ルール画像表示）
+            await ruleImage.DOFade(1f, 1f)
+                .SetEase(Ease.InOutQuad)
+                .AsyncWaitForCompletion();
+
+            // 一定時間表示（例：2秒）
+            await UniTask.Delay(2000);
+
+            // フェードアウト（ルール画像を消す）
+            await ruleImage.DOFade(0f, 1f)
+                .SetEase(Ease.InOutQuad)
+                .AsyncWaitForCompletion();
+
+            // 背景もフェードアウト（必要に応じて）
+            await fadeImage.DOFade(0f, 1f)
+                .SetEase(Ease.InOutQuad)
+                .AsyncWaitForCompletion();
+            // await fadeImage.DOFade(1f, 2f);
+            //
+            // logoTransform.gameObject.SetActive(true);
+            // logoTransform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            // await logoTransform.DOScale(Vector3.one, 2f).SetEase(Ease.OutBack);
+        }
         
         public async UniTask QuitInGame()
         {

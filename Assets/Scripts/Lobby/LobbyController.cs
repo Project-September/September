@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
 using September.Common;
@@ -16,7 +17,9 @@ namespace September.Lobby
         [SerializeField] Button _startButton;
         [SerializeField] Button _quitButton;
         [SerializeField] Text _roomNameText;
-        [SerializeField] Transform _contentTransform;
+        [SerializeField] private GameObject _imgEnd;
+        [SerializeField] private GameObject _fadePanel;
+        [SerializeField] private RectTransform _logoTransform;
         readonly Dictionary<PlayerRef, LobbyPlayerUI> _lobbyPlayerUIDic = new();
         
         public override void Spawned()
@@ -30,7 +33,9 @@ namespace September.Lobby
             }
             if (Runner.IsServer)
             {
-                _startButton.onClick.AddListener(() => NetworkManager.Instance.StartGame().Forget());
+                _startButton.onClick.AddListener(() => OnClick().Forget());
+                // Fade処理
+                // イメージを追加
             }
             else
             {
@@ -43,6 +48,12 @@ namespace September.Lobby
         {
             Runner.RemoveCallbacks(this);
             PlayerDatabase.Instance.ChangedDataAction -= ChangeLobbyPlayerUI;
+        }
+
+        private async UniTaskVoid OnClick()
+        {
+            await NetworkManager.Instance.Fade(_blackFadeImage, _logoTransform);
+            NetworkManager.Instance.StartGame().Forget();
         }
         
         void AddContents(PlayerRef playerRef)
