@@ -249,7 +249,7 @@ namespace InGame.Interact
                 _interactWaitTimer = 0f;
 
                 Debug.Log($"[Client] RPC_RequestInteract 送信: {context.Interactor} -> {_focusedObj.name} NetObj is null? {!netObj}");
-                RPC_RequestInteract(context.Interactor, netObj);
+                RPC_RequestInteract(context.Interactor, (int)context.CharacterType,netObj);
             }
         }
 
@@ -261,15 +261,16 @@ namespace InGame.Interact
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        private void RPC_RequestInteract(int interactor, NetworkObject target)
+        private void RPC_RequestInteract(int interactor, int characterType, NetworkObject target)
         {
-            Debug.Log($"[PlayerInteractionController] <UNK>: {interactor} -> {target.name}");
+            Debug.Log($"target.HasStateAuthority: {target.HasStateAuthority}, Runner.LocalPlayer: {Runner.LocalPlayer}");
             if (target && target.TryGetComponent(out InteractableBase interactable))
             {
                 var context = new InteractableContext
-                {
-                    Interactor = interactor,
-                };
+                 {
+                     Interactor = interactor,
+                     CharacterType = (CharacterType)characterType
+                 };
 
                 interactable.Interact(context);
             }
