@@ -18,9 +18,9 @@ namespace September.Common
     {
         [SerializeField] private Transform[] _spawnPositions;
         [SerializeField] private Image _fadeImage;
-        private int _spawnPositionIndex;
-        protected internal override void OnEnter()
+        private int _spawnPositionIndex; protected internal override void OnEnter()
         {
+            _fadeImage.gameObject.SetActive(true);
             HideCursor();
             SetUpUI();
             if (Context.Runner.IsServer)
@@ -32,7 +32,6 @@ namespace September.Common
 
         private async UniTask Initialize()
         {
-            _fadeImage.gameObject.SetActive(true);
             await Runner.LoadScene("Field", LoadSceneMode.Additive);
             var container = CharacterDataContainer.Instance;
             foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
@@ -51,11 +50,22 @@ namespace September.Common
                 //PlayerHealthのOnDeathに登録
             }
             Context.Register(StaticServiceLocator.Instance);
-            await FadeIn();
             // ToDo : ここにAnimation処理
-            await StartAnimation();
+            // ToDo : Animationが終了するまで入力を受け付けなくする
+            RPC_FadeAndAnimation();
             StartTimer().Forget();
-            
+        }
+
+        [Rpc]
+        private void RPC_FadeAndAnimation()
+        {
+            FadeAndAnimation().Forget();
+        }
+
+        private async UniTaskVoid FadeAndAnimation()
+        {
+            await FadeIn();
+            await StartAnimation();
         }
         
         // 全ての準備が整ったらFadeをあける
@@ -63,14 +73,17 @@ namespace September.Common
         {
             _fadeImage.color = new Color(1f, 1f, 1f, 1f);
 
-            await _fadeImage.DOFade(0f, 0.5f).SetEase(Ease.InOutQuad);
+            await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
+            Debug.Log("Fadeの終了");
         }
 
         // ゲームスタート前にPlayerがポーズする
         private async UniTask StartAnimation()
         {
             // 仮実装
+            Debug.Log("Animation Start");
             await UniTask.Delay(5000);
+            Debug.Log("Animation End");
         }
         
         private Vector3 GetSpawnPosition()
@@ -114,7 +127,6 @@ namespace September.Common
             killedData.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
             killerData.Score += Context.AddScore;
-            Debug.Log($"鬼が{data.ExecutorRef}から{data.TargetRef}に変更された");
             RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
         }
         private async UniTask StartTimer()

@@ -193,25 +193,12 @@ namespace CRISound
                 _atomExPlayer.SetPreDelayTime(delay);
 
                 var playback = _atomExPlayer.Start();
-
-                WA(cueName).Forget();
-                Debug.Log($"[SoundPlayer:Play] Playing {_type}, Cue: {cueName}, Status: {_atomExPlayer.GetStatus()}");
                 
                 var cueId = info.id;
                 _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), cueId);
-                Debug.Log($"[Play] CueID: {cueId}, Sheet: {cueSheet}, CueName: {cueName}");
-                
 
                 return playback;
             }
-
-            private async UniTask WA(string cueName)
-            {
-                for (int i = 0; i < 10; i++) {
-                    await UniTask.Delay(50);
-                    Debug.Log($"[StatusCheck:{i}] {cueName}: {_atomExPlayer.GetStatus()}");
-                }
-            } 
 
             public virtual void Stop()
             {

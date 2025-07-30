@@ -103,8 +103,6 @@ namespace September.Common
             fadeImage.color = new Color(0f, 0f, 0f, 0f);
 
             await fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InOutQuad);
-            
-            // ここにシェーダーを使用したクリックしたときのような演出
         }
 
         
