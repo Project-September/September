@@ -61,7 +61,10 @@ namespace September.Lobby
 
         private async UniTaskVoid RunFadeAndStartGameAsync()
         {
-            await NetworkManager.Instance.Fade(_fadePanel);
+            if (_fadePanel)
+            {
+                await NetworkManager.Instance.Fade(_fadePanel);
+            }
             NetworkManager.Instance.StartGame().Forget();
         }
         

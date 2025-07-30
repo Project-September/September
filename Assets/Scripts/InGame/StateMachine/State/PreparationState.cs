@@ -20,7 +20,7 @@ namespace September.Common
         [SerializeField] private Image _fadeImage;
         private int _spawnPositionIndex; protected internal override void OnEnter()
         {
-            _fadeImage.gameObject.SetActive(true);
+            if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
             SetUpUI();
             if (Context.Runner.IsServer)
@@ -71,10 +71,13 @@ namespace September.Common
         // 全ての準備が整ったらFadeをあける
         private async UniTask FadeIn()
         {
-            _fadeImage.color = new Color(1f, 1f, 1f, 1f);
+            if (_fadeImage)
+            {
+                _fadeImage.color = new Color(1f, 1f, 1f, 1f);
 
-            await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
-            Debug.Log("Fadeの終了");
+                await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
+                Debug.Log("Fadeの終了");
+            }
         }
 
         // ゲームスタート前にPlayerがポーズする
