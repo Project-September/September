@@ -33,8 +33,6 @@ namespace September.Lobby
             if (Runner.IsServer)
             {
                 _startButton.onClick.AddListener(() => OnClick().Forget());
-                // Fade処理
-                // イメージを追加
             }
             else
             {
@@ -50,6 +48,18 @@ namespace September.Lobby
         }
 
         private async UniTaskVoid OnClick()
+        {
+            RPC_Fade();
+            
+        }
+
+        [Rpc]
+        private void RPC_Fade()
+        {
+            RunFadeAndStartGameAsync().Forget();
+        }
+
+        private async UniTaskVoid RunFadeAndStartGameAsync()
         {
             await NetworkManager.Instance.Fade(_fadePanel);
             NetworkManager.Instance.StartGame().Forget();
@@ -70,7 +80,7 @@ namespace September.Lobby
             }
             else
             {
-               // _lobbyPlayerUIDic.Add(playerRef, Instantiate(_otherUIPrefab, _contentTransform));
+                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_otherUIPrefab, _contentTransform));
             }
         }
 
