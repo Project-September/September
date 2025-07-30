@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Interact;
 using NaughtyAttributes;
 using September.Common;
 using September.InGame.Effect;
@@ -18,10 +19,12 @@ namespace InGame.Exhibit
         
         private EffectSpawner _effectSpawner;
         private CancellationTokenSource _cts;
+        private InteractableBase  _interactableBase;
 
         private void Awake()
         {
             _cts =  new CancellationTokenSource();
+            _interactableBase = GetComponent<InteractableBase>();
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -41,7 +44,9 @@ namespace InGame.Exhibit
         {
             if (!Runner.TryGetPlayerObject(player, out var playerObject))
                 return;
-            
+
+            // 同時インタラクト不可
+            _interactableBase.ForceSetInteractable = false;
             Vector3 effectPosition = playerObject.transform.position + Vector3.down * 0.5f;
             
             // Effect生成処理
@@ -57,6 +62,7 @@ namespace InGame.Exhibit
             // Effectを消す
             await UniTask.Delay(TimeSpan.FromSeconds(_interactTimer),cancellationToken: _cts.Token);
             _effectSpawner?.StopEffect(effectId);
+            _interactableBase.ForceSetInteractable =　true;　
         }
 
         private void InitEffectSpawner()

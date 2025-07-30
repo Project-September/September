@@ -50,7 +50,6 @@ namespace CRISound
 
         public static void Initialize()
         {
-            Debug.Log("Initializing CuePlayAtomExPlayer");
             _instance.LoadCueSheet();
         }
 
@@ -142,10 +141,12 @@ namespace CRISound
         public class SoundPlayer
         {
             private SoundType _type;
+            private string _currentCueName;
             private float _volume = 1.0f;
             protected CriAtomExPlayer _atomExPlayer;
 
             public bool IsPlaying => _atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing;
+            public string CurrentCueName => _currentCueName;
 
             public CriAtomExPlayer Player => _atomExPlayer;
 
@@ -169,11 +170,20 @@ namespace CRISound
                 _volume = volume;
                 _atomExPlayer.SetVolume(_volume);
             }
+            
+            public bool IsPlayingCue(string cueName)
+            {
+                return _atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing &&
+                       _currentCueName == cueName;
+            }
 
             public virtual CriAtomExPlayback Play(string cueSheet, string cueName, float delay = 0.0f)
             {
+                _currentCueName = cueName;
+
                 if (!_instance.IsReady)
                 {
+                    Debug.LogWarning($"[SoundPlayer:Queue] Not ready. Queued: {_type}, {cueSheet}/{cueName}");
                     _instance.PlayQueue(_type, cueSheet, cueName);
                     return default;
                 }
@@ -181,7 +191,13 @@ namespace CRISound
                 CueInfo info = _instance._soundDic[cueSheet].GetCueInfo(cueName);
                 _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), info.id);
                 _atomExPlayer.SetPreDelayTime(delay);
-                return _atomExPlayer.Start();
+
+                var playback = _atomExPlayer.Start();
+                
+                var cueId = info.id;
+                _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), cueId);
+
+                return playback;
             }
 
             public virtual void Stop()
@@ -197,8 +213,10 @@ namespace CRISound
             {
                 protected CriAtomEx3dSource _source = new();
                 protected CriAtomExPlayer _atomExPlayer3D = new();
+                private string _currentCueName;
 
                 public bool IsBusy => _atomExPlayer3D.GetStatus() == CriAtomExPlayer.Status.Playing;
+                public string CurrentCueName => _currentCueName;
 
                 public void Dispose()
                 {
@@ -208,6 +226,7 @@ namespace CRISound
 
                 public void Play3D(Vector3 playPos, string cueSheet, string cueName)
                 {
+                    _currentCueName = cueName;
                     _source.SetPosition(playPos.x, playPos.y, playPos.z);
                     _source.Update();
 
@@ -218,7 +237,15 @@ namespace CRISound
                     _atomExPlayer3D.UpdateAll();
                     _atomExPlayer3D.Start();
                 }
+
+                public bool IsPlayingCue(string cueName)
+                {
+                    var status = _atomExPlayer3D.GetStatus();
+                    var isNameMatch = _currentCueName == cueName;
+                    return status == CriAtomExPlayer.Status.Playing && isNameMatch;
+                }
             }
+
 
             private CriAtomEx3dListener _listener;
             Sound3D[] _sound3Ds = new Sound3D[AtomSourceBuffer];
@@ -255,6 +282,28 @@ namespace CRISound
                 }
 
                 return null;
+            }
+            
+            // 指定したSEの再生が終了しているかどうか
+            public bool Is3DCuePlaying(string cueName)
+            {
+                foreach (var s in _sound3Ds)
+                {
+                    if (s.IsPlayingCue(cueName))
+                    {
+                        Debug.Log("Playing cue");
+                        return true;
+                    }
+                        
+                }
+
+                return false;
+            }
+            
+            // すべてのSEの再生が終了しているか確認したいとき
+            public bool IsAny3DPlaying()
+            {
+                return _sound3Ds.Any(s => s.IsBusy);
             }
 
             public Sound3D Play3D(Vector3 playPos, string cueSheet, string cueName)
