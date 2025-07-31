@@ -26,7 +26,7 @@ namespace InGame.Exhibit
         public string _warpOutSoundName;
         
         private CancellationTokenSource _cts;
-
+        private InteractableBase  _interactableBase;
         private EffectSpawner _effectSpawner;
         
         public override CharacterInteractEffectBase Clone()
@@ -44,10 +44,13 @@ namespace InGame.Exhibit
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             _cts = new CancellationTokenSource();
+            _interactableBase =  target;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
             if(target.Runner.TryGetPlayerObject(playerRef, out NetworkObject playerNetworkObject))
             {
                 HandleWarpAsync(playerNetworkObject).Forget();
+                // 同時インタラクト不可
+                target.ForceSetInteractable = false;
             }
         }
 
@@ -76,6 +79,7 @@ namespace InGame.Exhibit
             PlayEffect(EffectType.Warp, targetPos, Quaternion.identity);
             SetPlayerVisible(player, true);
             PlaySE(_warpOutSoundName);
+            _interactableBase.ForceSetInteractable = true;
         }
 
         private void SetPlayerVisible(NetworkObject player, bool isVisible)

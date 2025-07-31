@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using Fusion;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 namespace InGame.Common
 {
-    public class AnimationClipPlayer : MonoBehaviour
+    public class AnimationClipPlayer : NetworkBehaviour
     {
         [SerializeField] protected Animator _animator;
     

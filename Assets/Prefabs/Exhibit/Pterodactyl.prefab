@@ -272,6 +272,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       insertIndex: -1
       addedObject: {fileID: 575448598117113101}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1450576261565196690}
   m_SourcePrefab: {fileID: 100100000, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
 --- !u!4 &2415067396731086122 stripped
 Transform:
@@ -303,6 +306,7 @@ MonoBehaviour:
   - {fileID: 3224355206795992074}
   - {fileID: 9185989298910053852}
   - {fileID: 575448598117113101}
+  - {fileID: 1450576261565196690}
   ForceRemoteRenderTimeframe: 0
 --- !u!95 &7030523243637594336
 Animator:
@@ -430,26 +434,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a83e4d48f29c354cadbcb7f7bc8ea00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredInteractTimeDictionary:
-    keys: 020000000100000003000000
-    values:
-    - 1
-    - 1
-    - 1
-  _cooldownTimeDictionary:
-    keys: 030000000100000002000000
-    values:
-    - 1
-    - 1
-    - 1
-  _characterEffects: []
-  _getOffPoint: {fileID: 302465785191893965}
+  _points: []
+  _hitboxRadius: 0.2
+  _hitMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _startFrame: 0
+  _endFrame: 34
+  _damageAmount: 100
+  _maxHealth: 0
   _crySE: Pteranodon_cry
   _flapSE: Pteranodon_Flapping_1
   _moveSpeed: 5
+--- !u!114 &1450576261565196690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3084925805453180816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 076425aa117f6da4e8296801168596ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredInteractTimeDictionary:
+    keys: 01000000
+    values:
+    - 1
+  _cooldownTimeDictionary:
+    keys: 01000000
+    values:
+    - 1
+  _characterEffects:
+  - rid: 3030609879844782089
+  _LastInteractTime: -9999
+  _ForceSetInteractable: 1
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 3030609879844782089
+      type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 1
+        _interactTime: 5
+        _getOffPoint: {fileID: 302465785191893965}
+        _pterodactylInteractable: {fileID: 575448598117113101}
 --- !u!1001 &3456470937934892131
 PrefabInstance:
   m_ObjectHideFlags: 0

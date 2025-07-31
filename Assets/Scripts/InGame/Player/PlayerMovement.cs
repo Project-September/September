@@ -70,6 +70,7 @@ namespace InGame.Player
 
         public void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
+            CheckGroundManual();
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
             // set velocity
@@ -381,28 +382,46 @@ namespace InGame.Player
             return onPlaneVec.magnitude;
         }
 
-        private void CheckGround(Collision collision)
+        // private void CheckGround(Collision collision)
+        // {
+        //     // 接触面が地面か
+        //     foreach (var contact in collision.contacts)
+        //     {
+        //         // 接地できる角度か & 接地面に対して離れる velocity で無いか
+        //         if (Vector3.Angle(Vector3.up, contact.normal) <= _groundSlopeThreshold && (Vector3.Angle(_moveVelocity, contact.normal) >= 89 || _moveVelocity == Vector3.zero))
+        //         {
+        //             _isGround = true;
+        //             _isGroundTimer = 0.1f;
+        //             _groundNormal = contact.normal;
+        //             return;
+        //         }
+        //     }
+        // }
+
+        // private void OnCollisionStay(Collision other)
+        // {
+        //     if (HasStateAuthority)
+        //     {
+        //         // 接地判定
+        //         CheckGround(other);
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Cliant Stay");
+        //     }
+        // }
+        
+        private void CheckGroundManual()
         {
-            // 接触面が地面か
-            foreach (var contact in collision.contacts)
+            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, 0.2f, _groundLayer))
             {
-                // 接地できる角度か & 接地面に対して離れる velocity で無いか
-                if (Vector3.Angle(Vector3.up, contact.normal) <= _groundSlopeThreshold && (Vector3.Angle(_moveVelocity, contact.normal) >= 89 || _moveVelocity == Vector3.zero))
+                if (Vector3.Angle(Vector3.up, hitInfo.normal) <= _groundSlopeThreshold)
                 {
                     _isGround = true;
                     _isGroundTimer = 0.1f;
-                    _groundNormal = contact.normal;
-                    return;
+                    _groundNormal = hitInfo.normal;
                 }
-            }
-        }
-
-        private void OnCollisionStay(Collision other)
-        {
-            if (HasStateAuthority)
-            {
-                // 接地判定
-                CheckGround(other);
             }
         }
 
