@@ -37,10 +37,6 @@ namespace InGame.Exhibit
             {
                 if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
                 {
-                    // Buffを付与
-                    // OriginalSpeedRate = playerStatus.MaxSpeedRate;
-                    // playerStatus.MaxSpeedRate *= BoostMultiplier;
-
                     EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
                     spec.Duration = EffectDuration;
                     spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
@@ -68,15 +64,6 @@ namespace InGame.Exhibit
         // Buffを初期値に戻す
         private void RestorePlayerSpeed()
         {
-            // if (_targetPlayerObject != null && _targetPlayerObject.TryGetComponent(out PlayerStatus playerStatus))
-            // {
-            //     if (playerStatus.HasStateAuthority && OriginalSpeedRate >= 0f)
-            //     {
-            //         playerStatus.MaxSpeedRate = OriginalSpeedRate;
-            //     }
-            // }
-            //
-            // OriginalSpeedRate = -1f;
             _targetPlayerObject = null;
         }
 
