@@ -308,10 +308,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7360204081370723474, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7360204081370723474, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[2]'
+      value: 
+      objectReference: {fileID: 212486371}
+    - target: {fileID: 7360204081370723474, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[4]'
       value: 
       objectReference: {fileID: 212486373}
     - target: {fileID: 7372161791688749408, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
@@ -367,11 +371,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2415067396731086122, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
   m_PrefabInstance: {fileID: 212486369}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &212486371 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 302465785191893965, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
+--- !u!114 &212486371 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 575448598117113101, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
   m_PrefabInstance: {fileID: 212486369}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212486372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a83e4d48f29c354cadbcb7f7bc8ea00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &212486372 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3084925805453180816, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
@@ -389,28 +399,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a83e4d48f29c354cadbcb7f7bc8ea00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredInteractTimeDictionary:
-    keys: 020000000100000003000000
-    values:
-    - 1
-    - 1
-    - 1
-  _cooldownTimeDictionary:
-    keys: 030000000100000002000000
-    values:
-    - 1
-    - 1
-    - 1
-  _characterEffects: []
-  _LastInteractTime: -9999
-  _ForceSetInteractable: 1
-  _getOffPoint: {fileID: 212486371}
-  _crySE: Pteranodon_cry
-  _flapSE: Pteranodon_Flapping_1
+  _points: []
+  _hitboxRadius: 0.2
+  _hitMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _startFrame: 0
+  _endFrame: 34
+  _damageAmount: 100
+  _maxHealth: 0
+  _crySe: Pteranodon_cry
+  _flapSe: Pteranodon_Flapping_1
   _moveSpeed: 5
-  references:
-    version: 2
-    RefIds: []
+  _rotationSpeed: 5
+  _turnThreshold: 30
+  _CurrentBlendValue: 0
 --- !u!1 &219337899
 GameObject:
   m_ObjectHideFlags: 0
@@ -1129,8 +1132,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.8034414, z: 0, w: 0.5953838}
-  m_LocalPosition: {x: -18.520782, y: -2.21, z: 24.732597}
+  m_LocalRotation: {x: 0.021659082, y: -0.9537019, z: 0.07086659, w: 0.2914817}
+  m_LocalPosition: {x: 16.483675, y: -3.7899077, z: 27.096619}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1617,7 +1620,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6127325779914019723, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.984
+      value: -9.16
       objectReference: {fileID: 0}
     - target: {fileID: 6127325779914019723, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: m_LocalPosition.z
