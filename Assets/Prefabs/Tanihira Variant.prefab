@@ -108,6 +108,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7211274858843390964}
+    - targetCorrespondingSourceObject: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9128960786709165582}
   m_SourcePrefab: {fileID: 100100000, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
 --- !u!4 &3862667250155884466 stripped
 Transform:
@@ -152,3 +155,23 @@ MonoBehaviour:
   _networkRunner: {fileID: 0}
   _firstSpawnPoint: {fileID: 3476019141667097556}
   _navmeshSerchRadius: 5
+--- !u!114 &9128960786709165582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4081215343970159104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ddfef8e6ccbe7459f4fee3c1494731, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _detectionCenter: {fileID: 3862667250155884466}
+  _detectionRadius: 7
+  _detectionMask:
+    serializedVersion: 2
+    m_Bits: 64
+  _obstacleMask:
+    serializedVersion: 2
+    m_Bits: 63

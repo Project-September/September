@@ -10,6 +10,7 @@ namespace Ingame.Tanihira
         [SerializeField] private float _formationOffset = 1f;
         private List<FriendBase> _friendsList = new List<FriendBase>();
         private Transform _playerTransform;
+        public List<FriendBase> FriendsList => _friendsList;
 
         private void Start()
         {
@@ -64,7 +65,6 @@ namespace Ingame.Tanihira
         }
 
         //隊列の整理をする
-
         private void SortFormation()
         {
             if(_friendsList.Count > 0)

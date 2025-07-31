@@ -13,11 +13,10 @@ namespace Ingame.Tanihira
     public enum FriendState
     {
         Idle,
-        Move,
+        Formation,
         Attack,
-        Patroll,
         Chase,
-        Dead
+        Stun
     }
     
     /// <summary>
@@ -25,8 +24,6 @@ namespace Ingame.Tanihira
     /// </summary>
     public class FriendBase : NetworkBehaviour
     {
-        private FormationManager _formationManager;
-
         [SerializeField] protected Animator _animator;
         [SerializeField] protected Dictionary<FriendState, IFriendState> _friendStateMappings = new Dictionary<FriendState, IFriendState>();
         [SerializeField] protected FriendState _initialState = FriendState.Idle;
@@ -40,6 +37,7 @@ namespace Ingame.Tanihira
         protected FriendState _currentState;
 
         private static int _spawnCount;
+        private FormationManager _formationManager;
         
         // プロパティ
         public NavMeshAgent Agent => _agent;
@@ -77,7 +75,7 @@ namespace Ingame.Tanihira
         }
 
         /// <summary>
-        /// ステートを初期化する
+        /// 初期化処理
         /// </summary>
         protected virtual void InitializeStates()
         {
@@ -89,6 +87,14 @@ namespace Ingame.Tanihira
             
             _agent.enabled = false;
             _agent.enabled = true;
+            InitializeAgent();
+        }
+
+        //ステータスをnavmeshに反映
+        private void InitializeAgent()
+        {
+            _agent.angularSpeed = _friendStatus.FriendMoveSpeed;
+            _agent.speed = _friendStatus.FriendMoveSpeed;
         }
 
         /// <summary>

@@ -78,7 +78,6 @@ namespace InGame.Tanihira
                     }
                 }
             }
-            
         }
     }
 
