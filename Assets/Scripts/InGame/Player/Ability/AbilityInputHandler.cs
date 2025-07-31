@@ -154,9 +154,8 @@ namespace InGame.Player.Ability
     {
         None,
         クリエイトフロア,
-        チャージショット,
         通常攻撃,
-        クリエイトシールド,
+        ハルハンマー,
         全てのアビリティ,
     }
     
