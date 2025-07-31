@@ -1,6 +1,7 @@
 using System;
 using CRISound;
 using Fusion;
+using InGame.Common;
 using InGame.Interact;
 using InGame.Player;
 using September.Common;
@@ -13,9 +14,12 @@ namespace InGame.Exhibit
     public class TutankhamenInteractEffect : CharacterInteractEffectBase
     {
         public TutankhamenInteractRPCInvoker Invoker;
+        public float EffectDuration;
         public string SoundName;
         public GameObject EffectPos;
         public float BoostMultiplier = 1.5f;
+
+        [SerializeField] private StatusEffect _buffEffect;
         
         private float OriginalSpeedRate = -1f;
         // 過剰Destroy防止
@@ -34,12 +38,17 @@ namespace InGame.Exhibit
                 if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
                 {
                     // Buffを付与
-                    OriginalSpeedRate = playerStatus.MaxSpeedRate;
-                    playerStatus.MaxSpeedRate *= BoostMultiplier;
+                    // OriginalSpeedRate = playerStatus.MaxSpeedRate;
+                    // playerStatus.MaxSpeedRate *= BoostMultiplier;
+
+                    EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
+                    spec.Duration = EffectDuration;
+                    spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
+                    playerStatus.AddEffect(spec);
                 }
                 
                 _targetPlayerObject = playerNetworkObject;
-                Invoker.RPC_AttachHeadMask(playerNetworkObject);
+                Invoker.RPC_AttachHeadMask(playerNetworkObject, EffectDuration);
                 PlayEffect();
             }
             else
@@ -59,15 +68,15 @@ namespace InGame.Exhibit
         // Buffを初期値に戻す
         private void RestorePlayerSpeed()
         {
-            if (_targetPlayerObject != null && _targetPlayerObject.TryGetComponent(out PlayerStatus playerStatus))
-            {
-                if (playerStatus.HasStateAuthority && OriginalSpeedRate >= 0f)
-                {
-                    playerStatus.MaxSpeedRate = OriginalSpeedRate;
-                }
-            }
-
-            OriginalSpeedRate = -1f;
+            // if (_targetPlayerObject != null && _targetPlayerObject.TryGetComponent(out PlayerStatus playerStatus))
+            // {
+            //     if (playerStatus.HasStateAuthority && OriginalSpeedRate >= 0f)
+            //     {
+            //         playerStatus.MaxSpeedRate = OriginalSpeedRate;
+            //     }
+            // }
+            //
+            // OriginalSpeedRate = -1f;
             _targetPlayerObject = null;
         }
 
@@ -76,10 +85,12 @@ namespace InGame.Exhibit
             return new TutankhamenInteractEffect
             {
                 Invoker = Invoker,
+                EffectDuration = EffectDuration,
                 SoundName = SoundName,
                 EffectPos = EffectPos,
                 OriginalSpeedRate = OriginalSpeedRate,
                 BoostMultiplier = BoostMultiplier,
+                _buffEffect = _buffEffect
             };
         }
 
