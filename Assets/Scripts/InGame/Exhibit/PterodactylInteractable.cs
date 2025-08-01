@@ -1,7 +1,6 @@
 using CRISound;
 using Fusion;
 using InGame.Interact;
-using InGame.Player;
 using September.Common;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ namespace InGame.Exhibit
     { 
         [Header("Sound Settings")] 
         [SerializeField] private string _crySe = "Pteranodon_cry"; 
-        [SerializeField] private string _flapSe = "Pteranodon_Flapping_1";
+        //[SerializeField] private string _flapSe = "Pteranodon_Flapping_1";
         
         [Header("Movement Settings")] 
         [SerializeField] private float _moveSpeed = 5f;
@@ -19,7 +18,6 @@ namespace InGame.Exhibit
         [SerializeField] private float _turnThreshold = 30f;
         
         private Rigidbody _rigidbody;
-        private CameraController _cameraController;
         private InteractableBase  _interactableBase;
         private Animator _animator;
         
@@ -39,7 +37,6 @@ namespace InGame.Exhibit
         private void Awake() 
         { 
             _rigidbody = GetComponent<Rigidbody>();
-            _cameraController = GetComponent<CameraController>(); 
             _interactableBase = GetComponent<InteractableBase>(); 
             _animator = GetComponent<Animator>();
             

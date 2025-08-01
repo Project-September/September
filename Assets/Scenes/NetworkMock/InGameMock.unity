@@ -409,7 +409,6 @@ MonoBehaviour:
   _damageAmount: 100
   _maxHealth: 0
   _crySe: Pteranodon_cry
-  _flapSe: Pteranodon_Flapping_1
   _moveSpeed: 5
   _rotationSpeed: 5
   _turnThreshold: 30
@@ -1414,6 +1413,131 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1349787539698749764, guid: e5f2324cbf4d5f24a8a6eab9ef219aca, type: 3}
+--- !u!1001 &954981018
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1653780193}
+    m_Modifications:
+    - target: {fileID: 1292007954863827809, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_Name
+      value: BokeBoke
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -12.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -10.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 16.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.31354496
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.94957334
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 143.454
+      objectReference: {fileID: 0}
+    - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8436487958072541038, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: SortKey
+      value: 676985060
+      objectReference: {fileID: 0}
+    - target: {fileID: 8436487958072541038, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8436487958072541038, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[2]'
+      value: 
+      objectReference: {fileID: 954981021}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1292007954863827809, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 954981022}
+    - targetCorrespondingSourceObject: {fileID: 1292007954863827809, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 954981021}
+  m_SourcePrefab: {fileID: 100100000, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+--- !u!4 &954981019 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+  m_PrefabInstance: {fileID: 954981018}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &954981020 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1292007954863827809, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+  m_PrefabInstance: {fileID: 954981018}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &954981021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954981020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 954981022}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 00000000c71eafa0dd8f954a2b1a167c79406955
+  TriggerHashes: 00000000
+  TotalWords: 1
+--- !u!95 &954981022
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954981020}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d5756dd0e534e9f439f8c85325beaf4a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1022028475
 GameObject:
   m_ObjectHideFlags: 0
@@ -1657,6 +1781,10 @@ PrefabInstance:
     - target: {fileID: 7228950578283369073, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: m_Name
       value: PropAirplane
+      objectReference: {fileID: 0}
+    - target: {fileID: 7228950578283369073, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2304,6 +2432,7 @@ Transform:
   - {fileID: 677699895}
   - {fileID: 878018698}
   - {fileID: 1888177966}
+  - {fileID: 954981019}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1682867988

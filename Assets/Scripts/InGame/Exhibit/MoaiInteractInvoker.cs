@@ -42,13 +42,14 @@ namespace InGame.Exhibit
         {
             _animator.SetBool(Speak, true);
             _animator.speed = _animationSpeed;
+            
             if (_speakCue == null)
             {
                 Debug.Log("Queを再生(まだ登録されていません)");
             }
             else
             {
-                CRIAudio.PlaySE("Exhibit",_speakCue);
+                //CRIAudio.PlaySE("Exhibit",_speakCue);
             }
             
             _interactableBase.ForceSetInteractable = false;
