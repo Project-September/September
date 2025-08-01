@@ -66,7 +66,6 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetMeshActive(false);
             _tyrannoInteractable.GetOn(ownerPlayerRef);
             _isInteracting = true;
-            _tyrannoInteractable.IsInteractingAnimationTrigger(_isInteracting);
         }
 
         private void GetOff()
@@ -77,7 +76,6 @@ namespace InGame.Exhibit
             _ownerPlayerManager.transform.position = _getOffPoint.position;
             _tyrannoInteractable.GetOff(_ownerPlayerRef);
             _isInteracting = false;
-            _tyrannoInteractable.IsInteractingAnimationTrigger(_isInteracting);
             _interactTimer = 0;
             _ownerPlayerRef = PlayerRef.None;
             _interactable.EndInteract();
