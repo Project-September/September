@@ -10,31 +10,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -12.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -10.52
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 16.16
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.31354496
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.94957334
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -42,7 +42,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 143.454
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -59,5 +59,110 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1248590409878750981}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8436487958072541038}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8829714614392578707}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2655757576312144843}
   m_SourcePrefab: {fileID: 100100000, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
+--- !u!1 &1292007954863827809 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5e997bdc3e83aeb4cb3befa0f1a681ac, type: 3}
+  m_PrefabInstance: {fileID: 2102982780369376816}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1248590409878750981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292007954863827809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 076425aa117f6da4e8296801168596ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredInteractTimeDictionary:
+    keys: 04000000
+    values:
+    - 3
+  _cooldownTimeDictionary:
+    keys: 04000000
+    values:
+    - 3
+  _characterEffects:
+  - rid: 5190192992005652564
+  _LastInteractTime: -9999
+  _ForceSetInteractable: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 5190192992005652564
+      type: {class: MoaiInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 4
+        MoaiInteractInvoker: {fileID: 8829714614392578707}
+--- !u!114 &8436487958072541038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292007954863827809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 3227069562
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1248590409878750981}
+  - {fileID: 8829714614392578707}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &8829714614392578707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292007954863827809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3543ec7cbf1c4eb2a5317ba9571d7816, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speakCue: 
+  _interactTime: 5
+  _animationSpeed: 3
+--- !u!65 &2655757576312144843
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292007954863827809}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.307625, y: 3.9366956, z: 2.206262}
+  m_Center: {x: 0.020582436, y: 2.002392, z: -0.024060132}
