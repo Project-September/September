@@ -6,8 +6,7 @@ namespace InGame.Player.Ability
 {
     public interface IAbilityExecutor
     {
-        public Dictionary<int, List<AbilityRuntimeInfo>> PlayerActiveAbilityInfo { get; }
-        void ApplyAbilityState(AbilitySharedState abilitySharedState);
+        public Dictionary<int, List<AbilityBase>> ActiveAbilities { get; }
         void RequestAbilityExecution(AbilityContext context);
     }
 }

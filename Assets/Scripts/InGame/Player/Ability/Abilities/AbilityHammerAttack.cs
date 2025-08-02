@@ -31,7 +31,6 @@ namespace InGame.Player.Ability
         private readonly Collider[] _hitBuffer = new Collider[16];
         private readonly HashSet<IDamageable> _alreadyHit = new();
 
-        public override bool RunLocal => false;
         public override string DisplayName => "ハンマー攻撃";
 
         public AbilityHammerAttack()

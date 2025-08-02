@@ -53,6 +53,54 @@ PrefabInstance:
       value: AbilityExecutor
       objectReference: {fileID: 0}
     - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: 'managedReferences[-2]'
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: _abilityReferences.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_abilityReferences.Array.data[0]'
+      value: 7643012117068513408
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_abilityReferences.Array.data[1]'
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: _cooldownTimeDictionary.keys.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: _cooldownTimeDictionary.values.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_cooldownTimeDictionary.keys.Array.data[1]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_cooldownTimeDictionary.keys.Array.data[2]'
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_cooldownTimeDictionary.keys.Array.data[3]'
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_cooldownTimeDictionary.values.Array.data[1]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_cooldownTimeDictionary.values.Array.data[2]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
+      propertyPath: '_cooldownTimeDictionary.values.Array.data[3]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 355170716067853116, guid: 52643197c4870fc49ac21aa68653aed4, type: 3}
       propertyPath: managedReferences[7643012117068513408]._cooldown
       value: 1
       objectReference: {fileID: 0}

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Fusion;
 using InGame.Common;
 using September.Common;
@@ -12,10 +10,12 @@ namespace InGame.Player.Ability
     public class AbilityExecutor : NetworkBehaviour, IAbilityExecutor, IRegisterableService
     {
         [SerializeReference, SubclassSelector] private List<AbilityBase> _abilityReferences = new();
-        private readonly Dictionary<int, List<AbilityRuntimeInfo>> _playerActiveAbilityInfo = new();
-        private bool _isInitialized = false;
-        private bool _abilityStateDirty = false;
+        [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
+        [SerializeField] private SerializableDictionary<CharacterType, float> _eachCharacterLastActiveTime = new();
+
         private ISpawner _spawner;
+        private bool _isInitialized = false;
+        public Dictionary<int, List<AbilityBase>> ActiveAbilities { get; } = new();
 
         private void Awake()
         {
@@ -28,18 +28,32 @@ namespace InGame.Player.Ability
             _isInitialized = true;
         }
 
-        public Dictionary<int, List<AbilityRuntimeInfo>> PlayerActiveAbilityInfo => _playerActiveAbilityInfo;
-
         public void RequestAbilityExecution(AbilityContext context)
         {
             if (!_isInitialized) Initialize();
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(context.SourcePlayer),
+                    out var playerData))
+            {
+                // クールダウンチェック
+                var characterType = playerData.CharacterType;
+                if (_eachCharacterLastActiveTime.Dictionary.TryGetValue(characterType, out var lastActiveTime))
+                {
+                    var cooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var allCooldown)
+                        ? allCooldown
+                        : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(characterType, 0f);
+                    if (Runner && Runner.SimulationTime - lastActiveTime < cooldownTime)
+                    {
+                        Debug.Log($"キャラクター {characterType} のアビリティはクールダウン中です。");
+                        return;
+                    }
+                }
+            }
 
+            // アビリティの開始通知を全プレイヤーに送信。現状はアニメーションを同期するのに使っている
             RPC_NotifyAbilityStart(context);
-            var abilityRef = _abilityReferences.Find(x => x.AbilityName == context.AbilityName);
             if (Runner.IsServer)
             {
-                TryExecuteAbilityUnified(context, isAuthority: true);
-                _abilityStateDirty = true;
+                ExecuteAbilityUnified(context);
             }
             else
             {
@@ -54,194 +68,47 @@ namespace InGame.Player.Ability
             abilityRef?.OnStartNotifyAll(context);
         }
 
-        private void TryExecuteAbilityUnified(AbilityContext context, bool isAuthority)
+        private void ExecuteAbilityUnified(AbilityContext context)
         {
             var abilityRef = _abilityReferences.Find(x => x.AbilityName == context.AbilityName);
-            if (abilityRef == null) return;
+            if (abilityRef == null)
+            {
+                Debug.LogError($"Ability {context.AbilityName} が見つかりません。");
+                return;
+            }
 
             var abilityInstance = abilityRef.Clone(abilityRef);
-            var activeAbilityInfo = _playerActiveAbilityInfo
-                .Where(x => x.Key == context.SourcePlayer)
-                .SelectMany(x => x.Value)
-                .ToList();
+            abilityInstance.InitAbility(context, _spawner);
 
-            if (!abilityInstance.TryInitializeWithTrigger(context, activeAbilityInfo, _spawner)) return;
+            if (!ActiveAbilities.ContainsKey(context.SourcePlayer))
+                ActiveAbilities[context.SourcePlayer] = new List<AbilityBase>();
 
-            var runtime = new AbilityRuntimeInfo
-            {
-                Instance = abilityInstance,
-                RunLocal = abilityInstance.RunLocal,
-                IsAuthorityInstance = isAuthority
-            };
+            ActiveAbilities[context.SourcePlayer].Add(abilityInstance);
 
-            if (!_playerActiveAbilityInfo.ContainsKey(context.SourcePlayer))
-                _playerActiveAbilityInfo[context.SourcePlayer] = new();
-
-            _playerActiveAbilityInfo[context.SourcePlayer].Add(runtime);
-            _abilityStateDirty = true;
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(context.SourcePlayer),
+                    out var playerData))
+                _eachCharacterLastActiveTime.Dictionary[playerData.CharacterType] = Runner.SimulationTime;
         }
-
-        private void Update()
-        {
-            if (!_isInitialized) Initialize();
-            if (!Runner || Runner.IsServer) return;
-
-            foreach (var activeAbility in _playerActiveAbilityInfo)
-            {
-                foreach (var runtime in activeAbility.Value)
-                {
-                    runtime.Instance.CalculateSharedVariable(Time.deltaTime);
-                }
-            }
-        }
-
+        
         public override void FixedUpdateNetwork()
         {
             if (!_isInitialized) Initialize();
 
-            foreach (var activeAbility in _playerActiveAbilityInfo)
+            foreach (var kvp in ActiveAbilities)
             {
-                foreach (var runtime in activeAbility.Value)
-                {
-                    if (runtime.RunLocal || runtime.IsAuthorityInstance)
-                    {
-                        runtime.Instance.Tick(Runner.DeltaTime);
-                    }
-
-                    runtime.Instance.CalculateSharedVariable(Runner.DeltaTime);
-                }
+                kvp.Value.RemoveAll(runtime => runtime.Phase == AbilityBase.AbilityPhase.Ended);
             }
-
-            foreach (var kvp in _playerActiveAbilityInfo)
-            {
-                int beforeCount = kvp.Value.Count;
-                kvp.Value.RemoveAll(runtime => runtime.Instance.Phase == AbilityBase.AbilityPhase.Ended);
-                if (kvp.Value.Count != beforeCount)
-                {
-                    _abilityStateDirty = true;
-                }
-            }
-
-            if (Runner.IsServer && _abilityStateDirty)
-            {
-                SendAbilityStateSnapshot();
-            }
-            _abilityStateDirty = false;
         }
 
-        private void SendAbilityStateSnapshot()
-        {
-            var playerIds = new List<int>();
-            var abilityNames = new List<int>();
-            var isRunningArray = new List<bool>();
-            var runLocalArray = new List<bool>();
-
-            foreach (var (playerId, runtimeList) in _playerActiveAbilityInfo)
-            {
-                foreach (var info in runtimeList)
-                {
-                    playerIds.Add(playerId);
-                    abilityNames.Add((int)info.Instance.AbilityName);
-                    isRunningArray.Add(!info.Instance.AfterCooldown);
-                    runLocalArray.Add(info.RunLocal);
-                }
-            }
-
-            RPC_SyncAbilityState(playerIds.ToArray(), abilityNames.ToArray(), isRunningArray.ToArray(), runLocalArray.ToArray());
-        }
-
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         private void RPC_RequestAbility(AbilityContext context)
         {
-            TryExecuteAbilityUnified(context, isAuthority: true);
-            _abilityStateDirty = true;
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SyncAbilityState(int[] playerIds, int[] abilityNames, bool[] isRunningArray, bool[] runLocalArray)
-        {
-            if (Runner.IsServer) return;
-            var syncedKeys = new HashSet<(int playerId, AbilityName abilityName)>();
-
-            for (int i = 0; i < playerIds.Length; i++)
-            {
-                var playerId = playerIds[i];
-                var ability = (AbilityName)abilityNames[i];
-                var isRunning = isRunningArray[i];
-                var runLocal = runLocalArray[i];
-
-                syncedKeys.Add((playerId, ability));
-
-                if (!_playerActiveAbilityInfo.TryGetValue(playerId, out var list))
-                {
-                    list = new List<AbilityRuntimeInfo>();
-                    _playerActiveAbilityInfo[playerId] = list;
-                }
-
-                var existing = list.FirstOrDefault(x => x.Instance.AbilityName == ability);
-
-                if (isRunning)
-                {
-                    if (existing == null)
-                    {
-                        var refAbility = _abilityReferences.Find(x => x.AbilityName == ability);
-                        if (refAbility == null) continue;
-
-                        var instance = refAbility.Clone(refAbility);
-                        instance.InitAbility(new AbilityContext { SourcePlayer = playerId }, _spawner);
-
-                        list.Add(new AbilityRuntimeInfo
-                        {
-                            Instance = instance,
-                            RunLocal = runLocal,
-                            IsAuthorityInstance = false
-                        });
-                    }
-                }
-                else
-                {
-                    if (existing != null && existing.Instance.CurrentCooldown <= 0f)
-                        list.Remove(existing);
-                }
-            }
-
-            foreach (var kvp in _playerActiveAbilityInfo)
-            {
-                kvp.Value.RemoveAll(info =>
-                    !syncedKeys.Contains((kvp.Key, info.Instance.AbilityName)) && info.Instance.AfterCooldown);
-            }
-            
-        }
-
-        public void ApplyAbilityState(AbilitySharedState abilitySharedState)
-        {
-            if (!_isInitialized) Initialize();
-            RPC_SyncAbilityState(abilitySharedState);
-        }
-        
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SyncAbilityState(AbilitySharedState abilityStates)
-        {
-            if (Runner.IsServer) return;
-            var playerId = abilityStates.OwnerPlayerId;
-            if (_playerActiveAbilityInfo.TryGetValue(playerId, out var list))
-            {
-                //該当アビリティを摘出
-                list.FirstOrDefault(x => x.Instance.AbilityName == abilityStates.AbilityName)?.Instance
-                    .ApplySharedState(abilityStates);
-            }
+            ExecuteAbilityUnified(context);
         }
 
         public void Register(ServiceLocator locator)
         {
             locator.Register<IAbilityExecutor>(this);
         }
-    }
-
-    public class AbilityRuntimeInfo
-    {
-        public AbilityBase Instance;
-        public bool RunLocal;
-        public bool IsAuthorityInstance;
     }
 }

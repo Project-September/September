@@ -23,7 +23,6 @@ namespace InGame.Player.Ability
         private float _remainingTime;
         private MeleeHitboxExecutor _executor;
 
-        public override bool RunLocal => false;
         public override string DisplayName => "通常攻撃";
 
         public AbilityNormalAttack()

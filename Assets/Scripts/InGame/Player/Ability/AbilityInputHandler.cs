@@ -20,6 +20,7 @@ namespace InGame.Player.Ability
         private NetworkButtons _previousButtons;
         private IAbilityExecutor _abilityExecutor;
         private readonly TriggerEventContext _cachedTriggerContext = new();
+
         public override void FixedUpdateNetwork()
         {
             if (!GetInput<PlayerInput>(out var input) || !HasInputAuthority) return;
@@ -57,20 +58,13 @@ namespace InGame.Player.Ability
                 if (action.Condition == null) continue;
                 if (!action.Condition.Evaluate(triggerCtx))
                 {
-                    //Debug.Log(triggerCtx.CurrentButtons + " で " + action.Condition.DisplayConditionName + " の条件を満たしていません。");
                     continue;
                 }
-                else
-                {
-                    Debug.Log(
-                        triggerCtx.CurrentButtons + " で " + action.Condition.DisplayConditionName + " の条件を満たしました。");
-                }
-
+                
                 var abilityCtx = new AbilityContext
                 {
                     SourcePlayer = Runner.LocalPlayer.RawEncoded,
                     AbilityName = action.AbilityName,
-                    ActionType = action.ActionType
                 };
 
                 _abilityExecutor ??= StaticServiceLocator.Instance.Get<IAbilityExecutor>();
@@ -89,7 +83,6 @@ namespace InGame.Player.Ability
     {
         [SerializeReference, SubclassSelector] public IActionCondition Condition;
         public AbilityName AbilityName;
-        public AbilityActionType ActionType;
     }
 
     /// <summary>
@@ -122,7 +115,8 @@ namespace InGame.Player.Ability
                 case AbilityTriggerType.タップ:
                     return ctx.PreviousButtons.IsSet(index) == false && ctx.CurrentButtons.IsSet(index);
                 case AbilityTriggerType.ホールド:
-                    return ctx.CurrentButtons.IsSet(index) && !ctx.CurrentButtons.GetPressed(ctx.PreviousButtons).IsSet(index);
+                    return ctx.CurrentButtons.IsSet(index) &&
+                           !ctx.CurrentButtons.GetPressed(ctx.PreviousButtons).IsSet(index);
                 case AbilityTriggerType.リリース:
                     return ctx.CurrentButtons.GetReleased(ctx.PreviousButtons).IsSet(index);
                 default:
@@ -160,12 +154,6 @@ namespace InGame.Player.Ability
         リリース,
     }
 
-    public enum AbilityActionType
-    {
-        発動,
-        停止,
-    }
-
     /// <summary>
     /// 実行するアビリティのEnum
     /// 後でAbilityBaseを継承したクラスに合わせて自動生成するようにする
@@ -186,13 +174,12 @@ namespace InGame.Player.Ability
     [Serializable]
     public struct AbilityContext : INetworkStruct, IEquatable<AbilityContext>
     {
-        public AbilityActionType ActionType;
         public int SourcePlayer;
         public AbilityName AbilityName;
 
         public bool Equals(AbilityContext other)
         {
-            return ActionType == other.ActionType && SourcePlayer.Equals(other.SourcePlayer) &&
+            return SourcePlayer.Equals(other.SourcePlayer) &&
                    AbilityName == other.AbilityName;
         }
 
@@ -203,7 +190,7 @@ namespace InGame.Player.Ability
 
         public override int GetHashCode()
         {
-            return HashCode.Combine((int)ActionType, SourcePlayer, (int)AbilityName);
+            return HashCode.Combine(SourcePlayer, (int)AbilityName);
         }
     }
 
