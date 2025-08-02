@@ -21,7 +21,6 @@ namespace InGame.Player.Ability
 
         private float _remainingTime;
         private MeleeHitboxExecutor _executor;
-        private readonly HashSet<IDamageable> _alreadyHit = new();
 
         public override bool RunLocal => false;
         public override string DisplayName => "通常攻撃";
@@ -71,13 +70,18 @@ namespace InGame.Player.Ability
                     var damageable = collider.GetComponentInParent<IDamageable>();
                     if (damageable != null)
                     {
-                        _alreadyHit.Add(damageable);
+                        var hitData = new HitData(
+                            HitActionType.Damage,
+                            _attackDamage,
+                            PlayerRef.FromEncoded(Context.SourcePlayer),
+                            damageable.OwnerPlayerRef);
+                        damageable.TakeHit(ref hitData);
+                        // ヒットエフェクトを再生
                     }
                 }
             };
 
             _remainingTime = _attackDuration;
-            _alreadyHit.Clear();
         }
 
         protected override void OnUpdate(float deltaTime)
