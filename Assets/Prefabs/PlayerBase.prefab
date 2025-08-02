@@ -5101,6 +5101,7 @@ MonoBehaviour:
   - {fileID: -3905644752378878134}
   - {fileID: 958249503331897705}
   - {fileID: 7710838205980989238}
+  - {fileID: 2221120114231077883}
   - {fileID: 7508249662566368237}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
@@ -5287,21 +5288,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abilityActionContexts:
   - Condition:
-      rid: 7643012117068513393
-    AbilityName: 1
-    ActionType: 0
-  - Condition:
       rid: 7643012117068513402
     AbilityName: 3
     ActionType: 0
   references:
     version: 2
     RefIds:
-    - rid: 7643012117068513393
-      type: {class: ButtonActionConditionBase, ns: InGame.Player.Ability, asm: Scripts}
-      data:
-        Button: 4
-        TriggerType: 0
     - rid: 7643012117068513402
       type: {class: ButtonActionConditionBase, ns: InGame.Player.Ability, asm: Scripts}
       data:
