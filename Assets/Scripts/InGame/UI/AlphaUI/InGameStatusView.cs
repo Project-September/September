@@ -21,6 +21,7 @@ namespace September.InGame.UI
         [SerializeField, Label("TimerUI")] private TextMeshProUGUI _timerUIPrefab;
         [SerializeField, Label("スタミナUI")] private GameObject _staminaBarPrefab;
         [SerializeField, Label("インタラクトUI")] private GameObject _interactUIPrefab;
+        [SerializeField,Label("スコア表示UI")] private TextMeshProUGUI _scoreUIText;
 
         [Header("Canvas Prefabs")] 
         [SerializeField, Label("MainCanvas")] private Canvas _mainCanvas;
@@ -28,8 +29,6 @@ namespace September.InGame.UI
         
         [Header("Timer Settings")]
         [SerializeField,Label("TimerData")] private GameTimerData _timerData;
-
-        //[Header("UI Positions")] [SerializeField, Label("鬼ランプの表示Position")] private Vector2 _ogreUIPosition;
 
         private Slider _hpBarSlider;
         private Slider _staminaBarSlider;
@@ -59,6 +58,7 @@ namespace September.InGame.UI
             ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
             ui.IsInteracting.Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2)).AddTo(_cts.Token);
             ui.OnChangeInteractProgress.Subscribe(progress => _interactUI?.SetInteractProgress(progress)).AddTo(_cts.Token);
+            ui.OnChangeScoreValue.Subscribe(ChangeScore).AddTo(_cts.Token);
         }
 
         private void SetupUI()
@@ -73,8 +73,6 @@ namespace September.InGame.UI
                 Debug.LogWarning("_killLogText is null");
             
             _ogreUiInstance = Instantiate(_ogreUIPrefab, _mainCanvas.transform);
-            //RectTransform rectTransform = _ogreUiInstance.GetComponent<RectTransform>();
-            //rectTransform.anchoredPosition = _ogreUIPosition;
             _ogreUiInstance.SetActive(false);
             
             _hpBarSlider = Instantiate(_hpBarPrefab.gameObject,_mainCanvas.transform).GetComponent<Slider>();
@@ -99,6 +97,24 @@ namespace September.InGame.UI
         private void ChangeStamina(float value)
         {
             _staminaBarSlider.value = value;
+        }
+
+        // private Tween _scoreTween;
+        // private float _currentScore;
+        
+        private void ChangeScore(float value)
+        {
+            // _scoreTween?.Kill();
+            // _scoreTween = DOTween.To(
+            //     () => _currentScore,
+            //     x =>
+            //     {
+            //         _currentScore = x;
+            //         _scoreUIText.text = Mathf.FloorToInt(_currentScore).ToString();
+            //     },
+            //     value,0.5f).SetEase(Ease.OutQuad);
+            
+            _scoreUIText.text = value.ToString();
         }
 
         // キルのログを直接引数に入れる
