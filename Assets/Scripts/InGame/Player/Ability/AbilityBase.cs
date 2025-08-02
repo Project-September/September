@@ -143,6 +143,16 @@ namespace InGame.Player.Ability
             return currentActiveAbilities?.FirstOrDefault(x => x.Instance.AbilityName == AbilityName);
         }
 
+        /// <summary>
+        /// 全体にアビリティ開始を通知する
+        /// </summary>
+        /// <remarks>
+        /// この関数は全体への同期を目的としています（RPC等）
+        /// アニメーションなど全体に通知すべきものだけを書いてください。
+        /// 判定処理などはOnStart、OnUpdateなどのメソッドで行ってください。
+        /// </remarks>
+        /// <param name="context"></param>
+        public virtual void OnStartNotifyAll(AbilityContext context) { }
         protected virtual void OnStart() { }
         protected virtual void OnUpdate(float deltaTime) { }
 

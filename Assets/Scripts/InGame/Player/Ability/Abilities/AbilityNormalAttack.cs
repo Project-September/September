@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using InGame.Health;
 using UnityEngine;
 using Fusion;
@@ -39,6 +40,20 @@ namespace InGame.Player.Ability
 
         public override AbilityBase Clone(AbilityBase abilityReference) => new AbilityNormalAttack(this);
 
+        public override void OnStartNotifyAll(AbilityContext context)
+        {
+            var players = Object.FindObjectsByType<AnimationClipPlayer>(FindObjectsSortMode.None);
+            var ownerAnimator = players.FirstOrDefault(x => x.Object.InputAuthority == PlayerRef.FromEncoded(context.SourcePlayer));
+            if (ownerAnimator)
+            {
+                ownerAnimator.PlayClip(_attackAnimationClip);
+            }
+            else
+            {
+                Debug.LogWarning("アニメーションプレイヤーが見つかりません。通常攻撃のアニメーションを再生できません。");
+            }
+        }
+
         protected override void OnStart()
         {
             if (!_inGameManager && !StaticServiceLocator.Instance.TryGet(out _inGameManager))
@@ -56,8 +71,6 @@ namespace InGame.Player.Ability
                 return;
             }
 
-            var ownerAnimator = playerData.GetComponent<AnimationClipPlayer>();
-            if (ownerAnimator) ownerAnimator.PlayClip(_attackAnimationClip);
             var resolver = playerData.GetComponentInChildren<HitPointResolver>();
             var points = resolver?.GetPoints();
             var start = resolver?.GetStartFrame();
@@ -70,6 +83,11 @@ namespace InGame.Player.Ability
                     var damageable = collider.GetComponentInParent<IDamageable>();
                     if (damageable != null)
                     {
+                        if (damageable.OwnerPlayerRef == PlayerRef.FromEncoded(Context.SourcePlayer))
+                        {
+                            // 自分自身にはダメージを与えない
+                            return;
+                        }
                         var hitData = new HitData(
                             HitActionType.Damage,
                             _attackDamage,

@@ -7,8 +7,6 @@ using UnityEngine;
 
 namespace InGame.Player.Ability
 {
-    
-    
     /// <summary>
     /// アビリティの入力を受け取り実行を依頼するクラス
     /// ここでどのボタンでどのアビリティが実行されるか設定します
@@ -18,23 +16,28 @@ namespace InGame.Player.Ability
         [SerializeField, InfoBox("どのボタンでどのアビリティが発動するか設定します"), Label("アビリティの発動条件マップ")]
         private List<AbilityActionContext> _abilityActionContexts;
 
+        private NetworkButtons _currentButtons;
         private NetworkButtons _previousButtons;
         private IAbilityExecutor _abilityExecutor;
-
+        private readonly TriggerEventContext _cachedTriggerContext = new();
         public override void FixedUpdateNetwork()
         {
             if (!GetInput<PlayerInput>(out var input) || !HasInputAuthority) return;
 
-            var context = new TriggerEventContext
-            {
-                CurrentButtons = input.Buttons,
-                PreviousButtons = _previousButtons,
-                Owner = gameObject
-            };
+            _previousButtons = _currentButtons;
+            _currentButtons = input.Buttons;
 
-            EvaluateConditions(context);
-            _previousButtons = input.Buttons;
+            _cachedTriggerContext.CurrentButtons = _currentButtons;
+            _cachedTriggerContext.PreviousButtons = _previousButtons;
+            _cachedTriggerContext.Owner = gameObject;
         }
+
+        private void Update()
+        {
+            if (!HasInputAuthority) return;
+            EvaluateConditions(_cachedTriggerContext);
+        }
+
 
         public void OnCollisionEnter(Collision collision)
         {
@@ -44,14 +47,25 @@ namespace InGame.Player.Ability
                 EventPayload = collision
             };
 
-            EvaluateConditions(context);
+            //EvaluateConditions(context);
         }
 
         private void EvaluateConditions(TriggerEventContext triggerCtx)
         {
             foreach (var action in _abilityActionContexts)
             {
-                if (action.Condition == null || !action.Condition.Evaluate(triggerCtx)) continue;
+                if (action.Condition == null) continue;
+                if (!action.Condition.Evaluate(triggerCtx))
+                {
+                    //Debug.Log(triggerCtx.CurrentButtons + " で " + action.Condition.DisplayConditionName + " の条件を満たしていません。");
+                    continue;
+                }
+                else
+                {
+                    Debug.Log(
+                        triggerCtx.CurrentButtons + " で " + action.Condition.DisplayConditionName + " の条件を満たしました。");
+                }
+
                 var abilityCtx = new AbilityContext
                 {
                     SourcePlayer = Runner.LocalPlayer.RawEncoded,
@@ -64,27 +78,27 @@ namespace InGame.Player.Ability
             }
         }
     }
-   
+
     #region 条件設定用のクラス群
+
     /// <summary>
     /// 入力トリガーとアビリティを紐付けたデータ
     /// </summary>
     [Serializable]
     public struct AbilityActionContext
     {
-        [SerializeReference, SubclassSelector]
-        public IActionCondition Condition;
+        [SerializeReference, SubclassSelector] public IActionCondition Condition;
         public AbilityName AbilityName;
         public AbilityActionType ActionType;
     }
-    
+
     /// <summary>
     /// 条件の基底クラス
     /// </summary>
     public interface IActionCondition
     {
-        string DisplayConditionSelectName { get; }  // 条件選択時の表示名
-        string DisplayConditionName { get; }    // 条件選択後にインスペクタで表示する名前
+        string DisplayConditionSelectName { get; } // 条件選択時の表示名
+        string DisplayConditionName { get; } // 条件選択後にインスペクタで表示する名前
         bool Evaluate(TriggerEventContext context);
     }
 
@@ -103,16 +117,20 @@ namespace InGame.Player.Ability
         public bool Evaluate(TriggerEventContext ctx)
         {
             var index = (int)Button;
-            return TriggerType switch
+            switch (TriggerType)
             {
-                AbilityTriggerType.タップ => ctx.CurrentButtons.GetPressed(ctx.PreviousButtons).IsSet(index),
-                AbilityTriggerType.ホールド => ctx.CurrentButtons.IsSet(index) && !ctx.CurrentButtons.GetPressed(ctx.PreviousButtons).IsSet(index),
-                AbilityTriggerType.リリース => ctx.CurrentButtons.GetReleased(ctx.PreviousButtons).IsSet(index),
-                _ => false
-            };
+                case AbilityTriggerType.タップ:
+                    return ctx.PreviousButtons.IsSet(index) == false && ctx.CurrentButtons.IsSet(index);
+                case AbilityTriggerType.ホールド:
+                    return ctx.CurrentButtons.IsSet(index) && !ctx.CurrentButtons.GetPressed(ctx.PreviousButtons).IsSet(index);
+                case AbilityTriggerType.リリース:
+                    return ctx.CurrentButtons.GetReleased(ctx.PreviousButtons).IsSet(index);
+                default:
+                    return false;
+            }
         }
     }
-    
+
     /// <summary>
     /// ぶつかった時の入力依頼情報を設定するクラス
     /// </summary>
@@ -120,6 +138,7 @@ namespace InGame.Player.Ability
     public class OnCollisionCondition : IActionCondition
     {
         public string DisplayConditionSelectName => "衝突イベント";
+
         [SerializeField]
         //private AbilityName _targetAbility = AbilityName.全てのアビリティ;
 
@@ -131,8 +150,9 @@ namespace InGame.Player.Ability
             return context.EventPayload is Collision;
         }
     }
+
     #endregion
-    
+
     public enum AbilityTriggerType
     {
         タップ,
@@ -159,7 +179,7 @@ namespace InGame.Player.Ability
         クリエイトシールド,
         全てのアビリティ,
     }
-    
+
     /// <summary>
     /// アビリティ実行依頼時に必要な入力情報を保持する構造体
     /// </summary>
@@ -172,7 +192,8 @@ namespace InGame.Player.Ability
 
         public bool Equals(AbilityContext other)
         {
-            return ActionType == other.ActionType && SourcePlayer.Equals(other.SourcePlayer) && AbilityName == other.AbilityName;
+            return ActionType == other.ActionType && SourcePlayer.Equals(other.SourcePlayer) &&
+                   AbilityName == other.AbilityName;
         }
 
         public override bool Equals(object obj)
@@ -185,7 +206,7 @@ namespace InGame.Player.Ability
             return HashCode.Combine((int)ActionType, SourcePlayer, (int)AbilityName);
         }
     }
-    
+
     /// <summary>
     /// 判定に使う情報を詰め込んだクラス
     /// </summary>

@@ -34,6 +34,8 @@ namespace InGame.Player.Ability
         {
             if (!_isInitialized) Initialize();
 
+            RPC_NotifyAbilityStart(context);
+            var abilityRef = _abilityReferences.Find(x => x.AbilityName == context.AbilityName);
             if (Runner.IsServer)
             {
                 TryExecuteAbilityUnified(context, isAuthority: true);
@@ -43,6 +45,13 @@ namespace InGame.Player.Ability
             {
                 RPC_RequestAbility(context);
             }
+        }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_NotifyAbilityStart(AbilityContext context)
+        {
+            var abilityRef = _abilityReferences.Find(x => x.AbilityName == context.AbilityName);
+            abilityRef?.OnStartNotifyAll(context);
         }
 
         private void TryExecuteAbilityUnified(AbilityContext context, bool isAuthority)
