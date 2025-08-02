@@ -1,7 +1,8 @@
-using UnityEngine;
-
 public enum EffectType
 {
     Test,
     Warp,
+    Tutankhamen,
+    Explosion,
+    LondonTelephone,
 }

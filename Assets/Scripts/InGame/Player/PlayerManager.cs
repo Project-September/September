@@ -1,7 +1,11 @@
+using System;
 using Fusion;
+using InGame.Common;
 using InGame.Health;
 using September.Common;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using PlayerInput = September.Common.PlayerInput;
 
 namespace InGame.Player
 {
@@ -10,7 +14,6 @@ namespace InGame.Player
     /// </summary>
     public class PlayerManager : NetworkBehaviour, IAfterTick
     {
-        [SerializeField] PlayerParameter _playerParameter;
         [SerializeField] GameObject _colliderObj;
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
@@ -18,7 +21,6 @@ namespace InGame.Player
         PlayerMovement _playerMovement;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
-        GameInput _gameInput;
         PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
 
@@ -37,19 +39,9 @@ namespace InGame.Player
         }
         
         public bool IsLocalPlayer => HasInputAuthority;
-        public PlayerParameter PlayerParameter => _playerParameter;
         
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-
-        private void Start()
-        {
-            if (HasInputAuthority)
-            {
-                _gameInput = new GameInput();
-                _gameInput.Enable();
-            }
-        }
 
         public override void Spawned()
         {
@@ -59,23 +51,23 @@ namespace InGame.Player
         /// <summary> Player関連コンポーネントの初期化 </summary>
         void InitComponents()
         {
-            if (TryGetComponent(out PlayerMovement movement))
-            {
-                _playerMovement = movement;
-                movement.Init(_playerParameter.Stamina, _playerParameter.StaminaConsumption, _playerParameter.StaminaRegen);
-            }
+            _playerMovement = GetComponent<PlayerMovement>();
 
             if (TryGetComponent(out CameraController cameraController))
             {
-                this._cameraController = cameraController;
+                _cameraController = cameraController;
                 cameraController.Init(IsLocalPlayer);
             }
 
             if (TryGetComponent(out PlayerHealth health))
             {
                 _playerHealth = health;
-                health.Init(_playerParameter.Health);
                 health.OnDeath += OnDeath;
+            }
+
+            if (TryGetComponent(out PlayerAnimBase playerAnimBase))
+            {
+                playerAnimBase.Init(this);
             }
         }
 
@@ -84,12 +76,12 @@ namespace InGame.Player
             // Localでの処理にInputを送る
             if (HasInputAuthority)
             {
-                if (_gameInput.Player.Aim.triggered)
+                if (GameInput.I.Player.Aim.triggered)
                 {
                     _cameraController.CameraReset();
                 }
-            
-                _cameraController.RotateCamera(_gameInput.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
+                
+                _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
             }
         }
 
@@ -143,7 +135,7 @@ namespace InGame.Player
         {
             _playerControlState = controlState;
 
-            if (_playerControlState == PlayerControlState.ForcedMovement)
+            if (_playerControlState == PlayerControlState.ForcedControl)
             {
                 _playerMovement.Stop();
             }
@@ -168,7 +160,7 @@ namespace InGame.Player
         {
             Normal,
             InputLocked,
-            ForcedMovement
+            ForcedControl
         }
     }
 }

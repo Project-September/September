@@ -11,7 +11,42 @@ jobs:
         steps:
             - name: Build
               run: ../../../build.cmd
-              continue-on-error: true
             - name: DiscordFailurePost
               if: failure()
-              run: echo "失敗時通知"
+              shell: powershell
+              run: |
+                $repository = "${{ github.repository }}"
+                $branch = "${{ github.ref_name }}"
+                $runId = "${{ github.run_id }}"
+                $webhookUrl = "${{ secrets.DISCORD_WEBHOOK_URL }}"
+
+                $body = @"
+                {
+                  "embeds": [
+                    {
+                      "title": "Build Failed",
+                      "description": "WinBuild workflow has failed",
+                      "color": 15158332,
+                      "fields": [
+                        {
+                          "name": "Repository",
+                          "value": "$repository",
+                          "inline": true
+                        },
+                        {
+                          "name": "Branch",
+                          "value": "$branch",
+                          "inline": true
+                        },
+                        {
+                          "name": "View Logs",
+                          "value": "[GitHub Actions](https://github.com/$repository/actions/runs/$runId)",
+                          "inline": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+                "@
+                
+                Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $body -ContentType "application/json"

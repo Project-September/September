@@ -23,6 +23,7 @@ namespace InGame.Player
         [SerializeField] float _dashAcceleration;
         [SerializeField] private float _maxDashSpeed;
         [SerializeField] private float _dashCooldown = 3f;
+        [SerializeField] private float _staminaConsumption;
         [Header("Rotation")]
         [SerializeField, Tooltip("degree/s")] private float _rotationSpeed = 5f;
         [Header("Vault")]
@@ -37,17 +38,16 @@ namespace InGame.Player
         [SerializeField] private int _visibleBit;
 
         private Rigidbody _rb;
+        private PlayerStatus _status;
         
         // base move
         private Vector3 _moveVelocity;
         private Vector3 _rotationDirection;
         private bool _isGround;
-        // スタミナ消費量
-        private float _staminaConsumption;
-        // スタミナ回復量
-        float _staminaRegen;
+        private float _isGroundTimer;
+        private Vector3 _groundNormal = Vector3.up;
         private bool _isDashCoolTime;
-        private bool CanDash => !_isDashCoolTime && Stamina > 0 && _isGround;
+        private bool CanDash => !_isDashCoolTime && _status.CurrentStamina > 0 && IsGround;
         // vault
         private bool _doingVault;
         private float _vaultTimer;
@@ -58,33 +58,19 @@ namespace InGame.Player
         private float _gizmoTimer;
         private List<CapsuleCastData> _capsuleCastData = new();
 
-        public readonly BehaviorSubject<float> OnStaminaChanged = new(0);
-        public bool IsGround => _isGround;
         public Vector3 MoveVelocity => _moveVelocity;
-        
-        [Networked, OnChangedRender(nameof(OnChangedStamina))] private float Stamina { get; set; }
-        private void OnChangedStamina() => OnStaminaChanged.OnNext(Stamina);
-        [Networked, HideInInspector] public float MaxStamina { get; private set; }
+        public bool IsGround => _isGround || _isGroundTimer > 0;
+        public Vector3 GroundNormal => _groundNormal;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
-        }
-
-        public void Init(float stamina, float staminaConsumption, float staminaRegen)
-        {
-            Stamina = stamina;
-            MaxStamina = stamina;
-            _staminaConsumption = staminaConsumption;
-            _staminaRegen = staminaRegen;
-            
-            // なんかFixedUpdateNetworkで値を更新しないと変更が同期されなくてOnChangedRenderが反応しない見たい
-            // だから自分で呼ぶ必要がある
-            OnStaminaChanged.OnNext(Stamina);
+            _status = GetComponent<PlayerStatus>();
         }
 
         public void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
+            CheckGroundManual();
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
             // set velocity
@@ -92,7 +78,9 @@ namespace InGame.Player
             if (_doingVault) UpdateVault(deltaTime);
             else
             {
+                ApplyGrav(deltaTime);
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
+                AdsorptionOnGround();
                 ApplyVelocity(deltaTime);
             }
             
@@ -102,8 +90,10 @@ namespace InGame.Player
             // スタミナの更新
             UpdateStamina(isDash, deltaTime);
             
-            // is ground のリセット
+            // is ground の管理
+            if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
             _isGround = false;
+            _groundNormal = Vector3.up;
         }
 
         /// <summary> カメラ視点の移動入力を取得 </summary>
@@ -123,12 +113,12 @@ namespace InGame.Player
             isDash = isDash && CanDash;
             
             // Dash中ならスタミナを消費させる
-            if (isDash)
+            if (isDash && moveDirection != Vector2.zero)
             {
-                Stamina = Mathf.Max(0, Stamina - _staminaConsumption * deltaTime);
+                _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _staminaConsumption * deltaTime);
 
                 // スタミナなくなったら
-                if (Stamina <= 0)
+                if (_status.CurrentStamina <= 0)
                 {
                     // クールタイムに入れて一定時間後に解除
                     _isDashCoolTime = true;
@@ -143,40 +133,40 @@ namespace InGame.Player
         /// <summary> 水平方向のMoveVelocityを計算する </summary>
         private void CalcMoveVelocity(Vector2 moveDir, bool isDash, float deltaTime)
         {
-            Vector2 moveVelocity2 = new Vector2(_moveVelocity.x, _moveVelocity.z);
-            float lastMoveMag = moveVelocity2.magnitude;
+            float lastMoveMag = _moveVelocity.magnitude;
             // is ground で摩擦量が変わる
-            float friction = (_isGround ? _friction : _airFriction) * deltaTime;
+            float friction = (IsGround ? _friction : _airFriction) * deltaTime;
             
             // 入力がある場合
             if (moveDir != Vector2.zero)
             {
+                Vector3 moveDir3 = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveDir.x, 0, moveDir.y);
                 // 加速
-                float acceleration = (_isGround ? isDash ? _dashAcceleration : _acceleration : _airAcceleration) * deltaTime;
-                Vector2 targetVelocity = moveVelocity2 + moveDir * acceleration;
+                float acceleration = (IsGround ? isDash ? _dashAcceleration : _acceleration : _airAcceleration) * deltaTime;
+                Vector3 targetVelocity = _moveVelocity + moveDir3 * acceleration;
             
-                float maxSpeed = isDash ? _maxDashSpeed : _maxMoveSpeed;
+                float maxSpeed = (isDash ? _maxDashSpeed : _maxMoveSpeed) * _status.MaxSpeedRate;
                 float moveMag = targetVelocity.magnitude;
 
-                if (!_isGround)
+                if (!IsGround)
                 {
                     // 空中は加速も摩擦もかける
-                    moveVelocity2 = (moveMag - friction) / moveMag * targetVelocity;
+                    _moveVelocity = (moveMag - friction) / moveMag * targetVelocity;
                 }
                 else if (moveMag > maxSpeed) // todo:加速後のVectorから計算したいけど摩擦の計算時に加速を入れたくない
                 {
                     // 入力があってMaxSpeedを超えた場合、摩擦をかけるがMaxSpeedを下回らない
                     friction = Mathf.Min(friction, lastMoveMag - maxSpeed);
-                    moveVelocity2 = (lastMoveMag - friction) / moveMag * targetVelocity;
+                    _moveVelocity = (lastMoveMag - friction) / moveMag * targetVelocity;
                 }
                 else // max speed を超えない場合
                 {
                     // 加速する
-                    moveVelocity2 = targetVelocity;
+                    _moveVelocity = targetVelocity;
                 }
 
-                _moveVelocity.x = moveVelocity2.x;
-                _moveVelocity.z = moveVelocity2.y;
+                //_moveVelocity = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveVelocity2.x, 0, moveVelocity2.y);
+                // _moveVelocity = localVelocity + Vector3.up * yMag;
             }
             else // 入力がなかった場合
             {
@@ -186,6 +176,38 @@ namespace InGame.Player
                 frictionVec.y = 0;
                 _moveVelocity += frictionVec;
             }
+        }
+
+        void ApplyGrav(float deltaTime)
+        {
+            if (IsGround)
+            {
+                Vector3 normalUp = Quaternion.FromToRotation(_groundNormal, Vector3.up) * _moveVelocity;
+                normalUp.y = 0;
+                _moveVelocity = Quaternion.FromToRotation(Vector3.up, _groundNormal) * normalUp;
+            }
+            else _moveVelocity.y -= _gravity * deltaTime;
+        }
+
+        void AdsorptionOnGround()
+        {
+            if (_isGround) return;
+            
+            Vector3 origin = _moveCapsuleCollider.transform.position + Vector3.up * _moveCapsuleCollider.radius;
+            var hit = Physics.SphereCast(origin + Vector3.up * 0.1f, _moveCapsuleCollider.radius, Vector3.down, out var hitInfo, 0.4f, _groundLayer);
+
+            if (hit && hitInfo.distance > 0)
+            {
+                transform.position += Vector3.down * hitInfo.distance;
+            }
+        }
+        
+        private void ApplyVelocity(float deltaTime)
+        {
+            // 速度の代入
+            _rb.linearVelocity = _moveVelocity;
+            // 回転の向きを代入
+            _rotationDirection = _moveVelocity;
         }
 
         /// <summary> 指定方向に回転する </summary>
@@ -198,26 +220,15 @@ namespace InGame.Player
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), _rotationSpeed * deltaTime);
         }
 
-        private void ApplyVelocity(float deltaTime)
-        {
-            // 重力
-            if (_isGround) _moveVelocity.y = 0;
-            else _moveVelocity.y -= _gravity * deltaTime;
-            // 速度の代入
-            _rb.linearVelocity = _moveVelocity;
-            // 回転の向きを代入
-            _rotationDirection = _moveVelocity;
-        }
-
         /// <summary> 条件付きでスタミナを回復させる </summary>
         private void UpdateStamina(bool dashInput, float deltaTime)
         {
-            if (!dashInput || _isDashCoolTime) Stamina = Mathf.Min(MaxStamina, Stamina + _staminaRegen * deltaTime);
+            if (!dashInput || _isDashCoolTime) _status.CurrentStamina = Mathf.Min(_status.MaxStamina, _status.CurrentStamina + _status.StaminaRegen * deltaTime);
         }
 
         private void TryVault(Vector2 moveDirection)
         {
-            if (!_isGround) return;
+            if (!IsGround) return;
 
             _gizmoTimer = _gizmoDisplayDuration; // 1 秒 gizmo 表示
             _capsuleCastData.Clear();
@@ -350,7 +361,11 @@ namespace InGame.Player
         public void AddForce(Vector3 force)
         {
             _moveVelocity += force;
-            if (_moveVelocity.y > 0) _isGround = false;
+            if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
+            {
+                _isGround = false;
+                _isGroundTimer = 0.1f;
+            }
         }
 
         /// <summary> 速度ベクトルを0にする </summary>
@@ -359,28 +374,54 @@ namespace InGame.Player
             _moveVelocity = Vector3.zero;
         }
 
-        private void CheckGround(Collision collision)
+        public float GetSpeedOnPlane()
         {
-            // 上昇中なら終了
-            if (_moveVelocity.y > 0) return;
-                
-            // 接触面が地面か
-            foreach (var contact in collision.contacts)
-            {
-                if (Vector3.Angle(Vector3.up, contact.normal) <= _groundSlopeThreshold)
-                {
-                    _isGround = true;
-                    return;
-                }
-            }
+            Quaternion normalRot = Quaternion.FromToRotation(_groundNormal, Vector3.up);
+            Vector3 onPlaneVec = normalRot * _moveVelocity;
+            onPlaneVec.y = 0;
+            return onPlaneVec.magnitude;
         }
 
-        private void OnCollisionStay(Collision other)
+        // private void CheckGround(Collision collision)
+        // {
+        //     // 接触面が地面か
+        //     foreach (var contact in collision.contacts)
+        //     {
+        //         // 接地できる角度か & 接地面に対して離れる velocity で無いか
+        //         if (Vector3.Angle(Vector3.up, contact.normal) <= _groundSlopeThreshold && (Vector3.Angle(_moveVelocity, contact.normal) >= 89 || _moveVelocity == Vector3.zero))
+        //         {
+        //             _isGround = true;
+        //             _isGroundTimer = 0.1f;
+        //             _groundNormal = contact.normal;
+        //             return;
+        //         }
+        //     }
+        // }
+
+        // private void OnCollisionStay(Collision other)
+        // {
+        //     if (HasStateAuthority)
+        //     {
+        //         // 接地判定
+        //         CheckGround(other);
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Cliant Stay");
+        //     }
+        // }
+        
+        private void CheckGroundManual()
         {
-            if (HasStateAuthority)
+            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, 0.2f, _groundLayer))
             {
-                // 接地判定
-                CheckGround(other);
+                if (Vector3.Angle(Vector3.up, hitInfo.normal) <= _groundSlopeThreshold)
+                {
+                    _isGround = true;
+                    _isGroundTimer = 0.1f;
+                    _groundNormal = hitInfo.normal;
+                }
             }
         }
 
