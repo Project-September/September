@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -10,7 +11,7 @@ namespace InGame.Common
     public class AnimationClipPlayer : NetworkBehaviour
     {
         [SerializeField] protected Animator _animator;
-    
+        
         private PlayableGraph _graph;
         private AnimationLayerMixerPlayable _layerMixer;
         private const int PlayClipLayerIndex = 1;
@@ -40,11 +41,17 @@ namespace InGame.Common
             _graph.Play();
         }
 
-        public void PlayClip(AnimationClip clip, bool applyRootMotion = false)
+        [Rpc]
+        public void RPC_PlayClip(AnimationPlaySpecNetwork playSpecNetwork)
+        {
+            PlayClip(new AnimationPlaySpec(playSpecNetwork));
+        }
+
+        public void PlayClip(AnimationPlaySpec playSpec)
         {
             //Debug.Log($"Play clip : {clip.name}");
             // スキル用 AnimationClipPlayable を作成
-            if (!clip)
+            if (!playSpec.Clip)
             {
                 Debug.LogError("AnimationClip is null");
                 return;
@@ -54,7 +61,7 @@ namespace InGame.Common
                 Debug.LogError("PlayableGraph is not valid");
                 return;
             }
-            var skillPlayable = AnimationClipPlayable.Create(_graph, clip);
+            var skillPlayable = AnimationClipPlayable.Create(_graph, playSpec.Clip);
             skillPlayable.SetApplyFootIK(true);
             //skillPlayable.SetTime(0);
             //skillPlayable.SetDuration(clip.length);
@@ -66,15 +73,8 @@ namespace InGame.Common
             _layerMixer.SetInputWeight(PlayClipLayerIndex, 1f);
 
             // 終了後に戻す
-            StartCoroutine(DisableSkillLayerAfter(clip.length));
+            StartCoroutine(DisableSkillLayerAfter(playSpec.Clip.length));
         }
-
-        // public UniTask PlayClipAsync(AnimationClip clip, bool applyRootMotion = false)
-        // {
-        //     var tcs = new TaskCompletionSource<object>();
-        //     
-        //     return ;
-        // }
 
         private System.Collections.IEnumerator DisableSkillLayerAfter(float time)
         {
@@ -86,6 +86,38 @@ namespace InGame.Common
         void OnDestroy()
         { 
             _graph.Destroy();
+        }
+    }
+
+    public struct AnimationPlaySpec
+    {
+        public AnimationClip Clip;
+        public float SpeedRate;
+        public float StartTime;
+        public bool UseRootMotion;
+
+        public AnimationPlaySpec(AnimationPlaySpecNetwork specNetwork)
+        {
+            Clip = (uint)specNetwork.ClipIndex > AnimationClipsContainer.Instance.AnimationClips.Length ? null : AnimationClipsContainer.Instance.AnimationClips[specNetwork.ClipIndex];
+            SpeedRate = specNetwork.SpeedRate;
+            StartTime = specNetwork.StartTime;
+            UseRootMotion = specNetwork.UseRootMotion;
+        }
+    }
+
+    public struct AnimationPlaySpecNetwork : INetworkStruct
+    {
+        public int ClipIndex;
+        public float SpeedRate;
+        public float StartTime;
+        public bool UseRootMotion;
+
+        public AnimationPlaySpecNetwork(AnimationClip clip, float speedRate = 1, float startTime = 0, bool useRootMotion = false)
+        {
+            ClipIndex = Array.FindIndex(AnimationClipsContainer.Instance.AnimationClips, element => element == clip);
+            SpeedRate = speedRate;
+            StartTime = startTime;
+            UseRootMotion = useRootMotion;
         }
     }
 }
