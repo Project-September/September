@@ -11,10 +11,10 @@ namespace InGame.Common
     {
         private const string AssetPath = "AnimationClipsContainer";
         
-        [SerializeField] private AnimationClip[] _animationClips;
+        [SerializeField] private AnimationMontage[] _animationMontages;
         
         public static AnimationClipsContainer Instance { get; private set; }
-        public AnimationClip[] AnimationClips => _animationClips;
+        public AnimationMontage[] AnimationMontages => _animationMontages;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static async void Init()
@@ -27,6 +27,21 @@ namespace InGame.Common
             {
                 Debug.LogException(e);
             }
+        }
+    }
+
+    [Serializable]
+    public struct AnimationMontage
+    {
+        public AnimationClip AnimClip;
+        public Blend BlendIn;
+        public Blend BlendOut;
+
+        [Serializable]
+        public struct Blend
+        {
+            public float BlendTime;
+            public AnimationCurve BlendCurve;
         }
     }
 }
