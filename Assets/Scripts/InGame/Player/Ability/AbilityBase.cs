@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Fusion;
 using InGame.Common;
@@ -21,11 +20,17 @@ namespace InGame.Player.Ability
         }
 
         [SerializeField] private AbilityName _abilityName;
+        [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
+        [SerializeField] private SerializableDictionary<CharacterType, float> _eachCharacterLastActiveTime = new();
+        [Header("Startが呼ばれたらすぐにクールダウンを開始するかどうか")]
+        [SerializeField] protected bool _startCooldownImmediately = true;
+        
         protected ISpawner _spawner;
-
         public event Action OnEndAbilityEvent;
-        public virtual string DisplayName => AbilityName.ToString();
         public AbilityName AbilityName => _abilityName;
+        public bool StartCooldownImmediately => _startCooldownImmediately;
+        public SerializableDictionary<CharacterType, float> CooldownTimeDictionary => _cooldownTimeDictionary;
+        public SerializableDictionary<CharacterType, float> EachCharacterLastActiveTime => _eachCharacterLastActiveTime;
         public AbilityContext Context { get; private set; }
         protected int OwnerPlayerId { get; private set; } = -1;
         public AbilityPhase Phase { get; private set; } = AbilityPhase.None;
@@ -34,6 +39,7 @@ namespace InGame.Player.Ability
         protected AbilityBase(AbilityBase abilityReference)
         {
             _abilityName = abilityReference._abilityName;
+            _startCooldownImmediately = abilityReference._startCooldownImmediately;
         }
 
         public abstract AbilityBase Clone(AbilityBase abilityReference);
@@ -58,8 +64,8 @@ namespace InGame.Player.Ability
                 case AbilityPhase.None:
                     break;
                 case AbilityPhase.Started:
-                    Phase = AbilityPhase.Active;
                     OnStart();
+                    Phase = AbilityPhase.Active;
                     break;
                 case AbilityPhase.Active:
                     OnUpdate(deltaTime);

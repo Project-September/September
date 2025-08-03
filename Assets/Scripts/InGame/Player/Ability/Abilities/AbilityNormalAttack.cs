@@ -19,11 +19,8 @@ namespace InGame.Player.Ability
         [SerializeField] private AnimationClip _attackAnimationClip;
 
         private static InGameManager _inGameManager;
-
-        private float _remainingTime;
         private MeleeHitboxExecutor _executor;
-
-        public override string DisplayName => "通常攻撃";
+        private float _remainingTime;
 
         public AbilityNormalAttack()
         {
