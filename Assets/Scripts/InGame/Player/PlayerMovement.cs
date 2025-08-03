@@ -39,6 +39,7 @@ namespace InGame.Player
 
         private Rigidbody _rb;
         private PlayerStatus _status;
+        private Animator _animator;
         
         // base move
         private Vector3 _moveVelocity;
@@ -66,6 +67,7 @@ namespace InGame.Player
         {
             _rb = GetComponent<Rigidbody>();
             _status = GetComponent<PlayerStatus>();
+            _animator = GetComponentInChildren<Animator>();
         }
 
         public void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
@@ -109,6 +111,12 @@ namespace InGame.Player
         /// <summary> move velocity の計算 </summary>
         private void Move(Vector2 moveDirection, bool isDash, float cameraYaw, float deltaTime)
         {
+            if (_animator && _animator.applyRootMotion)
+            {
+                _moveVelocity = Vector3.zero;
+                return;
+            }
+            
             // Dash処理
             isDash = isDash && CanDash;
             

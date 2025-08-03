@@ -57,7 +57,7 @@ namespace InGame.Player.Ability
             }
 
             var ownerAnimator = playerData.GetComponent<AnimationClipPlayer>();
-            if (ownerAnimator) ownerAnimator.PlayClip(_attackAnimationClip);
+            if (ownerAnimator) ownerAnimator.PlayClip(_attackAnimationClip, 1, 0, true);
             var resolver = playerData.GetComponentInChildren<HitPointResolver>();
             var points = resolver?.GetPoints();
             var start = resolver?.GetStartFrame();
