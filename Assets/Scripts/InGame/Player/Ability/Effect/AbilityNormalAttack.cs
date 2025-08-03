@@ -19,7 +19,10 @@ namespace InGame.Player.Ability
         protected override void OnStart()
         {
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
-            if (ownerAnimator) ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
+            if (ownerAnimator && Parameter.Owner.HasInputAuthority)
+            {
+                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
+            }
             var resolver = Parameter.Owner.GetComponentInChildren<HitPointResolver>();
             var points = resolver?.GetPoints();
             var start = resolver?.GetStartFrame();

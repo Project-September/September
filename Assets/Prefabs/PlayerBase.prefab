@@ -5376,7 +5376,8 @@ MonoBehaviour:
     - rid: 2879281286638207087
       type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _cooldown: 0
+        _cooldown: 1
+        _phase: 0
         _normalAttackAnimationClip: {fileID: 1827226128182048838, guid: c51825af470896f4fb4def9482b406b6, type: 3}
         _hitMask:
           serializedVersion: 2
