@@ -168,11 +168,11 @@ GameObject:
   - component: {fileID: 8355274600117350697}
   - component: {fileID: 5358505061852357365}
   - component: {fileID: -3905644752378878134}
-  - component: {fileID: 958249503331897705}
   - component: {fileID: 4737425158909762900}
   - component: {fileID: 7710838205980989238}
   - component: {fileID: 2221120114231077883}
   - component: {fileID: 7508249662566368237}
+  - component: {fileID: 5072017953358575750}
   m_Layer: 6
   m_Name: PlayerPrefab_Haru
   m_TagString: Player
@@ -250,10 +250,10 @@ MonoBehaviour:
   - {fileID: 3242880713039265549}
   - {fileID: 5358505061852357365}
   - {fileID: -3905644752378878134}
-  - {fileID: 958249503331897705}
   - {fileID: 7710838205980989238}
   - {fileID: 2221120114231077883}
   - {fileID: 7508249662566368237}
+  - {fileID: 5072017953358575750}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
 MonoBehaviour:
@@ -425,31 +425,6 @@ MonoBehaviour:
   _param: {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
   _CurrentHealth: 0
   _CurrentStamina: 0
---- !u!114 &958249503331897705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8360875997416129576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f596036fa7ea144d88f91d88833f57a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _abilityActionContexts:
-  - Condition:
-      rid: 7643012117068513402
-    AbilityName: 3
-    ActionType: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 7643012117068513402
-      type: {class: ButtonActionConditionBase, ns: InGame.Player.Ability, asm: Scripts}
-      data:
-        Button: 3
-        TriggerType: 0
 --- !u!114 &4737425158909762900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,6 +505,38 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+--- !u!114 &5072017953358575750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c7244242fca19c4caa942020db8defa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _abilities:
+  - rid: 2879281286638207140
+  _conditions:
+  - rid: 2879281286638207139
+  references:
+    version: 2
+    RefIds:
+    - rid: 2879281286638207139
+      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
+      data: 
+    - rid: 2879281286638207140
+      type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _cooldown: 1
+        _phase: 0
+        _normalAttackAnimationClip: {fileID: 1827226128182048838, guid: c51825af470896f4fb4def9482b406b6, type: 3}
+        _hitMask:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        _attackDamage: 10
 --- !u!1001 &5098319602898460303
 PrefabInstance:
   m_ObjectHideFlags: 0
