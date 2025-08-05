@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Fusion;
 using InGame.Common;
 using InGame.Health;
@@ -15,6 +16,8 @@ namespace InGame.Player.Ability
         [SerializeField] private LayerMask _hitMask;
         [SerializeField] private int _attackDamage = 10;
         private MeleeHitboxExecutor _executor;
+        private GameObject _target;
+        private PlayerMovement _playerMovement;
 
         protected override void OnStart()
         {
@@ -23,6 +26,14 @@ namespace InGame.Player.Ability
             {
                 ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
             }
+            
+            _target = GameObject.FindGameObjectsWithTag("Player")
+                .Where(obj => obj.GetComponent<NetworkObject>() != Parameter.Owner)
+                .OrderBy(obj => Vector3.Distance(Parameter.Owner.transform.position, obj.transform.position))
+                .FirstOrDefault();
+            
+            _playerMovement = Parameter.Owner.GetComponent<PlayerMovement>();
+            
             var resolver = Parameter.Owner.GetComponentInChildren<HitPointResolver>();
             var points = resolver?.GetPoints();
             var start = resolver?.GetStartFrame();
@@ -50,6 +61,13 @@ namespace InGame.Player.Ability
         protected override void OnUpdate(float deltaTime)
         {
             _executor.Tick(deltaTime);
+
+            if (_target)
+            {
+                var direction = (_target.transform.position - Parameter.Owner.transform.position).normalized;
+                Debug.Log(direction);
+                _playerMovement.SetRotationDirection(direction);
+            }
             if (_executor.IsFinished)
             {
                 _phase = AbilityPhase.Ending;
