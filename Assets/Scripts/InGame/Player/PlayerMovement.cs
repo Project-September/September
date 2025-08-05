@@ -44,6 +44,7 @@ namespace InGame.Player
         // base move
         private Vector3 _moveVelocity;
         private Vector3 _rotationDirection;
+        private bool _setDirection;
         private bool _isGround;
         private float _isGroundTimer;
         private Vector3 _groundNormal = Vector3.up;
@@ -215,13 +216,20 @@ namespace InGame.Player
             // 速度の代入
             _rb.linearVelocity = _moveVelocity;
             // 回転の向きを代入
-            _rotationDirection = _moveVelocity;
+            if (!_setDirection) _rotationDirection = _moveVelocity;
+        }
+
+        public void SetRotationDirection(Vector3 lookDirection)
+        {
+            _rotationDirection = lookDirection;
+            _setDirection = true;
         }
 
         /// <summary> 指定方向に回転する </summary>
         private void RotationByDirection(Vector3 direction, float deltaTime)
         {
             direction.y = 0;
+            _setDirection = false;
             
             if (direction == Vector3.zero) return;
 
