@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Cinemachine;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -18,6 +19,7 @@ namespace September.Common
     {
         [SerializeField] private Transform[] _spawnPositions;
         [SerializeField] private Image _fadeImage;
+        [SerializeField] private CinemachineVirtualCamera _startCamera;
         private int _spawnPositionIndex; protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -50,6 +52,7 @@ namespace September.Common
                 //PlayerHealthのOnDeathに登録
             }
             Context.Register(StaticServiceLocator.Instance);
+            _startCamera.Priority = 20;
             // ToDo : ここにAnimation処理
             // ToDo : Animationが終了するまで入力を受け付けなくする
             RPC_FadeAndAnimation();
@@ -87,6 +90,7 @@ namespace September.Common
             Debug.Log("Animation Start");
             await UniTask.Delay(5000);
             Debug.Log("Animation End");
+            _startCamera.Priority = 0;
         }
         
         private Vector3 GetSpawnPosition()
