@@ -55,7 +55,7 @@ namespace September.Common
             var playerInput = new PlayerInput();
             if (_useAutoMove)
             {
-                SetAutoMove(playerInput);
+                SetAutoMove(ref playerInput);
             }
             else
             {
@@ -86,7 +86,7 @@ namespace September.Common
             input.Set(playerInput);
         }
 
-        private void SetAutoMove(PlayerInput playerInput)
+        private void SetAutoMove(ref PlayerInput playerInput)
         {
             // 自動移動の処理
             _autoMoveTimer += Time.deltaTime;
