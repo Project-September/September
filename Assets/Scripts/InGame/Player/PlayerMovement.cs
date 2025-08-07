@@ -39,10 +39,12 @@ namespace InGame.Player
 
         private Rigidbody _rb;
         private PlayerStatus _status;
+        private Animator _animator;
         
         // base move
         private Vector3 _moveVelocity;
         private Vector3 _rotationDirection;
+        private bool _setDirection;
         private bool _isGround;
         private float _isGroundTimer;
         private Vector3 _groundNormal = Vector3.up;
@@ -66,10 +68,12 @@ namespace InGame.Player
         {
             _rb = GetComponent<Rigidbody>();
             _status = GetComponent<PlayerStatus>();
+            _animator = GetComponentInChildren<Animator>();
         }
 
         public void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
+            CheckGroundManual();
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
             // set velocity
@@ -108,6 +112,12 @@ namespace InGame.Player
         /// <summary> move velocity の計算 </summary>
         private void Move(Vector2 moveDirection, bool isDash, float cameraYaw, float deltaTime)
         {
+            if (_animator && _animator.applyRootMotion)
+            {
+                _moveVelocity = Vector3.zero;
+                return;
+            }
+            
             // Dash処理
             isDash = isDash && CanDash;
             
@@ -206,13 +216,20 @@ namespace InGame.Player
             // 速度の代入
             _rb.linearVelocity = _moveVelocity;
             // 回転の向きを代入
-            _rotationDirection = _moveVelocity;
+            if (!_setDirection) _rotationDirection = _moveVelocity;
+        }
+
+        public void SetRotationDirection(Vector3 lookDirection)
+        {
+            _rotationDirection = lookDirection;
+            _setDirection = true;
         }
 
         /// <summary> 指定方向に回転する </summary>
         private void RotationByDirection(Vector3 direction, float deltaTime)
         {
             direction.y = 0;
+            _setDirection = false;
             
             if (direction == Vector3.zero) return;
 
@@ -381,28 +398,46 @@ namespace InGame.Player
             return onPlaneVec.magnitude;
         }
 
-        private void CheckGround(Collision collision)
+        // private void CheckGround(Collision collision)
+        // {
+        //     // 接触面が地面か
+        //     foreach (var contact in collision.contacts)
+        //     {
+        //         // 接地できる角度か & 接地面に対して離れる velocity で無いか
+        //         if (Vector3.Angle(Vector3.up, contact.normal) <= _groundSlopeThreshold && (Vector3.Angle(_moveVelocity, contact.normal) >= 89 || _moveVelocity == Vector3.zero))
+        //         {
+        //             _isGround = true;
+        //             _isGroundTimer = 0.1f;
+        //             _groundNormal = contact.normal;
+        //             return;
+        //         }
+        //     }
+        // }
+
+        // private void OnCollisionStay(Collision other)
+        // {
+        //     if (HasStateAuthority)
+        //     {
+        //         // 接地判定
+        //         CheckGround(other);
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Cliant Stay");
+        //     }
+        // }
+        
+        private void CheckGroundManual()
         {
-            // 接触面が地面か
-            foreach (var contact in collision.contacts)
+            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, 0.2f, _groundLayer))
             {
-                // 接地できる角度か & 接地面に対して離れる velocity で無いか
-                if (Vector3.Angle(Vector3.up, contact.normal) <= _groundSlopeThreshold && (Vector3.Angle(_moveVelocity, contact.normal) >= 89 || _moveVelocity == Vector3.zero))
+                if (Vector3.Angle(Vector3.up, hitInfo.normal) <= _groundSlopeThreshold)
                 {
                     _isGround = true;
                     _isGroundTimer = 0.1f;
-                    _groundNormal = contact.normal;
-                    return;
+                    _groundNormal = hitInfo.normal;
                 }
-            }
-        }
-
-        private void OnCollisionStay(Collision other)
-        {
-            if (HasStateAuthority)
-            {
-                // 接地判定
-                CheckGround(other);
             }
         }
 

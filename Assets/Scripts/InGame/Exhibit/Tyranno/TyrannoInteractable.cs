@@ -23,28 +23,32 @@ public class TyrannoInteractable : MountableExhibitBase
     
     private float _movingTime;
 
+    [Networked,OnChangedRender(nameof(OnBlendChangedRender))] public float MoveValue { get; set;}
+
     public override void GetOn(PlayerRef playerRef)
     {
         base.GetOn(playerRef);
+        RPC_SetBollValue(playerRef,true);
         HitAction += OnHit;
     }
 
     public override void GetOff(PlayerRef playerRef)
     {
         base.GetOff(playerRef);
+        RPC_SetBollValue(playerRef,false);
         HitAction -= OnHit;
     }
 
     public override void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
     {
         CheckIsGround();
-        var time = CheckMovingTime(playerInput, deltaTime);
-        _moveSpeed = time > 0.95f ? _dashSpeed : _walkSpeed;
+        MoveValue = CheckMovingTime(playerInput, deltaTime);
+        _moveSpeed = MoveValue > 0.95f ? _dashSpeed : _walkSpeed;
         var moveDirection =  Move(playerInput);
         moveDirection.y = 0;
         Rotate(deltaTime,moveDirection);
         AdsorptionOnGround();
-        Animator.SetFloat("Blend",time);      
+        Debug.Log(MoveValue);
         AnimationTrigger(playerInput);
         OnAttackUpdate(deltaTime);
 
@@ -141,9 +145,19 @@ public class TyrannoInteractable : MountableExhibitBase
             transform.position =new Vector3(transform.position.x, hit.point.y, transform.position.z);
         }
     }
-
-    public void IsInteractingAnimationTrigger(bool isInteracting)
+    
+    
+    public void OnBlendChangedRender()
     {
-        Animator.SetBool("IsInteracting", isInteracting);
+        Animator.SetFloat("Blend", MoveValue);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_SetBollValue(PlayerRef player, bool isInteracting)
+    {
+        if (Runner.LocalPlayer == player)
+        {
+            Animator.SetBool("IsInteracting",isInteracting);
+        }
     }
 }
