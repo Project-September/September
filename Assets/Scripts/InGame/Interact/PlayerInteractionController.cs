@@ -40,7 +40,14 @@ namespace InGame.Interact
 
         public override void Spawned()
         {
-            _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType;
+            if (PlayerDatabase.Instance?.PlayerDataDic == null)
+            {
+                _characterType = CharacterType.OkabeWright;
+            }
+            else
+            {
+                 _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType ;
+            }
         }
 
         private void Update()
@@ -138,11 +145,13 @@ namespace InGame.Interact
                 {
                     Interactor = Object.InputAuthority.RawEncoded,
                 };
-                UIController.I.ShowInteractUI(_focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+                if (UIController.I)
+                    UIController.I.ShowInteractUI(_focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
             }
             else
             {
-                UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
+                if (UIController.I)
+                    UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
             }
             //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
@@ -257,7 +266,7 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIController.I.SetInteractProgress(0f);
+            UIController.I?.SetInteractProgress(0f);
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
