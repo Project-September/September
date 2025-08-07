@@ -48,7 +48,6 @@ public class TyrannoInteractable : MountableExhibitBase
         moveDirection.y = 0;
         Rotate(deltaTime,moveDirection);
         AdsorptionOnGround();
-        Debug.Log(MoveValue);
         AnimationTrigger(playerInput);
         OnAttackUpdate(deltaTime);
 
@@ -61,22 +60,18 @@ public class TyrannoInteractable : MountableExhibitBase
 
     private void AnimationTrigger(PlayerInput playerInput)
     {
-        if (playerInput.Buttons.IsSet(PlayerButtons.Attack))
-        {
-            _isAttacking = true;
-            Animator.SetTrigger("Attack");
-        }
+        if (!playerInput.Buttons.IsSet(PlayerButtons.Attack)) return;
+        _isAttacking = true;
+        Animator.SetTrigger("Attack");
     }
     
     private void OnAttackUpdate(float deltaTime)
     {
         if(!_isAttacking) return;
         Executor?.Tick(deltaTime);
-        if (Executor is { IsFinished: true })
-        {
-            _isAttacking = false;
-            Executor.Init();
-        }
+        if (Executor is not { IsFinished: true }) return;
+        _isAttacking = false;
+        Executor.Init();
     }
     
     private void CheckIsGround()
