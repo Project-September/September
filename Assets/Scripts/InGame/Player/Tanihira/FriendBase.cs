@@ -13,7 +13,7 @@ namespace Ingame.Tanihira
     public enum FriendState
     {
         Idle,
-        Formation,
+        Move,
         Attack,
         Chase,
         Stun

@@ -24,7 +24,7 @@ namespace Ingame.Tanihira
             friend.Agent.updateRotation = true;
             
             //移動時のステータスを設定
-            friend.Agent.speed = friend.FriendStatus.FriendFormationSpeed; 
+            friend.Agent.speed = friend.FriendStatus.FriendFormationSpeed;
         }
 
         public void OnExit(FriendBase friend)

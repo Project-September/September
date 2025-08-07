@@ -64,8 +64,10 @@ namespace Ingame.Tanihira
             return null;
         }
 
-        //隊列の整理をする
-        private void SortFormation()
+        /// <summary>
+        /// 隊列整理
+        /// </summary>
+        public void SortFormation()
         {
             if(_friendsList.Count > 0)
             {

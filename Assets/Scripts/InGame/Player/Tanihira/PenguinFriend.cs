@@ -10,7 +10,7 @@ public class PenguinFriend : FriendBase
         base.Awake();
         //ペンギンのステートを設定
         _friendStateMappings[FriendState.Idle] = null;
-        _friendStateMappings[FriendState.Formation] = new FriendFormationState();
+        _friendStateMappings[FriendState.Move] = new FriendMoveState();
         _friendStateMappings[FriendState.Attack] = new FriendAttackState();
     }
 }
