@@ -22,6 +22,7 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         private int _spawnPositionIndex; 
         [SerializeField] private Vector3 _cameraOffset;
+        [SerializeField] private int _emoteDelay;
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -93,7 +94,7 @@ namespace September.Common
             {
                 var position = _spawnPositions[i].position + _cameraOffset;
                 _startCamera.gameObject.transform.Translate(position);
-                await UniTask.Delay(50); // 各エモートのAnimation分待つ
+                await UniTask.Delay(_emoteDelay); // 各エモートのAnimation分待つ
             }
             // 仮実装
             // Debug.Log("Animation Start");
