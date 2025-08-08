@@ -1,67 +1,70 @@
 using CRISound;
 using Fusion;
 using InGame.Interact;
+using NaughtyAttributes;
 using September.Common;
 using UnityEngine;
 
 namespace InGame.Exhibit
 {
     public class PterodactylInteractable : MountableExhibitBase
-    { 
-        [Header("Sound Settings")] 
-        [SerializeField] private string _crySe = "Pteranodon_cry"; 
-        //[SerializeField] private string _flapSe = "Pteranodon_Flapping_1";
-        
-        [Header("Movement Settings")] 
-        [SerializeField] private float _moveSpeed = 5f;
+    {
+        [Header("Sound Settings")] [SerializeField]
+        private string _crySe = "Pteranodon_cry";
+
+        [Header("Movement Settings")] [SerializeField]
+        private float _moveSpeed = 5f;
+
         [SerializeField] private float _rotationSpeed = 5f;
         [SerializeField] private float _turnThreshold = 30f;
-        
+
+        [Header("BulletSettings")] [SerializeField]
+        private GameObject _muzzle;
+
+        [SerializeField] private ParticleSystem _muzzleFlash;
+        [SerializeField] private GameObject _fireParticle;
+        [SerializeField] private float _fireSpeed = 20f;
+        [SerializeField] private float _rayDistance = 100f;
+        [SerializeField, Label("Fireの方向")] private float _downwardAngle = 30f;
+        [SerializeField] private LayerMask _fireHitMask;
+        [SerializeField] private float _bulletCoolDown = 2f;
+        private float _currentBulletCoolDown;
+
         private Rigidbody _rigidbody;
-        private InteractableBase  _interactableBase;
+        private InteractableBase _interactableBase;
         private Animator _animator;
-        
+
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
-        
+
         private float _currentTargetValue;
-          
-        [Networked] public float CurrentBlendValue { get; set; }
-        
+
+        [Networked, OnChangedRender(nameof(OnChangeAnimation))]
+        private float CurrentBlendValue { get; set; }
+
         #region AnimationHash
-        
+
         private static readonly int FlyStateBlend = Animator.StringToHash("FlyStateBlend");
-        
+
         #endregion
-        
-        private void Awake() 
-        { 
+
+        private void Awake()
+        {
             _rigidbody = GetComponent<Rigidbody>();
-            _interactableBase = GetComponent<InteractableBase>(); 
+            _interactableBase = GetComponent<InteractableBase>();
             _animator = GetComponent<Animator>();
-            
+
             _initialPosition = transform.position;
             _initialRotation = transform.rotation;
         }
-          
-        // private void LateUpdate()
-        // {
-        //     if (!HasInputAuthority)
-        //          return;
-        //
-        //     if (GameInput.I.Player.Aim.triggered)
-        //             _cameraController.CameraReset();
-        //           
-        //     _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
-        // }
-          
+
         public override void GetOn(PlayerRef ownerPlayerRef)
         {
-            if(!Runner.IsServer || OwnerPlayerRef != PlayerRef.None)
+            if (!Runner.IsServer || OwnerPlayerRef != PlayerRef.None)
                 return;
-              
+
             base.GetOn(ownerPlayerRef);
-          
+
             RPC_SetAnimatorEnabled(true);
             _currentTargetValue = 0.01f;
             _interactableBase.ForceSetInteractable = false;
@@ -71,32 +74,44 @@ namespace InGame.Exhibit
         public override void GetOff(PlayerRef ownerPlayerRef)
         {
             base.GetOff(ownerPlayerRef);
-            
+
             _rigidbody.linearVelocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
             transform.position = _initialPosition;
             transform.rotation = _initialRotation;
-            
+
             RPC_SetAnimatorEnabled(false);
-            _interactableBase.ForceSetInteractable = true;　
+            _interactableBase.ForceSetInteractable = true;
         }
-        
-        public override void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
+
+        public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
         {
-            if (!HasStateAuthority) 
-                return;
+            if (HasStateAuthority)
+            {
+                HandleMovement(playerInput);
+                
+                if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _bulletCoolDown <= _currentBulletCoolDown)
+                {
+                    OnPlayAttack();
+                }
+                else if (_bulletCoolDown >= _currentBulletCoolDown)
+                {
+                    _currentBulletCoolDown += Time.deltaTime;
+                }
+            }
             
-            HandleMovement(playerInput);
+            // Animationの同期
+            // float clampedBlend = Mathf.Clamp(CurrentBlendValue, _currentTargetValue, 1f);
+            // _animator.SetFloat(FlyStateBlend, clampedBlend);
+        }
+
+        // Animationの更新処理
+        private void OnChangeAnimation()
+        {
             float clampedBlend = Mathf.Clamp(CurrentBlendValue, _currentTargetValue, 1f);
             _animator.SetFloat(FlyStateBlend, clampedBlend);
         }
-        
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetAnimatorEnabled(bool isEnabled)
-        {
-            _animator.enabled = isEnabled;
-        }
-        
+
         private void HandleMovement(PlayerInput input)
         {
             Vector2 moveInput = input.MoveDirection;
@@ -107,12 +122,14 @@ namespace InGame.Exhibit
                 CurrentBlendValue = Mathf.Lerp(CurrentBlendValue, 0f, Runner.DeltaTime * 5f);
                 return;
             }
-            
+
             Vector3 moveDir = CalculateMoveDirection(input);
+            // キャラの回転方向の決定
             float angleToMoveDir = Vector3.SignedAngle(transform.forward, moveDir, Vector3.up);
             Quaternion targetRot = Quaternion.LookRotation(moveDir, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Runner.DeltaTime * _rotationSpeed);
-            
+
+            // 後ろ方向のときは無理な移動をしないように制御
             if (moveInput.y < 0 && Mathf.Abs(angleToMoveDir) > _turnThreshold)
                 _rigidbody.linearVelocity = Vector3.zero;
             else
@@ -121,6 +138,7 @@ namespace InGame.Exhibit
             CurrentBlendValue = Mathf.Lerp(CurrentBlendValue, moveInput.magnitude, Runner.DeltaTime * 5f);
         }
 
+        // 向きたい方向を取得
         private Vector3 CalculateMoveDirection(PlayerInput input)
         {
             Vector3 lookDir = input.DesiredLookDirection.normalized;
@@ -128,16 +146,68 @@ namespace InGame.Exhibit
             return (lookDir * input.MoveDirection.y + cameraRight * input.MoveDirection.x).normalized;
         }
 
-          
-        [Rpc]
-        private void RPC_PlaySE(Vector3 position, string cueName)
+        // Attack処理
+        private void OnPlayAttack()
         {
-            CRIAudio.PlaySE(position,"Exhibit", cueName);
+            // ToDo : RPC対応
+            _muzzleFlash.Play();
+            // 方向を決定
+            Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.transform.right) *
+                                   _muzzle.transform.forward;
+
+            if (Physics.Raycast(_muzzle.transform.position, angleForward, out RaycastHit hit, _rayDistance,
+                    _fireHitMask))
+            {
+                Vector3 targetPos = hit.point;
+
+                // 弾を生成し、ターゲット方向に飛ばす
+                Vector3 dir = (targetPos - _muzzle.transform.position).normalized;
+                Quaternion rotation = Quaternion.LookRotation(dir);
+
+                // ToDo : RPC対応
+                GameObject fire = Instantiate(_fireParticle, _muzzle.transform.position, rotation);
+                // Particleを発射する向きに向かせる
+                fire.GetComponent<Rigidbody>().AddForce(dir * _fireSpeed, ForceMode.Impulse);
+            }
+            else
+                Debug.LogError("No hit found in angled ray");
+
+            _currentBulletCoolDown = 0f;
         }
-          
+
+        // サウンド設定
         private void OnPlaySE(string cueName)
         {
             RPC_PlaySE(transform.position, cueName);
         }
+
+        [Rpc]
+        private void RPC_PlaySE(Vector3 position, string cueName)
+        {
+            CRIAudio.PlaySE(position, "Exhibit", cueName);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_SetAnimatorEnabled(bool isEnabled)
+        {
+            Debug.Log(isEnabled);
+            _animator.enabled = isEnabled;
+        }
     }
 }
+
+// private void OnDrawGizmos()
+// {
+//     if (_muzzle == null)
+//         return;
+//
+//     // 斜め下方向を計算
+//     Vector3 angledForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.transform.right) *
+//                             _muzzle.transform.forward;
+//
+//     // Gizmoの色設定
+//     Gizmos.color = Color.red;
+//
+//     // 発射方向の可視化
+//     Gizmos.DrawRay(_muzzle.transform.position, angledForward * _rayDistance);
+// }

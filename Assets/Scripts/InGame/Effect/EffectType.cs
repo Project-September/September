@@ -4,5 +4,6 @@ public enum EffectType
     Warp,
     Tutankhamen,
     Explosion,
-    LondonTelephone,
+    LondonTelephoneStart,
+    LondonTelephoneActive
 }
