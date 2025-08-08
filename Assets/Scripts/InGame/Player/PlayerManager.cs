@@ -46,6 +46,9 @@ namespace InGame.Player
 
         public override void Spawned()
         {
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0; // vsyncを無効化（必要なら）
+            
             InitComponents();
         }
 
