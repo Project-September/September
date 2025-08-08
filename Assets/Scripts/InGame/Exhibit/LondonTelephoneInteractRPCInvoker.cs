@@ -47,7 +47,7 @@ namespace InGame.Exhibit
 
             // 同時インタラクト不可
             _interactableBase.ForceSetInteractable = false;
-            Vector3 effectPosition = playerObject.transform.position + Vector3.down * 0.5f;
+            Vector3 effectPosition = playerObject.transform.position;
             
             // Effect生成処理
             InitEffectSpawner();
