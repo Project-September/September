@@ -22,20 +22,30 @@ public class TyrannoInteractable : MountableExhibitBase
     private float _hitDistance;
     
     private float _movingTime;
-
+    
     [Networked,OnChangedRender(nameof(OnBlendChangedRender))] public float MoveValue { get; set;}
+    
+    [Networked,OnChangedRender(nameof(SetIsInteracting))]private bool IsInteracting { get; set; }
+
+    private NetworkMecanimAnimator _mecanimAnimator;
+    public override void Spawned()
+    {
+        base.Spawned();
+        _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
+    }
+
 
     public override void GetOn(PlayerRef playerRef)
     {
         base.GetOn(playerRef);
-        RPC_SetBollValue(playerRef,true);
+        IsInteracting = true;
         HitAction += OnHit;
     }
 
     public override void GetOff(PlayerRef playerRef)
     {
         base.GetOff(playerRef);
-        RPC_SetBollValue(playerRef,false);
+        IsInteracting = false;
         HitAction -= OnHit;
     }
 
@@ -54,15 +64,15 @@ public class TyrannoInteractable : MountableExhibitBase
     }
 
     private void OnHit()
-    {
-        Animator.SetTrigger("Hit");
+    { 
+        _mecanimAnimator.SetTrigger("Hit");
     }
 
     private void AnimationTrigger(PlayerInput playerInput)
     {
         if (!playerInput.Buttons.IsSet(PlayerButtons.Attack)) return;
         _isAttacking = true;
-        Animator.SetTrigger("Attack");
+        _mecanimAnimator.SetTrigger("Attack");
     }
     
     private void OnAttackUpdate(float deltaTime)
@@ -143,16 +153,13 @@ public class TyrannoInteractable : MountableExhibitBase
     
     
     public void OnBlendChangedRender()
-    {
+    { 
         Animator.SetFloat("Blend", MoveValue);
     }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_SetBollValue(PlayerRef player, bool isInteracting)
+    
+    public void SetIsInteracting()
     {
-        if (Runner.LocalPlayer == player)
-        {
-            Animator.SetBool("IsInteracting",isInteracting);
-        }
+        Animator.SetBool("IsInteracting",IsInteracting);
     }
+    
 }
