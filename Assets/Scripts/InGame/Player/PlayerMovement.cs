@@ -63,6 +63,7 @@ namespace InGame.Player
         public Vector3 MoveVelocity => _moveVelocity;
         public bool IsGround => _isGround || _isGroundTimer > 0;
         public Vector3 GroundNormal => _groundNormal;
+        public bool InfiniteStamina { get; set; } = false;
 
         private void Awake()
         {
@@ -124,7 +125,7 @@ namespace InGame.Player
             // Dash中ならスタミナを消費させる
             if (isDash && moveDirection != Vector2.zero)
             {
-                _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _staminaConsumption * deltaTime);
+                if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _staminaConsumption * deltaTime);
 
                 // スタミナなくなったら
                 if (_status.CurrentStamina <= 0)

@@ -39,6 +39,12 @@ namespace September.Common
         
         Camera _mainCamera;
         
+        public bool UseAutoMove
+        {
+            get => _useAutoMove;
+            set => _useAutoMove = value;
+        }
+        
         private void Awake()
         {
             // InputSystemを有効にする
