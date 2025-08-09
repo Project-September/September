@@ -13,8 +13,7 @@ public class InGameDebugSetting : MonoBehaviour
     [SerializeField] private Button _applyBeforeStartTimeButton;
     [SerializeField] private TMP_InputField _ingameTimeInputField;
     [SerializeField] private Button _applyIngameTimeButton;
-    [SerializeField] private TMP_InputField _staminaInputField;
-    [SerializeField] private Button _applyStaminaButton;
+    [SerializeField] private Toggle _applyInfiniteStamina;
     [SerializeField] private Toggle _autoMoveToggle;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -35,19 +34,18 @@ public class InGameDebugSetting : MonoBehaviour
                 _gameTimerData.GameTime = time;
             }
         });
-        
-        _applyStaminaButton.onClick.AddListener( () =>
+
+        _applyInfiniteStamina.isOn = false;
+        _applyInfiniteStamina.onValueChanged.AddListener(isOn =>
         {
-            if (float.TryParse(_staminaInputField.text, out float stamina))
+            var players = FindObjectsOfType<PlayerMovement>();
+            foreach (var player in players)
             {
-                var players = FindObjectsOfType<PlayerStatus>();
-                foreach (var player in players)
-                {
-                    player.CurrentStamina = stamina;
-                }
+                player.InfiniteStamina = isOn;
             }
         });
-        
+
+        _autoMoveToggle.isOn = false;
         _autoMoveToggle.onValueChanged.AddListener(isOn =>
         {
             var players = FindObjectsOfType<InputProvider>();
