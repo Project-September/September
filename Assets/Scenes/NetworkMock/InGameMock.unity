@@ -1131,8 +1131,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
+  m_LocalRotation: {x: 0.021659082, y: -0.9537019, z: 0.07086659, w: 0.2914817}
+  m_LocalPosition: {x: 16.483675, y: -3.7899077, z: 27.096619}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2990,7 +2990,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tyranno
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -2458423887434476005, guid: 4a2facbe8555c2847b979f964b505979, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -3253,6 +3254,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5a7a0d2d0b14a0bb3292973ccfe2edc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _useAutoMove: 0
+  _moveInterval: 2
+  _autoMoveTimer: 0
+  _moveDirection: 1
 --- !u!1001 &597424540228789944
 PrefabInstance:
   m_ObjectHideFlags: 0
