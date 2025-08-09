@@ -1,4 +1,6 @@
+using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DebugUI : MonoBehaviour
@@ -23,6 +25,21 @@ public class DebugUI : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
+        SceneManager.sceneLoaded += OnEnterIngameScene;
+    }
+    
+    private void OnEnterIngameScene(Scene scene, LoadSceneMode mode)
+    {
+        if (SceneManager.GetActiveScene().name != "InGameMock")
+        {
+            return;
+        }
+        var statics = GameObject.Find("FusionStatsRenderPanel(Clone)");
+        if (statics != null)
+        {
+            statics.GetComponent<FusionBasicBillboard>().enabled = false;
+        }
     }
 
     private void Initialize()
@@ -32,6 +49,7 @@ public class DebugUI : MonoBehaviour
             _debugPanel.SetActive(false);
         }
         _isDebugUIVisible = false;
+        _debugPanel.SetActive(false);
     }
 
     private void Update()
