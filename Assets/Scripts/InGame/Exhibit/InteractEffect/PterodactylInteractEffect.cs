@@ -41,7 +41,16 @@ namespace InGame.Exhibit
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
             if (_isInteracting)
+            {
                 _interactTimer += _runner.DeltaTime;
+
+                if (playerInput.Buttons.IsSet(PlayerButtons.Interact) && _interactTimer > 1f)
+                {
+                    Debug.Log("Interactを終了");
+                    GetOff();
+                    return;
+                }
+            }
             
             if(CheckInteractEnd())
                 GetOff();
