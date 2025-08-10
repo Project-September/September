@@ -3,44 +3,43 @@ using Fusion;
 using InGame.Interact;
 using NaughtyAttributes;
 using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Exhibit
 {
     public class PterodactylInteractable : MountableExhibitBase
     {
-        [Header("Sound Settings")] [SerializeField]
-        private string _crySe = "Pteranodon_cry";
+        [Header("Sound Settings")] 
+        [SerializeField] private string _crySe = "Pteranodon_cry";
 
-        [Header("Movement Settings")] [SerializeField]
-        private float _moveSpeed = 5f;
-
+        [Header("Movement Settings")] 
+        [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _rotationSpeed = 5f;
         [SerializeField] private float _turnThreshold = 30f;
 
-        [Header("BulletSettings")] [SerializeField]
-        private GameObject _muzzle;
-
+        [Header("BulletSettings")]
+        [SerializeField] private Transform _muzzle;
         [SerializeField] private ParticleSystem _muzzleFlash;
+        [SerializeField, Label("Fireの方向")] private float _downwardAngle = 30f;
         [SerializeField] private GameObject _fireParticle;
         [SerializeField] private float _fireSpeed = 20f;
         [SerializeField] private float _rayDistance = 100f;
-        [SerializeField, Label("Fireの方向")] private float _downwardAngle = 30f;
         [SerializeField] private LayerMask _fireHitMask;
-        [SerializeField] private float _bulletCoolDown = 2f;
-        private float _currentBulletCoolDown;
-
-        private Rigidbody _rigidbody;
+        [SerializeField] private float _fireCooldown = 2f;
+        
+        private float _fireCooldownTimerSec;
         private InteractableBase _interactableBase;
-        private Animator _animator;
-
+        private const float Threshold = 0.02f;
+        private const float LerpSpeed = 5f;
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
-
         private float _currentTargetValue;
 
         [Networked, OnChangedRender(nameof(OnChangeAnimation))]
         private float CurrentBlendValue { get; set; }
+        [Networked,OnChangedRender(nameof(OnInteractingChanged))]
+        private NetworkBool IsInteracting { get; set; }
 
         #region AnimationHash
 
@@ -48,14 +47,27 @@ namespace InGame.Exhibit
 
         #endregion
 
-        private void Awake()
+        public override void Spawned()
         {
-            _rigidbody = GetComponent<Rigidbody>();
+            base.Spawned();
+            
             _interactableBase = GetComponent<InteractableBase>();
-            _animator = GetComponent<Animator>();
+            _initialPosition  = transform.position;
+            _initialRotation  = transform.rotation;
+            
+            if (HasStateAuthority)
+                Rigidbody.isKinematic = false;
+            
+            Animator.enabled = IsInteracting;
+        }
 
-            _initialPosition = transform.position;
-            _initialRotation = transform.rotation;
+        public override void Render()
+        {
+            Animator.enabled = IsInteracting;
+
+            float baseMin = IsInteracting ? _currentTargetValue : 0f;
+            float clamped  = Mathf.Max(CurrentBlendValue, baseMin);
+            Animator.SetFloat(FlyStateBlend, clamped);
         }
 
         public override void GetOn(PlayerRef ownerPlayerRef)
@@ -64,9 +76,10 @@ namespace InGame.Exhibit
                 return;
 
             base.GetOn(ownerPlayerRef);
-
-            RPC_SetAnimatorEnabled(true);
+            IsInteracting = true; 
+            
             _currentTargetValue = 0.01f;
+            CurrentBlendValue = _currentTargetValue;
             _interactableBase.ForceSetInteractable = false;
             OnPlaySE(_crySe);
         }
@@ -75,41 +88,40 @@ namespace InGame.Exhibit
         {
             base.GetOff(ownerPlayerRef);
 
-            _rigidbody.linearVelocity = Vector3.zero;
-            _rigidbody.angularVelocity = Vector3.zero;
-            transform.position = _initialPosition;
-            transform.rotation = _initialRotation;
-
-            RPC_SetAnimatorEnabled(false);
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
+            transform.SetPositionAndRotation(_initialPosition,_initialRotation);
+            
+            IsInteracting = false; 
+            _currentTargetValue = 0f;
+            CurrentBlendValue = _currentTargetValue;
             _interactableBase.ForceSetInteractable = true;
         }
 
         public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
         {
-            if (HasStateAuthority)
-            {
-                HandleMovement(playerInput);
-                
-                if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _bulletCoolDown <= _currentBulletCoolDown)
-                {
-                    OnPlayAttack();
-                }
-                else if (_bulletCoolDown >= _currentBulletCoolDown)
-                {
-                    _currentBulletCoolDown += Time.deltaTime;
-                }
-            }
+            if (!HasStateAuthority) 
+                return;
             
-            // Animationの同期
-            // float clampedBlend = Mathf.Clamp(CurrentBlendValue, _currentTargetValue, 1f);
-            // _animator.SetFloat(FlyStateBlend, clampedBlend);
+            HandleMovement(playerInput);
+            _fireCooldownTimerSec = Mathf.Min(_fireCooldown, _fireCooldownTimerSec + deltaTime);
+                
+            if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _fireCooldownTimerSec >= _fireCooldown)
+            {
+                Server_Fire();
+            }
         }
 
         // Animationの更新処理
         private void OnChangeAnimation()
         {
             float clampedBlend = Mathf.Clamp(CurrentBlendValue, _currentTargetValue, 1f);
-            _animator.SetFloat(FlyStateBlend, clampedBlend);
+            Animator.SetFloat(FlyStateBlend, clampedBlend);
+        }
+
+        private void OnInteractingChanged()
+        {
+            Animator.enabled = IsInteracting;
         }
 
         private void HandleMovement(PlayerInput input)
@@ -118,8 +130,10 @@ namespace InGame.Exhibit
 
             if (moveInput == Vector2.zero)
             {
-                _rigidbody.linearVelocity = Vector3.zero;
-                CurrentBlendValue = Mathf.Lerp(CurrentBlendValue, 0f, Runner.DeltaTime * 5f);
+                Rigidbody.linearVelocity = Vector3.zero;
+                
+                float idleTarget = IsInteracting ? _currentTargetValue : 0;
+                SetBlendValue(idleTarget);
                 return;
             }
 
@@ -131,11 +145,11 @@ namespace InGame.Exhibit
 
             // 後ろ方向のときは無理な移動をしないように制御
             if (moveInput.y < 0 && Mathf.Abs(angleToMoveDir) > _turnThreshold)
-                _rigidbody.linearVelocity = Vector3.zero;
+                Rigidbody.linearVelocity = Vector3.zero;
             else
-                _rigidbody.linearVelocity = moveDir * _moveSpeed;
+                Rigidbody.linearVelocity = moveDir * _moveSpeed;
 
-            CurrentBlendValue = Mathf.Lerp(CurrentBlendValue, moveInput.magnitude, Runner.DeltaTime * 5f);
+            SetBlendValue(moveInput.magnitude);
         }
 
         // 向きたい方向を取得
@@ -146,33 +160,67 @@ namespace InGame.Exhibit
             return (lookDir * input.MoveDirection.y + cameraRight * input.MoveDirection.x).normalized;
         }
 
-        // Attack処理
-        private void OnPlayAttack()
+        private void SetBlendValue(float target)
         {
-            // ToDo : RPC対応
-            _muzzleFlash.Play();
-            // 方向を決定
-            Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.transform.right) *
-                                   _muzzle.transform.forward;
+            if (IsInteracting) 
+                target = Mathf.Max(target, _currentTargetValue);
 
-            if (Physics.Raycast(_muzzle.transform.position, angleForward, out RaycastHit hit, _rayDistance,
+            float src  = CurrentBlendValue;
+            float next = Mathf.Lerp(src, target, Runner.DeltaTime * LerpSpeed);
+
+            if (Mathf.Abs(next - src) >= Threshold)
+                CurrentBlendValue = next;
+        }
+
+        private void Server_Fire()
+        {
+            if (_muzzle == null)
+            {
+                Debug.LogError("Muzzle is null");
+                return;
+            }
+            
+            PlayMuzzleFlash(_muzzle.position, _muzzle.rotation);
+            
+            Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
+            
+            if (Physics.Raycast(_muzzle.position, angleForward, out RaycastHit hit, _rayDistance,
                     _fireHitMask))
             {
-                Vector3 targetPos = hit.point;
-
                 // 弾を生成し、ターゲット方向に飛ばす
-                Vector3 dir = (targetPos - _muzzle.transform.position).normalized;
-                Quaternion rotation = Quaternion.LookRotation(dir);
-
-                // ToDo : RPC対応
-                GameObject fire = Instantiate(_fireParticle, _muzzle.transform.position, rotation);
-                // Particleを発射する向きに向かせる
-                fire.GetComponent<Rigidbody>().AddForce(dir * _fireSpeed, ForceMode.Impulse);
+                Vector3 dir = (hit.point - _muzzle.position).normalized;
+                Quaternion rotation = Quaternion.LookRotation(dir,Vector3.up);
+                Vector3 velocity = dir * _fireSpeed;
+                
+                Rpc_PlayFireBullet(_muzzle.position, rotation, velocity);
             }
             else
                 Debug.LogError("No hit found in angled ray");
 
-            _currentBulletCoolDown = 0f;
+            _fireCooldownTimerSec = 0f;
+        }
+        
+        private void PlayMuzzleFlash(Vector3 pos, Quaternion rot)
+        {
+            StaticServiceLocator.Instance.Get<EffectSpawner>()
+                .RequestPlayOneShotEffect(EffectType.PtrFireMuzzle, pos, rot, null);
+
+            if (_muzzleFlash != null)
+                _muzzleFlash.Play();
+        }
+
+        [Rpc]
+        private void Rpc_PlayFireBullet(Vector3 spawnPos, Quaternion rotation, Vector3 initialVelocity)
+        {
+            if(!_fireParticle)
+                return;
+            
+            GameObject instance = Instantiate(_fireParticle,spawnPos, rotation);
+
+            if (instance.TryGetComponent<Rigidbody>(out var rb))
+            {
+                rb.linearVelocity = initialVelocity;
+            }
         }
 
         // サウンド設定
@@ -185,13 +233,6 @@ namespace InGame.Exhibit
         private void RPC_PlaySE(Vector3 position, string cueName)
         {
             CRIAudio.PlaySE(position, "Exhibit", cueName);
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetAnimatorEnabled(bool isEnabled)
-        {
-            Debug.Log(isEnabled);
-            _animator.enabled = isEnabled;
         }
     }
 }

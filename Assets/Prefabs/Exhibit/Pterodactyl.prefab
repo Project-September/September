@@ -482,16 +482,16 @@ MonoBehaviour:
   _moveSpeed: 5
   _rotationSpeed: 5
   _turnThreshold: 30
-  _muzzle: {fileID: 6861177194732935714}
+  _muzzle: {fileID: 1776912245541953101}
   _muzzleFlash: {fileID: 2943128015699734913}
+  _downwardAngle: 30
   _fireParticle: {fileID: 7145253233522768830, guid: a94003fc19ce4f44984dc1df010b55fb, type: 3}
   _fireSpeed: 20
   _rayDistance: 100
-  _downwardAngle: 30
   _fireHitMask:
     serializedVersion: 2
     m_Bits: 128
-  _bulletCoolDown: 2
+  _fireCooldown: 2
 --- !u!114 &1450576261565196690
 MonoBehaviour:
   m_ObjectHideFlags: 0

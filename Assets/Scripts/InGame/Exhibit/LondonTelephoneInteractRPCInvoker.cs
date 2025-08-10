@@ -29,7 +29,7 @@ namespace InGame.Exhibit
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        public void RpcRequestInteraction(PlayerRef requestingPlayer)
+        public void Rpc_RequestInteraction(PlayerRef requestingPlayer)
         {
             // ここで他のプレイヤーに通知
             foreach (var player in Runner.ActivePlayers)

@@ -11,7 +11,7 @@ namespace InGame.Exhibit
         
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            LondonTelephoneInteractRPC.RpcRequestInteraction(PlayerRef.FromEncoded(context.Interactor));
+            LondonTelephoneInteractRPC.Rpc_RequestInteraction(PlayerRef.FromEncoded(context.Interactor));
         }
 
         public override CharacterInteractEffectBase Clone()
