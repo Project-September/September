@@ -1,18 +1,25 @@
+using Fusion;
+using InGame.Interact;
 using UnityEngine;
 
 
 namespace InGame.Exhibit.InteractEffect
 {
-    public class StradivariusInteractEffect : MonoBehaviour
+    public class StradivariusInteractEffect : CharacterInteractEffectBase
     {
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
+        [SerializeField] private StradivariusController _stradivariusController;
+        public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
+            var playerRef = PlayerRef.FromEncoded(context.Interactor);
+            _stradivariusController.HealPlayer(playerRef);
         }
 
-        // Update is called once per frame
-        void Update()
+        public override CharacterInteractEffectBase Clone()
         {
+            return new StradivariusInteractEffect()
+            {
+                _stradivariusController = _stradivariusController,
+            };
         }
     }
 }
