@@ -26,11 +26,14 @@ namespace InGame.Player
         {
             if (!_playerManager.IsLocalPlayer)
                 return;
-            
-            // Health監視
-            status.ReactiveCurrentHealth.DistinctUntilChanged().Subscribe(UIController.I.ChangeSliderValue).AddTo(this);
-            // Stamina 監視
-            status.ReactiveCurrentStamina.DistinctUntilChanged().Subscribe(UIController.I.ChangeStaminaValue).AddTo(this);
+
+            if (UIController.I)
+            {
+                // Health監視
+                status.ReactiveCurrentHealth.DistinctUntilChanged().Subscribe(UIController.I.ChangeSliderValue).AddTo(this);
+                // Stamina 監視
+                status.ReactiveCurrentStamina.DistinctUntilChanged().Subscribe(UIController.I.ChangeStaminaValue).AddTo(this);
+            }
         }
     }
 }
