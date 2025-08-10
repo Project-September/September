@@ -1,32 +1,40 @@
+using System;
 using Fusion;
 using September.Common;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace InGame.Interact
 {
     [DisallowMultipleComponent]
-    public abstract class InteractableBase : NetworkBehaviour
+    public class InteractableBase : NetworkBehaviour
     {
-        [SerializeField]
-        private SerializableDictionary<CharacterType, float> _requiredInteractTimeDictionary = new();
+        [SerializeField] private SerializableDictionary<CharacterType, float> _requiredInteractTimeDictionary = new();
 
-        [SerializeField]
-        private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
+        [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
 
-        [Networked]
-        private float LastInteractTime { get; set; } = -9999f;
+        [SerializeReference, SubclassSelector] private List<CharacterInteractEffectBase> _characterEffects = new();
+
+
+        [Networked] public float LastInteractTime { get; set; } = -9999f;
+
+        [Networked] public float LastUsedCooldownTime { get; set; } = 0f;
         
-        [Networked]
-        private float LastUsedCooldownTime { get; set; } = 0f;
+        /// <summary>
+        /// 外部から強制的にインタラクト可能にするかどうかを設定するために使う
+        /// </summary>
+        [Networked] public bool ForceSetInteractable { get; set; } = true;
 
         public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary => _requiredInteractTimeDictionary;
+        public SerializableDictionary<CharacterType, float> CooldownTimeDictionary => _cooldownTimeDictionary;
+
+        private CharacterInteractEffectBase _activeEffectBase;
 
         public void Interact(IInteractableContext context)
         {
-            if (GetSessionPlayerData(context.Interactor, out var data)) return;
-
-            var charaType = data.CharacterType;
+            if (!HasStateAuthority) return;
+            var charaType = context.CharacterType;
 
             if (!ValidateInteraction(context))
             {
@@ -34,23 +42,15 @@ namespace InGame.Interact
                 return;
             }
 
-            // 実行
-            OnInteract(context);
-
             // クールダウン登録
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
-        }
+            
+            //All キャラタイプのクールダウン時間を優先して取得する
+            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
 
-        private static bool GetSessionPlayerData(int interactor, out SessionPlayerData data)
-        {
-            if (!PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(interactor), out data))
-            {
-                Debug.LogWarning("[InteractableBase] インタラクト実行者のデータが見つかりません: " + interactor);
-                return true;
-            }
-
-            return false;
+            // 実行
+            OnInteract(context);
         }
 
         /// <summary>
@@ -59,21 +59,32 @@ namespace InGame.Interact
         /// </summary>
         public bool ValidateInteraction(IInteractableContext context)
         {
-            if (GetSessionPlayerData(context.Interactor, out var data)) return false;
-
-            var type = data.CharacterType;
+            var type = context.CharacterType;
             if (IsInCooldown())
             {
+                //Debug.LogError("[InteractableBase] クールダウン中のためインタラクトできません");
                 return false;
             }
 
             if (!Object.isActiveAndEnabled)
             {
-                Debug.Log($"[InteractableBase] オブジェクトが非アクティブです: {context.Interactor}");
+                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが無効です");
+                return false;
+            }
+            
+            if (!ForceSetInteractable)
+            {
+                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
                 return false;
             }
 
-            return OnValidateInteraction(context, type);
+            if (!OnValidateInteraction(context, type))
+            {
+                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -84,26 +95,82 @@ namespace InGame.Interact
         {
             return true;
         }
-        
-        protected abstract void OnInteract(IInteractableContext context);
 
-        protected bool IsInCooldown()
+        protected virtual void OnInteract(IInteractableContext context)
         {
+            var charaType = context.CharacterType;
+            // All を優先し、特定キャラタイプの effect があれば上書きする
+            var effect = _characterEffects
+                             .FirstOrDefault(e => e is { CharacterType: CharacterType.All })
+                         ?? _characterEffects.FirstOrDefault(e => e != null && e.CharacterType == charaType);
+
+            if (effect != null)
+            {
+                _activeEffectBase = effect.Clone();
+                _activeEffectBase.OnInteractStart(context, this);
+            }
+            else
+            {
+                Debug.LogWarning($"[{name}] {charaType} のインタラクト効果が設定されていません");
+            }
+        }
+
+        public bool IsInCooldown()
+        {
+            if (LastUsedCooldownTime <= 0f) return false;
             var currentTime = Runner ? Runner.SimulationTime : Time.time;
             float timeSinceLast = currentTime - LastInteractTime;
             return timeSinceLast < LastUsedCooldownTime;
         }
 
+        private void Update()
+        {
+            if (!HasStateAuthority) return;
+            _activeEffectBase?.OnInteractUpdate(Time.deltaTime);
+        }
+
+        private void LateUpdate()
+        {
+            if (!HasStateAuthority) return;
+            _activeEffectBase?.OnInteractLateUpdate(Time.deltaTime);
+        }
+
+        private void FixedUpdate()
+        {
+            if (!HasStateAuthority) return;
+            _activeEffectBase?.OnInteractFixedUpdate();
+        }
+
+        public override void FixedUpdateNetwork()
+        {
+            GetInput(out PlayerInput input);
+            _activeEffectBase?.OnInteractFixedNetworkUpdate(input);
+        }
+
+        private void OnCollisionStay(Collision collision)
+        {
+            if (!HasStateAuthority) return;
+            _activeEffectBase?.OnInteractCollisionStay(collision);
+        }
+
+        // 必要に応じて外部 or クールダウンなどから呼び出す用
+        public void EndInteract()
+        {
+            _activeEffectBase?.OnInteractEnd();
+            _activeEffectBase = null;
+        }
     }
 
-    public interface IInteractableContext
+    public interface IInteractableContext : INetworkStruct
     {
         int Interactor { get; }
+        CharacterType CharacterType { get; set; }
     }
 
     // シンプルな実装例。必要に合わせて情報は追加してください
     public struct InteractableContext : IInteractableContext
     {
         public int Interactor { get; set; }
+        public CharacterType CharacterType { get; set; }
     }
 }

@@ -29,14 +29,27 @@ namespace InGame.Interact
         private bool _isExecutingInteraction = false;
         private float _currentInteractTime = 0f;
         private float _requiredInteractTime = 1.0f;
-        private bool isHoldingInteract = false;
+        [SerializeField] private bool _isHoldingInteract = false;
+        private bool _hasCompletedInteraction = false;
 
         private void Awake()
         {
             if (!_interactOrigin)
                 _interactOrigin = transform;
         }
-        
+
+        public override void Spawned()
+        {
+            if (PlayerDatabase.Instance?.PlayerDataDic == null)
+            {
+                _characterType = CharacterType.OkabeWright;
+            }
+            else
+            {
+                 _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType ;
+            }
+        }
+
         private void Update()
         {
             if (!HasInputAuthority) return;
@@ -44,7 +57,7 @@ namespace InGame.Interact
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
             
-            if (isHoldingInteract)
+            if (_isHoldingInteract)
             {
                 if (!_isExecutingInteraction)
                     TryStartInteraction();
@@ -54,6 +67,7 @@ namespace InGame.Interact
                     _currentInteractTime += Runner.DeltaTime;
                     if (_currentInteractTime >= _requiredInteractTime)
                     {
+                        _hasCompletedInteraction = true;
                         CompleteInteraction();
                         UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
                     }
@@ -68,6 +82,8 @@ namespace InGame.Interact
 
         public override void FixedUpdateNetwork()
         {
+            _isHoldingInteract = false; // 毎フレームリセット
+            
             if (!HasInputAuthority) return;
             if (!GetInput(out PlayerInput input)) return;
 
@@ -84,7 +100,7 @@ namespace InGame.Interact
                 return;
             }
 
-            isHoldingInteract = input.Buttons.IsSet(PlayerButtons.Interact);
+            _isHoldingInteract = input.Buttons.IsSet(PlayerButtons.Interact);
         }
 
         private void UpdateFocusedInteractable()
@@ -129,11 +145,13 @@ namespace InGame.Interact
                 {
                     Interactor = Object.InputAuthority.RawEncoded,
                 };
-                UIController.I.ShowInteractUI(_focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+                if (UIController.I)
+                    UIController.I.ShowInteractUI(_focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
             }
             else
             {
-                UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
+                if (UIController.I)
+                    UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
             }
             //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
@@ -182,14 +200,17 @@ namespace InGame.Interact
             
             _currentInteractTime = 0f;
             _isExecutingInteraction = true;
+            _hasCompletedInteraction = false;
         }
 
         private float GetRequireInteractTime()
         {
             if (!_focusedObj)
                 return _baseInteractTime;
-            float baseTime = _focusedObj.RequiredInteractTimeDictionary.Dictionary
-                .GetValueOrDefault(_characterType, _baseInteractTime);
+            var dict = _focusedObj.RequiredInteractTimeDictionary.Dictionary;
+            float baseTime =
+                dict.TryGetValue(CharacterType.All, out var allVal) ? allVal :
+                dict.GetValueOrDefault(_characterType, _baseInteractTime);
 
             float multiplier = 1f;
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Object.InputAuthority, out var playerData) &&
@@ -203,9 +224,14 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
 
+            if (GetSessionPlayerData(Object.InputAuthority.RawEncoded, out var data))
+            {
+                return;
+            }
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
+                CharacterType = data.CharacterType,
             };
 
             if (HasStateAuthority)
@@ -232,7 +258,7 @@ namespace InGame.Interact
                 _interactWaitTimer = 0f;
 
                 Debug.Log($"[Client] RPC_RequestInteract 送信: {context.Interactor} -> {_focusedObj.name} NetObj is null? {!netObj}");
-                RPC_RequestInteract(context.Interactor, netObj);
+                RPC_RequestInteract(context.Interactor, (int)context.CharacterType,netObj);
             }
         }
 
@@ -240,22 +266,34 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIController.I.SetInteractProgress(0f);
+            UIController.I?.SetInteractProgress(0f);
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        private void RPC_RequestInteract(int interactor, NetworkObject target)
+        private void RPC_RequestInteract(int interactor, int characterType, NetworkObject target)
         {
-            Debug.Log($"[PlayerInteractionController] <UNK>: {interactor} -> {target.name}");
+            Debug.Log($"target.HasStateAuthority: {target.HasStateAuthority}, Runner.LocalPlayer: {Runner.LocalPlayer}");
             if (target && target.TryGetComponent(out InteractableBase interactable))
             {
                 var context = new InteractableContext
-                {
-                    Interactor = interactor,
-                };
+                 {
+                     Interactor = interactor,
+                     CharacterType = (CharacterType)characterType
+                 };
 
                 interactable.Interact(context);
             }
+        }
+        
+        private static bool GetSessionPlayerData(int interactor, out SessionPlayerData data)
+        {
+            if (!PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(interactor), out data))
+            {
+                Debug.LogWarning("[InteractableBase] インタラクト実行者のデータが見つかりません: " + interactor);
+                return true;
+            }
+
+            return false;
         }
 
 #if UNITY_EDITOR

@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Fusion;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace September.Common
 {
@@ -91,12 +93,30 @@ namespace September.Common
         {
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
+            
             await _networkRunner.LoadScene(_gameSceneName);
         }
+        
+        public async UniTask Fade(Image fadeImage)
+        {
+            fadeImage.gameObject.SetActive(true);
+            fadeImage.color = new Color(0f, 0f, 0f, 0f);
+
+            await fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InOutQuad);
+        }
+
+        
         public async UniTask QuitInGame()
         {
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
+            
+            if (!SceneManager.GetSceneByName("Field").isLoaded)
+            {
+                return;
+            }
+            
+            await _networkRunner.UnloadScene("Field"); 
             await _networkRunner.LoadScene(_resultSceneName);
         }
     }

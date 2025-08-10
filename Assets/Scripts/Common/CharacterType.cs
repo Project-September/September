@@ -4,6 +4,8 @@ namespace September.Common
     {
         None = 0,
         OkabeWright,
-        HulkTheButcher
+        HulkTheButcher,
+        Tanihira,
+        All,
     }
 }

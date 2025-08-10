@@ -13,27 +13,27 @@ namespace InGame.Player
         [SerializeField] TMP_Text _isGroundText;
 
         PlayerMovement _playerMovement;
+        PlayerStatus _playerStatus;
         
         private void Start()
         {
-            PlayerStatus playerStatus = GetComponentInParent<PlayerStatus>();
-            _playerMovement = playerStatus.GetComponent<PlayerMovement>();
+            PlayerManager playerManager = GetComponentInParent<PlayerManager>();
+            _playerStatus = GetComponentInParent<PlayerStatus>();
+            _playerMovement = _playerStatus.GetComponent<PlayerMovement>();
 
-            if (!playerStatus.ISLocalPlayer)
+            if (!playerManager.IsLocalPlayer)
             {
                 gameObject.SetActive(false);
                 return;
             }
 
-            playerStatus.CurrentHealth.Subscribe(health => _healthText.text = health.ToString());
-            playerStatus.CurrentStamina.Subscribe(stamina => _staminaText.text = stamina.ToString("F1"));
+            _playerStatus.ReactiveCurrentHealth.Subscribe(health => _healthText.text = health.ToString());
+            _playerStatus.ReactiveCurrentStamina.Subscribe(stamina => _staminaText.text = stamina.ToString("F1"));
         }
 
         private void FixedUpdate()
         {
-            Vector3 xzVelo = _playerMovement.MoveVelocity;
-            xzVelo.y = 0;
-            _speedText.text = $"velo:{_playerMovement.MoveVelocity}\nmag:{xzVelo.magnitude:F2}";
+            _speedText.text = $"velo:{_playerMovement.MoveVelocity}\non plane mag:{_playerMovement.GetSpeedOnPlane():F2}";
             _isGroundText.text = $"IsGround:{_playerMovement.IsGround}";
         }
     }
