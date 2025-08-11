@@ -94,7 +94,7 @@ namespace September.Common
             {
                 var position = _spawnPositions[i].position + _cameraOffset;
                 _startCamera.gameObject.transform.Translate(position);
-                await UniTask.Delay(_emoteDelay); // 各エモートのAnimation分待つ
+                await UniTask.Delay(TimeSpan.FromSeconds(_emoteDelay)); // 各エモートのAnimation分待つ
             }
             // 仮実装
             // Debug.Log("Animation Start");
