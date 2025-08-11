@@ -46,7 +46,6 @@ namespace InGame.Exhibit
 
                 if (playerInput.Buttons.IsSet(PlayerButtons.Interact) && _interactTimer > 1f)
                 {
-                    Debug.Log("Interactを終了");
                     GetOff();
                     return;
                 }

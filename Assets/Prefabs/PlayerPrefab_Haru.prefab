@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animator: {fileID: 0}
+  Animator: {fileID: 5615930422083952895}
   ApplyTiming: 2
   SyncSettings: 79
   StateHashes: 000000000cdf50fb5e852fd2325a708301e955b4
@@ -1204,6 +1204,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 494739354704531244, guid: 0eeb3f5c2ae92a5448278174e23b13f6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8514fbe94dc21da47a62481c67a30aaf, type: 2}
     - target: {fileID: 612651873241062718, guid: 0eeb3f5c2ae92a5448278174e23b13f6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -8.836617

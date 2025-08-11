@@ -147,13 +147,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 659054741613257981}
     m_Modifications:
+    - target: {fileID: 804085080765562456, guid: 448097a19bbf47541aeef862f21d0a7a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2610151814098329875, guid: 448097a19bbf47541aeef862f21d0a7a, type: 3}
       propertyPath: m_Name
       value: InteractUI
       objectReference: {fileID: 0}
     - target: {fileID: 2610151814098329875, guid: 448097a19bbf47541aeef862f21d0a7a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5199179440574145408, guid: 448097a19bbf47541aeef862f21d0a7a, type: 3}
       propertyPath: m_Pivot.x
