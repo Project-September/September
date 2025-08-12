@@ -56,6 +56,8 @@ namespace InGame.Player
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
         private Vector3 _vaultEndPos;
+        // teleport
+        private Vector3? _teleportTarget;
         // Gizmo
         private float _gizmoTimer;
         private List<CapsuleCastData> _capsuleCastData = new();
@@ -84,9 +86,16 @@ namespace InGame.Player
                 ApplyGrav(deltaTime);
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
                 AdsorptionOnGround();
-                ApplyVelocity(deltaTime);
+            }
+
+            if (_teleportTarget.HasValue)
+            {
+                transform.position = _teleportTarget.Value;
+                _moveVelocity = Vector3.zero;
+                _teleportTarget = null;
             }
             
+            ApplyVelocity(deltaTime);
             // Character の回転
             RotationByDirection(_rotationDirection, deltaTime);
             
@@ -388,6 +397,11 @@ namespace InGame.Player
         public void Stop()
         {
             _moveVelocity = Vector3.zero;
+        }
+
+        public void Teleport(Vector3 position)
+        {
+            _teleportTarget = position;
         }
 
         public float GetSpeedOnPlane()
