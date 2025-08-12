@@ -16,6 +16,7 @@ namespace InGame.Exhibit
     public class LondonTelephoneInteractRPCInvoker : NetworkBehaviour
     {
         [SerializeField,Label("Effect持続時間")] private float _interactTimer;
+        [SerializeField, Label("エフェクトの位置")] private Transform _effectPos; // エフェクト位置用の子オブジェクト
         
         private EffectSpawner _effectSpawner;
         private CancellationTokenSource _cts;
@@ -28,7 +29,7 @@ namespace InGame.Exhibit
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        public void RpcRequestInteraction(PlayerRef requestingPlayer)
+        public void Rpc_RequestInteraction(PlayerRef requestingPlayer)
         {
             // ここで他のプレイヤーに通知
             foreach (var player in Runner.ActivePlayers)
@@ -47,22 +48,32 @@ namespace InGame.Exhibit
 
             // 同時インタラクト不可
             _interactableBase.ForceSetInteractable = false;
-            Vector3 effectPosition = playerObject.transform.position + Vector3.down * 0.5f;
-            
+            Vector3 effectPosition = playerObject.transform.position;
+
             // Effect生成処理
             InitEffectSpawner();
+
+            // ロンドンテレフォンの下にエフェクトを再生
+            Vector3 startPos = _effectPos != null ? _effectPos.position : transform.position;
+            _effectSpawner?.RequestPlayOneShotEffect(
+                EffectType.LondonTelephoneStart,
+                startPos,
+                Quaternion.identity
+            );
+
             string effectId = GenerateEffectId();
-            
+
             _effectSpawner?.RequestPlayLoopEffect(
                 effectId,
-                EffectType.LondonTelephone,
-                effectPosition,
-                new());
-            
+                EffectType.LondonTelephoneActive,
+                effectPosition + Vector3.up,
+                new()
+            );
+
             // Effectを消す
-            await UniTask.Delay(TimeSpan.FromSeconds(_interactTimer),cancellationToken: _cts.Token);
+            await UniTask.Delay(TimeSpan.FromSeconds(_interactTimer), cancellationToken: _cts.Token);
             _effectSpawner?.StopEffect(effectId);
-            _interactableBase.ForceSetInteractable =　true;　
+            _interactableBase.ForceSetInteractable = true;
         }
 
         private void InitEffectSpawner()

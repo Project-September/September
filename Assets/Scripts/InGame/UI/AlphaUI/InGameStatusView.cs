@@ -13,24 +13,16 @@ namespace September.InGame.UI
     /// <summary>UIの管理</summary>
     public class InGameStatusView : MonoBehaviour
     {
-        [Header("UI Prefabs")]
-        [SerializeField, Label("オプションUI")] private GameObject _optionUIPrefab;
-        [SerializeField, Label("気絶バー")] private GameObject _hpBarPrefab;
-        [SerializeField, Label("キルログUI")] private GameObject _killLogTextPrefab;
-        [SerializeField, Label("鬼UI")] private GameObject _ogreUIPrefab;
-        [SerializeField, Label("TimerUI")] private TextMeshProUGUI _timerUIPrefab;
-        [SerializeField, Label("スタミナUI")] private GameObject _staminaBarPrefab;
-        [SerializeField, Label("インタラクトUI")] private GameObject _interactUIPrefab;
+        [Header("UI Root Prefab")] [SerializeField, Label("InGameUIRoot")]
+        private InGameUIRootRefs _uiRootPrefab;
 
-        [Header("Canvas Prefabs")] 
-        [SerializeField, Label("MainCanvas")] private Canvas _mainCanvas;
-        [SerializeField, Label("OptionCanvas")] private Canvas _optionCanvas;
-        
-        [Header("Timer Settings")]
-        [SerializeField,Label("TimerData")] private GameTimerData _timerData;
+        [Header("Canvas")] [SerializeField, Label("MainCanvas")]
+        private Canvas _mainCanvas;
 
-        //[Header("UI Positions")] [SerializeField, Label("鬼ランプの表示Position")] private Vector2 _ogreUIPosition;
+        [Header("Timer Settings")] [SerializeField, Label("TimerData")]
+        private GameTimerData _timerData;
 
+        private InGameUIRootRefs _uiRoot;
         private Slider _hpBarSlider;
         private Slider _staminaBarSlider;
         private TextMeshProUGUI _killLogText;
@@ -57,33 +49,30 @@ namespace September.InGame.UI
             ui.OnNoticeKillLog.Subscribe(killText => ShowKillLog(killText).Forget()).AddTo(_cts.Token);
             ui.OnShowOgreUI.Subscribe(ShowOgreLamp).AddTo(_cts.Token);
             ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
-            ui.IsInteracting.Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2)).AddTo(_cts.Token);
-            ui.OnChangeInteractProgress.Subscribe(progress => _interactUI?.SetInteractProgress(progress)).AddTo(_cts.Token);
+            ui.IsInteracting
+                .Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2))
+                .AddTo(_cts.Token);
+            ui.OnChangeInteractProgress.Subscribe(progress => _interactUI?.SetInteractProgress(progress))
+                .AddTo(_cts.Token);
         }
 
         private void SetupUI()
         {
-            _optionUI = Instantiate(_optionUIPrefab, _optionCanvas.transform);
+            if (!_uiRoot)
+                _uiRoot = Instantiate(_uiRootPrefab, _mainCanvas.transform);
+
+            _optionUI = _uiRoot.OptionUI;
+            _killLogUI = _uiRoot.KillLogPanel;
+            _killLogText = _uiRoot.KillLogText;
+            _ogreUiInstance = _uiRoot.OgreUI;
+            _hpBarSlider = _uiRoot.HpBar;
+            _staminaBarSlider = _uiRoot.StaminaBar;
+            _interactUI = _uiRoot.InteractUI;
             _optionUI.SetActive(true);
-            
-            _killLogUI = Instantiate(_killLogTextPrefab.gameObject, _mainCanvas.transform);
-            _killLogUI.SetActive(false);
-            _killLogText = _killLogUI.GetComponent<TextMeshProUGUI>();
-            if(_killLogText == null)
-                Debug.LogWarning("_killLogText is null");
-            
-            _ogreUiInstance = Instantiate(_ogreUIPrefab, _mainCanvas.transform);
-            //RectTransform rectTransform = _ogreUiInstance.GetComponent<RectTransform>();
-            //rectTransform.anchoredPosition = _ogreUIPosition;
+            _killLogUI.SetActive(true);
             _ogreUiInstance.SetActive(false);
-            
-            _hpBarSlider = Instantiate(_hpBarPrefab.gameObject,_mainCanvas.transform).GetComponent<Slider>();
             _hpBarSlider.gameObject.SetActive(true);
-            
-            _staminaBarSlider = Instantiate(_staminaBarPrefab.gameObject,_mainCanvas.transform).GetComponent<Slider>();
             _staminaBarSlider.gameObject.SetActive(true);
-            
-            _interactUI = Instantiate(_interactUIPrefab, _mainCanvas.transform).GetComponent<InteractUi>();
             _interactUI.SetActive(false);
         }
 
@@ -98,18 +87,21 @@ namespace September.InGame.UI
 
         private void ChangeStamina(float value)
         {
+            if (_staminaBarSlider == null) 
+                return;
+            
             _staminaBarSlider.value = value;
         }
 
         // キルのログを直接引数に入れる
         private async UniTask ShowKillLog(string killText)
         {
-            if(_killLogText == null)
+            if (_killLogText == null)
                 return;
-            
+
             _killLogText.text = killText;
             _killLogUI.SetActive(true);
-            
+
             RectTransform rect = _killLogText.GetComponent<RectTransform>();
             CanvasGroup canvasGroup = _killLogText.GetComponent<CanvasGroup>();
             if (canvasGroup == null)
@@ -131,13 +123,16 @@ namespace September.InGame.UI
             await seq.AsyncWaitForCompletion();
 
             // 完了後に削除 or 非表示
-            _killLogText.gameObject.SetActive(false); 
+            _killLogText.gameObject.SetActive(false);
         }
 
         // ToDo : タイマークラスを作成してアニメーションなどを柔軟に行えるようにする
         private async UniTask ShowGameStartTime()
         {
-            TextMeshProUGUI timer = Instantiate(_timerUIPrefab,transform);
+            if (_uiRoot == null || _uiRoot.TimerText == null) 
+                return;
+            
+            TextMeshProUGUI timer = _uiRoot.TimerText;
             timer.gameObject.SetActive(true);
 
             // カウントダウン
@@ -146,8 +141,7 @@ namespace September.InGame.UI
                 timer.text = i.ToString();
                 await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
             }
-
-            // Ready Goの表示とGameTimeの表示を開始する
+            
             timer.text = "Ready";
             await UniTask.Delay(TimeSpan.FromSeconds(_timerData.AfterReadyDelay), cancellationToken: _cts.Token);
 
@@ -168,13 +162,13 @@ namespace September.InGame.UI
         // 鬼の時にUIを表示する
         private void ShowOgreLamp(bool isShow)
         {
-            if(_ogreUiInstance != null) 
+            if (_ogreUiInstance != null)
                 _ogreUiInstance.gameObject.SetActive(isShow);
         }
 
         private void ShowOptionUI(bool isShow)
         {
-            if(_optionUI != null) 
+            if (_optionUI != null)
                 _optionUI.SetActive(isShow);
         }
 

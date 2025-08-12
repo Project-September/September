@@ -31,7 +31,19 @@ namespace September.Common
     /// </summary>
     public class InputProvider : SimulationBehaviour, INetworkRunnerCallbacks
     {
+        [Header("自動移動設定")]
+        [SerializeField] private bool _useAutoMove = false;
+        [SerializeField] private float _moveInterval = 2f;
+        [SerializeField] private float _autoMoveTimer = 0f;
+        [SerializeField] private int _moveDirection = 1;
+        
         Camera _mainCamera;
+        
+        public bool UseAutoMove
+        {
+            get => _useAutoMove;
+            set => _useAutoMove = value;
+        }
         
         private void Awake()
         {
@@ -47,16 +59,24 @@ namespace September.Common
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
             var playerInput = new PlayerInput();
-            var playerActions = GameInput.I.Player;
-            //  Input Actionからデータを取り出してネットワークに登録する
-            playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
-            playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
-            playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
-            playerInput.Buttons.Set(PlayerButtons.Attack, playerActions.Attack.IsPressed());
-            playerInput.Buttons.Set(PlayerButtons.Ability1, playerActions.Ability1.IsPressed());
-            playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
-            playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
-            playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+            if (_useAutoMove)
+            {
+                SetAutoMove(ref playerInput);
+            }
+            else
+            {
+                var playerActions = GameInput.I.Player;
+                //  Input Actionからデータを取り出してネットワークに登録する
+                playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Attack, playerActions.Attack.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Ability1, playerActions.Ability1.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
+                playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+            }
+            
             if (_mainCamera == null)
             {
                 _mainCamera = Camera.main;
@@ -70,6 +90,22 @@ namespace September.Common
             Vector3 cameraForward = _mainCamera.transform.forward;
             playerInput.DesiredLookDirection = cameraForward.normalized;
             input.Set(playerInput);
+        }
+
+        private void SetAutoMove(ref PlayerInput playerInput)
+        {
+            // 自動移動の処理
+            _autoMoveTimer += Time.deltaTime;
+            if (_autoMoveTimer >= _moveInterval)
+            {
+                _moveDirection *= -1; // 移動方向を反転
+                _autoMoveTimer = 0f; // タイマーをリセット
+            }
+                
+            playerInput.MoveDirection = new Vector2(_moveDirection, 0f);
+            playerInput.CameraYaw = 0f; // カメラのYawは固定
+            playerInput.DesiredLookDirection = transform.forward; // 前方を向く
+            playerInput.Buttons.Set(PlayerButtons.Dash, true);
         }
 
         #region CallbackEvents
