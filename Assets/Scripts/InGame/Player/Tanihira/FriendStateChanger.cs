@@ -6,6 +6,7 @@ namespace Ingame.Tanihira
     public class FriendStateChanger : MonoBehaviour
     {
         [SerializeField] private FormationManager _formationManager;
+        [SerializeField] private GameObject _friendOwner;
 
         public void SetMoveState()
         {
@@ -14,7 +15,7 @@ namespace Ingame.Tanihira
 
             foreach (var friend in _formationManager.FriendsList)
             {
-                // ここで攻撃状態に変更（必要に応じてターゲット設定も）
+                friend.SetDestination(_friendOwner.transform);
                 friend.ChangeState(FriendState.Move);
                 //隊列の整理をする
                 _formationManager.SortFormation();

@@ -1,22 +1,40 @@
 using System.Linq;
+using Fusion;
 using UnityEngine;
 
 namespace Ingame.Tanihira
 {
-    public class FriendPlayerDetector : MonoBehaviour
+    public class FriendPlayerDetector : NetworkBehaviour
     {
         [SerializeField] private Transform _detectionCenter;
         [SerializeField] private float _detectionRadius;
         [SerializeField] private LayerMask _detectionMask;
         [SerializeField] private LayerMask _obstacleMask;
         [SerializeField] private FriendStateChanger _friendStateChanger;
+        [SerializeField] private float _waitTime;
         
         private Transform _currentTarget;
+        private bool _isWaiting;
+        private float _waitTimer;
         
 
         private void Update()
         {
-            DetectePlayer();
+            if (!HasInputAuthority)
+                return;
+            
+            if (_isWaiting)
+            {
+                DetectePlayer();
+            }
+            else
+            {
+                _waitTimer += Time.deltaTime;
+                if (_waitTimer >= _waitTime)
+                {
+                    _isWaiting = true;
+                }
+            }
         }
 
         //プレイヤーを索敵する処理
@@ -35,6 +53,8 @@ namespace Ingame.Tanihira
                 .Distinct()                                                // 重複排除
                 .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude) // 距離順
                 .ToList();
+            
+            Debug.Log(uniqueRoots.Count);
 
             foreach (Transform player in uniqueRoots)
             {
@@ -42,12 +62,22 @@ namespace Ingame.Tanihira
                 if (player.gameObject == gameObject)
                     continue;
                 
-                Vector3 direction = (player.transform.position - _detectionCenter.position).normalized;
-                float distance = Vector3.Distance(_detectionCenter.position, player.transform.position);
+                // Rayの始点を少し上に
+                Vector3 start = _detectionCenter.position + Vector3.up * 0.5f;
+
+                // ターゲットの中心も少し上に
+                Vector3 targetCenter = player.position + Vector3.up * 0.5f;
+
+                Vector3 direction = (targetCenter - start).normalized;
+                float distance = Vector3.Distance(start, targetCenter);
                 
                 //間に障害物があった場合には無視
-                if(Physics.Raycast(_detectionCenter.position, direction, out RaycastHit hit, distance, _obstacleMask))
+                if (Physics.Raycast(start, direction, out RaycastHit hit, distance, _obstacleMask))
+                {
+                    Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
                     continue;
+                }
+                    
                 
                 //近い物をターゲットにして攻撃させる
                 _currentTarget = player.gameObject.transform;
@@ -55,7 +85,7 @@ namespace Ingame.Tanihira
             }
             
             //ペンギンに攻撃指示を飛ばす
-            if (_currentTarget != null)
+            if (_currentTarget)
             {
                 _friendStateChanger.SetChaseState(_currentTarget);
                 Debug.Log("攻撃！！");
