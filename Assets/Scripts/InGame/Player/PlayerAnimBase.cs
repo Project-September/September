@@ -14,22 +14,22 @@ namespace InGame.Player
 
         public void Init(PlayerManager playerManager)
         {
-            if (!playerManager.IsLocalPlayer)
-            {
-                enabled = false;
-                return;
-            }
+            // if (!playerManager.IsLocalPlayer)
+            // {
+            //     enabled = false;
+            //     return;
+            // }
             
             _playerManager = playerManager;
             _playerMovement = GetComponent<PlayerMovement>();
         }
 
-        private void Update()
+        public override void FixedUpdateNetwork()
         {
             UpdateAnimParams();
         }
 
-        void UpdateAnimParams()
+        private void UpdateAnimParams()
         {
             _animator.SetBool(_paramIsStan, _playerManager.IsStun);
             _animator.SetFloat(_pramSpeed, _playerMovement.GetSpeedOnPlane());

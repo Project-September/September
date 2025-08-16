@@ -74,6 +74,8 @@ namespace September.InGame.Effect
             
             RPC_PlayEffect(effectType, position, rotation, false, string.Empty, parentNetworkId);
         }
+        
+        // ToDo : Effectを返してほしい
 
         /// <summary>
         /// 手動で削除するエフェクトのリクエスト
@@ -155,13 +157,11 @@ namespace September.InGame.Effect
             {
                 // 親オブジェクトが指定されている場合、子オブジェクトとして生成
                 effect = Instantiate(effectData.Prefab, position, rotation, parent);
-                Debug.Log($"エフェクト '{effectType}' を親オブジェクト '{parent.name}' の子として生成");
             }
             else
             {
                 // 親オブジェクトが指定されていない場合、通常通り生成
                 effect = Instantiate(effectData.Prefab, position, rotation);
-                Debug.Log($"エフェクト '{effectType}' を単独で生成");
             }
 
             //パーティクルシステムの設定
@@ -176,14 +176,12 @@ namespace September.InGame.Effect
                     // ループエフェクトの場合
                     system.Play();
                     _activeEffects[effectId] = effect;
-                    Debug.Log($"ループエフェクトID '{effectId}' を生成");
                 }
                 else
                 {
                     // ワンショットエフェクトの場合
                     main.stopAction = ParticleSystemStopAction.Destroy;
                     system.Play();
-                    Debug.Log($"ワンショットエフェクト '{effectType}' を生成");
                 }
             }
             else
@@ -194,7 +192,6 @@ namespace September.InGame.Effect
                 if (isLoop && !string.IsNullOrEmpty(effectId))
                 {
                     _activeEffects[effectId] = effect;
-                    Debug.Log($"非パーティクルループエフェクトID '{effectId}' を生成");
                 }
             }
         }
@@ -210,7 +207,6 @@ namespace September.InGame.Effect
                     Destroy(effect);
                 }
                 _activeEffects.Remove(effectId);
-                Debug.Log($"エフェクトID '{effectId}' を停止");
             }
         }
 
