@@ -12,8 +12,8 @@ namespace InGame.Player.Ability.Effect
     {
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] private LayerMask _hitMask;
+        [SerializeField] private HitChecker _hitChecker;
         private int _attackDamage = int.MaxValue;
-        private HitChecker _hitChecker;
         
         protected override void OnStart()
         {
@@ -22,7 +22,21 @@ namespace InGame.Player.Ability.Effect
             {
                 ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
             }
-
+            
+            _hitChecker.OnHit += OnHitEnemy;
+        }
+        
+        private void OnHitEnemy(Collider hitInfo)
+        {
+            if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
+            var damageable = hitInfo.GetComponentInParent<IDamageable>();
+            if (damageable == null) return;
+            var hitData = new HitData(
+                HitActionType.Damage,
+                _attackDamage,
+                Parameter.Owner.InputAuthority,
+                damageable.OwnerPlayerRef);
+            damageable.TakeHit(ref hitData);
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -31,6 +45,12 @@ namespace InGame.Player.Ability.Effect
             {
                 _phase = AbilityPhase.Ending;
             }
+        }
+
+        protected override void OnEndAbility()
+        {
+            _hitChecker.OnHit -= OnHitEnemy;
+            base.OnEndAbility();
         }
     }
 }

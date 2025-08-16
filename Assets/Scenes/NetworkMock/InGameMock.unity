@@ -973,8 +973,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.8034414, z: 0, w: 0.5953838}
-  m_LocalPosition: {x: -18.520782, y: -2.21, z: 24.732597}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1677,7 +1677,7 @@ PrefabInstance:
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _getOffPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1205713321}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _muzzleFlash
       value: 
@@ -1759,6 +1759,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: '_characterEffects.Array.data[0]'
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: '_characterEffects.Array.data[1]'
       value: 5190193247054987343
       objectReference: {fileID: 0}
@@ -1768,27 +1772,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _cooldownTimeDictionary.keys.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _cooldownTimeDictionary.values.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
-      value: 2
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: '_cooldownTimeDictionary.values.Array.data[0]'
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _requiredInteractTimeDictionary.keys.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _requiredInteractTimeDictionary.values.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
-      value: 2
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: '_requiredInteractTimeDictionary.values.Array.data[0]'
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: managedReferences[5190193247054987343]._cooldownTime
@@ -1804,7 +1816,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7228950578283369073, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1838,6 +1850,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 0}
+--- !u!4 &1205713321 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4664626561920155601, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+  m_PrefabInstance: {fileID: 1205713317}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1317057244
 GameObject:
   m_ObjectHideFlags: 0

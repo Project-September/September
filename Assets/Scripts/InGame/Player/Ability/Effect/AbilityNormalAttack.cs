@@ -14,6 +14,7 @@ namespace InGame.Player.Ability
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] private int _attackDamage = 10;
         [SerializeField] private HitChecker _hitChecker;
+        [SerializeField] private Animator _ownerAnimator;
 
         protected override void OnStart()
         {
@@ -24,6 +25,7 @@ namespace InGame.Player.Ability
                 ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
             }
             
+            _hitChecker.OnHit -= OnHitEnemy;
             _hitChecker.OnHit += OnHitEnemy;
         }
 
@@ -42,7 +44,9 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (_hitChecker.IsFinished)
+            var a = _ownerAnimator.GetCurrentAnimatorStateInfo(0);
+            Debug.Log($"IsName: {a.IsName(_normalAttackAnimationClip.name)}");
+            if (_hitChecker.IsFinished || a.IsName(_normalAttackAnimationClip.name))
             {
                 _phase = AbilityPhase.Ending;
             }
