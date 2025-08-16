@@ -19,15 +19,15 @@ namespace InGame.Interact
 
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
-        [Networked] private float LastUsedCooldownTime { get; set; } = 0f;
+        [Networked] public float LastUsedCooldownTime { get; set; } = 0f;
         
         /// <summary>
         /// 外部から強制的にインタラクト可能にするかどうかを設定するために使う
         /// </summary>
         [Networked] public bool ForceSetInteractable { get; set; } = true;
 
-        public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
-            _requiredInteractTimeDictionary;
+        public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary => _requiredInteractTimeDictionary;
+        public SerializableDictionary<CharacterType, float> CooldownTimeDictionary => _cooldownTimeDictionary;
 
         private CharacterInteractEffectBase _activeEffectBase;
 
@@ -172,14 +172,5 @@ namespace InGame.Interact
     {
         public int Interactor { get; set; }
         public CharacterType CharacterType { get; set; }
-    }
-
-    [Serializable]
-    public class InteractEffectEntry
-    {
-        public CharacterType character;
-
-        [SerializeReference] [SubclassSelector]
-        public CharacterInteractEffectBase effect = new SimpleLogEffect();
     }
 }

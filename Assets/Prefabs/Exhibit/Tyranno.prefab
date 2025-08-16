@@ -3911,6 +3911,7 @@ GameObject:
   - component: {fileID: 4503392173304417129}
   - component: {fileID: 3882540875740709923}
   - component: {fileID: 6364766241162311564}
+  - component: {fileID: -2458423887434476005}
   m_Layer: 0
   m_Name: Tyranno
   m_TagString: Untagged
@@ -4105,6 +4106,7 @@ MonoBehaviour:
   _characterEffects:
   - rid: 3872013951182831691
   _LastInteractTime: -9999
+  _ForceSetInteractable: 1
   references:
     version: 2
     RefIds:
@@ -4165,6 +4167,23 @@ MonoBehaviour:
   _gravity: {x: 0, y: -200, z: 0}
   _maxRotateValue: 500
   _runBlendDelay: 3
+  _MoveValue: 0
+--- !u!111 &-2458423887434476005
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8352061886232285223}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!1 &8550128332805089152
 GameObject:
   m_ObjectHideFlags: 0

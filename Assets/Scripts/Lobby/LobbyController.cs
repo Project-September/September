@@ -32,7 +32,7 @@ namespace September.Lobby
             }
             if (Runner.IsServer)
             {
-                _startButton.onClick.AddListener(() => OnClick().Forget());
+                _startButton.onClick.AddListener(OnClick);
             }
             else
             {
@@ -47,10 +47,9 @@ namespace September.Lobby
             PlayerDatabase.Instance.ChangedDataAction -= ChangeLobbyPlayerUI;
         }
 
-        private async UniTaskVoid OnClick()
+        private void OnClick()
         {
             RPC_Fade();
-            
         }
 
         [Rpc]
@@ -61,7 +60,10 @@ namespace September.Lobby
 
         private async UniTaskVoid RunFadeAndStartGameAsync()
         {
-            await NetworkManager.Instance.Fade(_fadePanel);
+            if (_fadePanel)
+            {
+                await NetworkManager.Instance.Fade(_fadePanel);
+            }
             NetworkManager.Instance.StartGame().Forget();
         }
         

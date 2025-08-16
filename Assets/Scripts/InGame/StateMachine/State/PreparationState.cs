@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Cinemachine;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -18,9 +19,13 @@ namespace September.Common
     {
         [SerializeField] private Transform[] _spawnPositions;
         [SerializeField] private Image _fadeImage;
-        private int _spawnPositionIndex; protected internal override void OnEnter()
+        [SerializeField] private CinemachineVirtualCamera _startCamera;
+        private int _spawnPositionIndex; 
+        [SerializeField] private Vector3 _cameraOffset;
+        [SerializeField] private int _emoteDelay;
+        protected internal override void OnEnter()
         {
-            _fadeImage.gameObject.SetActive(true);
+            if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
             SetUpUI();
             if (Context.Runner.IsServer)
@@ -50,6 +55,7 @@ namespace September.Common
                 //PlayerHealthのOnDeathに登録
             }
             Context.Register(StaticServiceLocator.Instance);
+            RPC_SetCameraPriority(20);
             // ToDo : ここにAnimation処理
             // ToDo : Animationが終了するまで入力を受け付けなくする
             RPC_FadeAndAnimation();
@@ -71,19 +77,30 @@ namespace September.Common
         // 全ての準備が整ったらFadeをあける
         private async UniTask FadeIn()
         {
-            _fadeImage.color = new Color(1f, 1f, 1f, 1f);
+            if (_fadeImage)
+            {
+                _fadeImage.color = new Color(1f, 1f, 1f, 1f);
 
-            await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
-            Debug.Log("Fadeの終了");
+                await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
+                Debug.Log("Fadeの終了");
+            }
         }
 
         // ゲームスタート前にPlayerがポーズする
         private async UniTask StartAnimation()
         {
+            _startCamera.gameObject.transform.position =  _spawnPositions[0].position + _cameraOffset;
+            for (int i = 0; i < _spawnPositionIndex; i++)
+            {
+                var position = _spawnPositions[i].position + _cameraOffset;
+                _startCamera.gameObject.transform.Translate(position);
+                await UniTask.Delay(TimeSpan.FromSeconds(_emoteDelay)); // 各エモートのAnimation分待つ
+            }
             // 仮実装
-            Debug.Log("Animation Start");
-            await UniTask.Delay(5000);
-            Debug.Log("Animation End");
+            // Debug.Log("Animation Start");
+            // await UniTask.Delay(5000);
+            // Debug.Log("Animation End");
+            RPC_SetCameraPriority(0);
         }
         
         private Vector3 GetSpawnPosition()
@@ -163,6 +180,12 @@ namespace September.Common
             {
                 UIController.I.ShowOgreLamp(true);
             }
+        }
+        
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_SetCameraPriority(int priority)
+        {
+            _startCamera.Priority = priority;
         }
     }
 }
