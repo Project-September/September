@@ -2,29 +2,22 @@ using System;
 using System.Linq;
 using Fusion;
 using InGame.Interact;
+using September.Common;
 using UnityEngine;
 
 namespace InGame.Exhibit.InteractEffect
 {
-    [Serializable]
-    public class DisableInteractEffect : CharacterInteractEffectBase
+    public class DisableInteractEffect : NetworkBehaviour
     {
         [SerializeField] private float _cooldownTime = 5f;
-        private NetworkRunner Runner => NetworkRunner.Instances.FirstOrDefault();
-        public override void OnInteractStart(IInteractableContext context, InteractableBase target)
+        [SerializeField] private InteractableBase _interactable;
+        
+        public void OnHitHammerAttack()
         {
             var cooldownTime = _cooldownTime;
-            target.LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-            target.LastUsedCooldownTime = cooldownTime;
+            _interactable.LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
+            _interactable.LastUsedCooldownTime = cooldownTime;
             //何かしらの対応する演出を入れる
-        }
-
-        public override CharacterInteractEffectBase Clone()
-        {
-            return new DisableInteractEffect
-            {
-                _cooldownTime = _cooldownTime
-            };
         }
     }
 }

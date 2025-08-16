@@ -1,5 +1,6 @@
 using Fusion;
 using InGame.Common;
+using InGame.Exhibit.InteractEffect;
 using InGame.Health;
 using InGame.Interact;
 using September.Common;
@@ -44,16 +45,10 @@ namespace InGame.Player.Ability.Effect
                         damageable.TakeHit(ref hitData);
                     }
                     
-                    var interactable = collider.GetComponentInParent<InteractableBase>();
+                    var interactable = collider.GetComponentInParent<DisableInteractEffect>();
                     if (interactable != null)
                     {
-                        //Haruとしてインタラクトする
-                        var context = new InteractableContext()
-                        {
-                            Interactor = Parameter.Owner.InputAuthority.RawEncoded,
-                            CharacterType = CharacterType.HulkTheButcher,
-                        };
-                        interactable.Interact(context);
+                        interactable.OnHitHammerAttack();
                     }
                     
                     // ヒットエフェクトを再生

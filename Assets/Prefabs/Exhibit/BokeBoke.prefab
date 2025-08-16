@@ -13,8 +13,9 @@ GameObject:
   - component: {fileID: 8436487958072541038}
   - component: {fileID: 8829714614392578707}
   - component: {fileID: 2655757576312144843}
-  - component: {fileID: 8932925866463390802}
-  - component: {fileID: 8718693062014081580}
+  - component: {fileID: 7512599895438545304}
+  - component: {fileID: 3108143053938868281}
+  - component: {fileID: 3011504772297411474}
   m_Layer: 0
   m_Name: BokeBoke
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1292007954863827809}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.94957334, z: -0, w: 0.31354496}
+  m_LocalRotation: {x: 0, y: 0.9495734, z: 0, w: 0.31354508}
   m_LocalPosition: {x: -12.7, y: -10.52, z: 16.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -90,7 +91,8 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1248590409878750981}
   - {fileID: 8829714614392578707}
-  - {fileID: 8718693062014081580}
+  - {fileID: 3108143053938868281}
+  - {fileID: 3011504772297411474}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8829714614392578707
 MonoBehaviour:
@@ -128,7 +130,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.307625, y: 3.9366956, z: 2.206262}
   m_Center: {x: 0.020582436, y: 2.002392, z: -0.024060132}
---- !u!95 &8932925866463390802
+--- !u!95 &7512599895438545304
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -150,7 +152,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8718693062014081580
+--- !u!114 &3108143053938868281
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -162,12 +164,26 @@ MonoBehaviour:
   m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animator: {fileID: 8932925866463390802}
+  Animator: {fileID: 7512599895438545304}
   ApplyTiming: 2
   SyncSettings: 79
   StateHashes: 00000000c71eafa0dd8f954a2b1a167c79406955
   TriggerHashes: 00000000
   TotalWords: 1
+--- !u!114 &3011504772297411474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292007954863827809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 1248590409878750981}
 --- !u!1 &1442449213948767143
 GameObject:
   m_ObjectHideFlags: 0
