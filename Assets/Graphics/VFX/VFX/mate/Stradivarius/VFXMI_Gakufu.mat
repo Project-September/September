@@ -42,7 +42,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlphaTexture:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 208cb18fe0cc22b48a5dd1d79f005c45, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -51,7 +51,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _BaseTexture:
         m_Texture: {fileID: 2800000, guid: af5db0aaa4a56794f85baf1e67ab2b65, type: 3}
-        m_Scale: {x: 5.03, y: 1}
+        m_Scale: {x: 5, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
@@ -70,7 +70,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DistortionTexture:
-        m_Texture: {fileID: 2800000, guid: 83688d60ab2ebdd4da14810d900aa6ab, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 0.32, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -125,8 +125,8 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _Dissolve: 0
-    - _DissolveSoftness: 0.25
-    - _DistortionPower: 0.01
+    - _DissolveSoftness: 0
+    - _DistortionPower: 0
     - _DstBlend: 1
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
@@ -152,7 +152,7 @@ Material:
     - _ZTest: 4
     - _ZWrite: 0
     - _ZWriteControl: 0
-    - _maintex_rotate: 4.72
+    - _maintex_rotate: 1.54
     m_Colors:
     - _AlphaScrollSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
@@ -160,7 +160,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DistortionScrollSpeed: {r: 0.6, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _EmissiveColor: {r: 2, g: 2, b: 2, a: 0}
+    - _EmissiveColor: {r: 7.9999995, g: 7.9999995, b: 7.9999995, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
