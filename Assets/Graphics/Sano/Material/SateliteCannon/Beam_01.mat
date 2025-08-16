@@ -8,16 +8,17 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Beam_01
-  m_Shader: {fileID: -6465566751694194690, guid: a2b3e8469cf4ddf4788ef8a2291f80e6, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: deca7296fe8c679419ad25f36bbffbc7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _ALPHATEST_ON
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses:
@@ -29,16 +30,16 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlphaTexture:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 263fe921d53ff7d48a29ba3e43ae0de5, type: 3}
+        m_Scale: {x: 1, y: 2}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseTexture:
-        m_Texture: {fileID: 2800000, guid: a5b9aa6aeb8ea2f4aa41b970d14e1836, type: 3}
-        m_Scale: {x: 1, y: 3}
+        m_Texture: {fileID: 2800000, guid: 4ab7cde20f8a6d74cbba14fdfff3b2cc, type: 3}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
@@ -58,7 +59,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _DistortionTexture:
         m_Texture: {fileID: 2800000, guid: 4b3d9ef4af48fbc438c3e079fbe76f58, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 4, y: 2}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
@@ -99,29 +100,31 @@ Material:
     m_Ints: []
     m_Floats:
     - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
+    - _AlphaClip: 1
     - _AlphaToMask: 0
-    - _Blend: 2
+    - _BeamEdge: 0.797
+    - _BeamFresnel: 1
+    - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _CastShadows: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _Cull: 1
+    - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _Dissolve: 0
-    - _DissolveSoftness: 0.25
-    - _DistortionPower: 0.172
-    - _DstBlend: 1
+    - _Dissolve: 0.427
+    - _DissolveSoftness: 0.741
+    - _DistortionPower: 0.308
+    - _DstBlend: 10
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FresnelPower: 1.12
+    - _FresnelPower: 1.42
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _InverseFresnel: 0
+    - _InverseFresnel: 1
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -130,12 +133,12 @@ Material:
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _SoftParticleScale: 0.57
+    - _SoftParticleScale: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 5
     - _SrcBlendAlpha: 1
     - _Surface: 1
-    - _UseAlpha: 0
+    - _UseAlpha: 1
     - _UseBase: 1
     - _UseFresnel: 1
     - _WorkflowMode: 1
@@ -144,13 +147,13 @@ Material:
     - _ZWriteControl: 0
     - _maintex_rotate: 0
     m_Colors:
-    - _AlphaScrollSpeed: {r: 0, g: 0, b: 0, a: 0}
+    - _AlphaScrollSpeed: {r: 0, g: -1.44, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BaseScrollSpeed: {r: 0, g: -1, b: 0, a: 0}
+    - _BaseScrollSpeed: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DistortionScrollSpeed: {r: -0.27, g: -0.31, b: 0, a: 0}
+    - _DistortionScrollSpeed: {r: 0.52, g: -0.7, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _EmissiveColor: {r: 0.16065584, g: 2.270603, b: 2.1056514, a: 0}
+    - _EmissiveColor: {r: 0, g: 1.0227702, b: 2.9960785, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
