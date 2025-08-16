@@ -40,6 +40,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
 
     public void Tick(float deltaTime)
     {
+        Debug.Log(_currentFrame);
         _currentFrame++;
 
         if (_currentFrame >= _startFrame && _currentFrame <= _endFrame)
