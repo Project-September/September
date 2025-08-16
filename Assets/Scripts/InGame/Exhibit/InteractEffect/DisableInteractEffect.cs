@@ -7,11 +7,12 @@ using UnityEngine;
 
 namespace InGame.Exhibit.InteractEffect
 {
-    public class DisableInteractEffect : NetworkBehaviour
+    public class DisableInteractEffect : MonoBehaviour
     {
         [SerializeField] private float _cooldownTime = 5f;
         [SerializeField] private InteractableBase _interactable;
         
+        NetworkRunner Runner => NetworkRunner.Instances.FirstOrDefault();
         public void OnHitHammerAttack()
         {
             var cooldownTime = _cooldownTime;

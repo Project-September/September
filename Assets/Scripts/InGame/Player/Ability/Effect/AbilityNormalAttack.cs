@@ -44,9 +44,7 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
-            var a = _ownerAnimator.GetCurrentAnimatorStateInfo(0);
-            Debug.Log($"IsName: {a.IsName(_normalAttackAnimationClip.name)}");
-            if (_hitChecker.IsFinished || a.IsName(_normalAttackAnimationClip.name))
+            if (_hitChecker.IsFinished)
             {
                 _phase = AbilityPhase.Ending;
             }
