@@ -20,11 +20,11 @@ namespace Ingame.Tanihira
             //agentが移動できるように設定
             friend.Agent.enabled = true;
             friend.Agent.isStopped = false;
-            friend.Agent.updatePosition = true;
-            friend.Agent.updateRotation = true;
-            
+     
+          
             //移動時のステータスを設定
             friend.Agent.speed = friend.FriendStatus.FriendFormationSpeed;
+            friend.Agent.stoppingDistance = friend.FriendStatus.FriendFormationDistance;
         }
 
         public void OnExit(FriendBase friend)

@@ -45,7 +45,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 11
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[9]'
@@ -55,6 +55,10 @@ PrefabInstance:
       propertyPath: 'NetworkedBehaviours.Array.data[10]'
       value: 
       objectReference: {fileID: 7211274858843390964}
+    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[11]'
+      value: 
+      objectReference: {fileID: 9128960786709165582}
     - target: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_Name
       value: Tanihira Variant
@@ -175,14 +179,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _detectionCenter: {fileID: 3862667250155884466}
-  _detectionRadius: 10
+  _detectionRadius: 15
   _detectionMask:
     serializedVersion: 2
     m_Bits: 64
   _obstacleMask:
     serializedVersion: 2
-    m_Bits: 63
+    m_Bits: 191
   _friendStateChanger: {fileID: 2957292007609013862}
+  _waitTime: 5
 --- !u!114 &2957292007609013862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196,6 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _formationManager: {fileID: 913702230075351532}
+  _friendOwner: {fileID: 4081215343970159104}
 --- !u!114 &7653520761019020652 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}

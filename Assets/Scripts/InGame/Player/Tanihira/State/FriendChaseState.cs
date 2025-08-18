@@ -8,7 +8,8 @@ public class FriendChaseState : IFriendState
     
     public void OnEnter(FriendBase friend)
     {
-        
+        _stopDistance = friend.FriendStatus.AttackRange;
+        friend.Agent.stoppingDistance = _stopDistance;
     }
 
     public void OnExit(FriendBase friend)

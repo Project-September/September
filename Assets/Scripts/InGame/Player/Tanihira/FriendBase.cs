@@ -38,6 +38,7 @@ namespace Ingame.Tanihira
 
         private static int _spawnCount;
         private FormationManager _formationManager;
+        private NetworkMecanimAnimator _mecanimAnimator;
         
         // プロパティ
         public NavMeshAgent Agent => _agent;
@@ -48,6 +49,7 @@ namespace Ingame.Tanihira
         public Transform FormationPos => _formationPos;
         public FriendStatus FriendStatus => _friendStatus;
         public FriendState CurrentState => _currentState;
+        public NetworkMecanimAnimator MecanimAnimator => _mecanimAnimator;
 
         protected virtual void Awake()
         {
@@ -62,6 +64,7 @@ namespace Ingame.Tanihira
         protected virtual void Start()
         {
             _agent = GetComponent<NavMeshAgent>();
+            _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
             InitializeStates();
             ChangeState(_initialState);
         }
@@ -87,13 +90,15 @@ namespace Ingame.Tanihira
             
             _agent.enabled = false;
             _agent.enabled = true;
+            _agent.updatePosition = true;
+            _agent.updateRotation = true;
             InitializeAgent();
         }
 
         //ステータスをnavmeshに反映
         private void InitializeAgent()
         {
-            _agent.angularSpeed = _friendStatus.FriendMoveSpeed;
+            _agent.angularSpeed = _friendStatus.FriendRotateSpeed;
             _agent.speed = _friendStatus.FriendMoveSpeed;
         }
 
