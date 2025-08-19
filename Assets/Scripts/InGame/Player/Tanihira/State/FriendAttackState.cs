@@ -12,6 +12,7 @@ namespace Ingame.Tanihira
             friendObject = friend.Agent.gameObject.transform;
             LookTarget(friend.Agent.destination);
             friend.MecanimAnimator?.SetTrigger("Attack"); // アニメーターにAttackトリガーがある前提
+            OnAttack();
         }
 
         public void OnExit(FriendBase friend)
@@ -34,6 +35,11 @@ namespace Ingame.Tanihira
             {
                 friendObject.rotation = Quaternion.LookRotation(direction);
             }
+        }
+
+        private void OnAttack()
+        {
+            
         }
     }
 }
