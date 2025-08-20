@@ -29,11 +29,19 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_3a722d7c111c496993673804863b1553_Texture_1_Texture2D:
-        m_Texture: {fileID: 2800000, guid: 993eab70eb8b9264088ec85b14d310de, type: 3}
+        m_Texture: {fileID: 2800000, guid: 208cb18fe0cc22b48a5dd1d79f005c45, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_a629cb9bad604c1893ace811e88c9b72_Texture_1_Texture2D:
         m_Texture: {fileID: 2800000, guid: 6c07760b9dbad994691f01e61afc266d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_ba548ff6abc24866bfe33899b857a73d_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: e0b0475056a22bd4bbdea1f82235d4c2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_bf65b3baa9d14993ae0c227e726b34fa_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 904e6f4eaf79b8440b98e94faa086821, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -50,13 +58,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Distoriton_intensity: 0.06
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
+    - _Alpha: {r: 0, g: -0.1, b: 0, a: 0}
+    - _Alpha_2: {r: 0, g: -1.23, b: 0, a: 0}
     - _Color: {r: 2, g: 2, b: 2, a: 0}
     - _Maintile: {r: 22, g: 1, b: 0, a: 0}
     - _Scroll: {r: -0.34, g: 0, b: 0, a: 0}
     - _Stripe: {r: 22, g: 1, b: 0, a: 0}
+    - _Tiling: {r: 0.3, g: 0.3, b: 0, a: 0}
     - _holoscroll: {r: -0.56, g: 0, b: 0, a: 0}
     - _holotile: {r: 25, g: 1, b: 0, a: 0}
     - _scroll_rogo: {r: -0.5, g: 0, b: 0, a: 0}
