@@ -10,4 +10,7 @@ public enum EffectType
     PtrFireBullet,
     PtrFireExplosion,
     InteractComplete,
+    CooldownRect,
+    CooldownSquare,
+    CooldownLine,
 }

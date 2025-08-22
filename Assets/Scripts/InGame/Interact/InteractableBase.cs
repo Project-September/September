@@ -16,6 +16,8 @@ namespace InGame.Interact
         [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
 
         [SerializeReference, SubclassSelector] private List<CharacterInteractEffectBase> _characterEffects = new();
+        
+        [SerializeField] private EffectType _cooldownEffectType = EffectType.CooldownSquare;
 
 
         [Networked] public float LastInteractTime { get; set; } = -9999f;
