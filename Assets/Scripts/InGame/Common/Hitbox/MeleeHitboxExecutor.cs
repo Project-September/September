@@ -9,12 +9,6 @@ public class MeleeHitboxExecutor : IHitboxExecutor
     private readonly LayerMask _hitMask = default;
     private readonly HashSet<Collider> _alreadyHit = new();
     private RaycastHit[] _hitBuffer = new RaycastHit[32]; // バッファサイズは必要に応じて調整
-
-    private int _currentFrame;
-    private readonly int _startFrame;
-    private readonly int _endFrame;
-
-    public bool IsFinished => _currentFrame > _endFrame;
     public Action<Collider> OnHit;
 
     public MeleeHitboxExecutor(
@@ -27,25 +21,16 @@ public class MeleeHitboxExecutor : IHitboxExecutor
         _points = points ?? new List<Transform>();
         _hitboxRadius = hitboxRadius;
         _hitMask = hitMask == 0 ? ~0 : hitMask;
-        _startFrame = startFrame;
-        _endFrame = endFrame;
-        _currentFrame = 0;
     }
     
     public void Init()
     {
         _alreadyHit.Clear();
-        _currentFrame = 0;
     }
 
     public void Tick(float deltaTime)
     {
-        _currentFrame++;
-
-        if (_currentFrame >= _startFrame && _currentFrame <= _endFrame)
-        {
-            ExecuteHitCheck();
-        }
+        ExecuteHitCheck();
     }
     
     public void SetHitBufferSize(int size)
