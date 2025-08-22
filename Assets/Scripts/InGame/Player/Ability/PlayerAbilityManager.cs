@@ -24,7 +24,6 @@ namespace InGame.Player.Ability
 
         private void Update()
         {
-            if (!HasStateAuthority) return;
             foreach (var condition in _conditions)
             {
                 var targetAbility = _abilities.Find(a => a.GetType().Name == condition.TargetAbilityName);
