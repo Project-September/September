@@ -15,9 +15,16 @@ namespace InGame.Player.Ability
         [SerializeReference, SubclassSelector] private List<IAbilityExecuteCondition> _conditions = new();
         private NetworkButtons _previousButtons;
         private NetworkButtons _currentButtons;
+        private NetworkObject _networkObject;
+
+        private void Start()
+        {
+            _networkObject = GetComponent<NetworkObject>();
+        }
 
         private void Update()
         {
+            if (!HasStateAuthority) return;
             foreach (var condition in _conditions)
             {
                 var targetAbility = _abilities.Find(a => a.GetType().Name == condition.TargetAbilityName);
@@ -33,7 +40,7 @@ namespace InGame.Player.Ability
                     // アビリティの実行
                     targetAbility.Start(new AbilityParameter() 
                     {
-                        Owner = GetComponent<NetworkObject>(),
+                        Owner = _networkObject,
                     });
                 }
             }

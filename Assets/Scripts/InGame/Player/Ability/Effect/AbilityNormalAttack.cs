@@ -15,18 +15,21 @@ namespace InGame.Player.Ability
         [SerializeField] private int _attackDamage = 10;
         [SerializeField] private HitChecker _hitChecker;
         [SerializeField] private Animator _ownerAnimator;
+        [SerializeField] private bool _isSubscribe = false;
 
         protected override void OnStart()
         {
-            Debug.Log("AbilityNormalAttack Start");
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
                 ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
             }
-            
-            _hitChecker.OnHit -= OnHitEnemy;
-            _hitChecker.OnHit += OnHitEnemy;
+
+            if (!_isSubscribe)
+            {
+                _isSubscribe = true;
+                _hitChecker.OnHit += OnHitEnemy;
+            }
         }
 
         private void OnHitEnemy(Collider hitInfo)
@@ -48,12 +51,6 @@ namespace InGame.Player.Ability
             {
                 _phase = AbilityPhase.Ending;
             }
-        }
-
-        protected override void OnEndAbility()
-        {
-            _hitChecker.OnHit -= OnHitEnemy;
-            base.OnEndAbility();
         }
     }
 }
