@@ -162,8 +162,7 @@ MonoBehaviour:
   _friendsTypes: 000000000000000000000000
   _friendDatabase: {fileID: 11400000, guid: 378195fd5e8c92a4ca92dcf50c72789c, type: 2}
   _formationManager: {fileID: 913702230075351532}
-  _ownerPlayer: {fileID: 4081215343970159104}
-  _networkRunner: {fileID: 0}
+  _ownerPlayer: {fileID: 7968417084068229509}
   _firstSpawnPoint: {fileID: 3476019141667097556}
   _navmeshSerchRadius: 5
 --- !u!114 &9128960786709165582
@@ -179,7 +178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _detectionCenter: {fileID: 3862667250155884466}
-  _detectionRadius: 15
+  _detectionRadius: 10
   _detectionMask:
     serializedVersion: 2
     m_Bits: 64
@@ -187,7 +186,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 191
   _friendStateChanger: {fileID: 2957292007609013862}
-  _waitTime: 5
+  _waitTime: 15
 --- !u!114 &2957292007609013862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,5 +210,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c7244242fca19c4caa942020db8defa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7968417084068229509 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 5522732353369345576}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4081215343970159104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

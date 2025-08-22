@@ -11,10 +11,11 @@ namespace InGame.Tanihira
         [SerializeField] private FriendType[] _friendsTypes;
         [SerializeField] private FriendDatabase _friendDatabase;
         [SerializeField] private FormationManager _formationManager;
-        [SerializeField] private GameObject _ownerPlayer;
-        [SerializeField] private NetworkRunner _networkRunner;
+        [SerializeField] private NetworkObject _ownerPlayer;
         [SerializeField] private Transform _firstSpawnPoint;
         [SerializeField] private float _navmeshSerchRadius = 5.0f;
+        
+        private NetworkRunner _networkRunner;
 
         public void Start()
         {

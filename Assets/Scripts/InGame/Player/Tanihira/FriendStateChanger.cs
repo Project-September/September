@@ -33,9 +33,8 @@ namespace Ingame.Tanihira
 
             foreach (var friend in _formationManager.FriendsList)
             {
-                // ここで攻撃状態に変更（必要に応じてターゲット設定も）
-                friend.ChangeState(FriendState.Chase);
                 friend.SetDestination(target);
+                friend.ChangeState(FriendState.Chase);
             }
         }
     }
