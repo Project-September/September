@@ -1,201 +1,254 @@
 using CRISound;
 using Fusion;
 using InGame.Interact;
-using InGame.Player;
+using NaughtyAttributes;
 using September.Common;
-using September.InGame.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Exhibit
 {
-    public class PterodactylInteractable : InteractableBase
+    public class PterodactylInteractable : MountableExhibitBase
     {
-        [Header("Flight Settings")] 
-        [SerializeField] private Transform _getOffPoint;
-        
-        [Header("Sound Settings")]
-        [SerializeField] private string _crySE = "Pteranodon_cry";
-        [SerializeField] private string _flapSE = "Pteranodon_Flapping_1";
+        [Header("Sound Settings")] 
+        [SerializeField] private string _crySe = "Pteranodon_cry";
 
         [Header("Movement Settings")] 
-        [SerializeField] private float _moveSpeed;
-        private Rigidbody _rigidbody;
-        
-        [Header("Camera Settings")]
-        private CameraController _cameraController;
+        [SerializeField] private float _moveSpeed = 5f;
+        [SerializeField] private float _rotationSpeed = 5f;
+        [SerializeField] private float _turnThreshold = 30f;
 
+        [Header("BulletSettings")]
+        [SerializeField] private Transform _muzzle;
+        [SerializeField] private ParticleSystem _muzzleFlash;
+        [SerializeField, Label("Fireの方向")] private float _downwardAngle = 30f;
+        [SerializeField] private GameObject _fireParticle;
+        [SerializeField] private float _fireSpeed = 20f;
+        [SerializeField] private float _rayDistance = 100f;
+        [SerializeField] private LayerMask _fireHitMask;
+        [SerializeField] private float _fireCooldown = 2f;
+        
+        private float _fireCooldownTimerSec;
+        private InteractableBase _interactableBase;
+        private const float Threshold = 0.02f;
+        private const float LerpSpeed = 5f;
+        private Vector3 _initialPosition;
+        private Quaternion _initialRotation;
         private float _currentTargetValue;
-        private Animator _animator;
-        
-        [Header("Network Settings")]
-        [Networked, OnChangedRender(nameof(OnChangeOwnerRef))] private PlayerRef OwnerPlayerRef { get; set; }
 
-        private float _currentSpeed;
-
-        private PlayerManager _ownerPlayerManager;
-        
-        [Networked] private float _currentBlendValue { get; set; }
+        [Networked, OnChangedRender(nameof(OnChangeAnimation))]
+        private float CurrentBlendValue { get; set; }
+        [Networked,OnChangedRender(nameof(OnInteractingChanged))]
+        private NetworkBool IsInteracting { get; set; }
 
         #region AnimationHash
 
-        private static readonly int _flyStateBlend = Animator.StringToHash("FlyStateBlend");
-        
+        private static readonly int FlyStateBlend = Animator.StringToHash("FlyStateBlend");
+
         #endregion
-        
-       private void Awake()
-       {
-            _cameraController = GetComponent<CameraController>();
-            _animator = GetComponent<Animator>();
-            if(_animator is null)
-                Debug.LogError("Animator is null");
-            
-            _rigidbody = GetComponent<Rigidbody>(); 
-            _cameraController.Init(true);
-            _currentTargetValue = 0;
-       }
 
-       private void Start()
-       {
-           _rigidbody.isKinematic = true;
-       }
-
-       public override void FixedUpdateNetwork()
-       {
-           if (!HasStateAuthority) 
-               return;
-           
-           if (GetInput<PlayerInput>(out var input))
-           {
-               Vector2 moveDirection = input.MoveDirection;
-               Move(moveDirection);
-               
-               _currentBlendValue = Mathf.Lerp(_currentBlendValue, moveDirection.magnitude, Runner.DeltaTime * 5f);
-               
-               if (input.DesiredLookDirection.sqrMagnitude > 0.001f)
-               {
-                   Vector3 flatDir = new(input.DesiredLookDirection.x, 0f, input.DesiredLookDirection.z);
-                   Quaternion targetRotation = Quaternion.LookRotation(flatDir, Vector3.up);
-                   transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Runner.DeltaTime * 5f);
-               }
-           }
-       }
-
-        private void LateUpdate()
+        public override void Spawned()
         {
-            if (HasInputAuthority)
-            {
-                if (GameInput.I.Player.Aim.triggered)
-                    _cameraController.CameraReset();
+            base.Spawned();
+            
+            _interactableBase = GetComponent<InteractableBase>();
+            _initialPosition  = transform.position;
+            _initialRotation  = transform.rotation;
+            
+            if (HasStateAuthority)
+                Rigidbody.isKinematic = false;
+            
+            Animator.enabled = IsInteracting;
+        }
+
+        public override void Render()
+        {
+            Animator.enabled = IsInteracting;
+
+            float baseMin = IsInteracting ? _currentTargetValue : 0f;
+            float clamped  = Mathf.Max(CurrentBlendValue, baseMin);
+            Animator.SetFloat(FlyStateBlend, clamped);
+        }
+
+        public override void GetOn(PlayerRef ownerPlayerRef)
+        {
+            if (!Runner.IsServer || OwnerPlayerRef != PlayerRef.None)
+                return;
+
+            base.GetOn(ownerPlayerRef);
+            IsInteracting = true; 
+            
+            _currentTargetValue = 0.01f;
+            CurrentBlendValue = _currentTargetValue;
+            _interactableBase.ForceSetInteractable = false;
+            OnPlaySE(_crySe);
+        }
+
+        public override void GetOff(PlayerRef ownerPlayerRef)
+        {
+            base.GetOff(ownerPlayerRef);
+
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
+            transform.SetPositionAndRotation(_initialPosition,_initialRotation);
+            
+            IsInteracting = false; 
+            _currentTargetValue = 0f;
+            CurrentBlendValue = _currentTargetValue;
+            _interactableBase.ForceSetInteractable = true;
+        }
+
+        public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
+        {
+            if (!HasStateAuthority) 
+                return;
+            
+            HandleMovement(playerInput);
+            _fireCooldownTimerSec = Mathf.Min(_fireCooldown, _fireCooldownTimerSec + deltaTime);
                 
-                _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
+            if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _fireCooldownTimerSec >= _fireCooldown)
+            {
+                Server_Fire();
+            }
+        }
+
+        // Animationの更新処理
+        private void OnChangeAnimation()
+        {
+            float clampedBlend = Mathf.Clamp(CurrentBlendValue, _currentTargetValue, 1f);
+            Animator.SetFloat(FlyStateBlend, clampedBlend);
+        }
+
+        private void OnInteractingChanged()
+        {
+            Animator.enabled = IsInteracting;
+        }
+
+        private void HandleMovement(PlayerInput input)
+        {
+            Vector2 moveInput = input.MoveDirection;
+
+            if (moveInput == Vector2.zero)
+            {
+                Rigidbody.linearVelocity = Vector3.zero;
+                
+                float idleTarget = IsInteracting ? _currentTargetValue : 0;
+                SetBlendValue(idleTarget);
+                return;
             }
 
-            float clampedBlend = Mathf.Clamp(_currentBlendValue, _currentTargetValue, 1f);
-            _animator.SetFloat(_flyStateBlend, clampedBlend);
+            Vector3 moveDir = CalculateMoveDirection(input);
+            // キャラの回転方向の決定
+            float angleToMoveDir = Vector3.SignedAngle(transform.forward, moveDir, Vector3.up);
+            Quaternion targetRot = Quaternion.LookRotation(moveDir, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Runner.DeltaTime * _rotationSpeed);
+
+            // 後ろ方向のときは無理な移動をしないように制御
+            if (moveInput.y < 0 && Mathf.Abs(angleToMoveDir) > _turnThreshold)
+                Rigidbody.linearVelocity = Vector3.zero;
+            else
+                Rigidbody.linearVelocity = moveDir * _moveSpeed;
+
+            SetBlendValue(moveInput.magnitude);
         }
 
-        // キャラクターごとにスキルを変更する
-        protected override void OnInteract(IInteractableContext context)
+        // 向きたい方向を取得
+        private Vector3 CalculateMoveDirection(PlayerInput input)
         {
-            PlayerRef requester = PlayerRef.FromEncoded(context.Interactor);
-
-            if (OwnerPlayerRef == PlayerRef.None)
-                RPC_RequestGetOn(requester);
-            else if(OwnerPlayerRef == requester)
-                GetOff();
-        }
-        
-        [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
-        private void RPC_RequestGetOn(PlayerRef requester)
-        {
-            GetOn(requester);
-        }
-        
-        // 動き周り
-        private void Move(Vector2 moveDirection)
-        {
-            if(_rigidbody.isKinematic)
-                return;
-            
-            if (!GetInput<PlayerInput>(out var input)) 
-                return;
-            
-            Vector3 lookDir = input.DesiredLookDirection;
-            Vector3 cameraForward = lookDir.normalized;
-            Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraForward);
-
-            Vector3 moveDir = cameraForward * moveDirection.y + cameraRight * moveDirection.x;
-
-            // 飛行挙動
-            Vector3 velocityTarget = moveDir.normalized * _moveSpeed;
-            Vector3 velocityDelta = velocityTarget - _rigidbody.linearVelocity;
-            _rigidbody.AddForce(velocityDelta, ForceMode.VelocityChange);
-        }
-        
-        private void GetOn(PlayerRef ownerPlayerRef)
-        {
-            if(!Runner.IsServer || OwnerPlayerRef != PlayerRef.None)
-                return;
-
-            _currentTargetValue = 0.01f;
-            OwnerPlayerRef = ownerPlayerRef;
-            Object.AssignInputAuthority(OwnerPlayerRef);
-            OnPlaySE(_crySE);
-
-            _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>()
-                .PlayerDataDic[OwnerPlayerRef].GetComponent<PlayerManager>();
-
-            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
-            _ownerPlayerManager.RPC_SetColliderActive(false);
-            _ownerPlayerManager.RPC_SetMeshActive(false);
-            
-            _rigidbody.isKinematic = false;
-        }
-        
-        private void GetOff()
-        {
-            if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) 
-                return;
-
-            _currentTargetValue = 0f;
-            OwnerPlayerRef = PlayerRef.None;
-            Object.RemoveInputAuthority();
-            
-            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
-            _ownerPlayerManager.RPC_SetColliderActive(true);
-            _ownerPlayerManager.RPC_SetMeshActive(true);
-            _ownerPlayerManager.transform.position = _getOffPoint.position;
-            _rigidbody.isKinematic = true;
+            Vector3 lookDir = input.DesiredLookDirection.normalized;
+            Vector3 cameraRight = Vector3.Cross(Vector3.up, lookDir);
+            return (lookDir * input.MoveDirection.y + cameraRight * input.MoveDirection.x).normalized;
         }
 
-        private void OnChangeOwnerRef()
+        private void SetBlendValue(float target)
         {
-            if (OwnerPlayerRef == Runner.LocalPlayer)
+            if (IsInteracting) 
+                target = Mathf.Max(target, _currentTargetValue);
+
+            float src  = CurrentBlendValue;
+            float next = Mathf.Lerp(src, target, Runner.DeltaTime * LerpSpeed);
+
+            if (Mathf.Abs(next - src) >= Threshold)
+                CurrentBlendValue = next;
+        }
+
+        private void Server_Fire()
+        {
+            if (_muzzle == null)
             {
-                _cameraController.SetCameraPriority(15);
-                _cameraController.CameraReset();
+                Debug.LogError("Muzzle is null");
+                return;
+            }
+            
+            PlayMuzzleFlash(_muzzle.position, _muzzle.rotation);
+            
+            Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
+            
+            if (Physics.Raycast(_muzzle.position, angleForward, out RaycastHit hit, _rayDistance,
+                    _fireHitMask))
+            {
+                // 弾を生成し、ターゲット方向に飛ばす
+                Vector3 dir = (hit.point - _muzzle.position).normalized;
+                Quaternion rotation = Quaternion.LookRotation(dir,Vector3.up);
+                Vector3 velocity = dir * _fireSpeed;
+                
+                Rpc_PlayFireBullet(_muzzle.position, rotation, velocity);
             }
             else
-            {
-                _cameraController.SetCameraPriority(5);
-            }
+                Debug.LogError("No hit found in angled ray");
+
+            _fireCooldownTimerSec = 0f;
         }
         
-        protected override bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
+        private void PlayMuzzleFlash(Vector3 pos, Quaternion rot)
         {
-            // すでにキャラクターが乗っていたらインタラクト不可能にする
-            return OwnerPlayerRef == PlayerRef.None || OwnerPlayerRef == PlayerRef.FromEncoded(context.Interactor);
+            StaticServiceLocator.Instance.Get<EffectSpawner>()
+                .RequestPlayOneShotEffect(EffectType.PtrFireMuzzle, pos, rot, null);
+
+            if (_muzzleFlash != null)
+                _muzzleFlash.Play();
         }
 
-        [Rpc(RpcSources.All,RpcTargets.All)]
-        private void RPC_PlaySE(Vector3 position, string cueName)
+        [Rpc]
+        private void Rpc_PlayFireBullet(Vector3 spawnPos, Quaternion rotation, Vector3 initialVelocity)
         {
-            CRIAudio.PlaySE(position,"Exhibit", cueName);
+            if(!_fireParticle)
+                return;
+            
+            GameObject instance = Instantiate(_fireParticle,spawnPos, rotation);
+
+            if (instance.TryGetComponent<Rigidbody>(out var rb))
+            {
+                rb.linearVelocity = initialVelocity;
+            }
         }
-        
+
+        // サウンド設定
         private void OnPlaySE(string cueName)
         {
             RPC_PlaySE(transform.position, cueName);
         }
+
+        [Rpc]
+        private void RPC_PlaySE(Vector3 position, string cueName)
+        {
+            CRIAudio.PlaySE(position, "Exhibit", cueName);
+        }
     }
 }
+
+// private void OnDrawGizmos()
+// {
+//     if (_muzzle == null)
+//         return;
+//
+//     // 斜め下方向を計算
+//     Vector3 angledForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.transform.right) *
+//                             _muzzle.transform.forward;
+//
+//     // Gizmoの色設定
+//     Gizmos.color = Color.red;
+//
+//     // 発射方向の可視化
+//     Gizmos.DrawRay(_muzzle.transform.position, angledForward * _rayDistance);
+// }

@@ -26,11 +26,12 @@ namespace InGame.Player
         private float _cameraPitch;
         private float _cameraYaw;
         private bool _isInRotation;
-        Tweener _cameraTweener;
+        Tweener _rotateTweener;
         
         // camera position
-        private CameraSettings _cameraSettings;
-        private CameraSettings _defaultCameraSettings;
+        private Vector3 _currentOffset;
+        private Vector3 _defaultOffset;
+        Tweener _offsetTweener;
 
         public void Init(bool use)
         {
@@ -39,8 +40,8 @@ namespace InGame.Player
 
             // Prefabの初期状態をデフォルトとして保存
             _defaultRotation = _cameraPivot.localRotation;
-            _cameraSettings = new CameraSettings(_cameraTf.localPosition);
-            _defaultCameraSettings = new CameraSettings(_cameraTf.localPosition);
+            _currentOffset = _cameraTf.localPosition;
+            _defaultOffset = _cameraTf.localPosition;
         }
 
         private void LateUpdate()
@@ -78,8 +79,8 @@ namespace InGame.Player
         /// <summary> 障害物に応じてカメラの距離を変える </summary>
         void CheckCameraDistance()
         {
-            var isHit = Physics.SphereCast(_cameraPivot.position, _cameraRadius, 
-                _cameraTf.position - _cameraPivot.position, out var hit, _cameraSettings.MaxDistance, _collideAgainst);
+            var isHit = Physics.Linecast(_cameraPivot.position, _cameraPivot.position + _cameraPivot.TransformDirection(_currentOffset),
+                out var hit, _collideAgainst);
             
             if (isHit)
             {
@@ -88,7 +89,7 @@ namespace InGame.Player
             }
             else
             {
-                _cameraTf.localPosition = _cameraSettings.DefaultPosition;
+                _cameraTf.localPosition = _currentOffset;
             }
         }
 
@@ -98,9 +99,9 @@ namespace InGame.Player
             _isInRotation = true;
 
             // 遷移途中(Pauseを含む)
-            if (_cameraTweener.IsActive() && !_cameraTweener.IsComplete())
+            if (_rotateTweener.IsActive() && !_rotateTweener.IsComplete())
             {
-                _cameraTweener.Kill();
+                _rotateTweener.Kill();
             }
             
             Quaternion endRotation = Quaternion.LookRotation(targetWorldRotation * Vector3.forward, transform.up);
@@ -112,11 +113,13 @@ namespace InGame.Player
                 startYaw = _cameraYaw;
 
             // 移動Tweenの発火
-            _cameraTweener =　DOTween.To(
+            _rotateTweener =　DOTween.To(
                 () => 0f,
                 n =>
                 {
                     _cameraPivot.rotation = Quaternion.Euler(math.lerp(startPitch, targetPitch, n), Mathf.LerpAngle(startYaw, targetYaw, n), 0);
+                    _cameraPitch = _cameraPivot.rotation.eulerAngles.x;
+                    _cameraYaw = _cameraPivot.rotation.eulerAngles.y;
                 },
                 1f,
                 _motionDuration
@@ -146,6 +149,28 @@ namespace InGame.Player
             _camera.Priority = priority;
         }
 
+        public void ChangeOffset(Vector3 newOffset, float duration)
+        {
+            if (_offsetTweener.IsActive() && !_offsetTweener.IsComplete())
+            {
+                _offsetTweener.Kill();
+            }
+            
+            _offsetTweener = DOTween.To(
+                () => _currentOffset,
+                v => _currentOffset = v,
+                newOffset,
+                duration
+                )
+                .SetUpdate(UpdateType.Late)
+                .SetEase(_motionEase);
+        }
+
+        public void ResetOffset(float duration)
+        {
+            ChangeOffset(_defaultOffset, duration);
+        }
+
         /// <summary> 0 <= return < 360 </summary>
         private static float ToAngle(float angle)
         {
@@ -155,18 +180,6 @@ namespace InGame.Player
                 else if (angle < 0) angle += 360;
                 else return angle;
             }
-        }
-    }
-
-    public struct CameraSettings
-    {
-        public Vector3 DefaultPosition;
-        public readonly float MaxDistance;
-
-        public CameraSettings(Vector3 defaultPosition)
-        {
-            DefaultPosition = defaultPosition;
-            MaxDistance = DefaultPosition.magnitude;
         }
     }
 }

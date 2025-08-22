@@ -37,7 +37,19 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
         }
-        
+
+        public override void Spawned()
+        {
+            if (PlayerDatabase.Instance?.PlayerDataDic == null)
+            {
+                _characterType = CharacterType.OkabeWright;
+            }
+            else
+            {
+                 _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType ;
+            }
+        }
+
         private void Update()
         {
             if (!HasInputAuthority) return;
@@ -133,11 +145,13 @@ namespace InGame.Interact
                 {
                     Interactor = Object.InputAuthority.RawEncoded,
                 };
-                UIController.I.ShowInteractUI(_focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+                if (UIController.I)
+                    UIController.I.ShowInteractUI(_focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
             }
             else
             {
-                UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
+                if (UIController.I)
+                    UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
             }
             //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
@@ -193,8 +207,10 @@ namespace InGame.Interact
         {
             if (!_focusedObj)
                 return _baseInteractTime;
-            float baseTime = _focusedObj.RequiredInteractTimeDictionary.Dictionary
-                .GetValueOrDefault(_characterType, _baseInteractTime);
+            var dict = _focusedObj.RequiredInteractTimeDictionary.Dictionary;
+            float baseTime =
+                dict.TryGetValue(CharacterType.All, out var allVal) ? allVal :
+                dict.GetValueOrDefault(_characterType, _baseInteractTime);
 
             float multiplier = 1f;
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Object.InputAuthority, out var playerData) &&
@@ -242,7 +258,7 @@ namespace InGame.Interact
                 _interactWaitTimer = 0f;
 
                 Debug.Log($"[Client] RPC_RequestInteract 送信: {context.Interactor} -> {_focusedObj.name} NetObj is null? {!netObj}");
-                RPC_RequestInteract(context.Interactor, netObj);
+                RPC_RequestInteract(context.Interactor, (int)context.CharacterType,netObj);
             }
         }
 
@@ -250,19 +266,20 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIController.I.SetInteractProgress(0f);
+            UIController.I?.SetInteractProgress(0f);
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        private void RPC_RequestInteract(int interactor, NetworkObject target)
+        private void RPC_RequestInteract(int interactor, int characterType, NetworkObject target)
         {
-            Debug.Log($"[PlayerInteractionController] <UNK>: {interactor} -> {target.name}");
+            Debug.Log($"target.HasStateAuthority: {target.HasStateAuthority}, Runner.LocalPlayer: {Runner.LocalPlayer}");
             if (target && target.TryGetComponent(out InteractableBase interactable))
             {
                 var context = new InteractableContext
-                {
-                    Interactor = interactor,
-                };
+                 {
+                     Interactor = interactor,
+                     CharacterType = (CharacterType)characterType
+                 };
 
                 interactable.Interact(context);
             }

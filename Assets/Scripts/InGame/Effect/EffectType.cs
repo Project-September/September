@@ -4,5 +4,9 @@ public enum EffectType
     Warp,
     Tutankhamen,
     Explosion,
-    LondonTelephone,
+    LondonTelephoneStart,
+    LondonTelephoneActive,
+    PtrFireMuzzle,
+    PtrFireBullet,
+    PtrFireExplosion
 }
