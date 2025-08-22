@@ -4,12 +4,14 @@ using UnityEngine.UI;
 
 public class FriendChaseState : IFriendState
 {
-    private float _stopDistance;
-    
     public void OnEnter(FriendBase friend)
     {
-        _stopDistance = friend.FriendStatus.AttackRange;
-        friend.Agent.stoppingDistance = _stopDistance;
+        //目的地を設定
+        if (friend.Destination != null)
+            friend.Agent.SetDestination(friend.Destination.position);
+        
+        friend.Agent.speed = friend.FriendStatus.FriendChaseSpeed;
+        friend.Agent.stoppingDistance = friend.FriendStatus.FriendChaseDistance;
     }
 
     public void OnExit(FriendBase friend)
@@ -20,13 +22,11 @@ public class FriendChaseState : IFriendState
     public void OnUpdate(FriendBase friend)
     {
         if (friend.Destination == null || !friend.Agent.isOnNavMesh) return;
-
-        friend.Agent.SetDestination(friend.Destination.position);
             
         //速度に応じて、アニメーションを変化させる
         friend.Animator.SetFloat("MoveBlend", friend.Agent.velocity.magnitude);
 
-        if (friend.Agent.remainingDistance <= _stopDistance)
+        if (friend.Agent.remainingDistance <= friend.Agent.stoppingDistance && !friend.IsAttack)
         {
             friend.ChangeState(FriendState.Attack);
         }

@@ -5,6 +5,7 @@ namespace Ingame.Tanihira
 {
     public class FriendMoveState : IFriendState
     {
+        private bool _isSetDestination;
         public void OnEnter(FriendBase friend)
         {
             if (!friend.Agent.isOnNavMesh)
@@ -13,14 +14,9 @@ namespace Ingame.Tanihira
                 return;
             }
             
-            //目的地を設定
-            if (friend.Destination != null)
-                friend.Agent.SetDestination(friend.Destination.position);
-            
             //agentが移動できるように設定
             friend.Agent.enabled = true;
             friend.Agent.isStopped = false;
-     
           
             //移動時のステータスを設定
             friend.Agent.speed = friend.FriendStatus.FriendFormationSpeed;
@@ -29,7 +25,7 @@ namespace Ingame.Tanihira
 
         public void OnExit(FriendBase friend)
         {
-            
+            _isSetDestination = false;
         }
 
         public void OnUpdate(FriendBase friend)
@@ -37,7 +33,6 @@ namespace Ingame.Tanihira
             if (friend.Destination == null || !friend.Agent.isOnNavMesh) return;
 
             friend.Agent.SetDestination(friend.Destination.position);
-            
             //速度に応じて、アニメーションを変化させる
             friend.Animator.SetFloat("MoveBlend", friend.Agent.velocity.magnitude);
         }

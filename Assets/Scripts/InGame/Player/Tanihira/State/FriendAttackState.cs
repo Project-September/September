@@ -1,15 +1,20 @@
+using CriWare;
+using Fusion;
+using InGame.Health;
 using UnityEngine;
 
 namespace Ingame.Tanihira
 {
     public class FriendAttackState : IFriendState
     {
-        private Transform friendObject;
+        private Transform _friendObject;
+        private MeleeHitboxExecutor _executor;
+        
         public void OnEnter(FriendBase friend)
         {
             //navmeshでの処理
             friend.Agent.isStopped = true;
-            friendObject = friend.Agent.gameObject.transform;
+            _friendObject = friend.Agent.gameObject.transform;
             LookTarget(friend.Agent.destination);
             friend.MecanimAnimator?.SetTrigger("Attack"); // アニメーターにAttackトリガーがある前提
         }
@@ -27,12 +32,12 @@ namespace Ingame.Tanihira
 
         private void LookTarget(Vector3 target)
         {
-            Vector3 direction = target - friendObject.position;
+            Vector3 direction = target - _friendObject.position;
             direction.y = 0f; // 上下方向は無視
 
             if (direction.sqrMagnitude > 0.01f)
             {
-                friendObject.rotation = Quaternion.LookRotation(direction);
+                _friendObject.rotation = Quaternion.LookRotation(direction);
             }
         }
     }
