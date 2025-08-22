@@ -4,6 +4,7 @@ using September.Common;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using September.InGame.Effect;
 
 namespace InGame.Interact
 {
@@ -48,6 +49,9 @@ namespace InGame.Interact
             //All キャラタイプのクールダウン時間を優先して取得する
             LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
+            
+            var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+            effectSpawner.RequestPlayOneShotEffect(EffectType.InteractComplete, transform.position, transform.rotation);
 
             // 実行
             OnInteract(context);

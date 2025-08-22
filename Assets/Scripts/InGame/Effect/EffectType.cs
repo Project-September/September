@@ -8,5 +8,6 @@ public enum EffectType
     LondonTelephoneActive,
     PtrFireMuzzle,
     PtrFireBullet,
-    PtrFireExplosion
+    PtrFireExplosion,
+    InteractComplete,
 }
