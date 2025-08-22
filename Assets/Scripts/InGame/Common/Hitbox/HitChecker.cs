@@ -10,9 +10,9 @@ public class HitChecker : MonoBehaviour
     [SerializeField] private List<Transform> _hitPoints = new();
     [SerializeField] private float _radius = 0.1f;
     
-    private readonly List<Collider> _alreadyHit = new();
+    [SerializeField] private List<Collider> _alreadyHit = new();
     private MeleeHitboxExecutor _executor;
-    public bool IsFinished { get; private set; } = false;
+    public bool IsFinished = false;
     public event Action<Collider> OnHit;
     
     public void StartHitCheck()
@@ -27,6 +27,7 @@ public class HitChecker : MonoBehaviour
                 OnHit?.Invoke(item); // ヒットイベントを発火
             }
         };
+        IsFinished = false;
     }
     
     private void Update()
