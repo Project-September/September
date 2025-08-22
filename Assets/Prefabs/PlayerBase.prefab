@@ -378,6 +378,7 @@ MonoBehaviour:
   - {fileID: 750593193299160763}
   _radius: 0.1
   _alreadyHit: []
+  IsFinished: 0
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -3558,6 +3559,7 @@ MonoBehaviour:
   - {fileID: 750593193299160763}
   _radius: 0.1
   _alreadyHit: []
+  IsFinished: 0
 --- !u!1 &5474908219773255667
 GameObject:
   m_ObjectHideFlags: 0
@@ -5423,7 +5425,7 @@ MonoBehaviour:
     - rid: 2879281568291487894
       type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _cooldown: 0.7
+        _cooldown: 1
         _phase: 0
         _normalAttackAnimationClip: {fileID: 7400000, guid: 60c28bdfb725c81419321d4c49a63d73, type: 2}
         _attackDamage: 10
