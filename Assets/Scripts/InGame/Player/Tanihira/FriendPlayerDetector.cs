@@ -88,12 +88,10 @@ namespace Ingame.Tanihira
             if (_currentTarget)
             {
                 _friendStateChanger.SetChaseState(_currentTarget);
-                Debug.Log("攻撃！！");
             }
             else
             {
                 _friendStateChanger.SetMoveState();
-                Debug.Log("隊列に戻る");
             }
         }
         
