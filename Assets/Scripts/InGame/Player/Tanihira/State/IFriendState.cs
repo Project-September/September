@@ -1,5 +1,3 @@
-using Ingame.Tanihira;
-using UnityEngine;
 
 namespace Ingame.Tanihira
 {

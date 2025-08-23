@@ -1,7 +1,5 @@
 using Fusion;
 using InGame.Health;
-using Ingame.Tanihira;
-using NUnit.Framework;
 using UnityEngine;
 
 namespace Ingame.Tanihira
