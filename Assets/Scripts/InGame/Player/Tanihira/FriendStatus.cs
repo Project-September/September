@@ -15,6 +15,7 @@ namespace Ingame.Tanihira
         [SerializeField] private float _frinedFormationDistance = 1.0f;
         [SerializeField] private float _friendChaseSpeed = 5f;
         [SerializeField] private float _frinedChaseStopDistance = 1.0f;
+        [SerializeField] private float _friendStunTime = 10.0f;
 
         public int MaxHealth => _maxHealth;
         public int AttackPower => _attackPower;
@@ -24,5 +25,6 @@ namespace Ingame.Tanihira
         public float FriendFormationDistance => _frinedFormationDistance;
         public float FriendChaseSpeed => _friendChaseSpeed;
         public float FriendChaseDistance => _frinedChaseStopDistance;
+        public float FriendStunTime => _friendStunTime;
     }
 }

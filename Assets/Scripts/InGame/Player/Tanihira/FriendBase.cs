@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using CriWare;
 using Fusion;
 using InGame.Health;
 using UnityEngine;
@@ -38,11 +36,10 @@ namespace Ingame.Tanihira
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
         protected NetworkObject _ownerPlayer;
-        
+        protected NetworkMecanimAnimator _mecanimAnimator;
 
         private static int _spawnCount;
         private FormationManager _formationManager;
-        private NetworkMecanimAnimator _mecanimAnimator;
         private bool _isAttack;
         
         // プロパティ
