@@ -13,6 +13,7 @@ namespace InGame.Player
         private CancellationTokenSource _cts;
         Renderer _renderer;
         MaterialPropertyBlock _materialPropertyBlock;
+        PlayerEffectController _playerEffectController;
         
         public bool IsAlive => _status.CurrentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
@@ -35,6 +36,7 @@ namespace InGame.Player
             _cts = new CancellationTokenSource();
             _renderer = GetComponentInChildren<Renderer>();
             _status = GetComponent<PlayerStatus>();
+            _playerEffectController = GetComponent<PlayerEffectController>();
             _materialPropertyBlock = new MaterialPropertyBlock();
         }
 
@@ -66,10 +68,12 @@ namespace InGame.Player
 
             if (hitData.HitActionType == HitActionType.Damage)
             {
+                Debug.Log("Damage Taken");
                 hitData.Amount = TakeDamage(hitData.Amount);
             }
             else if (hitData.HitActionType == HitActionType.Heal)
             {
+                Debug.Log("Heal Taken");
                 hitData.Amount = TakeHeal(hitData.Amount);
             }
         }
@@ -116,6 +120,7 @@ namespace InGame.Player
         void Death(HitData lastHitData)
         {
             _status.CurrentHealth = _status.MaxHealth;
+            _playerEffectController.PlayStunEffect();
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)

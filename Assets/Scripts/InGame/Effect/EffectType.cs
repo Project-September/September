@@ -1,6 +1,7 @@
 public enum EffectType
 {
     Test,
+    StunNormal,
     Warp,
     Tutankhamen,
     Explosion,
