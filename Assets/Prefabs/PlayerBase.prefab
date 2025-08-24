@@ -299,6 +299,7 @@ GameObject:
   - component: {fileID: 2525442923973757293}
   - component: {fileID: 6261861407256658100}
   - component: {fileID: 6462417923102071326}
+  - component: {fileID: 4810525472409146702}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -379,6 +380,21 @@ MonoBehaviour:
   _radius: 0.1
   _alreadyHit: []
   IsFinished: 0
+--- !u!114 &4810525472409146702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed08c58996a8b304297cb853a8ff84c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _effectTransform: {fileID: 5645407088099010296}
+  _efffectRotationOffset: {x: 0, y: 0, z: 0}
+  _efffectPositionOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -5070,7 +5086,6 @@ GameObject:
   - component: {fileID: 2221120114231077883}
   - component: {fileID: 7508249662566368237}
   - component: {fileID: 2779401866583128900}
-  - component: {fileID: 4142321026636216433}
   m_Layer: 6
   m_Name: PlayerBase
   m_TagString: Player
@@ -5436,21 +5451,6 @@ MonoBehaviour:
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
---- !u!114 &4142321026636216433
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8360875997416129576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed08c58996a8b304297cb853a8ff84c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _effectTransform: {fileID: 5645407088099010296}
-  _efffectRotationOffset: {x: 0, y: 0, z: 0}
-  _efffectPositionOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
