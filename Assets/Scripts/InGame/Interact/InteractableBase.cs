@@ -17,8 +17,11 @@ namespace InGame.Interact
 
         [SerializeReference, SubclassSelector] private List<CharacterInteractEffectBase> _characterEffects = new();
         
+        [SerializeField] private Vector3 _interactEffectOffset = Vector3.zero;
+        [SerializeField] private Vector3 _cooldownEffectOffset = Vector3.zero;
+        [SerializeField] private EffectType _interactEffectType = EffectType.NormalInteractComplete;
         [SerializeField] private EffectType _cooldownEffectType = EffectType.CooldownSquare;
-
+        [SerializeField] private bool _spawnCooldownEffectOnStart = true;
 
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
@@ -45,20 +48,24 @@ namespace InGame.Interact
                 return;
             }
 
+            var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             // クールダウン登録
+            if (_spawnCooldownEffectOnStart)
+            {
+                effectSpawner.RequestPlayOneShotEffect(_cooldownEffectType, transform.position + _cooldownEffectOffset, transform.rotation);
+            }
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
             
-            //All キャラタイプのクールダウン時間を優先して取得する
+            //All キャラタイプのクールダウン時間を優先して取得する。
             LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
             
-            var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
-            effectSpawner.RequestPlayOneShotEffect(EffectType.InteractComplete, transform.position, transform.rotation);
+            effectSpawner.RequestPlayOneShotEffect(_interactEffectType, transform.position, transform.rotation);
 
             // 実行
             OnInteract(context);
         }
-
+        
         /// <summary>
         /// 共通のバリデーション（null, クールダウン）
         /// インタラクト可能なときは true を返す
