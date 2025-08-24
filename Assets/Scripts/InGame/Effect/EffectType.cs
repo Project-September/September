@@ -9,8 +9,11 @@ public enum EffectType
     PtrFireMuzzle,
     PtrFireBullet,
     PtrFireExplosion,
-    InteractComplete,
+    NormalInteractComplete,
     CooldownRect,
     CooldownSquare,
     CooldownLine,
+    PunchImpact,
+    OpticalCamouflageInteractComplete,
+    StunNormal,
 }

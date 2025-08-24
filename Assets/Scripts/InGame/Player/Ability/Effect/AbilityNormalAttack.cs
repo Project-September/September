@@ -4,6 +4,7 @@ using InGame.Common;
 using InGame.Health;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -24,7 +25,8 @@ namespace InGame.Player.Ability
             {
                 ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
             }
-
+            
+        
             if (!_isSubscribe)
             {
                 _isSubscribe = true;
