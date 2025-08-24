@@ -5070,6 +5070,7 @@ GameObject:
   - component: {fileID: 2221120114231077883}
   - component: {fileID: 7508249662566368237}
   - component: {fileID: 2779401866583128900}
+  - component: {fileID: 4142321026636216433}
   m_Layer: 6
   m_Name: PlayerBase
   m_TagString: Player
@@ -5432,10 +5433,24 @@ MonoBehaviour:
         _hitChecker: {fileID: 6462417923102071326}
         _ownerAnimator: {fileID: 2525442923973757293}
         _isSubscribe: 0
-        _effectTransform: {fileID: 5645407088099010296}
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
+--- !u!114 &4142321026636216433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed08c58996a8b304297cb853a8ff84c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _effectTransform: {fileID: 5645407088099010296}
+  _efffectRotationOffset: {x: 0, y: 0, z: 0}
+  _efffectPositionOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,7 +17,6 @@ namespace InGame.Player.Ability
         [SerializeField] private HitChecker _hitChecker;
         [SerializeField] private Animator _ownerAnimator;
         [SerializeField] private bool _isSubscribe = false;
-        [SerializeField] private Transform _effectTransform;
 
         protected override void OnStart()
         {
@@ -27,12 +26,7 @@ namespace InGame.Player.Ability
                 ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
             }
             
-            var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
-            if (effectSpawner && _effectTransform)
-            {
-                effectSpawner.RequestPlayOneShotEffect(EffectType.PunchImpact, _effectTransform.position, _effectTransform.rotation);
-            }
-
+        
             if (!_isSubscribe)
             {
                 _isSubscribe = true;
