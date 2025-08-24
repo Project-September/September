@@ -52622,17 +52622,17 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.56666666
-    functionName: EndHitCheck
+  - time: 0.33333334
+    functionName: PlayPunchEffect
     data: 
-    objectReferenceParameter: {fileID: 11500000, guid: 224c75cd33ef4d74f9cf5b541cc9b898, type: 3}
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.56666666
-    functionName: PlayPunchEffect
+    functionName: EndHitCheck
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 224c75cd33ef4d74f9cf5b541cc9b898, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

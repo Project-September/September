@@ -14,19 +14,23 @@ public class PlayerEffectController : MonoBehaviour
     {
         var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
         if (effectSpawner && _punchEffectTransform)
-            effectSpawner.RequestPlayOneShotEffect(EffectType.PunchImpact, _punchEffectTransform.position + _punchEffectPositionOffset, _punchEffectTransform.rotation * Quaternion.Euler(_punchEffectRotationOffset));
+        {
+            effectSpawner.RequestPlayOneShotEffect(EffectType.PunchImpact,
+                _punchEffectTransform.position + _punchEffectPositionOffset, transform.rotation, _punchEffectTransform);
+        }
     }
-    
+
     public void PlayStunEffect()
     {
         var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
         if (effectSpawner && _punchEffectTransform)
         {
             _generateStunEffectId = System.Guid.NewGuid().ToString();
-            effectSpawner.RequestPlayLoopEffect(_generateStunEffectId, EffectType.StunNormal, transform.position + _stunEffectPositionOffset, Quaternion.identity);
+            effectSpawner.RequestPlayLoopEffect(_generateStunEffectId, EffectType.StunNormal,
+                transform.position + _stunEffectPositionOffset, Quaternion.identity);
         }
     }
-    
+
     public void StopStunEffect()
     {
         var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
