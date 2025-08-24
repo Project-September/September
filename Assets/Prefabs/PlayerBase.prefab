@@ -392,9 +392,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed08c58996a8b304297cb853a8ff84c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _effectTransform: {fileID: 5645407088099010296}
-  _efffectRotationOffset: {x: 270, y: 45, z: 90}
-  _efffectPositionOffset: {x: 0, y: 0, z: 0}
+  _punchEffectTransform: {fileID: 5645407088099010296}
+  _punchEffectRotationOffset: {x: 0, y: 0, z: 0}
+  _punchEffectPositionOffset: {x: 0, y: 0, z: 0}
+  _stunEffectPositionOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
