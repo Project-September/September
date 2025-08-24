@@ -53,8 +53,6 @@ namespace Ingame.Tanihira
                 .Distinct()                                                // 重複排除
                 .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude) // 距離順
                 .ToList();
-            
-            Debug.Log(uniqueRoots.Count);
 
             foreach (Transform player in uniqueRoots)
             {

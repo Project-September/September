@@ -35,10 +35,7 @@ namespace InGame.Tanihira
             //初期で登録されたフレンドを生成
             for (int i = 0; i < _friendsTypes.Length; i++)
             {
-                Transform pos = _firstSpawnPoint;
-                //仮で３の間隔開けている（複数スポーンするときのオフセット）
-                pos.transform.position += new Vector3(i * 3, 0, 0);
-                SpawnFriend(_friendsTypes[i], pos);
+                SpawnFriend(_friendsTypes[i], _firstSpawnPoint);
             }
         }
 

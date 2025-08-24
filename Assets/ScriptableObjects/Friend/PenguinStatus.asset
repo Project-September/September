@@ -15,8 +15,9 @@ MonoBehaviour:
   _maxHealth: 100
   _attackPower: 10
   _friendRotateSpeed: 200
-  _friendMoveSpeed: 10
-  _friendFormationMoveSpeed: 5
+  _friendMoveSpeed: 15
+  _friendFormationMoveSpeed: 15
   _frinedFormationDistance: 0.7
-  _friendChaseSpeed: 15
+  _friendChaseSpeed: 30
   _frinedChaseStopDistance: 1
+  _friendStunTime: 10

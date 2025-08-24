@@ -37,9 +37,9 @@ namespace Ingame.Tanihira
         protected NetworkRunner _networkRunner;
         protected NetworkObject _ownerPlayer;
         protected NetworkMecanimAnimator _mecanimAnimator;
+        protected FormationManager _formationManager;
 
         private static int _spawnCount;
-        private FormationManager _formationManager;
         private bool _isAttack;
         
         // プロパティ
@@ -106,7 +106,7 @@ namespace Ingame.Tanihira
         private void InitializeAgent()
         {
             _agent.angularSpeed = _friendStatus.FriendRotateSpeed;
-            _agent.speed = _friendStatus.FriendMoveSpeed;
+            _agent.speed = _friendStatus.FriendFormationSpeed;
         }
 
         /// <summary>
