@@ -13,7 +13,6 @@ namespace InGame.Player
         private CancellationTokenSource _cts;
         Renderer _renderer;
         MaterialPropertyBlock _materialPropertyBlock;
-        PlayerEffectController _playerEffectController;
         
         public bool IsAlive => _status.CurrentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
@@ -36,7 +35,6 @@ namespace InGame.Player
             _cts = new CancellationTokenSource();
             _renderer = GetComponentInChildren<Renderer>();
             _status = GetComponent<PlayerStatus>();
-            _playerEffectController = GetComponent<PlayerEffectController>();
             _materialPropertyBlock = new MaterialPropertyBlock();
         }
 
@@ -120,7 +118,6 @@ namespace InGame.Player
         void Death(HitData lastHitData)
         {
             _status.CurrentHealth = _status.MaxHealth;
-            _playerEffectController.PlayStunEffect();
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
