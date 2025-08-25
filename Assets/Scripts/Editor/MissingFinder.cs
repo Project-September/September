@@ -1,3 +1,4 @@
+#if  UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -72,3 +73,5 @@ public class MissingFinder
         return path;
     }
 }
+
+#endif
