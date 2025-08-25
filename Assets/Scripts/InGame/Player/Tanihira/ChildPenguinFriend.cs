@@ -34,6 +34,12 @@ namespace Ingame.Tanihira
             //スタンしている時には、ステートを記録して変更を加えないようにする
             if (!IsAlive)
             {
+                //attackの場合はchaseに変えておく
+                if(newState == FriendState.Attack)
+                {
+                    newState = FriendState.Chase;
+                }
+
                 _stockFriendState = newState;
             }
             else
@@ -44,21 +50,26 @@ namespace Ingame.Tanihira
 
         private void AddDamage(int damage)
         {
-            _mecanimAnimator?.SetTrigger("Damage");
             if (_currentHealth - damage <= 0)
             {
                 _stockFriendState = _currentState;
                 ChangeState(FriendState.Stun);
             }
+            else
+            {
+                _mecanimAnimator?.SetTrigger("Damage");
+            }
             _currentHealth -= damage;
         }
 
         /// <summary>
-        /// Hpをmaxまで回復
+        /// Stun終了時の処理
         /// </summary>
-        public void RecoverHp()
+        public void RecoverStun()
         {
+            _formationManager.Register(this.gameObject.GetComponent<FriendBase>());
             _currentHealth = _maxHealth;
+            ChangeState(_stockFriendState);
         }
     
         public void TakeHit(ref HitData hitData)
