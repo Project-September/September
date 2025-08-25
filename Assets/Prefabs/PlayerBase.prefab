@@ -393,8 +393,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _punchEffect: {fileID: 3668695573810060199}
-  _punchEffectRotationOffset: {x: 0, y: 0, z: 0}
-  _punchEffectPositionOffset: {x: 0, y: 0, z: 0}
   _stunEffectPositionOffset: {x: 0, y: 2, z: 0}
 --- !u!1 &1314334536714435523
 GameObject:
@@ -5170,6 +5168,7 @@ MonoBehaviour:
   - {fileID: 2221120114231077883}
   - {fileID: 7508249662566368237}
   - {fileID: 2779401866583128900}
+  - {fileID: 4810525472409146702}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
 MonoBehaviour:
