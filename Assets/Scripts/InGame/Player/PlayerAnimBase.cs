@@ -14,12 +14,6 @@ namespace InGame.Player
 
         public void Init(PlayerManager playerManager)
         {
-            // if (!playerManager.IsLocalPlayer)
-            // {
-            //     enabled = false;
-            //     return;
-            // }
-            
             _playerManager = playerManager;
             _playerMovement = GetComponent<PlayerMovement>();
         }
