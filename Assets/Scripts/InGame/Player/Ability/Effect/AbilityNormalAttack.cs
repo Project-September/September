@@ -24,7 +24,7 @@ namespace InGame.Player.Ability
                 ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, false);
             }
             
-            if (!_isSubscribe && _hitChecker != null)
+            if (!_isSubscribe)
             {
                 _isSubscribe = true;
                 _hitChecker.OnHit += OnHitEnemy;
@@ -52,14 +52,14 @@ namespace InGame.Player.Ability
             }
         }
         
-        protected override void OnEndAbility()
-        {
-            if (_isSubscribe && _hitChecker != null)
-            {
-                _hitChecker.OnHit -= OnHitEnemy;
-                _isSubscribe = false;
-            }
-            base.OnEndAbility();
-        }
+        // protected override void OnEndAbility()
+        // {
+        //     if (_isSubscribe && _hitChecker != null)
+        //     {
+        //         _hitChecker.OnHit -= OnHitEnemy;
+        //         _isSubscribe = false;
+        //     }
+        //     base.OnEndAbility();
+        // }
     }
 }
