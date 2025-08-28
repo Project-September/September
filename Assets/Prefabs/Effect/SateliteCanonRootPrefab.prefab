@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5069940315894687600}
   - component: {fileID: 8171495592541490750}
+  - component: {fileID: 5590553593421308627}
+  - component: {fileID: 8100763672544996354}
   m_Layer: 0
   m_Name: SateliteCanonRootPrefab
   m_TagString: Untagged
@@ -50,13 +52,57 @@ PlayableDirector:
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
-  m_SceneBindings: []
+  m_SceneBindings:
+  - key: {fileID: -5272230352706903161, guid: 90cc8784bc51e2f4aa265438a7f62486, type: 2}
+    value: {fileID: 5590553593421308627}
   m_ExposedReferences:
     m_References:
     - effb0dc9f79097f4ca32bb2d28a10ce4: {fileID: 6312387380465816120}
     - 315785354e17d6b4681bccf626cade81: {fileID: 7514883428923433209}
     - 3b46ccd97d667d14c816a92c768e0584: {fileID: 4408604918597318580}
     - fc503c9a1958bcc4e83d29178e1539e9: {fileID: 6886405654665807093}
+--- !u!114 &5590553593421308627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116583463738296954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: fd1337c8361dc074fb59b7911604ec7f, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8100763672544996354}
+          m_TargetAssemblyTypeName: SateliteCanonReceiver, Scripts
+          m_MethodName: DestroyCanon
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &8100763672544996354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116583463738296954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd21e1135c9f0cb40bd2d0f572a5ee3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3624450586491831067
 PrefabInstance:
   m_ObjectHideFlags: 0

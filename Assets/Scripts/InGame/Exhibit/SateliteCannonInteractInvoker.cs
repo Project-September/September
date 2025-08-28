@@ -6,14 +6,14 @@ namespace Ingame.Exhibit
     public class SateliteCannonInteractRPCInvoker : NetworkBehaviour
     {
         [Header("サテライトキャノンプレハブ")] 
-        private GameObject _sateliteCannonPrefab;
+        [SerializeField] private GameObject _sateliteCannonPrefab;
 
         [Header("Rayの設定")] 
-        private float _rayCastHeight;
-        private LayerMask _raycastMask;
-        private float _hitDistance;
+        [SerializeField] private float _rayCastHeight;
+        [SerializeField] private LayerMask _raycastMask;
+        [SerializeField] private float _hitDistance;
         
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        [Rpc(RpcSources.All, RpcTargets.All)]
         public void Rpc_RequestInteraction(PlayerRef requestingPlayer)
         {
             // ここで他のプレイヤーに通知
@@ -46,7 +46,7 @@ namespace Ingame.Exhibit
         {
             Gizmos.color = new Color(0, 0, 1, 0.5f); // 半透明
             Vector3 startPos = new Vector3(0, _rayCastHeight, 0);
-            Gizmos.DrawWireCube(startPos, Vector3.one * 0.2f);
+            Gizmos.DrawWireCube(startPos, new Vector3(10, 1, 10));
         }
 #endif
     }

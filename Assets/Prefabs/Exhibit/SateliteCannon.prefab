@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2338220459587594111}
   - component: {fileID: 8302386863916485195}
   - component: {fileID: 806825774370489575}
+  - component: {fileID: 905073906492759685}
   m_Layer: 0
   m_Name: SateliteCannon
   m_TagString: Untagged
@@ -105,6 +106,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7da23b99c9925c946822f88092bff882, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sateliteCannonPrefab: {fileID: 1116583463738296954, guid: bc4d793fe185f054a8028a388bf329d4, type: 3}
+  _rayCastHeight: 50
+  _raycastMask:
+    serializedVersion: 2
+    m_Bits: 128
+  _hitDistance: 1000
+--- !u!65 &905073906492759685
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7916347356977786334}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0803808, y: 4.8451405, z: 1}
+  m_Center: {x: -0.04019046, y: 2.4404163, z: 0}
 --- !u!1001 &9049262115522219628
 PrefabInstance:
   m_ObjectHideFlags: 0
