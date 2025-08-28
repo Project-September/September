@@ -34,8 +34,14 @@ namespace InGame.Common
     public struct AnimationMontage
     {
         public AnimationClip AnimClip;
+        [Header("Blend")]
         public Blend BlendIn;
         public Blend BlendOut;
+        
+        [Header("Layer Meta")]
+        public AvatarMask AvatarMask;
+        public bool IsAdditive;
+        public bool UseRootMotion;
 
         [Serializable]
         public struct Blend

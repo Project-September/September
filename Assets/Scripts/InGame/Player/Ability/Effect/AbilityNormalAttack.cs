@@ -2,9 +2,6 @@ using System;
 using Fusion;
 using InGame.Common;
 using InGame.Health;
-using September.Common;
-using September.InGame.Common;
-using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -15,7 +12,8 @@ namespace InGame.Player.Ability
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] private int _attackDamage = 10;
         [SerializeField] private HitChecker _hitChecker;
-        [SerializeField] private Animator _ownerAnimator;
+        //[SerializeField] private Animator _ownerAnimator;
+        //[SerializeField] private AvatarMask _upperBodyMask;
         [SerializeField] private bool _isSubscribe = false;
 
         protected override void OnStart()
@@ -23,7 +21,7 @@ namespace InGame.Player.Ability
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
-                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
+                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, false);
             }
             
             if (!_isSubscribe)
@@ -53,5 +51,15 @@ namespace InGame.Player.Ability
                 _phase = AbilityPhase.Ending;
             }
         }
+        
+        // protected override void OnEndAbility()
+        // {
+        //     if (_isSubscribe && _hitChecker != null)
+        //     {
+        //         _hitChecker.OnHit -= OnHitEnemy;
+        //         _isSubscribe = false;
+        //     }
+        //     base.OnEndAbility();
+        // }
     }
 }
