@@ -11,10 +11,11 @@ namespace InGame.Tanihira
         [SerializeField] private FriendType[] _friendsTypes;
         [SerializeField] private FriendDatabase _friendDatabase;
         [SerializeField] private FormationManager _formationManager;
-        [SerializeField] private GameObject _ownerPlayer;
-        [SerializeField] private NetworkRunner _networkRunner;
+        [SerializeField] private NetworkObject _ownerPlayer;
         [SerializeField] private Transform _firstSpawnPoint;
         [SerializeField] private float _navmeshSerchRadius = 5.0f;
+        
+        private NetworkRunner _networkRunner;
 
         public void Start()
         {
@@ -34,10 +35,7 @@ namespace InGame.Tanihira
             //初期で登録されたフレンドを生成
             for (int i = 0; i < _friendsTypes.Length; i++)
             {
-                Transform pos = _firstSpawnPoint;
-                //仮で３の間隔開けている（複数スポーンするときのオフセット）
-                pos.transform.position += new Vector3(i * 3, 0, 0);
-                SpawnFriend(_friendsTypes[i], pos);
+                SpawnFriend(_friendsTypes[i], _firstSpawnPoint);
             }
         }
 

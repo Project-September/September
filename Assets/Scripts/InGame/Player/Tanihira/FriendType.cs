@@ -1,10 +1,10 @@
-using UnityEngine;
 
 namespace Ingame.Tanihira
 {
     public enum FriendType
     {
-        Penguin,
+        BossPenguin,
+        ChildPenguin,
         Pterodacty
     }
 }

@@ -1,6 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using Fusion;
+using InGame.Health;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -30,15 +30,17 @@ namespace Ingame.Tanihira
         [SerializeField, ReadOnly] protected Transform _destination;
         [SerializeField] protected FriendStatus _friendStatus;
         [SerializeField] protected Transform _formationPos;
+        [SerializeField] protected HitChecker _hitChecker;
+        [SerializeField, ReadOnly] protected FriendState _currentState;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
-        protected GameObject _ownerPlayer;
-        protected FriendState _currentState;
+        protected NetworkObject _ownerPlayer;
+        protected NetworkMecanimAnimator _mecanimAnimator;
+        protected FormationManager _formationManager;
 
         private static int _spawnCount;
-        private FormationManager _formationManager;
-        private NetworkMecanimAnimator _mecanimAnimator;
+        private bool _isAttack;
         
         // プロパティ
         public NavMeshAgent Agent => _agent;
@@ -50,6 +52,7 @@ namespace Ingame.Tanihira
         public FriendStatus FriendStatus => _friendStatus;
         public FriendState CurrentState => _currentState;
         public NetworkMecanimAnimator MecanimAnimator => _mecanimAnimator;
+        public bool IsAttack => _isAttack;
 
         protected virtual void Awake()
         {
@@ -82,6 +85,10 @@ namespace Ingame.Tanihira
         /// </summary>
         protected virtual void InitializeStates()
         {
+            //ヒット処理
+            _hitChecker.OnHit -= OnHitEnemy;
+            _hitChecker.OnHit += OnHitEnemy;
+            
             //アニメーションのルートモーションを不可
             if (_animator)
             {
@@ -99,7 +106,7 @@ namespace Ingame.Tanihira
         private void InitializeAgent()
         {
             _agent.angularSpeed = _friendStatus.FriendRotateSpeed;
-            _agent.speed = _friendStatus.FriendMoveSpeed;
+            _agent.speed = _friendStatus.FriendFormationSpeed;
         }
 
         /// <summary>
@@ -146,9 +153,35 @@ namespace Ingame.Tanihira
         /// オーナープレイヤーを設定
         /// </summary>
         /// <param name="ownerPlayer">オーナープレイヤー</param>
-        public void SetOwnerPlayer(GameObject ownerPlayer)
+        public void SetOwnerPlayer(NetworkObject ownerPlayer)
         {
             _ownerPlayer = ownerPlayer;
+        }
+        
+        private void OnHitEnemy(Collider hitInfo)
+        {
+            if (!HasStateAuthority) return;
+            
+            if (hitInfo.GetComponentInParent<NetworkObject>() == _ownerPlayer) return;
+            var damageable = hitInfo.GetComponentInParent<IDamageable>();
+            if (damageable == null) return;
+            var hitData = new HitData(
+                HitActionType.Damage,
+                _friendStatus.AttackPower,
+                _ownerPlayer.InputAuthority,
+                damageable.OwnerPlayerRef);
+            damageable.TakeHit(ref hitData);
+        }
+        
+        //アニメーションイベント用
+        public void StartAttack()
+        {
+            _isAttack = true;
+        }
+
+        public void EndAttack()
+        {
+            _isAttack = false;
         }
     }
 }

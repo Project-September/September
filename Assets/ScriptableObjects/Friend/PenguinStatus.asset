@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9bce80afb3ae2c45b56591a8effbdd4, type: 3}
   m_Name: PenguinStatus
   m_EditorClassIdentifier: 
-  _friendRotateSpeed: 120
-  _friendMoveSpeed: 3.5
-  _friendFormationMoveSpeed: 5
-  _frinedFormationDistance: 2
-  _friendChaseSpeed: 5
+  _maxHealth: 100
   _attackPower: 10
-  _attackRange: 1.5
+  _friendRotateSpeed: 200
+  _friendFormationMoveSpeed: 7
+  _frinedFormationDistance: 0.7
+  _friendChaseSpeed: 15
+  _frinedChaseStopDistance: 1
+  _friendStunTime: 10

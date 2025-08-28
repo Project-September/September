@@ -8,5 +8,12 @@ public enum EffectType
     LondonTelephoneActive,
     PtrFireMuzzle,
     PtrFireBullet,
-    PtrFireExplosion
+    PtrFireExplosion,
+    NormalInteractComplete,
+    CooldownRect,
+    CooldownSquare,
+    CooldownLine,
+    PunchImpact,
+    OpticalCamouflageInteractComplete,
+    StunNormal,
 }

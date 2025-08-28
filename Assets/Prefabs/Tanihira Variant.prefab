@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 611502171985657493}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.293}
+  m_LocalPosition: {x: 0, y: 0, z: -1.28}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -45,7 +45,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 12
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[9]'
@@ -59,6 +59,10 @@ PrefabInstance:
       propertyPath: 'NetworkedBehaviours.Array.data[11]'
       value: 
       objectReference: {fileID: 9128960786709165582}
+    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[12]'
+      value: 
+      objectReference: {fileID: 1037733087125527398}
     - target: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_Name
       value: Tanihira Variant
@@ -123,6 +127,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2957292007609013862}
   m_SourcePrefab: {fileID: 100100000, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+--- !u!114 &1037733087125527398 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4810525472409146702, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 5522732353369345576}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed08c58996a8b304297cb853a8ff84c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &3862667250155884466 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8736522266100138394, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -159,13 +174,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab6b58e15f61cef4f9e7eda7787f9cf0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _friendsTypes: 000000000000000000000000
+  _friendsTypes: 000000000100000001000000
   _friendDatabase: {fileID: 11400000, guid: 378195fd5e8c92a4ca92dcf50c72789c, type: 2}
   _formationManager: {fileID: 913702230075351532}
-  _ownerPlayer: {fileID: 4081215343970159104}
-  _networkRunner: {fileID: 0}
+  _ownerPlayer: {fileID: 7968417084068229509}
   _firstSpawnPoint: {fileID: 3476019141667097556}
-  _navmeshSerchRadius: 5
+  _navmeshSerchRadius: 100
 --- !u!114 &9128960786709165582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,7 +193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _detectionCenter: {fileID: 3862667250155884466}
-  _detectionRadius: 15
+  _detectionRadius: 10
   _detectionMask:
     serializedVersion: 2
     m_Bits: 64
@@ -187,7 +201,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 191
   _friendStateChanger: {fileID: 2957292007609013862}
-  _waitTime: 5
+  _waitTime: 15
 --- !u!114 &2957292007609013862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,5 +225,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c7244242fca19c4caa942020db8defa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7968417084068229509 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 5522732353369345576}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4081215343970159104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
