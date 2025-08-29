@@ -52,14 +52,14 @@ namespace InGame.Player.Ability
             }
         }
         
-        // protected override void OnEndAbility()
-        // {
-        //     if (_isSubscribe && _hitChecker != null)
-        //     {
-        //         _hitChecker.OnHit -= OnHitEnemy;
-        //         _isSubscribe = false;
-        //     }
-        //     base.OnEndAbility();
-        // }
+        protected override void OnEndAbility()
+        {
+            if (_isSubscribe && _hitChecker != null)
+            {
+                _hitChecker.OnHit -= OnHitEnemy;
+                _isSubscribe = false;
+            }
+            base.OnEndAbility();
+        }
     }
 }
