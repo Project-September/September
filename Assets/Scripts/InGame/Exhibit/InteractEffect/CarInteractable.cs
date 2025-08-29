@@ -1,7 +1,11 @@
 using System.Collections.Generic;
+using System.Numerics;
 using Fusion;
+using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.Splines;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 namespace InGame.Exhibit.InteractEffect
 {
@@ -13,8 +17,14 @@ namespace InGame.Exhibit.InteractEffect
         [Header("Move")]
         [SerializeField] private float _speed = 6f;
         [SerializeField] private Transform _target;
-        
         [SerializeField] private bool _loop = false;
+
+        [Header("EffectSettings")] 
+        [SerializeField] private float _hitEffectYOffset = 0.1f;
+
+        [Header("配置位置")] 
+        private Vector3 _initialPos;
+        private Quaternion _initialRot;
 
         [Header("減速設定")] 
         [SerializeField] private float _delayTime = 0.3f;
@@ -24,6 +34,7 @@ namespace InGame.Exhibit.InteractEffect
 
         private float _delayRemaining;
         private int _lastDelayKnotIndex = -1;
+        private EffectSpawner _effectSpawner;
 
         [Networked] private bool IsMoving { get; set; }
         [Networked] private float Progress {get; set;}
@@ -36,17 +47,23 @@ namespace InGame.Exhibit.InteractEffect
             if(_spline == null || _target == null)
                 return;
             
-            ApplyPose(Progress);
+            if(IsMoving) 
+                ApplyPose(Progress);
+            else
+                _target.SetPositionAndRotation(_initialPos, _initialRot);
         }
 
         public override void Spawned()
         {
+            _initialPos = _target.position;
+            _initialRot = _target.rotation;
+            
             if (_spline != null)
                 _approxCount = ApproxLength(_spline, 200);
+            
             CacheKnotWorldPositions();
         }
-
-        // 位置の同期がされていない＆ホストしかインタラクトが実行されない
+        
         public override void FixedUpdateNetwork()
         {
             if(!Object.HasStateAuthority || !IsMoving)
@@ -65,6 +82,8 @@ namespace InGame.Exhibit.InteractEffect
         {
             IsMoving = true;
             Progress = 0f;
+            _delayRemaining = 0;
+            _lastDelayKnotIndex = -1;
         }
 
         private void Move()
@@ -73,17 +92,16 @@ namespace InGame.Exhibit.InteractEffect
                 return;
 
             Spline spline = _spline.Spline;
-            // Spline 上の現在位置と姿勢を算出する
-            spline.Evaluate(Progress, out var localPos, out var localTan, out var localUp);
-
+            // Spline上の現在位置と姿勢を算出する
+            spline.Evaluate(Progress, out var localPos, out _, out _);
             Vector3 worldPos = _spline.transform.TransformPoint(localPos);
 
             if (_delayRemaining > 0f)
             {
                 _delayRemaining -= Runner.DeltaTime;
-                if (_delayRemaining < 0f) _delayRemaining = 0f;
+                if (_delayRemaining < 0f) 
+                    _delayRemaining = 0f;
                 
-                //ApplyPose(Progress);
                 return;
             }
 
@@ -124,16 +142,18 @@ namespace InGame.Exhibit.InteractEffect
             if (Progress >= 1f)
             {
                 if (_loop)
+                {
                     Progress -= 1f;
+                    _lastDelayKnotIndex = -1;
+                }
                 else
                 {
                     Progress = 1f;
                     IsMoving = false;
+                    // 元の展示位置へ戻す
+                    _target.SetPositionAndRotation(_initialPos, _initialRot);
                 }
             }
-
-            // Transformに反映
-            ApplyPose(Progress);
         }
 
         private void ApplyPose(float t)
@@ -159,7 +179,7 @@ namespace InGame.Exhibit.InteractEffect
             _knotWorldPositions.Clear();
             Spline spline = _spline.Spline;
 
-            foreach (BezierKnot knot in spline)
+            foreach (var knot in spline)
             {
                 Vector3 wp = _spline.transform.TransformPoint(knot.Position);
                 _knotWorldPositions.Add(wp);
@@ -172,8 +192,7 @@ namespace InGame.Exhibit.InteractEffect
             if (container == null || container.Spline == null)
                 return 0f;
 
-            var spline = container.Spline;
-
+            Spline spline = container.Spline;
             samples = Mathf.Max(2, samples);
             Vector3 prev = container.transform.TransformPoint(spline.EvaluatePosition(0f));
             float len = 0f;
@@ -187,6 +206,18 @@ namespace InGame.Exhibit.InteractEffect
             }
 
             return len;
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if(!Object.HasStateAuthority || !other.CompareTag("Player"))
+                return;
+
+            Vector3 playerPos = other.transform.position + Vector3.up * _hitEffectYOffset;
+            _effectSpawner?.RequestPlayOneShotEffect(
+                EffectType.CarHit,
+                playerPos,
+                Quaternion.identity);
         }
     }
 }

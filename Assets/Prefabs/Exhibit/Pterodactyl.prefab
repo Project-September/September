@@ -457,9 +457,9 @@ MonoBehaviour:
   Animator: {fileID: 7030523243637594336}
   ApplyTiming: 2
   SyncSettings: 79
-  StateHashes: 000000008a18fce4b9abd9d3
-  TriggerHashes: 00000000
-  TotalWords: 1
+  StateHashes: 000000008a18fce4b9abd9d30d286c404e865f43
+  TriggerHashes: 000000000d286c40
+  TotalWords: 2
 --- !u!114 &575448598117113101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,6 +519,11 @@ MonoBehaviour:
     - 5
   _characterEffects:
   - rid: 5190193564749135961
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
