@@ -8,6 +8,7 @@ namespace Ingame.Exhibit
     {
         [SerializeField] private HitChecker _hitChecker;
         [SerializeField] private int _hitDamage = 999;
+        [SerializeField] private Transform _underHitPos;
 
         private PlayerRef _ownerPlayer;
         
@@ -21,7 +22,7 @@ namespace Ingame.Exhibit
         private void OnHitCannon(Collider hitInfo)
         {
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
-            if (damageable == null) return;
+            if (damageable == null || hitInfo.transform.position.y < _underHitPos.position.y) return;
             var hitData = new HitData(
                 HitActionType.Damage,
                 _hitDamage,
