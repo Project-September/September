@@ -55,7 +55,7 @@ namespace InGame.Player
             _playerMovement = GetComponent<PlayerMovement>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
 
-            if (TryGetComponent(out CameraController cameraController))
+            if (TryGetComponent(out CameraController cameraController) && HasInputAuthority)
             {
                 _cameraController = cameraController;
                 cameraController.Init(IsLocalPlayer);
@@ -83,7 +83,7 @@ namespace InGame.Player
                     _cameraController.CameraReset();
                 }
                 
-                //_cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
+                _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
             }
         }
 

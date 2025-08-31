@@ -4,9 +4,9 @@ using September.Common;
 using UnityEngine;
 
 /// <summary>
-/// シンプルなMoverクラス。地面に沿って移動し、キャラを回転させる
+/// シンプルなMoverクラス。地面に沿って移動し、水平方向にキャラを回転させる
 /// </summary>
-public class PlayerMovementV2 : NetworkTRSP
+public class PlayerMovementV2 : NetworkBehaviour
 {
     [SerializeField] private Rigidbody _rb;
     [SerializeField] float _moveSpeed = 6f;   // 目標水平速度 [m/s]
@@ -14,21 +14,11 @@ public class PlayerMovementV2 : NetworkTRSP
     [SerializeField] private LayerMask _groundLayer = ~0;
     [SerializeField, Tooltip("地面と認識する最大角度")] private float _groundSlopeThreshold = 45f;
     [SerializeField] private float _groundCheckDistance = 0.5f;
-    [SerializeField] CameraController _cameraController;
     private PlayerInput _input;
     private float _isGroundTimer;
     private Vector3 _groundNormal = Vector3.up;
     
     public bool IsGround { get; set; }
-
-    public override void Spawned()
-    {
-        if (HasInputAuthority)
-        {
-            _cameraController = GetComponent<CameraController>();
-            _cameraController.Init(this);
-        }
-    }
 
     public override void FixedUpdateNetwork()
     {
