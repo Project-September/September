@@ -77,7 +77,7 @@ namespace InGame.Player
             CheckGroundManual();
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
-            // set velocity
+            //set velocity
             if (isJump) TryVault(moveDirection);
             if (_doingVault) UpdateVault(deltaTime);
             else
@@ -88,16 +88,16 @@ namespace InGame.Player
                 ApplyVelocity(deltaTime);
             }
             
-            // Character の回転
-            RotationByDirection(_rotationDirection, deltaTime);
+             // Character の回転
+             RotationByDirection(_rotationDirection, deltaTime);
             
-            // スタミナの更新
-            UpdateStamina(isDash, deltaTime);
+             // スタミナの更新
+             UpdateStamina(isDash, deltaTime);
             
-            // is ground の管理
-            if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
-            _isGround = false;
-            _groundNormal = Vector3.up;
+             // is ground の管理
+             if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
+             _isGround = false;
+             _groundNormal = Vector3.up;
         }
 
         /// <summary> カメラ視点の移動入力を取得 </summary>

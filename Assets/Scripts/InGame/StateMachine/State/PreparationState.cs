@@ -51,7 +51,7 @@ namespace September.Common
                     Context.AddPlayerObject(pair.Key, player);
                 }
                 var playerHealth = player.GetComponent<PlayerHealth>();
-                playerHealth.OnDeath += OnPlayerKilled;
+                if (playerHealth) playerHealth.OnDeath += OnPlayerKilled;
                 //PlayerHealthのOnDeathに登録
             }
             Context.Register(StaticServiceLocator.Instance);

@@ -54,6 +54,7 @@ namespace September.InGame.Effect
         /// </summary>
         public void RequestPlayOneShotEffect(EffectType effectType, Vector3 position, Quaternion rotation)
         {
+            Debug.LogError(effectType);
             RPC_PlayEffect(effectType, position, rotation, false, string.Empty, default(NetworkId));
         }
 
@@ -71,7 +72,8 @@ namespace September.InGame.Effect
                     parentNetworkId = parentNetworkObject.Id;
                 }
             }
-            
+
+            Debug.LogError(effectType);
             RPC_PlayEffect(effectType, position, rotation, false, string.Empty, parentNetworkId);
         }
         

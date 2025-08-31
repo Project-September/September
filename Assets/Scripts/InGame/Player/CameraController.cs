@@ -1,3 +1,4 @@
+using System;
 using Cinemachine;
 using DG.Tweening;
 using Unity.Mathematics;
@@ -14,6 +15,7 @@ namespace InGame.Player
         [SerializeField] private Transform _cameraPivot;
         [SerializeField] private Transform _cameraTf;
         [SerializeField] private CinemachineVirtualCameraBase _camera;
+        [SerializeField] private Vector3 _cameraOffset = new Vector3(0, 1.65f, 0);
         [Header("CameraCollision")]
         [SerializeField] private LayerMask _collideAgainst = ~0;
         [SerializeField] private float _cameraRadius;
@@ -38,6 +40,10 @@ namespace InGame.Player
             _cameraPivot.gameObject.SetActive(use);
             if (!use) return;
 
+            _cameraPivot = GameObject.Find("PlayerCameraPivot").transform;
+            _camera = _cameraPivot.GetComponentInChildren<CinemachineVirtualCamera>();
+            _cameraTf = _camera.transform;
+            _camera.Priority = 10000;
             // Prefabの初期状態をデフォルトとして保存
             _defaultRotation = _cameraPivot.localRotation;
             _currentOffset = _cameraTf.localPosition;
@@ -46,6 +52,7 @@ namespace InGame.Player
 
         private void LateUpdate()
         {
+            _cameraPivot.position = _characterTf.position + _cameraOffset;
             CheckCameraDistance();
         }
 

@@ -26,6 +26,7 @@ namespace InGame.Player.Ability
             
             if (!_isSubscribe)
             {
+                //Debug.Log($"Subscribe {Time.time}");
                 _isSubscribe = true;
                 _hitChecker.OnHit += OnHitEnemy;
             }
@@ -56,8 +57,10 @@ namespace InGame.Player.Ability
         {
             if (_isSubscribe && _hitChecker != null)
             {
+                //Debug.Log($"Unsubscribe OnHitEnemy {Time.time}");
                 _hitChecker.OnHit -= OnHitEnemy;
                 _isSubscribe = false;
+                _hitChecker.IsFinished = false;
             }
             base.OnEndAbility();
         }

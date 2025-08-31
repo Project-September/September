@@ -52,7 +52,7 @@ namespace InGame.Player
                 hitData.Executor?.HitExecution(hitData);
             }
             
-            RPC_HitDebug(hitData.HitActionType);
+            //RPC_HitDebug(hitData.HitActionType);
             Debug.Log(hitData + $"\nHealth:     {_status.CurrentHealth}");
         }
 
