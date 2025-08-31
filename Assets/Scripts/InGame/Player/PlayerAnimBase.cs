@@ -10,12 +10,12 @@ namespace InGame.Player
         [SerializeField] private string _pramIsGround = "IsGround";
         
         private PlayerManager _playerManager;
-        private PlayerMovement _playerMovement;
+        private PlayerMovementV2 _playerMovement;
 
         public void Init(PlayerManager playerManager)
         {
             _playerManager = playerManager;
-            _playerMovement = GetComponent<PlayerMovement>();
+            _playerMovement = GetComponent<PlayerMovementV2>();
         }
 
         public override void FixedUpdateNetwork()
