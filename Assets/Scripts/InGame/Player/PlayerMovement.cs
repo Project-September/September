@@ -98,26 +98,26 @@ namespace InGame.Player
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
             // set velocity
-            if (isJump) TryVault(moveDirection);
-            if (_doingVault) UpdateVault(deltaTime);
-            else
+            //if (isJump) TryVault(moveDirection);
+            //if (_doingVault) UpdateVault(deltaTime);
+            //else
             {
                 ApplyGrav(deltaTime);
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
-                AdsorptionOnGround();
+                //AdsorptionOnGround();
                 ApplyVelocity(deltaTime);
             }
             
             // Character の回転
-            RotationByDirection(_rotationDirection, deltaTime);
+            //RotationByDirection(_rotationDirection, deltaTime);
             
             // スタミナの更新
-            UpdateStamina(isDash, deltaTime);
+            //UpdateStamina(isDash, deltaTime);
             
             // is ground の管理
             if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
-            _isGround = false;
-            _groundNormal = Vector3.up;
+            // _isGround = false;
+            // _groundNormal = Vector3.up;
         }
 
         /// <summary> カメラ視点の移動入力を取得 </summary>
@@ -139,23 +139,23 @@ namespace InGame.Player
                 return;
             }
             
-            // Dash処理
-            isDash = isDash && CanDash;
-            
-            // Dash中ならスタミナを消費させる
-            if (isDash && moveDirection != Vector2.zero)
-            {
-                if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _staminaConsumption * deltaTime);
-
-                // スタミナなくなったら
-                if (_status.CurrentStamina <= 0)
-                {
-                    // クールタイムに入れて一定時間後に解除
-                    _isDashCoolTime = true;
-                    Observable.Timer(TimeSpan.FromSeconds(_dashCooldown))
-                        .Subscribe(_ => _isDashCoolTime = false).AddTo(this);
-                }
-            }
+            // // Dash処理
+            // isDash = isDash && CanDash;
+            //
+            // // Dash中ならスタミナを消費させる
+            // if (isDash && moveDirection != Vector2.zero)
+            // {
+            //     if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _staminaConsumption * deltaTime);
+            //
+            //     // スタミナなくなったら
+            //     if (_status.CurrentStamina <= 0)
+            //     {
+            //         // クールタイムに入れて一定時間後に解除
+            //         _isDashCoolTime = true;
+            //         Observable.Timer(TimeSpan.FromSeconds(_dashCooldown))
+            //             .Subscribe(_ => _isDashCoolTime = false).AddTo(this);
+            //     }
+            // }
             
             CalcMoveVelocity(moveDirection, isDash, deltaTime);
         }
@@ -165,15 +165,15 @@ namespace InGame.Player
         {
             float lastMoveMag = _moveVelocity.magnitude;
             // is ground で摩擦量が変わる
-            float friction = (IsGround ? _friction : _airFriction) * deltaTime;
+            //float friction = (IsGround ? _friction : _airFriction) * deltaTime;
             
             // 入力がある場合
             if (moveDir != Vector2.zero)
             {
                 Vector3 moveDir3 = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveDir.x, 0, moveDir.y);
                 // 加速
-                float acceleration = (IsGround ? isDash ? _dashAcceleration : _acceleration : _airAcceleration) * deltaTime;
-                Vector3 targetVelocity = _moveVelocity + moveDir3 * acceleration;
+                //float acceleration = (IsGround ? isDash ? _dashAcceleration : _acceleration : _airAcceleration) * deltaTime;
+                Vector3 targetVelocity = moveDir3; //* acceleration;
             
                 float maxSpeed = (isDash ? _maxDashSpeed : _maxMoveSpeed) * _status.MaxSpeedRate;
                 float moveMag = targetVelocity.magnitude;
@@ -181,18 +181,20 @@ namespace InGame.Player
                 if (!IsGround)
                 {
                     // 空中は加速も摩擦もかける
-                    _moveVelocity = (moveMag - friction) / moveMag * targetVelocity;
+                    _moveVelocity = (moveMag) / moveMag * targetVelocity;
                 }
                 else if (moveMag > maxSpeed) // todo:加速後のVectorから計算したいけど摩擦の計算時に加速を入れたくない
                 {
+                    Debug.Log("MaxSpeed Over");
                     // 入力があってMaxSpeedを超えた場合、摩擦をかけるがMaxSpeedを下回らない
-                    friction = Mathf.Min(friction, lastMoveMag - maxSpeed);
-                    _moveVelocity = (lastMoveMag - friction) / moveMag * targetVelocity;
+                    //friction = Mathf.Min(friction, lastMoveMag - maxSpeed);
+                    _moveVelocity = targetVelocity.normalized * maxSpeed;
                 }
                 else // max speed を超えない場合
                 {
+                    Debug.Log("MaxSpeed Not Over");
                     // 加速する
-                    _moveVelocity = targetVelocity;
+                    _moveVelocity = targetVelocity.normalized * maxSpeed;
                 }
 
                 //_moveVelocity = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveVelocity2.x, 0, moveVelocity2.y);
@@ -201,11 +203,13 @@ namespace InGame.Player
             else // 入力がなかった場合
             {
                 // 摩擦をかけるだけ
-                Vector3 frictionVec = friction * -_moveVelocity.normalized;
-                frictionVec = Vector3.ClampMagnitude(frictionVec, _moveVelocity.magnitude);
-                frictionVec.y = 0;
-                _moveVelocity += frictionVec;
+                // Vector3 frictionVec = friction * -_moveVelocity.normalized;
+                // frictionVec = Vector3.ClampMagnitude(frictionVec, _moveVelocity.magnitude);
+                // frictionVec.y = 0;
+                // _moveVelocity += frictionVec;
             }
+            
+            //Debug.Log($"空中か{IsGround} 速度{_moveVelocity.magnitude} 目標{moveDir} 方向{_rotationDirection} 向き{_moveVelocity}");
         }
 
         void ApplyGrav(float deltaTime)
@@ -237,7 +241,7 @@ namespace InGame.Player
             // 速度の代入
             _rb.linearVelocity = _moveVelocity;
             // 回転の向きを代入
-            if (!_setDirection) _rotationDirection = _moveVelocity;
+            //if (!_setDirection) _rotationDirection = _moveVelocity;
         }
 
         /// <summary> 指定方向に回転する </summary>

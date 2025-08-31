@@ -97,10 +97,10 @@ namespace InGame.Player
             }
             
             // プレイヤーの入力の管理
-            if (_playerControlState == PlayerControlState.Normal && !_playerMovement.CanMove && !IsStun)
-            {
-                _playerMovement.CanMove = true;
-            }
+            // if (_playerControlState == PlayerControlState.Normal && !_playerMovement.CanMove && !IsStun)
+            // {
+            //     _playerMovement.CanMove = true;
+            // }
 
             if (_shouldWarp)
             {
