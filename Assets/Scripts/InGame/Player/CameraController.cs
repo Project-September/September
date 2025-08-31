@@ -37,7 +37,6 @@ namespace InGame.Player
 
         public void Init(bool use)
         {
-            _cameraPivot.gameObject.SetActive(use);
             if (!use) return;
 
             _cameraPivot = GameObject.Find("PlayerCameraPivot").transform;
@@ -52,8 +51,21 @@ namespace InGame.Player
 
         private void LateUpdate()
         {
+            if (_cameraPivot == null)
+            {
+                _cameraPivot = GameObject.Find("PlayerCameraPivot").transform;
+                _camera = _cameraPivot.GetComponentInChildren<CinemachineVirtualCamera>();
+                _cameraTf = _camera.transform;
+                _camera.Priority = 10000;
+                // Prefabの初期状態をデフォルトとして保存
+                _defaultRotation = _cameraPivot.localRotation;
+                _currentOffset = _cameraTf.localPosition;
+                _defaultOffset = _cameraTf.localPosition;
+            }
+
             _cameraPivot.position = _characterTf.position + _cameraOffset;
             CheckCameraDistance();
+            RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
         }
 
         /// <summary> 入力からカメラを回転させる </summary>

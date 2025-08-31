@@ -83,7 +83,7 @@ namespace InGame.Player
                     _cameraController.CameraReset();
                 }
                 
-                _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
+                //_cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
             }
         }
 
@@ -97,21 +97,21 @@ namespace InGame.Player
                 }
             }
             
-            // プレイヤーの入力の管理
-            if (GetInput<PlayerInput>(out var input) && !IsStun && _playerControlState == PlayerControlState.Normal)
-            {
-                // player movement に入力を与えて更新する
-                _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
-                    input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
-            }
-
-            if (_shouldWarp)
-            {
-                transform.position = _targetPosition;
-                transform.rotation = _targetRotation;
-                _cameraController.CameraReset();
-                _shouldWarp = false;
-            }
+            // // プレイヤーの入力の管理
+            // if (GetInput<PlayerInput>(out var input) && !IsStun && _playerControlState == PlayerControlState.Normal)
+            // {
+            //     // player movement に入力を与えて更新する
+            //     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
+            //         input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+            // }
+            //
+            // if (_shouldWarp)
+            // {
+            //     transform.position = _targetPosition;
+            //     transform.rotation = _targetRotation;
+            //     _cameraController.CameraReset();
+            //     _shouldWarp = false;
+            // }
         }
 
         public void AfterTick()
