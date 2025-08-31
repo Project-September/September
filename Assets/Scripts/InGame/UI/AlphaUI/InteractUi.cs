@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,27 +20,27 @@ namespace September.InGame.UI
         [SerializeField] private Image _interactFillImage; // インタラクトの進行状況を示すUIのイメージ
         [SerializeField] private RectTransform _root;
         [SerializeField] private RectTransform _rootParentRectTransform;
-        private Camera _camera;
         private readonly ConnectionState _connectionState = ConnectionState.Remote;
         private GameObject _targetObject;
-
-        private void Awake()
+        CancellationTokenSource _cts;
+        void OnEnable()
         {
-            if (_connectionState == ConnectionState.Local)
-            {
-                // ローカル接続の初期化処理
-            }
-            else
-            {
-                _camera = Camera.main;
-            }
+            _cts = new CancellationTokenSource();
+            FollowEndOfFrame(_cts.Token).Forget();
+        }
+        void OnDisable()
+        {
+            _cts.Cancel();
+            _cts.Dispose();
         }
 
-        private void Start()
+        async UniTaskVoid FollowEndOfFrame(CancellationToken token)
         {
-            var canvas = _root.GetComponentInParent<Canvas>();
-            var container = (_root.parent as RectTransform);
-            Debug.Log($"mode={canvas.renderMode}, uiCam={(canvas.worldCamera?canvas.worldCamera.name:"null")}, parentPivot={container.pivot}, parentSize={container.rect.size}");
+            while (!token.IsCancellationRequested)
+            {
+                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
+                UpdateUiPosition();
+            }
         }
 
         public void SetActive(bool isShow, GameObject target = null)
@@ -52,20 +54,17 @@ namespace September.InGame.UI
             {
                 _root.gameObject.SetActive(isShow);
             }
-            
         }
         
         public void SetInteractProgress(float progress)
         {
-            // インタラクトの進行状況を更新するメソッド
-            // progressは0から1の範囲で、0が未開始、1が完了を示す
             if (_interactFillImage)
             {
                 _interactFillImage.fillAmount = Mathf.Clamp01(progress);
             }
         }
 
-        void LateUpdate()
+        private void UpdateUiPosition()
         {
             if (!_root || !_targetObject) return;
 
@@ -80,7 +79,11 @@ namespace September.InGame.UI
 
             // World -> Screen
             Vector3 sp = worldCam.WorldToScreenPoint(world);
-            if (sp.z < 0f) { _root.gameObject.SetActive(false); return; } // カメラ背面なら非表示など
+            if (sp.z < 0f)
+            {
+                _root.gameObject.SetActive(false);
+                return;
+            } // カメラ背面なら非表示など
             if (!_root.gameObject.activeSelf) _root.gameObject.SetActive(true);
 
             // Screen -> Container(Local) （Overlayは cam=null）
