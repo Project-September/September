@@ -35,6 +35,7 @@ namespace InGame.Exhibit
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
         private float _currentTargetValue;
+        private NetworkMecanimAnimator _mecanimAnimator;
 
         [Networked, OnChangedRender(nameof(OnChangeAnimation))]
         private float CurrentBlendValue { get; set; }
@@ -44,6 +45,7 @@ namespace InGame.Exhibit
         #region AnimationHash
 
         private static readonly int FlyStateBlend = Animator.StringToHash("FlyStateBlend");
+        private static readonly int Attack = Animator.StringToHash("Attack");
 
         #endregion
 
@@ -58,6 +60,7 @@ namespace InGame.Exhibit
             if (HasStateAuthority)
                 Rigidbody.isKinematic = false;
             
+            _mecanimAnimator =  GetComponent<NetworkMecanimAnimator>();
             Animator.enabled = IsInteracting;
         }
 
@@ -108,7 +111,7 @@ namespace InGame.Exhibit
                 
             if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _fireCooldownTimerSec >= _fireCooldown)
             {
-                Server_Fire();
+                Fire();
             }
         }
 
@@ -172,15 +175,13 @@ namespace InGame.Exhibit
                 CurrentBlendValue = next;
         }
 
-        private void Server_Fire()
+        private void Fire()
         {
             if (_muzzle == null)
             {
                 Debug.LogError("Muzzle is null");
                 return;
             }
-            
-            PlayMuzzleFlash(_muzzle.position, _muzzle.rotation);
             
             Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
             
@@ -215,6 +216,9 @@ namespace InGame.Exhibit
             if(!_fireParticle)
                 return;
             
+            _mecanimAnimator.SetTrigger(Attack);
+            PlayMuzzleFlash(_muzzle.position, _muzzle.rotation);
+            
             GameObject instance = Instantiate(_fireParticle,spawnPos, rotation);
 
             if (instance.TryGetComponent<Rigidbody>(out var rb))
@@ -236,19 +240,3 @@ namespace InGame.Exhibit
         }
     }
 }
-
-// private void OnDrawGizmos()
-// {
-//     if (_muzzle == null)
-//         return;
-//
-//     // 斜め下方向を計算
-//     Vector3 angledForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.transform.right) *
-//                             _muzzle.transform.forward;
-//
-//     // Gizmoの色設定
-//     Gizmos.color = Color.red;
-//
-//     // 発射方向の可視化
-//     Gizmos.DrawRay(_muzzle.transform.position, angledForward * _rayDistance);
-// }

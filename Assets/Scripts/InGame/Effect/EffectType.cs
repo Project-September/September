@@ -16,4 +16,5 @@ public enum EffectType
     PunchImpact,
     OpticalCamouflageInteractComplete,
     StunNormal,
+    CarHit,
 }
