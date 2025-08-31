@@ -22,19 +22,20 @@ namespace Ingame.Exhibit
                 if (player != requestingPlayer)
                 {
                     NetworkObject playerObject = Runner.GetPlayerObject(player);
-                    ShotCannon(playerObject.transform);
+                    ShotCannon(playerObject.transform, requestingPlayer);
                 }
             }
         }
 
-        private void ShotCannon(Transform playerPos)
+        private void ShotCannon(Transform playerPos, PlayerRef requestingPlayer)
         {
             //上からrayを下ろし、当たった箇所にサテライトキャノンを降らせる
             RaycastHit hit;
             Vector3 rayCastOrigin = new Vector3(playerPos.position.x, _rayCastHeight, playerPos.position.z);
             if (Physics.Raycast(rayCastOrigin, Vector3.down, out hit, _hitDistance, _raycastMask))
             {
-                Instantiate(_sateliteCannonPrefab, hit.point, Quaternion.identity);
+                var satelite = Instantiate(_sateliteCannonPrefab, hit.point, Quaternion.identity);
+                satelite.GetComponent<SateliteCannonHitChacker>().SetOwnerPlayer(requestingPlayer);
             }
             else
             {
