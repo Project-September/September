@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Fusion;
+using September.Common;
 using UniRx;
 using UnityEngine;
 
 namespace InGame.Player
 {
     /// <summary> プレイヤーの移動 </summary>
-    public class PlayerMovement : NetworkBehaviour
+    public class PlayerMovement : NetworkBehaviour, IAfterTick
     {
         [Header("BasicMove")]
         [SerializeField] private CapsuleCollider _moveCapsuleCollider;
@@ -36,6 +37,10 @@ namespace InGame.Player
         [Header("Gizmos")]
         [SerializeField] private float _gizmoDisplayDuration;
         [SerializeField] private int _visibleBit;
+        [Header("References")]
+        [SerializeField] private PlayerManager _playerManager;
+        [Networked] public NetworkBool CanMove { get; set; }
+        [Networked] private NetworkButtons PreviousButtons { get; set; }
 
         private Rigidbody _rb;
         private PlayerStatus _status;
@@ -71,8 +76,23 @@ namespace InGame.Player
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
         }
+        
+        public void AfterTick()
+        {
+            PreviousButtons = GetInput<PlayerInput>().GetValueOrDefault().Buttons;
+        }
 
-        public void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
+        public override void FixedUpdateNetwork()
+        {
+            if (GetInput<PlayerInput>(out var input) && CanMove)
+            {
+                // player movement に入力を与えて更新する
+                UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
+                    input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+            }
+        }
+
+        private void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
             CheckGroundManual();
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
@@ -218,12 +238,6 @@ namespace InGame.Player
             _rb.linearVelocity = _moveVelocity;
             // 回転の向きを代入
             if (!_setDirection) _rotationDirection = _moveVelocity;
-        }
-
-        public void SetRotationDirection(Vector3 lookDirection)
-        {
-            _rotationDirection = lookDirection;
-            _setDirection = true;
         }
 
         /// <summary> 指定方向に回転する </summary>

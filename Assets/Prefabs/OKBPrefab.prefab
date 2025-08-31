@@ -5087,7 +5087,7 @@ GameObject:
   - component: {fileID: 7508249662566368237}
   - component: {fileID: 2779401866583128900}
   m_Layer: 6
-  m_Name: OkbPrefab
+  m_Name: OKBPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5223,6 +5223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82df9dd14a0794b429f808e8d246e3c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerMovement: {fileID: 0}
   _colliderObj: {fileID: 2287520664147054077}
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 3
@@ -5240,6 +5241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 587e83a63041ba6409720410fb73af1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
   _moveCapsuleCollider: {fileID: 3128034714514688337}
   _gravity: 30
   _acceleration: 20
@@ -5287,6 +5289,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   _gizmoDisplayDuration: 1
   _visibleBit: 0
+  _playerManager: {fileID: -4668177863944640257}
+  _CanMove:
+    _value: 1
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0

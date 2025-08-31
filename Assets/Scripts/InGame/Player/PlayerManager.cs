@@ -12,13 +12,13 @@ namespace InGame.Player
     /// <summary>
     /// Playerのどこまでの機能を入れるかは未定
     /// </summary>
-    public class PlayerManager : NetworkBehaviour, IAfterTick
+    public class PlayerManager : NetworkBehaviour
     {
+        [SerializeField] PlayerMovement _playerMovement;
         [SerializeField] GameObject _colliderObj;
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
         
-        PlayerMovement _playerMovement;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
         PlayerControlState _playerControlState = PlayerControlState.Normal;
@@ -41,7 +41,7 @@ namespace InGame.Player
         
         public bool IsLocalPlayer => HasInputAuthority;
         
-        [Networked] private NetworkButtons PreviousButtons { get; set; }
+        
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
 
         public override void Spawned()
@@ -52,7 +52,6 @@ namespace InGame.Player
         /// <summary> Player関連コンポーネントの初期化 </summary>
         void InitComponents()
         {
-            _playerMovement = GetComponent<PlayerMovement>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
 
             if (TryGetComponent(out CameraController cameraController))
@@ -98,11 +97,9 @@ namespace InGame.Player
             }
             
             // プレイヤーの入力の管理
-            if (GetInput<PlayerInput>(out var input) && !IsStun && _playerControlState == PlayerControlState.Normal)
+            if (_playerControlState == PlayerControlState.Normal && !_playerMovement.CanMove && !IsStun)
             {
-                // player movement に入力を与えて更新する
-                _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
-                    input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+                _playerMovement.CanMove = true;
             }
 
             if (_shouldWarp)
@@ -112,11 +109,6 @@ namespace InGame.Player
                 _cameraController.CameraReset();
                 _shouldWarp = false;
             }
-        }
-
-        public void AfterTick()
-        {
-            PreviousButtons = GetInput<PlayerInput>().GetValueOrDefault().Buttons;
         }
 
         /// <summary> 気絶が終わったとき </summary>
