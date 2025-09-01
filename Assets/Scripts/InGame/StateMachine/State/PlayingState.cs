@@ -12,6 +12,7 @@ namespace September.Common
             //  制限時間カウント開始
             TickTimer = TickTimer.CreateFromSeconds(Context.Runner, Context.TimerData.GameTime);
             InGame_PlayBGM(Context.InGameBGMCueName);
+            Context.GameStarted?.Invoke();
         }
 
         protected internal override void OnNetworkFixedUpdate()

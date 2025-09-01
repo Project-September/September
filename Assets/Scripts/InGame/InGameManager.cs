@@ -4,6 +4,7 @@ using Fusion;
 using NaughtyAttributes;
 using September.Common;
 using September.InGame.UI;
+using Unity.Plastic.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 namespace September.InGame.Common
@@ -28,6 +29,8 @@ namespace September.InGame.Common
         public int AddScore => _addScore;
         public string InGameBGMCueName => _inGameBGMCueName;
         public string CurrentBGM { get; set; }
+        
+        public Action GameStarted { get; set; }
 
         public void Register(ServiceLocator locator)
         {
