@@ -1,7 +1,6 @@
 using Fusion;
 using InGame.Health;
 using UnityEngine;
-using static PlasticGui.PlasticTableColumn;
 
 namespace Ingame.Exhibit
 {
