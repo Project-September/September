@@ -310,6 +310,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1450576261565196690}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 729834472514017027}
   m_SourcePrefab: {fileID: 100100000, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
 --- !u!4 &2415067396731086122 stripped
 Transform:
@@ -454,9 +457,9 @@ MonoBehaviour:
   Animator: {fileID: 7030523243637594336}
   ApplyTiming: 2
   SyncSettings: 79
-  StateHashes: 000000008a18fce4b9abd9d3
-  TriggerHashes: 00000000
-  TotalWords: 1
+  StateHashes: 000000008a18fce4b9abd9d30d286c404e865f43
+  TriggerHashes: 000000000d286c40
+  TotalWords: 2
 --- !u!114 &575448598117113101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -505,28 +508,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 01000000
+    keys: 0100000002000000
     values:
-    - 3
+    - 5
+    - 5
   _cooldownTimeDictionary:
-    keys: 01000000
+    keys: 0100000002000000
     values:
-    - 3
+    - 5
+    - 5
   _characterEffects:
-  - rid: 3030609879844782089
+  - rid: 5190193564749135961
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
   references:
     version: 2
     RefIds:
-    - rid: 3030609879844782089
+    - rid: 5190193564749135961
       type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 1
         _interactTime: 20
         _getOffPoint: {fileID: 302465785191893965}
         _pterodactylInteractable: {fileID: 575448598117113101}
+--- !u!114 &729834472514017027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3084925805453180816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 1450576261565196690}
 --- !u!1001 &3456470937934892131
 PrefabInstance:
   m_ObjectHideFlags: 0

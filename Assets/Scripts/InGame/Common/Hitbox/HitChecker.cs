@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using Fusion;
+using InGame.Health;
+using JetBrains.Annotations;
+using UnityEngine;
+
+public class HitChecker : MonoBehaviour
+{
+    [SerializeField] private List<Transform> _hitPoints = new();
+    [SerializeField] private float _radius = 0.1f;
+    
+    [SerializeField] private List<Collider> _alreadyHit = new();
+    private MeleeHitboxExecutor _executor;
+    public bool IsFinished = false;
+    public event Action<Collider> OnHit;
+    
+    public void StartHitCheck()
+    {
+        _executor = new MeleeHitboxExecutor(_hitPoints, _radius)
+        {
+            OnHit = item =>
+            {
+                if (!item) return;
+                if (_alreadyHit.Contains(item)) return; // 既にヒット済みのColliderは無視
+                _alreadyHit.Add(item); // ヒット済みとして登録
+                OnHit?.Invoke(item); // ヒットイベントを発火
+            }
+        };
+        IsFinished = false;
+    }
+    
+    private void Update()
+    {
+        _executor?.Tick(Time.deltaTime);
+    }
+
+    public void EndHitCheck()
+    {
+        if (_executor != null)
+        {
+            _executor.OnHit = null; // ヒットイベントを解除
+            _executor = null; // Executorを解放
+            IsFinished = true; // ヒットチェックが終了したことを通知
+            _alreadyHit.Clear(); // ヒット済みリストをクリア
+        }
+    }
+}

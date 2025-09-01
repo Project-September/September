@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AnimationClipsContainer
   m_EditorClassIdentifier: 
   _animationMontages:
-  - AnimClip: {fileID: 1827226128182048838, guid: c51825af470896f4fb4def9482b406b6, type: 3}
+  - AnimClip: {fileID: 7400000, guid: 60c28bdfb725c81419321d4c49a63d73, type: 2}
     BlendIn:
       BlendTime: 0
       BlendCurve:
@@ -66,3 +66,6 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 0
+    AvatarMask: {fileID: 31900000, guid: 65530cec825e75e48aacc6fd6282151c, type: 2}
+    IsAdditive: 1
+    UseRootMotion: 0
