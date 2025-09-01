@@ -11,7 +11,18 @@ namespace Ingame.Exhibit
         [SerializeField] private Transform _underHitPos;
 
         private PlayerRef _ownerPlayer;
-        
+        private NetworkRunner _networkRunner;
+
+        private void Awake()
+        {
+            //_networkRunner = FindFirstObjectByType<NetworkRunner>();
+            //if (_networkRunner == null)
+            //{
+            //    Debug.LogError("NetworkRunnerがありません");
+            //}
+            //if (!_networkRunner.IsServer) return;
+        }
+
         private void Start()
         {
             //ヒット処理
@@ -22,15 +33,17 @@ namespace Ingame.Exhibit
         private void OnHitCannon(Collider hitInfo)
         {
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
-            if (damageable == null || hitInfo.transform.position.y < _underHitPos.position.y) return;
+            if (damageable == null || hitInfo.transform.position.y < _underHitPos.position.y) 
+                return;
+            //if (damageable.OwnerPlayerRef != _networkRunner.LocalPlayer)
+            //    return;
+
             var hitData = new HitData(
                 HitActionType.Damage,
                 _hitDamage,
                 _ownerPlayer,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
-            
-            Debug.Log(_ownerPlayer);
         }
 
         public void SetOwnerPlayer(PlayerRef playerRef)
