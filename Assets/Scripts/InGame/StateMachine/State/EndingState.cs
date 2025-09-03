@@ -11,6 +11,7 @@ namespace September.Common
 {
     public class EndingState : ImtStateMachine<InGameManager>.State
     {
+        [SerializeField] private GameObject _resultUI;
         protected internal override void OnEnter()
         {
             GameEnded().Forget();
@@ -21,8 +22,13 @@ namespace September.Common
             GetScore();
             await UniTask.Delay(TimeSpan.FromSeconds(Context.TimerData.EndGameDelay));
             Context.Cts.Cancel();
+            
+            // ここにリザルトの処理
+            await ShowResult();
+            
             ShowCursor();
-            if(!string.IsNullOrEmpty(Context.CurrentBGM)) CRIAudio.StopBGM("BGM", Context.CurrentBGM);
+            if(!string.IsNullOrEmpty(Context.CurrentBGM)) 
+                CRIAudio.StopBGM("BGM", Context.CurrentBGM);
             await NetworkManager.Instance.QuitInGame();
         }
         private void ShowCursor()
@@ -44,6 +50,15 @@ namespace September.Common
             var scores = ordered.Select(x => x.score).ToArray();
             RPC_SetRankingData(names, scores);
         }
+
+        private async UniTask ShowResult()
+        {
+            // InGameのUIを消す
+            // ResultのUIを出す
+            // FinishテキストをだしてResultUIを出す
+            // カメラを少しずらしてPlayerを左にする
+        }
+        
         [Rpc]
         private void RPC_SetRankingData(string[] names, int[] scores)
         {

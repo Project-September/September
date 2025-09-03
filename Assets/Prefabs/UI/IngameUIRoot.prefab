@@ -55,14 +55,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ca51593018e4e9db9d39cbf92633591, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <OptionUI>k__BackingField: {fileID: 4966429707506421182}
-  <KillLogPanel>k__BackingField: {fileID: 484323229334194163}
-  <KillLogText>k__BackingField: {fileID: 4193082005116193338}
-  <OgreUI>k__BackingField: {fileID: 5212011543543442690}
-  <HpBar>k__BackingField: {fileID: 2929237849895824226}
-  <StaminaBar>k__BackingField: {fileID: 1925335956997751062}
-  <InteractUI>k__BackingField: {fileID: 4614780362360993559}
-  <TimerText>k__BackingField: {fileID: 2163787292603525904}
+  _optionUI: {fileID: 0}
+  _killLogPanel: {fileID: 484323229334194163}
+  _killLogText: {fileID: 4193082005116193338}
+  _ogreUI: {fileID: 5212011543543442690}
+  _hpBar: {fileID: 2929237849895824226}
+  _staminaBar: {fileID: 1925335956997751062}
+  _interactUI: {fileID: 4614780362360993559}
+  _timerText: {fileID: 2163787292603525904}
 --- !u!1 &484323229334194163
 GameObject:
   m_ObjectHideFlags: 0
@@ -1572,11 +1572,6 @@ PrefabInstance:
 --- !u!224 &3265489697535288187 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5212912065641068019, guid: d34db57b9e7437b428b3812da8f0b5d3, type: 3}
-  m_PrefabInstance: {fileID: 7279684464956659336}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &4966429707506421182 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2444029574346300214, guid: d34db57b9e7437b428b3812da8f0b5d3, type: 3}
   m_PrefabInstance: {fileID: 7279684464956659336}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7981868646773080647

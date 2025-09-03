@@ -91,7 +91,7 @@ namespace InGame.Exhibit
             if (_interactTimer >= _interactTime)
                 return true;
 
-            return !_pterodactylInteractable.IsAlive;
+            return _pterodactylInteractable.IsDefeated;
         }
 
         public override CharacterInteractEffectBase Clone()

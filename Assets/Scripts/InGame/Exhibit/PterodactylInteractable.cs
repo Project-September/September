@@ -1,5 +1,6 @@
 using CRISound;
 using Fusion;
+using InGame.Health;
 using InGame.Interact;
 using NaughtyAttributes;
 using September.Common;
@@ -17,6 +18,8 @@ namespace InGame.Exhibit
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _rotationSpeed = 5f;
         [SerializeField] private float _turnThreshold = 30f;
+        [SerializeField] private float _deathFallImpulse = 8f;
+        [SerializeField] private bool _resetGravityGetOff;
 
         [Header("BulletSettings")]
         [SerializeField] private Transform _muzzle;
@@ -25,8 +28,10 @@ namespace InGame.Exhibit
         [SerializeField] private GameObject _fireParticle;
         [SerializeField] private float _fireSpeed = 20f;
         [SerializeField] private float _rayDistance = 100f;
-        [SerializeField] private LayerMask _fireHitMask;
+        [SerializeField] private LayerMask _playerMask;
+        [SerializeField] private LayerMask _groundLayer;
         [SerializeField] private float _fireCooldown = 2f;
+        [SerializeField] private int _hitDamage = 50;
         
         private float _fireCooldownTimerSec;
         private InteractableBase _interactableBase;
@@ -36,16 +41,22 @@ namespace InGame.Exhibit
         private Quaternion _initialRotation;
         private float _currentTargetValue;
         private NetworkMecanimAnimator _mecanimAnimator;
+        private bool _isDefeated;
+        private bool _isFalling;
 
         [Networked, OnChangedRender(nameof(OnChangeAnimation))]
         private float CurrentBlendValue { get; set; }
         [Networked,OnChangedRender(nameof(OnInteractingChanged))]
         private NetworkBool IsInteracting { get; set; }
 
+        public bool IsDefeated => _isDefeated;
+        
         #region AnimationHash
 
         private static readonly int FlyStateBlend = Animator.StringToHash("FlyStateBlend");
         private static readonly int Attack = Animator.StringToHash("Attack");
+        private static readonly int Damage = Animator.StringToHash("Hit");
+        private static readonly int Fall = Animator.StringToHash("Fall");
 
         #endregion
 
@@ -54,13 +65,19 @@ namespace InGame.Exhibit
             base.Spawned();
             
             _interactableBase = GetComponent<InteractableBase>();
+            _mecanimAnimator =  GetComponent<NetworkMecanimAnimator>();
+            
             _initialPosition  = transform.position;
             _initialRotation  = transform.rotation;
-            
+            _isDefeated =  false;
+            _isFalling = false;
+
             if (HasStateAuthority)
+            {
                 Rigidbody.isKinematic = false;
+                Rigidbody.useGravity = false;
+            }
             
-            _mecanimAnimator =  GetComponent<NetworkMecanimAnimator>();
             Animator.enabled = IsInteracting;
         }
 
@@ -79,8 +96,11 @@ namespace InGame.Exhibit
                 return;
 
             base.GetOn(ownerPlayerRef);
+            _isDefeated = false;
             IsInteracting = true; 
             
+            // Damage処理の追加
+            HitAction += OnHit;
             _currentTargetValue = 0.01f;
             CurrentBlendValue = _currentTargetValue;
             _interactableBase.ForceSetInteractable = false;
@@ -94,6 +114,7 @@ namespace InGame.Exhibit
             Rigidbody.linearVelocity = Vector3.zero;
             Rigidbody.angularVelocity = Vector3.zero;
             transform.SetPositionAndRotation(_initialPosition,_initialRotation);
+            HitAction -= OnHit;
             
             IsInteracting = false; 
             _currentTargetValue = 0f;
@@ -105,13 +126,18 @@ namespace InGame.Exhibit
         {
             if (!HasStateAuthority) 
                 return;
+            if (!_isFalling)
+            {
+                HandleMovement(playerInput);
+            }
             
-            HandleMovement(playerInput);
             _fireCooldownTimerSec = Mathf.Min(_fireCooldown, _fireCooldownTimerSec + deltaTime);
                 
             if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _fireCooldownTimerSec >= _fireCooldown)
             {
                 Fire();
+                // ラグ保障テスト
+                //FireLagComp();
             }
         }
 
@@ -185,8 +211,32 @@ namespace InGame.Exhibit
             
             Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
             
-            if (Physics.Raycast(_muzzle.position, angleForward, out RaycastHit hit, _rayDistance,
-                    _fireHitMask))
+            if (Physics.Raycast(_muzzle.position, angleForward, out RaycastHit playerHit, _rayDistance, _playerMask))
+            {
+                Vector3 dir = (playerHit.point - _muzzle.position).normalized;
+                Quaternion rotation = Quaternion.LookRotation(dir, Vector3.up);
+                Vector3 velocity = dir * _fireSpeed;
+                
+                Rpc_PlayFireBullet(_muzzle.position, rotation, velocity);
+                
+                // Damage処理
+                IDamageable damageable = playerHit.collider.GetComponentInParent<IDamageable>();
+                Debug.Assert(damageable != null);
+                
+                // 自分はスキップ
+                if (damageable.OwnerPlayerRef != OwnerPlayerRef)
+                {
+                    HitData hitData = new HitData(
+                        HitActionType.Damage,
+                        _hitDamage,
+                        OwnerPlayerRef,
+                        damageable.OwnerPlayerRef
+                    );
+                    damageable.TakeHit(ref hitData);
+                }
+            }
+            else if (Physics.Raycast(_muzzle.position, angleForward, out RaycastHit hit, _rayDistance,
+                    _groundLayer))
             {
                 // 弾を生成し、ターゲット方向に飛ばす
                 Vector3 dir = (hit.point - _muzzle.position).normalized;
@@ -199,6 +249,107 @@ namespace InGame.Exhibit
                 Debug.LogError("No hit found in angled ray");
 
             _fireCooldownTimerSec = 0f;
+        }
+
+        #region ラグ保障
+
+        private void FireLagComp()
+        {
+            if (_muzzle == null)
+            {
+                Debug.LogError("Muzzle is null");
+                return;
+            }
+
+            // 斜め前方向（既存と同じ）
+            Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
+            
+            if (Runner.LagCompensation.Raycast(
+                    _muzzle.position,
+                    angleForward,
+                    _rayDistance,
+                    OwnerPlayerRef,
+                    out var lagHit,
+                    _playerMask))
+            {
+                ApplyDamageAndPlayVfx(lagHit.Collider, lagHit.Point);
+            }
+            else if (Physics.Raycast(_muzzle.position, angleForward, out RaycastHit hit, _rayDistance, _groundLayer))
+            {
+                ApplyDamageAndPlayVfx(hit.collider, hit.point);
+            }
+            else
+            {
+                Debug.LogWarning("LagComp & Physics: No hit found.");
+            }
+
+            _fireCooldownTimerSec = 0f;
+        }
+        
+        private void ApplyDamageAndPlayVfx(Collider hitCollider, Vector3 hitPoint)
+        {
+            var damageable = hitCollider.GetComponentInParent<IDamageable>();
+            if (damageable != null && damageable.OwnerPlayerRef != OwnerPlayerRef)
+            {
+                var hitData = new HitData(
+                    HitActionType.Damage,
+                    _hitDamage,
+                    OwnerPlayerRef,
+                    damageable.OwnerPlayerRef
+                );
+                damageable.TakeHit(ref hitData);
+            }
+
+            // 見た目用の弾（マズル→命中点 方向）
+            Vector3 dir = (hitPoint - _muzzle.position).normalized;
+            Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
+            Vector3 vel = dir * _fireSpeed;
+            Rpc_PlayFireBullet(_muzzle.position, rot, vel);
+        }
+
+        #endregion
+        
+
+        // Damage処理
+        private void OnHit()
+        {
+            Debug.Log("Hit");
+            if (IsAlive)
+            {
+                _mecanimAnimator.SetTrigger(Damage);
+            }
+            else if(!_isFalling)
+            {
+                Animator.SetBool(Fall,true);
+                StartFalling();
+            }
+        }
+
+        private void StartFalling()
+        {
+            _isFalling = true;
+            
+            Rigidbody.isKinematic = false;
+            Rigidbody.useGravity = true;
+            
+            Rigidbody.linearVelocity = Vector3.zero;
+            Rigidbody.angularVelocity = Vector3.zero;
+            Rigidbody.AddForce(Vector3.down * _deathFallImpulse, ForceMode.VelocityChange);
+        }
+
+        private void TryMarkDefeated(Collider col)
+        {
+            if (_isDefeated || !_isFalling || !HasStateAuthority)
+                return;
+
+            if (col.gameObject.layer == _groundLayer)
+            {
+                _isDefeated = true;
+                _isFalling = false;
+                
+                if (_interactableBase) 
+                    _interactableBase.ForceSetInteractable = false;
+            }
         }
         
         private void PlayMuzzleFlash(Vector3 pos, Quaternion rot)
@@ -237,6 +388,15 @@ namespace InGame.Exhibit
         private void RPC_PlaySE(Vector3 position, string cueName)
         {
             CRIAudio.PlaySE(position, "Exhibit", cueName);
+        }
+
+        private void OnCollisionEnter(Collision other)
+        {
+            TryMarkDefeated(other.collider);
+        }
+        private void OnTriggerEnter(Collider other)
+        {
+            TryMarkDefeated(other.GetComponent<Collider>());
         }
     }
 }

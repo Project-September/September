@@ -11,16 +11,16 @@ using UniRx;
 namespace September.InGame.UI
 {
     /// <summary>UIの管理</summary>
-    public class InGameStatusView : MonoBehaviour
+    public class GameStatusView : MonoBehaviour
     {
-        [Header("UI Root Prefab")] [SerializeField, Label("InGameUIRoot")]
-        private InGameUIRootRefs _uiRootPrefab;
+        [Header("UI Root Prefab")] 
+        [SerializeField, Label("InGameUIRoot")] private InGameUIRootRefs _inGameUiRootPrefab;
+        
+        [Header("Canvas")] 
+        [SerializeField, Label("MainCanvas")] private Canvas _mainCanvas;
 
-        [Header("Canvas")] [SerializeField, Label("MainCanvas")]
-        private Canvas _mainCanvas;
-
-        [Header("Timer Settings")] [SerializeField, Label("TimerData")]
-        private GameTimerData _timerData;
+        [Header("Timer Settings")] 
+        [SerializeField, Label("TimerData")] private GameTimerData _timerData;
 
         [SerializeField] private InGameUIRootRefs _uiRoot;
         private Slider _hpBarSlider;
@@ -59,7 +59,7 @@ namespace September.InGame.UI
         private void SetupUI()
         {
             if (!_uiRoot)
-                _uiRoot = Instantiate(_uiRootPrefab, _mainCanvas.transform);
+                _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
 
             _optionUI = _uiRoot.OptionUI;
             _killLogUI = _uiRoot.KillLogPanel;
