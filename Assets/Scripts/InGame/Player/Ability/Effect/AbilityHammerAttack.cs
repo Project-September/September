@@ -41,7 +41,7 @@ namespace InGame.Player.Ability.Effect
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (_hitChecker.IsFinished)
+            if (_hitChecker.IsActive)
             {
                 _phase = AbilityPhase.Ending;
             }

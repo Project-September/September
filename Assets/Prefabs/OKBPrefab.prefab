@@ -379,7 +379,7 @@ MonoBehaviour:
   - {fileID: 750593193299160763}
   _radius: 0.1
   _alreadyHit: []
-  IsFinished: 0
+  IsActive: 0
 --- !u!114 &4810525472409146702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3572,7 +3572,7 @@ MonoBehaviour:
   - {fileID: 750593193299160763}
   _radius: 0.1
   _alreadyHit: []
-  IsFinished: 0
+  IsActive: 0
 --- !u!1 &5474908219773255667
 GameObject:
   m_ObjectHideFlags: 0
@@ -5087,7 +5087,7 @@ GameObject:
   - component: {fileID: 7508249662566368237}
   - component: {fileID: 2779401866583128900}
   m_Layer: 6
-  m_Name: OkbPrefab
+  m_Name: OKBPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5442,12 +5442,15 @@ MonoBehaviour:
     - rid: 2879281568291487894
       type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _cooldown: 1
+        _cooldown: 0
         _phase: 0
         _normalAttackAnimationClip: {fileID: 7400000, guid: 60c28bdfb725c81419321d4c49a63d73, type: 2}
         _attackDamage: 10
         _hitChecker: {fileID: 6462417923102071326}
         _isSubscribe: 0
+        _startHitCheckFrame: 9
+        _endHitCheckFrame: 17
+        _endAttackFrame: 22
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
