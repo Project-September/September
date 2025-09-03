@@ -3,6 +3,8 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Interact;
 using InGame.Player;
+using Ingame.Tanihira;
+using UnityEngine;
 
 namespace InGame.Exhibit
 {
@@ -19,6 +21,24 @@ namespace InGame.Exhibit
             {
                 StartOpticalCamouflage(playerNetworkObject);
                 StopOpticalCamouflage(playerNetworkObject).Forget();
+                
+                //FormationManagerを持っている場合には条件分岐
+                if (playerNetworkObject.TryGetComponent<FormationManager>(out var formationManager))
+                {
+                    var friendList = formationManager.FriendsList;
+                    foreach (var friend in friendList)
+                    {
+                        if (friend.TryGetComponent<NetworkObject>(out var friendNetworkObject))
+                        {
+                            StartOpticalCamouflage(friendNetworkObject);
+                            StopOpticalCamouflage(friendNetworkObject).Forget();
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("FormationManager not found");
+                }
             }
         }
 
