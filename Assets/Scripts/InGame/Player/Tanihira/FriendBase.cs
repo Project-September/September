@@ -12,11 +12,13 @@ namespace Ingame.Tanihira
     /// </summary>
     public enum FriendState
     {
+        None,
         Idle,
         Move,
         Attack,
         Chase,
-        Stun
+        Stun,
+        Wait
     }
     
     /// <summary>
@@ -38,6 +40,7 @@ namespace Ingame.Tanihira
         protected NetworkObject _ownerPlayer;
         protected NetworkMecanimAnimator _mecanimAnimator;
         protected FormationManager _formationManager;
+        protected FriendState _waitStockState;
 
         private static int _spawnCount;
         private bool _isAttack;
@@ -53,6 +56,8 @@ namespace Ingame.Tanihira
         public FriendState CurrentState => _currentState;
         public NetworkMecanimAnimator MecanimAnimator => _mecanimAnimator;
         public bool IsAttack => _isAttack;
+        public FriendState WaitStockState => _waitStockState;
+        public NetworkObject OwnerPlayer => _ownerPlayer;
 
         protected virtual void Awake()
         {
@@ -115,6 +120,17 @@ namespace Ingame.Tanihira
         /// <param name="newState">新しいステート</param>
         public virtual void ChangeState(FriendState newState)
         {
+            if (_currentState != FriendState.Wait)
+            {
+                //attackの場合はchaseに変えておく
+                if(newState == FriendState.Attack)
+                {
+                    newState = FriendState.Chase;
+                }
+                
+                _waitStockState = newState;
+            }
+            
             if (_friendStateMappings[newState] == null)
             {
                 Debug.LogWarning($"ステート {newState} が設定されていません");
@@ -171,6 +187,19 @@ namespace Ingame.Tanihira
                 _ownerPlayer.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
+        }
+
+        public void FinishWaitTime()
+        {
+            if (_waitStockState == FriendState.None)
+            {
+                ChangeState(FriendState.Move);
+            }
+            else
+            {
+                ChangeState(_waitStockState);
+                _waitStockState = FriendState.None;
+            }
         }
         
         //アニメーションイベント用
