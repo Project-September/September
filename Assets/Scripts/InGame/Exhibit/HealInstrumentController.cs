@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace InGame.Exhibit
 {
-    public class StradivariusController : NetworkBehaviour
+    public class HealInstrumentController : NetworkBehaviour
     {
         [SerializeField] private int _healAmount;
         private EffectSpawner _effectSpawner;
