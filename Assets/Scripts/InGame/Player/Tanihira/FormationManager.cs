@@ -27,7 +27,7 @@ namespace Ingame.Tanihira
             if (_friendsList.Count == 0)
             {
                 _friendsList.Add(friend);
-                return _playerTransform;
+                return _firstFormationTransform;
             }
             else //最後尾のオブジェクトのTransformを返す
             {
@@ -77,7 +77,7 @@ namespace Ingame.Tanihira
 
                     if (i == 0) //先頭の場合
                     {
-                        friend.SetDestination(_playerTransform);
+                        friend.SetDestination(_firstFormationTransform);
                     }
                     else
                     {

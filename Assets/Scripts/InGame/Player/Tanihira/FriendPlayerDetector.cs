@@ -53,8 +53,6 @@ namespace Ingame.Tanihira
                 .Distinct()                                                // 重複排除
                 .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude) // 距離順
                 .ToList();
-            
-            Debug.Log(uniqueRoots.Count);
 
             foreach (Transform player in uniqueRoots)
             {
@@ -88,12 +86,10 @@ namespace Ingame.Tanihira
             if (_currentTarget)
             {
                 _friendStateChanger.SetChaseState(_currentTarget);
-                Debug.Log("攻撃！！");
             }
             else
             {
                 _friendStateChanger.SetMoveState();
-                Debug.Log("隊列に戻る");
             }
         }
         

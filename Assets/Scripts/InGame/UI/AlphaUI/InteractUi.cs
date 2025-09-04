@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,22 +19,30 @@ namespace September.InGame.UI
         
         [SerializeField] private Image _interactFillImage; // インタラクトの進行状況を示すUIのイメージ
         [SerializeField] private RectTransform _root;
-        private Camera _camera;
+        [SerializeField] private RectTransform _rootParentRectTransform;
         private readonly ConnectionState _connectionState = ConnectionState.Remote;
         private GameObject _targetObject;
-
-        private void Awake()
+        CancellationTokenSource _cts;
+        void OnEnable()
         {
-            if (_connectionState == ConnectionState.Local)
+            _cts = new CancellationTokenSource();
+            FollowEndOfFrame(_cts.Token).Forget();
+        }
+        void OnDisable()
+        {
+            _cts.Cancel();
+            _cts.Dispose();
+        }
+
+        async UniTaskVoid FollowEndOfFrame(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
             {
-                // ローカル接続の初期化処理
-            }
-            else
-            {
-                _camera = Camera.main;
+                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
+                UpdateUiPosition();
             }
         }
-        
+
         public void SetActive(bool isShow, GameObject target = null)
         {
             if (target)
@@ -48,34 +58,38 @@ namespace September.InGame.UI
         
         public void SetInteractProgress(float progress)
         {
-            // インタラクトの進行状況を更新するメソッド
-            // progressは0から1の範囲で、0が未開始、1が完了を示す
             if (_interactFillImage)
             {
                 _interactFillImage.fillAmount = Mathf.Clamp01(progress);
             }
         }
 
-        private void LateUpdate()
+        private void UpdateUiPosition()
         {
-            if (_targetObject)
-            {
-                CalculatePosition(_targetObject);
-            }
-        }
+            if (!_root || !_targetObject) return;
 
-        private void CalculatePosition(GameObject targetObject)
-        {
-            // インタラクトUIの位置を計算するメソッド
-            if (!_root || !targetObject) return;
-            if (_camera)
+            var container = _root.parent as RectTransform;   // = InteractUI
+            if (!container) return;
+
+            var worldCam = Camera.main; // ← ここ超重要：実カメラ
+            if (!worldCam) return;
+
+            // ★ 頭上に出したいなら、ここでオフセット or バウンズ上端に差し替え
+            Vector3 world = _targetObject.transform.position; // or GetHeadTop(_target)
+
+            // World -> Screen
+            Vector3 sp = worldCam.WorldToScreenPoint(world);
+            if (sp.z < 0f)
             {
-                var screenPosition = _camera.WorldToScreenPoint(targetObject.transform.position);
-                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                        _root.parent as RectTransform, screenPosition, null, out var localPoint))
-                {
-                    _root.anchoredPosition = localPoint;
-                }
+                _root.gameObject.SetActive(false);
+                return;
+            } // カメラ背面なら非表示など
+            if (!_root.gameObject.activeSelf) _root.gameObject.SetActive(true);
+
+            // Screen -> Container(Local) （Overlayは cam=null）
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(container, sp, null, out var local))
+            {
+                _root.anchoredPosition = local; // 親pivot=0.5/子anchor=0.5なら補正不要
             }
         }
     }

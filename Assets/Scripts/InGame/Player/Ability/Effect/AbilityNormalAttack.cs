@@ -2,8 +2,6 @@ using System;
 using Fusion;
 using InGame.Common;
 using InGame.Health;
-using September.Common;
-using September.InGame.Common;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -14,22 +12,42 @@ namespace InGame.Player.Ability
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] private int _attackDamage = 10;
         [SerializeField] private HitChecker _hitChecker;
-        [SerializeField] private Animator _ownerAnimator;
         [SerializeField] private bool _isSubscribe = false;
+        [SerializeField] private int _startHitCheckFrame = 17;
+        [SerializeField] private int _endHitCheckFrame   = 21;
+        [SerializeField] private int _endAttackFrame     = 22;
+
+        // 変換後のTickオフセット
+        int _startHitTick, _endHitTick, _endAttackTick;
+
+        // 攻撃開始Tick
+        int _attackStartTick = -1;
+        
 
         protected override void OnStart()
         {
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
-                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
+                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, false);
             }
+            
+            float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;
+            float dt  = Runner != null ? Runner.DeltaTime : Time.fixedDeltaTime;
+            int FrameToTick(int f) => Mathf.RoundToInt((f / fps) / dt);
 
+            _startHitTick  = FrameToTick(_startHitCheckFrame);
+            _endHitTick    = FrameToTick(_endHitCheckFrame);
+            _endAttackTick = FrameToTick(_endAttackFrame);
+
+            _attackStartTick = Runner != null ? Runner.Tick : 0;
+            
             if (!_isSubscribe)
             {
                 _isSubscribe = true;
                 _hitChecker.OnHit += OnHitEnemy;
             }
+            _startHitTick  = FrameToTick(_startHitCheckFrame);
         }
 
         private void OnHitEnemy(Collider hitInfo)
@@ -47,10 +65,33 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (_hitChecker.IsFinished)
+            int now    = Runner.Tick;
+            int elapsed = now - _attackStartTick;
+            Debug.Log($"[AbilityNormalAttack] Tick:{now} Elapsed:{elapsed} Start:{_startHitTick} End:{_endHitTick} AttackEnd:{_endAttackTick}");
+
+            // ヒット窓
+            bool inWindow = elapsed >= _startHitTick && elapsed < _endHitTick;
+
+            if (_hitChecker != null)
             {
-                _phase = AbilityPhase.Ending;
+                // 必要な時だけ切り替え（連続呼び出しでも軽いが、不要トグルを避ける）
+                if (inWindow && !_hitChecker.IsActive) _hitChecker.StartHitCheck();
+                if (!inWindow && _hitChecker.IsActive) _hitChecker.EndHitCheck();
             }
+
+            // 攻撃終了
+            if (elapsed >= _endAttackTick)
+                _phase = AbilityPhase.Ending;
+        }
+        
+        protected override void OnEndAbility()
+        {
+            if (_isSubscribe && _hitChecker != null)
+            {
+                _hitChecker.OnHit -= OnHitEnemy;
+                _isSubscribe = false;
+            }
+            base.OnEndAbility();
         }
     }
 }

@@ -1,32 +1,92 @@
 using Fusion;
 using InGame.Health;
-using Ingame.Tanihira;
 using UnityEngine;
 
-public class ChildPenguinFriend : FriendBase, IDamageable
+namespace Ingame.Tanihira
 {
-    private int _maxHealth;
-    private int _currentHealth;
-    private float _attackPower;
-    
-    public bool IsAlive => _currentHealth > 0;
-    public PlayerRef OwnerPlayerRef => Object.InputAuthority;
-    
-    protected override void Awake()
+    public class ChildPenguinFriend : FriendBase, IDamageable
     {
-        base.Awake();
-        _maxHealth = FriendStatus.MaxHealth;
-        _currentHealth = _maxHealth;
-        _attackPower = FriendStatus.AttackPower;
-        //ペンギンのステートを設定
-        _friendStateMappings[FriendState.Idle] = null;
-        _friendStateMappings[FriendState.Move] = new FriendMoveState();
-        _friendStateMappings[FriendState.Chase] = new FriendChaseState();
-        _friendStateMappings[FriendState.Attack] = new FriendAttackState();
-    }
+        private int _maxHealth;
+        private int _currentHealth;
+        private float _attackPower;
+        private FriendState _stockFriendState;
     
-    public void TakeHit(ref HitData hitData)
-    {
-        
+        public bool IsAlive => _currentHealth > 0;
+        public PlayerRef OwnerPlayerRef => Object.InputAuthority;
+        public FriendState StockFriendState => _stockFriendState;
+    
+        protected override void Awake()
+        {
+            base.Awake();
+            _maxHealth = FriendStatus.MaxHealth;
+            _currentHealth = _maxHealth;
+            _attackPower = FriendStatus.AttackPower;
+            //ペンギンのステートを設定
+            _friendStateMappings[FriendState.Idle] = null;
+            _friendStateMappings[FriendState.Move] = new FriendMoveState();
+            _friendStateMappings[FriendState.Chase] = new FriendChaseState();
+            _friendStateMappings[FriendState.Attack] = new FriendAttackState();
+            _friendStateMappings[FriendState.Stun] = new FriendStunState();
+        }
+
+        public override void ChangeState(FriendState newState)
+        {
+            //スタンしている時には、ステートを記録して変更を加えないようにする
+            if (!IsAlive)
+            {
+                //attackの場合はchaseに変えておく
+                if(newState == FriendState.Attack)
+                {
+                    newState = FriendState.Chase;
+                }
+
+                _stockFriendState = newState;
+            }
+            else
+            {
+                base.ChangeState(newState);
+            }
+        }
+
+        private void AddDamage(int damage)
+        {
+            if (_currentHealth - damage <= 0)
+            {
+                _stockFriendState = _currentState;
+                ChangeState(FriendState.Stun);
+            }
+            else
+            {
+                _mecanimAnimator?.SetTrigger("Damage");
+            }
+            _currentHealth -= damage;
+        }
+
+        /// <summary>
+        /// Stun終了時の処理
+        /// </summary>
+        public void RecoverStun()
+        {
+            _formationManager.Register(this.gameObject.GetComponent<FriendBase>());
+            _currentHealth = _maxHealth;
+            ChangeState(_stockFriendState);
+        }
+    
+        public void TakeHit(ref HitData hitData)
+        {
+            if (IsAlive)
+            {
+                AddDamage(hitData.Amount);
+            }
+        }
+
+        [ContextMenu("ダメージ")]
+        private void TestAddDamage()
+        {
+            if (IsAlive)
+            {
+                AddDamage(100);
+            }
+        }
     }
 }

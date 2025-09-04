@@ -41,19 +41,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 26.69
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -9.01
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 16.67
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.7071068
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalRotation.x
@@ -61,11 +61,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7071068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -73,7 +73,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 270
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -170,9 +170,11 @@ MonoBehaviour:
     - 10
   _characterEffects:
   - rid: 3302172163222274141
-  _LastInteractTime: -9999
-  _LastUsedCooldownTime: 0
-  _ForceSetInteractable: 1
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
   references:
     version: 2
     RefIds:

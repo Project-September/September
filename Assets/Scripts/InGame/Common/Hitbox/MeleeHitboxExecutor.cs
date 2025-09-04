@@ -67,8 +67,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
                 int hitCount = Physics.CapsuleCastNonAlloc(
                     start, end, _hitboxRadius,
                     direction.normalized, _hitBuffer, distance,
-                    _hitMask);
-                
+                    _hitMask, QueryTriggerInteraction.Collide);
               
                 if (hitCount == _hitBuffer.Length)
                 {
