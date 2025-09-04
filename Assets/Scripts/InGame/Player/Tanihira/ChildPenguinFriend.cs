@@ -22,11 +22,13 @@ namespace Ingame.Tanihira
             _currentHealth = _maxHealth;
             _attackPower = FriendStatus.AttackPower;
             //ペンギンのステートを設定
+            _friendStateMappings[FriendState.None] = null;
             _friendStateMappings[FriendState.Idle] = null;
             _friendStateMappings[FriendState.Move] = new FriendMoveState();
             _friendStateMappings[FriendState.Chase] = new FriendChaseState();
             _friendStateMappings[FriendState.Attack] = new FriendAttackState();
             _friendStateMappings[FriendState.Stun] = new FriendStunState();
+            _friendStateMappings[FriendState.Wait] = new FriendWaitState();
         }
 
         public override void ChangeState(FriendState newState)
