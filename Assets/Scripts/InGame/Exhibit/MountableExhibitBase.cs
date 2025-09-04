@@ -18,6 +18,8 @@ namespace InGame.Exhibit
         protected Rigidbody Rigidbody { get; private set; }
         
         protected Action HitAction { get; set; }
+
+        protected bool IsSpawned { get; private set; }
         
         #region AttackParam
 
@@ -53,6 +55,7 @@ namespace InGame.Exhibit
              Animator = GetComponent<Animator>();
              Rigidbody.isKinematic = true;
              _currentHealth = _maxHealth;
+             IsSpawned = true;
         }
         
         private void CreateHitBox(PlayerRef playerRef)
@@ -82,7 +85,7 @@ namespace InGame.Exhibit
         
         private void LateUpdate()
         {
-            if(!HasInputAuthority) return;
+            if(!IsSpawned || !HasInputAuthority) return;
             
             if (GameInput.I.Player.Aim.triggered)
             {

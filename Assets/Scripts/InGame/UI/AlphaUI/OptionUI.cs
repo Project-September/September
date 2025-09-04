@@ -51,6 +51,8 @@ namespace InGame.UI
                 {
                     _optionUIPanel.transform.SetAsLastSibling();
                 }
+                Cursor.visible = _isShow;
+                Cursor.lockState = _isShow ? CursorLockMode.None : CursorLockMode.Locked;
             }
             Vector2 currentInput = _gameInput.UI.Volume.ReadValue<Vector2>();
 

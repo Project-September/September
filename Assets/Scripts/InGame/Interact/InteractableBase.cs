@@ -4,6 +4,8 @@ using September.Common;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using September.InGame.Effect;
 
 namespace InGame.Interact
 {
@@ -15,7 +17,12 @@ namespace InGame.Interact
         [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
 
         [SerializeReference, SubclassSelector] private List<CharacterInteractEffectBase> _characterEffects = new();
-
+        
+        [SerializeField] private Vector3 _interactEffectOffset = Vector3.zero;
+        [SerializeField] private Vector3 _cooldownEffectOffset = Vector3.zero;
+        [SerializeField] private EffectType _interactEffectType = EffectType.NormalInteractComplete;
+        [SerializeField] private EffectType _cooldownEffectType = EffectType.CooldownSquare;
+        [SerializeField] private bool _spawnCooldownEffectOnStart = true;
 
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
@@ -41,18 +48,38 @@ namespace InGame.Interact
                 Debug.Log($"[InteractableBase] OnValidateInteraction により拒否: {context.Interactor}");
                 return;
             }
-
+            
             // クールダウン登録
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
             
-            //All キャラタイプのクールダウン時間を優先して取得する
+            if (_spawnCooldownEffectOnStart)
+            {
+                //effectSpawner.RequestPlayOneShotEffect(_cooldownEffectType, transform.position + _cooldownEffectOffset, transform.rotation);
+                // クールダウンエフェクトを再生し、クールダウン時間分待機する
+                PlayCooldownEffect(LastUsedCooldownTime).Forget();
+            }
+            
+            //All キャラタイプのクールダウン時間を優先して取得する。
             LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
+            
+            var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+            effectSpawner.RequestPlayOneShotEffect(_interactEffectType, transform.position + _interactEffectOffset, transform.rotation);
 
             // 実行
             OnInteract(context);
         }
-
+        
+        private async UniTask PlayCooldownEffect(float cooldownTime)
+        {
+            if (cooldownTime <= 0f) return;
+            var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+            var uniqueEffectId = NetworkRunner.Instances.First().LocalPlayer.PlayerId + DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
+            effectSpawner.RequestPlayLoopEffect(uniqueEffectId, _cooldownEffectType, transform.position + _cooldownEffectOffset, transform.rotation);
+            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false);
+            effectSpawner.StopEffect(uniqueEffectId);
+        }
+        
         /// <summary>
         /// 共通のバリデーション（null, クールダウン）
         /// インタラクト可能なときは true を返す

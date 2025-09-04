@@ -23,6 +23,7 @@ namespace InGame.Player
         PlayerHealth _playerHealth;
         PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
+        PlayerEffectController _playerEffectController;
 
         private bool _shouldWarp = false;
         private Vector3 _targetPosition;
@@ -52,6 +53,7 @@ namespace InGame.Player
         void InitComponents()
         {
             _playerMovement = GetComponent<PlayerMovement>();
+            _playerEffectController = GetComponentInChildren<PlayerEffectController>();
 
             if (TryGetComponent(out CameraController cameraController))
             {
@@ -122,13 +124,16 @@ namespace InGame.Player
         {
             IsStun = false;
             _playerHealth.IsInvincible = false;
+            _playerEffectController.StopStunEffect();
         }
 
         void OnDeath(HitData lastHitData)
         {
             IsStun = true;
+            
             _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime);
             _playerHealth.IsInvincible = true;
+            _playerEffectController.PlayStunEffect();
         }
 
         public void SetControlState(PlayerControlState controlState)

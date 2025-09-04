@@ -3911,7 +3911,7 @@ GameObject:
   - component: {fileID: 4503392173304417129}
   - component: {fileID: 3882540875740709923}
   - component: {fileID: 6364766241162311564}
-  - component: {fileID: -2458423887434476005}
+  - component: {fileID: 5666963229739266544}
   m_Layer: 0
   m_Name: Tyranno
   m_TagString: Untagged
@@ -4092,31 +4092,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 030000000100000002000000
-    values:
-    - 1
-    - 1
-    - 1
+    keys: 
+    values: []
   _cooldownTimeDictionary:
-    keys: 030000000100000002000000
-    values:
-    - 1
-    - 1
-    - 1
-  _characterEffects:
-  - rid: 3872013951182831691
+    keys: 
+    values: []
+  _characterEffects: []
   _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
   references:
     version: 2
-    RefIds:
-    - rid: 3872013951182831691
-      type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
-      data:
-        _characterType: 1
-        _interactTime: 10
-        _getOffPoint: {fileID: 2715761595848630760}
-        _tyrannoInteractable: {fileID: 6364766241162311564}
+    RefIds: []
 --- !u!114 &3882540875740709923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4132,8 +4119,8 @@ MonoBehaviour:
   Animator: {fileID: 7266633102854800794}
   ApplyTiming: 2
   SyncSettings: 79
-  StateHashes: 000000004eeb5158547a6bb20d286c404e865f43b0e59c38f34baf3b
-  TriggerHashes: 000000000d286c40
+  StateHashes: 000000004eeb5158547a6bb20d286c404e865f43b0e59c38f34baf3b65a9e87d37f39754
+  TriggerHashes: 000000000d286c40a1609f62
   TotalWords: 2
 --- !u!114 &6364766241162311564
 MonoBehaviour:
@@ -4167,23 +4154,20 @@ MonoBehaviour:
   _gravity: {x: 0, y: -200, z: 0}
   _maxRotateValue: 500
   _runBlendDelay: 3
-  _MoveValue: 0
---- !u!111 &-2458423887434476005
-Animation:
+--- !u!114 &5666963229739266544
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8352061886232285223}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 0}
-  m_Animations: []
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_UpdateMode: 0
-  m_CullingType: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 4503392173304417129}
 --- !u!1 &8550128332805089152
 GameObject:
   m_ObjectHideFlags: 0

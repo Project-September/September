@@ -28,6 +28,8 @@ namespace September.InGame.Common
         public int AddScore => _addScore;
         public string InGameBGMCueName => _inGameBGMCueName;
         public string CurrentBGM { get; set; }
+        
+        public System.Action GameStarted { get; set; }
 
         public void Register(ServiceLocator locator)
         {

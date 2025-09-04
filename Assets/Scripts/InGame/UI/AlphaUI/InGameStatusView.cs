@@ -22,7 +22,7 @@ namespace September.InGame.UI
         [Header("Timer Settings")] [SerializeField, Label("TimerData")]
         private GameTimerData _timerData;
 
-        private InGameUIRootRefs _uiRoot;
+        [SerializeField] private InGameUIRootRefs _uiRoot;
         private Slider _hpBarSlider;
         private Slider _staminaBarSlider;
         private TextMeshProUGUI _killLogText;

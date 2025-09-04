@@ -66,10 +66,12 @@ namespace InGame.Player
 
             if (hitData.HitActionType == HitActionType.Damage)
             {
+                Debug.Log("Damage Taken");
                 hitData.Amount = TakeDamage(hitData.Amount);
             }
             else if (hitData.HitActionType == HitActionType.Heal)
             {
+                Debug.Log("Heal Taken");
                 hitData.Amount = TakeHeal(hitData.Amount);
             }
         }

@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
 using September.Common;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,15 +13,16 @@ namespace September.Lobby
 {
     public class LobbyController : NetworkBehaviour, INetworkRunnerCallbacks
     {
-        [SerializeField] LobbyPlayerUI _selfUIPrefab;
-        [SerializeField] LobbyPlayerUI _otherUIPrefab;
-        [SerializeField] Button _startButton;
-        [SerializeField] Button _quitButton;
-        [SerializeField] Text _roomNameText;
+        [SerializeField] private PlayerConditionView _playerConditionViewPrefab;
+        [SerializeField] private Button _readyButton;
+        [SerializeField] private Button _quitButton;
+        [SerializeField] private TextMeshProUGUI _playerNameText;
+        [SerializeField] private TextMeshProUGUI _roomNameText;
         [SerializeField] private Image _fadePanel;
         [SerializeField] private Transform _contentTransform;
-        readonly Dictionary<PlayerRef, LobbyPlayerUI> _lobbyPlayerUIDic = new();
-        
+        readonly Dictionary<PlayerRef, PlayerConditionView> _lobbyPlayerUIDic = new();
+        [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(4), HideInInspector]
+        public NetworkDictionary<PlayerRef, NetworkBool> PlayerIsReadyDic => default;
         public override void Spawned()
         {
             _roomNameText.text = Runner.SessionInfo.Name;
@@ -30,14 +32,7 @@ namespace September.Lobby
             {
                 AddContents(pr);
             }
-            if (Runner.IsServer)
-            {
-                _startButton.onClick.AddListener(OnClick);
-            }
-            else
-            {
-                _startButton.gameObject.SetActive(false);
-            }
+            _readyButton.onClick.AddListener(() => Rpc_ToggleReady(Runner.LocalPlayer));
             _quitButton.onClick.AddListener(() => NetworkManager.Instance.QuitLobby().Forget());
             PlayerDatabase.Instance.ChangedDataAction += ChangeLobbyPlayerUI;
         }
@@ -47,11 +42,27 @@ namespace September.Lobby
             PlayerDatabase.Instance.ChangedDataAction -= ChangeLobbyPlayerUI;
         }
 
-        private void OnClick()
+        private void OnChangedIsReady()
         {
-            RPC_Fade();
+            int isReadyCount = 0;
+            foreach (var kv in PlayerIsReadyDic)
+            {
+                if (kv.Value) isReadyCount++;
+                if (!_lobbyPlayerUIDic.TryGetValue(kv.Key, out var value)) return;
+                value.IsReadyImage.enabled = kv.Value;
+            }
+            //  全員準備完了ならゲームを開始する
+            if (isReadyCount == PlayerDatabase.Instance.PlayerDataDic.Count)
+            {
+                RPC_Fade();
+            }
         }
 
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        private void Rpc_ToggleReady(PlayerRef playerRef)
+        {
+            PlayerIsReadyDic.Set(playerRef, !PlayerIsReadyDic.Get(playerRef));
+        }
         [Rpc]
         private void RPC_Fade()
         {
@@ -72,40 +83,43 @@ namespace September.Lobby
             if (_lobbyPlayerUIDic.ContainsKey(playerRef)) return;
             if (Runner.LocalPlayer == playerRef)
             {
-                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_selfUIPrefab, _contentTransform));
-                _lobbyPlayerUIDic[playerRef].Dropdown.onValueChanged
-                    .AddListener(num =>
-                    {
-                        var data = CharacterDataContainer.Instance.GetCharacterData(num);
-                        PlayerDatabase.Instance.Rpc_SetCharacter(playerRef, data.Type);
-                    });
+                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
             }
             else
             {
-                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_otherUIPrefab, _contentTransform));
+                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
             }
         }
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
+            if (HasStateAuthority)
+            {
+                PlayerIsReadyDic.Add(player, false);
+            }
             if (Runner.LocalPlayer == player) return;
-            AddContents(player); 
+            AddContents(player);
         }
         
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
             Destroy(_lobbyPlayerUIDic[player].gameObject);
             _lobbyPlayerUIDic.Remove(player);
-            if (HasStateAuthority) PlayerDatabase.Instance.PlayerDataDic.Remove(player);
+            if (HasStateAuthority)
+            {
+                PlayerDatabase.Instance.PlayerDataDic.Remove(player);
+                PlayerIsReadyDic.Remove(player);
+            }
         }
         
         void ChangeLobbyPlayerUI(NetworkDictionary<PlayerRef, SessionPlayerData> dictionary)
         {
+            if(dictionary.ContainsKey(Runner.LocalPlayer)) _playerNameText.text = dictionary[Runner.LocalPlayer].DisplayNickName;
             foreach (var kv in dictionary)
             {
                 if (!_lobbyPlayerUIDic.TryGetValue(kv.Key, out var value)) return;
-                value.NameText.text = kv.Value.DisplayNickName;
-                if (value.JobText) value.JobText.text = CharacterDataContainer.Instance.GetCharacterData(kv.Value.CharacterType).DisplayName;
+                value.PlayerNameText.text = kv.Value.DisplayNickName;
+                value.CharacterIconImage.sprite = CharacterDataContainer.Instance.GetCharacterData(kv.Value.CharacterType).CharacterIcon;
             }
         }
 
