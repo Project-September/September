@@ -157,8 +157,10 @@ namespace September.Common
 
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
         {
-            if (killerData.StunData.TryGet(killedPlayer, out var count));
+            if (killerData.StunData.TryGet(killedPlayer, out var count))
+            {
                 killerData.StunData.Set(killedPlayer, count + 1);
+            }
             PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
         }
         
