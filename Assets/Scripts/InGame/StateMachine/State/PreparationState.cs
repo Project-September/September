@@ -143,7 +143,8 @@ namespace September.Common
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
             killedData.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
-            killerData.Score += Context.AddScore;
+            killerData.Score += Context.StunScore;
+            killerData.StunCount++;
             RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
         }
         private async UniTask StartTimer()

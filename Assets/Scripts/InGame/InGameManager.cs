@@ -5,6 +5,7 @@ using NaughtyAttributes;
 using September.Common;
 using September.InGame.UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace September.InGame.Common
 {
@@ -14,9 +15,9 @@ namespace September.InGame.Common
         [Header("Timer Settings"), SerializeField, Label("TimerData")]
         
         private GameTimerData _timerData;
-
+        
         [Header("他Playerを気絶させたときに得られるスコア"), SerializeField] 
-        private int _addScore;
+        private int _stunScore;
 
         private readonly Dictionary<PlayerRef, NetworkObject> _playerDataDic = new();
 
@@ -25,7 +26,7 @@ namespace September.InGame.Common
         public GameTimerData TimerData => _timerData;
         public CancellationTokenSource Cts { get; private set; }
 
-        public int AddScore => _addScore;
+        public int StunScore => _stunScore;
         public string InGameBGMCueName => _inGameBGMCueName;
         public string CurrentBGM { get; set; }
         
