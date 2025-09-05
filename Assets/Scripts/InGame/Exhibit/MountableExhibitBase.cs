@@ -2,26 +2,27 @@ using System;
 using System.Collections.Generic;
 using Fusion;
 using InGame.Health;
-using InGame.Interact;
 using InGame.Player;
+using Ingame.Tanihira;
+using NaughtyAttributes;
 using September.Common;
-using UnityEditor;
+using September.InGame.Common;
 using UnityEngine;
 
 namespace InGame.Exhibit
 {
-    public class MountableExhibitBase : NetworkBehaviour, IDamageable
+    public class MountableExhibitBase : NetworkBehaviour,IDamageable
     {
         protected CameraController CameraController { get; private set; }
-
+        
         protected Animator Animator { get; private set; }
 
         protected Rigidbody Rigidbody { get; private set; }
-
+        
         protected Action HitAction { get; set; }
 
         protected bool IsSpawned { get; private set; }
-
+        
         #region AttackParam
 
         protected MeleeHitboxExecutor Executor;
@@ -31,46 +32,40 @@ namespace InGame.Exhibit
         [SerializeField] private int _startFrame;
         [SerializeField] private int _endFrame = 34;
         [SerializeField] private int _damageAmount = 100;
-
         #endregion
-
+        
         #region DamageableParam
-
-        public bool IsAlive => _currentHealth > 0;
+        public bool IsAlive =>_currentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
 
-        private bool _isInvincible;
-
+        private bool _isInvincible ;
+    
         private int _currentHealth;
-
+    
         [SerializeField] private int _maxHealth;
-
+        
         #endregion
-
-        [Header("Gizmo: Hitbox 可視化")]
-        [SerializeField] private bool _drawHitboxGizmos = true; // Gizmoを描くか
-        [SerializeField] private bool _onlyWhenSelected = true; // 選択時のみ描くか
-        [SerializeField] private bool _drawIndexLabel = true; // インデックスのラベルを出すか
-        [SerializeField] private Color _hitboxWireColor = new Color(1f, 0.35f, 0.0f, 1f);
-        [SerializeField] private Color _hitboxSolidColor = new Color(1f, 0.35f, 0.0f, 0.12f);
-        [SerializeField] private Color _lineColor = new Color(1f, 0.55f, 0.0f, 0.8f);
-
-
+        
+        private PlayerManager _ownerPlayerManager;
+        
+        private Vector3 _hidePosition = new Vector3(0, 0, 0);
+        
+        [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
+        
         public override void Spawned()
         {
-            Rigidbody = GetComponent<Rigidbody>();
-            if (TryGetComponent(out CameraController cameraController))
-            {
-                CameraController = cameraController;
-                cameraController.Init(true);
-            }
-
-            Animator = GetComponent<Animator>();
-            Rigidbody.isKinematic = true;
-            _currentHealth = _maxHealth;
-            IsSpawned = true;
+             Rigidbody = GetComponent<Rigidbody>();
+             if (TryGetComponent(out CameraController cameraController))
+             {
+                 CameraController = cameraController;
+                 cameraController.Init(true);
+             }
+             Animator = GetComponent<Animator>();
+             Rigidbody.isKinematic = true;
+             _currentHealth = _maxHealth;
+             IsSpawned = true;
         }
-
+        
         private void CreateHitBox(PlayerRef playerRef)
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
@@ -87,67 +82,82 @@ namespace InGame.Exhibit
                 }
             };
         }
-
+        
         /// <summary>
         /// 展示物に乗ってる間のUpdate関数
         /// </summary>
-        public virtual void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
+        public virtual void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
         {
-
+          
         }
-
+        
         private void LateUpdate()
         {
-            if (!IsSpawned || !HasInputAuthority) return;
-
+            if(!IsSpawned || !HasInputAuthority) return;
+            
             if (GameInput.I.Player.Aim.triggered)
             {
                 CameraController.CameraReset();
             }
-
-            CameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Runner.DeltaTime);
+            CameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(),Runner.DeltaTime);
         }
-
+        
         /// <summary>
         /// インタラクト開始時の切り替え処理
         /// ホストでのみ実行される点に注意
         /// </summary>
         public virtual void GetOn(PlayerRef playerRef)
         {
+            _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>()
+                .PlayerDataDic[playerRef].GetComponent<PlayerManager>();
+            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
+            _ownerPlayerManager.RPC_SetColliderActive(false);
+            _ownerPlayerManager.RPC_SetMeshActive(false);
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
-            RPC_SetCameraPriority(playerRef, 15);
-            RPC_SetIsKinematic(playerRef, false);
+            RPC_SetCameraPriority(playerRef,15);
+            RPC_SetIsKinematic(playerRef,false);
             CreateHitBox(playerRef);
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                //ToDoペンギン無効化
+            }
         }
-
+        
         /// <summary>
         /// インタラクト終了時の切り替え処理
         /// ホストでのみ実行される点に注意
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
+            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _ownerPlayerManager.RPC_SetColliderActive(true);
+            _ownerPlayerManager.RPC_SetMeshActive(true);
+            _ownerPlayerManager.transform.position = _getOffPoint.position;
             Object.RemoveInputAuthority();
-            RPC_SetCameraPriority(playerRef, 5);
-            RPC_SetIsKinematic(playerRef, true);
+            RPC_SetCameraPriority(playerRef,5);
+            RPC_SetIsKinematic(playerRef,true);
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                //ToDoペンギン有効化
+            }
             Executor = null;
         }
-
+        
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetCameraPriority(PlayerRef player, int priority)
+        private void RPC_SetCameraPriority(PlayerRef player,int priority)
         {
             if (Runner.LocalPlayer == player)
             {
                 CameraController.SetCameraPriority(priority);
             }
         }
-
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetIsKinematic(PlayerRef player, bool kinematic)
         {
-            Rigidbody.isKinematic = kinematic;
+           Rigidbody.isKinematic = kinematic;
         }
-
+        
         public void TakeHit(ref HitData hitData)
         {
             ApplyHit(ref hitData);
@@ -167,7 +177,6 @@ namespace InGame.Exhibit
                 hitData.Amount = 0;
                 return;
             }
-
             if (hitData.HitActionType == HitActionType.Damage)
             {
                 hitData.Amount = TakeDamage(hitData.Amount);
@@ -178,7 +187,7 @@ namespace InGame.Exhibit
                 hitData.Amount = TakeHeal(hitData.Amount);
             }
         }
-
+    
         int TakeDamage(int damage)
         {
             if (_isInvincible) return 0;
@@ -194,61 +203,8 @@ namespace InGame.Exhibit
             _currentHealth = Mathf.Clamp(_currentHealth + heal, 0, _maxHealth);
             return prevHealth - _currentHealth;
         }
-        
-        private void OnDrawGizmos()
-        {
-            if (!_drawHitboxGizmos || _onlyWhenSelected) return;
-            DrawHitboxGizmosInternal();
-        }
-        
-        private void OnDrawGizmosSelected()
-        {
-            if (!_drawHitboxGizmos || !_onlyWhenSelected) return;
-            DrawHitboxGizmosInternal();
-        }
 
-        private void DrawHitboxGizmosInternal()
-        {
-            if (_points == null || _points.Count == 0) return;
-            
-            Gizmos.color = _lineColor;
-            for (int i = 0; i < _points.Count - 1; i++)
-            {
-                if (_points[i] && _points[i + 1])
-                {
-                    Gizmos.DrawLine(_points[i].position, _points[i + 1].position);
-                }
-            }
-            
-            for (int i = 0; i < _points.Count; i++)
-            {
-                var t = _points[i];
-                if (!t) continue;
-
-                float scaledR = _hitboxRadius * GetMaxAxisScale(t);
-                
-                Gizmos.color = _hitboxWireColor;
-                Gizmos.DrawWireSphere(t.position, scaledR);
-                Gizmos.color = _hitboxSolidColor;
-                Gizmos.DrawSphere(t.position, scaledR);
-
-#if UNITY_EDITOR
-                if (_drawIndexLabel)
-                {
-                    Handles.color = _hitboxWireColor;
-                    Handles.Label(t.position + Vector3.up * (scaledR * 0.25f), $"[{i}] r={scaledR:F2}");
-                }
-#endif
-            }
-        }
-        
-        private static float GetMaxAxisScale(Transform t)
-        {
-            var s = t.lossyScale;
-            float ax = Mathf.Abs(s.x);
-            float ay = Mathf.Abs(s.y);
-            float az = Mathf.Abs(s.z);
-            return Mathf.Max(ax, Mathf.Max(ay, az));
-        }
     }
 }
+
+

@@ -17,4 +17,5 @@ public enum EffectType
     OpticalCamouflageInteractComplete,
     StunNormal,
     CarHit,
+    Heal,
 }

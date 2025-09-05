@@ -8,12 +8,13 @@ public class TyrannoInteractable : MountableExhibitBase
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _walkSpeed;
     [SerializeField] private float _dashSpeed;
-    [SerializeField] private Vector3 _groundNormal;
     [SerializeField] private Vector3 _rayDirection;
     [SerializeField] private float _rayDistance;
     [SerializeField] private Vector3 _gravity;
     [SerializeField] private float _maxRotateValue;
     [SerializeField] private float _runBlendDelay;
+    
+    private Vector3 _groundNormal;
 
     private bool _isGround;
 
@@ -59,7 +60,7 @@ public class TyrannoInteractable : MountableExhibitBase
         var moveDirection = Move(playerInput);
         moveDirection.y = 0;　
         Rotate(deltaTime, moveDirection);　//回転
-        AdsorptionOnGround();　//自身が浮いてしまったときに補正して地面にくっつける
+        AdsorptionOnGround(deltaTime);　//自身が浮いてしまったときに補正して地面にくっつける
         AttackAnimationTrigger(playerInput);　//攻撃のAnimationを発火
         OnAttackUpdate(deltaTime);　//Attack中にだけ走るメソッド
     }
@@ -99,6 +100,7 @@ public class TyrannoInteractable : MountableExhibitBase
         if (!ray || Vector3.Angle(normal, Vector3.up) >= 90)
         {
             _isGround = false;
+            Rigidbody.AddForce(_gravity, ForceMode.Acceleration);
         }
     }
 
@@ -144,14 +146,15 @@ public class TyrannoInteractable : MountableExhibitBase
         transform.rotation = rot;
     }
 
-    private void AdsorptionOnGround()
+    private void AdsorptionOnGround(float deltaTime)
     {
         if (_isGround) return;
         var ray = Physics.Raycast(transform.position + Vector3.up, _rayDirection, out RaycastHit hit,
             1.5f);
         if (ray && hit.distance > 0)
         {
-            transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            var targetPos = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            Rigidbody.MovePosition(Vector3.Lerp(transform.position, targetPos, deltaTime * 10f));
         }
     }
 
