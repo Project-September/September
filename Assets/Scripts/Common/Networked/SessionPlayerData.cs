@@ -25,6 +25,7 @@ namespace September.Common
         public CharacterType CharacterType;
         public NetworkBool IsOgre;
         public int Score;
+        public int StunCount;
 
         public SessionPlayerData(NetworkString<_16> nickName, int nickNameOrder)
         {
@@ -33,6 +34,7 @@ namespace September.Common
             CharacterType = CharacterType.OkabeWright;
             IsOgre = false;
             Score = 0;
+            StunCount = 0;
         }
     }
 }
