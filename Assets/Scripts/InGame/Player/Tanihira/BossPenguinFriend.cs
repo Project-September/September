@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class BossPenguinFriend : FriendBase, IFriendBuff
 {
+    [SerializeField] private GameObject _tutankhamun;
     protected override void Awake()
     {
         base.Awake();
@@ -19,11 +20,11 @@ public class BossPenguinFriend : FriendBase, IFriendBuff
 
     public void StartBuff()
     {
-        throw new System.NotImplementedException();
+        _tutankhamun.SetActive(true);
     }
 
     public void StopBuff()
     {
-        throw new System.NotImplementedException();
+        _tutankhamun.SetActive(false);
     }
 }

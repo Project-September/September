@@ -57,13 +57,14 @@ namespace Ingame.Tanihira
         }
 
         /// <summary>
-        /// 先頭の友達を返すメソッド
+        /// ボスペンギンを返す
         /// </summary>
-        public FriendBase GetFirstFriend()
+        public BossPenguinFriend GetBossFriend()
         {
-            if( _friendsList.Count > 0)
+            foreach (FriendBase friend in _friendsList)
             {
-                return _friendsList.First();
+                if(friend.TryGetComponent<BossPenguinFriend>(out BossPenguinFriend bossPenguinFriend))
+                    return bossPenguinFriend;
             }
             
             return null;
