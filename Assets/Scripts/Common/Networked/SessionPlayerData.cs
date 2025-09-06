@@ -27,7 +27,7 @@ namespace September.Common
         public int Score;
         public int StunCount;
         [Networked, Capacity(3)] public NetworkDictionary<PlayerRef, int> StunData => default;
-        
+        public int BonusPoint;
 
         public  SessionPlayerData(NetworkString<_16> nickName, int nickNameOrder)
         {
@@ -37,7 +37,7 @@ namespace September.Common
             IsOgre = false;
             Score = 0;
             StunCount = 0;
-            
+            BonusPoint = 0;
         }
     }
 }

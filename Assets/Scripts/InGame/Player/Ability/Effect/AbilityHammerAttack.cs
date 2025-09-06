@@ -20,7 +20,7 @@ namespace InGame.Player.Ability.Effect
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority)
             {
-                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
+                //ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
             }
             
             _hitChecker.OnHit += OnHitEnemy;

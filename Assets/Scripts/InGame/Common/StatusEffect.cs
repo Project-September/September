@@ -27,7 +27,7 @@ namespace InGame.Common
         
         #if UNITY_EDITOR
         [CustomEditor(typeof(StatusEffect))]
-        public class StatusEffectEditor : Editor
+        public class StatusEffectEditor : UnityEditor.Editor
         {
             private StatusEffect _statusEffect;
             private SerializedProperty _durationTypeProp;
