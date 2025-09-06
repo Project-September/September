@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Fusion;
+using InGame.Common;
 using UniRx;
 using UnityEngine;
 
@@ -40,6 +41,7 @@ namespace InGame.Player
         private Rigidbody _rb;
         private PlayerStatus _status;
         private Animator _animator;
+        private AnimationClipPlayer _animationClipPlayer;
         
         // base move
         [Networked] public Vector3 MoveVelocity { get; set; }
@@ -50,8 +52,8 @@ namespace InGame.Player
         private Vector3 _groundNormal = Vector3.up;
         private bool _isDashCoolTime;
         private bool CanDash => !_isDashCoolTime && _status.CurrentStamina > 0 && IsGround;
-        // vault
-        private bool _doingVault;
+        
+        [Networked] public bool DoingVault { get; set; }
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
@@ -71,6 +73,7 @@ namespace InGame.Player
             _rb = GetComponent<Rigidbody>();
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
+            _animationClipPlayer = GetComponent<AnimationClipPlayer>();
         }
         
 
@@ -81,7 +84,7 @@ namespace InGame.Player
             
             // set velocity
             if (isJump) TryVault(moveDirection);
-            if (_doingVault) UpdateVault(deltaTime);
+            if (DoingVault) UpdateVault(deltaTime);
             else
             {
                 ApplyGrav(deltaTime);
@@ -351,7 +354,7 @@ namespace InGame.Player
         void StartVault()
         {
             _vaultTimer = 0;
-            _doingVault = true;
+            DoingVault = true;
             Stop();
             
             Vector3 dir = _vaultEndPos - _vaultStartPos;
@@ -374,7 +377,7 @@ namespace InGame.Player
 
         void EndVault()
         {
-            _doingVault = false;
+            DoingVault = false;
         }
 
         public void AddForce(Vector3 force)

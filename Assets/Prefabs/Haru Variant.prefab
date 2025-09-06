@@ -4040,9 +4040,60 @@ PrefabInstance:
       value: 2199596302
       objectReference: {fileID: 0}
     - target: {fileID: 2525442923973757293, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: d1bd6ac996bf68346b9d292b0e386c51, type: 2}
+    - target: {fileID: 2525442923973757293, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 22100000, guid: 90e6cca0fd2549e4d874c70e08dcfe6f, type: 2}
+    - target: {fileID: 2525442923973757293, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'mn_c_main'\n\tTransform 'mn_l_collar'\n\tTransform
+        'mn_c_spain01'\n\tTransform 'mn_l_ankle'\n\tTransform 'mn_r_nkee'\n\tTransform
+        'mn_l_elbow'\n\tTransform 'mn_r_shoulder'\n\tTransform 'mn_r_wrist'\n\tTransform
+        'mn_l_toe'\n\tTransform 'mn_c_spain02'\n\tand more ...\n\tFrom animation
+        clip 'Haru_Walk'\n\tFrom animation clip 'Haru_Walk'\n\tFrom animation clip
+        'Haru_Walk'\n\tFrom animation clip 'Haru_Walk'"
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[2879281568291487894]._normalAttackAnimationClip
+      value: 
+      objectReference: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _run
+      value: 
+      objectReference: {fileID: 7400000, guid: 3a4664b380a211248a76866ed6180b6f, type: 2}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _fall
+      value: 
+      objectReference: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _wait
+      value: 
+      objectReference: {fileID: 7400000, guid: fa53f754c61f98b4b9b339bb59fe046f, type: 2}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _walk
+      value: 
+      objectReference: {fileID: 7400000, guid: fa53f754c61f98b4b9b339bb59fe046f, type: 2}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _layerInfo.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _layerInfo.Array.data[1].Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _layerInfo.Array.data[2].Type
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _layerInfo.Array.data[1].LayerMask
+      value: 
+      objectReference: {fileID: 31900000, guid: e79b47197069d2745b4537a36e7dc837, type: 2}
     - target: {fileID: 4810525472409146702, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _punchEffect
       value: 

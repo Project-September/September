@@ -24,11 +24,11 @@ namespace InGame.Player
         PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
         PlayerEffectController _playerEffectController;
-        AnimationClipPlayer _animationClipPlayer;
 
         private bool _shouldWarp = false;
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
+        private bool _isVaultingLastFrame = false;
 
         public void SetWarpTarget(Vector3 targetPosition,Quaternion targetRotation)
         {
@@ -55,7 +55,6 @@ namespace InGame.Player
         {
             _playerMovement = GetComponent<PlayerMovement>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
-            _animationClipPlayer = GetComponent<AnimationClipPlayer>();
 
             if (TryGetComponent(out CameraController cameraController))
             {
@@ -77,26 +76,35 @@ namespace InGame.Player
 
         private void LateUpdate()
         {
-            if (_animationClipPlayer)
-            {
-                var maxSpeed = _playerMovement.DashMoveSpeed;
-                var walkSpeed = _playerMovement.WalkSpeed;
-                var moveSpeed = _playerMovement.MoveVelocity.magnitude;
-                var weight = 0f;
-                if (moveSpeed <= walkSpeed)
-                {
-                    // 0..Walk -> 0..1
-                    weight = Mathf.InverseLerp(0f, walkSpeed, moveSpeed);
-                }
-                else
-                {
-                    // Walk..Max -> 1..2
-                    weight = Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f;
-                }
-                
-                _animationClipPlayer.SetLocoWeight(weight);
-                _animationClipPlayer.SetFall(!_playerMovement.IsGround);
-            }
+            // if (_animationClipPlayer)
+            // {
+            //     var maxSpeed = _playerMovement.DashMoveSpeed;
+            //     var walkSpeed = _playerMovement.WalkSpeed;
+            //     var moveSpeed = _playerMovement.MoveVelocity.magnitude;
+            //     var weight = 0f;
+            //     if (moveSpeed <= walkSpeed)
+            //     {
+            //         // 0..Walk -> 0..1
+            //         weight = Mathf.InverseLerp(0f, walkSpeed, moveSpeed);
+            //     }
+            //     else
+            //     {
+            //         // Walk..Max -> 1..2
+            //         weight = Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f;
+            //     }
+            //     
+            //     _animationClipPlayer.SetLocoWeight(weight);
+            //     
+            //     switch ()
+            //     {
+            //         case false when _playerMovement.DoingVault:
+            //             _animationClipPlayer.SetTopPriorityClip(true);
+            //             break;
+            //         case true when !_playerMovement.DoingVault:
+            //             _animationClipPlayer.SetTopPriorityClip(false);
+            //             break;
+            //     }
+            // }
             
             // Localでの処理にInputを送る
             if (HasInputAuthority)

@@ -20,7 +20,6 @@ namespace InGame.Common
         [SerializeField] private List<LayerInfo> _layerInfo;
         [SerializeField, Range(0f, 10f)] private float _graphSpeed = 1f;
         [Header("移動アニメーション")] 
-        [SerializeField] private AnimationClip _fall;
         [SerializeField] private AnimationClip _wait;
         [SerializeField] private AnimationClip _walk;
         [SerializeField] private AnimationClip _run;
@@ -34,6 +33,18 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, int> _slotOf = new();
         private readonly Dictionary<LayerInfo.LayerType, AnimationClipPlayable> _runtimeClips = new();
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _layerCts = new();
+        private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
+
+        public bool IsPlayingTargetClip(AnimationClip clip)
+        {
+            foreach (var kv in _clipOf)
+            {
+                if (kv.Value == clip && _runtimeClips.TryGetValue(kv.Key, out var p) && p.IsValid())
+                    return true;
+            }
+
+            return false;
+        }
 
         private void Awake()
         {
@@ -282,6 +293,7 @@ namespace InGame.Common
                 _layerMixer.DisconnectInput(slot);
                 current.Destroy();
                 _runtimeClips.Remove(layerType);
+                _clipOf.Remove(LayerInfo.LayerType.TopLayer);
             }
         }
 
@@ -385,6 +397,8 @@ namespace InGame.Common
                 _layerMixer.DisconnectInput(slot);
                 prev.Destroy();
             }
+            
+            _clipOf[layerType] = clip;
 
             var p = AnimationClipPlayable.Create(_graph, clip);
             p.SetApplyFootIK(false);
@@ -436,50 +450,44 @@ namespace InGame.Common
             _baseMixer.SetInputWeight(2, wRun);
         }
         
-        public void SetFall(bool on)
+        public void SetTopPriorityClip(AnimationClip clip)
         {
-            if (!_slotOf.TryGetValue(LayerInfo.LayerType.FallThrough, out var slot))
+            if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
             {
-                Debug.LogWarning("[AnimationClipPlayer] FallTop レイヤーが設定されていません。_layerInfo の最後に追加してください。");
-                return;
-            }
-            if (_fall == null)
-            {
-                Debug.LogWarning("[AnimationClipPlayer] _fall クリップが未設定です。");
+                Debug.LogWarning("[AnimationClipPlayer] TopLayer が設定されていません。_layerInfo の最後に追加してください。");
                 return;
             }
 
-            if (on)
+            // 解除要求
+            if (clip == null)
             {
-                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.FallThrough, out var p) && p.IsValid())
-                {
-                    _layerMixer.SetInputWeight(slot, 1f);
-                }
-                else
-                {
-                    Play(_fall, LayerInfo.LayerType.FallThrough, 1f, additive: false);
-                }
-
-                var li = _layerInfo[slot];
-                li.Weight = 1f;          
-                _layerInfo[slot] = li;
-            }
-            else
-            {
-                // 重み 0 にして切断・破棄
                 _layerMixer.SetInputWeight(slot, 0f);
 
-                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.FallThrough, out var current) && current.IsValid())
+                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var current) && current.IsValid())
                 {
                     _layerMixer.DisconnectInput(slot);
                     current.Destroy();
-                    _runtimeClips.Remove(LayerInfo.LayerType.FallThrough);
+                    _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
                 }
 
-                var li = _layerInfo[slot];
-                li.Weight = 0f;            // ★ 内部Weightも 0 に
-                _layerInfo[slot] = li;
+                var li0 = _layerInfo[slot];
+                li0.Weight = 0f;
+                _layerInfo[slot] = li0;
+                return;
             }
+
+            if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var prev) && prev.IsValid())
+            {
+                _layerMixer.DisconnectInput(slot);
+                prev.Destroy();
+                _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
+            }
+
+            Play(clip, LayerInfo.LayerType.TopLayer, 1f, additive: false);
+
+            var li = _layerInfo[slot];
+            li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
+            _layerInfo[slot] = li;
         }
     }
 
@@ -491,7 +499,7 @@ namespace InGame.Common
             Base = 0, //永続するモーション(移動など)
             FullBody = 1, //一時的な全身モーション
             UpperBody = 2,　//一時的な上半身モーション
-            FallThrough = 3, //落下モーションレイヤ、最優先で再生される
+            TopLayer = 3, //落下モーションレイヤ、最優先で再生される
         }
 
         public LayerType Type;
