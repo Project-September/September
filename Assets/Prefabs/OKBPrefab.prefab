@@ -5427,13 +5427,14 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
-        _normalAttackAnimationClip: {fileID: 7400000, guid: 11d1bcbf5c13ec14eb6e1cdbe68229e9, type: 2}
+        _normalAttackAnimationClip: {fileID: 7400000, guid: bca6193f688d20a43b0b8202f53a204a, type: 2}
         _attackDamage: 10
         _hitChecker: {fileID: 6462417923102071326}
         _isSubscribe: 0
         _startHitCheckFrame: 9
         _endHitCheckFrame: 17
         _endAttackFrame: 22
+        _layerWeight: 1
         _additiveMotion: 0
         _blendIn:
           BlendTime: 0.3

@@ -1,8 +1,12 @@
 using System;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
 using InGame.Health;
+using InGame.Player;
+using September.Common;
+using September.InGame.Common;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -17,6 +21,9 @@ namespace InGame.Player.Ability
         [SerializeField] private int _startHitCheckFrame = 17;
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
+        
+        [Header("攻撃アニメーション設定")]
+        [SerializeField] private float _layerWeight = 1f;
         [SerializeField] private bool _additiveMotion = false;
         [SerializeField] private LayerInfo.Blend _blendIn;
         [SerializeField] private LayerInfo.Blend _blendOut;
@@ -27,13 +34,16 @@ namespace InGame.Player.Ability
         // 攻撃開始Tick
         int _attackStartTick = -1;
         
+        // 最も近い敵のTransform
+        private Transform _closestEnemyTransform;
+        
 
         protected override void OnStart()
         {
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
-                ownerAnimator.PlayAsync(_normalAttackAnimationClip, LayerInfo.LayerType.FullBody, 1, _additiveMotion,
+                ownerAnimator.PlayAsync(_normalAttackAnimationClip, LayerInfo.LayerType.FullBody, _layerWeight, _additiveMotion,
                     blendIn: _blendIn, outBlend: _blendOut).Forget();
             }
             
@@ -46,6 +56,9 @@ namespace InGame.Player.Ability
             _endAttackTick = FrameToTick(_endAttackFrame);
 
             _attackStartTick = Runner != null ? Runner.Tick : 0;
+            
+            // 最も近い敵を取得
+            _closestEnemyTransform = GetClosestEnemy();
             
             if (!_isSubscribe)
             {
