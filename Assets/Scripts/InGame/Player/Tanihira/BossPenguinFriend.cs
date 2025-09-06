@@ -3,7 +3,7 @@ using InGame.Health;
 using Ingame.Tanihira;
 using UnityEngine;
 
-public class PenguinFriend : FriendBase
+public class BossPenguinFriend : FriendBase, IFriendBuff
 {
     protected override void Awake()
     {
@@ -15,5 +15,15 @@ public class PenguinFriend : FriendBase
         _friendStateMappings[FriendState.Chase] = new FriendChaseState();
         _friendStateMappings[FriendState.Attack] = new FriendAttackState();
         _friendStateMappings[FriendState.Wait] = new FriendWaitState();
+    }
+
+    public void StartBuff()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void StopBuff()
+    {
+        throw new System.NotImplementedException();
     }
 }
