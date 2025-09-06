@@ -41,7 +41,6 @@ namespace InGame.Player
         private Rigidbody _rb;
         private PlayerStatus _status;
         private Animator _animator;
-        private AnimationClipPlayer _animationClipPlayer;
         
         // base move
         [Networked] public Vector3 MoveVelocity { get; set; }
@@ -65,6 +64,8 @@ namespace InGame.Player
         public float WalkSpeed => _maxMoveSpeed;
         public float DashMoveSpeed => _maxDashSpeed;
         public bool IsGround => _isGround || _isGroundTimer > 0;
+        [Networked] 
+        public NetworkBool IsGroundNet { get; set; }
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
 
@@ -73,7 +74,6 @@ namespace InGame.Player
             _rb = GetComponent<Rigidbody>();
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
-            _animationClipPlayer = GetComponent<AnimationClipPlayer>();
         }
         
 
@@ -103,6 +103,13 @@ namespace InGame.Player
             if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
             _isGround = false;
             _groundNormal = Vector3.up;
+            
+            if (HasStateAuthority) {
+                bool groundedNow = _isGround || _isGroundTimer > 0f;
+                // 無駄な書き込みを避ける（同値なら送らない）
+                if (groundedNow != IsGroundNet)
+                    IsGroundNet = groundedNow;
+            }
         }
 
         /// <summary> カメラ視点の移動入力を取得 </summary>

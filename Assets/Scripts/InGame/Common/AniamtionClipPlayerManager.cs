@@ -49,11 +49,11 @@ namespace  InGame.Common
                 }
                 
                 //上るアニメーション中ではなくIsGroundedがfalseになったらFallDownアニメーションを再生
-                if (!_animationClipPlayer.IsPlayingTargetClip(_jumpOver) && !_playerMovement.IsGround)
+                if (!_animationClipPlayer.IsPlayingTargetClip(_jumpOver) && !_playerMovement.IsGroundNet)
                 {
                     _animationClipPlayer.SetTopPriorityClip(_fallDown);
                 }
-                else if (_playerMovement.IsGround && _animationClipPlayer.IsPlayingTargetClip(_fallDown))
+                else if (_playerMovement.IsGroundNet && _animationClipPlayer.IsPlayingTargetClip(_fallDown))
                 {   //地面に着地したらFallDownアニメーションを解除
                     _animationClipPlayer.SetTopPriorityClip(null);
                 }

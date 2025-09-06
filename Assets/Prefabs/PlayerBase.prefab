@@ -5086,6 +5086,7 @@ GameObject:
   - component: {fileID: 7508249662566368237}
   - component: {fileID: 2779401866583128900}
   - component: {fileID: 3570017578186338863}
+  - component: {fileID: 2447315062394318487}
   m_Layer: 6
   m_Name: PlayerBase
   m_TagString: Player
@@ -5288,6 +5289,9 @@ MonoBehaviour:
   _gizmoDisplayDuration: 1
   _visibleBit: 0
   _MoveVelocity: {x: 0, y: 0, z: 0}
+  _DoingVault: 0
+  _IsGroundNet:
+    _value: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5436,6 +5440,7 @@ MonoBehaviour:
         _startHitCheckFrame: 17
         _endHitCheckFrame: 21
         _endAttackFrame: 30
+        _isStopWhenAttack: 1
         _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
@@ -5459,6 +5464,22 @@ MonoBehaviour:
   _run: {fileID: 0}
   _locoWeight: 0
   _animator: {fileID: 2525442923973757293}
+--- !u!114 &2447315062394318487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a120739eaa41989479cb040e1558abce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animationClipPlayer: {fileID: 3570017578186338863}
+  _playerMovement: {fileID: 3242880713039265549}
+  _jumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
+  _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
