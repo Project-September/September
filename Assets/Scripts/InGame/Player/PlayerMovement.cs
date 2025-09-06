@@ -60,6 +60,8 @@ namespace InGame.Player
         private float _gizmoTimer;
         private List<CapsuleCastData> _capsuleCastData = new();
 
+        public float WalkSpeed => _maxMoveSpeed;
+        public float DashMoveSpeed => _maxDashSpeed;
         public Vector3 MoveVelocity => _moveVelocity;
         public bool IsGround => _isGround || _isGroundTimer > 0;
         public Vector3 GroundNormal => _groundNormal;

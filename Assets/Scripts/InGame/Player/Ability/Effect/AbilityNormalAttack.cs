@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
 using InGame.Health;
@@ -16,6 +17,9 @@ namespace InGame.Player.Ability
         [SerializeField] private int _startHitCheckFrame = 17;
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
+        [SerializeField] private bool _additiveMotion = false;
+        [SerializeField] private LayerInfo.Blend _blendIn;
+        [SerializeField] private LayerInfo.Blend _blendOut;
 
         // 変換後のTickオフセット
         int _startHitTick, _endHitTick, _endAttackTick;
@@ -29,7 +33,8 @@ namespace InGame.Player.Ability
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
-                //ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, false);
+                ownerAnimator.PlayAsync(_normalAttackAnimationClip, LayerInfo.LayerType.FullBody, 1, _additiveMotion,
+                    blendIn: _blendIn, outBlend: _blendOut).Forget();
             }
             
             float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;
@@ -67,7 +72,6 @@ namespace InGame.Player.Ability
         {
             int now    = Runner.Tick;
             int elapsed = now - _attackStartTick;
-            Debug.Log($"[AbilityNormalAttack] Tick:{now} Elapsed:{elapsed} Start:{_startHitTick} End:{_endHitTick} AttackEnd:{_endAttackTick}");
 
             // ヒット窓
             bool inWindow = elapsed >= _startHitTick && elapsed < _endHitTick;

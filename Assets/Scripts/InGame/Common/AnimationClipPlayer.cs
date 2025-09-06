@@ -18,7 +18,8 @@ namespace InGame.Common
     {
         [SerializeField] private List<LayerInfo> _layerInfo;
         [SerializeField, Range(0f, 10f)] private float _graphSpeed = 1f;
-        [Header("移動アニメーション")] [SerializeField] private AnimationClip _wait;
+        [Header("移動アニメーション")] 
+        [SerializeField] private AnimationClip _wait;
         [SerializeField] private AnimationClip _walk;
         [SerializeField] private AnimationClip _run;
         [SerializeField, Range(0f, 2f)] private float _locoWeight = 0f;
@@ -126,6 +127,8 @@ namespace InGame.Common
         {
             _graph.Evaluate(Time.deltaTime * _graphSpeed);
         }
+        
+        public void SetLocoWeight(float w) => _locoWeight = w;
 
         /// <summary>
         /// 指定のアニメーションを再生する。
