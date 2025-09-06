@@ -236,7 +236,7 @@ namespace InGame.Player
             
             if (direction == Vector3.zero) return;
 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), _rotationSpeed * deltaTime);
+            _rb.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), _rotationSpeed * deltaTime);
         }
 
         /// <summary> 条件付きでスタミナを回復させる </summary>

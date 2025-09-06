@@ -27,6 +27,9 @@ namespace InGame.Player.Ability
         [SerializeField] private bool _additiveMotion = false;
         [SerializeField] private LayerInfo.Blend _blendIn;
         [SerializeField] private LayerInfo.Blend _blendOut;
+        
+        [Header("自動エイム設定")]
+        [SerializeField] private bool _enableAutoAim = true;
 
         // 変換後のTickオフセット
         int _startHitTick, _endHitTick, _endAttackTick;
@@ -36,6 +39,7 @@ namespace InGame.Player.Ability
         
         // 最も近い敵のTransform
         private Transform _closestEnemyTransform;
+        private PlayerMovement _playerMovement;
         
 
         protected override void OnStart()
@@ -57,8 +61,14 @@ namespace InGame.Player.Ability
 
             _attackStartTick = Runner != null ? Runner.Tick : 0;
             
-            // 最も近い敵を取得
-            _closestEnemyTransform = GetClosestEnemy();
+            // PlayerMovementコンポーネントを取得
+            _playerMovement = Parameter.Owner.GetComponent<PlayerMovement>();
+            
+            // 自動エイムが有効な場合のみ最も近い敵を取得
+            if (_enableAutoAim)
+            {
+                _closestEnemyTransform = GetClosestEnemy();
+            }
             
             if (!_isSubscribe)
             {
@@ -86,6 +96,18 @@ namespace InGame.Player.Ability
             int now    = Runner.Tick;
             int elapsed = now - _attackStartTick;
 
+            // 最も近い敵の方向を向く
+            if (_closestEnemyTransform != null && _playerMovement != null)
+            {
+                Vector3 directionToEnemy = (_closestEnemyTransform.position - Parameter.Owner.transform.position).normalized;
+                directionToEnemy.y = 0; // Y軸は無視して水平方向のみ
+                
+                if (directionToEnemy.magnitude > 0.1f)
+                {
+                    _playerMovement.SetRotationDirection(directionToEnemy);
+                }
+            }
+
             // ヒット窓
             bool inWindow = elapsed >= _startHitTick && elapsed < _endHitTick;
 
@@ -99,6 +121,40 @@ namespace InGame.Player.Ability
             // 攻撃終了
             if (elapsed >= _endAttackTick)
                 _phase = AbilityPhase.Ending;
+        }
+        
+        private Transform GetClosestEnemy()
+        {
+            try
+            {
+                var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+                if (inGameManager?.PlayerDataDic == null || Parameter.Owner == null) return null;
+
+                Transform closestEnemy = null;
+                float closestDistance = float.MaxValue;
+                Vector3 ownerPosition = Parameter.Owner.transform.position;
+
+                foreach (var playerData in inGameManager.PlayerDataDic.Values)
+                {
+                    if (playerData == null || playerData == Parameter.Owner) continue;
+
+                    var playerManager = playerData.GetComponent<PlayerManager>();
+                    if (playerManager == null || playerManager.IsStun) continue;
+
+                    float distance = Vector3.Distance(ownerPosition, playerData.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestEnemy = playerData.transform;
+                    }
+                }
+
+                return closestEnemy;
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
         }
         
         protected override void OnEndAbility()

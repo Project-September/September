@@ -77,6 +77,26 @@ namespace InGame.Player
 
         private void LateUpdate()
         {
+            if (_animationClipPlayer)
+            {
+                var maxSpeed = _playerMovement.DashMoveSpeed;
+                var walkSpeed = _playerMovement.WalkSpeed;
+                var moveSpeed = _playerMovement.MoveVelocity.magnitude;
+                var weight = 0f;
+                if (moveSpeed <= walkSpeed)
+                {
+                    // 0..Walk -> 0..1
+                    weight = Mathf.InverseLerp(0f, walkSpeed, moveSpeed);
+                }
+                else
+                {
+                    // Walk..Max -> 1..2
+                    weight = Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f;
+                }
+                
+                _animationClipPlayer.SetLocoWeight(weight);
+            }
+            
             // Localでの処理にInputを送る
             if (HasInputAuthority)
             {
@@ -115,25 +135,7 @@ namespace InGame.Player
                 _shouldWarp = false;
             }
 
-            if (_animationClipPlayer)
-            {
-                var maxSpeed = _playerMovement.DashMoveSpeed;
-                var walkSpeed = _playerMovement.WalkSpeed;
-                var moveSpeed = _playerMovement.MoveVelocity.magnitude;
-                var weight = 0f;
-                if (moveSpeed <= walkSpeed)
-                {
-                    // 0..Walk -> 0..1
-                    weight = Mathf.InverseLerp(0f, walkSpeed, moveSpeed);
-                }
-                else
-                {
-                    // Walk..Max -> 1..2
-                    weight = Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f;
-                }
-                
-                _animationClipPlayer.SetLocoWeight(weight);
-            }
+            
         }
 
         public void AfterTick()
