@@ -95,6 +95,7 @@ namespace InGame.Player
                 }
                 
                 _animationClipPlayer.SetLocoWeight(weight);
+                _animationClipPlayer.SetFall(!_playerMovement.IsGround);
             }
             
             // Localでの処理にInputを送る

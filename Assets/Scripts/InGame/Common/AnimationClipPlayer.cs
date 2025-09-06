@@ -20,6 +20,7 @@ namespace InGame.Common
         [SerializeField] private List<LayerInfo> _layerInfo;
         [SerializeField, Range(0f, 10f)] private float _graphSpeed = 1f;
         [Header("移動アニメーション")] 
+        [SerializeField] private AnimationClip _fall;
         [SerializeField] private AnimationClip _wait;
         [SerializeField] private AnimationClip _walk;
         [SerializeField] private AnimationClip _run;
@@ -434,6 +435,52 @@ namespace InGame.Common
             _baseMixer.SetInputWeight(1, wWalk);
             _baseMixer.SetInputWeight(2, wRun);
         }
+        
+        public void SetFall(bool on)
+        {
+            if (!_slotOf.TryGetValue(LayerInfo.LayerType.FallThrough, out var slot))
+            {
+                Debug.LogWarning("[AnimationClipPlayer] FallTop レイヤーが設定されていません。_layerInfo の最後に追加してください。");
+                return;
+            }
+            if (_fall == null)
+            {
+                Debug.LogWarning("[AnimationClipPlayer] _fall クリップが未設定です。");
+                return;
+            }
+
+            if (on)
+            {
+                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.FallThrough, out var p) && p.IsValid())
+                {
+                    _layerMixer.SetInputWeight(slot, 1f);
+                }
+                else
+                {
+                    Play(_fall, LayerInfo.LayerType.FallThrough, 1f, additive: false);
+                }
+
+                var li = _layerInfo[slot];
+                li.Weight = 1f;          
+                _layerInfo[slot] = li;
+            }
+            else
+            {
+                // 重み 0 にして切断・破棄
+                _layerMixer.SetInputWeight(slot, 0f);
+
+                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.FallThrough, out var current) && current.IsValid())
+                {
+                    _layerMixer.DisconnectInput(slot);
+                    current.Destroy();
+                    _runtimeClips.Remove(LayerInfo.LayerType.FallThrough);
+                }
+
+                var li = _layerInfo[slot];
+                li.Weight = 0f;            // ★ 内部Weightも 0 に
+                _layerInfo[slot] = li;
+            }
+        }
     }
 
     [Serializable]
@@ -444,6 +491,7 @@ namespace InGame.Common
             Base = 0, //永続するモーション(移動など)
             FullBody = 1, //一時的な全身モーション
             UpperBody = 2,　//一時的な上半身モーション
+            FallThrough = 3, //落下モーションレイヤ、最優先で再生される
         }
 
         public LayerType Type;

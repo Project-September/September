@@ -5436,6 +5436,7 @@ MonoBehaviour:
         _startHitCheckFrame: 9
         _endHitCheckFrame: 17
         _endAttackFrame: 22
+        _isStopWhenAttack: 1
         _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
@@ -5465,7 +5466,12 @@ MonoBehaviour:
     LayerMask: {fileID: 31900000, guid: 1422e64155a2f1a4fafe7cd620bda205, type: 2}
     Weight: 0
     Additive: 0
+  - Type: 3
+    LayerMask: {fileID: 0}
+    Weight: 1
+    Additive: 0
   _graphSpeed: 1
+  _fall: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
   _wait: {fileID: 7400000, guid: e281b9c0b3aad9f49b64687001943220, type: 2}
   _walk: {fileID: 7400000, guid: b0eef498192b4af4da58c49f42d6f6fe, type: 2}
   _run: {fileID: 7400000, guid: 1b75d33f3707cec46a636ae1779bb096, type: 2}

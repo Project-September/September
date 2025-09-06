@@ -21,6 +21,7 @@ namespace InGame.Player.Ability
         [SerializeField] private int _startHitCheckFrame = 17;
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
+        [SerializeField] private bool _isStopWhenAttack = true;
         
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
@@ -86,7 +87,7 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
-            _playerMovement.Stop();
+            if (_isStopWhenAttack) _playerMovement.Stop();
             int now    = Runner.Tick;
             int elapsed = now - _attackStartTick;
 
