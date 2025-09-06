@@ -22,12 +22,6 @@ namespace InGame.Player.Ability
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
         
-        [Header("攻撃アニメーション設定")]
-        [SerializeField] private float _layerWeight = 1f;
-        [SerializeField] private bool _additiveMotion = false;
-        [SerializeField] private LayerInfo.Blend _blendIn;
-        [SerializeField] private LayerInfo.Blend _blendOut;
-        
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
 
@@ -47,8 +41,7 @@ namespace InGame.Player.Ability
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
-                ownerAnimator.PlayAsync(_normalAttackAnimationClip, LayerInfo.LayerType.FullBody, _layerWeight, _additiveMotion,
-                    blendIn: _blendIn, outBlend: _blendOut).Forget();
+                ownerAnimator.PlayClip(_normalAttackAnimationClip);
             }
             
             float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;
@@ -93,6 +86,7 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
+            _playerMovement.Stop();
             int now    = Runner.Tick;
             int elapsed = now - _attackStartTick;
 

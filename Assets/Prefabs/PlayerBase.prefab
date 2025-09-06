@@ -5167,6 +5167,7 @@ MonoBehaviour:
   - {fileID: 7710838205980989238}
   - {fileID: 7508249662566368237}
   - {fileID: 2779401866583128900}
+  - {fileID: 3570017578186338863}
   - {fileID: 4810525472409146702}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
@@ -5286,6 +5287,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _gizmoDisplayDuration: 1
   _visibleBit: 0
+  _MoveVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5434,6 +5436,7 @@ MonoBehaviour:
         _startHitCheckFrame: 17
         _endHitCheckFrame: 21
         _endAttackFrame: 30
+        _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 

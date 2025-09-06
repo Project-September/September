@@ -5167,6 +5167,7 @@ MonoBehaviour:
   - {fileID: 7710838205980989238}
   - {fileID: 7508249662566368237}
   - {fileID: 2779401866583128900}
+  - {fileID: 8254388696613982807}
   - {fileID: 4810525472409146702}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
@@ -5286,6 +5287,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _gizmoDisplayDuration: 1
   _visibleBit: 0
+  _MoveVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5434,60 +5436,7 @@ MonoBehaviour:
         _startHitCheckFrame: 9
         _endHitCheckFrame: 17
         _endAttackFrame: 22
-        _layerWeight: 1
-        _additiveMotion: 0
-        _blendIn:
-          BlendTime: 0.3
-          BlendCurve:
-            serializedVersion: 2
-            m_Curve:
-            - serializedVersion: 3
-              time: 0
-              value: 0
-              inSlope: 2
-              outSlope: 2
-              tangentMode: 0
-              weightedMode: 0
-              inWeight: 0
-              outWeight: 0
-            - serializedVersion: 3
-              time: 1
-              value: 1
-              inSlope: 0
-              outSlope: 0
-              tangentMode: 0
-              weightedMode: 0
-              inWeight: 0
-              outWeight: 0
-            m_PreInfinity: 2
-            m_PostInfinity: 2
-            m_RotationOrder: 4
-        _blendOut:
-          BlendTime: 0.3
-          BlendCurve:
-            serializedVersion: 2
-            m_Curve:
-            - serializedVersion: 3
-              time: 0
-              value: 0
-              inSlope: 2
-              outSlope: 2
-              tangentMode: 0
-              weightedMode: 0
-              inWeight: 0
-              outWeight: 0
-            - serializedVersion: 3
-              time: 1
-              value: 1
-              inSlope: 0
-              outSlope: 0
-              tangentMode: 0
-              weightedMode: 0
-              inWeight: 0
-              outWeight: 0
-            m_PreInfinity: 2
-            m_PostInfinity: 2
-            m_RotationOrder: 4
+        _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 

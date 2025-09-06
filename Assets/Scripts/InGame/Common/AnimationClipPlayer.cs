@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Fusion;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -14,7 +15,7 @@ namespace InGame.Common
     /// 一時的なモーションはFullBodyやUpperBodyレイヤーに設定して使う。
     /// RootMotion非対応。
     /// </summary>
-    public class AnimationClipPlayer : MonoBehaviour
+    public class AnimationClipPlayer : NetworkBehaviour
     {
         [SerializeField] private List<LayerInfo> _layerInfo;
         [SerializeField, Range(0f, 10f)] private float _graphSpeed = 1f;
@@ -129,7 +130,38 @@ namespace InGame.Common
         }
         
         public void SetLocoWeight(float w) => _locoWeight = w;
+        
 
+        public void PlayClip(AnimationClip clip)
+        {
+            if (AnimationClipsContainer.Instance.AnimationMontages == null)
+            {
+                Debug.LogWarning("AnimationClipsContainer Instance is null");
+                return;
+            }
+            
+            // AnimationClipsContainer から探して再生
+            var index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
+                x => x.AnimClip == clip);
+
+            if (index < 0)
+            {
+                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
+                return;
+            }
+            
+            Debug.Log($"PlayClip {clip.name} index={index}");
+            RPC_PlayAsync(index);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_PlayAsync(int clipIndex)
+        {
+            var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
+            PlayAsync(montage.AnimClip, montage.TargetLayer, 1f, montage.BlendIn, montage.BlendOut,
+                montage.IsAdditive).Forget();
+        }
+        
         /// <summary>
         /// 指定のアニメーションを再生する。
         /// 開始前と終了前にWeightをBlend可能
@@ -141,14 +173,14 @@ namespace InGame.Common
         /// <param name="external">外部から再生処理を止めるトークン。デフォルトではゲームオブジェクトのトークンに紐づく</param>
         /// <param name="blendIn">アニメーション再生開始時のブレンド</param>
         /// <param name="outBlend">アニメーション再生終了時のブレンド</param>
-        public async UniTask PlayAsync(
+        private async UniTask PlayAsync(
             AnimationClip clip,
             LayerInfo.LayerType layerType,
             float weight,
+            LayerInfo.Blend blendIn,
+            LayerInfo.Blend outBlend,
             bool additive = false,
-            CancellationToken external = default,
-            LayerInfo.Blend blendIn = default,
-            LayerInfo.Blend outBlend = default)
+            CancellationToken external = default)
         {
             if (!clip) return;
             if (layerType == LayerInfo.LayerType.Base)
