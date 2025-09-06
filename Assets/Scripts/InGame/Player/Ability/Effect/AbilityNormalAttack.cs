@@ -29,7 +29,7 @@ namespace InGame.Player.Ability
             var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
-                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, false);
+                //ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, false);
             }
             
             float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;

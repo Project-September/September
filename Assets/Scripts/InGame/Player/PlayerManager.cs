@@ -67,10 +67,10 @@ namespace InGame.Player
                 health.OnDeath += OnDeath;
             }
 
-            if (TryGetComponent(out PlayerAnimBase playerAnimBase))
-            {
-                playerAnimBase.Init(this);
-            }
+            // if (TryGetComponent(out PlayerAnimBase playerAnimBase))
+            // {
+            //     playerAnimBase.Init(this);
+            // }
         }
 
         private void LateUpdate()
