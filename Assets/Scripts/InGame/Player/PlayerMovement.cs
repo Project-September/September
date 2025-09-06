@@ -42,7 +42,7 @@ namespace InGame.Player
         private Animator _animator;
         
         // base move
-        private Vector3 _moveVelocity;
+        [Networked] public Vector3 MoveVelocity { get; set; }
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
@@ -60,7 +60,8 @@ namespace InGame.Player
         private float _gizmoTimer;
         private List<CapsuleCastData> _capsuleCastData = new();
 
-        public Vector3 MoveVelocity => _moveVelocity;
+        public float WalkSpeed => _maxMoveSpeed;
+        public float DashMoveSpeed => _maxDashSpeed;
         public bool IsGround => _isGround || _isGroundTimer > 0;
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
@@ -71,6 +72,7 @@ namespace InGame.Player
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
         }
+        
 
         public void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
@@ -115,7 +117,7 @@ namespace InGame.Player
         {
             if (_animator && _animator.applyRootMotion)
             {
-                _moveVelocity = Vector3.zero;
+                MoveVelocity = Vector3.zero;
                 return;
             }
             
@@ -143,7 +145,7 @@ namespace InGame.Player
         /// <summary> 水平方向のMoveVelocityを計算する </summary>
         private void CalcMoveVelocity(Vector2 moveDir, bool isDash, float deltaTime)
         {
-            float lastMoveMag = _moveVelocity.magnitude;
+            float lastMoveMag = MoveVelocity.magnitude;
             // is ground で摩擦量が変わる
             float friction = (IsGround ? _friction : _airFriction) * deltaTime;
             
@@ -153,7 +155,7 @@ namespace InGame.Player
                 Vector3 moveDir3 = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveDir.x, 0, moveDir.y);
                 // 加速
                 float acceleration = (IsGround ? isDash ? _dashAcceleration : _acceleration : _airAcceleration) * deltaTime;
-                Vector3 targetVelocity = _moveVelocity + moveDir3 * acceleration;
+                Vector3 targetVelocity = MoveVelocity + moveDir3 * acceleration;
             
                 float maxSpeed = (isDash ? _maxDashSpeed : _maxMoveSpeed) * _status.MaxSpeedRate;
                 float moveMag = targetVelocity.magnitude;
@@ -161,18 +163,18 @@ namespace InGame.Player
                 if (!IsGround)
                 {
                     // 空中は加速も摩擦もかける
-                    _moveVelocity = (moveMag - friction) / moveMag * targetVelocity;
+                    MoveVelocity = (moveMag - friction) / moveMag * targetVelocity;
                 }
                 else if (moveMag > maxSpeed) // todo:加速後のVectorから計算したいけど摩擦の計算時に加速を入れたくない
                 {
                     // 入力があってMaxSpeedを超えた場合、摩擦をかけるがMaxSpeedを下回らない
                     friction = Mathf.Min(friction, lastMoveMag - maxSpeed);
-                    _moveVelocity = (lastMoveMag - friction) / moveMag * targetVelocity;
+                    MoveVelocity = (lastMoveMag - friction) / moveMag * targetVelocity;
                 }
                 else // max speed を超えない場合
                 {
                     // 加速する
-                    _moveVelocity = targetVelocity;
+                    MoveVelocity = targetVelocity;
                 }
 
                 //_moveVelocity = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveVelocity2.x, 0, moveVelocity2.y);
@@ -181,10 +183,10 @@ namespace InGame.Player
             else // 入力がなかった場合
             {
                 // 摩擦をかけるだけ
-                Vector3 frictionVec = friction * -_moveVelocity.normalized;
-                frictionVec = Vector3.ClampMagnitude(frictionVec, _moveVelocity.magnitude);
+                Vector3 frictionVec = friction * -MoveVelocity.normalized;
+                frictionVec = Vector3.ClampMagnitude(frictionVec, MoveVelocity.magnitude);
                 frictionVec.y = 0;
-                _moveVelocity += frictionVec;
+                MoveVelocity += frictionVec;
             }
         }
 
@@ -192,11 +194,11 @@ namespace InGame.Player
         {
             if (IsGround)
             {
-                Vector3 normalUp = Quaternion.FromToRotation(_groundNormal, Vector3.up) * _moveVelocity;
+                Vector3 normalUp = Quaternion.FromToRotation(_groundNormal, Vector3.up) * MoveVelocity;
                 normalUp.y = 0;
-                _moveVelocity = Quaternion.FromToRotation(Vector3.up, _groundNormal) * normalUp;
+                MoveVelocity = Quaternion.FromToRotation(Vector3.up, _groundNormal) * normalUp;
             }
-            else _moveVelocity.y -= _gravity * deltaTime;
+            else MoveVelocity -= new Vector3(0, _gravity * deltaTime, 0);
         }
 
         void AdsorptionOnGround()
@@ -215,9 +217,9 @@ namespace InGame.Player
         private void ApplyVelocity(float deltaTime)
         {
             // 速度の代入
-            _rb.linearVelocity = _moveVelocity;
+            _rb.linearVelocity = MoveVelocity;
             // 回転の向きを代入
-            if (!_setDirection) _rotationDirection = _moveVelocity;
+            if (!_setDirection) _rotationDirection = MoveVelocity;
         }
 
         public void SetRotationDirection(Vector3 lookDirection)
@@ -234,7 +236,7 @@ namespace InGame.Player
             
             if (direction == Vector3.zero) return;
 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), _rotationSpeed * deltaTime);
+            _rb.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), _rotationSpeed * deltaTime);
         }
 
         /// <summary> 条件付きでスタミナを回復させる </summary>
@@ -377,8 +379,8 @@ namespace InGame.Player
 
         public void AddForce(Vector3 force)
         {
-            _moveVelocity += force;
-            if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
+            MoveVelocity += force;
+            if (Vector3.Angle(MoveVelocity, _groundNormal) < 89)
             {
                 _isGround = false;
                 _isGroundTimer = 0.1f;
@@ -388,13 +390,13 @@ namespace InGame.Player
         /// <summary> 速度ベクトルを0にする </summary>
         public void Stop()
         {
-            _moveVelocity = Vector3.zero;
+            MoveVelocity = Vector3.zero;
         }
 
         public float GetSpeedOnPlane()
         {
             Quaternion normalRot = Quaternion.FromToRotation(_groundNormal, Vector3.up);
-            Vector3 onPlaneVec = normalRot * _moveVelocity;
+            Vector3 onPlaneVec = normalRot * MoveVelocity;
             onPlaneVec.y = 0;
             return onPlaneVec.magnitude;
         }

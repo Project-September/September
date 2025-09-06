@@ -379,7 +379,7 @@ MonoBehaviour:
   - {fileID: 750593193299160763}
   _radius: 0.1
   _alreadyHit: []
-  IsFinished: 0
+  IsActive: 0
 --- !u!114 &4810525472409146702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3572,7 +3572,7 @@ MonoBehaviour:
   - {fileID: 750593193299160763}
   _radius: 0.1
   _alreadyHit: []
-  IsFinished: 0
+  IsActive: 0
 --- !u!1 &5474908219773255667
 GameObject:
   m_ObjectHideFlags: 0
@@ -5083,9 +5083,9 @@ GameObject:
   - component: {fileID: -3905644752378878134}
   - component: {fileID: 4737425158909762900}
   - component: {fileID: 7710838205980989238}
-  - component: {fileID: 2221120114231077883}
   - component: {fileID: 7508249662566368237}
   - component: {fileID: 2779401866583128900}
+  - component: {fileID: 3570017578186338863}
   m_Layer: 6
   m_Name: PlayerBase
   m_TagString: Player
@@ -5165,9 +5165,9 @@ MonoBehaviour:
   - {fileID: 5358505061852357365}
   - {fileID: -3905644752378878134}
   - {fileID: 7710838205980989238}
-  - {fileID: 2221120114231077883}
   - {fileID: 7508249662566368237}
   - {fileID: 2779401866583128900}
+  - {fileID: 3570017578186338863}
   - {fileID: 4810525472409146702}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
@@ -5287,6 +5287,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _gizmoDisplayDuration: 1
   _visibleBit: 0
+  _MoveVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5377,22 +5378,6 @@ MonoBehaviour:
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
   _isHoldingInteract: 0
---- !u!114 &2221120114231077883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8360875997416129576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 589ff6351b0c87248acd0f070ff2dd4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 2525442923973757293}
-  _paramIsStan: IsStan
-  _pramSpeed: Speed
-  _pramIsGround: IsGround
 --- !u!114 &7508249662566368237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5448,9 +5433,32 @@ MonoBehaviour:
         _attackDamage: 10
         _hitChecker: {fileID: 6462417923102071326}
         _isSubscribe: 0
+        _startHitCheckFrame: 17
+        _endHitCheckFrame: 21
+        _endAttackFrame: 30
+        _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
+--- !u!114 &3570017578186338863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83db0a2456e37ec47923962239d9002c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _layerInfo: []
+  _graphSpeed: 1
+  _wait: {fileID: 0}
+  _walk: {fileID: 0}
+  _run: {fileID: 0}
+  _locoWeight: 0
+  _animator: {fileID: 2525442923973757293}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

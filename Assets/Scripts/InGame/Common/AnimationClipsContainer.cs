@@ -35,19 +35,11 @@ namespace InGame.Common
     {
         public AnimationClip AnimClip;
         [Header("Blend")]
-        public Blend BlendIn;
-        public Blend BlendOut;
+        public LayerInfo.Blend BlendIn;
+        public LayerInfo.Blend BlendOut;
         
         [Header("Layer Meta")]
-        public AvatarMask AvatarMask;
+        public LayerInfo.LayerType TargetLayer;
         public bool IsAdditive;
-        public bool UseRootMotion;
-
-        [Serializable]
-        public struct Blend
-        {
-            public float BlendTime;
-            public AnimationCurve BlendCurve;
-        }
     }
 }
