@@ -7,6 +7,7 @@ using InGame.Health;
 using InGame.Player;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -15,13 +16,15 @@ namespace InGame.Player.Ability
     public class AbilityNormalAttack : AbilityBase
     {
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
-        [SerializeField] private int _attackDamage = 10;
-        [SerializeField] private HitChecker _hitChecker;
+        [SerializeField] protected int _attackDamage = 10;
+        [SerializeField] protected HitChecker _hitChecker;
         [SerializeField] private bool _isSubscribe = false;
         [SerializeField] private int _startHitCheckFrame = 17;
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
         [SerializeField] private bool _isStopWhenAttack = true;
+        [SerializeField] protected EffectType _hitEffect = EffectType.HitNormal;
+        [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
@@ -35,15 +38,17 @@ namespace InGame.Player.Ability
         // 最も近い敵のTransform
         private Transform _closestEnemyTransform;
         private PlayerMovement _playerMovement;
-        
+        protected EffectSpawner _effectSpawner;
 
         protected override void OnStart()
         {
-            var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
-            if (ownerAnimator && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
+            if (_animationClipPlayer && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
             {
-                ownerAnimator.PlayClip(_normalAttackAnimationClip);
+                _animationClipPlayer.PlayClip(_normalAttackAnimationClip);
             }
+            
+            if (!_effectSpawner)
+                _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             
             float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;
             float dt  = Runner != null ? Runner.DeltaTime : Time.fixedDeltaTime;
@@ -72,7 +77,7 @@ namespace InGame.Player.Ability
             _startHitTick  = FrameToTick(_startHitCheckFrame);
         }
 
-        private void OnHitEnemy(Collider hitInfo)
+        protected virtual void OnHitEnemy(Collider hitInfo)
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
@@ -83,6 +88,10 @@ namespace InGame.Player.Ability
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
+            
+            //エフェクトの再生
+          
+            _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(_hitChecker.HitPoint.First().position), Quaternion.identity);
         }
 
         protected override void OnUpdate(float deltaTime)

@@ -18,4 +18,5 @@ public enum EffectType
     StunNormal,
     CarHit,
     Heal,
+    HitNormal,
 }

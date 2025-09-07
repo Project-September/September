@@ -162,7 +162,6 @@ namespace InGame.Common
                 return;
             }
             
-            Debug.Log($"PlayClip {clip.name} index={index}");
             RPC_PlayAsync(index);
         }
 
@@ -171,7 +170,7 @@ namespace InGame.Common
         {
             var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
             PlayAsync(montage.AnimClip, montage.TargetLayer, 1f, montage.BlendIn, montage.BlendOut,
-                montage.IsAdditive).Forget();
+                montage.IsAdditive, montage.PlaySpeed).Forget();
         }
         
         /// <summary>
@@ -192,6 +191,7 @@ namespace InGame.Common
             LayerInfo.Blend blendIn,
             LayerInfo.Blend outBlend,
             bool additive = false,
+            float playSpeed = 1f,
             CancellationToken external = default)
         {
             if (!clip) return;
@@ -215,7 +215,7 @@ namespace InGame.Common
             var startW = useBlendIn ? currentW : Mathf.Clamp01(weight);
             var targetW = Mathf.Clamp01(weight);
 
-            Play(clip, layerType, startW, additive);
+            Play(clip, layerType, startW, additive, playSpeed);
 
             var liNow = _layerInfo[slot];
             liNow.Weight = startW;
@@ -375,7 +375,7 @@ namespace InGame.Common
             }
         }
 
-        private void Play(AnimationClip clip, LayerInfo.LayerType layerType, float weight, bool additive = false)
+        private void Play(AnimationClip clip, LayerInfo.LayerType layerType, float weight, bool additive = false, float playSpeed = 1f)
         {
             if (!clip) return;
 
@@ -404,7 +404,7 @@ namespace InGame.Common
             p.SetApplyFootIK(false);
             p.SetTime(0);
             p.SetDuration(clip.length);
-            p.SetSpeed(1f);
+            p.SetSpeed(playSpeed);
 
             _layerMixer.ConnectInput(slot, p, 0);
             _layerMixer.SetLayerAdditive((uint)slot, additive);

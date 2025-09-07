@@ -34,6 +34,7 @@ namespace InGame.Common
     public struct AnimationMontage
     {
         public AnimationClip AnimClip;
+        public float PlaySpeed;
         [Header("Blend")]
         public LayerInfo.Blend BlendIn;
         public LayerInfo.Blend BlendOut;
@@ -41,5 +42,15 @@ namespace InGame.Common
         [Header("Layer Meta")]
         public LayerInfo.LayerType TargetLayer;
         public bool IsAdditive;
+
+        public AnimationMontage(float playSpeed = 1)
+        {
+            AnimClip = null;
+            PlaySpeed = playSpeed;
+            BlendIn = new LayerInfo.Blend();
+            BlendOut = new LayerInfo.Blend();
+            TargetLayer = LayerInfo.LayerType.Base;
+            IsAdditive = false;
+        }
     }
 }
