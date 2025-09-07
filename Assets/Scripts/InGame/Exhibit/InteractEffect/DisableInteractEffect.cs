@@ -19,6 +19,7 @@ namespace InGame.Exhibit.InteractEffect
             _interactable.LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
             _interactable.LastUsedCooldownTime = cooldownTime;
             //何かしらの対応する演出を入れる
+            
         }
     }
 }

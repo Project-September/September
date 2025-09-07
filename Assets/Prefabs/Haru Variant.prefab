@@ -3967,6 +3967,10 @@ PrefabInstance:
       propertyPath: _meshObj
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _jumpOver
+      value: 
+      objectReference: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: SortKey
       value: 2199596302
@@ -4010,10 +4014,14 @@ PrefabInstance:
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _walk
       value: 
-      objectReference: {fileID: 7400000, guid: fa53f754c61f98b4b9b339bb59fe046f, type: 2}
+      objectReference: {fileID: 7400000, guid: 91f15a44261cbef48b98b2fefa9cd72d, type: 2}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _graphSpeed
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.data[1].Type
@@ -4022,6 +4030,10 @@ PrefabInstance:
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.data[2].Type
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _layerInfo.Array.data[3].Type
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.data[0].Weight
