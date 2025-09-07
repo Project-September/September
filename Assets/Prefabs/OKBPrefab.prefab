@@ -333,7 +333,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1292013223828287825}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: cd799a2b68062f94789149da707e4e54, type: 2}
   m_Controller: {fileID: 9100000, guid: cb3d2de5fef4c364da24b9ae4f719a16, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -341,7 +341,15 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'okb_ReJoint:test__Spine'\n\tTransform 'okb_ReJoint:test__L_UpLeg'\n\tTransform
+    'okb_ReJoint:test__R_UpLeg'\n\tTransform 'okb_ReJoint:test_okb_Reference2'\n\tTransform
+    'okb_ReJoint:test__Hips'\n\tTransform 'okb_ReJoint:test__L_Foot'\n\tTransform
+    'okb_ReJoint:test__R_ToeBase'\n\tTransform 'okb_ReJoint:test__R_HandThumb1'\n\tTransform
+    'okb_ReJoint:test__R_HandMiddle1'\n\tTransform 'okb_ReJoint:test__R_HandMiddle2'\n\tand
+    more ...\n\tFrom animation clip 'fall'\n\tFrom animation clip 'wait'\n\tFrom
+    animation clip 'walk'\n\tFrom animation clip 'run'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -5083,9 +5091,10 @@ GameObject:
   - component: {fileID: -3905644752378878134}
   - component: {fileID: 4737425158909762900}
   - component: {fileID: 7710838205980989238}
-  - component: {fileID: 2221120114231077883}
   - component: {fileID: 7508249662566368237}
   - component: {fileID: 2779401866583128900}
+  - component: {fileID: 8254388696613982807}
+  - component: {fileID: 7344648055957507413}
   m_Layer: 6
   m_Name: OKBPrefab
   m_TagString: Player
@@ -5165,9 +5174,9 @@ MonoBehaviour:
   - {fileID: 5358505061852357365}
   - {fileID: -3905644752378878134}
   - {fileID: 7710838205980989238}
-  - {fileID: 2221120114231077883}
   - {fileID: 7508249662566368237}
   - {fileID: 2779401866583128900}
+  - {fileID: 8254388696613982807}
   - {fileID: 4810525472409146702}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
@@ -5287,6 +5296,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   _gizmoDisplayDuration: 1
   _visibleBit: 0
+  _MoveVelocity: {x: 0, y: 0, z: 0}
+  _DoingVault: 0
+  _IsGroundNet:
+    _value: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5377,22 +5390,6 @@ MonoBehaviour:
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
   _isHoldingInteract: 0
---- !u!114 &2221120114231077883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8360875997416129576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 589ff6351b0c87248acd0f070ff2dd4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 2525442923973757293}
-  _paramIsStan: IsStan
-  _pramSpeed: Speed
-  _pramIsGround: IsGround
 --- !u!114 &7508249662566368237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5444,16 +5441,69 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
-        _normalAttackAnimationClip: {fileID: 7400000, guid: 60c28bdfb725c81419321d4c49a63d73, type: 2}
+        _normalAttackAnimationClip: {fileID: 7400000, guid: bca6193f688d20a43b0b8202f53a204a, type: 2}
         _attackDamage: 10
         _hitChecker: {fileID: 6462417923102071326}
         _isSubscribe: 0
         _startHitCheckFrame: 9
         _endHitCheckFrame: 17
         _endAttackFrame: 22
+        _isStopWhenAttack: 1
+        _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
+--- !u!114 &8254388696613982807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83db0a2456e37ec47923962239d9002c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _layerInfo:
+  - Type: 0
+    LayerMask: {fileID: 0}
+    Weight: 1
+    Additive: 0
+  - Type: 1
+    LayerMask: {fileID: 31900000, guid: d2a9b2d5401ebb64393d28fbc2986379, type: 2}
+    Weight: 0
+    Additive: 0
+  - Type: 2
+    LayerMask: {fileID: 31900000, guid: 1422e64155a2f1a4fafe7cd620bda205, type: 2}
+    Weight: 0
+    Additive: 0
+  - Type: 3
+    LayerMask: {fileID: 0}
+    Weight: 1
+    Additive: 0
+  _graphSpeed: 1
+  _wait: {fileID: 7400000, guid: e281b9c0b3aad9f49b64687001943220, type: 2}
+  _walk: {fileID: 7400000, guid: b0eef498192b4af4da58c49f42d6f6fe, type: 2}
+  _run: {fileID: 7400000, guid: 1b75d33f3707cec46a636ae1779bb096, type: 2}
+  _locoWeight: 0
+  _animator: {fileID: 2525442923973757293}
+--- !u!114 &7344648055957507413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a120739eaa41989479cb040e1558abce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animationClipPlayer: {fileID: 8254388696613982807}
+  _playerMovement: {fileID: 3242880713039265549}
+  _jumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
+  _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
