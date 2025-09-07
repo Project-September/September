@@ -9,7 +9,7 @@ namespace InGame.Player.Ability.Condition
     {
         public string TargetAbilityName => nameof(AbilityHammerAttack);
 
-        public bool IsConditionMatch(TriggerEventContext context)
+        public bool IsConditionMatch(in TriggerEventContext context)
         {
             //Available状態でAttackボタンが押されたら条件を満たす
             return context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available &&
