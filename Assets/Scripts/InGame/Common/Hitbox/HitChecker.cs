@@ -13,6 +13,7 @@ public class HitChecker : MonoBehaviour
     [SerializeField] private List<Collider> _alreadyHit = new();
     private MeleeHitboxExecutor _executor;
     public bool IsActive = false;
+    public List<Transform> HitPoint => _hitPoints;
     public event Action<Collider> OnHit;
     
     public void StartHitCheck()

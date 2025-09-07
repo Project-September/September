@@ -70,7 +70,7 @@ namespace InGame.Interact
             OnInteract(context);
         }
         
-        private async UniTask PlayCooldownEffect(float cooldownTime)
+        public async UniTask PlayCooldownEffect(float cooldownTime)
         {
             if (cooldownTime <= 0f) return;
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();

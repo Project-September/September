@@ -5298,6 +5298,8 @@ MonoBehaviour:
   _visibleBit: 0
   _MoveVelocity: {x: 0, y: 0, z: 0}
   _DoingVault: 0
+  _IsGroundNet:
+    _value: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5447,6 +5449,8 @@ MonoBehaviour:
         _endHitCheckFrame: 17
         _endAttackFrame: 22
         _isStopWhenAttack: 1
+        _hitEffect: 18
+        _animationClipPlayer: {fileID: 8254388696613982807}
         _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
@@ -5500,7 +5504,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 8254388696613982807}
   _playerMovement: {fileID: 3242880713039265549}
-  _jumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
+  _jumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
 --- !u!1 &8408815403407481762
 GameObject:
