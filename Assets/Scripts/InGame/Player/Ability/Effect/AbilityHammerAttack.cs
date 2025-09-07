@@ -14,14 +14,12 @@ namespace InGame.Player.Ability.Effect
     {
         protected override void OnHitEnemy(Collider hitInfo)
         {
-            Debug.Log(
-                $"Name {hitInfo.gameObject.name} networkObject {hitInfo.GetComponentInParent<NetworkObject>()} owner {Parameter.Owner} isAlive {hitInfo.GetComponentInParent<IDamageable>()?.IsAlive} disableInteractEffect {hitInfo.GetComponent<DisableInteractEffect>()}");
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
             var disableInteractEffect = hitInfo.GetComponent<DisableInteractEffect>();
-            if (damageable == null || !disableInteractEffect) return;
+            if (damageable == null && !disableInteractEffect) return;
 
-            if (damageable.IsAlive)
+            if (damageable != null)
             {
                 var hitData = new HitData(
                     HitActionType.Damage,
