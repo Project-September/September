@@ -71,6 +71,8 @@ namespace Ingame.Tanihira
         
         protected virtual void Start()
         {
+            //Noneステートの設定
+            _friendStateMappings[FriendState.None] = new FriendNoneState();
             _agent = GetComponent<NavMeshAgent>();
             _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
             InitializeStates();
@@ -120,6 +122,16 @@ namespace Ingame.Tanihira
         /// <param name="newState">新しいステート</param>
         public virtual void ChangeState(FriendState newState)
         {
+            //Noneの時には強制的にステートを変更させる
+            if (newState == FriendState.None)
+            {
+                // 現在のステートのOnExitを呼び出し、コンポーネントを無効化
+                _friendStateMappings[_currentState]?.OnExit(this);
+                // 新しいステートに変更
+                _currentState = newState;
+                return;
+            }
+            
             if (_currentState != FriendState.Wait)
             {
                 //attackの場合はchaseに変えておく

@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Fusion;
-using September.Common;
-using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,15 +12,20 @@ namespace Ingame.Tanihira
     public class FormationManager : NetworkBehaviour
     {
         [SerializeField] private Transform _firstFormationTransform;
-        [SerializeField] private float _formationOffset = 1f;
+        [SerializeField] private float _formationOffset = 1.0f;
+        [SerializeField] private float _outFieldWarpHeight = 100.0f;
         private List<FriendBase> _friendsList = new List<FriendBase>();
+        private List<FriendBase> _currentFriendsList = new List<FriendBase>();
         private Transform _playerTransform;
-        //private EffectSpawner _effectSpawner;
+        private float _warpDuration = 0.5f;
+        private CancellationTokenSource _cts;
+        public List<FriendBase> CurrentFriendsList => _currentFriendsList;
         public List<FriendBase> FriendsList => _friendsList;
+        
 
         private void Start()
         {
-            //_effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
+            _cts = new CancellationTokenSource();
         }
 
         /// <summary>
@@ -29,15 +35,15 @@ namespace Ingame.Tanihira
         public Transform Register(FriendBase friend)
         {
             //先頭の位置を返す
-            if (_friendsList.Count == 0)
+            if (_currentFriendsList.Count == 0)
             {
-                _friendsList.Add(friend);
+                _currentFriendsList.Add(friend);
                 return _firstFormationTransform;
             }
             else //最後尾のオブジェクトのTransformを返す
             {
-                Transform newDestination = _friendsList.Last().FormationPos;
-                _friendsList.Add(friend);
+                Transform newDestination = _currentFriendsList.Last().FormationPos;
+                _currentFriendsList.Add(friend);
                 return newDestination;
             }
         }
@@ -48,22 +54,23 @@ namespace Ingame.Tanihira
         /// <param name="friend"></param>
         public void DeleteFriend(FriendBase friend)
         {
-            int index = _friendsList.IndexOf(friend);
+            int index = _currentFriendsList.IndexOf(friend);
             if (index >= 0)
             {
-                _friendsList.RemoveAt(index);
+                _currentFriendsList.RemoveAt(index);
                 SortFormation();
             }
         }
 
         /// <summary>
-        /// 先頭の友達を返すメソッド
+        /// ボスペンギンを返す
         /// </summary>
-        public FriendBase GetFirstFriend()
+        public BossPenguinFriend GetBossFriend()
         {
-            if( _friendsList.Count > 0)
+            foreach (FriendBase friend in _currentFriendsList)
             {
-                return _friendsList.First();
+                if(friend.TryGetComponent<BossPenguinFriend>(out BossPenguinFriend bossPenguinFriend))
+                    return bossPenguinFriend;
             }
             
             return null;
@@ -74,11 +81,11 @@ namespace Ingame.Tanihira
         /// </summary>
         public void SortFormation()
         {
-            if(_friendsList.Count > 0)
+            if(_currentFriendsList.Count > 0)
             {
-                for(int i = 0; i < _friendsList.Count; i++)
+                for(int i = 0; i < _currentFriendsList.Count; i++)
                 {
-                    FriendBase friend = _friendsList[i];
+                    FriendBase friend = _currentFriendsList[i];
 
                     if (i == 0) //先頭の場合
                     {
@@ -86,24 +93,47 @@ namespace Ingame.Tanihira
                     }
                     else
                     {
-                        friend.SetDestination(_friendsList[i - 1].FormationPos);
+                        friend.SetDestination(_currentFriendsList[i - 1].FormationPos);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// 隊列にいるフレンドをワープさせる
+        /// 原罪の隊列を登録する
         /// </summary>
-        public void WarpFriend(Vector3 warpPosition, Quaternion warpRotation)
+        public void RegisterFriendFormation()
+        {
+            _friendsList.Clear();
+            foreach (FriendBase friend in _currentFriendsList)
+            {
+                _friendsList.Add(friend);
+            }
+        }
+
+        /// <summary>
+        /// 隊列にいるフレンドをプレイヤーの近くにワープさせる
+        /// </summary>
+        public async void WarpFriendNearPlayer(Vector3 warpPosition, Quaternion warpRotation)
         {
             if(!HasStateAuthority)
                 return;
             
-            //フレンドを全員ワープさせる
-            foreach (FriendBase friend in _friendsList)
+            //フレンドのステートの切り替え
+            foreach (FriendBase friend in _currentFriendsList)
             {
+                friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
+                friend.Animator.SetFloat("MoveBlend", 0);
+                friend.ChangeState(FriendState.Wait);
+            }
+
+            //少し待ってから移動させる
+            await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration), cancellationToken: _cts.Token);
+            
+            //フレンドを隊列のフレンドをワープさせる
+            foreach (FriendBase friend in _currentFriendsList)
+            {
                 var fixedPos = warpPosition;
                 NavMeshHit hit;
                 if (NavMesh.SamplePosition(warpPosition, out hit, 10.0f, NavMesh.AllAreas))
@@ -113,12 +143,39 @@ namespace Ingame.Tanihira
                 }
                 else
                 {
-                    return;
+                    continue;
                 }
                 
                 var networkTransform = friend.GetComponent<NetworkTransform>();
                 networkTransform.Teleport(fixedPos, warpRotation);
-                friend.ChangeState(FriendState.Wait);
+                // NavMeshAgent と同期
+                friend.Agent.Warp(fixedPos);
+            }
+        }
+
+        [ContextMenu("FriendWarpOutSide")]
+        public async void WarpFriendOutField()
+        {
+            if(!HasStateAuthority)
+                return;
+            
+            //フレンドのステートの切り替え
+            foreach (FriendBase friend in _friendsList)
+            {
+                friend.Agent.isStopped = true;
+                friend.Agent.enabled = false;
+                friend.ChangeState(FriendState.None);
+            }
+            
+            //少し待ってから移動させる
+            await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration), cancellationToken: _cts.Token);
+            
+            Vector3 warpPos = new Vector3(0, 0 , _outFieldWarpHeight);
+            //フレンドを全員ワープさせる
+            foreach (FriendBase friend in _friendsList)
+            {
+                var networkTransform = friend.GetComponent<NetworkTransform>();
+                networkTransform.Teleport(warpPos);
             }
         }
     }
