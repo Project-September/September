@@ -29,6 +29,7 @@ namespace InGame.Player
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
+        public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
         public void SetWarpTarget(Vector3 targetPosition,Quaternion targetRotation)
         {
