@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Player;
 using UnityEngine;
 using September.Common;
 using September.InGame.UI;
@@ -31,11 +32,13 @@ namespace InGame.Interact
         private float _requiredInteractTime = 1.0f;
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
+        private PlayerManager _playerManager;
 
         private void Awake()
         {
             if (!_interactOrigin)
                 _interactOrigin = transform;
+            _playerManager = GetComponent<PlayerManager>();
         }
 
         public override void Spawned()
@@ -146,7 +149,11 @@ namespace InGame.Interact
                     Interactor = Object.InputAuthority.RawEncoded,
                 };
                 if (UIController.I)
-                    UIController.I.ShowInteractUI(_focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+                {
+                    var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
+                        PlayerManager.PlayerControlState.ForcedControl;
+                    UIController.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+                }
             }
             else
             {
