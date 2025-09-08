@@ -26,10 +26,8 @@ namespace InGame.Exhibit
             _interactable = target;
             var charaType = context.CharacterType;
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
-            if (charaType == CharacterType.OkabeWright)
-            {
-                GetOn(playerRef);
-            }
+            GetOn(playerRef);
+            
         }
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
