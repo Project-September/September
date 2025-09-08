@@ -16,31 +16,29 @@ namespace InGame.Player.Ability
         private NetworkButtons _previousButtons;
         private NetworkButtons _currentButtons;
         private NetworkObject _networkObject;
+        private readonly Dictionary<string, AbilityBase> _abilityByName = new();
 
         private void Start()
         {
             _networkObject = GetComponent<NetworkObject>();
+            foreach (var a in _abilities)
+                _abilityByName[a.GetType().Name] = a;
         }
 
         private void Update()
         {
             foreach (var condition in _conditions)
             {
-                var targetAbility = _abilities.Find(a => a.GetType().Name == condition.TargetAbilityName);
-                
-                if (targetAbility == null)
+                if (!_abilityByName.TryGetValue(condition.TargetAbilityName, out var targetAbility))
                 {
-                    Debug.LogError($"[PlayerAbilityManager] アビリティ '{condition.TargetAbilityName}' が見つかりません。");
+                    Debug.LogError($"[PlayerAbilityManager] '{condition.TargetAbilityName}' が見つかりません。");
                     continue;
                 }
-                // 条件を満たす場合、アビリティを実行
-                if (condition.IsConditionMatch(new TriggerEventContext(targetAbility, _currentButtons, _previousButtons)))
+                
+                var ctx = new TriggerEventContext(gameObject, targetAbility, _currentButtons, _previousButtons);
+                if (condition.IsConditionMatch(in ctx))
                 {
-                    // アビリティの実行
-                    targetAbility.Start(new AbilityParameter() 
-                    {
-                        Owner = _networkObject,
-                    });
+                    targetAbility.Start(new AbilityParameter { Owner = _networkObject });
                 }
             }
             

@@ -5449,6 +5449,8 @@ MonoBehaviour:
         _endHitCheckFrame: 17
         _endAttackFrame: 22
         _isStopWhenAttack: 1
+        _hitEffect: 18
+        _animationClipPlayer: {fileID: 8254388696613982807}
         _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}

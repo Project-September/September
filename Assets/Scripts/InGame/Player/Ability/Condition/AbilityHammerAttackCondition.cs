@@ -8,11 +8,16 @@ namespace InGame.Player.Ability.Condition
     public class AbilityHammerAttackCondition : IAbilityExecuteCondition
     {
         public string TargetAbilityName => nameof(AbilityHammerAttack);
+        private PlayerMovement _playerMovement;
 
-        public bool IsConditionMatch(TriggerEventContext context)
+        public bool IsConditionMatch(in TriggerEventContext context)
         {
+            if (!context.Owner) return false;
+            if (!_playerMovement)
+                _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             //Available状態でAttackボタンが押されたら条件を満たす
-            return context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available &&
+            return _playerMovement.IsGround &&
+                   context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available &&
                    context.AbilityRef.CanStartAbilityOverride() &&
                    context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(PlayerButtons.Attack);
         }

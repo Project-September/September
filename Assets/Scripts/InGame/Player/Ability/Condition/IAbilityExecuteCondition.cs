@@ -10,17 +10,19 @@ namespace  InGame.Player.Ability
     public interface IAbilityExecuteCondition
     {
         public string TargetAbilityName { get; }
-        public bool IsConditionMatch(TriggerEventContext context);
+        public bool IsConditionMatch(in TriggerEventContext context);
     }
 
-    public class TriggerEventContext
+    public readonly struct TriggerEventContext
     {
+        public GameObject Owner { get; }
         public AbilityBase AbilityRef { get; }
         public NetworkButtons CurrentButtons { get; }
         public NetworkButtons PreviousButtons { get; }
 
-        public TriggerEventContext(AbilityBase abilityRef, NetworkButtons currentButtons, NetworkButtons previousButtons)
+        public TriggerEventContext(GameObject owner, AbilityBase abilityRef, NetworkButtons currentButtons, NetworkButtons previousButtons)
         {
+            Owner = owner;
             AbilityRef = abilityRef;
             CurrentButtons = currentButtons;
             PreviousButtons = previousButtons;
