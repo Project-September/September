@@ -24,7 +24,7 @@ namespace Ingame.Tanihira
     /// <summary>
     /// フレンド機能のベースクラス
     /// </summary>
-    public class FriendBase : NetworkBehaviour
+    public class FriendBase : NetworkBehaviour, IFriendBuff
     {
         [SerializeField] protected Animator _animator;
         [SerializeField] protected Dictionary<FriendState, IFriendState> _friendStateMappings = new Dictionary<FriendState, IFriendState>();
@@ -34,6 +34,7 @@ namespace Ingame.Tanihira
         [SerializeField] protected Transform _formationPos;
         [SerializeField] protected HitChecker _hitChecker;
         [SerializeField, ReadOnly] protected FriendState _currentState;
+        [SerializeField] private GameObject _tutankhamen;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -223,6 +224,16 @@ namespace Ingame.Tanihira
         public void EndAttack()
         {
             _isAttack = false;
+        }
+        
+        public void StartBuff()
+        {
+            _tutankhamen.SetActive(true);
+        }
+
+        public void StopBuff()
+        {
+            _tutankhamen.SetActive(false);
         }
     }
 }

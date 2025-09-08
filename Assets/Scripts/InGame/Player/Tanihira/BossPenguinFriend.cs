@@ -3,9 +3,8 @@ using InGame.Health;
 using Ingame.Tanihira;
 using UnityEngine;
 
-public class BossPenguinFriend : FriendBase, IFriendBuff
+public class BossPenguinFriend : FriendBase
 {
-    [SerializeField] private GameObject _tutankhamun;
     protected override void Awake()
     {
         base.Awake();
@@ -16,15 +15,5 @@ public class BossPenguinFriend : FriendBase, IFriendBuff
         _friendStateMappings[FriendState.Chase] = new FriendChaseState();
         _friendStateMappings[FriendState.Attack] = new FriendAttackState();
         _friendStateMappings[FriendState.Wait] = new FriendWaitState();
-    }
-
-    public void StartBuff()
-    {
-        _tutankhamun.SetActive(true);
-    }
-
-    public void StopBuff()
-    {
-        _tutankhamun.SetActive(false);
     }
 }

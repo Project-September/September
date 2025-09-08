@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Fusion;
@@ -16,28 +17,30 @@ namespace InGame.Exhibit
         private GameObject _instantiateMask;
         private bool _isMaskAttached;
 
-        private BossPenguinFriend _bossPenguin;
+        private List<FriendBase> _friendList = new List<FriendBase>();
         
         public bool IsMaskAttached => _isMaskAttached;
 
         [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
         public void RPC_AttachHeadMask(NetworkObject player, float duration)
         {
-            if (player.TryGetComponent<FormationManager>(out FormationManager formation))
+            AttachHeadMask(player);
+            if (player.TryGetComponent<FormationManager>(out FormationManager formationManager))
             {
-                _bossPenguin = formation.GetBossFriend();
-                if(_bossPenguin)
+                foreach (var friend in formationManager.FriendsList)
                 {
-                    _bossPenguin.StartBuff();
-                    _isMaskAttached = true;
+                    _friendList.Add(friend);
+                }
+                
+                if(_friendList.Count > 0)
+                {
+                    foreach (FriendBase friend in _friendList)
+                    {
+                        friend.StartBuff();
+                    }
                 }
             }
-            else
-            {
-                AttachHeadMask(player);
-            }
-            
-             _maskDuration = duration;
+            _maskDuration = duration;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -79,24 +82,21 @@ namespace InGame.Exhibit
         {
             await UniTask.Delay(TimeSpan.FromSeconds(_maskDuration));
 
-            if(_bossPenguin)
+            if(_friendList.Count > 0)
             {
-                DestoryPenguinMask(_bossPenguin);
-                return;
-            }   
+                foreach (FriendBase friend in _friendList)
+                {
+                    friend.StopBuff();
+                }
+                _friendList.Clear();
+            }
 
             if (_instantiateMask == null)
                 return;
             
             Destroy(_instantiateMask);
             _instantiateMask = null;
-            
             _isMaskAttached = false;
-        }
-
-        private void DestoryPenguinMask(BossPenguinFriend bossPenguin)
-        {
-            bossPenguin.StopBuff();
         }
     }
 }
