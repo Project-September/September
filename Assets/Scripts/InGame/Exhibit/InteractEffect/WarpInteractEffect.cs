@@ -75,7 +75,7 @@ namespace InGame.Exhibit
             
             //隊列を持っていたら、フレンドも移動させる
             FormationManager formationManager = player.GetComponent<FormationManager>();
-            formationManager?.WarpFriend(targetPos, targetRot);
+            formationManager?.WarpFriendNearPlayer(targetPos, targetRot);
             
             // 少し待ってから移動予約
             await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration),cancellationToken: _cts.Token);
@@ -98,7 +98,7 @@ namespace InGame.Exhibit
             //隊列がある場合にはフレンドを見えなくする
             if (player.TryGetComponent<FormationManager>(out FormationManager formationManager))
             {
-                foreach (var friend in formationManager.FriendsList)
+                foreach (var friend in formationManager.CurrentFriendsList)
                 {
                     foreach (Renderer renderer in friend.GetComponentsInChildren<Renderer>())
                     {
