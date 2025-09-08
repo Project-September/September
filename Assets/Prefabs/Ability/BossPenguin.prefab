@@ -227,6 +227,7 @@ MonoBehaviour:
   _formationPos: {fileID: 7149895256155660826}
   _hitChecker: {fileID: 5000002887888360693}
   _currentState: 0
+  _tutankhamun: {fileID: 4038995096450918138}
 --- !u!195 &-3575381120417351687
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -361,12 +362,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2644adf050ca8ae44bb76e4bbe841f87, type: 3}
+--- !u!1 &4038995096450918138 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8639538251982876037, guid: 2644adf050ca8ae44bb76e4bbe841f87, type: 3}
+  m_PrefabInstance: {fileID: 5758040002933476223}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4866389647219883430 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 891793513555637977, guid: 2644adf050ca8ae44bb76e4bbe841f87, type: 3}
   m_PrefabInstance: {fileID: 5758040002933476223}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4038995096450918138}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}

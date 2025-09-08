@@ -5,7 +5,7 @@ namespace Ingame.Tanihira
 {
     public class FriendWaitState : IFriendState
     {
-        private float _waitTime = 0.5f;
+        private float _waitTime = 1.0f;
         private float _waitTimer;
     
         public void OnEnter(FriendBase friend)
@@ -16,6 +16,7 @@ namespace Ingame.Tanihira
         public void OnExit(FriendBase friend)
         {
             friend.Agent.enabled = true;
+            friend.Agent.isStopped = false;
         }
 
         public void OnUpdate(FriendBase friend)

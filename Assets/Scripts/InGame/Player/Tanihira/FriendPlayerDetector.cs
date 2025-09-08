@@ -13,6 +13,7 @@ namespace Ingame.Tanihira
         [SerializeField] private LayerMask _detectionMask;
         [SerializeField] private LayerMask _obstacleMask;
         [SerializeField] private FriendStateChanger _friendStateChanger;
+        [SerializeField] private FormationManager _formationManager;
         
         private Transform _currentTarget;
         private bool _isWaiting;
@@ -46,7 +47,7 @@ namespace Ingame.Tanihira
         //プレイヤーを索敵する処理
         private void DetectePlayer()
         {
-            if (IsTargetValid(_currentTarget))
+            if (IsTargetValid(_currentTarget) || _formationManager.CurrentFriendsList.FirstOrDefault().CurrentState == FriendState.None)
                 return;
             
             //範囲内のプレイヤーを検出
@@ -81,7 +82,6 @@ namespace Ingame.Tanihira
                     Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
                     continue;
                 }
-                    
                 
                 //近い物をターゲットにして攻撃させる
                 _currentTarget = player.gameObject.transform;

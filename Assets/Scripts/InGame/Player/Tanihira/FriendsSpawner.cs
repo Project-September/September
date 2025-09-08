@@ -14,7 +14,6 @@ namespace InGame.Tanihira
         [SerializeField] private NetworkObject _ownerPlayer;
         [SerializeField] private Transform _firstSpawnPoint;
         [SerializeField] private float _navmeshSerchRadius = 5.0f;
-        
         private NetworkRunner _networkRunner;
 
         public void Start()
@@ -37,6 +36,8 @@ namespace InGame.Tanihira
             {
                 SpawnFriend(_friendsTypes[i], _firstSpawnPoint);
             }
+
+            _formationManager.RegisterFriendFormation();
         }
 
         /// <summary>

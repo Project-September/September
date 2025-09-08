@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Fusion;
+using Ingame.Tanihira;
 
 namespace InGame.Exhibit
 {
@@ -14,14 +15,29 @@ namespace InGame.Exhibit
         private float _maskDuration = 5f;
         private GameObject _instantiateMask;
         private bool _isMaskAttached;
+
+        private BossPenguinFriend _bossPenguin;
         
         public bool IsMaskAttached => _isMaskAttached;
 
         [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
         public void RPC_AttachHeadMask(NetworkObject player, float duration)
         {
-            AttachHeadMask(player);
-            _maskDuration = duration;
+            if (player.TryGetComponent<FormationManager>(out FormationManager formation))
+            {
+                _bossPenguin = formation.GetBossFriend();
+                if(_bossPenguin)
+                {
+                    _bossPenguin.StartBuff();
+                    _isMaskAttached = true;
+                }
+            }
+            else
+            {
+                AttachHeadMask(player);
+            }
+            
+             _maskDuration = duration;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -63,6 +79,12 @@ namespace InGame.Exhibit
         {
             await UniTask.Delay(TimeSpan.FromSeconds(_maskDuration));
 
+            if(_bossPenguin)
+            {
+                DestoryPenguinMask(_bossPenguin);
+                return;
+            }   
+
             if (_instantiateMask == null)
                 return;
             
@@ -70,6 +92,11 @@ namespace InGame.Exhibit
             _instantiateMask = null;
             
             _isMaskAttached = false;
+        }
+
+        private void DestoryPenguinMask(BossPenguinFriend bossPenguin)
+        {
+            bossPenguin.StopBuff();
         }
     }
 }
