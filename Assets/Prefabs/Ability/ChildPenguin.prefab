@@ -31,6 +31,77 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3645482351071708722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &79087981602981250
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8966335526031022935}
+    m_Modifications:
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.000004852882
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.6964343
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.71762055
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.000100549165
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704894711281665644, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_Name
+      value: FX_Tutankhamun_buff
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704894711281665644, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+--- !u!4 &324020167905794841 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 389522583833583259, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+  m_PrefabInstance: {fileID: 79087981602981250}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7779320689186046958 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7704894711281665644, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+  m_PrefabInstance: {fileID: 79087981602981250}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3827465531517608409
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -89,6 +160,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7149895256155660826}
+    - targetCorrespondingSourceObject: {fileID: 5292628107875056270, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 324020167905794841}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
       insertIndex: -1
@@ -265,6 +339,7 @@ MonoBehaviour:
   _formationPos: {fileID: 7149895256155660826}
   _hitChecker: {fileID: -5790574225442928201}
   _currentState: 0
+  _tutankhamen: {fileID: 7779320689186046958}
 --- !u!65 &4605572418024795219
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -309,5 +384,10 @@ Transform:
 --- !u!137 &7754587058459683000 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: -2413876317369136799, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
+  m_PrefabInstance: {fileID: 3827465531517608409}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8966335526031022935 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5292628107875056270, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
   m_PrefabInstance: {fileID: 3827465531517608409}
   m_PrefabAsset: {fileID: 0}

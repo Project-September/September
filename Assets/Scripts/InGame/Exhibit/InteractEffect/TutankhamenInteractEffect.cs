@@ -36,19 +36,21 @@ namespace InGame.Exhibit
 
             if (target.Runner.TryGetPlayerObject(playerRef, out var playerNetworkObject))
             {
-                //タニヒラの場合の処理
-                if (playerNetworkObject.TryGetComponent<FormationManager>(out var formationManager))
+                
+                if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
                 {
                     EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
+                    spec.Duration = EffectDuration;
+                    spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
+                    playerStatus.AddEffect(spec);
                 }
-                else
+                
+                if (playerNetworkObject.TryGetComponent(out FormationManager formationManager))
                 {
-                    if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
+                    var friendList = formationManager.FriendsList;
+                    foreach (var friend in friendList)
                     {
-                        EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
-                        spec.Duration = EffectDuration;
-                        spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
-                        playerStatus.AddEffect(spec);
+                        friend.StartBuff(BoostMultiplier);
                     }
                 }
                 

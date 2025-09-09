@@ -11,7 +11,7 @@ namespace Ingame.Tanihira
     
         public void OnEnter(FriendBase friend)
         {
-            _stunTime = friend.FriendStatus.FriendStunTime;
+            _stunTime = friend.CurrentFriendStatus.FriendStunTime;
             _stunTimer = 0;
             _isStun = true;
             //隊列から離れる
