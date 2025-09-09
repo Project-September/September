@@ -42,6 +42,7 @@ namespace Ingame.Tanihira
         protected NetworkMecanimAnimator _mecanimAnimator;
         protected FormationManager _formationManager;
         protected FriendState _waitStockState;
+        protected FriendStatus _currentStatus;
 
         private static int _spawnCount;
         private bool _isAttack;
@@ -53,7 +54,7 @@ namespace Ingame.Tanihira
         public Transform Destination => _destination;
         public NetworkRunner NetworkRunner => _networkRunner;
         public Transform FormationPos => _formationPos;
-        public FriendStatus FriendStatus => _friendStatus;
+        public FriendStatus CurrentFriendStatus => _currentStatus;
         public FriendState CurrentState => _currentState;
         public NetworkMecanimAnimator MecanimAnimator => _mecanimAnimator;
         public bool IsAttack => _isAttack;
@@ -68,6 +69,9 @@ namespace Ingame.Tanihira
                 Debug.LogError("NetworkRunnerがありません");
             }
             if (!_networkRunner.IsServer) return;
+            
+            //ステータスをコピー
+            _currentStatus = _friendStatus.Clone();
         }
         
         protected virtual void Start()
@@ -113,8 +117,8 @@ namespace Ingame.Tanihira
         //ステータスをnavmeshに反映
         private void InitializeAgent()
         {
-            _agent.angularSpeed = _friendStatus.FriendRotateSpeed;
-            _agent.speed = _friendStatus.FriendFormationSpeed;
+            _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
+            _agent.speed = _currentStatus.FriendFormationSpeed;
         }
 
         /// <summary>
@@ -196,7 +200,7 @@ namespace Ingame.Tanihira
             if (damageable == null) return;
             var hitData = new HitData(
                 HitActionType.Damage,
-                _friendStatus.AttackPower,
+                _currentStatus.AttackPower,
                 _ownerPlayer.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
@@ -225,15 +229,43 @@ namespace Ingame.Tanihira
         {
             _isAttack = false;
         }
-        
+
         public void StartBuff()
         {
             _tutankhamen.SetActive(true);
         }
 
+        public void StartBuff(float buffRate)
+        {
+            _currentStatus.FriendFormationSpeed *= buffRate;
+            _currentStatus.FriendChaseSpeed *= buffRate;
+            _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * buffRate);
+            ApplyStatus();
+        }
+
         public void StopBuff()
         {
+            _currentStatus.FriendFormationSpeed = _friendStatus.FriendFormationSpeed;
+            _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
+            _currentStatus.AttackPower = _friendStatus.AttackPower;
+            ApplyStatus();
             _tutankhamen.SetActive(false);
+        }
+
+        private void ApplyStatus()
+        {
+            //現在のステートによってスピードを反映する
+            switch (_currentState)
+            {
+                case FriendState.Move:
+                    _agent.speed = _currentStatus.FriendFormationSpeed;
+                    break;
+                case FriendState.Chase:
+                    _agent.speed = _currentStatus.FriendChaseSpeed;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

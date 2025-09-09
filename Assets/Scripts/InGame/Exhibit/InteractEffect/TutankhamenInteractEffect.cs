@@ -45,6 +45,15 @@ namespace InGame.Exhibit
                     playerStatus.AddEffect(spec);
                 }
                 
+                if (playerNetworkObject.TryGetComponent(out FormationManager formationManager))
+                {
+                    var friendList = formationManager.FriendsList;
+                    foreach (var friend in friendList)
+                    {
+                        friend.StartBuff(BoostMultiplier);
+                    }
+                }
+                
                 _targetPlayerObject = playerNetworkObject;
                 Invoker.RPC_AttachHeadMask(playerNetworkObject, EffectDuration);
                 PlayEffect();
