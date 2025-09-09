@@ -120,7 +120,7 @@ namespace InGame.Exhibit
             CreateHitBox(playerRef);
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
-                //ToDoペンギン無効化
+                formationManager.WarpFriendOutField();
             }
         }
         
@@ -137,9 +137,10 @@ namespace InGame.Exhibit
             Object.RemoveInputAuthority();
             RPC_SetCameraPriority(playerRef,5);
             RPC_SetIsKinematic(playerRef,true);
+            var obj = _ownerPlayerManager.GetComponent<NetworkObject>();
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
-                //ToDoペンギン有効化
+                formationManager.WarpFriendNearPlayer(obj.transform.position,obj.transform.rotation);
             }
             Executor = null;
         }
