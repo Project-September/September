@@ -6,7 +6,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using September.Common; // PlayerDatabase
+using September.Common;
 
 namespace Result
 {
@@ -19,8 +19,6 @@ namespace Result
 
     public class ResultAnimation : MonoBehaviour
     {
-        [Header("Prefab / Root")]
-        [SerializeField] private ResultUIRootRefs _resultUIRootPrefab;
         private ResultUIRootRefs _resultUIRoot;
 
         [Header("Delays")]
@@ -56,16 +54,12 @@ namespace Result
         [Header("Icons")]
         [SerializeField] private CharacterIconPair[] _iconTable;
         [SerializeField] private Sprite _defaultIcon;
-
-        // --- Cached UI refs
+        
         private TextMeshProUGUI _finishText;
         private TextMeshProUGUI _resultText;
+        private ResultRowRefs[] _rows;
         private Image _resultBg;
         private RectTransform _rowsRoot;
-        private TextMeshProUGUI[] _nameSlots;
-        private TextMeshProUGUI[] _scoreSlots;
-        private TextMeshProUGUI[] _rankSlots;
-        private Image[] _iconSlots;
         private TextMeshProUGUI _yourRankText;
 
         private Dictionary<CharacterType, Sprite> _iconMap;
@@ -74,7 +68,7 @@ namespace Result
         public async UniTask Play(ResultUIRootRefs resultUIRoot)
         {
             _resultUIRoot = resultUIRoot;
-            CacheRefs();
+            Initialize();
 
             await UniTask.Delay(TimeSpan.FromSeconds(_startDelay));
 
@@ -84,16 +78,13 @@ namespace Result
             await AnimateYourRank();
         }
 
-        private void CacheRefs()
+        private void Initialize()
         {
+            _rows = _resultUIRoot.Rows;
             _finishText = _resultUIRoot.FinishText;
             _resultText = _resultUIRoot.ResultText;
             _resultBg = _resultUIRoot.ResultBg;
             _rowsRoot = _resultUIRoot.RowsRoot;
-            _nameSlots = _resultUIRoot.NameSlots;
-            _scoreSlots = _resultUIRoot.ScoreSlots;
-            _rankSlots = _resultUIRoot.RankSlots;
-            _iconSlots = _resultUIRoot.IconSlots;
             _yourRankText = _resultUIRoot.YourRankText;
 
             _finishText.gameObject.SetActive(false);
@@ -101,10 +92,9 @@ namespace Result
             _resultBg.gameObject.SetActive(false);
             _yourRankText.gameObject.SetActive(false);
 
-            foreach (var slot in _nameSlots)
+            foreach (ResultRowRefs row in _rows)
             {
-                if (!slot) continue;
-                (slot.transform.parent?.gameObject ?? slot.gameObject).SetActive(false);
+                if (row) row.gameObject.SetActive(false);
             }
 
             _iconMap = _iconTable?.GroupBy(x => x.Type).ToDictionary(g => g.Key, g => g.Last().Icon)
@@ -145,52 +135,53 @@ namespace Result
 
         private async UniTask AnimateRows()
         {
-            var db = PlayerDatabase.Instance;
+            PlayerDatabase db = PlayerDatabase.Instance;
             if (!db) return;
 
-            // ネット同期済みの全員スコアで初期並びを作る（降順）
+            // Ogreを最後に、それ以外はスコア降順
             var data = db.PlayerDataDic
-                .Select(kv => kv.Value)
-                .OrderByDescending(v => v.Score)
+                .Select(kv => new { kv.Key, kv.Value })
+                .OrderBy(x => x.Value.IsOgre ? 1 : 0)
+                .ThenByDescending(x => x.Value.Score)
                 .Select(d => (
-                    name: d.DisplayNickName,
-                    icon: _iconMap.GetValueOrDefault(d.CharacterType, _defaultIcon),
-                    score: d.Score))
+                    playerRef: d.Key,
+                    name: d.Value.DisplayNickName,
+                    icon: _iconMap.GetValueOrDefault(d.Value.CharacterType, _defaultIcon),
+                    score: d.Value.Score,
+                    isOgre: d.Value.IsOgre))
                 .ToList();
 
-            int rowCount = Mathf.Min(data.Count, _nameSlots.Length, _scoreSlots.Length, _rankSlots.Length, _iconSlots.Length);
+            int rowCount = Mathf.Min(data.Count, _rows.Length);
 
             for (int i = 0; i < rowCount; i++)
             {
                 var rowData = data[i];
-                var nameLabel = _nameSlots[i];
-                var scoreLabel = _scoreSlots[i];
-                var rankLabel = _rankSlots[i];
-                var iconImage = _iconSlots[i];
+                var row = _rows[i];
+                row.gameObject.SetActive(true);
 
-                var row = nameLabel.transform.parent?.gameObject ?? nameLabel.gameObject;
-                row.SetActive(true);
+                row.Name.text = rowData.name;
+                row.Score.text = "";
+                row.Rank.text = "";
+                row.Icon.sprite = rowData.icon;
 
-                nameLabel.text = rowData.name;
-                scoreLabel.text = "";
-                rankLabel.text = "";
-                iconImage.sprite = rowData.icon;
-
-                var cg = row.GetComponent<CanvasGroup>() ?? row.AddComponent<CanvasGroup>();
+                CanvasGroup cg = row.GetComponent<CanvasGroup>() ?? row.gameObject.AddComponent<CanvasGroup>();
                 cg.alpha = 0f;
 
-                var rt = row.transform as RectTransform;
-                var endPos = rt.anchoredPosition;
-                rt.anchoredPosition = endPos + new Vector2(-_rowSlideOffset, 0f);
+                RectTransform rt = row.transform as RectTransform;
+                if (rt)
+                {
+                    Vector2 endPos = rt.anchoredPosition;
+                    rt.anchoredPosition = endPos + new Vector2(-_rowSlideOffset, 0f);
 
-                DOTween.Sequence()
-                    .AppendInterval(_rowStagger * i)
-                    .Append(cg.DOFade(1f, _rowFadeDuration))
-                    .Join(rt.DOAnchorPos(endPos, _rowFadeDuration).SetEase(Ease.OutQuad));
+                    DOTween.Sequence()
+                        .AppendInterval(_rowStagger * i)
+                        .Append(cg.DOFade(1f, _rowFadeDuration))
+                        .Join(rt.DOAnchorPos(endPos, _rowFadeDuration).SetEase(Ease.OutQuad));
+                }
 
-                // スコアを 0 → 最終値へロールアップ
+                // スコアをロールアップ
                 await UniTask.Delay(TimeSpan.FromSeconds(_rowStagger * i));
-                await RollupScore(scoreLabel, rowData.score, _scoreRollDuration, _scoreUseThousands);
+                await RollupScore(row.Score, rowData.score, _scoreRollDuration, _scoreUseThousands);
             }
 
             await AnimateSortByScoreAsync(rowCount);
@@ -215,22 +206,21 @@ namespace Result
 
             for (int i = 0; i < rowCount; i++)
             {
-                var name = _nameSlots[i];
-                if (!name) continue;
-                var rt = name.transform.parent as RectTransform;
+                var row = _rows[i];
+                if (!row || !row.Score) continue;
+
+                RectTransform rt = row.transform as RectTransform;
                 if (!rt) continue;
 
-                int.TryParse(_scoreSlots[i].text.Replace(",", ""), out var scoreVal);
-                rows.Add((rt, _scoreSlots[i], _rankSlots[i], scoreVal));
+                int.TryParse(row.Score.text.Replace(",", ""), out int scoreVal);
+                rows.Add((rt, row.Score, row.Rank, scoreVal));
             }
 
             if (rows.Count <= 1) return;
 
-            // 現在のYレーンを記録
             float[] lanesY = rows.OrderByDescending(r => r.rt.position.y)
-                                 .Select(r => r.rt.anchoredPosition.y).ToArray();
+                .Select(r => r.rt.anchoredPosition.y).ToArray();
 
-            // スコア降順で並び替え
             var sorted = rows.OrderByDescending(x => x.scoreVal).ToList();
 
             for (int newIndex = 0; newIndex < sorted.Count; newIndex++)
@@ -242,25 +232,26 @@ namespace Result
 
                 float targetY = lanesY[newIndex];
                 row.rt.DOAnchorPosY(targetY, _sortMoveDuration)
-                      .SetEase(Ease.InOutCubic)
-                      .SetDelay(_sortStagger * newIndex);
+                    .SetEase(Ease.InOutCubic)
+                    .SetDelay(_sortStagger * newIndex);
             }
 
             await UniTask.Delay(TimeSpan.FromSeconds(_sortMoveDuration + _sortStagger * (sorted.Count - 1)));
 
-            // 確定
             for (int i = 0; i < sorted.Count; i++)
                 sorted[i].rt.SetSiblingIndex(i);
         }
 
         private async UniTask AnimateYourRank()
         {
-            if (!_yourRankText) return;
+            if (!_yourRankText) 
+                return;
 
-            var db = PlayerDatabase.Instance;
-            if (!db) return;
+            PlayerDatabase db = PlayerDatabase.Instance;
+            if (!db) 
+                return;
 
-            string localName = db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out var d)
+            string localName = db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out SessionPlayerData d)
                 ? d.DisplayNickName
                 : null;
             
@@ -274,11 +265,11 @@ namespace Result
             _yourRankText.text = $"あなたの順位は {rank + 1} 位です";
             _yourRankText.gameObject.SetActive(true);
 
-            var cg = _yourRankText.GetComponent<CanvasGroup>() ?? _yourRankText.gameObject.AddComponent<CanvasGroup>();
+            CanvasGroup cg = _yourRankText.GetComponent<CanvasGroup>() ?? _yourRankText.gameObject.AddComponent<CanvasGroup>();
             cg.alpha = 0f;
 
-            var rt = _yourRankText.rectTransform;
-            var end = rt.anchoredPosition;
+            RectTransform rt = _yourRankText.rectTransform;
+            Vector2 end = rt.anchoredPosition;
             rt.anchoredPosition = end + _yourRankOffset;
 
             await DOTween.Sequence()

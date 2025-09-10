@@ -8,11 +8,8 @@ namespace Result
     {
         [SerializeField] private TextMeshProUGUI _finishText;
         [SerializeField] private TextMeshProUGUI _resultText;
-        [SerializeField] private TextMeshProUGUI[] _nameSlots;
-        [SerializeField] private TextMeshProUGUI[] _scoreSlots;
-        [SerializeField] private TextMeshProUGUI[] _rankSlots;
+        [SerializeField] public ResultRowRefs[] _rows;
         [SerializeField] private TextMeshProUGUI _yourRankText;
-        [SerializeField] private Image[] _iconSlots;
         [SerializeField] private Image _resultBg;
         [SerializeField] private RectTransform _rowsRoot;
 
@@ -20,10 +17,7 @@ namespace Result
         public TextMeshProUGUI ResultText => _resultText;
         public Image ResultBg => _resultBg;
         public RectTransform RowsRoot => _rowsRoot;
-        public TextMeshProUGUI[] ScoreSlots => _scoreSlots;
-        public TextMeshProUGUI[] RankSlots => _rankSlots;
-        public Image[] IconSlots => _iconSlots;
-        public TextMeshProUGUI[] NameSlots => _nameSlots;
+        public ResultRowRefs[] Rows => _rows;
         public TextMeshProUGUI YourRankText => _yourRankText;
     }
 }
