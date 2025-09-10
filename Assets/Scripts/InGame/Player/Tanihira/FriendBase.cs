@@ -12,17 +12,19 @@ namespace Ingame.Tanihira
     /// </summary>
     public enum FriendState
     {
+        None,
         Idle,
         Move,
         Attack,
         Chase,
-        Stun
+        Stun,
+        Wait
     }
     
     /// <summary>
     /// フレンド機能のベースクラス
     /// </summary>
-    public class FriendBase : NetworkBehaviour
+    public class FriendBase : NetworkBehaviour, IFriendBuff
     {
         [SerializeField] protected Animator _animator;
         [SerializeField] protected Dictionary<FriendState, IFriendState> _friendStateMappings = new Dictionary<FriendState, IFriendState>();
@@ -32,12 +34,15 @@ namespace Ingame.Tanihira
         [SerializeField] protected Transform _formationPos;
         [SerializeField] protected HitChecker _hitChecker;
         [SerializeField, ReadOnly] protected FriendState _currentState;
+        [SerializeField] private GameObject _tutankhamen;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
         protected NetworkObject _ownerPlayer;
         protected NetworkMecanimAnimator _mecanimAnimator;
         protected FormationManager _formationManager;
+        protected FriendState _waitStockState;
+        protected FriendStatus _currentStatus;
 
         private static int _spawnCount;
         private bool _isAttack;
@@ -49,10 +54,12 @@ namespace Ingame.Tanihira
         public Transform Destination => _destination;
         public NetworkRunner NetworkRunner => _networkRunner;
         public Transform FormationPos => _formationPos;
-        public FriendStatus FriendStatus => _friendStatus;
+        public FriendStatus CurrentFriendStatus => _currentStatus;
         public FriendState CurrentState => _currentState;
         public NetworkMecanimAnimator MecanimAnimator => _mecanimAnimator;
         public bool IsAttack => _isAttack;
+        public FriendState WaitStockState => _waitStockState;
+        public NetworkObject OwnerPlayer => _ownerPlayer;
 
         protected virtual void Awake()
         {
@@ -62,10 +69,15 @@ namespace Ingame.Tanihira
                 Debug.LogError("NetworkRunnerがありません");
             }
             if (!_networkRunner.IsServer) return;
+            
+            //ステータスをコピー
+            _currentStatus = _friendStatus.Clone();
         }
         
         protected virtual void Start()
         {
+            //Noneステートの設定
+            _friendStateMappings[FriendState.None] = new FriendNoneState();
             _agent = GetComponent<NavMeshAgent>();
             _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
             InitializeStates();
@@ -105,8 +117,8 @@ namespace Ingame.Tanihira
         //ステータスをnavmeshに反映
         private void InitializeAgent()
         {
-            _agent.angularSpeed = _friendStatus.FriendRotateSpeed;
-            _agent.speed = _friendStatus.FriendFormationSpeed;
+            _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
+            _agent.speed = _currentStatus.FriendFormationSpeed;
         }
 
         /// <summary>
@@ -115,6 +127,27 @@ namespace Ingame.Tanihira
         /// <param name="newState">新しいステート</param>
         public virtual void ChangeState(FriendState newState)
         {
+            //Noneの時には強制的にステートを変更させる
+            if (newState == FriendState.None)
+            {
+                // 現在のステートのOnExitを呼び出し、コンポーネントを無効化
+                _friendStateMappings[_currentState]?.OnExit(this);
+                // 新しいステートに変更
+                _currentState = newState;
+                return;
+            }
+            
+            if (_currentState != FriendState.Wait)
+            {
+                //attackの場合はchaseに変えておく
+                if(newState == FriendState.Attack)
+                {
+                    newState = FriendState.Chase;
+                }
+                
+                _waitStockState = newState;
+            }
+            
             if (_friendStateMappings[newState] == null)
             {
                 Debug.LogWarning($"ステート {newState} が設定されていません");
@@ -167,10 +200,23 @@ namespace Ingame.Tanihira
             if (damageable == null) return;
             var hitData = new HitData(
                 HitActionType.Damage,
-                _friendStatus.AttackPower,
+                _currentStatus.AttackPower,
                 _ownerPlayer.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
+        }
+
+        public void FinishWaitTime()
+        {
+            if (_waitStockState == FriendState.None)
+            {
+                ChangeState(FriendState.Move);
+            }
+            else
+            {
+                ChangeState(_waitStockState);
+                _waitStockState = FriendState.None;
+            }
         }
         
         //アニメーションイベント用
@@ -182,6 +228,44 @@ namespace Ingame.Tanihira
         public void EndAttack()
         {
             _isAttack = false;
+        }
+
+        public void StartBuff()
+        {
+            _tutankhamen.SetActive(true);
+        }
+
+        public void StartBuff(float buffRate)
+        {
+            _currentStatus.FriendFormationSpeed *= buffRate;
+            _currentStatus.FriendChaseSpeed *= buffRate;
+            _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * buffRate);
+            ApplyStatus();
+        }
+
+        public void StopBuff()
+        {
+            _currentStatus.FriendFormationSpeed = _friendStatus.FriendFormationSpeed;
+            _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
+            _currentStatus.AttackPower = _friendStatus.AttackPower;
+            ApplyStatus();
+            _tutankhamen.SetActive(false);
+        }
+
+        private void ApplyStatus()
+        {
+            //現在のステートによってスピードを反映する
+            switch (_currentState)
+            {
+                case FriendState.Move:
+                    _agent.speed = _currentStatus.FriendFormationSpeed;
+                    break;
+                case FriendState.Chase:
+                    _agent.speed = _currentStatus.FriendChaseSpeed;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

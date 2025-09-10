@@ -51,8 +51,14 @@ namespace September.Common
                     Context.AddPlayerObject(pair.Key, player);
                 }
                 var playerHealth = player.GetComponent<PlayerHealth>();
-                playerHealth.OnDeath += OnPlayerKilled;
-                //PlayerHealthのOnDeathに登録
+                playerHealth.OnDeath += OnPlayerKilled; //PlayerHealthのOnDeathに登録
+                var spd = pair.Value;
+                foreach (var data in PlayerDatabase.Instance.PlayerDataDic)
+                {
+                    if(pair.Key == data.Key) continue;
+                    spd.StunData.Add(data.Key, 0);
+                }
+                PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
             }
             Context.Register(StaticServiceLocator.Instance);
             RPC_SetCameraPriority(20);
@@ -143,9 +149,21 @@ namespace September.Common
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
             killedData.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
-            killerData.Score += Context.AddScore;
+            killerData.Score += Context.StunScore;
+            killerData.StunCount++;
+            UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
         }
+
+        private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
+        {
+            if (killerData.StunData.TryGet(killedPlayer, out var count))
+            {
+                killerData.StunData.Set(killedPlayer, count + 1);
+            }
+            PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
+        }
+        
         private async UniTask StartTimer()
         {
             for (int i = Context.TimerData.PreStartTime; i >= 1; i--)

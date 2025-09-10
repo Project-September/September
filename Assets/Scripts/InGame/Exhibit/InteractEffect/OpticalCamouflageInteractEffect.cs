@@ -25,7 +25,7 @@ namespace InGame.Exhibit
                 //FormationManagerを持っている場合には条件分岐
                 if (playerNetworkObject.TryGetComponent<FormationManager>(out var formationManager))
                 {
-                    var friendList = formationManager.FriendsList;
+                    var friendList = formationManager.CurrentFriendsList;
                     foreach (var friend in friendList)
                     {
                         if (friend.TryGetComponent<NetworkObject>(out var friendNetworkObject))

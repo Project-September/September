@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using Fusion;
 using InGame.Health;
-using InGame.Interact;
 using InGame.Player;
+using Ingame.Tanihira;
+using NaughtyAttributes;
 using September.Common;
+using September.InGame.Common;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -43,6 +45,12 @@ namespace InGame.Exhibit
         [SerializeField] private int _maxHealth;
         
         #endregion
+        
+        private PlayerManager _ownerPlayerManager;
+        
+        private Vector3 _hidePosition = new Vector3(0, 0, 0);
+        
+        [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
         
         public override void Spawned()
         {
@@ -100,11 +108,20 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOn(PlayerRef playerRef)
         {
+            _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>()
+                .PlayerDataDic[playerRef].GetComponent<PlayerManager>();
+            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
+            _ownerPlayerManager.RPC_SetColliderActive(false);
+            _ownerPlayerManager.RPC_SetMeshActive(false);
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
             RPC_SetIsKinematic(playerRef,false);
             CreateHitBox(playerRef);
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                formationManager.WarpFriendOutField();
+            }
         }
         
         /// <summary>
@@ -113,9 +130,18 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
+            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _ownerPlayerManager.RPC_SetColliderActive(true);
+            _ownerPlayerManager.RPC_SetMeshActive(true);
+            _ownerPlayerManager.transform.position = _getOffPoint.position;
             Object.RemoveInputAuthority();
             RPC_SetCameraPriority(playerRef,5);
             RPC_SetIsKinematic(playerRef,true);
+            var obj = _ownerPlayerManager.GetComponent<NetworkObject>();
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                formationManager.WarpFriendNearPlayer(obj.transform.position,obj.transform.rotation);
+            }
             Executor = null;
         }
         

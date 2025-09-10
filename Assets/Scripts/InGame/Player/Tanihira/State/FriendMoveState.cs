@@ -19,8 +19,8 @@ namespace Ingame.Tanihira
             friend.Agent.isStopped = false;
           
             //移動時のステータスを設定
-            friend.Agent.speed = friend.FriendStatus.FriendFormationSpeed;
-            friend.Agent.stoppingDistance = friend.FriendStatus.FriendFormationDistance;
+            friend.Agent.speed = friend.CurrentFriendStatus.FriendFormationSpeed;
+            friend.Agent.stoppingDistance = friend.CurrentFriendStatus.FriendFormationDistance;
         }
 
         public void OnExit(FriendBase friend)

@@ -34,7 +34,8 @@ namespace September.Common
             if (_services.TryGetValue(typeof(T), out var service))
                 return (T)service;
 
-            throw new InvalidOperationException($"{typeof(T).Name} is not registered.");
+            Debug.LogError($"{typeof(T).Name} is not registered.");
+            return default;
         }
 
         public bool TryGet<T>(out T result)
