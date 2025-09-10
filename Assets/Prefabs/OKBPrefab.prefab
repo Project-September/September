@@ -300,6 +300,7 @@ GameObject:
   - component: {fileID: 6261861407256658100}
   - component: {fileID: 6462417923102071326}
   - component: {fileID: 4810525472409146702}
+  - component: {fileID: 504783062325590936}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -402,6 +403,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _punchEffect: {fileID: 3668695573810060199}
   _stunEffectPositionOffset: {x: 0, y: 2, z: 0}
+--- !u!114 &504783062325590936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7256c04836003a040b94cf9c96d573e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sheetName: ALLCue
+  _footstepCueName: SE_OKB_Footstep
+  _punchSwingCueName: SE_Player_Punch_Swing
+  _punchHitCueName: SE_Player_Punch_Hit
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -5178,6 +5195,7 @@ MonoBehaviour:
   - {fileID: 2779401866583128900}
   - {fileID: 8254388696613982807}
   - {fileID: 4810525472409146702}
+  - {fileID: 504783062325590936}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
 MonoBehaviour:
