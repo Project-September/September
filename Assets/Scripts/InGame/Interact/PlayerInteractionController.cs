@@ -22,6 +22,8 @@ namespace InGame.Interact
         [SerializeField] private float _interactResponseTimeout = 3f;
         [SerializeField] private float _interactAngleBuffer = 10f; // 角度に+10°
         [SerializeField] private float _interactRadiusBuffer = 0.3f; // 距離に+0.3m
+        //許容できる高さの差
+        [SerializeField] private float _heightDifference = 0.01f;
         
         private bool _isWaitingForResponse = false;
         private float _interactWaitTimer = 0f;
@@ -179,16 +181,8 @@ namespace InGame.Interact
                 ? _interactRadius
                 : _interactRadius + _interactRadiusBuffer;
 
-            float angleLimit = mode == InteractRangeCheckMode.Strict
-                ? _interactAngle
-                : _interactAngle + _interactAngleBuffer;
-
-            return toTarget.sqrMagnitude <= radius * radius;
-            if (toTarget.sqrMagnitude > radius * radius)
-                return false;
-
-            float angle = Vector3.Angle(_interactOrigin.forward, toTarget);
-            return angle <= angleLimit;
+            return toTarget.sqrMagnitude <= radius * radius &&
+                   gameObject.transform.position.y - targetPosition.y <= _heightDifference;
         }
 
         private void TryStartInteraction()
@@ -302,40 +296,5 @@ namespace InGame.Interact
 
             return false;
         }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
-        {
-            if (_interactOrigin == null)
-                _interactOrigin = transform;
-
-            // Sphere範囲表示
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(_interactOrigin.position, _interactRadius);
-
-            // 前方角度表示
-            Vector3 forward = _interactOrigin.forward;
-
-            int segments = 30;
-            float step = _interactAngle / segments;
-
-            Gizmos.color = Color.cyan;
-
-            for (int i = -segments; i <= segments; i++)
-            {
-                float angle = i * step;
-                Quaternion rot = Quaternion.AngleAxis(angle, Vector3.up);
-                Vector3 dir = rot * forward;
-                Gizmos.DrawLine(_interactOrigin.position, _interactOrigin.position + dir * _interactRadius);
-            }
-
-            // 現在の選択対象を表示
-            if (_focusedObj)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(_focusedObj.transform.position, 0.2f);
-            }
-        }
-#endif
     }
 }
