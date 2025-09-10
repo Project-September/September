@@ -35,6 +35,9 @@ namespace  InGame.Common
                     weight = Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f;
                 }
                 
+                const float weightEps = 1e-3f;
+                if (Mathf.Abs(weight) < weightEps) weight = 0f;
+                weight = Mathf.Clamp(weight, 0f, 2f);
                 _animationClipPlayer.SetLocoWeight(weight);
 
                 if (_playerMovement.DoingVault && !_isVaultingLastFrame)
