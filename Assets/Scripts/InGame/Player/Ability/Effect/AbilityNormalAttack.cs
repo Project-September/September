@@ -42,7 +42,7 @@ namespace InGame.Player.Ability
 
         protected override void OnStart()
         {
-            if (_animationClipPlayer && Parameter.Owner.HasInputAuthority && _normalAttackAnimationClip)
+            if (_animationClipPlayer&& _normalAttackAnimationClip)
             {
                 _animationClipPlayer.PlayClip(_normalAttackAnimationClip);
             }
@@ -96,7 +96,7 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (_isStopWhenAttack) _playerMovement.Stop();
+            if (_isStopWhenAttack && _playerMovement) _playerMovement.Stop();
             int now    = Runner.Tick;
             int elapsed = now - _attackStartTick;
 

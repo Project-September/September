@@ -33,6 +33,8 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, int> _slotOf = new();
         private readonly Dictionary<LayerInfo.LayerType, AnimationClipPlayable> _runtimeClips = new();
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _layerCts = new();
+        private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _weightBlendCts = new();
+
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
 
         public bool IsPlayingTargetClip(AnimationClip clip)
@@ -487,6 +489,88 @@ namespace InGame.Common
 
             var li = _layerInfo[slot];
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
+            _layerInfo[slot] = li;
+        }
+        
+        public async UniTask BlendLayerWeight(
+            LayerInfo.LayerType layer,
+            float toWeight,
+            LayerInfo.Blend blend,
+            CancellationToken external = default)
+        {
+            if (layer == LayerInfo.LayerType.Base)
+            {
+                Debug.LogWarning("Base レイヤーは SetLocoWeight() で制御してください。");
+                return;
+            }
+            if (!_slotOf.TryGetValue(layer, out int slot))
+            {
+                Debug.LogWarning($"未定義のレイヤー {layer}");
+                return;
+            }
+
+            // 進行中のブレンドをキャンセル
+            if (_weightBlendCts.TryGetValue(layer, out var old))
+            {
+                old.Cancel();
+                old.Dispose();
+            }
+
+            var linked = CancellationTokenSource.CreateLinkedTokenSource(
+                external, this.GetCancellationTokenOnDestroy());
+            _weightBlendCts[layer] = linked;
+            var token = linked.Token;
+
+            float from = Mathf.Clamp01(_layerInfo[slot].Weight);
+            float to   = Mathf.Clamp01(toWeight);
+
+            if (Mathf.Approximately(blend.BlendTime, 0f))
+            {
+                SetLayerWeight(layer, to);
+                linked.Dispose();
+                _weightBlendCts.Remove(layer);
+                return;
+            }
+
+            try
+            {
+                // 既存の補間ルーチンを利用（クラス内の private メソッド）
+                await BlendWeightAsync(blend, token, from, to, slot);
+            }
+            catch (OperationCanceledException)
+            {
+                // キャンセル時はそのまま終了
+                return;
+            }
+            finally
+            {
+                if (_weightBlendCts.TryGetValue(layer, out var cts))
+                {
+                    cts.Dispose();
+                    _weightBlendCts.Remove(layer);
+                }
+            }
+
+            SetLayerWeight(layer, to);
+        }
+        
+        public void SetLayerWeight(LayerInfo.LayerType layer, float weight)
+        {
+            if (layer == LayerInfo.LayerType.Base)
+            {
+                Debug.LogWarning("Base レイヤーは SetLocoWeight を使ってください。");
+                return;
+            }
+            if (!_slotOf.TryGetValue(layer, out int slot))
+            {
+                Debug.LogWarning($"未定義のレイヤー {layer}");
+                return;
+            }
+
+            var w = Mathf.Clamp01(weight);
+            _layerMixer.SetInputWeight(slot, w);      // Playables側に即反映
+            var li = _layerInfo[slot];                // 内部状態も更新（Updateで毎フレーム再適用される）
+            li.Weight = w;
             _layerInfo[slot] = li;
         }
     }

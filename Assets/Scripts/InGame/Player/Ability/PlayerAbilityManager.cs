@@ -18,7 +18,7 @@ namespace InGame.Player.Ability
         private NetworkObject _networkObject;
         private readonly Dictionary<string, AbilityBase> _abilityByName = new();
 
-        private void Start()
+        public override void Spawned()
         {
             _networkObject = GetComponent<NetworkObject>();
             foreach (var a in _abilities)
@@ -27,6 +27,18 @@ namespace InGame.Player.Ability
 
         private void Update()
         {
+
+        }
+
+        public override void FixedUpdateNetwork()
+        {
+            if (!GetInput<PlayerInput>(out var input)) return;
+            
+            // 入力を更新
+            _previousButtons = _currentButtons;
+            _currentButtons = input.Buttons;
+            
+            if (!HasStateAuthority) return;
             foreach (var condition in _conditions)
             {
                 if (!_abilityByName.TryGetValue(condition.TargetAbilityName, out var targetAbility))
@@ -46,15 +58,6 @@ namespace InGame.Player.Ability
             {
                 ability.Tick(Time.deltaTime);
             }
-        }
-
-        public override void FixedUpdateNetwork()
-        {
-            if (!GetInput<PlayerInput>(out var input)) return;
-            
-            // 入力を更新
-            _previousButtons = _currentButtons;
-            _currentButtons = input.Buttons;
         }
     }
 }
