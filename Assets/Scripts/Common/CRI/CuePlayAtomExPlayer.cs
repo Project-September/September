@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using static CriWare.CriAtomEx;
@@ -212,6 +212,7 @@ namespace CRISound
             public class Sound3D
             {
                 protected CriAtomEx3dSource _source = new();
+                public CriAtomEx3dSource Source => _source;
                 protected CriAtomExPlayer _atomExPlayer3D = new();
                 private string _currentCueName;
 
@@ -234,6 +235,7 @@ namespace CRISound
                     _atomExPlayer3D.SetCue(_instance._soundDic[cueSheet].GetAcb(), info.id);
                     _atomExPlayer3D.SetPanType(CriAtomEx.PanType.Pos3d);
                     _atomExPlayer3D.Set3dSource(_source);
+                    _atomExPlayer3D.Set3dListener(_instance._sePlayer.Listener);
                     _atomExPlayer3D.UpdateAll();
                     _atomExPlayer3D.Start();
                 }
@@ -244,10 +246,24 @@ namespace CRISound
                     var isNameMatch = _currentCueName == cueName;
                     return status == CriAtomExPlayer.Status.Playing && isNameMatch;
                 }
+
+                /// <summary>
+                /// 3DSourceの位置セットと更新
+                /// 移動する音の場合、Update等で呼び出しておく必要がある
+                /// </summary>
+                /// <param name="pos"></param>
+                public void UpdateSourcePosition(Vector3 pos)
+                {
+                    Source.SetPosition(pos.x, pos.y, pos.z);
+                    Source.Update();
+                }
+
+                public CriAtomEx3dSource GetSource() { return Source; }
             }
 
 
             private CriAtomEx3dListener _listener;
+            public CriAtomEx3dListener Listener => _listener;
             Sound3D[] _sound3Ds = new Sound3D[AtomSourceBuffer];
 
             public SEPlayerWith3D() : base(SoundType.SE)
