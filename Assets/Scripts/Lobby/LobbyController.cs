@@ -52,8 +52,9 @@ namespace September.Lobby
                 value.IsReadyImage.enabled = kv.Value;
             }
             //  全員準備完了ならゲームを開始する
-            if (isReadyCount == PlayerDatabase.Instance.PlayerDataDic.Count)
+            if (isReadyCount == PlayerDatabase.Instance.PlayerDataDic.Count && HasStateAuthority)
             {
+                DelayStartGame(0.5f).Forget();
                 RPC_Fade();
             }
         }
@@ -63,18 +64,15 @@ namespace September.Lobby
         {
             PlayerIsReadyDic.Set(playerRef, !PlayerIsReadyDic.Get(playerRef));
         }
-        [Rpc]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_Fade()
         {
-            RunFadeAndStartGameAsync().Forget();
+            NetworkManager.Instance.Fade(_fadePanel).Forget();
         }
 
-        private async UniTaskVoid RunFadeAndStartGameAsync()
+        private async UniTaskVoid DelayStartGame(float delay)
         {
-            if (_fadePanel)
-            {
-                await NetworkManager.Instance.Fade(_fadePanel);
-            }
+            await UniTask.WaitForSeconds(delay);
             NetworkManager.Instance.StartGame().Forget();
         }
         
