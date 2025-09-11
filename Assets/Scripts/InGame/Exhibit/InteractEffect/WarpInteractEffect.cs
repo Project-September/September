@@ -8,6 +8,7 @@ using UnityEngine;
 using InGame.Interact;
 using InGame.Player;
 using Ingame.Tanihira;
+using September.Common;
 using September.InGame.Effect;
 
 namespace InGame.Exhibit
@@ -45,6 +46,8 @@ namespace InGame.Exhibit
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             _cts = new CancellationTokenSource();
+            if (!_effectSpawner)
+                _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             _interactableBase =  target;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
             if(target.Runner.TryGetPlayerObject(playerRef, out NetworkObject playerNetworkObject))
@@ -60,7 +63,7 @@ namespace InGame.Exhibit
         {
             // Effectの再生
             Vector3 effectPos = player.transform.position + Vector3.up * 1.0f;
-            PlayEffect(EffectType.Warp, effectPos,Quaternion.identity);
+            PlayEffect(EffectType.WarpIn, effectPos,Quaternion.identity);
             PlaySE(_warpInSoundName);
 
             // Playerを初期化
@@ -81,7 +84,7 @@ namespace InGame.Exhibit
             await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration),cancellationToken: _cts.Token);
             
             // ゴール側エフェクトの再生
-            PlayEffect(EffectType.Warp, targetPos, Quaternion.identity);
+            PlayEffect(EffectType.WarpOut, targetPos, Quaternion.identity);
             SetPlayerVisible(player, true);
             PlaySE(_warpOutSoundName);
             _interactableBase.ForceSetInteractable = true;

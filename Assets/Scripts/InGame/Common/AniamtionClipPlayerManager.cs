@@ -88,7 +88,6 @@ namespace InGame.Common
                     BlendCurve = _landOutCurve
                 }
             );
-            _animationClipPlayer.SetTopPriorityClip(null);
         }
     }
 }
