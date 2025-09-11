@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 536499402856614603}
   - component: {fileID: 1631707056656396585}
   - component: {fileID: 1109377942412471749}
+  - component: {fileID: -8354369273336728333}
   m_Layer: 0
   m_Name: Moniter
   m_TagString: Untagged
@@ -79,7 +80,7 @@ MonoBehaviour:
   _characterEffects:
   - rid: 4146068367287517271
   _interactEffectOffset: {x: 0, y: 0, z: 0}
-  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: -0.5, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
@@ -131,8 +132,22 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6101073, y: 1, z: 0.2735138}
-  m_Center: {x: 0.0083479285, y: 0, z: 0.025988325}
+  m_Size: {x: 0.6101073, y: 0.9, z: 0.2735138}
+  m_Center: {x: 0, y: 0, z: 0.025988325}
+--- !u!114 &-8354369273336728333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169062250687249688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 536499402856614603}
 --- !u!1001 &4388365964989820408
 PrefabInstance:
   m_ObjectHideFlags: 0
