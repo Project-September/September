@@ -3226,6 +3226,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6364766241162311564, guid: 4a2facbe8555c2847b979f964b505979, type: 3}
+      propertyPath: _dashSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6364766241162311564, guid: 4a2facbe8555c2847b979f964b505979, type: 3}
+      propertyPath: _walkSpeed
+      value: 2.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8352061886232285223, guid: 4a2facbe8555c2847b979f964b505979, type: 3}
       propertyPath: m_Name
       value: Tyranno
