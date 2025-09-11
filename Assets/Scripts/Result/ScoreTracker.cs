@@ -9,6 +9,16 @@ namespace Result
         private readonly Dictionary<ExhibitType, int> _count =  new();
         private int _stunCount;
         private ExhibitScoreConfig _config;
+        
+        private int _grapplingHookCount;
+        private int _friendExhibitCount;
+
+        // スコアの加算処理
+        public void AddGrapplingHook() => _grapplingHookCount++;
+        public void AddFriendExhibit() => _friendExhibitCount++;
+
+        public int GrapplingHookCount => _grapplingHookCount;
+        public int FriendExhibitCount => _friendExhibitCount;
 
         public ScoreTracker(ExhibitScoreConfig config)
         {

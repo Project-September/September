@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -35,6 +36,19 @@ namespace Result
         [SerializeField] private TextMeshProUGUI _exhibitTotalText;
         [SerializeField] private ExhibitScoreConfig _exhibitScoreConfig;
         
+        [Header("4ページ目: アビリティボーナス")]
+        [SerializeField] private Transform _abilityRowRoot;
+        [SerializeField] private GameObject _abilityRowPrefab;
+        [SerializeField] private TextMeshProUGUI _abilityTitle;
+        [SerializeField] private TextMeshProUGUI _abilityTotalText;
+        
+        [Header("Ability Bonus Config")]
+        [SerializeField] private ExhibitScoreConfig _okabeRideConfig;
+        [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
+        [SerializeField] private int _sarutobiBonusScore = 50;
+        [SerializeField] private int _tanihiraBonusScore = 100;
+        
+        private Dictionary<CharacterType, IAbilityBonusRenderer> _bonusRenderers;
         private const int StunPoint = 150;
 
         private void Update()
@@ -81,8 +95,17 @@ namespace Result
             if (_pages.Length > 0)
                 _stack.Push(_pages[0]);
             
+            _bonusRenderers = new Dictionary<CharacterType, IAbilityBonusRenderer>
+            {
+                { CharacterType.OkabeWright, new OkabeBonusRenderer(_okabeRideConfig.Entries.ToDictionary(e => e.Type, e => e.Points)) },
+                { CharacterType.HulkTheButcher, new HaruBonusRenderer(_haruDestroyConfig.Entries.ToDictionary(e => e.Type, e => e.Points)) },
+                { CharacterType.Sarutobi, new SarutobiBonusRenderer(_sarutobiBonusScore) },
+                { CharacterType.Tanihira, new TanihiraBonusRenderer(_tanihiraBonusScore) },
+            };
+            
             SetStunPage();
             SetExhibitPage();
+            SetAbilityBonusPage();
         }
 
         /// <summary>
@@ -185,6 +208,41 @@ namespace Result
 
             if (_exhibitTotalText)
                 _exhibitTotalText.text = totalScore.ToString();
+        }
+        
+        private void SetAbilityBonusPage()
+        {
+            // 既存の行を消去
+            foreach (Transform child in _abilityRowRoot)
+                Destroy(child.gameObject);
+
+            ResultDataInbox inbox = ResultDataInbox.I;
+            if (!inbox)
+                return;
+
+            int totalScore = 0;
+
+            // ローカルプレイヤーのキャラタイプを取得
+            var db = PlayerDatabase.Instance;
+            if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out var localData))
+            {
+                Debug.LogWarning("[SetAbilityBonusPage] Local player data not found");
+                return;
+            }
+            CharacterType chara = localData.CharacterType;
+
+            // ボーナスレンダラーがあれば実行
+            if (_bonusRenderers != null && _bonusRenderers.TryGetValue(chara, out IAbilityBonusRenderer r))
+            {
+                totalScore = r.Render(inbox, _abilityRowRoot, _abilityRowPrefab, _abilityTitle);
+            }
+            else
+            {
+                Debug.Log($"[SetAbilityBonusPage] No bonus renderer for {chara}");
+            }
+
+            if (_abilityTotalText)
+                _abilityTotalText.text = totalScore.ToString();
         }
         
         // ページ遷移制御
