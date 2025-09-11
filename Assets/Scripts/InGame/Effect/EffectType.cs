@@ -1,3 +1,4 @@
+//勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 public enum EffectType
 {
     Test,
@@ -19,4 +20,7 @@ public enum EffectType
     CarHit,
     Heal,
     HitNormal,
+    WarpIn,
+    WarpOut,
 }
+//勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
