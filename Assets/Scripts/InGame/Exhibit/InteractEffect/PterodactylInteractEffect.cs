@@ -28,7 +28,6 @@ namespace InGame.Exhibit
             
             _runner = target.Runner;
             _interactable = target;
-            CharacterType characterType = context.CharacterType;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
             GetOn(playerRef);
         }
