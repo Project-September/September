@@ -45,10 +45,12 @@ namespace InGame.Exhibit
                     return;
                 }
             }
-            
-            if(CheckInteractEnd())
+
+            if (CheckInteractEnd())
+            {
                 GetOff();
-                
+                return;
+            }
             _pterodactylInteractable.OnInteractFixedUpdate(playerInput,_runner.DeltaTime);
         }
 
