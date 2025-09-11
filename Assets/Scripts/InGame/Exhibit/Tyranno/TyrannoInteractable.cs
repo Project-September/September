@@ -23,7 +23,7 @@ public class TyrannoInteractable : MountableExhibitBase
     private float _hitDistance;
 
     private float _movingTime;
-
+    
     [Networked, OnChangedRender(nameof(OnBlendChangedRender))]
     private float MoveValue { get; set; }
 
@@ -62,7 +62,7 @@ public class TyrannoInteractable : MountableExhibitBase
         Rotate(deltaTime, moveDirection);　//回転
         AdsorptionOnGround(deltaTime);　//自身が浮いてしまったときに補正して地面にくっつける
         AttackAnimationTrigger(playerInput);　//攻撃のAnimationを発火
-        OnAttackUpdate(deltaTime);　//Attack中にだけ走るメソッド
+        OnAttackUpdate(deltaTime);　//Attack中にだけ発火するメソッド
     }
 
     private void OnHit()
