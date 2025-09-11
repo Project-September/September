@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Fusion;
+using Ingame.Tanihira;
 
 namespace InGame.Exhibit
 {
@@ -14,6 +16,8 @@ namespace InGame.Exhibit
         private float _maskDuration = 5f;
         private GameObject _instantiateMask;
         private bool _isMaskAttached;
+
+        private List<FriendBase> _friendList = new List<FriendBase>();
         
         public bool IsMaskAttached => _isMaskAttached;
 
@@ -21,6 +25,21 @@ namespace InGame.Exhibit
         public void RPC_AttachHeadMask(NetworkObject player, float duration)
         {
             AttachHeadMask(player);
+            if (player.TryGetComponent<FormationManager>(out FormationManager formationManager))
+            {
+                foreach (var friend in formationManager.FriendsList)
+                {
+                    _friendList.Add(friend);
+                }
+                
+                if(_friendList.Count > 0)
+                {
+                    foreach (FriendBase friend in _friendList)
+                    {
+                        friend.StartBuff();
+                    }
+                }
+            }
             _maskDuration = duration;
         }
 
@@ -63,12 +82,20 @@ namespace InGame.Exhibit
         {
             await UniTask.Delay(TimeSpan.FromSeconds(_maskDuration));
 
+            if(_friendList.Count > 0)
+            {
+                foreach (FriendBase friend in _friendList)
+                {
+                    friend.StopBuff();
+                }
+                _friendList.Clear();
+            }
+
             if (_instantiateMask == null)
                 return;
             
             Destroy(_instantiateMask);
             _instantiateMask = null;
-            
             _isMaskAttached = false;
         }
     }

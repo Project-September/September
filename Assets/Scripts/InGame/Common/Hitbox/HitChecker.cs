@@ -12,7 +12,8 @@ public class HitChecker : MonoBehaviour
     
     [SerializeField] private List<Collider> _alreadyHit = new();
     private MeleeHitboxExecutor _executor;
-    public bool IsFinished = false;
+    public bool IsActive = false;
+    public List<Transform> HitPoint => _hitPoints;
     public event Action<Collider> OnHit;
     
     public void StartHitCheck()
@@ -27,7 +28,7 @@ public class HitChecker : MonoBehaviour
                 OnHit?.Invoke(item); // ヒットイベントを発火
             }
         };
-        IsFinished = false;
+        IsActive = true;
     }
     
     private void Update()
@@ -41,7 +42,7 @@ public class HitChecker : MonoBehaviour
         {
             _executor.OnHit = null; // ヒットイベントを解除
             _executor = null; // Executorを解放
-            IsFinished = true; // ヒットチェックが終了したことを通知
+            IsActive = false; // ヒットチェックが終了したことを通知
             _alreadyHit.Clear(); // ヒット済みリストをクリア
         }
     }

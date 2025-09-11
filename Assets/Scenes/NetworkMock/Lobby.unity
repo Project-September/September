@@ -1042,7 +1042,6 @@ GameObject:
   m_Component:
   - component: {fileID: 290815996}
   - component: {fileID: 290815995}
-  - component: {fileID: 290815994}
   - component: {fileID: 290815993}
   m_Layer: 0
   m_Name: MainCamera
@@ -1095,14 +1094,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &290815994
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 290815992}
-  m_Enabled: 1
 --- !u!20 &290815995
 Camera:
   m_ObjectHideFlags: 0
@@ -3171,7 +3162,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 598347563}
   m_HandleRect: {fileID: 598347562}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3889,8 +3880,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1017903993}
   m_HandleRect: {fileID: 1017903992}
   m_Direction: 2
-  m_Value: 1.0000007
-  m_Size: 0.86632407
+  m_Value: 0.9999992
+  m_Size: 0.8663239
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

@@ -28,7 +28,11 @@ namespace  InGame.Player.Ability
 
         [SerializeField] protected float _cooldown;
         [SerializeField] protected AbilityPhase _phase = AbilityPhase.Available;
-        private NetworkRunner Runner => NetworkRunner.Instances.FirstOrDefault();
+        protected NetworkRunner Runner => NetworkRunner.Instances.FirstOrDefault();
+        
+        /// <summary>
+        /// アビリティのパラメータ。開始前にセットされるためその前にはアクセスしないこと
+        /// </summary>
         public AbilityParameter Parameter { get; set; }
         protected float CooldownEndTime { get; private set; }
         public AbilityPhase Phase => _phase;

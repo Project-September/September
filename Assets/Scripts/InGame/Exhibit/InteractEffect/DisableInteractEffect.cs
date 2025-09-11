@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Interact;
 using September.Common;
@@ -19,6 +20,7 @@ namespace InGame.Exhibit.InteractEffect
             _interactable.LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
             _interactable.LastUsedCooldownTime = cooldownTime;
             //何かしらの対応する演出を入れる
+            _interactable.PlayCooldownEffect(cooldownTime).Forget();
         }
     }
 }
