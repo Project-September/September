@@ -81,7 +81,7 @@ namespace InGame.Player
             // {
             //     var maxSpeed = _playerMovement.DashMoveSpeed;
             //     var walkSpeed = _playerMovement.WalkSpeed;
-            //     var moveSpeed = _playerMovement.MoveVelocity.magnitude;
+            //     var moveSpeed = _playerMovement._moveVelocity.magnitude;
             //     var weight = 0f;
             //     if (moveSpeed <= walkSpeed)
             //     {

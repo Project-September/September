@@ -37,7 +37,7 @@ namespace InGame.Player
         private Animator _animator;
         
         // base move
-        [Networked] public Vector3 MoveVelocity { get; set; }
+        private Vector3 _moveVelocity;
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
@@ -71,6 +71,7 @@ namespace InGame.Player
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
+            _rb.useGravity = true;
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
         }
@@ -99,7 +100,7 @@ namespace InGame.Player
             if (_teleportTarget.HasValue)
             {
                 transform.position = _teleportTarget.Value;
-                MoveVelocity = Vector3.zero;
+                _moveVelocity = Vector3.zero;
                 _teleportTarget = null;
             }
             
@@ -115,7 +116,7 @@ namespace InGame.Player
             _isGround = false;
             _groundNormal = Vector3.up;
             
-            MoveVelocity = Vector3.zero;
+            _moveVelocity = Vector3.zero;
                 
             if (HasStateAuthority)
             {
@@ -138,7 +139,7 @@ namespace InGame.Player
         {
             if (_animator && _animator.applyRootMotion)
             {
-                MoveVelocity = Vector3.zero;
+                _moveVelocity = Vector3.zero;
                 return;
             }
             
@@ -171,7 +172,7 @@ namespace InGame.Player
             if (moveDir != Vector2.zero && IsGround)
             {
                 Vector3 moveDir3 = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveDir.x, 0, moveDir.y);
-                MoveVelocity = moveDir3 * (isDash ? _dashSpeed : _moveSpeed);
+                _moveVelocity = moveDir3 * (isDash ? _dashSpeed : _moveSpeed);
             }
         }
 
@@ -195,11 +196,11 @@ namespace InGame.Player
         {
             if (IsGround)
             {
-                _rb.linearVelocity = MoveVelocity;
+                _rb.linearVelocity = _moveVelocity;
             }
             
             // 回転の向きを代入
-            if (!_setDirection) _rotationDirection = MoveVelocity;
+            if (!_setDirection) _rotationDirection = _moveVelocity;
         }
 
         public void SetRotationDirection(Vector3 lookDirection)
@@ -359,8 +360,8 @@ namespace InGame.Player
 
         public void AddForce(Vector3 force)
         {
-            MoveVelocity += force;
-            if (Vector3.Angle(MoveVelocity, _groundNormal) < 89)
+            _moveVelocity += force;
+            if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
             {
                 _isGround = false;
                 _isGroundTimer = 0;
@@ -370,8 +371,8 @@ namespace InGame.Player
         /// <summary> 速度ベクトルを0にする </summary>
         public void Stop()
         {
-            MoveVelocity = Vector3.zero;
-            _rb.linearVelocity = MoveVelocity;
+            _moveVelocity = Vector3.zero;
+            _rb.linearVelocity = _moveVelocity;
         }
 
         public void Teleport(Vector3 position)

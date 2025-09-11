@@ -4104,6 +4104,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _rb
+      value: 
+      objectReference: {fileID: 3644220712944108679}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _jumpOver
       value: 
       objectReference: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
@@ -4271,6 +4275,14 @@ PrefabInstance:
       propertyPath: managedReferences[5091638408297054335]._normalAttackAnimationClip
       value: 
       objectReference: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _dashSpeed
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _moveSpeed
+      value: 1.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _run
       value: 
@@ -4440,6 +4452,11 @@ PrefabInstance:
       addedObject: {fileID: 2569623669843166931}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+--- !u!54 &3644220712944108679 stripped
+Rigidbody:
+  m_CorrespondingSourceObject: {fileID: 6099435784402053345, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 7365447978694257766}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4582497511770257016 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6462417923102071326, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
