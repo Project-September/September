@@ -198,6 +198,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Warp"",
+                    ""type"": ""Button"",
+                    ""id"": ""506da238-3225-4001-9ab0-c119eccd8c05"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -627,6 +636,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Ability2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1216f590-1ea7-43d8-ad34-7edef8c2e8b1"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Warp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1233,6 +1253,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Ability1 = m_Player.FindAction("Ability1", throwIfNotFound: true);
         m_Player_Ability2 = m_Player.FindAction("Ability2", throwIfNotFound: true);
+        m_Player_Warp = m_Player.FindAction("Warp", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1247,16 +1268,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_Option = m_UI.FindAction("Option", throwIfNotFound: true);
         m_UI_Volume = m_UI.FindAction("Volume", throwIfNotFound: true);
-        
-        OnConstruct();
     }
 
     ~@GameInput()
     {
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, GameInput.Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, GameInput.UI.Disable() has not been called.");
-        
-        OnDestruct();
     }
 
     /// <summary>
@@ -1344,6 +1361,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Ability1;
     private readonly InputAction m_Player_Ability2;
+    private readonly InputAction m_Player_Warp;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1403,6 +1421,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Ability2".
         /// </summary>
         public InputAction @Ability2 => m_Wrapper.m_Player_Ability2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Warp".
+        /// </summary>
+        public InputAction @Warp => m_Wrapper.m_Player_Warp;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1465,6 +1487,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Ability2.started += instance.OnAbility2;
             @Ability2.performed += instance.OnAbility2;
             @Ability2.canceled += instance.OnAbility2;
+            @Warp.started += instance.OnWarp;
+            @Warp.performed += instance.OnWarp;
+            @Warp.canceled += instance.OnWarp;
         }
 
         /// <summary>
@@ -1512,6 +1537,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Ability2.started -= instance.OnAbility2;
             @Ability2.performed -= instance.OnAbility2;
             @Ability2.canceled -= instance.OnAbility2;
+            @Warp.started -= instance.OnWarp;
+            @Warp.performed -= instance.OnWarp;
+            @Warp.canceled -= instance.OnWarp;
         }
 
         /// <summary>
@@ -1918,6 +1946,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAbility2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Warp" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnWarp(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
