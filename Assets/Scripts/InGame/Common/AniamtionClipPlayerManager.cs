@@ -43,7 +43,7 @@ namespace InGame.Common
             else if (!_playerMovement.DoingVault && _isVaultingLastFrame)
             {
                 _isVaultingLastFrame = false;
-                _animationClipPlayer.PlayClip(null);
+                //_animationClipPlayer.PlayClip(null);
             }
 
             // ===== 落下の開始（TopLayerへクリップ挿入→重み0→1へブレンド） =====
@@ -88,7 +88,6 @@ namespace InGame.Common
                     BlendCurve = _landOutCurve
                 }
             );
-            _animationClipPlayer.PlayClip(null);
         }
     }
 }
