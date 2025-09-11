@@ -28,6 +28,8 @@ namespace InGame.Player
         private bool _shouldWarp = false;
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
+        private bool _isVaultingLastFrame = false;
+        public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
         public void SetWarpTarget(Vector3 targetPosition,Quaternion targetRotation)
         {
@@ -67,14 +69,44 @@ namespace InGame.Player
                 health.OnDeath += OnDeath;
             }
 
-            if (TryGetComponent(out PlayerAnimBase playerAnimBase))
-            {
-                playerAnimBase.Init(this);
-            }
+            // if (TryGetComponent(out PlayerAnimBase playerAnimBase))
+            // {
+            //     playerAnimBase.Init(this);
+            // }
         }
 
         private void LateUpdate()
         {
+            // if (_animationClipPlayer)
+            // {
+            //     var maxSpeed = _playerMovement.DashMoveSpeed;
+            //     var walkSpeed = _playerMovement.WalkSpeed;
+            //     var moveSpeed = _playerMovement.MoveVelocity.magnitude;
+            //     var weight = 0f;
+            //     if (moveSpeed <= walkSpeed)
+            //     {
+            //         // 0..Walk -> 0..1
+            //         weight = Mathf.InverseLerp(0f, walkSpeed, moveSpeed);
+            //     }
+            //     else
+            //     {
+            //         // Walk..Max -> 1..2
+            //         weight = Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f;
+            //     }
+            //     
+            //     _animationClipPlayer.SetLocoWeight(weight);
+            //     
+            //     switch ()
+            //     {
+            //         case false when _playerMovement.DoingVault:
+            //             _animationClipPlayer.SetTopPriorityClip(true);
+            //             break;
+            //         case true when !_playerMovement.DoingVault:
+            //             _animationClipPlayer.SetTopPriorityClip(false);
+            //             break;
+            //     }
+            // }
+            
             // Localでの処理にInputを送る
             if (HasInputAuthority)
             {
@@ -117,6 +149,8 @@ namespace InGame.Player
                 _cameraController.CameraReset();
                 _shouldWarp = false;
             }
+
+            
         }
 
         public void AfterTick()

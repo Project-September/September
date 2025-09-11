@@ -1,5 +1,7 @@
 using System.Linq;
 using Fusion;
+using September.Common;
+using September.InGame.Common;
 using UnityEngine;
 
 namespace Ingame.Tanihira
@@ -11,12 +13,20 @@ namespace Ingame.Tanihira
         [SerializeField] private LayerMask _detectionMask;
         [SerializeField] private LayerMask _obstacleMask;
         [SerializeField] private FriendStateChanger _friendStateChanger;
-        [SerializeField] private float _waitTime;
+        [SerializeField] private FormationManager _formationManager;
         
         private Transform _currentTarget;
         private bool _isWaiting;
-        private float _waitTimer;
-        
+        private InGameManager _inGameManager;
+
+        private void Start()
+        {
+            _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+            if (_inGameManager)
+            {
+                _inGameManager.GameStarted += GameStart;
+            }
+        }
 
         private void Update()
         {
@@ -27,20 +37,17 @@ namespace Ingame.Tanihira
             {
                 DetectePlayer();
             }
-            else
-            {
-                _waitTimer += Time.deltaTime;
-                if (_waitTimer >= _waitTime)
-                {
-                    _isWaiting = true;
-                }
-            }
+        }
+
+        private void GameStart()
+        {
+            _isWaiting = true;
         }
 
         //プレイヤーを索敵する処理
         private void DetectePlayer()
         {
-            if (IsTargetValid(_currentTarget))
+            if (IsTargetValid(_currentTarget) || _formationManager.CurrentFriendsList.FirstOrDefault().CurrentState == FriendState.None)
                 return;
             
             //範囲内のプレイヤーを検出
@@ -75,7 +82,6 @@ namespace Ingame.Tanihira
                     Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
                     continue;
                 }
-                    
                 
                 //近い物をターゲットにして攻撃させる
                 _currentTarget = player.gameObject.transform;
@@ -117,6 +123,11 @@ namespace Ingame.Tanihira
             }
 
             return true;
+        }
+
+        private void OnDisable()
+        {
+            _inGameManager.GameStarted -= GameStart;
         }
         
         private void OnDrawGizmosSelected()

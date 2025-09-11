@@ -10,8 +10,8 @@ public class FriendChaseState : IFriendState
         if (friend.Destination != null)
             friend.Agent.SetDestination(friend.Destination.position);
         
-        friend.Agent.speed = friend.FriendStatus.FriendChaseSpeed;
-        friend.Agent.stoppingDistance = friend.FriendStatus.FriendChaseDistance;
+        friend.Agent.speed = friend.CurrentFriendStatus.FriendChaseSpeed;
+        friend.Agent.stoppingDistance = friend.CurrentFriendStatus.FriendChaseDistance;
     }
 
     public void OnExit(FriendBase friend)

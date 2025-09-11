@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Fusion;
+using InGame.Common;
 using UniRx;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ namespace InGame.Player
         private Animator _animator;
         
         // base move
-        private Vector3 _moveVelocity;
+        [Networked] public Vector3 MoveVelocity { get; set; }
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
@@ -47,6 +48,8 @@ namespace InGame.Player
         private bool _isDash;
         // vault
         private bool _doingVault;
+        
+        [Networked] public bool DoingVault { get; set; }
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
@@ -57,8 +60,11 @@ namespace InGame.Player
         private float _gizmoTimer;
         private List<CapsuleCastData> _capsuleCastData = new();
 
-        public Vector3 MoveVelocity => _moveVelocity;
+        public float WalkSpeed => _moveSpeed;
+        public float DashMoveSpeed => _dashSpeed;
         public bool IsGround => _isGround || _isGroundTimer > 0;
+        [Networked] 
+        public NetworkBool IsGroundNet { get; set; }
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
 
@@ -68,6 +74,7 @@ namespace InGame.Player
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
         }
+        
 
         public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
@@ -76,7 +83,7 @@ namespace InGame.Player
             
             // set velocity
             if (isJump) TryVault(moveDirection);
-            if (_doingVault) UpdateVault(deltaTime);
+            if (DoingVault) UpdateVault(deltaTime);
             else
             {
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
@@ -92,7 +99,7 @@ namespace InGame.Player
             if (_teleportTarget.HasValue)
             {
                 transform.position = _teleportTarget.Value;
-                _moveVelocity = Vector3.zero;
+                MoveVelocity = Vector3.zero;
                 _teleportTarget = null;
             }
             
@@ -108,7 +115,12 @@ namespace InGame.Player
             _isGround = false;
             _groundNormal = Vector3.up;
             
-            _moveVelocity = Vector3.zero;
+            MoveVelocity = Vector3.zero;
+                
+            if (HasStateAuthority)
+            {
+                IsGroundNet = IsGround;
+            }
         }
 
         /// <summary> カメラ視点の移動入力を取得 </summary>
@@ -126,7 +138,7 @@ namespace InGame.Player
         {
             if (_animator && _animator.applyRootMotion)
             {
-                _moveVelocity = Vector3.zero;
+                MoveVelocity = Vector3.zero;
                 return;
             }
             
@@ -159,7 +171,7 @@ namespace InGame.Player
             if (moveDir != Vector2.zero && IsGround)
             {
                 Vector3 moveDir3 = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveDir.x, 0, moveDir.y);
-                _moveVelocity = moveDir3 * (isDash ? _dashSpeed : _moveSpeed);
+                MoveVelocity = moveDir3 * (isDash ? _dashSpeed : _moveSpeed);
             }
         }
 
@@ -183,11 +195,11 @@ namespace InGame.Player
         {
             if (IsGround)
             {
-                _rb.linearVelocity = _moveVelocity;
+                _rb.linearVelocity = MoveVelocity;
             }
             
             // 回転の向きを代入
-            if (!_setDirection) _rotationDirection = _moveVelocity;
+            if (!_setDirection) _rotationDirection = MoveVelocity;
         }
 
         public void SetRotationDirection(Vector3 lookDirection)
@@ -319,7 +331,7 @@ namespace InGame.Player
         void StartVault()
         {
             _vaultTimer = 0;
-            _doingVault = true;
+            DoingVault = true;
             Stop();
             
             Vector3 dir = _vaultEndPos - _vaultStartPos;
@@ -342,13 +354,13 @@ namespace InGame.Player
 
         void EndVault()
         {
-            _doingVault = false;
+            DoingVault = false;
         }
 
         public void AddForce(Vector3 force)
         {
-            _moveVelocity += force;
-            if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
+            MoveVelocity += force;
+            if (Vector3.Angle(MoveVelocity, _groundNormal) < 89)
             {
                 _isGround = false;
                 _isGroundTimer = 0;
@@ -358,8 +370,8 @@ namespace InGame.Player
         /// <summary> 速度ベクトルを0にする </summary>
         public void Stop()
         {
-            _moveVelocity = Vector3.zero;
-            _rb.linearVelocity = _moveVelocity;
+            MoveVelocity = Vector3.zero;
+            _rb.linearVelocity = MoveVelocity;
         }
 
         public void Teleport(Vector3 position)

@@ -8,7 +8,6 @@ namespace Ingame.Tanihira
     {
         private int _maxHealth;
         private int _currentHealth;
-        private float _attackPower;
         private FriendState _stockFriendState;
     
         public bool IsAlive => _currentHealth > 0;
@@ -18,15 +17,16 @@ namespace Ingame.Tanihira
         protected override void Awake()
         {
             base.Awake();
-            _maxHealth = FriendStatus.MaxHealth;
+            _maxHealth = CurrentFriendStatus.MaxHealth;
             _currentHealth = _maxHealth;
-            _attackPower = FriendStatus.AttackPower;
             //ペンギンのステートを設定
+            _friendStateMappings[FriendState.None] = null;
             _friendStateMappings[FriendState.Idle] = null;
             _friendStateMappings[FriendState.Move] = new FriendMoveState();
             _friendStateMappings[FriendState.Chase] = new FriendChaseState();
             _friendStateMappings[FriendState.Attack] = new FriendAttackState();
             _friendStateMappings[FriendState.Stun] = new FriendStunState();
+            _friendStateMappings[FriendState.Wait] = new FriendWaitState();
         }
 
         public override void ChangeState(FriendState newState)

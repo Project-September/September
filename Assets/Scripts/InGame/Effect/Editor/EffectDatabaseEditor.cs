@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(EffectDatabase))]
-public class EffectDatabaseEditor : Editor
+public class EffectDatabaseEditor : UnityEditor.Editor
 {
     private SerializedProperty _effects;
 
