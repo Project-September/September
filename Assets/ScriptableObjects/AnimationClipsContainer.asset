@@ -128,7 +128,7 @@ MonoBehaviour:
   - AnimClip: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
     PlaySpeed: 1
     BlendIn:
-      BlendTime: 0.3
+      BlendTime: 0
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -154,16 +154,16 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0.3
+      BlendTime: 0
       BlendCurve:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0
+          value: 1
           inSlope: 0
           outSlope: 0
-          tangentMode: 0
+          tangentMode: 34
           weightedMode: 0
           inWeight: 0
           outWeight: 0
@@ -172,7 +172,7 @@ MonoBehaviour:
           value: 1
           inSlope: 0
           outSlope: 0
-          tangentMode: 0
+          tangentMode: 34
           weightedMode: 0
           inWeight: 0
           outWeight: 0
@@ -184,7 +184,7 @@ MonoBehaviour:
   - AnimClip: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
     PlaySpeed: 1
     BlendIn:
-      BlendTime: 0.3
+      BlendTime: 0
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -210,7 +210,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0.3
+      BlendTime: 0
       BlendCurve:
         serializedVersion: 2
         m_Curve:

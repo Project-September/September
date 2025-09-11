@@ -38,12 +38,12 @@ namespace InGame.Common
             if (_playerMovement.DoingVault && !_isVaultingLastFrame)
             {
                 _isVaultingLastFrame = true;
-                _animationClipPlayer.PlayClip(_jumpOver);
+                _animationClipPlayer.SetTopPriorityClip(_jumpOver);
             }
             else if (!_playerMovement.DoingVault && _isVaultingLastFrame)
             {
                 _isVaultingLastFrame = false;
-                //_animationClipPlayer.PlayClip(null);
+                _animationClipPlayer.SetTopPriorityClip(null);
             }
 
             // ===== 落下の開始（TopLayerへクリップ挿入→重み0→1へブレンド） =====
@@ -52,10 +52,10 @@ namespace InGame.Common
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
                 && !_animationClipPlayer.IsPlayingTargetClip(_fallDown))
             {
-                _animationClipPlayer.PlayClip(_fallDown);
-                _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.FullBody, 0f);
+                _animationClipPlayer.SetTopPriorityClip(_fallDown);
+                _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
                 _animationClipPlayer.BlendLayerWeight(
-                    LayerInfo.LayerType.FullBody,
+                    LayerInfo.LayerType.TopLayer,
                     1f,
                     new LayerInfo.Blend {
                         BlendTime = _fallInTime,
@@ -81,7 +81,7 @@ namespace InGame.Common
         private async UniTaskVoid FadeOutAndClearFall()
         {
             await _animationClipPlayer.BlendLayerWeight(
-                LayerInfo.LayerType.FullBody,
+                LayerInfo.LayerType.TopLayer,
                 0f,
                 new LayerInfo.Blend {
                     BlendTime = _landOutTime,

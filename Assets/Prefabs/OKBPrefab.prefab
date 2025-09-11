@@ -5525,7 +5525,7 @@ MonoBehaviour:
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
-  _fallInTime: 0.2
+  _fallInTime: 0.5
   _fallInCurve:
     serializedVersion: 2
     m_Curve:
@@ -5550,7 +5550,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _landOutTime: 0.12
+  _landOutTime: 0.3
   _landOutCurve:
     serializedVersion: 2
     m_Curve:
