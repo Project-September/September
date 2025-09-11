@@ -6,7 +6,6 @@ namespace Result
 {
     public class ResultDataInbox : SingletonMonoBehaviour<ResultDataInbox>
     {
-
         public int RoundId { get; private set; }
         public int StunCount { get; private set; }
         public int PageTotal { get; private set; } // ページ2の合計（サーバー計の自分の最終合計）

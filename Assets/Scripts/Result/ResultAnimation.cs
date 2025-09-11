@@ -19,6 +19,7 @@ namespace Result
 
     public class ResultAnimation : MonoBehaviour
     {
+        [SerializeField] private PageController _pageController;
         private ResultUIRootRefs _resultUIRoot;
 
         [Header("Delays")]
@@ -76,6 +77,7 @@ namespace Result
             await AnimateBackground();
             await AnimateRows();
             await AnimateYourRank();
+            _pageController.Initialize();
         }
 
         private void Initialize()
@@ -136,27 +138,29 @@ namespace Result
         private async UniTask AnimateRows()
         {
             PlayerDatabase db = PlayerDatabase.Instance;
-            if (!db) return;
+            if (!db) 
+                return;
 
             // Ogreを最後に、それ以外はスコア降順
             var data = db.PlayerDataDic
-                .Select(kv => new { kv.Key, kv.Value })
-                .OrderBy(x => x.Value.IsOgre ? 1 : 0)
-                .ThenByDescending(x => x.Value.Score)
-                .Select(d => (
-                    playerRef: d.Key,
-                    name: d.Value.DisplayNickName,
-                    icon: _iconMap.GetValueOrDefault(d.Value.CharacterType, _defaultIcon),
-                    score: d.Value.Score,
-                    isOgre: d.Value.IsOgre))
+                .Select(kv => kv.Value)
+                .OrderByDescending(x => x.Score)
+                .Select(x => (
+                    x.DisplayNickName,
+                    _iconMap.GetValueOrDefault(x.CharacterType, _defaultIcon),
+                    x.Score 
+                ))
                 .ToList();
 
             int rowCount = Mathf.Min(data.Count, _rows.Length);
+            
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_rowsRoot);
 
             for (int i = 0; i < rowCount; i++)
             {
-                var rowData = data[i];
-                var row = _rows[i];
+                (string name, Sprite icon, int score) rowData = data[i];
+                ResultRowRefs row = _rows[i];
                 row.gameObject.SetActive(true);
 
                 row.Name.text = rowData.name;
@@ -170,6 +174,8 @@ namespace Result
                 RectTransform rt = row.transform as RectTransform;
                 if (rt)
                 {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(_rowsRoot);
+                    
                     Vector2 endPos = rt.anchoredPosition;
                     rt.anchoredPosition = endPos + new Vector2(-_rowSlideOffset, 0f);
 
@@ -216,7 +222,8 @@ namespace Result
                 rows.Add((rt, row.Score, row.Rank, scoreVal));
             }
 
-            if (rows.Count <= 1) return;
+            if (rows.Count <= 1)
+                return;
 
             float[] lanesY = rows.OrderByDescending(r => r.rt.position.y)
                 .Select(r => r.rt.anchoredPosition.y).ToArray();

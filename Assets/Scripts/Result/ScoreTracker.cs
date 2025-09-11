@@ -41,7 +41,8 @@ namespace Result
         
         public void MergeFrom(ScoreTracker other)
         {
-            if (other == null) return;
+            if (other == null) 
+                return;
 
             foreach (var kv in other._count)
             {

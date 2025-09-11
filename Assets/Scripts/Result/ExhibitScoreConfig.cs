@@ -19,7 +19,7 @@ public class ExhibitScoreConfig : ScriptableObject
             return _lookup.GetValueOrDefault(type, 0);
             
         _lookup = new Dictionary<ExhibitType, int>();
-        foreach (var e in _entries)
+        foreach (ExhibitScoreEntry e in _entries)
             _lookup[e.Type] = e.Points;
         return _lookup.GetValueOrDefault(type, 0);
     }
