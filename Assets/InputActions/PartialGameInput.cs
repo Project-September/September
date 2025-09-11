@@ -43,6 +43,41 @@ public partial class GameInput
         }
     }
 
+    public void ToggleMoveInput(bool value)
+    {
+        if (value)
+        {
+            Player.Jump.Enable();
+            Player.Move.Enable();
+            Player.Dash.Enable();
+            Player.Aim.Enable();
+        }
+        else
+        {
+            Player.Jump.Disable();
+            Player.Move.Disable();
+            Player.Dash.Disable();
+            Player.Aim.Disable();
+        }
+    }
+    public void ToggleActionInput(bool value)
+    {
+        if (value)
+        {
+            Player.Attack.Enable();
+            Player.Ability1.Enable();
+            Player.Ability2.Enable();
+            Player.Interact.Enable();
+        }
+        else
+        {
+            Player.Attack.Disable();
+            Player.Ability1.Disable();
+            Player.Ability2.Disable();
+            Player.Interact.Disable();
+        }
+    }
+
     public enum DeviceType
     {
         Unknown,

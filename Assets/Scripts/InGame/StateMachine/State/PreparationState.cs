@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
 using Cinemachine;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
+using InGame.Common;
 using InGame.Health;
 using InGame.Player;
 using September.InGame.Common;
@@ -20,14 +22,14 @@ namespace September.Common
         [SerializeField] private Transform[] _spawnPositions;
         [SerializeField] private Image _fadeImage;
         [SerializeField] private CinemachineVirtualCamera _startCamera;
-        private int _spawnPositionIndex; 
         [SerializeField] private Vector3 _cameraOffset;
-        [SerializeField] private int _emoteDelay;
+        [SerializeField] private CountdownAnimation _countdownAnimation;
+        private int _spawnPositionIndex; 
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
-            SetUpUI();
+            UIController.I.SetUpStartUI();
             if (Context.Runner.IsServer)
             {
                 ChooseOgre();
@@ -51,7 +53,8 @@ namespace September.Common
                     Context.AddPlayerObject(pair.Key, player);
                 }
                 var playerHealth = player.GetComponent<PlayerHealth>();
-                playerHealth.OnDeath += OnPlayerKilled; //PlayerHealthのOnDeathに登録
+                //PlayerHealthのOnDeathに登録
+                playerHealth.OnDeath += OnPlayerKilled;
                 var spd = pair.Value;
                 foreach (var data in PlayerDatabase.Instance.PlayerDataDic)
                 {
@@ -60,65 +63,101 @@ namespace September.Common
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
             }
+            
             Context.Register(StaticServiceLocator.Instance);
-            RPC_SetCameraPriority(20);
-            // ToDo : ここにAnimation処理
-            // ToDo : Animationが終了するまで入力を受け付けなくする
-            RPC_FadeAndAnimation();
-            StartTimer().Forget();
+            RPC_OpeningSequence();
         }
 
-        [Rpc]
-        private void RPC_FadeAndAnimation()
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_OpeningSequence()
         {
-            FadeAndAnimation().Forget();
+            OpeningSequence().Forget();
         }
 
-        private async UniTaskVoid FadeAndAnimation()
+        private async UniTaskVoid OpeningSequence()
         {
-            await FadeIn();
+            GameInput.I.ToggleMoveInput(false);
+            GameInput.I.ToggleActionInput(false);
+            _startCamera.Priority = 999;
+            _startCamera.ForceCameraPosition(_spawnPositions[0].position + _cameraOffset, Quaternion.identity);
+            //  黒画面フェードアウト
+            await FadeOut();
+            //  各プレイヤーに注目 + エモート
             await StartAnimation();
+            _startCamera.Priority = -999;
+            //  カメラが元の位置に戻るまで待つ
+            await UniTask.WaitForSeconds(1.5f);
+            //  カウントダウン開始 
+            _countdownAnimation.StartCountdown();
+            await UniTask.WaitForSeconds(3f);
+            //  準備フェーズ
+            GameInput.I.ToggleMoveInput(true);
+            PlayBGM(Context.InGameBGMCueName);
+            UIController.I.StartTimer();
+            await UniTask.Delay(TimeSpan.FromSeconds(10f));
+            //  ゲーム開始
+            GameInput.I.ToggleActionInput(true);
+            SetOgreLamp();
+            if (Context.Runner.IsServer)
+            {
+                //  ステート終了
+                Context.Rpc_SendEvent((int)StateEventId.Finish);
+            }
         }
         
         // 全ての準備が整ったらFadeをあける
-        private async UniTask FadeIn()
+        private async UniTask FadeOut()
         {
             if (_fadeImage)
             {
-                _fadeImage.color = new Color(1f, 1f, 1f, 1f);
+                _fadeImage.color = new Color(0f, 0f, 0f, 1f);
 
                 await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
                 Debug.Log("Fadeの終了");
+            }
+            else
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(1f));
             }
         }
 
         // ゲームスタート前にPlayerがポーズする
         private async UniTask StartAnimation()
         {
-            _startCamera.gameObject.transform.position =  _spawnPositions[0].position + _cameraOffset;
-            for (int i = 0; i < _spawnPositionIndex; i++)
+            var playerDatabase = PlayerDatabase.Instance;
+            var characterDataContainer = CharacterDataContainer.Instance;
+            int index = 0;
+            foreach (var pair in playerDatabase.PlayerDataDic)
             {
-                var position = _spawnPositions[i].position + _cameraOffset;
-                _startCamera.gameObject.transform.Translate(position);
-                await UniTask.Delay(TimeSpan.FromSeconds(_emoteDelay)); // 各エモートのAnimation分待つ
+                var animClipPlayer = Context.Runner.GetPlayerObject(pair.Key).GetComponent<AnimationClipPlayer>();
+                var characterType = pair.Value.CharacterType;
+                var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
+
+                _startCamera.transform.position = _spawnPositions[index].position + _cameraOffset;
+                await UniTask.WaitForSeconds(1f);
+                float delayTime = 1f;
+                if (emoteClip)
+                {
+                    if(Context.Runner.IsServer) animClipPlayer.PlayClip(emoteClip);
+                    delayTime = emoteClip.length;
+                }
+                await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
+                index++;
             }
-            // 仮実装
-            // Debug.Log("Animation Start");
-            // await UniTask.Delay(5000);
-            // Debug.Log("Animation End");
-            RPC_SetCameraPriority(0);
         }
-        
+        private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
+        {
+            if (killerData.StunData.TryGet(killedPlayer, out var count))
+            {
+                killerData.StunData.Set(killedPlayer, count + 1);
+            }
+            PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
+        }
         private Vector3 GetSpawnPosition()
         {
             var result = _spawnPositions[_spawnPositionIndex].position;
             _spawnPositionIndex = (_spawnPositionIndex + 1) % _spawnPositions.Length;
             return result;
-        }
-        private void SetUpUI()
-        {
-            UIController.I.SetUpStartUI();
-            UIController.I.StartTimer();
         }
         /// <summary>
         /// 鬼を抽選するメソッド
@@ -133,7 +172,6 @@ namespace September.Common
             var data = dic.Get(ogreKey);
             data.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
-            RPC_SetOgreLamp(ogreKey);
         }
         /// <summary>
         /// 各Playerの気絶時に呼ばれるメソッド
@@ -154,31 +192,30 @@ namespace September.Common
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
         }
-
-        private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
-        {
-            if (killerData.StunData.TryGet(killedPlayer, out var count))
-            {
-                killerData.StunData.Set(killedPlayer, count + 1);
-            }
-            PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
-        }
-        
-        private async UniTask StartTimer()
-        {
-            for (int i = Context.TimerData.PreStartTime; i >= 1; i--)
-            {
-                //ReadyTime表示
-                await UniTask.Delay(TimeSpan.FromSeconds(Context.TimerData.Duration), cancellationToken: Context.Cts.Token);
-            }
-            await UniTask.Delay(TimeSpan.FromSeconds(Context.TimerData.AfterReadyDelay), cancellationToken: Context.Cts.Token);
-            //  ステート終了
-            Context.Rpc_SendEvent((int)StateEventId.Finish);
-        }
         private void HideCursor()
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
+        }
+        private void PlayBGM(string newCueName)
+        {
+            if(!string.IsNullOrEmpty(Context.CurrentBGM))
+            {
+                CRIAudio.StopBGM("BGM", Context.CurrentBGM);
+            }
+            
+            if(!string.IsNullOrEmpty(newCueName))
+            {
+                CRIAudio.PlayBGM("BGM", newCueName);
+                Context.CurrentBGM = newCueName;
+            }
+        }
+        private void SetOgreLamp()
+        {
+            if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
+            {
+                UIController.I.ShowOgreLamp(true);
+            }
         }
         // 鬼変更時のUI更新通知
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -190,20 +227,6 @@ namespace September.Common
                 UIController.I.ShowOgreLamp(false);
             else if(targetRef == Context.Runner.LocalPlayer)
                 UIController.I.ShowOgreLamp(true);
-        }
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetOgreLamp(PlayerRef ogreRef)
-        {
-            if (ogreRef == Context.Runner.LocalPlayer)
-            {
-                UIController.I.ShowOgreLamp(true);
-            }
-        }
-        
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetCameraPriority(int priority)
-        {
-            _startCamera.Priority = priority;
         }
     }
 }

@@ -22,6 +22,7 @@ namespace September.Common
             public NetworkPrefabRef Prefab;
             public VideoClip ExplainVideo;
             public Sprite CharacterIcon;
+            public AnimationClip EmoteAnimation;
         }
         [SerializeField, ArrayLength(DataCount)] CharacterData[] _characterData;
 
