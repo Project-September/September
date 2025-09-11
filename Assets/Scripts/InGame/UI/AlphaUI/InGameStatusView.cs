@@ -26,10 +26,12 @@ namespace September.InGame.UI
         private Slider _hpBarSlider;
         private Slider _staminaBarSlider;
         private TextMeshProUGUI _killLogText;
+        private TextMeshProUGUI _ogreMessageText;
         private GameObject _optionUI;
         private GameObject _killLogUI;
         private GameObject _ogreUiInstance;
         private InteractUi _interactUI;
+        private UniTask _ogreMessageTask;
 
         private CancellationTokenSource _cts;
 
@@ -65,6 +67,7 @@ namespace September.InGame.UI
             _killLogUI = _uiRoot.KillLogPanel;
             _killLogText = _uiRoot.KillLogText;
             _ogreUiInstance = _uiRoot.OgreUI;
+            _ogreMessageText = _uiRoot.OgreMessageText;
             _hpBarSlider = _uiRoot.HpBar;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
@@ -158,12 +161,26 @@ namespace September.InGame.UI
             await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
             Destroy(timer.gameObject);
         }
-
         // 鬼の時にUIを表示する
         private void ShowOgreLamp(bool isShow)
         {
-            if (_ogreUiInstance != null)
-                _ogreUiInstance.gameObject.SetActive(isShow);
+            if (!_ogreUiInstance) return;
+            _ogreUiInstance.gameObject.SetActive(isShow);
+            if (isShow && _ogreMessageTask.Status.IsCompleted())
+            {
+                _ogreMessageTask = OgreMessage().Preserve();
+            }
+        }
+        //  鬼になったことを伝えるメッセージ
+        private async UniTask OgreMessage()
+        {
+            var col = _ogreMessageText.color;
+            col.a = 0;
+            _ogreMessageText.color = col;
+            _ogreMessageText.text = "あなたが鬼です";
+            await _ogreMessageText.DOFade(1, 1f);
+            await UniTask.WaitForSeconds(2f);
+            await _ogreMessageText.DOFade(0, 1f);
         }
 
         private void ShowOptionUI(bool isShow)
