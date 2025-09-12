@@ -5473,10 +5473,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 3570017578186338863}
-  _rb: {fileID: 6099435784402053345}
+  _rb: {fileID: -189776657306787398}
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+  _faint: {fileID: 0}
+  _getUp: {fileID: 0}
   _fallInTime: 0.2
   _fallInCurve:
     serializedVersion: 2
