@@ -12,14 +12,29 @@ namespace Ingame.Exhibit
         [SerializeField] private float _rayCastHeight;
         [SerializeField] private LayerMask _raycastMask;
         [SerializeField] private float _hitDistance;
+
+        [Header("Debug用")]
+        [SerializeField] private bool _isDebug;
         
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void Rpc_RequestInteraction(PlayerRef requestingPlayer)
         {
-            // ここで他のプレイヤーに通知
-            foreach (var player in Runner.ActivePlayers)
+            if(!_isDebug)
             {
-                if (player != requestingPlayer)
+                // ここで他のプレイヤーに通知
+                foreach (var player in Runner.ActivePlayers)
+                {
+                    if (player != requestingPlayer)
+                    {
+                        NetworkObject playerObject = Runner.GetPlayerObject(player);
+                        ShotCannon(playerObject.transform, requestingPlayer);
+                    }
+                }
+            }
+            else
+            {
+                // ここで他のプレイヤーに通知
+                foreach (var player in Runner.ActivePlayers)
                 {
                     NetworkObject playerObject = Runner.GetPlayerObject(player);
                     ShotCannon(playerObject.transform, requestingPlayer);

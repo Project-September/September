@@ -23,6 +23,7 @@ namespace InGame.Player.Ability
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
         [SerializeField] private bool _isStopWhenAttack = true;
+        [SerializeField] private float _searchRadius = 2f;
         [SerializeField] protected EffectType _hitEffect = EffectType.HitNormal;
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         
@@ -135,7 +136,7 @@ namespace InGame.Player.Ability
                 if (inGameManager?.PlayerDataDic == null || Parameter.Owner == null) return null;
 
                 Transform closestEnemy = null;
-                float closestDistance = float.MaxValue;
+                float closestDistance = _searchRadius;
                 Vector3 ownerPosition = Parameter.Owner.transform.position;
 
                 foreach (var playerData in inGameManager.PlayerDataDic.Values)
