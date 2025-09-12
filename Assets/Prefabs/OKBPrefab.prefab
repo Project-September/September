@@ -301,6 +301,7 @@ GameObject:
   - component: {fileID: 6462417923102071326}
   - component: {fileID: 4810525472409146702}
   - component: {fileID: 504783062325590936}
+  - component: {fileID: 6329918266438203417}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -419,6 +420,23 @@ MonoBehaviour:
   _footstepCueName: SE_OKB_Footstep
   _punchSwingCueName: SE_Player_Punch_Swing
   _punchHitCueName: SE_Player_Punch_Hit
+  _audioBroadcaster: {fileID: 6329918266438203417}
+  _clipPlayer: {fileID: 8254388696613982807}
+  _footstepBlockClipList:
+  - {fileID: 7400000, guid: bca6193f688d20a43b0b8202f53a204a, type: 2}
+--- !u!114 &6329918266438203417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -5196,6 +5214,7 @@ MonoBehaviour:
   - {fileID: 8254388696613982807}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
+  - {fileID: 6329918266438203417}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
 MonoBehaviour:
@@ -5309,6 +5328,7 @@ MonoBehaviour:
   _gizmoDisplayDuration: 1
   _visibleBit: 0
   _DoingVault: 0
+  _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
     _value: 0
 --- !u!114 &8355274600117350697
@@ -5515,10 +5535,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 8254388696613982807}
-  _rb: {fileID: 6099435784402053345}
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+  _faint: {fileID: 0}
+  _getUp: {fileID: 0}
   _fallInTime: 0.5
   _fallInCurve:
     serializedVersion: 2

@@ -300,6 +300,8 @@ GameObject:
   - component: {fileID: 6261861407256658100}
   - component: {fileID: 6462417923102071326}
   - component: {fileID: 4810525472409146702}
+  - component: {fileID: 2132102575819528591}
+  - component: {fileID: 3043690341386287730}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -394,6 +396,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _punchEffect: {fileID: 3668695573810060199}
   _stunEffectPositionOffset: {x: 0, y: 2, z: 0}
+--- !u!114 &2132102575819528591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+--- !u!114 &3043690341386287730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7256c04836003a040b94cf9c96d573e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sheetName: ALLCue
+  _footstepCueName: SE_Player_Footstep_Generic
+  _punchSwingCueName: SE_Player_Punch_Swing
+  _punchHitCueName: SE_Player_Punch_Hit
+  _audioBroadcaster: {fileID: 2132102575819528591}
+  _clipPlayer: {fileID: 3570017578186338863}
+  _footstepBlockClipList: []
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -5170,6 +5204,8 @@ MonoBehaviour:
   - {fileID: 2779401866583128900}
   - {fileID: 3570017578186338863}
   - {fileID: 4810525472409146702}
+  - {fileID: 2132102575819528591}
+  - {fileID: 3043690341386287730}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
 MonoBehaviour:
@@ -5283,6 +5319,7 @@ MonoBehaviour:
   _gizmoDisplayDuration: 1
   _visibleBit: 0
   _DoingVault: 0
+  _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
     _value: 0
 --- !u!114 &8355274600117350697
@@ -5473,7 +5510,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 3570017578186338863}
-  _rb: {fileID: -189776657306787398}
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
