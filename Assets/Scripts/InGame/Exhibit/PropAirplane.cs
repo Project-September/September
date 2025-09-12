@@ -79,6 +79,12 @@ namespace InGame.Exhibit
             _cameraController = GetComponent<AirplaneCamera>();
         }
 
+        [SerializeField] private bool _isSpawned = false;
+        public override void Spawned()
+        {
+            _isSpawned = true;
+        }
+
         public override void FixedUpdateNetwork()
         {
             if (HasStateAuthority)
@@ -299,6 +305,7 @@ namespace InGame.Exhibit
 
         private void LateUpdate()
         {
+            if (_isSpawned == false) return;
             // camera 操作
             if (HasInputAuthority)
             {
