@@ -5268,18 +5268,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveCapsuleCollider: {fileID: 3128034714514688337}
-  _gravity: 30
-  _acceleration: 20
-  _maxMoveSpeed: 1.8
-  _airAcceleration: 4
-  _friction: 30
-  _airFriction: 0.2
+  _moveSpeed: 1.8
   _groundSlopeThreshold: 45
   _groundLayer:
     serializedVersion: 2
     m_Bits: 159
-  _dashAcceleration: 40
-  _maxDashSpeed: 7
+  _dashSpeed: 7
   _dashCooldown: 3
   _staminaConsumption: 20
   _rotationSpeed: 720
@@ -5314,7 +5308,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   _gizmoDisplayDuration: 1
   _visibleBit: 0
-  _MoveVelocity: {x: 0, y: 0, z: 0}
   _DoingVault: 0
   _IsGroundNet:
     _value: 0
@@ -5522,6 +5515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 8254388696613982807}
+  _rb: {fileID: 6099435784402053345}
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}

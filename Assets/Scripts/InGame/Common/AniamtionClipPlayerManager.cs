@@ -7,6 +7,7 @@ namespace InGame.Common
     public class AnimationClipPlayerManager : MonoBehaviour
     {
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
+        [SerializeField] private Rigidbody _rb;
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private AnimationClip _jumpOver;
         [SerializeField] private AnimationClip _fallDown;
@@ -27,7 +28,7 @@ namespace InGame.Common
 
             var maxSpeed = _playerMovement.DashMoveSpeed;
             var walkSpeed = _playerMovement.WalkSpeed;
-            var moveSpeed = _playerMovement.MoveVelocity.magnitude;
+            var moveSpeed = _rb.linearVelocity.magnitude;
             var weight = (moveSpeed <= walkSpeed)
                 ? Mathf.InverseLerp(0f, walkSpeed, moveSpeed)         // 0..1
                 : Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed)+1f; // 1..2
