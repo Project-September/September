@@ -78,6 +78,7 @@ MonoBehaviour:
     - 1
   _characterEffects:
   - rid: 3416131569625071707
+  _type: 0
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
@@ -112,6 +113,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _hitDistance: 1000
+  _isDebug: 0
 --- !u!65 &905073906492759685
 BoxCollider:
   m_ObjectHideFlags: 0

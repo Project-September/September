@@ -677,6 +677,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "PageSlide",
+                    "type": "Button",
+                    "id": "5d1e9a00-f276-4890-8696-cf38c649bb76",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PageSlideBack",
+                    "type": "Button",
+                    "id": "fa0d7543-6ecb-4a02-84e9-70026d3c0d2f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1086,6 +1104,28 @@
                     "action": "Volume",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "0faa6992-57b2-4e55-a3cd-028de6e3e3cc",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PageSlide",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b89648cb-2c47-4afa-beec-be7639135f53",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PageSlideBack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

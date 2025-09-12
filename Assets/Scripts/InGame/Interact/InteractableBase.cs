@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Result;
 using September.InGame.Effect;
 
 namespace InGame.Interact
@@ -17,7 +18,8 @@ namespace InGame.Interact
         [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
 
         [SerializeReference, SubclassSelector] private List<CharacterInteractEffectBase> _characterEffects = new();
-        
+
+        [SerializeField] private ExhibitType _type;
         [SerializeField] private Vector3 _interactEffectOffset = Vector3.zero;
         [SerializeField] private Vector3 _cooldownEffectOffset = Vector3.zero;
         [SerializeField] private EffectType _interactEffectType = EffectType.NormalInteractComplete;
@@ -27,13 +29,16 @@ namespace InGame.Interact
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
         [Networked] public float LastUsedCooldownTime { get; set; } = 0f;
-        
+
         /// <summary>
         /// 外部から強制的にインタラクト可能にするかどうかを設定するために使う
         /// </summary>
-        [Networked] public bool ForceSetInteractable { get; set; } = true;
+        [Networked]
+        public bool ForceSetInteractable { get; set; } = true;
 
-        public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary => _requiredInteractTimeDictionary;
+        public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
+            _requiredInteractTimeDictionary;
+
         public SerializableDictionary<CharacterType, float> CooldownTimeDictionary => _cooldownTimeDictionary;
 
         private CharacterInteractEffectBase _activeEffectBase;
@@ -41,45 +46,68 @@ namespace InGame.Interact
         public void Interact(IInteractableContext context)
         {
             if (!HasStateAuthority) return;
-            var charaType = context.CharacterType;
 
             if (!ValidateInteraction(context))
             {
                 Debug.Log($"[InteractableBase] OnValidateInteraction により拒否: {context.Interactor}");
                 return;
             }
-            
-            // クールダウン登録
+
+            var charaType = context.CharacterType;
+
+            // All 優先でクールダウン時間を取得
+            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all
+                : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
+
+            // クールダウン登録（サーバ時刻 or ローカル時刻）
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-            
-            if (_spawnCooldownEffectOnStart)
+
+            // クールダウンのループエフェクト（必要なら）
+            if (_spawnCooldownEffectOnStart && LastUsedCooldownTime > 0f)
             {
-                //effectSpawner.RequestPlayOneShotEffect(_cooldownEffectType, transform.position + _cooldownEffectOffset, transform.rotation);
-                // クールダウンエフェクトを再生し、クールダウン時間分待機する
                 PlayCooldownEffect(LastUsedCooldownTime).Forget();
             }
-            
-            //All キャラタイプのクールダウン時間を優先して取得する。
-            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
-                ? all : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
-            
+
+            // ワンショットの相互作用エフェクト（ホスト側でのみ再生。見た目の同期は別途やる場合はRPC/OnChangedで）
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             effectSpawner.RequestPlayOneShotEffect(_interactEffectType, transform.position + _interactEffectOffset, transform.rotation);
 
-            // 実行
+            // このインタラクトに紐づく派生処理
             OnInteract(context);
+
+            // 実行者
+            var actor = PlayerRef.FromEncoded(context.Interactor);
+            
+            if (_type != ExhibitType.None)
+            {
+                PlayerDatabase.Instance.Server_AddExhibit(actor, _type);
+                
+                if (PlayerDatabase.Instance.PlayerDataDic.TryGet(actor, out var data))
+                {
+                    var playerName = data.DisplayNickName;
+                    var count = PlayerDatabase.Instance.Server_GetTotal(actor); 
+                    Debug.Log($"[Score] {playerName} {_type} Interact → Total={count}");
+                }
+                else
+                {
+                    Debug.Log($"[Score] {actor} {_type} Interact");
+                }
+            }
         }
-        
+
         public async UniTask PlayCooldownEffect(float cooldownTime)
         {
             if (cooldownTime <= 0f) return;
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
-            var uniqueEffectId = NetworkRunner.Instances.First().LocalPlayer.PlayerId + DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
-            effectSpawner.RequestPlayLoopEffect(uniqueEffectId, _cooldownEffectType, transform.position + _cooldownEffectOffset, transform.rotation);
+            var uniqueEffectId = NetworkRunner.Instances.First().LocalPlayer.PlayerId +
+                                 DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
+            effectSpawner.RequestPlayLoopEffect(uniqueEffectId, _cooldownEffectType,
+                transform.position + _cooldownEffectOffset, transform.rotation);
             await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false);
             effectSpawner.StopEffect(uniqueEffectId);
         }
-        
+
         /// <summary>
         /// 共通のバリデーション（null, クールダウン）
         /// インタラクト可能なときは true を返す
@@ -98,7 +126,7 @@ namespace InGame.Interact
                 //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが無効です");
                 return false;
             }
-            
+
             if (!ForceSetInteractable)
             {
                 //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");

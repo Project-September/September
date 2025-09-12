@@ -17,6 +17,7 @@ namespace September.InGame.UI
         private readonly ReactiveProperty<bool> _onShowOgreUI = new();
         private readonly ReactiveProperty<float> _onChangeStaminaValue = new();
         private readonly Subject<Unit> _onGameStart = new();
+        private readonly Subject<Unit> _onGameEnd = new();
         private readonly Subject<(bool, GameObject)> _isInteracting = new();
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
 
@@ -32,6 +33,7 @@ namespace September.InGame.UI
         public IReadOnlyReactiveProperty<float> OnChangeStaminaValue => _onChangeStaminaValue;
         
         public IObservable<Unit> OnGameStart => _onGameStart;
+        public IObservable<Unit> OnGameEnd => _onGameEnd;
         public IObservable<(bool, GameObject)> IsInteracting => _isInteracting;
         public IReadOnlyReactiveProperty<float> OnChangeInteractProgress => _onChangeInteractProgress;
         
@@ -40,6 +42,11 @@ namespace September.InGame.UI
         public void SetUpStartUI()
         {
             _onGameStart.OnNext(Unit.Default);
+        }
+
+        public void ShowResultAnimation()
+        {
+            _onGameEnd.OnNext(Unit.Default);
         }
 
         public void ShowNoticeKillLog(string text)

@@ -25,9 +25,7 @@ namespace September.Common
         public CharacterType CharacterType;
         public NetworkBool IsOgre;
         public int Score;
-        public int StunCount;
         [Networked, Capacity(3)] public NetworkDictionary<PlayerRef, int> StunData => default;
-        public int BonusPoint;
 
         public  SessionPlayerData(NetworkString<_16> nickName, int nickNameOrder)
         {
@@ -36,8 +34,6 @@ namespace September.Common
             CharacterType = CharacterType.OkabeWright;
             IsOgre = false;
             Score = 0;
-            StunCount = 0;
-            BonusPoint = 0;
         }
     }
 }

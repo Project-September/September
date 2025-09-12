@@ -170,11 +170,15 @@ MonoBehaviour:
     - 10
   _characterEffects:
   - rid: 3302172163222274141
+  _type: 3
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
+  _ForceSetInteractable: 1
   references:
     version: 2
     RefIds:
