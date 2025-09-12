@@ -320,6 +320,13 @@ namespace InGame.Common
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
+        
+        // AnimationClipPlayer 内に public で薄いラッパを追加
+        public CancellationToken EnsureLayerToken(LayerInfo.LayerType layer, CancellationToken external = default)
+        {
+            // 元の private RenewLayerCts を呼ぶだけ
+            return RenewLayerCts(layer, external);
+        }
 
         /// <summary>
         /// 以前使っていたレイヤーの処理が残っていればキャンセル
