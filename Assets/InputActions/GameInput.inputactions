@@ -112,6 +112,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Warp",
+                    "type": "Button",
+                    "id": "506da238-3225-4001-9ab0-c119eccd8c05",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -541,6 +550,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Ability2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1216f590-1ea7-43d8-ad34-7edef8c2e8b1",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Warp",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

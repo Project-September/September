@@ -24,7 +24,7 @@ namespace InGame.Common
         [SerializeField] private AnimationClip _walk;
         [SerializeField] private AnimationClip _run;
         [SerializeField, Range(0f, 2f)] private float _locoWeight = 0f;
-        [SerializeField] private Animator _animator;
+        [SerializeField] protected Animator _animator;
 
         private PlayableGraph _graph;
         private AnimationMixerPlayable _baseMixer;

@@ -81,7 +81,7 @@ namespace InGame.Player
             // {
             //     var maxSpeed = _playerMovement.DashMoveSpeed;
             //     var walkSpeed = _playerMovement.WalkSpeed;
-            //     var moveSpeed = _playerMovement.MoveVelocity.magnitude;
+            //     var moveSpeed = _playerMovement._moveVelocity.magnitude;
             //     var weight = 0f;
             //     if (moveSpeed <= walkSpeed)
             //     {
@@ -130,11 +130,16 @@ namespace InGame.Player
             }
             
             // プレイヤーの入力の管理
-            if (GetInput<PlayerInput>(out var input) && !IsStun && _playerControlState == PlayerControlState.Normal)
+            if (GetInput<PlayerInput>(out var input))
             {
-                // player movement に入力を与えて更新する
-                _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
-                    input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+                if (!IsStun && _playerControlState == PlayerControlState.Normal)
+                {
+                    // player movement に入力を与えて更新する
+                    _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
+                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+                }
+                
+                _playerMovement.MoveTick(Runner.DeltaTime);
             }
 
             if (_shouldWarp)

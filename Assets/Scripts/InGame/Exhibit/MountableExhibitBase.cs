@@ -41,6 +41,9 @@ namespace InGame.Exhibit
         private bool _isInvincible ;
     
         private int _currentHealth;
+        
+        private Vector3 _initialPosition;
+        private Quaternion _initialRotation;
     
         [SerializeField] private int _maxHealth;
         
@@ -64,6 +67,8 @@ namespace InGame.Exhibit
              Rigidbody.isKinematic = true;
              _currentHealth = _maxHealth;
              IsSpawned = true;
+             _initialPosition = transform.position;
+             _initialRotation = transform.rotation;
         }
         
         private void CreateHitBox(PlayerRef playerRef)
@@ -142,6 +147,7 @@ namespace InGame.Exhibit
             {
                 formationManager.WarpFriendNearPlayer(obj.transform.position,obj.transform.rotation);
             }
+            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
             Executor = null;
         }
         

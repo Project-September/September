@@ -300,6 +300,8 @@ GameObject:
   - component: {fileID: 6261861407256658100}
   - component: {fileID: 6462417923102071326}
   - component: {fileID: 4810525472409146702}
+  - component: {fileID: 2132102575819528591}
+  - component: {fileID: 3043690341386287730}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -394,6 +396,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _punchEffect: {fileID: 3668695573810060199}
   _stunEffectPositionOffset: {x: 0, y: 2, z: 0}
+--- !u!114 &2132102575819528591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+--- !u!114 &3043690341386287730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7256c04836003a040b94cf9c96d573e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sheetName: ALLCue
+  _footstepCueName: SE_Player_Footstep_Generic
+  _punchSwingCueName: SE_Player_Punch_Swing
+  _punchHitCueName: SE_Player_Punch_Hit
+  _audioBroadcaster: {fileID: 2132102575819528591}
+  _clipPlayer: {fileID: 3570017578186338863}
+  _footstepBlockClipList: []
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -5170,6 +5204,8 @@ MonoBehaviour:
   - {fileID: 2779401866583128900}
   - {fileID: 3570017578186338863}
   - {fileID: 4810525472409146702}
+  - {fileID: 2132102575819528591}
+  - {fileID: 3043690341386287730}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
 MonoBehaviour:
@@ -5242,18 +5278,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveCapsuleCollider: {fileID: 3128034714514688337}
-  _gravity: 30
-  _acceleration: 20
-  _maxMoveSpeed: 1.8
-  _airAcceleration: 4
-  _friction: 30
-  _airFriction: 0.2
+  _moveSpeed: 1.8
   _groundSlopeThreshold: 45
   _groundLayer:
     serializedVersion: 2
     m_Bits: 159
-  _dashAcceleration: 40
-  _maxDashSpeed: 7
+  _dashSpeed: 7
   _dashCooldown: 3
   _staminaConsumption: 20
   _rotationSpeed: 720
@@ -5288,8 +5318,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   _gizmoDisplayDuration: 1
   _visibleBit: 0
-  _MoveVelocity: {x: 0, y: 0, z: 0}
   _DoingVault: 0
+  _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
     _value: 0
 --- !u!114 &8355274600117350697
@@ -5381,6 +5411,7 @@ MonoBehaviour:
   _interactResponseTimeout: 3
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
+  _heightDifference: 0.01
   _isHoldingInteract: 0
 --- !u!114 &7508249662566368237
 MonoBehaviour:
@@ -5441,6 +5472,8 @@ MonoBehaviour:
         _endHitCheckFrame: 21
         _endAttackFrame: 30
         _isStopWhenAttack: 1
+        _hitEffect: 18
+        _animationClipPlayer: {fileID: 0}
         _enableAutoAim: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
@@ -5480,6 +5513,22 @@ MonoBehaviour:
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+  _faint: {fileID: 0}
+  _getUp: {fileID: 0}
+  _fallInTime: 0.2
+  _fallInCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _landOutTime: 0.12
+  _landOutCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
