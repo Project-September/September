@@ -151,6 +151,10 @@ namespace September.Common
             {
                 killerData.StunData.Set(killedPlayer, count + 1);
             }
+            else
+            {
+                killerData.StunData.Set(killedPlayer, 1);
+            }
             PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
         }
         private Vector3 GetSpawnPosition()
@@ -165,7 +169,8 @@ namespace September.Common
         private void ChooseOgre()
         {
             var dic = PlayerDatabase.Instance.PlayerDataDic;
-            if (dic.Count <= 0 || !Context.Runner.IsServer) return;
+            if (dic.Count <= 0 || !Context.Runner.IsServer) 
+                return;
             
             var index = Random.Range(0, dic.Count);
             var ogreKey = dic.ToArray()[index].Key;
@@ -178,17 +183,17 @@ namespace September.Common
         /// </summary>
         private void OnPlayerKilled(HitData data)
         {
-            if (!Context.Runner.IsServer) return; // サーバー側でのみ実行可能
+            if (!Context.Runner.IsServer) return; 
+            PlayerDatabase.Instance.Server_AddStun(data.ExecutorRef);
             
-            var killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef); //DataBaseから該当Playerの情報取得
+            var killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef); 
             killerData.IsOgre = false;
-            PlayerDatabase.Instance.PlayerDataDic.Set(data.ExecutorRef, killerData); //DataBase更新 
+            PlayerDatabase.Instance.PlayerDataDic.Set(data.ExecutorRef, killerData);
 
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
             killedData.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
-            killerData.Score += Context.StunScore;
-            killerData.StunCount++;
+            
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
         }

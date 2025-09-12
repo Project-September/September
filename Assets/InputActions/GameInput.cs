@@ -743,6 +743,24 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""PageSlide"",
+                    ""type"": ""Button"",
+                    ""id"": ""5d1e9a00-f276-4890-8696-cf38c649bb76"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PageSlideBack"",
+                    ""type"": ""Button"",
+                    ""id"": ""fa0d7543-6ecb-4a02-84e9-70026d3c0d2f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1152,6 +1170,28 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""Volume"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0faa6992-57b2-4e55-a3cd-028de6e3e3cc"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PageSlide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b89648cb-2c47-4afa-beec-be7639135f53"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PageSlideBack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1247,16 +1287,14 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_Option = m_UI.FindAction("Option", throwIfNotFound: true);
         m_UI_Volume = m_UI.FindAction("Volume", throwIfNotFound: true);
-        
-        OnConstruct();
+        m_UI_PageSlide = m_UI.FindAction("PageSlide", throwIfNotFound: true);
+        m_UI_PageSlideBack = m_UI.FindAction("PageSlideBack", throwIfNotFound: true);
     }
 
     ~@GameInput()
     {
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, GameInput.Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, GameInput.UI.Disable() has not been called.");
-        
-        OnDestruct();
     }
 
     /// <summary>
@@ -1561,6 +1599,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_TrackedDeviceOrientation;
     private readonly InputAction m_UI_Option;
     private readonly InputAction m_UI_Volume;
+    private readonly InputAction m_UI_PageSlide;
+    private readonly InputAction m_UI_PageSlideBack;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1620,6 +1660,14 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Volume".
         /// </summary>
         public InputAction @Volume => m_Wrapper.m_UI_Volume;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/PageSlide".
+        /// </summary>
+        public InputAction @PageSlide => m_Wrapper.m_UI_PageSlide;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/PageSlideBack".
+        /// </summary>
+        public InputAction @PageSlideBack => m_Wrapper.m_UI_PageSlideBack;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1682,6 +1730,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Volume.started += instance.OnVolume;
             @Volume.performed += instance.OnVolume;
             @Volume.canceled += instance.OnVolume;
+            @PageSlide.started += instance.OnPageSlide;
+            @PageSlide.performed += instance.OnPageSlide;
+            @PageSlide.canceled += instance.OnPageSlide;
+            @PageSlideBack.started += instance.OnPageSlideBack;
+            @PageSlideBack.performed += instance.OnPageSlideBack;
+            @PageSlideBack.canceled += instance.OnPageSlideBack;
         }
 
         /// <summary>
@@ -1729,6 +1783,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Volume.started -= instance.OnVolume;
             @Volume.performed -= instance.OnVolume;
             @Volume.canceled -= instance.OnVolume;
+            @PageSlide.started -= instance.OnPageSlide;
+            @PageSlide.performed -= instance.OnPageSlide;
+            @PageSlide.canceled -= instance.OnPageSlide;
+            @PageSlideBack.started -= instance.OnPageSlideBack;
+            @PageSlideBack.performed -= instance.OnPageSlideBack;
+            @PageSlideBack.canceled -= instance.OnPageSlideBack;
         }
 
         /// <summary>
@@ -2010,5 +2070,19 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnVolume(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PageSlide" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPageSlide(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PageSlideBack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPageSlideBack(InputAction.CallbackContext context);
     }
 }
