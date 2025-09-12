@@ -50,6 +50,7 @@ namespace InGame.Player
         private bool _doingVault;
         
         [Networked] public bool DoingVault { get; set; }
+        [Networked] public Vector3 NetworkVelocity { get; set; }
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
@@ -197,6 +198,7 @@ namespace InGame.Player
             if (IsGround)
             {
                 _rb.linearVelocity = _moveVelocity;
+                NetworkVelocity = _moveVelocity;
             }
             
             // 回転の向きを代入

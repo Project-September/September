@@ -1,4 +1,5 @@
-using Cysharp.Threading.Tasks;           // 追加
+using Cysharp.Threading.Tasks;
+using Fusion.Addons.Physics; // 追加
 using InGame.Player;
 using UnityEngine;
 
@@ -7,10 +8,11 @@ namespace InGame.Common
     public class AnimationClipPlayerManager : MonoBehaviour
     {
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
-        [SerializeField] private Rigidbody _rb;
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private AnimationClip _jumpOver;
         [SerializeField] private AnimationClip _fallDown;
+        [SerializeField] private AnimationClip _faint;  // 追加: 気絶アニメーション
+        [SerializeField] private AnimationClip _getUp;   // 追加: 起き上がりアニメーション
 
         // ▼ 追加: ブレンド設定
         [Header("Fall Blend")]
@@ -28,7 +30,7 @@ namespace InGame.Common
 
             var maxSpeed = _playerMovement.DashMoveSpeed;
             var walkSpeed = _playerMovement.WalkSpeed;
-            var moveSpeed = _rb.linearVelocity.magnitude;
+            var moveSpeed = _playerMovement.NetworkVelocity.magnitude;
             var weight = (moveSpeed <= walkSpeed)
                 ? Mathf.InverseLerp(0f, walkSpeed, moveSpeed)         // 0..1
                 : Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed)+1f; // 1..2
@@ -77,6 +79,7 @@ namespace InGame.Common
                 }
             }
         }
+        
 
         // 1→0へブレンド完了後にTopLayerを外す
         private async UniTaskVoid FadeOutAndClearFall()
