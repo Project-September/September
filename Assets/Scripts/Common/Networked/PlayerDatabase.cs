@@ -130,7 +130,7 @@ namespace September.Common
             return sb.ToString();
         }
         
-        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
         private void Rpc_SendPersonalResult( int roundId, string encodedPayload, int pageTotal)
         {
             // クライアント受信：ResultDataInboxへ保存

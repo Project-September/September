@@ -201,6 +201,7 @@ MonoBehaviour:
     - 5
   _characterEffects:
   - rid: 5190193405626941525
+  _type: 8
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
@@ -274,6 +275,7 @@ MonoBehaviour:
   _speed: 50
   _target: {fileID: 3184967845531604829}
   _loop: 0
+  _hitEffectYOffset: 0.1
   _delayTime: 0.3
   _slowdownRadius: 5
   _minSpeedFactor: 0.25

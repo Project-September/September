@@ -293,7 +293,7 @@ Transform:
   m_GameObject: {fileID: 6666232806654655558}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4.93, z: 17.22}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.63, y: 0.63, z: 0.63}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -344,7 +344,14 @@ MonoBehaviour:
     - 0
   _characterEffects:
   - rid: 5083283266887483664
+  _type: 0
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
   _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
   references:
     version: 2

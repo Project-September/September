@@ -77,6 +77,8 @@ namespace Result
             _gameInput = new GameInput();
             _gameInput.Enable();
             _isActive = true;
+            
+            ResultDataInbox.I.OnChanged += SetExhibitPage;
 
             RectTransform rootRt = (RectTransform)transform;
             _canvasWidth = rootRt.rect.width;
