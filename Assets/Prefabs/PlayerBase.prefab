@@ -300,6 +300,8 @@ GameObject:
   - component: {fileID: 6261861407256658100}
   - component: {fileID: 6462417923102071326}
   - component: {fileID: 4810525472409146702}
+  - component: {fileID: 2132102575819528591}
+  - component: {fileID: 3043690341386287730}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -394,6 +396,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _punchEffect: {fileID: 3668695573810060199}
   _stunEffectPositionOffset: {x: 0, y: 2, z: 0}
+--- !u!114 &2132102575819528591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+--- !u!114 &3043690341386287730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292013223828287825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7256c04836003a040b94cf9c96d573e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sheetName: ALLCue
+  _footstepCueName: SE_Player_Footstep_Generic
+  _punchSwingCueName: SE_Player_Punch_Swing
+  _punchHitCueName: SE_Player_Punch_Hit
+  _audioBroadcaster: {fileID: 2132102575819528591}
+  _clipPlayer: {fileID: 3570017578186338863}
+  _footstepBlockClipList: []
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -5170,6 +5204,8 @@ MonoBehaviour:
   - {fileID: 2779401866583128900}
   - {fileID: 3570017578186338863}
   - {fileID: 4810525472409146702}
+  - {fileID: 2132102575819528591}
+  - {fileID: 3043690341386287730}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-189776657306787398
 MonoBehaviour:
@@ -5456,9 +5492,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _layerInfo: []
   _graphSpeed: 1
-  _wait: {fileID: 7400000, guid: b0eef498192b4af4da58c49f42d6f6fe, type: 2}
-  _walk: {fileID: 7400000, guid: e281b9c0b3aad9f49b64687001943220, type: 2}
-  _run: {fileID: 7400000, guid: 1b75d33f3707cec46a636ae1779bb096, type: 2}
+  _wait: {fileID: 0}
+  _walk: {fileID: 0}
+  _run: {fileID: 0}
   _locoWeight: 0
   _animator: {fileID: 2525442923973757293}
 --- !u!114 &2447315062394318487
@@ -5477,9 +5513,8 @@ MonoBehaviour:
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
-  _faint: {fileID: 7400000, guid: e8cbd34ecaacc9b459b559b2034dca3c, type: 2}
+  _faint: {fileID: 0}
   _getUp: {fileID: 0}
-  _playerManager: {fileID: -4668177863944640257}
   _fallInTime: 0.2
   _fallInCurve:
     serializedVersion: 2
@@ -5489,20 +5524,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   _landOutTime: 0.12
   _landOutCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _overrideInTime: 0.08
-  _overrideInCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _overrideOutTime: 0.1
-  _overrideOutCurve:
     serializedVersion: 2
     m_Curve: []
     m_PreInfinity: 2

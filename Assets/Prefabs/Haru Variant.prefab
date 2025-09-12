@@ -4275,6 +4275,10 @@ PrefabInstance:
       propertyPath: managedReferences[5091638408297054335]._normalAttackAnimationClip
       value: 
       objectReference: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
+    - target: {fileID: 3043690341386287730, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _footstepCueName
+      value: SE_Hulk_Footstep
+      objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _dashSpeed
       value: 7
@@ -4438,6 +4442,10 @@ PrefabInstance:
     - target: {fileID: 8736522266100138394, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8963956046015859524, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _footstepCueName
+      value: SE_Hulk_Footstep
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

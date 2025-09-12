@@ -15,6 +15,12 @@ namespace CRISound
         SE,
         Voice
     }
+
+    public enum SoundTrackingType
+    {
+        Spot,
+        Follow
+    }
     public class CuePlayAtomExPlayer
     {
         static CuePlayAtomExPlayer _instance = new();
@@ -211,9 +217,13 @@ namespace CRISound
             /// <summary>3Dサウンド再生用(単一)</summary>
             public class Sound3D
             {
-                protected CriAtomEx3dSource _source = new();
-                public CriAtomEx3dSource Source => _source;
+                protected CriAtomEx3dSource _criAtomEx3DSource = new();
                 protected CriAtomExPlayer _atomExPlayer3D = new();
+                public CriAtomEx3dSource CroAtomEx3DSource => _criAtomEx3DSource;
+                public CriAtomExPlayer CriAtomExPlayer3D => _atomExPlayer3D;
+
+                protected CriAtomExPlayback _criAtomExPlayback3D;
+                public CriAtomExPlayback CriAtomExPlayback3D => _criAtomExPlayback3D;
                 private string _currentCueName;
 
                 public bool IsBusy => _atomExPlayer3D.GetStatus() == CriAtomExPlayer.Status.Playing;
@@ -222,22 +232,22 @@ namespace CRISound
                 public void Dispose()
                 {
                     _atomExPlayer3D.Dispose();
-                    _source.Dispose();
+                    _criAtomEx3DSource.Dispose();
                 }
 
                 public void Play3D(Vector3 playPos, string cueSheet, string cueName)
                 {
                     _currentCueName = cueName;
-                    _source.SetPosition(playPos.x, playPos.y, playPos.z);
-                    _source.Update();
+                    _criAtomEx3DSource.SetPosition(playPos.x, playPos.y, playPos.z);
+                    _criAtomEx3DSource.Update();
 
                     CueInfo info = _instance._soundDic[cueSheet].GetCueInfo(cueName);
                     _atomExPlayer3D.SetCue(_instance._soundDic[cueSheet].GetAcb(), info.id);
                     _atomExPlayer3D.SetPanType(CriAtomEx.PanType.Pos3d);
-                    _atomExPlayer3D.Set3dSource(_source);
+                    _atomExPlayer3D.Set3dSource(_criAtomEx3DSource);
                     _atomExPlayer3D.Set3dListener(_instance._sePlayer.Listener);
                     _atomExPlayer3D.UpdateAll();
-                    _atomExPlayer3D.Start();
+                    _criAtomExPlayback3D = _atomExPlayer3D.Start();
                 }
 
                 public bool IsPlayingCue(string cueName)
@@ -254,11 +264,11 @@ namespace CRISound
                 /// <param name="pos"></param>
                 public void UpdateSourcePosition(Vector3 pos)
                 {
-                    Source.SetPosition(pos.x, pos.y, pos.z);
-                    Source.Update();
+                    CroAtomEx3DSource.SetPosition(pos.x, pos.y, pos.z);
+                    CroAtomEx3DSource.Update();
                 }
 
-                public CriAtomEx3dSource GetSource() { return Source; }
+                public CriAtomEx3dSource GetSource() { return CroAtomEx3DSource; }
             }
 
 
@@ -299,8 +309,9 @@ namespace CRISound
 
                 return null;
             }
-            
+
             // 指定したSEの再生が終了しているかどうか
+            // 指定した名前のキューが一つでも再生中であれば true
             public bool Is3DCuePlaying(string cueName)
             {
                 foreach (var s in _sound3Ds)
@@ -314,6 +325,13 @@ namespace CRISound
                 }
 
                 return false;
+            }
+
+            // 指定したSEの再生が終了しているかどうか
+            // 指定した再生元が再生中であれば true 
+            public bool Is3DCuePlayingPlaybackOrigin(CriAtomExPlayback playback)
+            {
+                return playback.GetStatus() == CriAtomExPlayback.Status.Playing;
             }
             
             // すべてのSEの再生が終了しているか確認したいとき
