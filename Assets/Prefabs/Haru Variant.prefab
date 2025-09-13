@@ -4291,6 +4291,18 @@ PrefabInstance:
       propertyPath: _moveSpeed
       value: 1.8
       objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _maxLedgeDepth
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _reachDistance
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _moveCapsuleCollider
+      value: 
+      objectReference: {fileID: 5574982545240335671}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _run
       value: 
@@ -4480,6 +4492,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 224c75cd33ef4d74f9cf5b541cc9b898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!136 &5574982545240335671 stripped
+CapsuleCollider:
+  m_CorrespondingSourceObject: {fileID: 3128034714514688337, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 7365447978694257766}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &6321949946618764873 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}

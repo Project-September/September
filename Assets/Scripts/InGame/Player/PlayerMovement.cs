@@ -29,8 +29,7 @@ namespace InGame.Player
         [SerializeField] private float _timeToVault;
         [SerializeField] private AnimationCurve _vaultCurve;
         [Header("Gizmos")]
-        [SerializeField] private float _gizmoDisplayDuration;
-        [SerializeField] private int _visibleBit;
+        [SerializeField] private bool _visible;
 
         private Rigidbody _rb;
         private PlayerStatus _status;
@@ -38,6 +37,7 @@ namespace InGame.Player
         
         // base move
         private Vector3 _moveVelocity;
+        public Vector3 MoveVelocity => _moveVelocity;
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
@@ -49,8 +49,8 @@ namespace InGame.Player
         // vault
         private bool _doingVault;
         
-        [Networked] public bool DoingVault { get; set; }
-        [Networked] public Vector3 NetworkVelocity { get; set; }
+        [Networked, HideInInspector] public bool DoingVault { get; private set; }
+        [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
@@ -58,14 +58,13 @@ namespace InGame.Player
         // teleport
         private Vector3? _teleportTarget;
         // Gizmo
-        private float _gizmoTimer;
         private List<CapsuleCastData> _capsuleCastData = new();
 
         public float WalkSpeed => _moveSpeed;
         public float DashMoveSpeed => _dashSpeed;
         public bool IsGround => _isGround || _isGroundTimer > 0;
-        [Networked] 
-        public NetworkBool IsGroundNet { get; set; }
+        [Networked, HideInInspector] 
+        public NetworkBool IsGroundNet { get; private set; }
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
 
@@ -84,9 +83,8 @@ namespace InGame.Player
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
             // set velocity
-            if (isJump) TryVault(moveDirection);
-            if (DoingVault) UpdateVault(deltaTime);
-            else
+            if (isJump && HasStateAuthority) TryVault(moveDirection);
+            if (!DoingVault)
             {
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
                 AdsorptionOnGround();
@@ -97,6 +95,8 @@ namespace InGame.Player
         public virtual void MoveTick(float deltaTime)
         {
             CheckGroundManual();
+            
+            if (DoingVault && HasStateAuthority) UpdateVault(deltaTime);
             
             if (_teleportTarget.HasValue)
             {
@@ -111,18 +111,17 @@ namespace InGame.Player
             
             // スタミナの更新
             UpdateStamina(_isDash, deltaTime);
-            
-            // is ground の管理
-            if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
-            _isGround = false;
-            _groundNormal = Vector3.up;
-            
-            _moveVelocity = Vector3.zero;
                 
             if (HasStateAuthority)
             {
                 IsGroundNet = IsGround;
             }
+            
+            // is ground の管理
+            if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
+            _isGround = false;
+            _groundNormal = Vector3.up;
+            _moveVelocity = Vector3.zero;
         }
 
         /// <summary> カメラ視点の移動入力を取得 </summary>
@@ -232,7 +231,6 @@ namespace InGame.Player
         {
             if (!IsGround) return;
 
-            _gizmoTimer = _gizmoDisplayDuration; // 1 秒 gizmo 表示
             _capsuleCastData.Clear();
             
             // ステップ1：キャラクターが歩くことができない壁やオブジェクトを見つけるために前方にCastします。
@@ -240,7 +238,8 @@ namespace InGame.Player
             Vector3 moveDir3 = new Vector3(moveDirection.x, 0, moveDirection.y);
             Vector3 point1 = transform.position + Vector3.up * (_maxLedgeHeight - capsuleRadius) - moveDir3 * 0.01f;
             Vector3 point2 = transform.position + Vector3.up * (_minLedgeHeight + capsuleRadius) - moveDir3 * 0.01f;
-            bool hit = Physics.CapsuleCast(point1, point2, capsuleRadius, moveDir3, out var frontHitInfo, _reachDistance, _groundLayer);
+            float reachDistance = _reachDistance * GetSpeedOnPlane();
+            bool hit = Physics.CapsuleCast(point1, point2, capsuleRadius, moveDir3, out var frontHitInfo, reachDistance, _groundLayer);
             // hit point が歩けるかどうか
             bool walkablePoint = Vector3.Angle(Vector3.up, frontHitInfo.normal) <= _groundSlopeThreshold;
             
@@ -249,7 +248,7 @@ namespace InGame.Player
                 P1 = point1,
                 P2 = point2,
                 Direction = moveDir3,
-                Distance = moveDir3 * _reachDistance,
+                Distance = moveDir3 * reachDistance,
                 Radius = capsuleRadius,
                 IsHit = hit,
                 HitInfo = frontHitInfo
@@ -285,48 +284,46 @@ namespace InGame.Player
             point2 = frontHitInfo.point - frontHitInfo.normal * 0.01f;
             point2.y = underPoint + capsuleRadius;
             // 二つ目の障害物を見つける Cast
-            hit = Physics.CapsuleCast(point1, point2, capsuleRadius, -frontHitInfo.normal, out var secondHitInfo, _maxLedgeDepth + capsuleRadius, _groundLayer);
+            hit = Physics.CapsuleCast(point1, point2, capsuleRadius, -frontHitInfo.normal, out var secondHitInfo, _maxLedgeDepth + frontHitInfo.distance, _groundLayer);
             
             _capsuleCastData.Add(new CapsuleCastData()
             {
                 P1 = point1,
                 P2 = point2,
                 Direction = -frontHitInfo.normal,
-                Distance = -frontHitInfo.normal * (_maxLedgeDepth + capsuleRadius),
+                Distance = -frontHitInfo.normal * (_maxLedgeDepth + frontHitInfo.distance),
                 Radius = capsuleRadius,
                 IsHit = hit,
                 HitInfo = secondHitInfo
             });
+
+            // 奥に十分なスペースがないと乗り越えられない
+            if (hit) return;
             
             origin = point2 + halfHeight * Vector3.up;
-            Vector3 reverseCastOrigin = origin - frontHitInfo.normal * (hit ? secondHitInfo.distance : _maxLedgeDepth + capsuleRadius);
-            // 最も近い乗り越えられる地点を探す Cast
+            Vector3 reverseCastOrigin = origin - frontHitInfo.normal * (_maxLedgeDepth + frontHitInfo.distance);
+            // 逆向きにCastして、障害物の奥行を求める
             hit = Physics.CapsuleCast(reverseCastOrigin + Vector3.up * halfHeight, reverseCastOrigin + Vector3.down * halfHeight, capsuleRadius, 
-                frontHitInfo.normal, out var canVaultHitInfo, _maxLedgeDepth + 0.1f, _groundLayer);
+                frontHitInfo.normal, out var canVaultHitInfo, frontHitInfo.distance, _groundLayer);
             
             _capsuleCastData.Add(new CapsuleCastData()
             {
                 P1 = reverseCastOrigin + Vector3.up * halfHeight,
                 P2 = reverseCastOrigin + Vector3.down * halfHeight,
                 Direction = frontHitInfo.normal,
-                Distance = frontHitInfo.normal * (_maxLedgeDepth + 0.1f),
+                Distance = frontHitInfo.normal * (frontHitInfo.distance),
                 Radius = capsuleRadius,
                 IsHit = hit,
                 HitInfo = canVaultHitInfo
             });
 
-            if (!hit) return;
-
-            Vector3 distance = frontHitInfo.normal * (canVaultHitInfo.distance - 0.01f); // ほんの少し手前
-            bool checkPosition = Physics.CheckCapsule(reverseCastOrigin + Vector3.up * halfHeight + distance,
-                reverseCastOrigin + Vector3.down * halfHeight + distance, capsuleRadius);
-
-            if (checkPosition) return;
+            // 奥行がありすぎたら終了
+            if (hit) return;
             
             _vaultStartPos = transform.position;
             _vaultTopPos = (frontHitInfo.point + canVaultHitInfo.point) * 0.5f;
             _vaultTopPos.y = heightHitInfo.point.y;
-            _vaultEndPos = reverseCastOrigin + Vector3.down * (halfHeight + capsuleRadius) + distance;
+            _vaultEndPos = reverseCastOrigin + Vector3.down * (halfHeight + capsuleRadius);
             StartVault();
         }
 
@@ -336,14 +333,12 @@ namespace InGame.Player
             _vaultTimer = 0;
             DoingVault = true;
             Stop();
-            
-            Vector3 dir = _vaultEndPos - _vaultStartPos;
-            dir.y = 0;
-            _rotationDirection = dir;
         }
 
         void UpdateVault(float deltaTime)
         {
+            Vector3 prevPos = transform.position;
+            
             _vaultTimer += deltaTime;
             float t = _vaultTimer / _timeToVault;
             Vector3 resPos = Vector3.Lerp(_vaultStartPos, _vaultEndPos, t);
@@ -352,22 +347,16 @@ namespace InGame.Player
             
             transform.position = resPos;
             
-            if (_vaultTimer >= _timeToVault) EndVault();
+            SetRotationDirection(_vaultEndPos - _vaultStartPos);
+            
+            if (_vaultTimer >= _timeToVault) EndVault((transform.position - prevPos) / deltaTime);
         }
 
-        void EndVault()
+        void EndVault(Vector3 endVelocity)
         {
+            _moveVelocity = endVelocity;
+            _rb.linearVelocity = _moveVelocity;
             DoingVault = false;
-        }
-
-        public void AddForce(Vector3 force)
-        {
-            _moveVelocity += force;
-            if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
-            {
-                _isGround = false;
-                _isGroundTimer = 0;
-            }
         }
 
         /// <summary> 速度ベクトルを0にする </summary>
@@ -405,14 +394,6 @@ namespace InGame.Player
             }
         }
 
-        private void Update()
-        {
-            if (_gizmoTimer > 0)
-            {
-                _gizmoTimer -= Time.deltaTime;
-            }
-        }
-
         struct CapsuleCastData
         {
             public Vector3 P1;
@@ -427,18 +408,12 @@ namespace InGame.Player
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (_gizmoTimer <= 0) return;
+            if (!_visible) return;
 
             int index = 0;
 
             foreach (var castData in _capsuleCastData)
             {
-                if (((_visibleBit >> index) & 1) == 0)
-                {
-                    index++;
-                    continue;
-                }
-                
                 if (index == 0) Gizmos.color = Color.green;
                 else if (index == 1) Gizmos.color = Color.cyan;
                 else if (index == 2) Gizmos.color = Color.yellow;
@@ -460,35 +435,32 @@ namespace InGame.Player
                 
                 index++;
             }
-            
-            if (((_visibleBit >> 4) & 1) == 1)
+
+            Gizmos.color = Color.blue;
+            Vector3 radUp = Vector3.up * _moveCapsuleCollider.radius;
+            Vector3 radHeightUp = Vector3.up * (_moveCapsuleCollider.radius + _moveCapsuleCollider.height);
+            DrawCapsuleGizmo(_vaultStartPos + radUp, _vaultStartPos + radHeightUp, _moveCapsuleCollider.radius);
+            DrawCapsuleGizmo(_vaultTopPos + radUp, _vaultTopPos + radHeightUp, _moveCapsuleCollider.radius);
+            DrawCapsuleGizmo(_vaultEndPos + radUp, _vaultEndPos + radHeightUp, _moveCapsuleCollider.radius);
+
+            int vertexCount = 20;
+            Vector3 frontPrevPos = _vaultStartPos;
+            Vector3 backPrevPos = _vaultEndPos;
+
+            for (int i = 1; i <= vertexCount; i++)
             {
-                Gizmos.color = Color.blue;
-                Vector3 radUp = Vector3.up * _moveCapsuleCollider.radius;
-                Vector3 radHeightUp = Vector3.up * (_moveCapsuleCollider.radius + _moveCapsuleCollider.height);
-                DrawCapsuleGizmo(_vaultStartPos + radUp, _vaultStartPos + radHeightUp, _moveCapsuleCollider.radius);
-                DrawCapsuleGizmo(_vaultTopPos + radUp, _vaultTopPos + radHeightUp, _moveCapsuleCollider.radius);
-                DrawCapsuleGizmo(_vaultEndPos + radUp, _vaultEndPos + radHeightUp, _moveCapsuleCollider.radius);
+                float t = i / (float)vertexCount;
+                float curveValue = _vaultCurve.Evaluate(t);
 
-                int vertexCount = 20;
-                Vector3 frontPrevPos = _vaultStartPos;
-                Vector3 backPrevPos = _vaultEndPos;
-
-                for (int i = 1; i <= vertexCount; i++)
-                {
-                    float t = i / (float)vertexCount;
-                    float curveValue = _vaultCurve.Evaluate(t);
-
-                    Vector3 pos = Vector3.Lerp(_vaultStartPos, _vaultTopPos, t);
-                    pos.y = Mathf.Lerp(_vaultStartPos.y, _vaultTopPos.y, curveValue);
-                    Gizmos.DrawLine(frontPrevPos, pos);
-                    frontPrevPos = pos;
+                Vector3 pos = Vector3.Lerp(_vaultStartPos, _vaultTopPos, t);
+                pos.y = Mathf.Lerp(_vaultStartPos.y, _vaultTopPos.y, curveValue);
+                Gizmos.DrawLine(frontPrevPos, pos);
+                frontPrevPos = pos;
                     
-                    pos = Vector3.Lerp(_vaultEndPos, _vaultTopPos, t);
-                    pos.y = Mathf.Lerp(_vaultEndPos.y, _vaultTopPos.y, curveValue);
-                    Gizmos.DrawLine(backPrevPos, pos);
-                    backPrevPos = pos;
-                }
+                pos = Vector3.Lerp(_vaultEndPos, _vaultTopPos, t);
+                pos.y = Mathf.Lerp(_vaultEndPos.y, _vaultTopPos.y, curveValue);
+                Gizmos.DrawLine(backPrevPos, pos);
+                backPrevPos = pos;
             }
         }
         
