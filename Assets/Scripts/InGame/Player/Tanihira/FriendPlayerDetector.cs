@@ -79,13 +79,12 @@ namespace Ingame.Tanihira
                 //間に障害物があった場合には無視
                 if (Physics.Raycast(start, direction, out RaycastHit hit, distance, _obstacleMask))
                 {
-                    Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
+                    //Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
                     continue;
                 }
                 
                 //近い物をターゲットにして攻撃させる
                 _currentTarget = player.gameObject.transform;
-                Debug.Log(player.gameObject.name);
             }
             
             //ペンギンに攻撃指示を飛ばす
@@ -123,11 +122,6 @@ namespace Ingame.Tanihira
             }
 
             return true;
-        }
-
-        private void OnDisable()
-        {
-            _inGameManager.GameStarted -= GameStart;
         }
         
         private void OnDrawGizmosSelected()

@@ -16,6 +16,8 @@ namespace Ingame.Tanihira
 
         public override void Spawned()
         {
+            _maxHealth = _friendStatus.MaxHealth;
+            _currentHealth = _maxHealth;
             //ペンギンのステートを設定
             _friendStateMappings[FriendState.None] = null;
             _friendStateMappings[FriendState.Idle] = null;
@@ -25,9 +27,6 @@ namespace Ingame.Tanihira
             _friendStateMappings[FriendState.Stun] = new FriendStunState();
             _friendStateMappings[FriendState.Wait] = new FriendWaitState();
             base.Spawned();
-            _maxHealth = CurrentFriendStatus.MaxHealth;
-            _currentHealth = _maxHealth;
-            
         }
         public override void ChangeState(FriendState newState)
         {

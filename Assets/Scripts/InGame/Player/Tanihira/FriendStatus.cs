@@ -15,6 +15,7 @@ namespace Ingame.Tanihira
         [SerializeField] private float _friendChaseSpeed = 5f;
         [SerializeField] private float _friendChaseStopDistance = 1.0f;
         [SerializeField] private float _friendStunTime = 10.0f;
+        [SerializeField] private float _friendAccleration = 10.0f;
 
         public int MaxHealth { get => _maxHealth; set => _maxHealth = value; }
         public int AttackPower { get => _attackPower; set => _attackPower = value; }
@@ -24,6 +25,7 @@ namespace Ingame.Tanihira
         public float FriendChaseSpeed { get => _friendChaseSpeed; set => _friendChaseSpeed = value; }
         public float FriendChaseDistance { get => _friendChaseStopDistance; set => _friendChaseStopDistance = value; }
         public float FriendStunTime { get => _friendStunTime; set => _friendStunTime = value; }
+        public float FriendAccleration { get => _friendAccleration; set => _friendAccleration = value; }
         
         public FriendStatus Clone()
         {
@@ -36,6 +38,7 @@ namespace Ingame.Tanihira
             clone.FriendChaseSpeed = this.FriendChaseSpeed;
             clone.FriendChaseDistance = this.FriendChaseDistance;
             clone.FriendStunTime = this.FriendStunTime;
+            clone.FriendAccleration = this.FriendAccleration;
             return clone;
         }
     }
