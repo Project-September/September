@@ -15,33 +15,19 @@ namespace InGame.Player.Ability
         [SerializeReference, SubclassSelector] private List<IAbilityExecuteCondition> _conditions = new();
         private NetworkButtons _previousButtons;
         private NetworkButtons _currentButtons;
+        private NetworkObject _networkObject;
+        private readonly Dictionary<string, AbilityBase> _abilityByName = new();
+
+        public override void Spawned()
+        {
+            _networkObject = GetComponent<NetworkObject>();
+            foreach (var a in _abilities)
+                _abilityByName[a.GetType().Name] = a;
+        }
 
         private void Update()
         {
-            foreach (var condition in _conditions)
-            {
-                var targetAbility = _abilities.Find(a => a.GetType().Name == condition.TargetAbilityName);
-                
-                if (targetAbility == null)
-                {
-                    Debug.LogError($"[PlayerAbilityManager] アビリティ '{condition.TargetAbilityName}' が見つかりません。");
-                    continue;
-                }
-                // 条件を満たす場合、アビリティを実行
-                if (condition.IsConditionMatch(new TriggerEventContext(targetAbility, _currentButtons, _previousButtons)))
-                {
-                    // アビリティの実行
-                    targetAbility.Start(new AbilityParameter() 
-                    {
-                        Owner = GetComponent<NetworkObject>(),
-                    });
-                }
-            }
-            
-            foreach (var ability in _abilities)
-            {
-                ability.Tick(Time.deltaTime);
-            }
+
         }
 
         public override void FixedUpdateNetwork()
@@ -51,6 +37,27 @@ namespace InGame.Player.Ability
             // 入力を更新
             _previousButtons = _currentButtons;
             _currentButtons = input.Buttons;
+            
+            if (!HasStateAuthority) return;
+            foreach (var condition in _conditions)
+            {
+                if (!_abilityByName.TryGetValue(condition.TargetAbilityName, out var targetAbility))
+                {
+                    Debug.LogError($"[PlayerAbilityManager] '{condition.TargetAbilityName}' が見つかりません。");
+                    continue;
+                }
+                
+                var ctx = new TriggerEventContext(gameObject, targetAbility, _currentButtons, _previousButtons);
+                if (condition.IsConditionMatch(in ctx))
+                {
+                    targetAbility.Start(new AbilityParameter { Owner = _networkObject });
+                }
+            }
+            
+            foreach (var ability in _abilities)
+            {
+                ability.Tick(Time.deltaTime);
+            }
         }
     }
 }

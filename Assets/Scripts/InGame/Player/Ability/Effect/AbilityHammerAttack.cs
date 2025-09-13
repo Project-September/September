@@ -1,73 +1,42 @@
+using System.Linq;
 using Fusion;
 using InGame.Common;
+using InGame.Exhibit.InteractEffect;
 using InGame.Health;
 using InGame.Interact;
 using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Ability.Effect
 {
-    public class AbilityHammerAttack : AbilityBase
+    public class AbilityHammerAttack : AbilityNormalAttack
     {
-        [SerializeField] private AnimationClip _normalAttackAnimationClip;
-        [SerializeField] private LayerMask _hitMask;
-        private int _attackDamage = int.MaxValue;
-        private MeleeHitboxExecutor _executor;
-
-        protected override void OnStart()
+        protected override void OnHitEnemy(Collider hitInfo)
         {
-            var ownerAnimator = Parameter.Owner.GetComponent<AnimationClipPlayer>();
-            if (ownerAnimator && Parameter.Owner.HasInputAuthority)
-            {
-                ownerAnimator.PlayClip(_normalAttackAnimationClip, 1, 0, true);
-            }
-            var resolver = Parameter.Owner.GetComponentInChildren<HitPointResolver>();
-            var points = resolver?.GetPoints();
-            var start = resolver?.GetStartFrame();
-            var end = resolver?.GetEndFrame();
-            var radius = resolver?.GetRadius() ?? 0.1f;
-            _executor = new MeleeHitboxExecutor(points, radius, _hitMask, start ?? 0, end ?? int.MaxValue)
-            {
-                OnHit = collider =>
-                {
-                    //自分に当たった場合は無視
-                    if (collider.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
-                    
-                    var damageable = collider.GetComponentInParent<IDamageable>();
-                    if (damageable != null)
-                    {
-                        var hitData = new HitData(
-                            HitActionType.Damage,
-                            _attackDamage,
-                            Parameter.Owner.InputAuthority,
-                            damageable.OwnerPlayerRef);
-                        damageable.TakeHit(ref hitData);
-                    }
-                    
-                    var interactable = collider.GetComponentInParent<InteractableBase>();
-                    if (interactable != null)
-                    {
-                        //Haruとしてインタラクトする
-                        var context = new InteractableContext()
-                        {
-                            Interactor = Parameter.Owner.InputAuthority.RawEncoded,
-                            CharacterType = CharacterType.HulkTheButcher,
-                        };
-                        interactable.Interact(context);
-                    }
-                    
-                    // ヒットエフェクトを再生
-                }
-            };
-        }
+            if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
+            var damageable = hitInfo.GetComponentInParent<IDamageable>();
+            var disableInteractEffect = hitInfo.GetComponent<DisableInteractEffect>();
+            if (damageable == null && !disableInteractEffect) return;
 
-        protected override void OnUpdate(float deltaTime)
-        {
-            _executor.Tick(deltaTime);
-            if (_executor.IsFinished)
+            if (damageable != null)
             {
-                _phase = AbilityPhase.Ending;
+                var hitData = new HitData(
+                    HitActionType.Damage,
+                    _attackDamage,
+                    Parameter.Owner.InputAuthority,
+                    damageable.OwnerPlayerRef);
+                damageable.TakeHit(ref hitData);
             }
+
+            if (disableInteractEffect)
+            {
+                disableInteractEffect.OnHitHammerAttack();
+            }
+
+            //エフェクトの再生
+            _effectSpawner.RequestPlayOneShotEffect(_hitEffect,
+                hitInfo.ClosestPoint(_hitChecker.HitPoint.First().position), Quaternion.identity);
         }
     }
 }

@@ -23,10 +23,13 @@ namespace InGame.Player
         PlayerHealth _playerHealth;
         PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
+        PlayerEffectController _playerEffectController;
 
         private bool _shouldWarp = false;
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
+        private bool _isVaultingLastFrame = false;
+        public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
         public void SetWarpTarget(Vector3 targetPosition,Quaternion targetRotation)
         {
@@ -52,6 +55,7 @@ namespace InGame.Player
         void InitComponents()
         {
             _playerMovement = GetComponent<PlayerMovement>();
+            _playerEffectController = GetComponentInChildren<PlayerEffectController>();
 
             if (TryGetComponent(out CameraController cameraController))
             {
@@ -65,14 +69,44 @@ namespace InGame.Player
                 health.OnDeath += OnDeath;
             }
 
-            if (TryGetComponent(out PlayerAnimBase playerAnimBase))
-            {
-                playerAnimBase.Init(this);
-            }
+            // if (TryGetComponent(out PlayerAnimBase playerAnimBase))
+            // {
+            //     playerAnimBase.Init(this);
+            // }
         }
 
         private void LateUpdate()
         {
+            // if (_animationClipPlayer)
+            // {
+            //     var maxSpeed = _playerMovement.DashMoveSpeed;
+            //     var walkSpeed = _playerMovement.WalkSpeed;
+            //     var moveSpeed = _playerMovement._moveVelocity.magnitude;
+            //     var weight = 0f;
+            //     if (moveSpeed <= walkSpeed)
+            //     {
+            //         // 0..Walk -> 0..1
+            //         weight = Mathf.InverseLerp(0f, walkSpeed, moveSpeed);
+            //     }
+            //     else
+            //     {
+            //         // Walk..Max -> 1..2
+            //         weight = Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f;
+            //     }
+            //     
+            //     _animationClipPlayer.SetLocoWeight(weight);
+            //     
+            //     switch ()
+            //     {
+            //         case false when _playerMovement.DoingVault:
+            //             _animationClipPlayer.SetTopPriorityClip(true);
+            //             break;
+            //         case true when !_playerMovement.DoingVault:
+            //             _animationClipPlayer.SetTopPriorityClip(false);
+            //             break;
+            //     }
+            // }
+            
             // Localでの処理にInputを送る
             if (HasInputAuthority)
             {
@@ -96,11 +130,16 @@ namespace InGame.Player
             }
             
             // プレイヤーの入力の管理
-            if (GetInput<PlayerInput>(out var input) && !IsStun && _playerControlState == PlayerControlState.Normal)
+            if (GetInput<PlayerInput>(out var input))
             {
-                // player movement に入力を与えて更新する
-                _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
-                    input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+                if (!IsStun && _playerControlState == PlayerControlState.Normal)
+                {
+                    // player movement に入力を与えて更新する
+                    _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
+                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+                }
+                
+                _playerMovement.MoveTick(Runner.DeltaTime);
             }
 
             if (_shouldWarp)
@@ -110,6 +149,8 @@ namespace InGame.Player
                 _cameraController.CameraReset();
                 _shouldWarp = false;
             }
+
+            
         }
 
         public void AfterTick()
@@ -122,13 +163,16 @@ namespace InGame.Player
         {
             IsStun = false;
             _playerHealth.IsInvincible = false;
+            _playerEffectController.StopStunEffect();
         }
 
         void OnDeath(HitData lastHitData)
         {
             IsStun = true;
+            
             _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime);
             _playerHealth.IsInvincible = true;
+            _playerEffectController.PlayStunEffect();
         }
 
         public void SetControlState(PlayerControlState controlState)

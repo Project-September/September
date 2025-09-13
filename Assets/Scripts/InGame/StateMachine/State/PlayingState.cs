@@ -11,7 +11,7 @@ namespace September.Common
         {
             //  制限時間カウント開始
             TickTimer = TickTimer.CreateFromSeconds(Context.Runner, Context.TimerData.GameTime);
-            InGame_PlayBGM(Context.InGameBGMCueName);
+            Context.GameStarted?.Invoke();
         }
 
         protected internal override void OnNetworkFixedUpdate()
@@ -20,19 +20,6 @@ namespace September.Common
             {
                 TickTimer = TickTimer.None;
                 Context.Rpc_SendEvent((int)StateEventId.Finish);
-            }
-        }
-        private void InGame_PlayBGM(string newCueName)
-        {
-            if(!string.IsNullOrEmpty(Context.CurrentBGM))
-            {
-                CRIAudio.StopBGM("BGM", Context.CurrentBGM);
-            }
-            
-            if(!string.IsNullOrEmpty(newCueName))
-            {
-                CRIAudio.PlayBGM("BGM", newCueName);
-                Context.CurrentBGM = newCueName;
             }
         }
     }

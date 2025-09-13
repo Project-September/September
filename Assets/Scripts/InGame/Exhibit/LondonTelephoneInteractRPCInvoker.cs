@@ -16,7 +16,7 @@ namespace InGame.Exhibit
     public class LondonTelephoneInteractRPCInvoker : NetworkBehaviour
     {
         [SerializeField,Label("Effect持続時間")] private float _interactTimer;
-        [SerializeField, Label("エフェクトの位置")] private Transform _effectPos; // エフェクト位置用の子オブジェクト
+        [SerializeField, Label("エフェクトの位置")] private Transform _effectPos;
         
         private EffectSpawner _effectSpawner;
         private CancellationTokenSource _cts;
@@ -83,7 +83,7 @@ namespace InGame.Exhibit
 
         private static string GenerateEffectId()
         {
-            return DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
+            return Guid.NewGuid().ToString();
         }
     }
 }

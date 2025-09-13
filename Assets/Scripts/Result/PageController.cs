@@ -1,0 +1,340 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using Fusion;
+using September.Common;
+using TMPro;
+using UnityEngine;
+
+namespace Result
+{
+    public class PageController : MonoBehaviour
+    {
+        [Header("Anim Settings")]
+        [SerializeField] private float _slideDuration = 0.45f;
+        [SerializeField] private float _pageGap = 40f;
+        [SerializeField] private Ease _ease = Ease.OutCubic;
+
+        private GameInput _gameInput;
+        private readonly Stack<RectTransform> _stack = new();
+        private bool _isActive;
+        private bool _isAnimating;
+        private float _canvasWidth;
+
+        [Header("Pages")]
+        [SerializeField] private RectTransform[] _pages;
+
+        [Header("2ページ目: スタン")]
+        [SerializeField] private Transform _stunRowRoot;
+        [SerializeField] private TextMeshProUGUI _stunTotalText;
+
+        [Header("3ページ目　インタラクト")]
+        [SerializeField] private Transform _exhibitRowRoot;
+        [SerializeField] private GameObject _exhibitRowPrefab;
+        [SerializeField] private TextMeshProUGUI _exhibitTotalText;
+        [SerializeField] private ExhibitScoreConfig _exhibitScoreConfig;
+        
+        [Header("4ページ目: アビリティボーナス")]
+        [SerializeField] private Transform _abilityRowRoot;
+        [SerializeField] private GameObject _abilityRowPrefab;
+        [SerializeField] private TextMeshProUGUI _abilityTitle;
+        [SerializeField] private TextMeshProUGUI _abilityTotalText;
+        
+        [Header("Ability Bonus Config")]
+        [SerializeField] private ExhibitScoreConfig _okabeRideConfig;
+        [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
+        [SerializeField] private int _sarutobiBonusScore = 50;
+        [SerializeField] private int _tanihiraBonusScore = 100;
+        
+        private Dictionary<CharacterType, IAbilityBonusRenderer> _bonusRenderers;
+        private const int StunPoint = 150;
+
+        private void Update()
+        {
+            if (!_isActive || _isAnimating) return;
+
+            if (_gameInput.UI.PageSlide.triggered)
+            {
+                RectTransform next = GetNextPage();
+                if (next)
+                {
+                    next.gameObject.SetActive(true);
+                    PushAsync(next).Forget();
+                }
+            }
+
+            if (_gameInput.UI.PageSlideBack.triggered || _gameInput.UI.Cancel.triggered)
+            {
+                if (_stack.Count > 1)
+                    PopAsync().Forget();
+            }
+        }
+
+        public void Initialize()
+        {
+            _gameInput = new GameInput();
+            _gameInput.Enable();
+            _isActive = true;
+            
+            ResultDataInbox.I.OnChanged += SetExhibitPage;
+
+            RectTransform rootRt = (RectTransform)transform;
+            _canvasWidth = rootRt.rect.width;
+
+            for (int i = 0; i < _pages.Length; i++)
+            {
+                var p = _pages[i];
+                if (!p) 
+                    continue;
+
+                EnsureCanvasGroup(p).alpha = i == 0 ? 1f : 0f;
+                p.gameObject.SetActive(true);
+                p.anchoredPosition = i == 0 ? Vector2.zero : OffRight();
+            }
+
+            if (_pages.Length > 0)
+                _stack.Push(_pages[0]);
+            
+            _bonusRenderers = new Dictionary<CharacterType, IAbilityBonusRenderer>
+            {
+                { CharacterType.OkabeWright, new OkabeBonusRenderer(_okabeRideConfig.Entries.ToDictionary(e => e.Type, e => e.Points)) },
+                { CharacterType.HulkTheButcher, new HaruBonusRenderer(_haruDestroyConfig.Entries.ToDictionary(e => e.Type, e => e.Points)) },
+                { CharacterType.Sarutobi, new SarutobiBonusRenderer(_sarutobiBonusScore) },
+                { CharacterType.Tanihira, new TanihiraBonusRenderer(_tanihiraBonusScore) },
+            };
+            
+            SetStunPage();
+            SetExhibitPage();
+            SetAbilityBonusPage();
+        }
+
+        /// <summary>
+        /// 2ページ目: 自分が気絶させた相手一覧と合計
+        /// </summary>
+        private void SetStunPage()
+        {
+            PlayerDatabase db = PlayerDatabase.Instance;
+            if (!db)
+                return;
+
+            if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out SessionPlayerData localData))
+            {
+                Debug.LogWarning("[SetStunPage] Local player data not found");
+                return;
+            }
+            
+            int totalScore = 0;
+
+            int i = 0;
+            foreach (var kv in localData.StunData)
+            {
+                PlayerRef targetRef = kv.Key;
+                int count = kv.Value;
+
+                string targetName = db.PlayerDataDic.TryGet(targetRef, out SessionPlayerData targetData)
+                    ? targetData.DisplayNickName
+                    : $"Player {targetRef.RawEncoded}";
+
+                int score = count * StunPoint;
+
+                // rowRoot に並んでる子オブジェクトを使う
+                if (i < _stunRowRoot.childCount)
+                {
+                    Transform row = _stunRowRoot.GetChild(i);
+                    row.gameObject.SetActive(true);
+
+                    TextMeshProUGUI[] texts = row.GetComponentsInChildren<TextMeshProUGUI>(true);
+                    if (texts.Length >= 3)
+                    {
+                        texts[0].text = targetName;
+                        texts[1].text = $"{count}回";
+                        texts[2].text = $"{score}点";
+                    }
+                    else
+                        Debug.LogError("[SetStunPage] Row に Text が3つ無い");
+                }
+                
+                totalScore += score;
+                i++;
+            }
+
+            // 余った Row は非表示に
+            for (; i < _stunRowRoot.childCount; i++)
+            {
+                _stunRowRoot.GetChild(i).gameObject.SetActive(false);
+            }
+
+            if (_stunTotalText)
+                _stunTotalText.text = totalScore.ToString();
+        }
+        
+        private void SetExhibitPage()
+        {
+            // 既存の行を消去
+            foreach (Transform child in _exhibitRowRoot)
+                Destroy(child.gameObject);
+
+            ResultDataInbox inbox = ResultDataInbox.I;
+            
+            Debug.Assert(inbox);
+            Debug.Log(_exhibitScoreConfig.Entries.Count);
+            
+            int totalScore = 0;
+            
+            foreach (ExhibitScoreEntry entry in _exhibitScoreConfig.Entries)
+            {
+                ExhibitType type = entry.Type;
+                int point = entry.Points;
+
+                int count = inbox.ExhibitCounts.GetValueOrDefault(type, 0);
+                int score = count * point;
+
+                GameObject row = Instantiate(_exhibitRowPrefab, _exhibitRowRoot);
+                var texts = row.GetComponentsInChildren<TextMeshProUGUI>(true);
+
+                if (texts.Length >= 3)
+                {
+                    texts[0].text = type.ToString();  
+                    texts[1].text = $"×{count}";
+                    texts[2].text = score.ToString();
+                }
+                else
+                {
+                    Debug.LogError("[SetExhibitPage] Prefab に Text が3つ無い");
+                }
+                
+                totalScore += score;
+            }
+
+            if (_exhibitTotalText)
+                _exhibitTotalText.text = totalScore.ToString();
+        }
+        
+        private void SetAbilityBonusPage()
+        {
+            // 既存の行を消去
+            foreach (Transform child in _abilityRowRoot)
+                Destroy(child.gameObject);
+
+            ResultDataInbox inbox = ResultDataInbox.I;
+            if (!inbox)
+                return;
+
+            int totalScore = 0;
+
+            // ローカルプレイヤーのキャラタイプを取得
+            var db = PlayerDatabase.Instance;
+            if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out var localData))
+            {
+                Debug.LogWarning("[SetAbilityBonusPage] Local player data not found");
+                return;
+            }
+            CharacterType chara = localData.CharacterType;
+
+            // ボーナスレンダラーがあれば実行
+            if (_bonusRenderers != null && _bonusRenderers.TryGetValue(chara, out IAbilityBonusRenderer r))
+            {
+                totalScore = r.Render(inbox, _abilityRowRoot, _abilityRowPrefab, _abilityTitle);
+            }
+            else
+            {
+                Debug.Log($"[SetAbilityBonusPage] No bonus renderer for {chara}");
+            }
+
+            if (_abilityTotalText)
+                _abilityTotalText.text = totalScore.ToString();
+        }
+        
+        // ページ遷移制御
+        private RectTransform GetNextPage()
+        {
+            if (_pages == null || _pages.Length == 0) 
+                return null;
+            RectTransform top = _stack.Peek();
+            int idx = Array.IndexOf(_pages, top);
+            int next = Mathf.Clamp(idx + 1, 0, _pages.Length - 1);
+            if (next == idx) 
+                return null;
+            return _pages[next];
+        }
+
+        private async UniTask PushAsync(RectTransform nextPage, bool first = false)
+        {
+            if (_isAnimating)
+                return;
+            _isAnimating = true;
+
+            RectTransform current = _stack.Count > 0 ? _stack.Peek() : null;
+            CanvasGroup nextCg = EnsureCanvasGroup(nextPage);
+            nextCg.alpha = 0f;
+            nextPage.anchoredPosition = OffRight();
+
+            Sequence seq = DOTween.Sequence();
+
+            if (current && !first)
+            {
+                CanvasGroup curCg = EnsureCanvasGroup(current);
+                seq.Join(current.DOAnchorPos(OffLeft(), _slideDuration).SetEase(_ease));
+                seq.Join(curCg.DOFade(0f, _slideDuration));
+            }
+
+            seq.Append(nextPage.DOAnchorPos(Vector2.zero, _slideDuration).SetEase(_ease));
+            seq.Join(nextCg.DOFade(1f, _slideDuration));
+
+            await seq.AsyncWaitForCompletion();
+
+            if (current && !first)
+            {
+                EnsureCanvasGroup(current).alpha = 0f;
+                current.anchoredPosition = OffLeft();
+            }
+
+            _stack.Push(nextPage);
+            _isAnimating = false;
+        }
+
+        private async UniTask PopAsync()
+        {
+            if (_isAnimating) 
+                return;
+            _isAnimating = true;
+
+            RectTransform current = _stack.Pop();
+            RectTransform previous = _stack.Peek();
+
+            CanvasGroup curCg = EnsureCanvasGroup(current);
+            CanvasGroup prevCg = EnsureCanvasGroup(previous);
+
+            prevCg.alpha = 1f;
+            previous.anchoredPosition = OffLeft();
+
+            Sequence seq = DOTween.Sequence()
+                .Join(current.DOAnchorPos(OffRight(), _slideDuration).SetEase(_ease))
+                .Join(curCg.DOFade(0f, _slideDuration))
+                .Join(previous.DOAnchorPos(Vector2.zero, _slideDuration).SetEase(_ease));
+
+            await seq.AsyncWaitForCompletion();
+
+            curCg.alpha = 0f;
+            current.anchoredPosition = OffRight();
+            _isAnimating = false;
+        }
+
+        private Vector2 OffRight() => new(_canvasWidth * 1.05f + _pageGap, 0f);
+        private Vector2 OffLeft() => new(-_canvasWidth * 1.05f - _pageGap, 0f);
+
+        private CanvasGroup EnsureCanvasGroup(RectTransform rt)
+        {
+            if (!rt.TryGetComponent<CanvasGroup>(out var cg) || !cg)
+                cg = rt.gameObject.AddComponent<CanvasGroup>();
+            return cg;
+        }
+
+        private void OnDisable()
+        {
+            _gameInput.Disable();
+        }
+    }
+}

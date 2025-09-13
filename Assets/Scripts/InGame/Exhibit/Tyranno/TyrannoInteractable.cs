@@ -5,15 +5,14 @@ using UnityEngine;
 
 public class TyrannoInteractable : MountableExhibitBase
 {
-    [SerializeField] private float _moveSpeed;
     [SerializeField] private float _walkSpeed;
     [SerializeField] private float _dashSpeed;
-    [SerializeField] private Vector3 _groundNormal;
     [SerializeField] private Vector3 _rayDirection;
     [SerializeField] private float _rayDistance;
     [SerializeField] private Vector3 _gravity;
     [SerializeField] private float _maxRotateValue;
-    [SerializeField] private float _runBlendDelay;
+    
+    private Vector3 _groundNormal;
 
     private bool _isGround;
 
@@ -22,7 +21,7 @@ public class TyrannoInteractable : MountableExhibitBase
     private float _hitDistance;
 
     private float _movingTime;
-
+    
     [Networked, OnChangedRender(nameof(OnBlendChangedRender))]
     private float MoveValue { get; set; }
 
@@ -30,7 +29,9 @@ public class TyrannoInteractable : MountableExhibitBase
     private bool IsInteracting { get; set; }
 
     private NetworkMecanimAnimator _mecanimAnimator;
-
+    
+    private static readonly int Attack = Animator.StringToHash("Attack");
+    
     public override void Spawned()
     {
         base.Spawned();
@@ -54,14 +55,12 @@ public class TyrannoInteractable : MountableExhibitBase
     public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
     {
         CheckIsGround();
-        MoveValue = CheckMovingTime(playerInput, deltaTime);　//今どのくらいの時間入力し続けてるか
-        _moveSpeed = MoveValue > 0.95f ? _dashSpeed : _walkSpeed;　//ダッシュか歩きかを判別
         var moveDirection = Move(playerInput);
         moveDirection.y = 0;　
         Rotate(deltaTime, moveDirection);　//回転
-        AdsorptionOnGround();　//自身が浮いてしまったときに補正して地面にくっつける
+        AdsorptionOnGround(deltaTime);　//自身が浮いてしまったときに補正して地面にくっつける
         AttackAnimationTrigger(playerInput);　//攻撃のAnimationを発火
-        OnAttackUpdate(deltaTime);　//Attack中にだけ走るメソッド
+        OnAttackUpdate(deltaTime);　//Attack中にだけ発火するメソッド
     }
 
     private void OnHit()
@@ -73,14 +72,14 @@ public class TyrannoInteractable : MountableExhibitBase
     {
         if (!playerInput.Buttons.IsSet(PlayerButtons.Attack)) return;
         _isAttacking = true;
-        _mecanimAnimator.SetTrigger("Attack");
+        _mecanimAnimator.SetTrigger(Attack);
     }
 
     private void OnAttackUpdate(float deltaTime)
     {
         if (!_isAttacking) return;
         Executor?.Tick(deltaTime);
-        if (Executor is not { IsFinished: true }) return;
+        //if (Executor is not { IsFinished: true }) return;
         _isAttacking = false;
         Executor.Init();
     }
@@ -99,6 +98,7 @@ public class TyrannoInteractable : MountableExhibitBase
         if (!ray || Vector3.Angle(normal, Vector3.up) >= 90)
         {
             _isGround = false;
+            Rigidbody.AddForce(_gravity, ForceMode.Acceleration);
         }
     }
 
@@ -115,27 +115,26 @@ public class TyrannoInteractable : MountableExhibitBase
     private Vector3 Move(PlayerInput playerInput)
     {
         var inputMoveDirection = playerInput.MoveDirection;
-        if (playerInput.MoveDirection == Vector2.zero) return Vector3.zero;
+        if (playerInput.MoveDirection == Vector2.zero)
+        {
+            MoveValue = 0;
+            return Vector3.zero;
+        }
         var moveVector2 = GetMoveDirection(inputMoveDirection, playerInput.CameraYaw);
         var moveDirection = new Vector3(moveVector2.x, 0, moveVector2.y);
         var moveVelocity = Vector3.ProjectOnPlane(moveDirection, _groundNormal).normalized;　//坂に沿った動きに
-        Rigidbody.linearVelocity = moveVelocity * _moveSpeed;
+        if (playerInput.Buttons.IsSet(PlayerButtons.Dash))
+        {
+            MoveValue = 1;
+            Rigidbody.linearVelocity = moveVelocity * _dashSpeed;
+        }
+        else
+        {
+            MoveValue = 0.5f;
+            Rigidbody.linearVelocity = moveVelocity * _walkSpeed;
+        }
         return moveDirection;
     }
-
-    private float CheckMovingTime(PlayerInput playerInput, float deltaTime)
-    {
-        if (playerInput.MoveDirection == Vector2.zero)
-        {
-            _movingTime = 0f;
-            return 0f;
-        }
-
-        _movingTime += deltaTime;
-        return Mathf.Clamp(_movingTime / _runBlendDelay, 0f, 1f);　
-        //入力されたままの状態が設定したDelay時間に対してどの程度続いているかを0～１で返すメソッド
-    }
-
     private void Rotate(float deltaTime, Vector3 moveDirection)
     {
         if (moveDirection == Vector3.zero) return;
@@ -144,14 +143,15 @@ public class TyrannoInteractable : MountableExhibitBase
         transform.rotation = rot;
     }
 
-    private void AdsorptionOnGround()
+    private void AdsorptionOnGround(float deltaTime)
     {
         if (_isGround) return;
         var ray = Physics.Raycast(transform.position + Vector3.up, _rayDirection, out RaycastHit hit,
             1.5f);
         if (ray && hit.distance > 0)
         {
-            transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            var targetPos = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            Rigidbody.MovePosition(Vector3.Lerp(transform.position, targetPos, deltaTime * 10f));
         }
     }
 

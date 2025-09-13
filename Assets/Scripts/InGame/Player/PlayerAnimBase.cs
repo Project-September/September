@@ -8,31 +8,26 @@ namespace InGame.Player
         [SerializeField] private string _paramIsStan = "IsStan";
         [SerializeField] private string _pramSpeed = "Speed";
         [SerializeField] private string _pramIsGround = "IsGround";
+        [SerializeField] private float _speedDampTime = 0.2f;
         
         private PlayerManager _playerManager;
         private PlayerMovement _playerMovement;
 
         public void Init(PlayerManager playerManager)
         {
-            // if (!playerManager.IsLocalPlayer)
-            // {
-            //     enabled = false;
-            //     return;
-            // }
-            
             _playerManager = playerManager;
             _playerMovement = GetComponent<PlayerMovement>();
         }
 
         public override void FixedUpdateNetwork()
         {
-            UpdateAnimParams();
+            UpdateAnimParams(Time.fixedDeltaTime);
         }
 
-        private void UpdateAnimParams()
+        private void UpdateAnimParams(float deltaTime)
         {
             _animator.SetBool(_paramIsStan, _playerManager.IsStun);
-            _animator.SetFloat(_pramSpeed, _playerMovement.GetSpeedOnPlane());
+            _animator.SetFloat(_pramSpeed, _playerMovement.GetSpeedOnPlane(), _speedDampTime, deltaTime);
             _animator.SetBool(_pramIsGround, _playerMovement.IsGround);
         }
     }

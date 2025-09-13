@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Video;
 
 namespace September.Common
 {
@@ -19,6 +20,9 @@ namespace September.Common
             public CharacterType Type;
             public string DisplayName;
             public NetworkPrefabRef Prefab;
+            public VideoClip ExplainVideo;
+            public Sprite CharacterIcon;
+            public AnimationClip EmoteAnimation;
         }
         [SerializeField, ArrayLength(DataCount)] CharacterData[] _characterData;
 

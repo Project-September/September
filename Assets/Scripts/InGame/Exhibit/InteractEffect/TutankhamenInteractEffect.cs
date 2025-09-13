@@ -1,6 +1,7 @@
 using System;
 using CRISound;
 using Fusion;
+using Ingame.Tanihira;
 using InGame.Common;
 using InGame.Interact;
 using InGame.Player;
@@ -35,12 +36,22 @@ namespace InGame.Exhibit
 
             if (target.Runner.TryGetPlayerObject(playerRef, out var playerNetworkObject))
             {
+                
                 if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
                 {
                     EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
                     spec.Duration = EffectDuration;
                     spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
                     playerStatus.AddEffect(spec);
+                }
+                
+                if (playerNetworkObject.TryGetComponent(out FormationManager formationManager))
+                {
+                    var friendList = formationManager.FriendsList;
+                    foreach (var friend in friendList)
+                    {
+                        friend.StartBuff(BoostMultiplier);
+                    }
                 }
                 
                 _targetPlayerObject = playerNetworkObject;

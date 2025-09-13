@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 7624587381050686148}
   - component: {fileID: 439631256018364724}
   - component: {fileID: 6428114833908659226}
+  - component: {fileID: 1610821991240361927}
+  - component: {fileID: 4482752977680701309}
+  - component: {fileID: 7306939920785276090}
   m_Layer: 0
   m_Name: OpticalCamouflage
   m_TagString: Untagged
@@ -28,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 4322834578117657907}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.93, y: -7.188, z: 28.587}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -58,6 +61,15 @@ MonoBehaviour:
     - 5
   _characterEffects:
   - rid: 2742221729578614885
+  _type: 5
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 14
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
+  _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
+  _ForceSetInteractable: 1
   references:
     version: 2
     RefIds:
@@ -106,6 +118,48 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9334037, y: 1.4992065, z: 0.69239426}
   m_Center: {x: 0.009843379, y: 0.65807724, z: 0.011123657}
+--- !u!114 &1610821991240361927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4322834578117657907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 7624587381050686148}
+--- !u!114 &4482752977680701309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4322834578117657907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 7624587381050686148}
+--- !u!114 &7306939920785276090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4322834578117657907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 7624587381050686148}
 --- !u!1001 &1138885513903168269
 PrefabInstance:
   m_ObjectHideFlags: 0

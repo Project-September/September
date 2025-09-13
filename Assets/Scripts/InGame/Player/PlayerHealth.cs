@@ -23,6 +23,7 @@ namespace InGame.Player
 
         /// <summary> 無敵 </summary> 無敵の set が　public なのどうなん
         [Networked, HideInInspector] public NetworkBool IsInvincible { get; set; }
+        public int CurrentHealth => _status.CurrentHealth;
 
         public override void Spawned()
         {
@@ -52,7 +53,7 @@ namespace InGame.Player
                 hitData.Executor?.HitExecution(hitData);
             }
             
-            RPC_HitDebug(hitData.HitActionType);
+            //RPC_HitDebug(hitData.HitActionType);
             Debug.Log(hitData + $"\nHealth:     {_status.CurrentHealth}");
         }
 
@@ -66,10 +67,12 @@ namespace InGame.Player
 
             if (hitData.HitActionType == HitActionType.Damage)
             {
+                Debug.Log("Damage Taken");
                 hitData.Amount = TakeDamage(hitData.Amount);
             }
             else if (hitData.HitActionType == HitActionType.Heal)
             {
+                Debug.Log("Heal Taken");
                 hitData.Amount = TakeHeal(hitData.Amount);
             }
         }

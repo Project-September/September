@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using NaughtyAttributes;
+using Result;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,8 +14,9 @@ namespace September.InGame.UI
     /// <summary>UIの管理</summary>
     public class InGameStatusView : MonoBehaviour
     {
-        [Header("UI Root Prefab")] [SerializeField, Label("InGameUIRoot")]
-        private InGameUIRootRefs _uiRootPrefab;
+        [Header("UI Root Prefab")] 
+        [SerializeField, Label("InGameUIRoot")] private InGameUIRootRefs _inGameUiRootPrefab;
+        [SerializeField] private ResultUIRootRefs _resultUIRootPrefab;
 
         [Header("Canvas")] [SerializeField, Label("MainCanvas")]
         private Canvas _mainCanvas;
@@ -26,12 +28,16 @@ namespace September.InGame.UI
         private Slider _hpBarSlider;
         private Slider _staminaBarSlider;
         private TextMeshProUGUI _killLogText;
+        private TextMeshProUGUI _ogreMessageText;
         private GameObject _optionUI;
         private GameObject _killLogUI;
         private GameObject _ogreUiInstance;
         private InteractUi _interactUI;
+        private UniTask _ogreMessageTask;
 
         private CancellationTokenSource _cts;
+        
+        
 
         private void Awake()
         {
@@ -49,6 +55,7 @@ namespace September.InGame.UI
             ui.OnNoticeKillLog.Subscribe(killText => ShowKillLog(killText).Forget()).AddTo(_cts.Token);
             ui.OnShowOgreUI.Subscribe(ShowOgreLamp).AddTo(_cts.Token);
             ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
+            ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
             ui.IsInteracting
                 .Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2))
                 .AddTo(_cts.Token);
@@ -59,12 +66,13 @@ namespace September.InGame.UI
         private void SetupUI()
         {
             if (!_uiRoot)
-                _uiRoot = Instantiate(_uiRootPrefab, _mainCanvas.transform);
+                _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
 
             _optionUI = _uiRoot.OptionUI;
             _killLogUI = _uiRoot.KillLogPanel;
             _killLogText = _uiRoot.KillLogText;
             _ogreUiInstance = _uiRoot.OgreUI;
+            _ogreMessageText = _uiRoot.OgreMessageText;
             _hpBarSlider = _uiRoot.HpBar;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
@@ -83,6 +91,13 @@ namespace September.InGame.UI
 
             DOTween.To(() => _hpBarSlider.value, x => _hpBarSlider.value = x, value, 0.3f)
                 .SetEase(Ease.OutQuad);
+        }
+
+        private async UniTask PlayResultAnimation()
+        {
+            var resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
+            ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
+            await resultAnim.Play(resultUI);
         }
 
         private void ChangeStamina(float value)
@@ -158,12 +173,26 @@ namespace September.InGame.UI
             await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
             Destroy(timer.gameObject);
         }
-
         // 鬼の時にUIを表示する
         private void ShowOgreLamp(bool isShow)
         {
-            if (_ogreUiInstance != null)
-                _ogreUiInstance.gameObject.SetActive(isShow);
+            if (!_ogreUiInstance) return;
+            _ogreUiInstance.gameObject.SetActive(isShow);
+            if (isShow && _ogreMessageTask.Status.IsCompleted())
+            {
+                _ogreMessageTask = OgreMessage().Preserve();
+            }
+        }
+        //  鬼になったことを伝えるメッセージ
+        private async UniTask OgreMessage()
+        {
+            var col = _ogreMessageText.color;
+            col.a = 0;
+            _ogreMessageText.color = col;
+            _ogreMessageText.text = "あなたが鬼です";
+            await _ogreMessageText.DOFade(1, 1f);
+            await UniTask.WaitForSeconds(2f);
+            await _ogreMessageText.DOFade(0, 1f);
         }
 
         private void ShowOptionUI(bool isShow)

@@ -1,3 +1,4 @@
+//勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 public enum EffectType
 {
     Test,
@@ -8,5 +9,18 @@ public enum EffectType
     LondonTelephoneActive,
     PtrFireMuzzle,
     PtrFireBullet,
-    PtrFireExplosion
+    PtrFireExplosion,
+    NormalInteractComplete,
+    CooldownRect,
+    CooldownSquare,
+    CooldownLine,
+    PunchImpact,
+    OpticalCamouflageInteractComplete,
+    StunNormal,
+    CarHit,
+    Heal,
+    HitNormal,
+    WarpIn,
+    WarpOut,
 }
+//勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

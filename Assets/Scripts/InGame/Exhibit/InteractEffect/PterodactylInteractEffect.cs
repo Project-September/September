@@ -4,7 +4,6 @@ using InGame.Interact;
 using InGame.Player;
 using NaughtyAttributes;
 using September.Common;
-using September.InGame.Common;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -13,7 +12,6 @@ namespace InGame.Exhibit
     public class PterodactylInteractEffect : CharacterInteractEffectBase
     {
         [SerializeField,Label("インタラクト可能時間")] private float _interactTime;
-        [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
         [SerializeField] private PterodactylInteractable _pterodactylInteractable;
 
         private PlayerRef _ownerPlayerRef;
@@ -30,12 +28,8 @@ namespace InGame.Exhibit
             
             _runner = target.Runner;
             _interactable = target;
-            CharacterType characterType = context.CharacterType;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
-            if (characterType == CharacterType.OkabeWright)
-            {
-                GetOn(playerRef);
-            }
+            GetOn(playerRef);
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
@@ -46,26 +40,22 @@ namespace InGame.Exhibit
 
                 if (playerInput.Buttons.IsSet(PlayerButtons.Interact) && _interactTimer > 1f)
                 {
-                    Debug.Log("Interactを終了");
                     GetOff();
                     return;
                 }
             }
-            
-            if(CheckInteractEnd())
+
+            if (CheckInteractEnd())
+            {
                 GetOff();
-                
+                return;
+            }
             _pterodactylInteractable.OnInteractFixedUpdate(playerInput,_runner.DeltaTime);
         }
 
         private void GetOn(PlayerRef playerRef)
         {
             _ownerPlayerRef = playerRef;
-            _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>()
-                .PlayerDataDic[_ownerPlayerRef].GetComponent<PlayerManager>();
-            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
-            _ownerPlayerManager.RPC_SetColliderActive(false);
-            _ownerPlayerManager.RPC_SetMeshActive(false);
             _pterodactylInteractable.GetOn(playerRef);
             _isInteracting = true;
             
@@ -74,10 +64,6 @@ namespace InGame.Exhibit
 
         private void GetOff()
         {
-            _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
-            _ownerPlayerManager.RPC_SetColliderActive(true);
-            _ownerPlayerManager.RPC_SetMeshActive(true);
-            _ownerPlayerManager.transform.position = _getOffPoint.position;
             _pterodactylInteractable.GetOff(_ownerPlayerRef);
             _isInteracting = false;
             // Animationの処理
@@ -100,7 +86,6 @@ namespace InGame.Exhibit
             return new PterodactylInteractEffect
             {
                 _interactTime = _interactTime,
-                _getOffPoint = _getOffPoint,
                 _pterodactylInteractable = _pterodactylInteractable
             };
         }

@@ -12,6 +12,7 @@ namespace September.InGame.UI
         [field: SerializeField] public GameObject KillLogPanel { get; private set; }
         [field: SerializeField] public TextMeshProUGUI KillLogText { get; private set; }
         [field: SerializeField] public GameObject OgreUI { get; private set; }
+        [field: SerializeField] public TextMeshProUGUI OgreMessageText { get; private set; }
 
         [Header("Bars")]
         [field: SerializeField] public Slider HpBar { get; private set; }
