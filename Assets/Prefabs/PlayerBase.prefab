@@ -5289,8 +5289,8 @@ MonoBehaviour:
   _rotationSpeed: 720
   _maxLedgeHeight: 1.5
   _minLedgeHeight: 0.5
-  _maxLedgeDepth: 0.3
-  _reachDistance: 2
+  _maxLedgeDepth: 0.8
+  _reachDistance: 0.2
   _timeToVault: 0.5
   _vaultCurve:
     serializedVersion: 2
@@ -5316,8 +5316,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _gizmoDisplayDuration: 1
-  _visibleBit: 0
+  _visible: 0
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
@@ -5472,6 +5471,7 @@ MonoBehaviour:
         _endHitCheckFrame: 21
         _endAttackFrame: 30
         _isStopWhenAttack: 1
+        _searchRadius: 2
         _hitEffect: 18
         _animationClipPlayer: {fileID: 0}
         _enableAutoAim: 1
@@ -5515,6 +5515,7 @@ MonoBehaviour:
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
   _faint: {fileID: 0}
   _getUp: {fileID: 0}
+  _playerManager: {fileID: 0}
   _fallInTime: 0.2
   _fallInCurve:
     serializedVersion: 2
@@ -5524,6 +5525,20 @@ MonoBehaviour:
     m_RotationOrder: 4
   _landOutTime: 0.12
   _landOutCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _overrideInTime: 0.08
+  _overrideInCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _overrideOutTime: 0.1
+  _overrideOutCurve:
     serializedVersion: 2
     m_Curve: []
     m_PreInfinity: 2

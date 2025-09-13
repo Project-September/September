@@ -49,8 +49,8 @@ namespace InGame.Player
         // vault
         private bool _doingVault;
         
-        [Networked, HideInInspector] public bool DoingVault { get; set; }
-        [Networked] public Vector3 NetworkVelocity { get; set; }
+        [Networked, HideInInspector] public bool DoingVault { get; private set; }
+        [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
@@ -64,7 +64,7 @@ namespace InGame.Player
         public float DashMoveSpeed => _dashSpeed;
         public bool IsGround => _isGround || _isGroundTimer > 0;
         [Networked, HideInInspector] 
-        public NetworkBool IsGroundNet { get; set; }
+        public NetworkBool IsGroundNet { get; private set; }
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
 
@@ -83,9 +83,8 @@ namespace InGame.Player
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
             // set velocity
-            if (isJump) TryVault(moveDirection);
-            if (DoingVault) UpdateVault(deltaTime);
-            else
+            if (isJump && HasStateAuthority) TryVault(moveDirection);
+            if (!DoingVault)
             {
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
                 AdsorptionOnGround();
@@ -96,6 +95,8 @@ namespace InGame.Player
         public virtual void MoveTick(float deltaTime)
         {
             CheckGroundManual();
+            
+            if (DoingVault && HasStateAuthority) UpdateVault(deltaTime);
             
             if (_teleportTarget.HasValue)
             {
@@ -318,12 +319,6 @@ namespace InGame.Player
 
             // 奥行がありすぎたら終了
             if (hit) return;
-
-            // Vector3 distance = frontHitInfo.normal * (canVaultHitInfo.distance - 0.01f); // ほんの少し手前
-            // bool checkPosition = Physics.CheckCapsule(reverseCastOrigin + Vector3.up * halfHeight + distance,
-            //     reverseCastOrigin + Vector3.down * halfHeight + distance, capsuleRadius);
-
-            // if (checkPosition) return;
             
             _vaultStartPos = transform.position;
             _vaultTopPos = (frontHitInfo.point + canVaultHitInfo.point) * 0.5f;
