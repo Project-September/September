@@ -10,39 +10,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 23.42851
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -6.634004
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 62.77121
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.004010747
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.00017178206
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.999076
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.042790864
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -4.905
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 179.54
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -128,11 +128,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 
-    values: []
+    keys: 05000000
+    values:
+    - 5
   _cooldownTimeDictionary:
-    keys: 
-    values: []
+    keys: 05000000
+    values:
+    - 10
   _characterEffects:
   - rid: 4983488310407856386
   _type: 0
@@ -165,4 +167,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healAmount: 50
-  _offset: {x: 0, y: 0, z: 0}
+  _offset: {x: 0, y: 0.9, z: 0}
