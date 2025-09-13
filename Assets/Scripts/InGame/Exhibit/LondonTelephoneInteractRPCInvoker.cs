@@ -67,7 +67,8 @@ namespace InGame.Exhibit
                 effectId,
                 EffectType.LondonTelephoneActive,
                 effectPosition + Vector3.up,
-                new()
+                new(),
+                playerObject.transform
             );
 
             // Effectを消す
