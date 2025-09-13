@@ -5491,7 +5491,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _firstFormationTransform: {fileID: 3476019141667097556}
   _formationOffset: 1
+  _warpSerchDistance: 10
   _outFieldWarpHeight: 100
+  _inFieldWarpHeight: -5
 --- !u!114 &7211274858843390964
 MonoBehaviour:
   m_ObjectHideFlags: 0

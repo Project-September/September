@@ -36,7 +36,7 @@ namespace InGame.Exhibit
                 {
                     foreach (FriendBase friend in _friendList)
                     {
-                        friend.StartBuff();
+                        friend.SetMask(true);
                     }
                 }
             }
@@ -87,6 +87,7 @@ namespace InGame.Exhibit
                 foreach (FriendBase friend in _friendList)
                 {
                     friend.StopBuff();
+                    friend.SetMask(false);
                 }
                 _friendList.Clear();
             }
