@@ -32,6 +32,8 @@ namespace InGame.Exhibit
         [SerializeField] private int _startFrame;
         [SerializeField] private int _endFrame = 34;
         [SerializeField] private int _damageAmount = 100;
+        protected float StartFrame => _startFrame;
+        protected float EndFrame => _endFrame;
         #endregion
         
         #region DamageableParam
@@ -71,7 +73,7 @@ namespace InGame.Exhibit
              _initialRotation = transform.rotation;
         }
         
-        private void CreateHitBox(PlayerRef playerRef)
+        protected void CreateHitBox(PlayerRef playerRef)
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
             {
@@ -123,7 +125,6 @@ namespace InGame.Exhibit
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
             RPC_SetIsKinematic(playerRef,false);
-            CreateHitBox(playerRef);
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
                 formationManager.WarpFriendOutField();
@@ -195,7 +196,6 @@ namespace InGame.Exhibit
                 hitData.Amount = TakeHeal(hitData.Amount);
             }
         }
-    
         int TakeDamage(int damage)
         {
             if (_isInvincible) return 0;
