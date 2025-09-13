@@ -31,14 +31,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1292007954863827809}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.9495734, z: 0, w: 0.31354508}
-  m_LocalPosition: {x: -12.7, y: -10.52, z: 16.16}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6342254120449036074}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 143.454, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1248590409878750981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,6 +61,12 @@ MonoBehaviour:
     - 3
   _characterEffects:
   - rid: 5190192992005652564
+  _type: 9
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1

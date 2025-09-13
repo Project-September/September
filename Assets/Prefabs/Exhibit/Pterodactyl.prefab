@@ -224,31 +224,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14.859
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -6.07
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 24.687
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.29228523
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.9563312
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -256,7 +256,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -146.01
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -481,6 +481,7 @@ MonoBehaviour:
   _endFrame: 34
   _damageAmount: 100
   _maxHealth: 10
+  _getOffPoint: {fileID: 302465785191893965}
   _crySe: Pteranodon_cry
   _moveSpeed: 5
   _rotationSpeed: 5
@@ -488,13 +489,17 @@ MonoBehaviour:
   _muzzle: {fileID: 1776912245541953101}
   _muzzleFlash: {fileID: 2943128015699734913}
   _downwardAngle: 30
-  _fireParticle: {fileID: 7145253233522768830, guid: a94003fc19ce4f44984dc1df010b55fb, type: 3}
+  _fireParticle: {fileID: -6299654888396855261, guid: a94003fc19ce4f44984dc1df010b55fb, type: 3}
   _fireSpeed: 20
-  _rayDistance: 100
-  _fireHitMask:
+  _rayDistance: 9999
+  _playerHitMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 64
   _fireCooldown: 2
+  _radius: 3
+  _hitEffect: {fileID: 3681082649069878751, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
+  _damage: 50
+  _aimObject: {fileID: 0}
 --- !u!114 &1450576261565196690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,6 +524,7 @@ MonoBehaviour:
     - 5
   _characterEffects:
   - rid: 5190193564749135961
+  _type: 1
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
@@ -535,7 +541,6 @@ MonoBehaviour:
       data:
         _characterType: 1
         _interactTime: 20
-        _getOffPoint: {fileID: 302465785191893965}
         _pterodactylInteractable: {fileID: 575448598117113101}
 --- !u!114 &729834472514017027
 MonoBehaviour:

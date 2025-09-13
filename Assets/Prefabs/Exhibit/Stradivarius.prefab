@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.0026360082
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.2888087
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.005365649
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -30,11 +30,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -135,6 +135,12 @@ MonoBehaviour:
     values: []
   _characterEffects:
   - rid: 4983488310407856386
+  _type: 0
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -145,7 +151,7 @@ MonoBehaviour:
       type: {class: StradivariusInteractEffect, ns: InGame.Exhibit.InteractEffect, asm: Scripts}
       data:
         _characterType: 4
-        _stradivariusController: {fileID: 5945293030809737423}
+        _healInstrumentController: {fileID: 0}
 --- !u!114 &5945293030809737423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,3 +165,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healAmount: 50
+  _offset: {x: 0, y: 0, z: 0}

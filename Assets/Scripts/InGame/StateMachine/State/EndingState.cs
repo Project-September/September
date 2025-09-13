@@ -5,6 +5,7 @@ using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.InGame.Common;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace September.Common
@@ -18,12 +19,17 @@ namespace September.Common
 
         private async UniTaskVoid GameEnded()
         {
-            GetScore();
+            //GetScore();
             await UniTask.Delay(TimeSpan.FromSeconds(Context.TimerData.EndGameDelay));
             Context.Cts.Cancel();
+            
+            // ここにエンド処理
+            PlayerDatabase.Instance.Server_PushResultToClients();
+            UIController.I.ShowResultAnimation();
+            
             ShowCursor();
             if(!string.IsNullOrEmpty(Context.CurrentBGM)) CRIAudio.StopBGM("BGM", Context.CurrentBGM);
-            await NetworkManager.Instance.QuitInGame();
+            //await NetworkManager.Instance.QuitInGame();
         }
         private void ShowCursor()
         {

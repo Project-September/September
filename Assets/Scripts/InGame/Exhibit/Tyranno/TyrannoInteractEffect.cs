@@ -24,7 +24,6 @@ namespace InGame.Exhibit
             if(_isInteracting) return;
             _networkRunner = target.Runner;
             _interactable = target;
-            var charaType = context.CharacterType;
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
             GetOn(playerRef);
             
@@ -34,6 +33,12 @@ namespace InGame.Exhibit
             if (_isInteracting)
             {
                 _interactTimer += _networkRunner.DeltaTime;
+                
+                if (playerInput.Buttons.IsSet(PlayerButtons.Interact) && _interactTimer > 1f)
+                {
+                    GetOff();
+                    return;
+                }
             }
             
             if (CheckInteractEnd())

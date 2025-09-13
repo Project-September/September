@@ -87,7 +87,7 @@ namespace Common
                 CharacterType = _characterType
             };
             
-            PlayerDatabase.Instance.Rpc_SetPlayerData(playerRef, playerData);
+          //  PlayerDatabase.Instance.Rpc_SetPlayerData(playerRef, playerData);
         }
 
         void CheckStartInGame(NetworkDictionary<PlayerRef, SessionPlayerData> dictionary)
