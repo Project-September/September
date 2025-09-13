@@ -52,11 +52,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 1
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _characterEffects:
@@ -76,7 +76,7 @@ MonoBehaviour:
     - rid: 2742221729578614885
       type: {class: OpticalCamouflageInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         _duration: 5
 --- !u!114 &439631256018364724
 MonoBehaviour:

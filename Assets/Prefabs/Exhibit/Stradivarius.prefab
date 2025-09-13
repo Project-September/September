@@ -10,39 +10,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 23.42851
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -6.634004
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 62.77121
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.004010747
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.00017178206
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.999076
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.042790864
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -4.905
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 179.54
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 40b1b61e384ba18439cf6841695dcfa9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -137,7 +137,7 @@ MonoBehaviour:
     - 10
   _characterEffects:
   - rid: 4983488310407856386
-  _type: 0
+  _type: 11
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
@@ -152,8 +152,8 @@ MonoBehaviour:
     - rid: 4983488310407856386
       type: {class: StradivariusInteractEffect, ns: InGame.Exhibit.InteractEffect, asm: Scripts}
       data:
-        _characterType: 4
-        _healInstrumentController: {fileID: 0}
+        _characterType: 5
+        _healInstrumentController: {fileID: 5945293030809737423}
 --- !u!114 &5945293030809737423
 MonoBehaviour:
   m_ObjectHideFlags: 0

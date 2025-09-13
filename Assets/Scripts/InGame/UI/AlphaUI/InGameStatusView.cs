@@ -93,7 +93,7 @@ namespace September.InGame.UI
 
         private async UniTask PlayResultAnimation()
         {
-            var resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
+            ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
             ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
             await resultAnim.Play(resultUI);
         }

@@ -61,11 +61,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -158,11 +158,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _characterEffects:
@@ -182,7 +182,7 @@ MonoBehaviour:
     - rid: 3302172481320386636
       type: {class: LondonTelephoneInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         LondonTelephoneInteractRPC: {fileID: 863788955882466386}
 --- !u!65 &6675958784025676327
 BoxCollider:

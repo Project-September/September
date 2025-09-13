@@ -1128,6 +1128,45 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Result",
+            "id": "75076912-f11d-4a71-96c1-54a1466a7512",
+            "actions": [
+                {
+                    "name": "Finish",
+                    "type": "Button",
+                    "id": "d05dc7b1-d9ac-4c39-ad42-3d025e774c8f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "9029802e-eab3-4dd6-82b1-a10518eb5a39",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Finish",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6bb43234-90d4-45df-bcc7-e7f0026b25b4",
+                    "path": "<XInputController>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Finish",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

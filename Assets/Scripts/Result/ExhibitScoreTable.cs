@@ -14,6 +14,8 @@ namespace Result
         LondonTelephone,
         Car,
         Moai,
+        SateliteCanon,
+        Instrument,
     }
 
     [Serializable]

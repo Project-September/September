@@ -70,13 +70,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
-    - 1
+    - 4
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
-    - 1
+    - 4
   _characterEffects:
   - rid: 4146068367287517271
   _type: 0
@@ -94,7 +94,7 @@ MonoBehaviour:
     - rid: 4146068367287517271
       type: {class: SateliteCannonInteractEffect, ns: Ingame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         SateliteCannonInteractRPCInvoker: {fileID: 1631707056656396585}
 --- !u!114 &1631707056656396585
 MonoBehaviour:
