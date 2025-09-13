@@ -32,15 +32,31 @@ namespace September.InGame
         [SerializeField] string _cueSheet = "ALLCue";
 
         private List<FollowEntry> _followingList = new List<FollowEntry>(); // 移動しながら鳴る音のリスト
+        private PlayerRef _localPlayer;
 
         /// <summary>
-        /// アニメーションイベントから呼び出す足音などの再生
+        /// アニメーションイベントから呼び出す呼び出す音の再生(展示物用)
+        /// 音源の位置はAudioBroadcasterが付いた自身のTransform固定
+        /// 3D再生
+        /// </summary>
+        /// <param name="animationEvent"></param>
+        public void PlaySoundFromAnimationEventForExhibit(AnimationEvent animationEvent)
+        {
+            string cueName = animationEvent.stringParameter;
+            int trackingType = animationEvent.intParameter;
+
+            RPC_Request3DSound(Object.Id, _cueSheet, cueName, (SoundTrackingType)trackingType); // 3D再生依頼
+        }
+
+        /// <summary>
+        /// アニメーションイベントから呼び出す音の再生(プレイヤー用)
         /// 音源の位置はAudioBroadcasterが付いた自身のTransform固定
         /// ローカル→2D再生、その他→3D再生
         /// </summary>
         /// <param name="animationEvent"></param>
-        public void PlaySoundFromAnimationEvent(AnimationEvent animationEvent)
+        public void PlaySoundFromAnimationEventForPlayer(AnimationEvent animationEvent)
         {
+            // 操作中のプレイヤーではないときは何もしない
             if (!HasInputAuthority) return;
 
             string cueName = animationEvent.stringParameter;
@@ -58,9 +74,13 @@ namespace September.InGame
         /// <param name="cueName"></param>
         /// <param name="trackingType">短い音→ Spot(0)、移動しながら鳴る音→ Follow(1)</param>
         /// <param name="sourceObjId"> 発声元のオブジェクト </param>
-        public void PlaySoundFromCode(string cueName, int trackingType, NetworkId sourceObjId = default)
+        /// <param name="playerRef"> ローカル環境のPlayer デフォルト = スクリプトが付いたオブジェクトの環境プレイヤー</param>
+        public void PlaySoundFromCode(string cueName, int trackingType, NetworkId sourceObjId = default, PlayerRef playerRef = default)
         {
-            if (!HasInputAuthority) return;
+            if (playerRef == default)
+            {
+                playerRef = _localPlayer;
+            }
 
             // ID入力がない(デフォルト)の場合は自分自身を使用 (AnimationEvent用)
             if (!sourceObjId.IsValid && Object)
@@ -68,35 +88,53 @@ namespace September.InGame
                 sourceObjId = Object.Id;
             }
 
-            CRIAudio.PlaySE(_cueSheet, cueName);                                                  // 2D再生
-            RPC_Request3DSound(sourceObjId, _cueSheet, cueName, (SoundTrackingType)trackingType); // 3D再生依頼
+            // 操作中のローカルプレイヤーからの音は2D再生を行う
+            if (playerRef == _localPlayer && HasInputAuthority == true)
+            {
+                CRIAudio.PlaySE(_cueSheet, cueName);                                                  // 2D再生
+                Debug.LogWarning("ローカル2D再生");
+            }
+            RPC_Request3DSound(sourceObjId, _cueSheet, cueName, (SoundTrackingType)trackingType);     // 3D再生依頼
         }
 
-        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        private void RPC_Request3DSound(NetworkId targetId, string sheet, string cue, SoundTrackingType tracking)
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        private void RPC_Request3DSound(NetworkId targetId, string sheet, string cue, SoundTrackingType tracking, PlayerRef playerRef = default)
         {
+            if (playerRef == default) 
+            {
+                playerRef = _localPlayer;
+            }
+
             // サーバーから All へ配布（ここは Host/Server だけが実行）
-            RPC_Play3DSound(targetId, sheet, cue, tracking);
+            RPC_Play3DSound(targetId, sheet, cue, tracking, playerRef);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_Play3DSound(NetworkId targetId, string sheetName, string cueName, SoundTrackingType trackingType)
+        private void RPC_Play3DSound(NetworkId targetId, string sheetName, string cueName, SoundTrackingType trackingType, PlayerRef playerRef = default)
         {
-            if (HasInputAuthority) return; // 操作中の場合は3D再生しない(二重再生防止)
+            if (playerRef == default)
+            {
+                playerRef = _localPlayer;
+            }
 
+            // 自分自身が操作中のローカルプレイヤーだったとき
+            if (playerRef == _localPlayer && HasInputAuthority == true) return; // 2D再生を既に行っているため二重再生防止
+
+            Debug.LogWarning("3D再生");
+
+            // 以下で3D再生を行う
             if (Runner.TryFindObject(targetId, out var networkObj))
             {
-                Transform followTransform = networkObj.transform;
-
+                Transform followTramsform = networkObj.transform;
 
                 if (trackingType == SoundTrackingType.Spot)
                 {
-                    CRIAudio.PlaySE(followTransform.position, sheetName, cueName);                // 3D再生
+                    CRIAudio.PlaySE(followTramsform.position, sheetName, cueName);                // 3D再生
                 }
                 else if (trackingType == SoundTrackingType.Follow)
                 {
-                    var sePlayer = CRIAudio.PlaySE(followTransform.position, sheetName, cueName); // 3D再生
-                    var followSound = new FollowEntry(followTransform, sePlayer);
+                    var sePlayer = CRIAudio.PlaySE(followTramsform.position, sheetName, cueName); // 3D再生
+                    var followSound = new FollowEntry(followTramsform, sePlayer);
                     _followingList.Add(followSound);                                              // 追跡リストに追加、LateUpdateで位置更新
                     Debug.Log($"追跡中の音数:{_followingList.Count}");
                 }
@@ -106,7 +144,6 @@ namespace September.InGame
                 Debug.LogWarning("SE再生位置に設定されているオブジェクトが見つかりません");
                 return;
             }
-
         }
 
         void LateUpdate()
