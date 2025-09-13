@@ -113,6 +113,7 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOn(PlayerRef playerRef)
         {
+            _currentHealth = _maxHealth;
             _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>()
                 .PlayerDataDic[playerRef].GetComponent<PlayerManager>();
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
