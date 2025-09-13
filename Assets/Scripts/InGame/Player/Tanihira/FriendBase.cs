@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using InGame.Health;
 using UnityEngine;
@@ -109,6 +110,7 @@ namespace Ingame.Tanihira
         {
             _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
             _agent.speed = _currentStatus.FriendFormationSpeed;
+            _agent.acceleration = _currentStatus.FriendAccleration;
         }
 
         /// <summary>
@@ -127,7 +129,7 @@ namespace Ingame.Tanihira
                 return;
             }
             
-            if (_currentState != FriendState.Wait)
+            if (_currentState == FriendState.Wait)
             {
                 //attackの場合はchaseに変えておく
                 if(newState == FriendState.Attack)
@@ -184,8 +186,15 @@ namespace Ingame.Tanihira
         private void OnHitEnemy(Collider hitInfo)
         {
             if (!HasStateAuthority) return;
+            var targetObj = hitInfo.GetComponentInParent<NetworkObject>();
+            if (targetObj == null || targetObj == _ownerPlayer) return;
+            //隊列の味方も除外
+            if (targetObj.TryGetComponent<FriendBase>(out var friend))
+            {
+                if (_formationManager != null && _formationManager.FriendsList != null && _formationManager.FriendsList.Contains(friend))
+                    return;
+            }
             
-            if (hitInfo.GetComponentInParent<NetworkObject>() == _ownerPlayer) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
             if (damageable == null) return;
             var hitData = new HitData(
