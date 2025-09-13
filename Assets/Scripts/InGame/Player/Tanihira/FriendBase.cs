@@ -35,6 +35,7 @@ namespace Ingame.Tanihira
         [SerializeField] protected HitChecker _hitChecker;
         [SerializeField, ReadOnly] protected FriendState _currentState;
         [SerializeField] private GameObject _tutankhamen;
+        [Networked] private NetworkBool HasMask { get; set; }
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -52,7 +53,7 @@ namespace Ingame.Tanihira
         public Animator Animator => _animator;
         public FormationManager FormationManager => _formationManager;
         public Transform Destination => _destination;
-        public NetworkRunner NetworkRunner => _networkRunner;
+        public NetworkRunner FriendRunner => _networkRunner;
         public Transform FormationPos => _formationPos;
         public FriendStatus CurrentFriendStatus => _currentStatus;
         public FriendState CurrentState => _currentState;
@@ -60,22 +61,11 @@ namespace Ingame.Tanihira
         public bool IsAttack => _isAttack;
         public FriendState WaitStockState => _waitStockState;
         public NetworkObject OwnerPlayer => _ownerPlayer;
-
-        protected virtual void Awake()
-        {
-            _networkRunner = FindFirstObjectByType<NetworkRunner>();
-            if (_networkRunner == null)
-            {
-                Debug.LogError("NetworkRunnerがありません");
-            }
-            if (!_networkRunner.IsServer) return;
-            
-            //ステータスをコピー
-            _currentStatus = _friendStatus.Clone();
-        }
+        public GameObject Tutankhamen => _tutankhamen;
         
-        protected virtual void Start()
+        public override void Spawned()
         {
+            _currentStatus = _friendStatus.Clone();
             //Noneステートの設定
             _friendStateMappings[FriendState.None] = new FriendNoneState();
             _agent = GetComponent<NavMeshAgent>();
@@ -86,7 +76,7 @@ namespace Ingame.Tanihira
 
         public override void FixedUpdateNetwork()
         {
-            if (!_networkRunner.IsServer && !HasInputAuthority) return;
+            if (!HasStateAuthority) return;
             
             // 現在のステートのUpdateを呼び出し
             _friendStateMappings[_currentState]?.OnUpdate(this);
@@ -230,9 +220,15 @@ namespace Ingame.Tanihira
             _isAttack = false;
         }
 
-        public void StartBuff()
+        public override void Render()
         {
-            _tutankhamen.SetActive(true);
+            if(_tutankhamen)
+                _tutankhamen.SetActive(HasMask);
+        }
+        public void SetMask(bool value)
+        {
+            if (!HasStateAuthority) return;
+            HasMask = value;
         }
 
         public void StartBuff(float buffRate)
@@ -249,7 +245,6 @@ namespace Ingame.Tanihira
             _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
             _currentStatus.AttackPower = _friendStatus.AttackPower;
             ApplyStatus();
-            _tutankhamen.SetActive(false);
         }
 
         private void ApplyStatus()

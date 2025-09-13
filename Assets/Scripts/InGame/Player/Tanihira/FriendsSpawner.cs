@@ -24,6 +24,9 @@ namespace InGame.Tanihira
         //初期化処理
         private void Initialize()
         {
+            if(!HasInputAuthority)
+                return;
+            
             _networkRunner = FindFirstObjectByType<NetworkRunner>();
             if (_networkRunner == null)
             {
