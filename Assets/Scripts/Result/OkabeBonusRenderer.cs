@@ -80,7 +80,6 @@ namespace Result
 
         public int Render(ResultDataInbox inbox, Transform rowRoot, GameObject rowPrefab, TextMeshProUGUI abilityTitle)
         {
-            // GrapplingHookCount を ResultDataInbox に追加する必要あり
             int count = inbox.GrapplingHookCount;
             int score = count * _scorePerHook;
 
@@ -108,7 +107,6 @@ namespace Result
 
         public int Render(ResultDataInbox inbox, Transform rowRoot, GameObject rowPrefab, TextMeshProUGUI abilityTitle)
         {
-            // FriendExhibitCount を ResultDataInbox に追加する必要あり
             int count = inbox.FriendExhibitCount;
             int score = count * _scorePerFriend;
 

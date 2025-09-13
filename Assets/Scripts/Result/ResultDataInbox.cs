@@ -6,7 +6,6 @@ namespace Result
 {
     public class ResultDataInbox : SingletonMonoBehaviour<ResultDataInbox>
     {
-        public int RoundId { get; private set; }
         public int StunCount { get; private set; }
         public int PageTotal { get; private set; } 
         
@@ -27,7 +26,6 @@ namespace Result
         /// </summary>
         public void Clear()
         {
-            RoundId = 0;
             StunCount = 0;
             PageTotal = 0;
             GrapplingHookCount = 0;
@@ -39,12 +37,11 @@ namespace Result
 
         /// <summary>
         /// サーバーから送られてきた文字列をデコードして保存
+        /// 文字は頭文字
         /// </summary>
-        public void LoadFromEncoded(int roundId, string payload, int pageTotal)
+        public void LoadFromEncoded(string payload, int pageTotal)
         {
-            RoundId = roundId;
             PageTotal = pageTotal;
-
             _exhibitCounts.Clear();
             _destroyedExhibitCounts.Clear();
             StunCount = 0;
@@ -76,12 +73,14 @@ namespace Result
                         foreach (string it in items)
                         {
                             string[] kv = it.Split('=', StringSplitOptions.RemoveEmptyEntries);
-                            if (kv.Length != 2) continue;
+                            if (kv.Length != 2) 
+                                continue;
 
                             if (Enum.TryParse(kv[0], out ExhibitType t) &&
                                 int.TryParse(kv[1], out int c))
                             {
                                 _exhibitCounts[t] = Mathf.Max(0, c);
+                                Debug.Log($"インタラクトのカウント{_exhibitCounts[t]}ふやしました");
                             }
                         }
                     }

@@ -53,7 +53,8 @@ namespace Result
 
         private void Update()
         {
-            if (!_isActive || _isAnimating) return;
+            if (!_isActive || _isAnimating) 
+                return;
 
             if (_gameInput.UI.PageSlide.triggered)
             {
@@ -65,27 +66,30 @@ namespace Result
                 }
             }
 
-            if (_gameInput.UI.PageSlideBack.triggered || _gameInput.UI.Cancel.triggered)
-            {
-                if (_stack.Count > 1)
-                    PopAsync().Forget();
-            }
+            if (!_gameInput.UI.PageSlideBack.triggered && !_gameInput.UI.Cancel.triggered)
+                return;
+            
+            if (_stack.Count > 1)
+                PopAsync().Forget();
         }
+        
+        private ResultDataInbox _resultDataInbox;
 
         public void Initialize()
         {
             _gameInput = new GameInput();
             _gameInput.Enable();
             _isActive = true;
+            _resultDataInbox = ResultDataInbox.I;
             
-            ResultDataInbox.I.OnChanged += SetExhibitPage;
+            _resultDataInbox.OnChanged += SetExhibitPage;
 
             RectTransform rootRt = (RectTransform)transform;
             _canvasWidth = rootRt.rect.width;
 
             for (int i = 0; i < _pages.Length; i++)
             {
-                var p = _pages[i];
+                RectTransform p = _pages[i];
                 if (!p) 
                     continue;
 
@@ -175,24 +179,25 @@ namespace Result
             // 既存の行を消去
             foreach (Transform child in _exhibitRowRoot)
                 Destroy(child.gameObject);
-
-            ResultDataInbox inbox = ResultDataInbox.I;
             
-            Debug.Assert(inbox);
-            Debug.Log(_exhibitScoreConfig.Entries.Count);
+            Debug.Assert(_resultDataInbox);
             
             int totalScore = 0;
             
+            // インタラクトできる種類とスコアを取得
             foreach (ExhibitScoreEntry entry in _exhibitScoreConfig.Entries)
             {
+                // 展示物の種類　例　プテラ
                 ExhibitType type = entry.Type;
+                // 登録した種類
                 int point = entry.Points;
-
-                int count = inbox.ExhibitCounts.GetValueOrDefault(type, 0);
+                // 何回インタラクトしたか
+                int count = _resultDataInbox.ExhibitCounts.GetValueOrDefault(type, 0);
+                // スコアとインタラクト回数を乗算
                 int score = count * point;
 
                 GameObject row = Instantiate(_exhibitRowPrefab, _exhibitRowRoot);
-                var texts = row.GetComponentsInChildren<TextMeshProUGUI>(true);
+                TextMeshProUGUI[] texts = row.GetComponentsInChildren<TextMeshProUGUI>(true);
 
                 if (texts.Length >= 3)
                 {
@@ -201,9 +206,7 @@ namespace Result
                     texts[2].text = score.ToString();
                 }
                 else
-                {
                     Debug.LogError("[SetExhibitPage] Prefab に Text が3つ無い");
-                }
                 
                 totalScore += score;
             }
@@ -214,7 +217,6 @@ namespace Result
         
         private void SetAbilityBonusPage()
         {
-            // 既存の行を消去
             foreach (Transform child in _abilityRowRoot)
                 Destroy(child.gameObject);
 
@@ -223,25 +225,21 @@ namespace Result
                 return;
 
             int totalScore = 0;
-
-            // ローカルプレイヤーのキャラタイプを取得
-            var db = PlayerDatabase.Instance;
-            if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out var localData))
+            
+            PlayerDatabase db = PlayerDatabase.Instance;
+            if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out SessionPlayerData localData))
             {
                 Debug.LogWarning("[SetAbilityBonusPage] Local player data not found");
                 return;
             }
             CharacterType chara = localData.CharacterType;
-
-            // ボーナスレンダラーがあれば実行
+            
             if (_bonusRenderers != null && _bonusRenderers.TryGetValue(chara, out IAbilityBonusRenderer r))
             {
                 totalScore = r.Render(inbox, _abilityRowRoot, _abilityRowPrefab, _abilityTitle);
             }
             else
-            {
                 Debug.Log($"[SetAbilityBonusPage] No bonus renderer for {chara}");
-            }
 
             if (_abilityTotalText)
                 _abilityTotalText.text = totalScore.ToString();
@@ -255,9 +253,8 @@ namespace Result
             RectTransform top = _stack.Peek();
             int idx = Array.IndexOf(_pages, top);
             int next = Mathf.Clamp(idx + 1, 0, _pages.Length - 1);
-            if (next == idx) 
-                return null;
-            return _pages[next];
+            
+            return next == idx ? null : _pages[next];
         }
 
         private async UniTask PushAsync(RectTransform nextPage, bool first = false)
@@ -327,7 +324,7 @@ namespace Result
 
         private CanvasGroup EnsureCanvasGroup(RectTransform rt)
         {
-            if (!rt.TryGetComponent<CanvasGroup>(out var cg) || !cg)
+            if (!rt.TryGetComponent(out CanvasGroup cg) || !cg)
                 cg = rt.gameObject.AddComponent<CanvasGroup>();
             return cg;
         }
