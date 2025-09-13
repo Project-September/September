@@ -19,7 +19,6 @@ namespace September.Common
         public static PlayerDatabase Instance;
         
         private readonly Dictionary<PlayerRef, ScoreTracker> _serverTrackers = new();
-        private int _currentRoundId = 0;
         
         public override void Spawned()
         {
@@ -43,8 +42,6 @@ namespace September.Common
                 _serverTrackers[actor] = tracker = new ScoreTracker(_config);
 
             tracker.AddInteract(type);
-            Debug.Log($"[Server_AddExhibit] {actor} got {type}, count={tracker.GetInteractCount(type)}, total={tracker.CalcTotal()}");
-
             UpdatePlayerScore(actor, tracker);
         }
 
@@ -66,7 +63,7 @@ namespace September.Common
         public int Server_GetTotal(PlayerRef actor)　=> !_serverTrackers.TryGetValue(actor, out ScoreTracker tracker) ? 0 : tracker.CalcTotal();
         private void UpdatePlayerScore(PlayerRef actor, ScoreTracker tracker)
         {
-            if (PlayerDataDic.TryGet(actor, out var d))
+            if (PlayerDataDic.TryGet(actor, out SessionPlayerData d))
             {
                 d.Score = tracker.CalcTotal();
                 PlayerDataDic.Set(actor, d);
@@ -78,21 +75,17 @@ namespace September.Common
         {
             if(!Object.HasStateAuthority)
                 return;
-            
-            _currentRoundId++;
 
             foreach (var kv in PlayerDataDic)
             {
                 PlayerRef player = kv.Key;
                 SessionPlayerData data =  kv.Value;
-                
-                // 詳細を取得
                 _serverTrackers.TryGetValue(player, out ScoreTracker tracker);
 
                 if (tracker == null)
                 {
                     Debug.LogWarning($"[ResultPush] No tracker for {player}.");
-                    Rpc_SendPersonalResult( _currentRoundId, "", data.Score);
+                    Rpc_SendPersonalResult( player,"", data.Score);
                     continue;
                 }
                 
@@ -107,7 +100,7 @@ namespace September.Common
                 
                 // 個人詳細をエンコードして当人にだけ送る
                 string payload = EncodeDetailV2(tracker);
-                Rpc_SendPersonalResult(_currentRoundId, payload, calc);
+                Rpc_SendPersonalResult(player, payload, calc);
             }
         }
 
@@ -130,16 +123,18 @@ namespace September.Common
             return sb.ToString();
         }
         
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
-        private void Rpc_SendPersonalResult( int roundId, string encodedPayload, int pageTotal)
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void Rpc_SendPersonalResult(PlayerRef target, string encodedPayload, int pageTotal)
         {
-            // クライアント受信：ResultDataInboxへ保存
+            if (Runner.LocalPlayer != target) 
+                return;
+            
             if (!ResultDataInbox.I)
             {
                 GameObject go = new("[ResultDataInbox]");
                 go.AddComponent<ResultDataInbox>();
             }
-            ResultDataInbox.I.LoadFromEncoded(roundId, encodedPayload, pageTotal);
+            ResultDataInbox.I.LoadFromEncoded(encodedPayload, pageTotal);
         }
         
         public void AddPlayerData(PlayerRef playerRef)
@@ -168,7 +163,6 @@ namespace September.Common
         {
             ChangedDataAction?.Invoke(PlayerDataDic);
         }
-    
     }
 }
 

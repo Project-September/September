@@ -36,8 +36,6 @@ namespace September.InGame.UI
         private UniTask _ogreMessageTask;
 
         private CancellationTokenSource _cts;
-        
-        
 
         private void Awake()
         {
@@ -86,7 +84,7 @@ namespace September.InGame.UI
 
         private void ChangeHp(int value)
         {
-            if (_hpBarSlider == null)
+            if (!_hpBarSlider)
                 return;
 
             DOTween.To(() => _hpBarSlider.value, x => _hpBarSlider.value = x, value, 0.3f)
@@ -102,7 +100,7 @@ namespace September.InGame.UI
 
         private void ChangeStamina(float value)
         {
-            if (_staminaBarSlider == null) 
+            if (!_staminaBarSlider) 
                 return;
             
             _staminaBarSlider.value = value;
@@ -111,11 +109,12 @@ namespace September.InGame.UI
         // キルのログを直接引数に入れる
         private async UniTask ShowKillLog(string killText)
         {
-            if (_killLogText == null)
+            if (!_killLogText)
                 return;
 
             _killLogText.text = killText;
             _killLogUI.SetActive(true);
+            _killLogText.gameObject.SetActive(true);
 
             RectTransform rect = _killLogText.GetComponent<RectTransform>();
             CanvasGroup canvasGroup = _killLogText.GetComponent<CanvasGroup>();
@@ -144,7 +143,7 @@ namespace September.InGame.UI
         // ToDo : タイマークラスを作成してアニメーションなどを柔軟に行えるようにする
         private async UniTask ShowGameStartTime()
         {
-            if (_uiRoot == null || _uiRoot.TimerText == null) 
+            if (!_uiRoot || !_uiRoot.TimerText) 
                 return;
             
             TextMeshProUGUI timer = _uiRoot.TimerText;
