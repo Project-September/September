@@ -92,7 +92,6 @@ namespace September.InGame
             if (playerRef == _localPlayer && HasInputAuthority == true)
             {
                 CRIAudio.PlaySE(_cueSheet, cueName);                                                  // 2D再生
-                Debug.LogWarning("ローカル2D再生");
             }
             RPC_Request3DSound(sourceObjId, _cueSheet, cueName, (SoundTrackingType)trackingType);     // 3D再生依頼
         }
@@ -120,8 +119,6 @@ namespace September.InGame
             // 自分自身が操作中のローカルプレイヤーだったとき
             if (playerRef == _localPlayer && HasInputAuthority == true) return; // 2D再生を既に行っているため二重再生防止
 
-            Debug.LogWarning("3D再生");
-
             // 以下で3D再生を行う
             if (Runner.TryFindObject(targetId, out var networkObj))
             {
@@ -136,7 +133,6 @@ namespace September.InGame
                     var sePlayer = CRIAudio.PlaySE(followTramsform.position, sheetName, cueName); // 3D再生
                     var followSound = new FollowEntry(followTramsform, sePlayer);
                     _followingList.Add(followSound);                                              // 追跡リストに追加、LateUpdateで位置更新
-                    Debug.Log($"追跡中の音数:{_followingList.Count}");
                 }
             }
             else
