@@ -11,9 +11,13 @@ namespace Ingame.Tanihira
 {
     public class FormationManager : NetworkBehaviour
     {
+        [Header("隊列の設定")]
         [SerializeField] private Transform _firstFormationTransform;
         [SerializeField] private float _formationOffset = 1.0f;
+        [Header("ワープ設定")] 
+        [SerializeField] private float _warpSerchDistance = 10.0f;
         [SerializeField] private float _outFieldWarpHeight = 100.0f;
+        [SerializeField] private float _inFieldWarpHeight = 10.0f;
         private List<FriendBase> _friendsList = new List<FriendBase>();
         private List<FriendBase> _currentFriendsList = new List<FriendBase>();
         private Transform _playerTransform;
@@ -135,8 +139,9 @@ namespace Ingame.Tanihira
             foreach (FriendBase friend in _currentFriendsList)
             {
                 var fixedPos = warpPosition;
+                fixedPos.y = _outFieldWarpHeight;
                 NavMeshHit hit;
-                if (NavMesh.SamplePosition(warpPosition, out hit, 10.0f, NavMesh.AllAreas))
+                if (NavMesh.SamplePosition(fixedPos, out hit, _warpSerchDistance, NavMesh.AllAreas))
                 {
                     // NavMesh上にワープ
                     fixedPos = hit.position + Vector3.up * friend.Agent.baseOffset;
@@ -178,5 +183,14 @@ namespace Ingame.Tanihira
                 networkTransform.Teleport(warpPos);
             }
         }
+        
+#if UNITY_EDITOR       
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = new Color(1, 0, 1, 0.5f); // 半透明
+            Vector3 startPos = new Vector3(0, _inFieldWarpHeight, 0);
+            Gizmos.DrawWireCube(startPos, new Vector3(10, 1, 10));
+        }
+#endif
     }
 }
