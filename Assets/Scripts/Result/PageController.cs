@@ -4,9 +4,11 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
+using NaughtyAttributes;
 using September.Common;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Result
 {
@@ -29,6 +31,7 @@ namespace Result
         [Header("2ページ目: スタン")]
         [SerializeField] private Transform _stunRowRoot;
         [SerializeField] private TextMeshProUGUI _stunTotalText;
+        [SerializeField,Label("スタンさせたときのスコア")] private int StunPoint = 150;
 
         [Header("3ページ目　インタラクト")]
         [SerializeField] private Transform _exhibitRowRoot;
@@ -49,12 +52,26 @@ namespace Result
         [SerializeField] private int _tanihiraBonusScore = 100;
         
         private Dictionary<CharacterType, IAbilityBonusRenderer> _bonusRenderers;
-        private const int StunPoint = 150;
+        private ResultDataInbox _resultDataInbox;
+        private bool _isFinish;
+
+        private void Awake()
+        {
+            _isFinish = false;
+        }
 
         private void Update()
         {
             if (!_isActive || _isAnimating) 
                 return;
+
+            // リザルト画面に以降する
+            if (_isFinish && _gameInput.Result.Finish.triggered)
+            {
+                //NetworkManager.Instance.QuitInGame().Forget();
+                SceneManager.UnloadSceneAsync("Field");
+                SceneManager.LoadSceneAsync("Result", LoadSceneMode.Single);
+            }
 
             if (_gameInput.UI.PageSlide.triggered)
             {
@@ -72,12 +89,10 @@ namespace Result
             if (_stack.Count > 1)
                 PopAsync().Forget();
         }
-        
-        private ResultDataInbox _resultDataInbox;
 
         public void Initialize()
         {
-            _gameInput = new GameInput();
+            _gameInput = GameInput.I;
             _gameInput.Enable();
             _isActive = true;
             _resultDataInbox = ResultDataInbox.I;
@@ -112,6 +127,7 @@ namespace Result
             SetStunPage();
             SetExhibitPage();
             SetAbilityBonusPage();
+            _isFinish = true;
         }
 
         /// <summary>

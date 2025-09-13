@@ -52,11 +52,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 3
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 3
   _characterEffects:
@@ -76,7 +76,7 @@ MonoBehaviour:
     - rid: 5190192992005652564
       type: {class: MoaiInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         MoaiInteractInvoker: {fileID: 8829714614392578707}
 --- !u!114 &8436487958072541038
 MonoBehaviour:

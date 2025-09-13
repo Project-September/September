@@ -161,11 +161,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 2
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 10
   _characterEffects:
@@ -185,7 +185,7 @@ MonoBehaviour:
     - rid: 3302172163222274141
       type: {class: WarpInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         _warpDestination: {fileID: 0}
         _warpDuration: 0.5
         _warpPosition: {fileID: 0}

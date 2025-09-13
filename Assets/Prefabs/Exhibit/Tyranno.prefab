@@ -4092,13 +4092,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
-    - 1
+    - 3
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
-    - 1
+    - 5
   _characterEffects:
   - rid: 6899644472827052118
   _type: 2
@@ -4116,7 +4116,7 @@ MonoBehaviour:
     - rid: 6899644472827052118
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         _interactTime: 10
         _tyrannoInteractable: {fileID: 6364766241162311564}
 --- !u!114 &3882540875740709923
@@ -4167,6 +4167,7 @@ MonoBehaviour:
   _rayDistance: 1.3
   _gravity: {x: 0, y: -200, z: 0}
   _maxRotateValue: 500
+  _cooldownTime: 0
 --- !u!114 &5666963229739266544
 MonoBehaviour:
   m_ObjectHideFlags: 0

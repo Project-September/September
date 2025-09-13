@@ -6,9 +6,6 @@ namespace Result
 {
     public class ResultDataInbox : SingletonMonoBehaviour<ResultDataInbox>
     {
-        public int StunCount { get; private set; }
-        public int PageTotal { get; private set; } 
-        
         private readonly Dictionary<ExhibitType, int> _exhibitCounts = new();
         public IReadOnlyDictionary<ExhibitType, int> ExhibitCounts => _exhibitCounts;
         
@@ -26,8 +23,6 @@ namespace Result
         /// </summary>
         public void Clear()
         {
-            StunCount = 0;
-            PageTotal = 0;
             GrapplingHookCount = 0;
             FriendExhibitCount = 0;
             _exhibitCounts.Clear();
@@ -41,10 +36,8 @@ namespace Result
         /// </summary>
         public void LoadFromEncoded(string payload, int pageTotal)
         {
-            PageTotal = pageTotal;
             _exhibitCounts.Clear();
             _destroyedExhibitCounts.Clear();
-            StunCount = 0;
             GrapplingHookCount = 0;
             FriendExhibitCount = 0;
 
@@ -80,7 +73,6 @@ namespace Result
                                 int.TryParse(kv[1], out int c))
                             {
                                 _exhibitCounts[t] = Mathf.Max(0, c);
-                                Debug.Log($"インタラクトのカウント{_exhibitCounts[t]}ふやしました");
                             }
                         }
                     }
@@ -103,7 +95,7 @@ namespace Result
                     {
                         string s = b[2..];
                         if (int.TryParse(s, out int stun))
-                            StunCount = Mathf.Max(0, stun);
+                            Mathf.Max(0, stun);
                     }
                     else if (b.StartsWith("G:")) 
                     {

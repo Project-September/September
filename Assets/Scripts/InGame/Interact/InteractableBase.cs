@@ -77,22 +77,11 @@ namespace InGame.Interact
             OnInteract(context);
 
             // 実行者
-            var actor = PlayerRef.FromEncoded(context.Interactor);
+            PlayerRef actor = PlayerRef.FromEncoded(context.Interactor);
             
             if (_type != ExhibitType.None)
             {
                 PlayerDatabase.Instance.Server_AddExhibit(actor, _type);
-                
-                if (PlayerDatabase.Instance.PlayerDataDic.TryGet(actor, out var data))
-                {
-                    var playerName = data.DisplayNickName;
-                    var count = PlayerDatabase.Instance.Server_GetTotal(actor); 
-                    Debug.Log($"[Score] {playerName} {_type} Interact → Total={count}");
-                }
-                else
-                {
-                    Debug.Log($"[Score] {actor} {_type} Interact");
-                }
             }
         }
 

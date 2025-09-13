@@ -192,11 +192,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _characterEffects:
@@ -216,7 +216,7 @@ MonoBehaviour:
     - rid: 5190193405626941525
       type: {class: CarInteractEffect, ns: InGame.Exhibit.InteractEffect, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         CarInteractable: {fileID: 2605522184190301224}
 --- !u!114 &2445524348534426417
 MonoBehaviour:
