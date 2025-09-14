@@ -96,6 +96,32 @@ namespace September.InGame
             RPC_Request3DSound(sourceObjId, _cueSheet, cueName, (SoundTrackingType)trackingType);     // 3D再生依頼
         }
 
+        /// <summary>
+        /// Spot固定の音再生
+        /// NetworkObject以外のポジション指定用(Vector3)
+        /// 3D再生
+        /// </summary>
+        /// <param name="cueName"></param>
+        /// <param name="worldPos"></param>
+        public void PlaySoundAtPosition(string cueName, Vector3 worldPos)
+        {
+            if (!HasStateAuthority) return;
+            RPC_Request3DSoundAtPosition(worldPos, _cueSheet, cueName);
+        }
+
+        /// <summary>
+        /// Spot固定の音再生
+        /// NetworkObject以外のポジション指定用(Transform)
+        /// 3D再生
+        /// </summary>
+        /// <param name="cueName"></param>
+        /// <param name="transform"></param>
+        public void PlaySoundAtTransform(string cueName, Transform transform)
+        {
+            if (!transform) return;
+            PlaySoundAtPosition(cueName, transform.position);
+        }
+
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
         private void RPC_Request3DSound(NetworkId targetId, string sheet, string cue, SoundTrackingType tracking, PlayerRef playerRef = default)
         {
@@ -140,6 +166,12 @@ namespace September.InGame
                 Debug.LogWarning("SE再生位置に設定されているオブジェクトが見つかりません");
                 return;
             }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_Request3DSoundAtPosition(Vector3 worldPos, string sheetName, string cueName)
+        {
+            CRIAudio.PlaySE(worldPos, sheetName, cueName);
         }
 
         void LateUpdate()
