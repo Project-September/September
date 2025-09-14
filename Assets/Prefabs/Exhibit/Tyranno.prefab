@@ -3912,6 +3912,7 @@ GameObject:
   - component: {fileID: 3882540875740709923}
   - component: {fileID: 6364766241162311564}
   - component: {fileID: 5666963229739266544}
+  - component: {fileID: 1202300003036827832}
   m_Layer: 0
   m_Name: Tyranno
   m_TagString: Untagged
@@ -4008,6 +4009,7 @@ MonoBehaviour:
   - {fileID: 4503392173304417129}
   - {fileID: 3882540875740709923}
   - {fileID: 6364766241162311564}
+  - {fileID: 1202300003036827832}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &5100037498407888784
 MonoBehaviour:
@@ -4107,6 +4109,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 1202300003036827832}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -4182,6 +4187,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 4503392173304417129}
+--- !u!114 &1202300003036827832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8352061886232285223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1 &8550128332805089152
 GameObject:
   m_ObjectHideFlags: 0

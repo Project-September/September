@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7512599895438545304}
   - component: {fileID: 3108143053938868281}
   - component: {fileID: 3011504772297411474}
+  - component: {fileID: 6318056708501723071}
   m_Layer: 0
   m_Name: BokeBoke
   m_TagString: Untagged
@@ -67,6 +68,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 6318056708501723071}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -98,6 +102,7 @@ MonoBehaviour:
   - {fileID: 1248590409878750981}
   - {fileID: 8829714614392578707}
   - {fileID: 3108143053938868281}
+  - {fileID: 6318056708501723071}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8829714614392578707
 MonoBehaviour:
@@ -189,6 +194,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 1248590409878750981}
+--- !u!114 &6318056708501723071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1292007954863827809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1 &1442449213948767143
 GameObject:
   m_ObjectHideFlags: 0

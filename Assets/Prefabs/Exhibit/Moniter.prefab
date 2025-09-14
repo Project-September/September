@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1631707056656396585}
   - component: {fileID: 1109377942412471749}
   - component: {fileID: -8354369273336728333}
+  - component: {fileID: 2769590208293396546}
   m_Layer: 0
   m_Name: Moniter
   m_TagString: Untagged
@@ -56,6 +57,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 536499402856614603}
   - {fileID: 1631707056656396585}
+  - {fileID: 2769590208293396546}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &536499402856614603
 MonoBehaviour:
@@ -85,6 +87,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 2769590208293396546}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -150,6 +155,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 536499402856614603}
+--- !u!114 &2769590208293396546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169062250687249688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1001 &4388365964989820408
 PrefabInstance:
   m_ObjectHideFlags: 0

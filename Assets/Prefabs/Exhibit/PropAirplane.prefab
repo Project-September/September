@@ -922,6 +922,7 @@ GameObject:
   - component: {fileID: 6773177065010528805}
   - component: {fileID: -5982283155467583323}
   - component: {fileID: -8190595206022697743}
+  - component: {fileID: 4308694996682901781}
   m_Layer: 0
   m_Name: PropAirplane
   m_TagString: Untagged
@@ -1019,6 +1020,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6751401814558250722}
   - {fileID: 6773177065010528805}
+  - {fileID: 4308694996682901781}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &6751401814558250722
 MonoBehaviour:
@@ -1071,6 +1073,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 4308694996682901781}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -1156,6 +1161,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 0}
+--- !u!114 &4308694996682901781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228950578283369073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1 &7384611136017809608
 GameObject:
   m_ObjectHideFlags: 0

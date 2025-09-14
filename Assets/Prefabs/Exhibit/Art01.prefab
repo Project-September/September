@@ -102,6 +102,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5515927971026239416}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2531934738477890898}
   m_SourcePrefab: {fileID: 100100000, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}
 --- !u!1 &3948263822443002454 stripped
 GameObject:
@@ -147,6 +150,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7031200934987414312}
+  - {fileID: 2531934738477890898}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &7031200934987414312
 MonoBehaviour:
@@ -176,6 +180,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 2531934738477890898}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -205,6 +212,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 7031200934987414312}
+--- !u!114 &2531934738477890898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3948263822443002454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!4 &4431785762032050412 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e25c5601d17f3f64092628eb0bb45db2, type: 3}

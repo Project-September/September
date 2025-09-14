@@ -344,10 +344,5 @@ namespace Result
                 cg = rt.gameObject.AddComponent<CanvasGroup>();
             return cg;
         }
-
-        private void OnDisable()
-        {
-            _gameInput.Disable();
-        }
     }
 }

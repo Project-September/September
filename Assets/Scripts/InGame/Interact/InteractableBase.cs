@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Fusion;
 using September.Common;
 using UnityEngine;
@@ -7,9 +7,13 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Result;
 using September.InGame.Effect;
+using September.InGame;
+using CRISound;
+using WebSocketSharp;
 
 namespace InGame.Interact
 {
+    [RequireComponent(typeof (AudioBroadcaster))] // サウンド再生用のコンポーネント
     [DisallowMultipleComponent]
     public class InteractableBase : NetworkBehaviour
     {
@@ -25,6 +29,9 @@ namespace InGame.Interact
         [SerializeField] private EffectType _interactEffectType = EffectType.NormalInteractComplete;
         [SerializeField] private EffectType _cooldownEffectType = EffectType.CooldownSquare;
         [SerializeField] private bool _spawnCooldownEffectOnStart = true;
+        [SerializeField] private AudioBroadcaster _audioBroadcaster;
+        [SerializeField] private string _interactSoundCueName;
+        [SerializeField] private SoundTrackingType _interactSoundTrackingType = SoundTrackingType.Spot;
 
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
@@ -152,6 +159,9 @@ namespace InGame.Interact
             {
                 _activeEffectBase = effect.Clone();
                 _activeEffectBase.OnInteractStart(context, this);
+
+                if (_interactSoundCueName.IsNullOrEmpty()) return;
+                _audioBroadcaster.PlaySoundFromCode(_interactSoundCueName, (int)_interactSoundTrackingType, Object.Id); // 全体3D再生
             }
             else
             {
