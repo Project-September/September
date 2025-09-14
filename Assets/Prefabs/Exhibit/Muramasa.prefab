@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8618729755284100401}
   - component: {fileID: 7519097605473453328}
   - component: {fileID: -881610955048844292}
+  - component: {fileID: 884689928168090516}
   m_Layer: 0
   m_Name: Muramasa
   m_TagString: Untagged
@@ -135,6 +136,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 884689928168090516}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -159,4 +163,18 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7519097605473453328}
+  - {fileID: 884689928168090516}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &884689928168090516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5764894245619052002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
