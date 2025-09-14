@@ -173,6 +173,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d62732ea444869d4fbaa91569b884dcc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1470605871195394660}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d62732ea444869d4fbaa91569b884dcc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8562786234446322791}
   m_SourcePrefab: {fileID: 100100000, guid: d62732ea444869d4fbaa91569b884dcc, type: 3}
 --- !u!1 &2844190075288522215 stripped
 GameObject:
@@ -207,6 +210,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 8562786234446322791}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -237,6 +243,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4731277372856524398}
   - {fileID: 2605522184190301224}
+  - {fileID: 8562786234446322791}
   ForceRemoteRenderTimeframe: 0
 --- !u!65 &2604388470956955840
 BoxCollider:
@@ -285,6 +292,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _damage: 0
 --- !u!114 &1470605871195394660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,6 +316,19 @@ MonoBehaviour:
   m_ObjectForwardAxis: 2
   m_ObjectUpAxis: 1
   m_StartOffset: 0
+--- !u!114 &8562786234446322791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2844190075288522215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!4 &3184967845531604829 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d62732ea444869d4fbaa91569b884dcc, type: 3}
