@@ -9,6 +9,7 @@ using Result;
 using September.InGame.Effect;
 using September.InGame;
 using CRISound;
+using WebSocketSharp;
 
 namespace InGame.Interact
 {
@@ -159,7 +160,7 @@ namespace InGame.Interact
                 _activeEffectBase = effect.Clone();
                 _activeEffectBase.OnInteractStart(context, this);
 
-                if (_interactSoundCueName == null) return;
+                if (_interactSoundCueName.IsNullOrEmpty()) return;
                 _audioBroadcaster.PlaySoundFromCode(_interactSoundCueName, (int)_interactSoundTrackingType, Object.Id); // 全体3D再生
             }
             else
