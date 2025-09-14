@@ -139,7 +139,7 @@ namespace Ingame.Tanihira
             foreach (FriendBase friend in _currentFriendsList)
             {
                 var fixedPos = warpPosition;
-                fixedPos.y = _outFieldWarpHeight;
+                fixedPos.y = _inFieldWarpHeight;
                 NavMeshHit hit;
                 if (NavMesh.SamplePosition(fixedPos, out hit, _warpSerchDistance, NavMesh.AllAreas))
                 {
@@ -175,7 +175,7 @@ namespace Ingame.Tanihira
             //少し待ってから移動させる
             await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration), cancellationToken: _cts.Token);
             
-            Vector3 warpPos = new Vector3(0, 0 , _outFieldWarpHeight);
+            Vector3 warpPos = new Vector3(0, _outFieldWarpHeight , 0);
             //フレンドを全員ワープさせる
             foreach (FriendBase friend in _friendsList)
             {
