@@ -75,7 +75,7 @@ namespace September.InGame
         /// <param name="trackingType">短い音→ Spot(0)、移動しながら鳴る音→ Follow(1)</param>
         /// <param name="sourceObjId"> 発声元のオブジェクト </param>
         /// <param name="playerRef"> ローカル環境のPlayer デフォルト = スクリプトが付いたオブジェクトの環境プレイヤー</param>
-        public void PlaySoundFromCode(string cueName, int trackingType, NetworkId sourceObjId = default, PlayerRef playerRef = default)
+        public void PlaySoundFromCode(string cueName, int trackingType = default, NetworkId sourceObjId = default, PlayerRef playerRef = default)
         {
             if (playerRef == default)
             {
