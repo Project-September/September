@@ -22,9 +22,10 @@ namespace September.Common
             ShowCursor();
             if(!string.IsNullOrEmpty(Context.CurrentBGM)) CRIAudio.StopBGM("BGM", Context.CurrentBGM);
             // ここにエンド処理
+            GameInput.I.ToggleMoveInput(false);
+            GameInput.I.ToggleActionInput(false);
             PlayerDatabase.Instance.Server_PushResultToClients();
             UIController.I.ShowResultAnimation();
-            GameInput.I.ToggleMoveInput(false);
         }
         private void ShowCursor()
         {
