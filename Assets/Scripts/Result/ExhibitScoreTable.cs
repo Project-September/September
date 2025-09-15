@@ -1,20 +1,33 @@
 using System;
+using System.Reflection;
 
 namespace Result
 {
     public enum ExhibitType : byte
     {
+        [DisplayName("なし")]
         None,
+        [DisplayName("プテラ")]
         Ptr,
+        [DisplayName("ティラノサウルス")]
         TRex,
+        [DisplayName("アート")]
         Art,
+        [DisplayName("飛行機")]
         AirPlane,
+        [DisplayName("光学迷彩")]
         FlagealCamouflage,
+        [DisplayName("ツタンカーメン")]
         Tutankhamun,
+        [DisplayName("ロンドンテレフォン")]
         LondonTelephone,
+        [DisplayName("車")]
         Car,
+        [DisplayName("モアイ像")]
         Moai,
+        [DisplayName("サテライトキャノン")]
         SateliteCanon,
+        [DisplayName("楽器")]
         Instrument,
     }
 
@@ -23,5 +36,22 @@ namespace Result
     {
         public ExhibitType Type;
         public int Points;
+    }
+    
+    [AttributeUsage(AttributeTargets.Field)]
+    public class DisplayNameAttribute : Attribute
+    {
+        public string Name { get; }
+        public DisplayNameAttribute(string name) => Name = name;
+    }
+
+    public static class ExhibitTypeExtensions
+    {
+        public static string ToDisplayName(this ExhibitType type)
+        {
+            var field = type.GetType().GetField(type.ToString());
+            var attr = field?.GetCustomAttribute<DisplayNameAttribute>();
+            return attr?.Name ?? type.ToString();
+        }
     }
 }
