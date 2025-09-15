@@ -217,7 +217,7 @@ namespace Result
 
                 if (texts.Length >= 3)
                 {
-                    texts[0].text = type.ToString();  
+                    texts[0].text = type.ToDisplayName();  
                     texts[1].text = $"×{count}";
                     texts[2].text = score.ToString();
                 }
@@ -334,7 +334,7 @@ namespace Result
             current.anchoredPosition = OffRight();
             _isAnimating = false;
         }
-
+        
         private Vector2 OffRight() => new(_canvasWidth * 1.05f + _pageGap, 0f);
         private Vector2 OffLeft() => new(-_canvasWidth * 1.05f - _pageGap, 0f);
 
