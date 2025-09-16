@@ -75,7 +75,7 @@ namespace September.InGame
         /// <param name="trackingType">短い音→ Spot(0)、移動しながら鳴る音→ Follow(1)</param>
         /// <param name="sourceObjId"> 発声元のオブジェクト </param>
         /// <param name="playerRef"> ローカル環境のPlayer デフォルト = スクリプトが付いたオブジェクトの環境プレイヤー</param>
-        public void PlaySoundFromCode(string cueName, int trackingType, NetworkId sourceObjId = default, PlayerRef playerRef = default)
+        public void PlaySoundFromCode(string cueName, int trackingType = default, NetworkId sourceObjId = default, PlayerRef playerRef = default)
         {
             if (playerRef == default)
             {
@@ -94,6 +94,32 @@ namespace September.InGame
                 CRIAudio.PlaySE(_cueSheet, cueName);                                                  // 2D再生
             }
             RPC_Request3DSound(sourceObjId, _cueSheet, cueName, (SoundTrackingType)trackingType);     // 3D再生依頼
+        }
+
+        /// <summary>
+        /// Spot固定の音再生
+        /// NetworkObject以外のポジション指定用(Vector3)
+        /// 3D再生
+        /// </summary>
+        /// <param name="cueName"></param>
+        /// <param name="worldPos"></param>
+        public void PlaySoundAtPosition(string cueName, Vector3 worldPos)
+        {
+            if (!HasStateAuthority) return;
+            RPC_Request3DSoundAtPosition(worldPos, _cueSheet, cueName);
+        }
+
+        /// <summary>
+        /// Spot固定の音再生
+        /// NetworkObject以外のポジション指定用(Transform)
+        /// 3D再生
+        /// </summary>
+        /// <param name="cueName"></param>
+        /// <param name="transform"></param>
+        public void PlaySoundAtTransform(string cueName, Transform transform)
+        {
+            if (!transform) return;
+            PlaySoundAtPosition(cueName, transform.position);
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -140,6 +166,12 @@ namespace September.InGame
                 Debug.LogWarning("SE再生位置に設定されているオブジェクトが見つかりません");
                 return;
             }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_Request3DSoundAtPosition(Vector3 worldPos, string sheetName, string cueName)
+        {
+            CRIAudio.PlaySE(worldPos, sheetName, cueName);
         }
 
         void LateUpdate()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -23,14 +24,18 @@ namespace September.InGame.UI
 
         [Header("Timer Settings")] [SerializeField, Label("TimerData")]
         private GameTimerData _timerData;
+        
+        [Header("キルログ")]
+        [SerializeField] private GameObject  _killLogItemPrefab;
+        [SerializeField] private int _maxLogCount = 5;
 
         private InGameUIRootRefs _uiRoot;
         private Slider _hpBarSlider;
         private Slider _staminaBarSlider;
-        private TextMeshProUGUI _killLogText;
+        private readonly Queue<GameObject> _killLogQueue = new();
         private TextMeshProUGUI _ogreMessageText;
         private GameObject _optionUI;
-        private GameObject _killLogUI;
+        private GameObject _killLogPanel;
         private GameObject _ogreUiInstance;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
@@ -67,15 +72,14 @@ namespace September.InGame.UI
                 _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
 
             _optionUI = _uiRoot.OptionUI;
-            _killLogUI = _uiRoot.KillLogPanel;
-            _killLogText = _uiRoot.KillLogText;
+            _killLogPanel = _uiRoot.KillLogPanel;
             _ogreUiInstance = _uiRoot.OgreUI;
             _ogreMessageText = _uiRoot.OgreMessageText;
             _hpBarSlider = _uiRoot.HpBar;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
             _optionUI.SetActive(true);
-            _killLogUI.SetActive(true);
+            _killLogPanel.SetActive(true);
             _ogreUiInstance.SetActive(false);
             _hpBarSlider.gameObject.SetActive(true);
             _staminaBarSlider.gameObject.SetActive(true);
@@ -109,35 +113,28 @@ namespace September.InGame.UI
         // キルのログを直接引数に入れる
         private async UniTask ShowKillLog(string killText)
         {
-            if (!_killLogText)
-                return;
+            GameObject killLog = Instantiate(_killLogItemPrefab, _killLogPanel.transform);
 
-            _killLogText.text = killText;
-            _killLogUI.SetActive(true);
-            _killLogText.gameObject.SetActive(true);
+            TextMeshProUGUI tmp = killLog.GetComponentInChildren<TextMeshProUGUI>();
+            tmp.text = killText;
+            
+            
+            // フェード用 CanvasGroup
+            CanvasGroup cg = killLog.GetComponent<CanvasGroup>() ?? killLog.AddComponent<CanvasGroup>();
+            cg.alpha = 0;
+            await cg.DOFade(1f, 0.3f);
 
-            RectTransform rect = _killLogText.GetComponent<RectTransform>();
-            CanvasGroup canvasGroup = _killLogText.GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-                canvasGroup = _killLogText.gameObject.AddComponent<CanvasGroup>();
-
-            // 初期状態（下側、完全表示）
-            rect.anchoredPosition = new Vector2(0, 0);
-            canvasGroup.alpha = 1f;
-
-            float moveDistance = 100f;
-            float duration = 2f;
-            float fadeDuration = 0.5f;
-
-            // DoTweenアニメーションを開始
-            Sequence seq = DOTween.Sequence();
-            seq.Append(rect.DOAnchorPosY(moveDistance, duration).SetEase(Ease.OutCubic));
-            seq.Join(canvasGroup.DOFade(0f, fadeDuration).SetDelay(duration - fadeDuration));
-            // DoTweenが完了するまで待機
-            await seq.AsyncWaitForCompletion();
-
-            // 完了後に削除 or 非表示
-            _killLogText.gameObject.SetActive(false);
+            _killLogQueue.Enqueue(killLog);
+            
+            if (_killLogQueue.Count > _maxLogCount)
+            {
+                GameObject old = _killLogQueue.Dequeue();
+                if (old)
+                {
+                    CanvasGroup oldCg = old.GetComponent<CanvasGroup>() ?? old.AddComponent<CanvasGroup>();
+                    oldCg.DOFade(0f, 0.5f).OnComplete(() => Destroy(old));
+                }
+            }
         }
 
         // ToDo : タイマークラスを作成してアニメーションなどを柔軟に行えるようにする
@@ -155,12 +152,6 @@ namespace September.InGame.UI
                 timer.text = i.ToString();
                 await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
             }
-            
-            timer.text = "Ready";
-            await UniTask.Delay(TimeSpan.FromSeconds(_timerData.AfterReadyDelay), cancellationToken: _cts.Token);
-
-            timer.text = "Go!";
-            await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
 
             for (float remaining = _timerData.GameTime; remaining >= 0; remaining--)
             {

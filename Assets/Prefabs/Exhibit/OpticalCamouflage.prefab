@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1610821991240361927}
   - component: {fileID: 4482752977680701309}
   - component: {fileID: 7306939920785276090}
+  - component: {fileID: 7286847240433619292}
   m_Layer: 0
   m_Name: OpticalCamouflage
   m_TagString: Untagged
@@ -67,6 +68,9 @@ MonoBehaviour:
   _interactEffectType: 14
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 7286847240433619292}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -96,6 +100,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7624587381050686148}
+  - {fileID: 7286847240433619292}
   ForceRemoteRenderTimeframe: 0
 --- !u!65 &6428114833908659226
 BoxCollider:
@@ -160,6 +165,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 7624587381050686148}
+--- !u!114 &7286847240433619292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4322834578117657907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1001 &1138885513903168269
 PrefabInstance:
   m_ObjectHideFlags: 0

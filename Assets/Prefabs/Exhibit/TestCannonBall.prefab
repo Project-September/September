@@ -277,6 +277,7 @@ GameObject:
   - component: {fileID: 2713266884439550522}
   - component: {fileID: 4885728260643230006}
   - component: {fileID: 4192184776908821714}
+  - component: {fileID: 1999867505836688356}
   m_Layer: 0
   m_Name: TestCannonBall
   m_TagString: Untagged
@@ -321,6 +322,7 @@ MonoBehaviour:
   - {fileID: 782028490540396198}
   - {fileID: 2713266884439550522}
   - {fileID: 4192184776908821714}
+  - {fileID: 1999867505836688356}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &782028490540396198
 MonoBehaviour:
@@ -350,6 +352,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 1999867505836688356}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -440,3 +445,16 @@ MonoBehaviour:
     Position: 0.01
     Rotation: 0.01
     Scale: 0.01
+--- !u!114 &1999867505836688356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6666232806654655558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue

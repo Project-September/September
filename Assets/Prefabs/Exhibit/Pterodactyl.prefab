@@ -176,7 +176,7 @@ Transform:
   m_GameObject: {fileID: 1918040745492258685}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.655, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -313,6 +313,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       insertIndex: -1
       addedObject: {fileID: 729834472514017027}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 130707149095327359}
   m_SourcePrefab: {fileID: 100100000, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
 --- !u!4 &2415067396731086122 stripped
 Transform:
@@ -345,6 +348,7 @@ MonoBehaviour:
   - {fileID: 9185989298910053852}
   - {fileID: 575448598117113101}
   - {fileID: 1450576261565196690}
+  - {fileID: 130707149095327359}
   ForceRemoteRenderTimeframe: 0
 --- !u!95 &7030523243637594336
 Animator:
@@ -528,6 +532,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 130707149095327359}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -554,6 +561,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 1450576261565196690}
+--- !u!114 &130707149095327359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3084925805453180816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1001 &3456470937934892131
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -568,31 +588,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.67
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.33
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9848078
+      value: 0.9986295
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.17364816
+      value: 0.052335896
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y

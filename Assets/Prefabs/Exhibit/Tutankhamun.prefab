@@ -182,6 +182,7 @@ GameObject:
   - component: {fileID: 5804073900053128395}
   - component: {fileID: 1960778445117928785}
   - component: {fileID: 7869224748463613965}
+  - component: {fileID: 4304440884544294375}
   m_Layer: 0
   m_Name: Tutankhamun
   m_TagString: Untagged
@@ -227,6 +228,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1960778445117928785}
   - {fileID: 7869224748463613965}
+  - {fileID: 4304440884544294375}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &1960778445117928785
 MonoBehaviour:
@@ -256,6 +258,9 @@ MonoBehaviour:
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 4304440884544294375}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -285,6 +290,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tutankhamenHead: {fileID: 7704894711281665644, guid: 28c75912856f51a488163dfe15a26a04, type: 3}
+--- !u!114 &4304440884544294375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8301522110719607552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1 &8946548731749455363
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -36,6 +36,8 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _weightBlendCts = new();
 
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
+
+        public AnimationMixerPlayable BaseMixer => _baseMixer;
 
         public bool IsPlayingTargetClip(AnimationClip clip)
         {
