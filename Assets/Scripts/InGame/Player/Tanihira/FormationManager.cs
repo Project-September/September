@@ -104,7 +104,7 @@ namespace Ingame.Tanihira
         }
 
         /// <summary>
-        /// 原罪の隊列を登録する
+        /// 現在の隊列を登録する
         /// </summary>
         public void RegisterFriendFormation()
         {
