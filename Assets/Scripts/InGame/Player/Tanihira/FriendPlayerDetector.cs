@@ -14,31 +14,33 @@ namespace Ingame.Tanihira
         [SerializeField] private LayerMask _obstacleMask;
         [SerializeField] private FriendStateChanger _friendStateChanger;
         [SerializeField] private FormationManager _formationManager;
+        [SerializeField] private bool _isWaiting;
         
         private Transform _currentTarget;
-        private bool _isWaiting;
         private InGameManager _inGameManager;
 
         private void Start()
         {
-            _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
-            if (_inGameManager)
+            if (HasStateAuthority)
             {
-                _inGameManager.GameStarted += GameStart;
+                _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+                if (_inGameManager)
+                {
+                    _inGameManager.GameStarted += GameStart;
+                }
             }
         }
 
-        private void Update()
+        public override void FixedUpdateNetwork()
         {
-            if (!HasInputAuthority)
-                return;
+            if (!HasStateAuthority) return;
             
             if (_isWaiting)
             {
                 DetectePlayer();
             }
         }
-
+        
         private void GameStart()
         {
             _isWaiting = true;
