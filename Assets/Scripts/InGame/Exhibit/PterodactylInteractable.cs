@@ -53,7 +53,8 @@ namespace InGame.Exhibit
         private Vector3 _hitPosition;
 
         [Networked] private Vector3 AimObjectPosition { get; set; }
-
+        [Networked] private Quaternion AimObjectRotation { get; set; }
+        
         [Networked, OnChangedRender(nameof(OnChangeAnimation))]
         private float CurrentBlendValue { get; set; }
         
@@ -137,6 +138,7 @@ namespace InGame.Exhibit
             }
 
             _aimObject.transform.position = AimObjectPosition;
+            _aimObject.transform.rotation = AimObjectRotation;
         }
 
         [Rpc]
@@ -164,7 +166,10 @@ namespace InGame.Exhibit
                 {
                     IsAimObjectActive = true;
                 }
-                AimObjectPosition = point;
+                var offset = hits[i].normal * 1f;
+                AimObjectPosition = point + offset;
+                var rot = Quaternion.FromToRotation(Vector3.up,hits[i].normal);
+                AimObjectRotation = rot;
                 return hits[i];
             }
 
