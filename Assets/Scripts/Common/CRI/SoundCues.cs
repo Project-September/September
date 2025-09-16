@@ -27,12 +27,12 @@ namespace CRISound
         {
             public static readonly CueData Ingame_01 = new CueData(SheetName, "BGM_Ingame_01");
             //public static readonly CueData Ingame_last_01 = new CueData(SheetName, "BGM_Ingame_last_01");
-            //public static readonly CueData Okb_01 = new CueData(SheetName, "BGM_Okb_01");
-            //public static readonly CueData Haruku_01 = new CueData(SheetName, "BGM_Haruku_01");
+            public static readonly CueData Okb_01 = new CueData(SheetName, "BGM_Okb_01");
+            public static readonly CueData Haruku_01 = new CueData(SheetName, "BGM_Haruku_01");
             //public static readonly CueData Tanihira_01 = new CueData(SheetName, "BGM_Tanihira_01");
-            //public static readonly CueData Koinuma_01 = new CueData(SheetName, "BGM_Koinuma_01");
-            //public static readonly CueData Select_01 = new CueData(SheetName, "BGM_Select_01");
-            //public static readonly CueData Result_01 = new CueData(SheetName, "BGM_Result_01");
+            public static readonly CueData Koinuma_01 = new CueData(SheetName, "BGM_Koinuma_01");
+            public static readonly CueData Select_01_Loop = new CueData(SheetName, "BGM_Select_01");
+            public static readonly CueData Result_01_Loop = new CueData(SheetName, "BGM_Result_01");
             //public static readonly CueData Title_01 = new CueData(SheetName, "BGM_Title_01");
         }
 
@@ -41,11 +41,11 @@ namespace CRISound
             //public static readonly CueData Player_Revive = new CueData(SheetName, "SE_Player_Revive");
             public static readonly CueData Player_Punch_Swing = new CueData(SheetName, "SE_Player_Punch_Swing");
             public static readonly CueData Player_Punch_Hit = new CueData(SheetName, "SE_Player_Punch_Hit");
-            //public static readonly CueData Player_Knockout = new CueData(SheetName, "SE_Player_Knockout");
-            //public static readonly CueData Player_Footstep_Generic = new CueData(SheetName, "SE_Player_Footstep_Generic");
+            public static readonly CueData Player_Knockout = new CueData(SheetName, "SE_Player_Knockout");
+            public static readonly CueData Player_Footstep_Generic = new CueData(SheetName, "SE_Player_Footstep_Generic");
             public static readonly CueData OKB_Footstep = new CueData(SheetName, "SE_OKB_Footstep");
-            //public static readonly CueData Hulk_Footstep = new CueData(SheetName, "SE_Hulk_Footstep");
-            //public static readonly CueData Hulk_Yell = new CueData(SheetName, "SE_Hulk_Yell");
+            public static readonly CueData Hulk_Footstep = new CueData(SheetName, "SE_Hulk_Footstep");
+            public static readonly CueData Hulk_Yell = new CueData(SheetName, "SE_Hulk_Yell");
             //public static readonly CueData Hulk_Break = new CueData(SheetName, "SE_Hulk_Break");
             //public static readonly CueData Tanihira_Footstep = new CueData(SheetName, "SE_Tanihira_Footstep");
             //public static readonly CueData Penguin_Footstep = new CueData(SheetName, "SE_Penguin_Footstep");
@@ -54,9 +54,9 @@ namespace CRISound
             //public static readonly CueData Tanihira_FriendCall = new CueData(SheetName, "SE_Tanihira_FriendCall");
             //public static readonly CueData Sarutobi_Appear = new CueData(SheetName, "SE_Sarutobi_Appear");
             //public static readonly CueData Sarutobi_Bomb = new CueData(SheetName, "SE_Sarutobi_Bomb");
-            //public static readonly CueData Sarutobi_Grapple_Prepare = new CueData(SheetName, "SE_Sarutobi_Grapple_Prepare");
-            //public static readonly CueData Sarutobi_Grapple_Land = new CueData(SheetName, "SE_Sarutobi_Grapple_Land");
-            //public static readonly CueData Sarutobi_Grapple_Move = new CueData(SheetName, "SE_Sarutobi_Grapple_Move");
+            public static readonly CueData Sarutobi_Grapple_Prepare = new CueData(SheetName, "SE_Sarutobi_Grapple_Prepare");
+            public static readonly CueData Sarutobi_Grapple_Land = new CueData(SheetName, "SE_Sarutobi_Grapple_Land");
+            public static readonly CueData Sarutobi_Grapple_Move = new CueData(SheetName, "SE_Sarutobi_Grapple_Move");
             //public static readonly CueData UI_CooldownReady = new CueData(SheetName, "SE_UI_CooldownReady");
             //public static readonly CueData UI_ModeChange = new CueData(SheetName, "SE_UI_ModeChange");
             //public static readonly CueData UI_ModeChanged = new CueData(SheetName, "SE_UI_ModeChanged");
@@ -87,15 +87,15 @@ namespace CRISound
             public static readonly CueData Tyranno_Footstep = new CueData(SheetName, "SE_Tyranno_Footstep");
             public static readonly CueData Tyranno_Bite = new CueData(SheetName, "SE_Tyranno_Bite");
             public static readonly CueData Tyranno_Interact = new CueData(SheetName, "SE_Tyranno_Interact");
-            //public static readonly CueData Hulk_Land = new CueData(SheetName, "SE_Hulk_Land");
+            public static readonly CueData Hulk_Land = new CueData(SheetName, "SE_Hulk_Land");
         }
 
         public static class VOICE
         {
-            //public static readonly CueData OKB_CharacterSelect = new CueData(SheetName, "VO_OKB_CharacterSelect");
-            //public static readonly CueData OKB_GameStart_01 = new CueData(SheetName, "VO_OKB_GameStart_01");
-            //public static readonly CueData OKB_GameStart_02 = new CueData(SheetName, "VO_OKB_GameStart_02");
-            //public static readonly CueData OKB_GameStart_03 = new CueData(SheetName, "VO_OKB_GameStart_03");
+            public static readonly CueData OKB_CharacterSelect = new CueData(SheetName, "VO_OKB_CharacterSelect");
+            public static readonly CueData OKB_GameStart_01 = new CueData(SheetName, "VO_OKB_GameStart_01");
+            public static readonly CueData OKB_GameStart_02 = new CueData(SheetName, "VO_OKB_GameStart_02");
+            public static readonly CueData OKB_GameStart_03 = new CueData(SheetName, "VO_OKB_GameStart_03");
             //public static readonly CueData OKB_Attack_01 = new CueData(SheetName, "VO_OKB_Attack_01");
             //public static readonly CueData OKB_Attack_02 = new CueData(SheetName, "VO_OKB_Attack_02");
             //public static readonly CueData OKB_Attack_03 = new CueData(SheetName, "VO_OKB_Attack_03");
@@ -106,9 +106,23 @@ namespace CRISound
             //public static readonly CueData OKB_Interact_02 = new CueData(SheetName, "VO_OKB_Interact_02");
             //public static readonly CueData OKB_Interact_03 = new CueData(SheetName, "VO_OKB_Interact_03");
             //public static readonly CueData OKB_UniqueInteract = new CueData(SheetName, "VO_OKB_UniqueInteract");
-            //public static readonly CueData OKB_Win_01 = new CueData(SheetName, "VO_OKB_Win_01");
-            //public static readonly CueData OKB_Win_02 = new CueData(SheetName, "VO_OKB_Win_02");
+            public static readonly CueData OKB_Win_01 = new CueData(SheetName, "VO_OKB_Win_01");
+            public static readonly CueData OKB_Win_02 = new CueData(SheetName, "VO_OKB_Win_02");
             //public static readonly CueData OKB_Win_03 = new CueData(SheetName, "VO_OKB_Win_03");
+            public static readonly CueData Haru_CharacterSelect = new CueData(SheetName, "VO_Haru_CharacterSelect");
+            public static readonly CueData Haru_GameStart_01 = new CueData(SheetName, "VO_Haru_GameStart_01");
+            public static readonly CueData Haru_GameStart_02 = new CueData(SheetName, "VO_Haru_GameStart_02");
+            public static readonly CueData Haru_Win_01 = new CueData(SheetName, "VO_Haru_Win_01");
+            public static readonly CueData Haru_Win_02 = new CueData(SheetName, "VO_Haru_Win_02");
+            public static readonly CueData Koinuma_CharacterSelect = new CueData(SheetName, "VO_Koinuma_CharacterSelect");
+            public static readonly CueData Koinuma_GameStart_01 = new CueData(SheetName, "VO_Koinuma_GameStart_01");
+            public static readonly CueData Koinuma_Win_01 = new CueData(SheetName, "Koinuma_Win_01");
+            public static readonly CueData Koinuma_Win_02 = new CueData(SheetName, "VO_Koinuma_Win_02");
+            public static readonly CueData Tanihira_CharacterSelect = new CueData(SheetName, "VO_Tanihira_CahracterSelect");
+            public static readonly CueData Tanihira_GameStart_01 = new CueData(SheetName, "VO_Tanihira_GameStart_01");
+            public static readonly CueData Tanihira_GameStart_02 = new CueData(SheetName, "VO_Tanihira_GameStart_02");
+            public static readonly CueData Tanihira_Win_01 = new CueData(SheetName, "VO_Tanihira_Win_01");
+            public static readonly CueData Tanihira_Win_02 = new CueData(SheetName, "VO_Tanihira_Win_02");
         }
     }
 }
