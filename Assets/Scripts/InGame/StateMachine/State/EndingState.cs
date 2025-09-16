@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CRISound;
 using Cysharp.Threading.Tasks;
 using September.InGame.Common;
@@ -25,6 +25,7 @@ namespace September.Common
             PlayerDatabase.Instance.Server_PushResultToClients();
             UIController.I.ShowResultAnimation();
             GameInput.I.ToggleMoveInput(false);
+            BGMManager.ChangeBGM("Result");
         }
         private void ShowCursor()
         {
