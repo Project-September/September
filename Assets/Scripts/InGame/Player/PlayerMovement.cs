@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
 using UniRx;
@@ -57,12 +58,14 @@ namespace InGame.Player
         private Vector3 _vaultEndPos;
         // teleport
         private Vector3? _teleportTarget;
+        // knock back
+        private bool _knockBackActive = false;
         // Gizmo
         private List<CapsuleCastData> _capsuleCastData = new();
 
         public float WalkSpeed => _moveSpeed;
         public float DashMoveSpeed => _dashSpeed;
-        public bool IsGround => _isGround || _isGroundTimer > 0;
+        public bool IsGround => (_isGround || _isGroundTimer > 0) && !_knockBackActive;
         [Networked, HideInInspector] 
         public NetworkBool IsGroundNet { get; private set; }
         public Vector3 GroundNormal => _groundNormal;
@@ -364,6 +367,18 @@ namespace InGame.Player
         {
             _moveVelocity = Vector3.zero;
             _rb.linearVelocity = _moveVelocity;
+        }
+
+        public async UniTask KnockBack(Vector3 force, float duration = 0)
+        {
+            if (!HasStateAuthority) return;
+
+            _rb.linearVelocity = force;
+            _knockBackActive = true;
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: this.GetCancellationTokenOnDestroy());
+            
+            _knockBackActive = false;
         }
 
         public void Teleport(Vector3 position)
