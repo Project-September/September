@@ -3577,10 +3577,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.71
-  m_Height: 3.24
+  m_Radius: 1
+  m_Height: 4
   m_Direction: 1
-  m_Center: {x: 0, y: 1.62, z: -0.98}
+  m_Center: {x: 0, y: 2, z: -0.58}
 --- !u!114 &1998339236888916700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3678,14 +3678,14 @@ MonoBehaviour:
   _startFrame: 0
   _endFrame: 34
   _damageAmount: 100
-  _maxHealth: 100
+  _maxHealth: 10
   _getOffPoint: {fileID: 4130316385680683925}
   _walkSpeed: 2.5
   _dashSpeed: 5
   _rayDirection: {x: 0, y: -1, z: 0}
   _rayDistance: 1.3
   _gravity: {x: 0, y: -200, z: 0}
-  _maxRotateValue: 500
+  _maxRotateValue: 250
   _cooldownTime: 3
 --- !u!114 &3413971113884217349
 MonoBehaviour:
