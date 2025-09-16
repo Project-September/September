@@ -65,6 +65,7 @@ namespace Result
         // 合計値を計算
         public int CalcTotal()
         {
+            // スコアの設定に合わせて計算
             int sum = _count.Sum(kv => (_config ? _config.GetPoint(kv.Key) : 0) * kv.Value);
 
             const int stunPoint = 150;
