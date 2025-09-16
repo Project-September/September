@@ -20,6 +20,29 @@ namespace CRISound
             OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
         }
 
+        /// <summary>
+        /// "Title", "Lobby", "InGameMock", "Field", "Result"のいずれかで指定
+        /// </summary>
+        /// <param name="sceneName"></param>
+        public static async void ChangeBGM(string sceneName)
+        {
+            // 待機フラグが立っているときは現在のBGMを止め、解除されるまで流さない
+            string newCueName = GetCueNameByScene(sceneName);
+            _isWaiting = GetWaitFlagByScene(sceneName);
+
+            if (_isWaiting)
+            {
+                CRIAudio.StopBGM("ALLCue", _currentCueName);
+                await UniTask.WaitUntil(() => !_isWaiting);
+            }
+
+            if (!string.IsNullOrEmpty(newCueName))
+            {
+                CRIAudio.PlayBGM("ALLCue", newCueName);
+                _currentCueName = newCueName;
+            }
+        }
+
         /// <summary> 待機フラグを false にする </summary>
         public static void ReleseFlag()
         {
@@ -32,27 +55,9 @@ namespace CRISound
             {
                 await UniTask.WaitUntil(() => CuePlayAtomExPlayer.Instance.IsReady);
             }
-            string newCueName = GetCueNameByScene(scene.name);
-            _isWaiting = GetWaitFlagByScene(scene.name);
-            
-            // 例：タイトル
-            //if (!string.IsNullOrEmpty(_currentCueName) && newCueName != _currentCueName)
-            //{
-            //    CRIAudio.StopBGM("ALLCue", _currentCueName);
-            //}
 
-            // 待機フラグが立っているときは現在のBGMを止め、解除されるまで流さない
-            if (_isWaiting)
-            {
-                CRIAudio.StopBGM("ALLCue", _currentCueName);
-                await UniTask.WaitUntil(() => !_isWaiting);
-            }
-            
-            if(!string.IsNullOrEmpty(newCueName))
-            {
-                CRIAudio.PlayBGM("ALLCue", newCueName);
-                _currentCueName = newCueName;
-            }
+            _isWaiting = GetWaitFlagByScene(scene.name);
+            ChangeBGM(scene.name);
         }
         
         private static string GetCueNameByScene(string sceneName)
