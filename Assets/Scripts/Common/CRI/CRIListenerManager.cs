@@ -5,10 +5,10 @@ namespace September.Common
 {
     public class CRIListenerManager : MonoBehaviour
     {
-        [SerializeField] private Transform _follow;   // MainCamera をアタッチ（実行時に差し替え可）
+        [SerializeField] private Transform _follow;   // Player をアタッチ（実行時に差し替え可）
+        [SerializeField] private Transform _camera;   // MainCamera をアタッチ（実行時に差し替え可）
 
         private static CRIListenerManager _instance;
-
 
         private void Awake()
         {
@@ -31,22 +31,30 @@ namespace September.Common
             var sePlayer = CuePlayAtomExPlayer.Instance.Player(SoundType.SE) as CuePlayAtomExPlayer.SEPlayerWith3D;
             if (sePlayer == null || sePlayer.Listener == null) return;
 
-            // 位置更新
+            // 位置更新 プレイヤー基準
             var pos = _follow.position;
-            sePlayer.Listener.SetPosition(pos.x, pos.y, pos.z);
+            sePlayer.Listener.SetPosition(pos.x, pos.y, pos.z); // 距離減衰などはここが基準
 
-            // 角度更新
-            var forward = _follow.forward.normalized;
-            var up = _follow.up.normalized;
-            sePlayer.Listener.SetOrientation(forward.x, forward.y, forward.z, up.x, up.y, up.z);
+            if (_camera == null) return ;
+
+            // 角度更新 カメラ基準
+            var forward = _camera.forward.normalized;
+            var up = _camera.up.normalized;
+            sePlayer.Listener.SetOrientation(forward.x, forward.y, forward.z, up.x, up.y, up.z); // パン(左右バランス)はここが基準
             sePlayer.Listener.Update();
         }
 
         /// <summary>
         /// サウンドのListenerをオブジェクトにアタッチする
-        /// 実行中にカメラが切り替わる場合などに使用
         /// </summary>
         /// <param name="cam"></param>
-        public void Attach(Transform obj) => _follow = obj;
+        public void AttachPlayer(Transform obj) => _follow = obj;
+
+        /// <summary>
+        /// 音を視界基準で聞くため、カメラをアタッチする
+        /// </summary>
+        /// <param name="obj"></param>
+        public void AttachCamera(Transform obj) => _camera = obj;
+
     }
 }
