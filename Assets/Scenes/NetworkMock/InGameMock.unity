@@ -640,7 +640,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3184967845531604829, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
   m_PrefabInstance: {fileID: 384207245}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &477266339
+--- !u!1 &476088940
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -648,8 +648,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 477266341}
-  - component: {fileID: 477266340}
+  - component: {fileID: 476088942}
+  - component: {fileID: 476088941}
   m_Layer: 0
   m_Name: NavMesh Surface
   m_TagString: Untagged
@@ -657,13 +657,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &477266340
+--- !u!114 &476088941
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 477266339}
+  m_GameObject: {fileID: 476088940}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
@@ -687,15 +687,15 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 51f697029a33e584e8451c4f8d9da665, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 5cd3f11d9e3fdcc44b3d51575eb4064b, type: 2}
   m_BuildHeightMesh: 0
---- !u!4 &477266341
+--- !u!4 &476088942
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 477266339}
+  m_GameObject: {fileID: 476088940}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1756,8 +1756,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.16909811, y: 0.7703555, z: -0.22818965, w: 0.5708658}
-  m_LocalPosition: {x: -22.510273, y: 0.78999996, z: 25.946217}
+  m_LocalRotation: {x: 0.064683594, y: 0.9346123, z: -0.22782795, w: 0.2653497}
+  m_LocalPosition: {x: -11.53545, y: -5.868456, z: 65.95054}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3359,9 +3359,9 @@ MonoBehaviour:
   bakedScaleOffsetTerrain: []
   assetList: []
   uvOverlapAssetList: 
-  idremap: 0000000001000000
+  idremap: 0000000000000000
   usesRealtimeGI: 0
-  emptyDirectionTex: {fileID: 0}
+  emptyDirectionTex: {fileID: 2800000, guid: 04afea73344b7d049b5b7ac5ae315dd5, type: 3}
   anyVolumes: 0
   compressedVolumes: 0
   sectors:
@@ -4887,5 +4887,5 @@ SceneRoots:
   - {fileID: 1377654576}
   - {fileID: 1405967100}
   - {fileID: 330490200}
-  - {fileID: 477266341}
   - {fileID: 1508911447}
+  - {fileID: 476088942}
