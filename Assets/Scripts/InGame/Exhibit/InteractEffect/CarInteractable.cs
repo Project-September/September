@@ -217,8 +217,8 @@ namespace InGame.Exhibit.InteractEffect
 
         private void OnCollisionEnter(Collision other)
         {
-            if (!other.transform.root.CompareTag("Player"))
-                return;
+            if (!other.transform.root.CompareTag("Player")) return;
+            if(!IsMoving) return;
             var nObj = other.transform.GetComponentInParent<NetworkObject>();
             RPC_OnHit(nObj);
         }
