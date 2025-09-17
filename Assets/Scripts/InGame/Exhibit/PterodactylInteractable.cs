@@ -74,11 +74,7 @@ namespace InGame.Exhibit
         public override void Spawned()
         {
             base.Spawned();
-
             _interactableBase = GetComponent<InteractableBase>();
-            if (HasStateAuthority)
-                Rigidbody.isKinematic = false;
-
             _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
             Animator.enabled = IsInteracting;
             IsAimObjectActive = false;
