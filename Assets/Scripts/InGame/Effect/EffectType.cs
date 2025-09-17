@@ -23,6 +23,7 @@ public enum EffectType
     WarpIn,
     WarpOut,
     PenguinAttack,
-    PenguinRun
+    PenguinRun,
+    Muramasa
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
