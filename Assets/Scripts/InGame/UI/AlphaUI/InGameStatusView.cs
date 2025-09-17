@@ -19,11 +19,11 @@ namespace September.InGame.UI
         [SerializeField, Label("InGameUIRoot")] private InGameUIRootRefs _inGameUiRootPrefab;
         [SerializeField] private ResultUIRootRefs _resultUIRootPrefab;
 
-        [Header("Canvas")] [SerializeField, Label("MainCanvas")]
-        private Canvas _mainCanvas;
+        [Header("Canvas")] 
+        [SerializeField, Label("MainCanvas")] private Canvas _mainCanvas;
 
-        [Header("Timer Settings")] [SerializeField, Label("TimerData")]
-        private GameTimerData _timerData;
+        [Header("Timer Settings")] 
+        [SerializeField, Label("TimerData")] private GameTimerData _timerData;
         
         [Header("キルログ")]
         [SerializeField] private GameObject  _killLogItemPrefab;
@@ -35,7 +35,7 @@ namespace September.InGame.UI
         private readonly Queue<GameObject> _killLogQueue = new();
         private TextMeshProUGUI _ogreMessageText;
         private GameObject _optionUI;
-        private GameObject _killLogPanel;
+        private GameObject _LogPanel;
         private GameObject _ogreUiInstance;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
@@ -55,7 +55,7 @@ namespace September.InGame.UI
             ui.OnChangeSliderValue.Subscribe(ChangeHp).AddTo(_cts.Token);
             ui.OnClickOptionButton.Subscribe(ShowOptionUI).AddTo(_cts.Token);
             ui.OnStartTimer.Subscribe(_ => ShowGameStartTime().Forget()).AddTo(_cts.Token);
-            ui.OnNoticeKillLog.Subscribe(killText => ShowKillLog(killText).Forget()).AddTo(_cts.Token);
+            ui.OnShowLog.Subscribe(killText => ShowLog(killText).Forget()).AddTo(_cts.Token);
             ui.OnShowOgreUI.Subscribe(ShowOgreLamp).AddTo(_cts.Token);
             ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
             ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
@@ -72,14 +72,14 @@ namespace September.InGame.UI
                 _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
 
             _optionUI = _uiRoot.OptionUI;
-            _killLogPanel = _uiRoot.KillLogPanel;
+            _LogPanel = _uiRoot.LogPanel;
             _ogreUiInstance = _uiRoot.OgreUI;
             _ogreMessageText = _uiRoot.OgreMessageText;
             _hpBarSlider = _uiRoot.HpBar;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
             _optionUI.SetActive(true);
-            _killLogPanel.SetActive(true);
+            _LogPanel.SetActive(true);
             _ogreUiInstance.SetActive(false);
             _hpBarSlider.gameObject.SetActive(true);
             _staminaBarSlider.gameObject.SetActive(true);
@@ -111,9 +111,9 @@ namespace September.InGame.UI
         }
 
         // キルのログを直接引数に入れる
-        private async UniTask ShowKillLog(string killText)
+        private async UniTask ShowLog (string killText)
         {
-            GameObject killLog = Instantiate(_killLogItemPrefab, _killLogPanel.transform);
+            GameObject killLog = Instantiate(_killLogItemPrefab, _LogPanel.transform);
 
             TextMeshProUGUI tmp = killLog.GetComponentInChildren<TextMeshProUGUI>();
             tmp.text = killText;
@@ -187,7 +187,7 @@ namespace September.InGame.UI
 
         private void ShowOptionUI(bool isShow)
         {
-            if (_optionUI != null)
+            if (_optionUI)
                 _optionUI.SetActive(isShow);
         }
 

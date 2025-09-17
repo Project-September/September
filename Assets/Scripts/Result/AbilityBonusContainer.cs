@@ -34,7 +34,7 @@ namespace Result
                     abilityTitle.text = "Ride Bonus";
                     return RenderExhibitBonus(inbox, rowRoot, rowPrefab, _okabeRideConfig);
 
-                case CharacterType.HulkTheButcher: // Haru
+                case CharacterType.HulkTheButcher: 
                     abilityTitle.text = "Destroy Bonus";
                     return RenderExhibitBonus(inbox, rowRoot, rowPrefab, _haruDestroyConfig, destroyed: true);
 
@@ -56,7 +56,7 @@ namespace Result
             ExhibitScoreConfig config, bool destroyed = false)
         {
             int total = 0;
-            foreach (var kv in config.Entries)
+            foreach (ExhibitScoreEntry kv in config.Entries)
             {
                 int count = destroyed
                     ? inbox.DestroyedExhibitCounts.GetValueOrDefault(kv.Type, 0)
@@ -64,8 +64,8 @@ namespace Result
 
                 int score = count * kv.Points;
 
-                var row = Object.Instantiate(prefab, root);
-                var texts = row.GetComponentsInChildren<TextMeshProUGUI>();
+                GameObject row = Object.Instantiate(prefab, root);
+                TextMeshProUGUI[] texts = row.GetComponentsInChildren<TextMeshProUGUI>();
                 texts[0].text = kv.Type.ToDisplayName();
                 texts[1].text = $"×{count}";
                 texts[2].text = score.ToString();
@@ -95,7 +95,7 @@ namespace Result
                     return _okabeRideConfig.Entries.Sum(e =>
                         inbox.ExhibitCounts.GetValueOrDefault(e.Type, 0) * e.Points);
 
-                case CharacterType.HulkTheButcher: // Haru
+                case CharacterType.HulkTheButcher:
                     return _haruDestroyConfig.Entries.Sum(e =>
                         inbox.DestroyedExhibitCounts.GetValueOrDefault(e.Type, 0) * e.Points);
 

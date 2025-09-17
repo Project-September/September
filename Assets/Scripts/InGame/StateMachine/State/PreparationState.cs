@@ -193,7 +193,8 @@ namespace September.Common
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
             killedData.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
-            
+            // Log
+            UIController.I.ShowLog($"{data.ExecutorRef}が{data.TargetRef}を倒した");
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
         }
@@ -213,8 +214,6 @@ namespace September.Common
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
         {
-            UIController.I.ShowNoticeKillLog($"鬼が{executor}から{targetRef}に変更された");
-            
             if (executor == Context.Runner.LocalPlayer)
                 UIController.I.ShowOgreLamp(false);
             else if(targetRef == Context.Runner.LocalPlayer)
