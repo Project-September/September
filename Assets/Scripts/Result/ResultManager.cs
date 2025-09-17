@@ -10,7 +10,7 @@ public class ResultManager : MonoBehaviour
     private void Start()
     {
         _cts = new CancellationTokenSource();
-        _gameInput =  new GameInput();
+        _gameInput =  GameInput.I;
     }
 
     private void Update()
