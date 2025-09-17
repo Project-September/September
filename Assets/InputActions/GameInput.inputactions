@@ -1167,6 +1167,76 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Debug",
+            "id": "1d700de1-4f73-49ea-ab18-3daeeeea8f8a",
+            "actions": [
+                {
+                    "name": "Title",
+                    "type": "Button",
+                    "id": "46f5503c-5515-45fc-9775-f7d97654aac7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Result",
+                    "type": "Button",
+                    "id": "ff7d395a-8304-4925-bfe5-33224e087e91",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "db2a8f6b-d75d-49af-84cb-71087a91a835",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Title",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "522ec327-3a09-4ea8-b13e-81b7b0b81211",
+                    "path": "<XInputController>/{Cancel}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Title",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "37bce03f-82d1-4712-8eed-43a7433c2ca4",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Result",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cf5f80df-ccc2-4164-841a-0f9cdc07e189",
+                    "path": "<XInputController>/{Cancel}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Result",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

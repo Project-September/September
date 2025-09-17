@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using CRISound;
 using Fusion;
 using InGame.Health;
+using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -36,6 +39,7 @@ namespace Ingame.Tanihira
         [SerializeField] protected HitChecker _hitChecker;
         [SerializeField, ReadOnly] protected FriendState _currentState;
         [SerializeField] private GameObject _tutankhamen;
+        [SerializeField] private Transform _attackEffectPos;
         [Networked] private NetworkBool HasMask { get; set; }
         
         protected NavMeshAgent _agent;
@@ -45,6 +49,7 @@ namespace Ingame.Tanihira
         protected FormationManager _formationManager;
         protected FriendState _waitStockState;
         protected FriendStatus _currentStatus;
+        protected EffectSpawner _effectSpawner;
 
         private static int _spawnCount;
         private bool _isAttack;
@@ -71,6 +76,7 @@ namespace Ingame.Tanihira
             _friendStateMappings[FriendState.None] = new FriendNoneState();
             _agent = GetComponent<NavMeshAgent>();
             _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
+            
             InitializeStates();
             ChangeState(_initialState);
         }
@@ -203,6 +209,18 @@ namespace Ingame.Tanihira
                 _ownerPlayer.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
+            //エフェクトを出す
+            PlayEffect();
+        }
+        
+        private void PlayEffect()
+        {
+            // Effect生成処理
+            _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
+            _effectSpawner?.RequestPlayOneShotEffect(EffectType.PenguinAttack, _attackEffectPos.position,
+                _attackEffectPos.rotation);
+            // 音量再生
+            //CRIAudio.PlaySE("ALLCue", SoundCues.SE.Penguin_Attack);
         }
 
         public void FinishWaitTime()

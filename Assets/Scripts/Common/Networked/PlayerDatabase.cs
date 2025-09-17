@@ -58,6 +58,21 @@ namespace September.Common
 
             UpdatePlayerScore(actor, tracker);
         }
+        
+        // ハルクのDestroy処理もここで加算
+        public void Server_AddDestroyExhibit(PlayerRef actor, ExhibitType type)
+        {
+            if(!Object.HasStateAuthority)
+                return;
+
+            if (!_serverTrackers.TryGetValue(actor, out ScoreTracker tracker))
+            {
+                _serverTrackers[actor] = tracker = new ScoreTracker(_config);
+
+                tracker.AddDestroyed(type);
+                UpdatePlayerScore(actor, tracker);
+            }
+        }
 
         // 合計スコア取得
         public int Server_GetTotal(PlayerRef actor)　=> !_serverTrackers.TryGetValue(actor, out ScoreTracker tracker) ? 0 : tracker.CalcTotal();
@@ -98,7 +113,6 @@ namespace September.Common
                     PlayerDataDic.Set(player, data);
                 }
                 
-                // 個人詳細をエンコードして当人にだけ送る
                 string payload = EncodeDetailV2(tracker);
                 Rpc_SendPersonalResult(player, payload, calc);
             }
@@ -116,6 +130,21 @@ namespace September.Common
                 
                 sb.Append(kv.Key).Append('=').Append(kv.Value);
                 first = false;
+            }
+
+            if (tracker.DestroyedExhibitCounts.Count > 0)
+            {
+                sb.Append("|D:");
+                first = true;
+                foreach (KeyValuePair<ExhibitType, int> kv in tracker.DestroyedExhibitCounts)
+                {
+                    if (!first)
+                    {
+                        sb.Append(',');
+                    }
+                    sb.Append(kv.Key).Append('=').Append(kv.Value);
+                    first = false;
+                }
             }
             sb.Append("|S:").Append(tracker.StunCount);
             sb.Append("|G:").Append(tracker.GrapplingHookCount);

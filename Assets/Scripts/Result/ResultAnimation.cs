@@ -56,6 +56,12 @@ namespace Result
         [SerializeField] private CharacterIconPair[] _iconTable;
         [SerializeField] private Sprite _defaultIcon;
         
+        [Header("Ability Bonus Config")]
+        [SerializeField] private ExhibitScoreConfig _okabeRideConfig;
+        [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
+        [SerializeField] private int _sarutobiBonusScore = 50;
+        [SerializeField] private int _tanihiraBonusScore = 100;
+        
         private TextMeshProUGUI _finishText;
         private TextMeshProUGUI _resultText;
         private ResultRowRefs[] _rows;
@@ -69,6 +75,7 @@ namespace Result
         public async UniTask Play(ResultUIRootRefs resultUIRoot)
         {
             _resultUIRoot = resultUIRoot;
+            AbilityBonusContainer.Init(_okabeRideConfig,_haruDestroyConfig,_sarutobiBonusScore,_tanihiraBonusScore);
             Initialize();
 
             await UniTask.Delay(TimeSpan.FromSeconds(_startDelay));
@@ -141,16 +148,27 @@ namespace Result
             if (!db) 
                 return;
 
-            // Ogreを最後に、それ以外はスコア降順
+            // ローカルのスコアを参照
+            ResultDataInbox inbox = ResultDataInbox.I;
+            
             var data = db.PlayerDataDic
-                .Select(kv => kv.Value)
-                .OrderByDescending(x => x.Score)
-                .Select(x => (
-                    x.DisplayNickName,
-                    _iconMap.GetValueOrDefault(x.CharacterType, _defaultIcon),
-                    x.Score 
-                ))
-                .ToList();
+                .Select(kv =>
+                {
+                    SessionPlayerData d = kv.Value;
+                    // 基本スコア
+                    int baseScore = d.Score;
+                    //固有ボーナス
+                    int abilityScore = AbilityBonusContainer.CalcBonus(d.CharacterType,inbox);
+                    return
+                    (
+                        d.DisplayNickName, _iconMap.GetValueOrDefault(d.CharacterType, _defaultIcon),
+                        baseScore + abilityScore, d.IsOgre
+                    );
+                })
+                // 鬼は最後　それ以外は降順ソート
+                .OrderBy(x => x.IsOgre ? 1 : 0)
+                .ThenByDescending(x => x.Item3)
+                .ToList();  
 
             int rowCount = Mathf.Min(data.Count, _rows.Length);
             
@@ -159,7 +177,7 @@ namespace Result
 
             for (int i = 0; i < rowCount; i++)
             {
-                (string name, Sprite icon, int score) rowData = data[i];
+                (string name, Sprite icon, int score, bool isOgre) rowData = data[i];
                 ResultRowRefs row = _rows[i];
                 row.gameObject.SetActive(true);
 
@@ -262,9 +280,14 @@ namespace Result
                 ? d.DisplayNickName
                 : null;
             
-            var ranking = db.PlayerDataDic
-                .Select(kv => kv.Value)
-                .OrderByDescending(v => v.Score)
+            List<(string DisplayNickName, int total)> ranking = db.PlayerDataDic
+                .Select(kv =>
+                {
+                    SessionPlayerData d = kv.Value;
+                    int total = d.Score + AbilityBonusContainer.CalcBonus(d.CharacterType, ResultDataInbox.I);
+                    return (d.DisplayNickName, total);
+                })
+                .OrderByDescending(v => v.total)
                 .ToList();
             
             int rank = ranking.FindIndex(p => p.DisplayNickName == localName);

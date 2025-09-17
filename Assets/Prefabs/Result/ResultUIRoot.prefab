@@ -434,7 +434,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4100441255551603045}
   m_Father: {fileID: 438431239371005147}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -472,6 +473,81 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 43f74b582c830dc4298a7fdd60e03063, type: 3}
   m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &1294285121459254361
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4100441255551603045}
+  - component: {fileID: 7754957701838930407}
+  - component: {fileID: 4585821413456395119}
+  m_Layer: 5
+  m_Name: icon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &4100441255551603045
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294285121459254361}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 837285135627424358}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 216.43054, y: -431.04016}
+  m_SizeDelta: {x: -432.8612, y: -862.0804}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &7754957701838930407
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294285121459254361}
+  m_CullTransparentMesh: 1
+--- !u!114 &4585821413456395119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294285121459254361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1103,6 +1179,10 @@ MonoBehaviour:
   - Type: 3
     Icon: {fileID: 21300000, guid: ddc2df57ee9d3004481e34d4ba7cb2b6, type: 3}
   _defaultIcon: {fileID: 21300000, guid: ddc2df57ee9d3004481e34d4ba7cb2b6, type: 3}
+  _okabeRideConfig: {fileID: 11400000, guid: c0c1276d285f64042989cd9c4ddf6005, type: 2}
+  _haruDestroyConfig: {fileID: 11400000, guid: f453eafa8363088438ff15bd0234111b, type: 2}
+  _sarutobiBonusScore: 50
+  _tanihiraBonusScore: 100
 --- !u!114 &8028413653264302213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1125,6 +1205,7 @@ MonoBehaviour:
   - {fileID: 3479997389608968833}
   _stunRowRoot: {fileID: 7894413625073317186}
   _stunTotalText: {fileID: 6473718285236084701}
+  StunPoint: 150
   _exhibitRowRoot: {fileID: 2670811292962281800}
   _exhibitRowPrefab: {fileID: 2647427190352640587, guid: 9d80713af3959744e85178534f54514b, type: 3}
   _exhibitTotalText: {fileID: 3927973731709547011}
@@ -1133,10 +1214,6 @@ MonoBehaviour:
   _abilityRowPrefab: {fileID: 4082013979130643075, guid: 5ccd26013933b5349a869b621a21bb7b, type: 3}
   _abilityTitle: {fileID: 272954687983860881}
   _abilityTotalText: {fileID: 7035789625661166714}
-  _okabeRideConfig: {fileID: 11400000, guid: c0c1276d285f64042989cd9c4ddf6005, type: 2}
-  _haruDestroyConfig: {fileID: 11400000, guid: f453eafa8363088438ff15bd0234111b, type: 2}
-  _sarutobiBonusScore: 50
-  _tanihiraBonusScore: 100
 --- !u!1 &4812206973395280579
 GameObject:
   m_ObjectHideFlags: 0

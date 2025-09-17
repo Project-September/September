@@ -12,6 +12,8 @@ namespace Result
         
         private int _grapplingHookCount;
         private int _friendExhibitCount;
+        
+        private readonly Dictionary<ExhibitType, int> _destroyedExhibitCounts = new();
 
         // スコアの加算処理
         public void AddGrapplingHook() => _grapplingHookCount++;
@@ -27,6 +29,7 @@ namespace Result
         
         public void SetConfig(ExhibitScoreConfig config) => _config = config;
         public IReadOnlyDictionary<ExhibitType,int> ExhibitCounts => _count;
+        public IReadOnlyDictionary<ExhibitType,int> DestroyedExhibitCounts => _destroyedExhibitCounts;
         
         // Stun
         public void AddStun() => _stunCount++;
@@ -49,6 +52,12 @@ namespace Result
             return _count.GetValueOrDefault(type, 0);
         }
         
+        public void AddDestroyed(ExhibitType t)
+        {
+            _destroyedExhibitCounts.TryAdd(t, 0);
+            _destroyedExhibitCounts[t]++;
+        }
+        
         public void MergeFrom(ScoreTracker other)
         {
             if (other == null) 
@@ -65,6 +74,7 @@ namespace Result
         // 合計値を計算
         public int CalcTotal()
         {
+            // スコアの設定に合わせて計算
             int sum = _count.Sum(kv => (_config ? _config.GetPoint(kv.Key) : 0) * kv.Value);
 
             const int stunPoint = 150;
@@ -75,7 +85,10 @@ namespace Result
         public void Clear()
         {
             _count.Clear();
+            _destroyedExhibitCounts.Clear();
             _stunCount = 0;
+            _grapplingHookCount = 0;
+            _friendExhibitCount = 0;
         }
     }
 }

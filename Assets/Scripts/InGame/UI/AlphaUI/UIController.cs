@@ -13,7 +13,7 @@ namespace September.InGame.UI
         private readonly Subject<bool> _onClickOptionButton = new();
         private readonly ReactiveProperty<int> _onChangeSliderValue = new();
         private readonly Subject<Unit> _onStartTimer = new();
-        private readonly Subject<string> _onNoticeKillLog = new();
+        private readonly Subject<string> _onShowLog = new();
         private readonly ReactiveProperty<bool> _onShowOgreUI = new();
         private readonly ReactiveProperty<float> _onChangeStaminaValue = new();
         private readonly Subject<Unit> _onGameStart = new();
@@ -28,7 +28,7 @@ namespace September.InGame.UI
         public IObservable<bool> OnClickOptionButton => _onClickOptionButton;
         public IReadOnlyReactiveProperty<int> OnChangeSliderValue => _onChangeSliderValue;
         public IObservable<Unit> OnStartTimer => _onStartTimer;
-        public IObservable<string> OnNoticeKillLog => _onNoticeKillLog;
+        public IObservable<string> OnShowLog => _onShowLog;
         public IObservable<bool> OnShowOgreUI => _onShowOgreUI;
         public IReadOnlyReactiveProperty<float> OnChangeStaminaValue => _onChangeStaminaValue;
         
@@ -49,9 +49,9 @@ namespace September.InGame.UI
             _onGameEnd.OnNext(Unit.Default);
         }
 
-        public void ShowNoticeKillLog(string text)
+        public void ShowLog(string text)
         {
-            _onNoticeKillLog.OnNext(text);
+            _onShowLog.OnNext(text);
         }
         
         public void StartTimer()

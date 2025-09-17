@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3645482351071708722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1016002523281781459
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3005691076101400526}
+  m_Layer: 0
+  m_Name: AttackEffectPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3005691076101400526
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016002523281781459}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.56, z: 0.145}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3645482351071708722}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &79087981602981250
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -160,6 +191,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7149895256155660826}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3005691076101400526}
     - targetCorrespondingSourceObject: {fileID: 5292628107875056270, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 324020167905794841}
@@ -340,6 +374,7 @@ MonoBehaviour:
   _hitChecker: {fileID: -5790574225442928201}
   _currentState: 0
   _tutankhamen: {fileID: 7779320689186046958}
+  _attackEffectPos: {fileID: 3005691076101400526}
 --- !u!65 &4605572418024795219
 BoxCollider:
   m_ObjectHideFlags: 0

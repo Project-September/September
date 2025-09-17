@@ -82,7 +82,8 @@ namespace Result
                         foreach (string it in items)
                         {
                             string[] kv = it.Split('=', StringSplitOptions.RemoveEmptyEntries);
-                            if (kv.Length != 2) continue;
+                            if (kv.Length != 2)
+                                continue;
 
                             if (Enum.TryParse(kv[0], out ExhibitType t) &&
                                 int.TryParse(kv[1], out int c))

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -45,13 +44,6 @@ namespace Result
         [SerializeField] private TextMeshProUGUI _abilityTitle;
         [SerializeField] private TextMeshProUGUI _abilityTotalText;
         
-        [Header("Ability Bonus Config")]
-        [SerializeField] private ExhibitScoreConfig _okabeRideConfig;
-        [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
-        [SerializeField] private int _sarutobiBonusScore = 50;
-        [SerializeField] private int _tanihiraBonusScore = 100;
-        
-        private Dictionary<CharacterType, IAbilityBonusRenderer> _bonusRenderers;
         private ResultDataInbox _resultDataInbox;
         private bool _isFinish;
 
@@ -115,14 +107,6 @@ namespace Result
 
             if (_pages.Length > 0)
                 _stack.Push(_pages[0]);
-            
-            _bonusRenderers = new Dictionary<CharacterType, IAbilityBonusRenderer>
-            {
-                { CharacterType.OkabeWright, new OkabeBonusRenderer(_okabeRideConfig.Entries.ToDictionary(e => e.Type, e => e.Points)) },
-                { CharacterType.HulkTheButcher, new HaruBonusRenderer(_haruDestroyConfig.Entries.ToDictionary(e => e.Type, e => e.Points)) },
-                { CharacterType.Sarutobi, new SarutobiBonusRenderer(_sarutobiBonusScore) },
-                { CharacterType.Tanihira, new TanihiraBonusRenderer(_tanihiraBonusScore) },
-            };
             
             SetStunPage();
             SetExhibitPage();
@@ -217,7 +201,7 @@ namespace Result
 
                 if (texts.Length >= 3)
                 {
-                    texts[0].text = type.ToString();  
+                    texts[0].text = type.ToDisplayName();  
                     texts[1].text = $"×{count}";
                     texts[2].text = score.ToString();
                 }
@@ -240,26 +224,22 @@ namespace Result
             if (!inbox)
                 return;
 
-            int totalScore = 0;
-            
             PlayerDatabase db = PlayerDatabase.Instance;
             if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out SessionPlayerData localData))
             {
                 Debug.LogWarning("[SetAbilityBonusPage] Local player data not found");
                 return;
             }
+
             CharacterType chara = localData.CharacterType;
-            
-            if (_bonusRenderers != null && _bonusRenderers.TryGetValue(chara, out IAbilityBonusRenderer r))
-            {
-                totalScore = r.Render(inbox, _abilityRowRoot, _abilityRowPrefab, _abilityTitle);
-            }
-            else
-                Debug.Log($"[SetAbilityBonusPage] No bonus renderer for {chara}");
+
+            // AbilityBonusContainer に「描画付き」メソッドを用意して呼ぶ
+            int totalScore = AbilityBonusContainer.Render(chara, inbox, _abilityRowRoot, _abilityRowPrefab, _abilityTitle);
 
             if (_abilityTotalText)
                 _abilityTotalText.text = totalScore.ToString();
         }
+
         
         // ページ遷移制御
         private RectTransform GetNextPage()
@@ -334,7 +314,7 @@ namespace Result
             current.anchoredPosition = OffRight();
             _isAnimating = false;
         }
-
+        
         private Vector2 OffRight() => new(_canvasWidth * 1.05f + _pageGap, 0f);
         private Vector2 OffLeft() => new(-_canvasWidth * 1.05f - _pageGap, 0f);
 
