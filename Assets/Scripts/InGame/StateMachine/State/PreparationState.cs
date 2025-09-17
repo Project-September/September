@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Cinemachine;
 using CRISound;
@@ -92,7 +92,7 @@ namespace September.Common
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ
             GameInput.I.ToggleMoveInput(true);
-            PlayBGM(Context.InGameBGMCueName);
+            BGMManager.ReleseFlag();
             UIController.I.StartTimer();
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
             //  ゲーム開始
@@ -201,19 +201,6 @@ namespace September.Common
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-        }
-        private void PlayBGM(string newCueName)
-        {
-            if(!string.IsNullOrEmpty(Context.CurrentBGM))
-            {
-                CRIAudio.StopBGM("BGM", Context.CurrentBGM);
-            }
-            
-            if(!string.IsNullOrEmpty(newCueName))
-            {
-                CRIAudio.PlayBGM("BGM", newCueName);
-                Context.CurrentBGM = newCueName;
-            }
         }
         private void SetOgreLamp()
         {

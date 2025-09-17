@@ -1,4 +1,4 @@
-using CRISound;
+﻿using CRISound;
 using September.Common;
 using UnityEngine;
 
@@ -18,6 +18,7 @@ public static class RuntimeManager
         if (prefab != null)
         {
             CuePlayAtomExPlayer.Initialize();
+            BGMManager.Initialize();
         }
         else
             Debug.LogError($"{prefab.name} is not found in Resources");

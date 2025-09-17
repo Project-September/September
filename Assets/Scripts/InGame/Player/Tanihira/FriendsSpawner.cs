@@ -24,22 +24,21 @@ namespace InGame.Tanihira
         //初期化処理
         private void Initialize()
         {
-            if(!HasInputAuthority)
-                return;
-            
             _networkRunner = FindFirstObjectByType<NetworkRunner>();
             if (_networkRunner == null)
             {
                 Debug.LogError("NetworkRunnerがありません");
             }
-            if (!_networkRunner.IsServer) return;
-            
-            //初期で登録されたフレンドを生成
-            for (int i = 0; i < _friendsTypes.Length; i++)
-            {
-                SpawnFriend(_friendsTypes[i], _firstSpawnPoint);
-            }
 
+            if (HasStateAuthority)
+            {
+                //初期で登録されたフレンドを生成
+                for (int i = 0; i < _friendsTypes.Length; i++)
+                {
+                    SpawnFriend(_friendsTypes[i], _firstSpawnPoint);
+                }
+            }
+            
             _formationManager.RegisterFriendFormation();
         }
 
