@@ -424,6 +424,10 @@ MonoBehaviour:
   _clipPlayer: {fileID: 8254388696613982807}
   _footstepBlockClipList:
   - {fileID: 7400000, guid: bca6193f688d20a43b0b8202f53a204a, type: 2}
+  _playerTransform: {fileID: 0}
+  _cameraTransform: {fileID: 0}
+  _debugBGMVolume: 1
+  _debugSEVolume: 1
 --- !u!114 &6329918266438203417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5538,9 +5542,10 @@ MonoBehaviour:
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
-  _faint: {fileID: 0}
-  _getUp: {fileID: 0}
-  _playerManager: {fileID: 0}
+  _faint: {fileID: 7400000, guid: e8cbd34ecaacc9b459b559b2034dca3c, type: 2}
+  _getUp: {fileID: 7400000, guid: f4140103be0d5964e882ae1d03cbc847, type: 2}
+  _playerManager: {fileID: -4668177863944640257}
+  _playerHealth: {fileID: 5358505061852357365}
   _fallInTime: 0.5
   _fallInCurve:
     serializedVersion: 2
@@ -5591,6 +5596,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _hitReactionClip: {fileID: 7400000, guid: dc52e77d074bc11469d9ad6d72bb5654, type: 2}
   _overrideInTime: 0.08
   _overrideInCurve:
     serializedVersion: 2

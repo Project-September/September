@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Fusion;
 using Fusion.Addons.Physics; // 追加
 using InGame.Player;
+using UniRx;
 using UnityEngine;
 
 namespace InGame.Common
@@ -16,6 +18,7 @@ namespace InGame.Common
         [SerializeField] private AnimationClip _faint;  // 追加: 気絶アニメーション
         [SerializeField] private AnimationClip _getUp;   // 追加: 起き上がりアニメーション
         [SerializeField] private PlayerManager _playerManager; // 追加: PlayerManager参照
+        [SerializeField] private PlayerHealth _playerHealth;
 
         // ▼ 追加: ブレンド設定
         [Header("Fall Blend")]
@@ -24,6 +27,8 @@ namespace InGame.Common
         [SerializeField, Range(0f, 1f)] private float _landOutTime = 0.12f;
         [SerializeField] private AnimationCurve _landOutCurve = null;
         
+        [Header("被ダメ")]
+        [SerializeField] private AnimationClip _hitReactionClip = null;
         [Header("気絶")]
         [SerializeField, Range(0f, 1f)] private float _overrideInTime = 0.08f;
         [SerializeField] private AnimationCurve _overrideInCurve = null;
@@ -34,6 +39,27 @@ namespace InGame.Common
         private bool _isVaultingLastFrame = false;
         private bool _isFadingOutFall = false;       // 着地フェード多重起動防止
         private CancellationTokenSource _overrideCts;
+        private bool _isFainting = false;          // 気絶中フラグ（多重起動防止）
+
+        private void Start()
+        {
+            Observable.EveryUpdate().Subscribe(_ =>
+            {
+                if (_playerManager.IsStun && !_isFainting)
+                {
+                    _isFainting = true;
+                    TriggerFaint();
+                }
+            });
+            _playerHealth.OnHitTaken += (hitData) =>
+            {
+                if (!_playerManager.IsStun)
+                {
+                    //被ダメのアニメーション再生
+                    RPC_SetTopPriorityClip();
+                }
+            };
+        }
 
         private void LateUpdate()
         {
@@ -107,6 +133,13 @@ namespace InGame.Common
             _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
             _overrideCts = null;
         }
+
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_SetTopPriorityClip()
+        {
+            _animationClipPlayer.SetTopPriorityClip(_hitReactionClip);
+        }
         
           private async UniTaskVoid PlayFaintSequenceAsync()
         {
@@ -172,6 +205,7 @@ namespace InGame.Common
                 }
                 cts.Dispose();
             }
+            _isFainting = false;
         }
         
 
