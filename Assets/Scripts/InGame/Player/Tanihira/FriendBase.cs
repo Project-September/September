@@ -90,6 +90,14 @@ namespace Ingame.Tanihira
             
             // 現在のステートのUpdateを呼び出し
             _friendStateMappings[_currentState]?.OnUpdate(this);
+            transform.position = _agent.nextPosition;
+            if(_agent != null && _agent.enabled && _agent.isOnNavMesh)
+            //位置を更新する
+            if (_agent.remainingDistance >= _agent.stoppingDistance)
+            {
+                if(_agent.desiredVelocity.sqrMagnitude > 0.01f)
+                    transform.rotation = Quaternion.LookRotation(_agent.velocity);
+            }
         }
 
         /// <summary>
@@ -109,8 +117,9 @@ namespace Ingame.Tanihira
             
             _agent.enabled = false;
             _agent.enabled = true;
-            _agent.updatePosition = true;
-            _agent.updateRotation = true;
+            //Agentでの移動を無効かする
+            _agent.updatePosition = false;
+            _agent.updateRotation = false;
             InitializeAgent();
         }
 
