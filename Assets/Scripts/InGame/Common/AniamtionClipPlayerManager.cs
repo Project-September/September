@@ -43,14 +43,19 @@ namespace InGame.Common
 
         private void Start()
         {
-            Observable.EveryUpdate().Subscribe(_ =>
-            {
-                if (_playerManager.IsStun && !_isFainting)
+            _playerManager.ObserveEveryValueChanged(x => x.IsStun)
+                .Subscribe(isStun =>
                 {
-                    _isFainting = true;
-                    TriggerFaint();
-                }
-            });
+                    if (isStun && !_isFainting)
+                    {
+                        _isFainting = true;
+                        TriggerFaint();
+                    }
+                    else
+                    {
+                        _isFainting = false;
+                    }
+                });
             _playerHealth.OnHitTaken += (hitData) =>
             {
                 if (!_playerManager.IsStun)
@@ -200,7 +205,6 @@ namespace InGame.Common
                 }
                 cts.Dispose();
             }
-            _isFainting = false;
         }
         
 
