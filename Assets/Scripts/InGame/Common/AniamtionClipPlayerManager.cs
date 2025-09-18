@@ -56,7 +56,7 @@ namespace InGame.Common
                 if (!_playerManager.IsStun)
                 {
                     //被ダメのアニメーション再生
-                    RPC_SetTopPriorityClip();
+                    _animationClipPlayer.PlayClip(_hitReactionClip);
                 }
             };
         }
@@ -135,12 +135,7 @@ namespace InGame.Common
         }
 
 
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        private void RPC_SetTopPriorityClip()
-        {
-            _animationClipPlayer.SetTopPriorityClip(_hitReactionClip);
-        }
-        
+
           private async UniTaskVoid PlayFaintSequenceAsync()
         {
             _hardOverride = true;
