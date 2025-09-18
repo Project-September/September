@@ -60,7 +60,6 @@ namespace Result
             // リザルト画面に以降する
             if (_isFinish && _gameInput.Result.Finish.triggered)
             {
-                //NetworkManager.Instance.QuitInGame().Forget();
                 SceneManager.UnloadSceneAsync("Field");
                 SceneManager.LoadSceneAsync("Result", LoadSceneMode.Single);
             }

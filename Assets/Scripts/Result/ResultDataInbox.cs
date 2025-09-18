@@ -15,6 +15,7 @@ namespace Result
         // その他のカウント
         public int GrapplingHookCount { get; private set; }
         public int FriendExhibitCount { get; private set; }
+        public int StunCount { get; private set; }
 
         public event Action OnChanged;
 
@@ -96,7 +97,7 @@ namespace Result
                     {
                         string s = b[2..];
                         if (int.TryParse(s, out int stun))
-                            Mathf.Max(0, stun);
+                            StunCount = Mathf.Max(0, stun);
                     }
                     else if (b.StartsWith("G:")) 
                     {
