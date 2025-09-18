@@ -36,6 +36,7 @@ namespace Result
     {
         public ExhibitType Type;
         public int Points;
+        public int DestroyPoints;
     }
     
     [AttributeUsage(AttributeTargets.Field)]

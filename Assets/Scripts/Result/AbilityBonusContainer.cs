@@ -87,7 +87,7 @@ namespace Result
             return total;
         }
         
-        public static int CalcBonus(CharacterType type, ResultDataInbox inbox)
+        public static int CalcBonus(CharacterType type, ScoreTracker inbox)
         {
             switch (type)
             {
