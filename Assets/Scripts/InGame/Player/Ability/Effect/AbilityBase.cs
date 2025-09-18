@@ -75,6 +75,7 @@ namespace  InGame.Player.Ability
         public virtual bool CanStartAbilityOverride() => true;
         protected virtual void OnStart() { }
         protected virtual void OnUpdate(float deltaTime) { }
+        public virtual void OnUpdateLocal(float deltaTime, GameObject owner) { }   // ローカルプレイヤー専用の更新処理。基本使わない
         protected virtual void OnEndAbility()
         {
             CooldownEndTime = Runner ? Runner.SimulationTime + _cooldown : Time.time + _cooldown;
