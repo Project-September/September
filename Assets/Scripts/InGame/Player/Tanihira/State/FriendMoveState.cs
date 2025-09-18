@@ -35,6 +35,7 @@ namespace Ingame.Tanihira
             friend.Agent.SetDestination(friend.Destination.position);
             //速度に応じて、アニメーションを変化させる
             friend.Animator.SetFloat("MoveBlend", friend.Agent.velocity.magnitude);
+            friend.ChangeRunEffect(friend.Agent.velocity.magnitude);
         }
     }
 }
