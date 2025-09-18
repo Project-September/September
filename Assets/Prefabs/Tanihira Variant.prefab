@@ -5615,9 +5615,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _firstFormationTransform: {fileID: 3476019141667097556}
   _formationOffset: 1
-  _warpSerchDistance: 10
+  _warpSerchDistance: 3
   _outFieldWarpHeight: 100
   _inFieldWarpHeight: -7
+  _underWarpHeight: 40
+  _raycastMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &7211274858843390964
 MonoBehaviour:
   m_ObjectHideFlags: 0
