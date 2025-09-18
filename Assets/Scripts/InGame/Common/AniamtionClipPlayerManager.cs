@@ -66,6 +66,8 @@ namespace InGame.Common
             };
         }
 
+        public bool EnableFallMotion = true;
+
         private void LateUpdate()
         {
             if (!_animationClipPlayer) return;
@@ -94,6 +96,7 @@ namespace InGame.Common
             // ===== 落下の開始（TopLayerへクリップ挿入→重み0→1へブレンド） =====
             // すでに FallDown が再生中なら何もしない（毎フレーム再生し直さない）
             if (!_playerMovement.IsGroundNet
+                && EnableFallMotion
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
                 && !_animationClipPlayer.IsPlayingTargetClip(_fallDown))
             {

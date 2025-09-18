@@ -1,10 +1,7 @@
-using System;
 using Fusion;
-using InGame.Common;
 using InGame.Health;
 using September.Common;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using PlayerInput = September.Common.PlayerInput;
 
 namespace InGame.Player
@@ -17,6 +14,7 @@ namespace InGame.Player
         [SerializeField] GameObject _colliderObj;
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
+        [SerializeField] private Vector3 _respawnPosition;
         
         PlayerMovement _playerMovement;
         CameraController _cameraController;
@@ -49,6 +47,8 @@ namespace InGame.Player
         public override void Spawned()
         {
             InitComponents();
+            
+            _respawnPosition = transform.position;
         }
 
         /// <summary> Player関連コンポーネントの初期化 </summary>
@@ -68,11 +68,6 @@ namespace InGame.Player
                 _playerHealth = health;
                 health.OnDeath += OnDeath;
             }
-
-            // if (TryGetComponent(out PlayerAnimBase playerAnimBase))
-            // {
-            //     playerAnimBase.Init(this);
-            // }
         }
 
         private void LateUpdate()
@@ -140,6 +135,11 @@ namespace InGame.Player
                 }
                 
                 _playerMovement.MoveTick(Runner.DeltaTime);
+
+                if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Warp))
+                {
+                    Respawn();
+                }
             }
 
             if (_shouldWarp)
@@ -195,6 +195,14 @@ namespace InGame.Player
         public void RPC_SetMeshActive(NetworkBool active)
         {
             _meshObj.SetActive(active);
+        }
+
+        /// <summary> 非常用リスポーン </summary>
+        void Respawn()
+        {
+            if (!HasStateAuthority) return;
+            
+            _playerMovement.Teleport(_respawnPosition);
         }
 
         /// <summary> スタンの経過時間を取得する </summary>
