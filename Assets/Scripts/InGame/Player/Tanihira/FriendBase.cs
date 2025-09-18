@@ -40,7 +40,10 @@ namespace Ingame.Tanihira
         [SerializeField, ReadOnly] protected FriendState _currentState;
         [SerializeField] private GameObject _tutankhamen;
         [SerializeField] private Transform _attackEffectPos;
+        [SerializeField] private GameObject _runEffectObject;
+        [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
         [Networked] private NetworkBool HasMask { get; set; }
+        [Networked] private NetworkBool HasRunEffect { get; set; }
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -251,11 +254,31 @@ namespace Ingame.Tanihira
         {
             if(_tutankhamen)
                 _tutankhamen.SetActive(HasMask);
+            if(_runEffectObject)
+                _runEffectObject.SetActive(HasRunEffect);
         }
         public void SetMask(bool value)
         {
             if (!HasStateAuthority) return;
             HasMask = value;
+        }
+
+        private void SetRunEffect(bool value)
+        {
+            if (!HasStateAuthority) return;
+            HasRunEffect = value;
+        }
+
+        public void ChangeRunEffect(float value)
+        {
+            if (value >= _maxRunBlendTreeCount)
+            {
+                SetRunEffect(true);
+            }
+            else
+            {
+                SetRunEffect(false);
+            }
         }
 
         public void StartBuff(float buffRate)
