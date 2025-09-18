@@ -16,7 +16,7 @@ namespace InGame.Player.Ability.Effect
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
-            var disableInteractEffect = hitInfo.GetComponent<DisableInteractEffect>();
+            var disableInteractEffect = hitInfo.gameObject.GetComponentInHierarchy<DisableInteractEffect>();
             if (damageable == null && !disableInteractEffect) return;
 
             if (damageable != null)
