@@ -25,9 +25,12 @@ public class FriendChaseState : IFriendState
             
         //速度に応じて、アニメーションを変化させる
         friend.Animator.SetFloat("MoveBlend", friend.Agent.velocity.magnitude);
+        friend.ChangeRunEffect(friend.Agent.velocity.magnitude);
 
         if (friend.Agent.remainingDistance <= friend.Agent.stoppingDistance && !friend.IsAttack)
         {
+            //エフェクトを消す
+            friend.ChangeRunEffect(0.0f);
             friend.ChangeState(FriendState.Attack);
         }
     }

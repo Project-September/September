@@ -104,7 +104,7 @@ namespace Ingame.Tanihira
         }
 
         /// <summary>
-        /// 原罪の隊列を登録する
+        /// 現在の隊列を登録する
         /// </summary>
         public void RegisterFriendFormation()
         {
@@ -126,7 +126,7 @@ namespace Ingame.Tanihira
             //フレンドのステートの切り替え
             foreach (FriendBase friend in _currentFriendsList)
             {
-                friend.Agent.isStopped = true;
+                //friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
                 friend.Animator.SetFloat("MoveBlend", 0);
                 friend.ChangeState(FriendState.Wait);

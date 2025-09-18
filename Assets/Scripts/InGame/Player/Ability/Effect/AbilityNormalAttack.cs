@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -17,8 +18,6 @@ namespace InGame.Player.Ability
     {
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] protected int _attackDamage = 10;
-        [SerializeField] protected HitChecker _hitChecker;
-        [SerializeField] private bool _isSubscribe = false;
         [SerializeField] private int _startHitCheckFrame = 17;
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
@@ -29,6 +28,21 @@ namespace InGame.Player.Ability
         
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
+        
+        [Header("Hit Box Cast")]
+        [SerializeField] private Vector3 _boxHalfExtents = new Vector3(0.45f, 0.85f, 0.45f);
+        [SerializeField] private Vector3 _boxLocalOffset = new Vector3(0f, 0.9f, 0.6f);
+        [SerializeField, Tooltip("前方へ掃引する距離")]
+        private float _boxCastDistance = 1.0f;
+        [SerializeField] private LayerMask _hitLayer = ~0;
+        [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Ignore;
+        private readonly RaycastHit[] _hitBuffer = new RaycastHit[16];
+        private readonly HashSet<Collider> _alreadyHit = new HashSet<Collider>();
+        
+        [Header("Debug Draw")]
+        [SerializeField] private Color _debugHitBoxColor   = new Color(0f, 0.6f, 1f, 1f);
+        [SerializeField, Tooltip("Debug 線の表示秒数。0 なら 1 フレームだけ")]
+        private float _debugDrawDuration = 1f; // 例: 0.05f
 
         // 変換後のTickオフセット
         int _startHitTick, _endHitTick, _endAttackTick;
@@ -70,15 +84,42 @@ namespace InGame.Player.Ability
                 _closestEnemyTransform = GetClosestEnemy();
             }
             
-            if (!_isSubscribe)
-            {
-                _isSubscribe = true;
-                _hitChecker.OnHit += OnHitEnemy;
-            }
             _startHitTick  = FrameToTick(_startHitCheckFrame);
         }
 
-        protected virtual void OnHitEnemy(Collider hitInfo)
+        public override void OnUpdateLocal(float deltaTime, GameObject owner)
+        {
+            if (HitboxDebugUtility.IsDebugModeEnabled)
+            {
+                var t = owner.transform;
+                if (!t) return;
+
+                // BoxCast の原点と向き
+                var origin = t.position + t.TransformVector(_boxLocalOffset);
+                var dir    = t.forward;
+                var rot    = t.rotation;
+                
+                if (HitboxDebugUtility.IsDebugModeEnabled)
+                {
+                    // 表示したい位置を1つだけ選ぶ
+                    // BoxCast なら「終了位置だけ」見せるのが直感的
+                    var boxCenter = _boxCastDistance > 0f
+                        ? origin + dir.normalized * _boxCastDistance   // 終了側
+                        : origin;                                       // 距離0なら開始側
+
+                    HitboxDebugUtility.DrawBoxOneFrame(
+                        boxCenter,
+                        _boxHalfExtents,
+                        rot,
+                        _debugHitBoxColor   // 好きな色に
+                    );
+                }
+
+            }
+
+        }
+
+        protected virtual void OnHitEnemy(Collider hitInfo, Vector3 hitPosition)
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
@@ -89,10 +130,54 @@ namespace InGame.Player.Ability
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
-            
+
             //エフェクトの再生
-          
-            _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(_hitChecker.HitPoint.First().position), Quaternion.identity);
+            _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
+        }
+        
+        private void CastAndApplyHits()
+        {
+            var t = Parameter.Owner.transform;
+
+            // BoxCast の原点と向き
+            var origin = t.position + t.TransformVector(_boxLocalOffset);
+            var dir    = t.forward;
+            var rot    = t.rotation;
+
+            // 掃引（NonAlloc で GC しない）
+            int hitCount = Physics.BoxCastNonAlloc(
+                origin,
+                _boxHalfExtents,
+                dir,
+                _hitBuffer,
+                rot,
+                _boxCastDistance,
+                _hitLayer,
+                _triggerInteraction
+            );
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                var hit = _hitBuffer[i];
+                var col = hit.collider;
+                if (col == null) continue;
+
+                // 自分自身除外
+                if (col.GetComponentInParent<NetworkObject>() == Parameter.Owner) continue;
+
+                // 二度当たり防止
+                if (_alreadyHit.Contains(col)) continue;
+                _alreadyHit.Add(col);
+
+                // ヒット位置が 0 のことがあるのでフォールバック
+                var hitPos = hit.point;
+                if (hitPos == Vector3.zero)
+                    hitPos = origin + dir * Mathf.Max(0.1f, _boxCastDistance * 0.5f);
+
+                OnHitEnemy(col, hitPos);
+            }
+            // バッファ初期化（念のため）
+            Array.Clear(_hitBuffer, 0, hitCount);
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -116,11 +201,15 @@ namespace InGame.Player.Ability
             // ヒット窓
             bool inWindow = elapsed >= _startHitTick && elapsed < _endHitTick;
 
-            if (_hitChecker != null)
+            if (inWindow)
             {
-                // 必要な時だけ切り替え（連続呼び出しでも軽いが、不要トグルを避ける）
-                if (inWindow && !_hitChecker.IsActive) _hitChecker.StartHitCheck();
-                if (!inWindow && _hitChecker.IsActive) _hitChecker.EndHitCheck();
+                CastAndApplyHits(); // ← ここで BoxCast 実行
+            }
+            else
+            {
+                // 窓を抜けたら次の攻撃に備えてクリア
+                if (elapsed >= _endHitTick && _alreadyHit.Count > 0)
+                    _alreadyHit.Clear();
             }
 
             // 攻撃終了
@@ -161,15 +250,6 @@ namespace InGame.Player.Ability
                 return null;
             }
         }
-        
-        protected override void OnEndAbility()
-        {
-            if (_isSubscribe && _hitChecker != null)
-            {
-                _hitChecker.OnHit -= OnHitEnemy;
-                _isSubscribe = false;
-            }
-            base.OnEndAbility();
-        }
     }
 }
+

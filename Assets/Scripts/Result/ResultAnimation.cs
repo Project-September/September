@@ -140,17 +140,23 @@ namespace Result
             PlayerDatabase db = PlayerDatabase.Instance;
             if (!db) 
                 return;
-
-            // Ogreを最後に、それ以外はスコア降順
+            
             var data = db.PlayerDataDic
-                .Select(kv => kv.Value)
-                .OrderByDescending(x => x.Score)
-                .Select(x => (
-                    x.DisplayNickName,
-                    _iconMap.GetValueOrDefault(x.CharacterType, _defaultIcon),
-                    x.Score 
-                ))
-                .ToList();
+                .Select(kv =>
+                {
+                    SessionPlayerData d = kv.Value;
+                    return
+                    (
+                        d.DisplayNickName,
+                        _iconMap.GetValueOrDefault(d.CharacterType, _defaultIcon),
+                        d.Score,
+                        d.IsOgre
+                    );
+                })
+                // 鬼は最後　それ以外は降順ソート
+                .OrderBy(x => x.IsOgre ? 1 : 0)
+                .ThenByDescending(x => x.Item3)
+                .ToList();  
 
             int rowCount = Mathf.Min(data.Count, _rows.Length);
             
@@ -159,7 +165,7 @@ namespace Result
 
             for (int i = 0; i < rowCount; i++)
             {
-                (string name, Sprite icon, int score) rowData = data[i];
+                (string name, Sprite icon, int score, bool isOgre) rowData = data[i];
                 ResultRowRefs row = _rows[i];
                 row.gameObject.SetActive(true);
 
@@ -262,9 +268,16 @@ namespace Result
                 ? d.DisplayNickName
                 : null;
             
-            var ranking = db.PlayerDataDic
-                .Select(kv => kv.Value)
-                .OrderByDescending(v => v.Score)
+            List<(string DisplayNickName, int total)> ranking = db.PlayerDataDic
+                .Select(kv =>
+                {
+                    SessionPlayerData data = kv.Value;
+                    int total = data.Score;
+                    
+                    Debug.Log($"Player {data.DisplayNickName} Total={total}");
+                    return (data.DisplayNickName, total);
+                })
+                .OrderByDescending(v => v.total)
                 .ToList();
             
             int rank = ranking.FindIndex(p => p.DisplayNickName == localName);

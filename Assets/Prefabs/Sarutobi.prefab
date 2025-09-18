@@ -13461,8 +13461,6 @@ MonoBehaviour:
         _phase: 0
         _normalAttackAnimationClip: {fileID: 7400000, guid: 5baf9b89bf82cf9419a44964406b2f20, type: 2}
         _attackDamage: 10
-        _hitChecker: {fileID: 6462417923102071326}
-        _isSubscribe: 0
         _startHitCheckFrame: 9
         _endHitCheckFrame: 17
         _endAttackFrame: 22
@@ -13471,6 +13469,15 @@ MonoBehaviour:
         _hitEffect: 18
         _animationClipPlayer: {fileID: 8254388696613982807}
         _enableAutoAim: 1
+        _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
+        _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
+        _boxCastDistance: 1
+        _hitLayer:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        _triggerInteraction: 1
+        _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
+        _debugDrawDuration: 1
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
@@ -13527,7 +13534,8 @@ MonoBehaviour:
   _fallDown: {fileID: 7400000, guid: 7d6ee42e50a5e3046917db7f6ac26f3b, type: 2}
   _faint: {fileID: 0}
   _getUp: {fileID: 0}
-  _playerManager: {fileID: 0}
+  _playerManager: {fileID: -4668177863944640257}
+  _playerHealth: {fileID: 5358505061852357365}
   _fallInTime: 0.5
   _fallInCurve:
     serializedVersion: 2
@@ -13578,6 +13586,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _hitReactionClip: {fileID: 7400000, guid: 8f18717f0d2423b49bb4db278088a1ba, type: 2}
   _overrideInTime: 0.08
   _overrideInCurve:
     serializedVersion: 2

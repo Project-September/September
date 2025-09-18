@@ -113,7 +113,6 @@ namespace September.Common
                 _fadeImage.color = new Color(0f, 0f, 0f, 1f);
 
                 await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
-                Debug.Log("Fadeの終了");
             }
             else
             {
@@ -186,16 +185,20 @@ namespace September.Common
             if (!Context.Runner.IsServer) return; 
             PlayerDatabase.Instance.Server_AddStun(data.ExecutorRef);
             
-            var killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef); 
-            killerData.IsOgre = false;
-            PlayerDatabase.Instance.PlayerDataDic.Set(data.ExecutorRef, killerData);
-
+            var killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef);
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
-            killedData.IsOgre = true;
-            PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
-            
+            if (killerData.IsOgre && data.ExecutorRef != data.TargetRef)
+            {
+                killerData.IsOgre = false;
+                PlayerDatabase.Instance.PlayerDataDic.Set(data.ExecutorRef, killerData);
+                killedData.IsOgre = true;
+                PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
+                RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
+            }
+            // Log
+            UIController.I.ShowLog($"{data.ExecutorRef}が{data.TargetRef}を倒した");
+            if(data.ExecutorRef != data.TargetRef) return;
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
-            RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
         }
         private void HideCursor()
         {
@@ -213,8 +216,6 @@ namespace September.Common
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
         {
-            UIController.I.ShowNoticeKillLog($"鬼が{executor}から{targetRef}に変更された");
-            
             if (executor == Context.Runner.LocalPlayer)
                 UIController.I.ShowOgreLamp(false);
             else if(targetRef == Context.Runner.LocalPlayer)

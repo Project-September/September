@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using CRISound;
 using Fusion;
 using InGame.Health;
+using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -36,7 +39,11 @@ namespace Ingame.Tanihira
         [SerializeField] protected HitChecker _hitChecker;
         [SerializeField, ReadOnly] protected FriendState _currentState;
         [SerializeField] private GameObject _tutankhamen;
+        [SerializeField] private Transform _attackEffectPos;
+        [SerializeField] private GameObject _runEffectObject;
+        [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
         [Networked] private NetworkBool HasMask { get; set; }
+        [Networked] private NetworkBool HasRunEffect { get; set; }
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -45,6 +52,7 @@ namespace Ingame.Tanihira
         protected FormationManager _formationManager;
         protected FriendState _waitStockState;
         protected FriendStatus _currentStatus;
+        protected EffectSpawner _effectSpawner;
 
         private static int _spawnCount;
         private bool _isAttack;
@@ -71,6 +79,7 @@ namespace Ingame.Tanihira
             _friendStateMappings[FriendState.None] = new FriendNoneState();
             _agent = GetComponent<NavMeshAgent>();
             _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
+            
             InitializeStates();
             ChangeState(_initialState);
         }
@@ -81,6 +90,14 @@ namespace Ingame.Tanihira
             
             // 現在のステートのUpdateを呼び出し
             _friendStateMappings[_currentState]?.OnUpdate(this);
+            transform.position = _agent.nextPosition;
+            if(_agent != null && _agent.enabled && _agent.isOnNavMesh)
+            //位置を更新する
+            if (_agent.remainingDistance >= _agent.stoppingDistance)
+            {
+                if(_agent.desiredVelocity.sqrMagnitude > 0.01f)
+                    transform.rotation = Quaternion.LookRotation(_agent.velocity);
+            }
         }
 
         /// <summary>
@@ -100,8 +117,9 @@ namespace Ingame.Tanihira
             
             _agent.enabled = false;
             _agent.enabled = true;
-            _agent.updatePosition = true;
-            _agent.updateRotation = true;
+            //Agentでの移動を無効かする
+            _agent.updatePosition = false;
+            _agent.updateRotation = false;
             InitializeAgent();
         }
 
@@ -203,6 +221,18 @@ namespace Ingame.Tanihira
                 _ownerPlayer.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
+            //エフェクトを出す
+            PlayEffect();
+        }
+        
+        private void PlayEffect()
+        {
+            // Effect生成処理
+            _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
+            _effectSpawner?.RequestPlayOneShotEffect(EffectType.PenguinAttack, _attackEffectPos.position,
+                _attackEffectPos.rotation);
+            // 音量再生
+            //CRIAudio.PlaySE("ALLCue", SoundCues.SE.Penguin_Attack);
         }
 
         public void FinishWaitTime()
@@ -233,11 +263,31 @@ namespace Ingame.Tanihira
         {
             if(_tutankhamen)
                 _tutankhamen.SetActive(HasMask);
+            if(_runEffectObject)
+                _runEffectObject.SetActive(HasRunEffect);
         }
         public void SetMask(bool value)
         {
             if (!HasStateAuthority) return;
             HasMask = value;
+        }
+
+        private void SetRunEffect(bool value)
+        {
+            if (!HasStateAuthority) return;
+            HasRunEffect = value;
+        }
+
+        public void ChangeRunEffect(float value)
+        {
+            if (value >= _maxRunBlendTreeCount)
+            {
+                SetRunEffect(true);
+            }
+            else
+            {
+                SetRunEffect(false);
+            }
         }
 
         public void StartBuff(float buffRate)

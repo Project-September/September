@@ -71,6 +71,8 @@ namespace InGame.Exhibit
              IsSpawned = true;
              _initialPosition = transform.position;
              _initialRotation = transform.rotation;
+             if(!Runner.IsServer) return;
+             RPC_SetIsKinematic(true);
         }
         
         protected void CreateHitBox(PlayerRef playerRef)
@@ -124,7 +126,7 @@ namespace InGame.Exhibit
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
-            RPC_SetIsKinematic(playerRef,false);
+            RPC_SetIsKinematic(false);
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
                 formationManager.WarpFriendOutField();
@@ -143,7 +145,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.transform.position = _getOffPoint.position;
             Object.RemoveInputAuthority();
             RPC_SetCameraPriority(playerRef,5);
-            RPC_SetIsKinematic(playerRef,true);
+            RPC_SetIsKinematic(true);
             var obj = _ownerPlayerManager.GetComponent<NetworkObject>();
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
@@ -162,7 +164,7 @@ namespace InGame.Exhibit
             }
         }
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetIsKinematic(PlayerRef player, bool kinematic)
+        private void RPC_SetIsKinematic(bool kinematic)
         {
            Rigidbody.isKinematic = kinematic;
         }
