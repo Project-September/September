@@ -4,19 +4,16 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
 using September.Common;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Splines;
 using UnityEngine.UI;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-namespace InGame.Player.Ability.Effect
+namespace InGame.Player.Sarutobi
 {
     public class AbilityGrapplingHook : NetworkBehaviour, IAfterTick
     {
         [Header("Ability")]
-        [SerializeField] private SplineContainer _grappleableSplinePrefab;
         [SerializeField] private GameObject _targetUIPrefab;
         [SerializeField] private float _coolTime;
         [Header("Grappling Hook")]
@@ -24,8 +21,8 @@ namespace InGame.Player.Ability.Effect
         [SerializeField] private float _maxAngle;
         [SerializeField] private float _distanceReflectionRate;
         [SerializeField] private float _angleReflectionRate;
+        [SerializeField] private float _wireSpeed;
         [Header("Jump")]
-        [SerializeField] private float _shotWaitTime;
         [SerializeField] private float _pullingSpeed;
         [SerializeField] private Vector3 _pullLastForce;
         [SerializeField] private float _landingDuration;
@@ -49,6 +46,7 @@ namespace InGame.Player.Ability.Effect
         
         private GrappleStateType _grappleState = GrappleStateType.ShotWait;
         private float _jumpTimer;
+        private float _wireTimer;
         private Vector3 _targetPosition;
         private Vector3 _startPosition;
         private float _distanceMag;
@@ -68,13 +66,14 @@ namespace InGame.Player.Ability.Effect
             
             if (HasInputAuthority)
             {
-                _grappleableSpline = Instantiate(_grappleableSplinePrefab);
-                _grappleableSpline.transform.position = Vector3.zero;
+                _playerMovement = GetComponent<PlayerMovement>();
+                _grappleableSpline = GrapplingSpline.I.GrapplingTargetSpline;
                 _targetUI = Instantiate(_targetUIPrefab).GetComponentInChildren<Image>().transform;
                 _mainCamera = Camera.main;
-                _wireLine = GetComponent<LineRenderer>();
-                _wireLine.enabled = false;
             }
+            
+            _wireLine = GetComponent<LineRenderer>();
+            _wireLine.enabled = false;
         }
 
         public override void FixedUpdateNetwork()
@@ -130,9 +129,17 @@ namespace InGame.Player.Ability.Effect
             PreviousButtons = GetInput<PlayerInput>().GetValueOrDefault().Buttons;
         }
 
-        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+        [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
         void RPC_GrappleStart(Vector3 targetPosition)
         {
+            if (!HasStateAuthority)
+            {
+                _targetPosition = targetPosition + Vector3.up * 0.05f;
+                _startPosition = transform.position;
+                _distanceMag = Vector3.Distance(_startPosition, _targetPosition);
+                return;
+            }
+            
             AbilityState = AbilityStateType.Active;
             _grappleState = GrappleStateType.Shot;
             _targetPosition = targetPosition + Vector3.up * 0.05f;
@@ -149,16 +156,14 @@ namespace InGame.Player.Ability.Effect
             await PlayClipAndWait(_animShot);
             _grappleState = GrappleStateType.ShotWait;
             _clipPlayer.PlayClip(_animShotWait);
-            _wireLine.enabled = true;
+            RPC_DisplayWireStart();
         }
 
         void ShotWaitTick()
         {
             _jumpTimer += Runner.DeltaTime;
-            
-            DisplayWire(_handSocket.position + (_targetPosition - _handSocket.position) * _jumpTimer / _shotWaitTime);
                     
-            if (_jumpTimer >= _shotWaitTime)
+            if (_jumpTimer >= _distanceMag / _wireSpeed)
             {
                 _grappleState = GrappleStateType.PreJump;
                 _jumpTimer = 0;
@@ -181,15 +186,13 @@ namespace InGame.Player.Ability.Effect
             float t = Math.Clamp(_jumpTimer * _pullingSpeed / _distanceMag, 0, 1);
             
             transform.position = Vector3.Lerp(_startPosition, _targetPosition, t);
-            
-            DisplayWire(_targetPosition);
 
             if (t >= 1)
             {
                 _grappleState = GrappleStateType.Landing;
                 _jumpTimer = 0;
                 _playerMovement.KnockBack(transform.rotation * _pullLastForce, 0.2f).Forget();
-                _wireLine.enabled = false;
+                RPC_DisplayWireEnd();
                 _clipPlayerManager.EnableFallMotion = true;
             }
         }
@@ -268,6 +271,14 @@ namespace InGame.Player.Ability.Effect
                 return false;
             }
             
+            // 障害物判定　カプセルの中心から同じRadiusの球でTargetまでCast
+            Vector3 halfHeight = (_playerMovement.MoveCapsuleCollider.height * 0.5f + _playerMovement.MoveCapsuleCollider.radius) * Vector3.up;
+            
+            if (Physics.CheckCapsule(transform.position + halfHeight, position + halfHeight, _playerMovement.MoveCapsuleCollider.radius, _playerMovement.GroundLayer))
+            {
+                return false;
+            }
+            
             point = posDiff.magnitude * _distanceReflectionRate + angle * _angleReflectionRate;
             
             return true;
@@ -318,7 +329,30 @@ namespace InGame.Player.Ability.Effect
             _targetUI.position = screenPos;
         }
 
-        void DisplayWire(Vector3 otherPos)
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        void RPC_DisplayWireStart()
+        {
+            _wireLine.enabled = true;
+            _wireTimer = 0;
+        }
+
+        private void Update()
+        {
+            if (_wireLine.enabled)
+            {
+                _wireTimer += Time.deltaTime;
+                float t = Math.Clamp(_wireTimer * _wireSpeed / _distanceMag, 0, 1);
+                SetWirePosition(Vector3.Lerp(_startPosition, _targetPosition, t));
+            }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        void RPC_DisplayWireEnd()
+        {
+            _wireLine.enabled = false;
+        }
+
+        void SetWirePosition(Vector3 otherPos)
         {
             _wireLine.SetPosition(0, _handSocket.position);
             _wireLine.SetPosition(1, otherPos);

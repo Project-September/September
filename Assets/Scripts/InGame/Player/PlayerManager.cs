@@ -135,6 +135,11 @@ namespace InGame.Player
                 }
                 
                 _playerMovement.MoveTick(Runner.DeltaTime);
+
+                if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Warp))
+                {
+                    Respawn();
+                }
             }
 
             if (_shouldWarp)

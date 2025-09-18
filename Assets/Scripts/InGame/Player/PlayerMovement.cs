@@ -70,6 +70,8 @@ namespace InGame.Player
         public NetworkBool IsGroundNet { get; private set; }
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
+        public CapsuleCollider MoveCapsuleCollider => _moveCapsuleCollider;
+        public LayerMask GroundLayer => _groundLayer;
 
         private void Awake()
         {

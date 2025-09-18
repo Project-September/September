@@ -1960,6 +1960,10 @@ MonoBehaviour:
   _clipPlayer: {fileID: 8254388696613982807}
   _footstepBlockClipList:
   - {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
+  _playerTransform: {fileID: 0}
+  _cameraTransform: {fileID: 0}
+  _debugBGMVolume: 1
+  _debugSEVolume: 1
 --- !u!114 &6329918266438203417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13519,7 +13523,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 8254388696613982807}
   _playerMovement: {fileID: 3242880713039265549}
-  _jumpOver: {fileID: 7400000, guid: 5335a3665ec1b154f9715b270165c7f3, type: 2}
+  _jumpOver: {fileID: 7400000, guid: 0fa62cdfa27db1f4f92d97a10a5d8df5, type: 2}
   _fallDown: {fileID: 7400000, guid: 7d6ee42e50a5e3046917db7f6ac26f3b, type: 2}
   _faint: {fileID: 0}
   _getUp: {fileID: 0}
@@ -13588,6 +13592,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  EnableFallMotion: 1
 --- !u!114 &4940562243900058895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13600,7 +13605,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbd17a7a6e4380c499c268f3eb49b17f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _grappleableSplinePrefab: {fileID: 5101062614667460384, guid: 966b04d4e5b1b1c4d99777ab3d878b59, type: 3}
   _targetUIPrefab: {fileID: 2541600367538618662, guid: a369727939273664ea0cfb03757f02c7, type: 3}
   _coolTime: 0
   _distanceRange:
@@ -13609,7 +13613,7 @@ MonoBehaviour:
   _maxAngle: 15
   _distanceReflectionRate: 0
   _angleReflectionRate: 1
-  _shotWaitTime: 0.2
+  _wireSpeed: 130
   _pullingSpeed: 13
   _pullLastForce: {x: 0, y: 0, z: 3}
   _landingDuration: 0.967
