@@ -164,7 +164,20 @@ namespace InGame.Player
             
             CalcMoveVelocity(moveDirection, isDash, deltaTime);
         }
-
+        
+        public void AddForce(Vector3 force)
+        {
+            _moveVelocity += force;
+            if (Vector3.Angle(MoveVelocity, _groundNormal) < 89)
+                _moveVelocity += force;
+            if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
+            {
+                _isGround = false;
+                _isGroundTimer = 0.1f;
+                _isGroundTimer = 0;
+            }
+        }
+        
         /// <summary> 水平方向のMoveVelocityを計算する </summary>
         private void CalcMoveVelocity(Vector2 moveDir, bool isDash, float deltaTime)
         {
