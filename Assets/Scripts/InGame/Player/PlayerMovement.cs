@@ -67,6 +67,7 @@ namespace InGame.Player
         public NetworkBool IsGroundNet { get; private set; }
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
+        [Networked] public bool IgnoreInput { get; set; } = false;
 
         private void Awake()
         {
@@ -81,6 +82,7 @@ namespace InGame.Player
         {
             CheckGroundManual();
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
+            if (IgnoreInput) moveDirection = Vector2.zero;
             
             // set velocity
             if (isJump && HasStateAuthority) TryVault(moveDirection);

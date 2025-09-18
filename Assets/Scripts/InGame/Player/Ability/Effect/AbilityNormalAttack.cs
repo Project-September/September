@@ -180,11 +180,16 @@ namespace InGame.Player.Ability
             }
             // バッファ初期化（念のため）
             Array.Clear(_hitBuffer, 0, hitCount);
+            
+            if (_isStopWhenAttack && _playerMovement)
+            {
+                _playerMovement.IgnoreInput = true;
+            }
         }
 
         protected override void OnUpdate(float deltaTime)
         {
-            //if (_isStopWhenAttack && _playerMovement) _playerMovement.Stop();
+        
             int now    = Runner.Tick;
             int elapsed = now - _attackStartTick;
 
@@ -218,7 +223,13 @@ namespace InGame.Player.Ability
 
             // 攻撃終了
             if (elapsed >= _endAttackTick)
+            {
+                if (_isStopWhenAttack && _playerMovement)
+                {
+                    _playerMovement.IgnoreInput = false;
+                }
                 _phase = AbilityPhase.Ending;
+            }
         }
         
         private Transform GetClosestEnemy()
