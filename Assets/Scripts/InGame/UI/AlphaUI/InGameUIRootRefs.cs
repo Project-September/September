@@ -12,6 +12,7 @@ namespace September.InGame.UI
         public GameObject LogPanel;
         public GameObject OgreUI;
         public TextMeshProUGUI OgreMessageText;
+        public TextMeshProUGUI StatusUpText;
 
         [Header("Bars")]
         public Slider HpBar;

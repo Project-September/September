@@ -7,6 +7,7 @@ using InGame.Interact;
 using InGame.Player;
 using September.Common;
 using September.InGame.Effect;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -57,6 +58,7 @@ namespace InGame.Exhibit
                 _targetPlayerObject = playerNetworkObject;
                 Invoker.RPC_AttachHeadMask(playerNetworkObject, EffectDuration);
                 PlayEffect();
+                Invoker.RPC_ShowStatusUpUI(playerRef);
             }
             else
                 Debug.LogError("Player not found");
@@ -71,7 +73,7 @@ namespace InGame.Exhibit
             Invoker.RPC_DestroyMask();
             RestorePlayerSpeed();
         }
-
+        
         // Buffを初期値に戻す
         private void RestorePlayerSpeed()
         {

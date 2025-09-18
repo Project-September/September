@@ -1,4 +1,5 @@
 using System;
+using InGame.Exhibit;
 using UniRx;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ namespace September.InGame.UI
         private readonly Subject<Unit> _onGameEnd = new();
         private readonly Subject<(bool, GameObject)> _isInteracting = new();
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
+        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new(); 
 
         #endregion
         
@@ -36,6 +38,7 @@ namespace September.InGame.UI
         public IObservable<Unit> OnGameEnd => _onGameEnd;
         public IObservable<(bool, GameObject)> IsInteracting => _isInteracting;
         public IReadOnlyReactiveProperty<float> OnChangeInteractProgress => _onChangeInteractProgress;
+        public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
         
         #endregion
         
@@ -73,7 +76,6 @@ namespace September.InGame.UI
         {
             _onChangeStaminaValue.Value = value;
         }
-        
         public void ShowInteractUI(bool isShow, GameObject target = null)
         {
             _isInteracting.OnNext((isShow, target));
@@ -86,6 +88,11 @@ namespace September.InGame.UI
             {
                 _isInteracting.OnNext((false, null));
             }
+        }
+
+        public void ShowStatusUpUI(float seconds, StatusUpType status)
+        {
+            _onInteractStatusUpObject.OnNext((seconds,status));
         }
     }
 }
