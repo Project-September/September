@@ -296,7 +296,7 @@ MonoBehaviour:
   - AnimClip: {fileID: 7400000, guid: c17a2f3eb17d6624d943b734a44d7962, type: 2}
     PlaySpeed: 1
     BlendIn:
-      BlendTime: 0
+      BlendTime: 0.5
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -322,7 +322,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0
+      BlendTime: 0.5
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -347,10 +347,10 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 0
-    TargetLayer: 1
+    TargetLayer: 2
     IsAdditive: 0
   - AnimClip: {fileID: 7400000, guid: dc52e77d074bc11469d9ad6d72bb5654, type: 2}
-    PlaySpeed: 2
+    PlaySpeed: 3
     BlendIn:
       BlendTime: 0.5
       BlendCurve:

@@ -173,6 +173,7 @@ namespace InGame.Common
         private void RPC_PlayAsync(int clipIndex)
         {
             var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
+            Debug.LogError($"{montage.AnimClip.name} を再生します。　layer { montage.TargetLayer }");
             PlayAsync(montage.AnimClip, montage.TargetLayer, 1f, montage.BlendIn, montage.BlendOut,
                 montage.IsAdditive, montage.PlaySpeed).Forget();
         }
