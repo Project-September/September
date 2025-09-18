@@ -1,11 +1,8 @@
 using System.Linq;
 using Fusion;
-using InGame.Common;
 using InGame.Exhibit.InteractEffect;
 using InGame.Health;
-using InGame.Interact;
 using September.Common;
-using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Ability.Effect
@@ -31,7 +28,9 @@ namespace InGame.Player.Ability.Effect
 
             if (disableInteractEffect)
             {
+                PlayerRef actor = Parameter.Owner.InputAuthority;
                 disableInteractEffect.OnHitHammerAttack();
+                PlayerDatabase.Instance.Server_AddDestroyExhibit(actor,disableInteractEffect.ExhibitType);
             }
 
             //エフェクトの再生

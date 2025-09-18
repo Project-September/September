@@ -113,7 +113,6 @@ namespace September.Common
                 _fadeImage.color = new Color(0f, 0f, 0f, 1f);
 
                 await _fadeImage.DOFade(0f, 1f).SetEase(Ease.InOutQuad);
-                Debug.Log("Fadeの終了");
             }
             else
             {

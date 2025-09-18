@@ -74,11 +74,15 @@ namespace Result
         // 合計値を計算
         public int CalcTotal()
         {
-            // スコアの設定に合わせて計算
-            int sum = _count.Sum(kv => (_config ? _config.GetPoint(kv.Key) : 0) * kv.Value);
-
+            int sum = 0;
+            
+            sum += _count.Sum(kv => (_config ? _config.GetPoint(kv.Key) : 0) * kv.Value);
+            
             const int stunPoint = 150;
             sum += _stunCount * stunPoint;
+            
+            sum += _destroyedExhibitCounts.Sum(kv => _config .GetDestroyPoint(kv.Key) * kv.Value);
+
             return sum;
         }
 

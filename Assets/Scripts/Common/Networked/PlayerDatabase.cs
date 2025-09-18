@@ -13,6 +13,12 @@ namespace September.Common
         [Header("Not Networked")]
         [SerializeField] private ExhibitScoreConfig _config;
         
+        [Header("Ability Bonus Config")]
+        [SerializeField] private ExhibitScoreConfig _okabeRideConfig;
+        [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
+        [SerializeField] private int _sarutobiBonusScore = 50;
+        [SerializeField] private int _tanihiraBonusScore = 100;
+        
         [Networked, OnChangedRender(nameof(OnChangedPlayerData)), Capacity(4)]
         public NetworkDictionary<PlayerRef, SessionPlayerData> PlayerDataDic => default;
         public Action<NetworkDictionary<PlayerRef, SessionPlayerData>> ChangedDataAction;
@@ -26,6 +32,7 @@ namespace September.Common
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+                AbilityBonusContainer.Init(_okabeRideConfig, _haruDestroyConfig, _sarutobiBonusScore, _tanihiraBonusScore);
             }
             else
             {
@@ -59,7 +66,7 @@ namespace September.Common
             UpdatePlayerScore(actor, tracker);
         }
         
-        // ハルクのDestroy処理もここで加算
+        // ハルクのDestroy処理をここで加算
         public void Server_AddDestroyExhibit(PlayerRef actor, ExhibitType type)
         {
             if(!Object.HasStateAuthority)
@@ -68,19 +75,33 @@ namespace September.Common
             if (!_serverTrackers.TryGetValue(actor, out ScoreTracker tracker))
             {
                 _serverTrackers[actor] = tracker = new ScoreTracker(_config);
-
-                tracker.AddDestroyed(type);
-                UpdatePlayerScore(actor, tracker);
             }
+            
+            tracker.AddDestroyed(type);
+            UpdatePlayerScore(actor, tracker);
+            Debug.Log($"{actor}が{type}を壊した");
         }
 
         // 合計スコア取得
-        public int Server_GetTotal(PlayerRef actor)　=> !_serverTrackers.TryGetValue(actor, out ScoreTracker tracker) ? 0 : tracker.CalcTotal();
+        public int Server_GetTotal(PlayerRef actor)
+        {
+            if (!_serverTrackers.TryGetValue(actor, out ScoreTracker tracker))
+                return 0;
+
+            if (!PlayerDataDic.TryGet(actor, out SessionPlayerData d))
+                return tracker.CalcTotal();
+
+            return tracker.CalcTotal() + AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
+        }
+        
         private void UpdatePlayerScore(PlayerRef actor, ScoreTracker tracker)
         {
             if (PlayerDataDic.TryGet(actor, out SessionPlayerData d))
             {
-                d.Score = tracker.CalcTotal();
+                int baseScore = tracker.CalcTotal();
+                int bonus = AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
+                
+                d.Score = baseScore + bonus;
                 PlayerDataDic.Set(actor, d);
             }
         }
@@ -104,7 +125,8 @@ namespace September.Common
                     continue;
                 }
                 
-                int calc = tracker.CalcTotal();
+                int calc = tracker.CalcTotal() + AbilityBonusContainer.CalcBonus(data.CharacterType, tracker);
+
                 if (calc != data.Score)
                 {
                     // エラーだしてもいいかも

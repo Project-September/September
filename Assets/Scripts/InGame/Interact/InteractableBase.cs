@@ -48,6 +48,8 @@ namespace InGame.Interact
 
         public SerializableDictionary<CharacterType, float> CooldownTimeDictionary => _cooldownTimeDictionary;
 
+        public ExhibitType ExhibitType => _type;
+
         private CharacterInteractEffectBase _activeEffectBase;
 
         public void Interact(IInteractableContext context)
