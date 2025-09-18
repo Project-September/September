@@ -71,6 +71,7 @@ namespace InGame.Exhibit
              IsSpawned = true;
              _initialPosition = transform.position;
              _initialRotation = transform.rotation;
+             if(!Runner.IsServer) return;
              RPC_SetIsKinematic(true);
         }
         
