@@ -5456,39 +5456,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _abilities:
-  - rid: 2879281568291487894
+  - rid: 5091638614146416869
   _conditions:
-  - rid: 2879281568291487895
+  - rid: 5091638614146416868
   references:
     version: 2
     RefIds:
-    - rid: 2879281568291487894
-      type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
+    - rid: 5091638614146416868
+      type: {class: AbilityHammerAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+      data: 
+    - rid: 5091638614146416869
+      type: {class: AbilityHammerAttack, ns: InGame.Player.Ability.Effect, asm: Scripts}
       data:
-        _cooldown: 1
+        _cooldown: 0
         _phase: 0
-        _normalAttackAnimationClip: {fileID: 7400000, guid: 60c28bdfb725c81419321d4c49a63d73, type: 2}
+        _normalAttackAnimationClip: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
         _attackDamage: 10
         _startHitCheckFrame: 17
         _endHitCheckFrame: 21
-        _endAttackFrame: 30
+        _endAttackFrame: 22
         _isStopWhenAttack: 1
         _searchRadius: 2
         _hitEffect: 18
-        _animationClipPlayer: {fileID: 0}
+        _animationClipPlayer: {fileID: 3570017578186338863}
         _enableAutoAim: 1
         _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
-        _boxLocalOffset: {x: 0, y: 0.9, z: -0.22}
+        _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
         _boxCastDistance: 1
         _hitLayer:
           serializedVersion: 2
           m_Bits: 4294967295
-        _triggerInteraction: 0
+        _triggerInteraction: 1
         _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
         _debugDrawDuration: 1
-    - rid: 2879281568291487895
-      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
-      data: 
 --- !u!114 &3570017578186338863
 MonoBehaviour:
   m_ObjectHideFlags: 0
