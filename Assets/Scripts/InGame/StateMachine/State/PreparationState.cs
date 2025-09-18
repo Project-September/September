@@ -197,6 +197,7 @@ namespace September.Common
             }
             // Log
             UIController.I.ShowLog($"{data.ExecutorRef}が{data.TargetRef}を倒した");
+            if(data.ExecutorRef != data.TargetRef) return;
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
         }
         private void HideCursor()
