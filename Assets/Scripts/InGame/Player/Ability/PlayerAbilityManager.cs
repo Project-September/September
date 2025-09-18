@@ -27,7 +27,10 @@ namespace InGame.Player.Ability
 
         private void Update()
         {
-
+            foreach (var ability in _abilities)
+            {
+                ability.OnUpdateLocal(Time.deltaTime, gameObject);
+            }
         }
 
         public override void FixedUpdateNetwork()

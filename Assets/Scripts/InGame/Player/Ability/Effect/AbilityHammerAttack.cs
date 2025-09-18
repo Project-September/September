@@ -12,7 +12,7 @@ namespace InGame.Player.Ability.Effect
 {
     public class AbilityHammerAttack : AbilityNormalAttack
     {
-        protected override void OnHitEnemy(Collider hitInfo)
+        protected override void OnHitEnemy(Collider hitInfo, Vector3 hitPosition)
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
@@ -35,8 +35,7 @@ namespace InGame.Player.Ability.Effect
             }
 
             //エフェクトの再生
-            _effectSpawner.RequestPlayOneShotEffect(_hitEffect,
-                hitInfo.ClosestPoint(_hitChecker.HitPoint.First().position), Quaternion.identity);
+            _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
         }
     }
 }
