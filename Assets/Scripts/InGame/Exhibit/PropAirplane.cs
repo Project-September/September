@@ -69,9 +69,11 @@ namespace InGame.Exhibit
         private bool _sendToHost;
         // MachineGun
         private float _machineGunTimer;
-        
+
         [Networked, OnChangedRender(nameof(OnChangeOwnerPlayerRef))] private PlayerRef OwnerPlayerRef { get; set; }
         [Networked] private float CurrentAccel { get; set; }
+        [Networked] private NetworkButtons PreviousButtons { get; set; }
+        [Networked] private float GetOnTime { get; set; }
 
         private void Awake()
         {
@@ -91,6 +93,17 @@ namespace InGame.Exhibit
             {
                 if (GetInput<PlayerInput>(out var input))
                 {
+                    // 乗ってから1秒は降りる処理を無視（ティラノと同じ仕様）
+                    float timeSinceGetOn = Runner.SimulationTime - GetOnTime;
+
+                    // Eキーで降りる（WasPressedで新規押下のみ検知）
+                    if (timeSinceGetOn > 1f && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Interact))
+                    {
+                        GetOff();
+                        Debug.Log("GetOff");
+                        return;
+                    }
+
                     if (input.Buttons.IsSet(PlayerButtons.Dash))
                     {
                         if (IsGround) AddSpeedBack();
@@ -102,6 +115,9 @@ namespace InGame.Exhibit
                     _ownerPlayerManager.transform.position = transform.position;
 
                     UpdateMachineGun(input.Buttons.IsSet(PlayerButtons.Attack), Runner.DeltaTime);
+
+                    // 前フレームのボタン状態を保存
+                    PreviousButtons = input.Buttons;
                 }
                 else
                 {
@@ -265,8 +281,8 @@ namespace InGame.Exhibit
         {
             // 既に誰か乗っていたら乗れないよん
             if (!Runner.IsServer || OwnerPlayerRef != PlayerRef.None) return;
-            
-            // set input authority 
+
+            // set input authority
             OwnerPlayerRef = ownerPlayerRef;
             Object.AssignInputAuthority(ownerPlayerRef);
             // playerの状態切り替え
@@ -274,6 +290,9 @@ namespace InGame.Exhibit
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
+
+            // 乗った時刻を記録
+            GetOnTime = Runner.SimulationTime;
         }
 
         void GetOff()
