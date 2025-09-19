@@ -17,7 +17,7 @@ namespace September.Common
         [SerializeField] private ExhibitScoreConfig _okabeRideConfig;
         [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
         [SerializeField] private int _sarutobiBonusScore = 50;
-        [SerializeField] private int _tanihiraBonusScore = 100;
+        [SerializeField] private ExhibitScoreConfig _tanihiraBonusScore;
         
         [Networked, OnChangedRender(nameof(OnChangedPlayerData)), Capacity(4)]
         public NetworkDictionary<PlayerRef, SessionPlayerData> PlayerDataDic => default;
@@ -79,7 +79,6 @@ namespace September.Common
             
             tracker.AddDestroyed(type);
             UpdatePlayerScore(actor, tracker);
-            Debug.Log($"{actor}が{type}を壊した");
         }
 
         // 合計スコア取得

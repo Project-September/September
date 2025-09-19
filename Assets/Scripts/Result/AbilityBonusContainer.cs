@@ -11,18 +11,18 @@ namespace Result
         private static ExhibitScoreConfig _okabeRideConfig;
         private static ExhibitScoreConfig _haruDestroyConfig;
         private static int _sarutobiBonusScore;
-        private static int _tanihiraBonusScore;
+        private static ExhibitScoreConfig _tanihiraFriendConfig;
 
         public static void Init(
             ExhibitScoreConfig okabe,
             ExhibitScoreConfig haru,
             int sarutobi,
-            int tanihira)
+            ExhibitScoreConfig tanihira)
         {
             _okabeRideConfig = okabe;
             _haruDestroyConfig = haru;
             _sarutobiBonusScore = sarutobi;
-            _tanihiraBonusScore = tanihira;
+            _tanihiraFriendConfig = tanihira;
         }
         
         public static int Render(CharacterType type, ResultDataInbox inbox,
@@ -44,7 +44,7 @@ namespace Result
 
                 case CharacterType.Tanihira:
                     abilityTitle.text = "Friend Bonus";
-                    return RenderSimpleBonus(rowRoot, rowPrefab, "Friend Exhibit", inbox.FriendExhibitCount, _tanihiraBonusScore);
+                    return RenderExhibitBonus(inbox, rowRoot,rowPrefab, _tanihiraFriendConfig);
 
                 default:
                     abilityTitle.text = "No Bonus";
@@ -56,6 +56,7 @@ namespace Result
             ExhibitScoreConfig config, bool destroyed = false)
         {
             int total = 0;
+            
             foreach (ExhibitScoreEntry kv in config.Entries)
             {
                 int count = destroyed
@@ -103,7 +104,8 @@ namespace Result
                     return inbox.GrapplingHookCount * _sarutobiBonusScore;
 
                 case CharacterType.Tanihira:
-                    return inbox.FriendExhibitCount * _tanihiraBonusScore;
+                    return _tanihiraFriendConfig.Entries.Sum(e =>
+                        inbox.ExhibitCounts.GetValueOrDefault(e.Type, 0) * e.Points);
 
                 default:
                     return 0;
