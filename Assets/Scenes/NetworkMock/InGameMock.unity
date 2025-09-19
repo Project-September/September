@@ -1901,8 +1901,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.15260132, y: -0.8086604, z: 0.23953608, w: 0.5151735}
-  m_LocalPosition: {x: 20.002966, y: 0.77697897, z: 26.767498}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2415,6 +2415,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: _cooldownEffectTransform
+      value: 
+      objectReference: {fileID: 1257078259}
+    - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _cooldownTimeDictionary.keys.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -2764,6 +2772,37 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1158822628}
   ForceRemoteRenderTimeframe: 0
+--- !u!1 &1257078258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1257078259}
+  m_Layer: 0
+  m_Name: AirPlanePos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1257078259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1257078258}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1, y: -10.259, z: 0}
+  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1653780193}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1317057244
 GameObject:
   m_ObjectHideFlags: 0
@@ -4266,6 +4305,7 @@ Transform:
   - {fileID: 2024697704}
   - {fileID: 1864694295}
   - {fileID: 988878217}
+  - {fileID: 1257078259}
   - {fileID: 212486370}
   - {fileID: 1474187224}
   - {fileID: 196039146}
