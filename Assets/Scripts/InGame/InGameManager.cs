@@ -29,8 +29,13 @@ namespace September.InGame.Common
         public int StunScore => _stunScore;
         public string InGameBGMCueName => _inGameBGMCueName;
         public string CurrentBGM { get; set; }
-        
+
         public System.Action GameStarted { get; set; }
+
+        /// <summary>
+        /// 現在のゲーム状態名を取得する
+        /// </summary>
+        public string CurrentStateName => _stateMachine?.CurrentStateName ?? "";
 
         public void Register(ServiceLocator locator)
         {

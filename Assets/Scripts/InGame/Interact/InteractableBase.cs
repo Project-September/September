@@ -8,6 +8,8 @@ using Cysharp.Threading.Tasks;
 using Result;
 using September.InGame.Effect;
 using September.InGame;
+using September.InGame.Common;
+using InGame.Player;
 using CRISound;
 using WebSocketSharp;
 
@@ -154,7 +156,71 @@ namespace InGame.Interact
         /// </summary>
         protected virtual bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
         {
+            // ゲーム終了状態の時はインタラクトを無効化
+            if (IsGameEnded())
+            {
+                return false;
+            }
+
+            // プレイヤーがスタン状態の時はインタラクトを無効化
+            if (IsPlayerStunned(context))
+            {
+                return false;
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// ゲームが終了状態かどうかを判定する
+        /// </summary>
+        private bool IsGameEnded()
+        {
+            try
+            {
+                var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+                if (inGameManager == null) return false;
+
+                // EndingStateかどうかをチェック
+                return inGameManager.CurrentStateName == "EndingState";
+            }
+            catch (System.Exception)
+            {
+                // エラーが発生した場合は安全側にインタラクトを許可
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// プレイヤーがスタン状態かどうかを判定する
+        /// </summary>
+        private bool IsPlayerStunned(IInteractableContext context)
+        {
+            try
+            {
+                // インタラクト実行者のPlayerRefを取得
+                PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
+
+                var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+                if (inGameManager == null) return false;
+
+                // プレイヤーのNetworkObjectを取得
+                if (inGameManager.PlayerDataDic.TryGetValue(playerRef, out NetworkObject playerObject))
+                {
+                    // PlayerManagerを取得してスタン状態をチェック
+                    var playerManager = playerObject.GetComponent<PlayerManager>();
+                    if (playerManager != null)
+                    {
+                        return playerManager.IsStun;
+                    }
+                }
+            }
+            catch (System.Exception)
+            {
+                // エラーが発生した場合は安全側でインタラクトを許可
+            }
+
+            return false;
         }
 
         protected virtual void OnInteract(IInteractableContext context)

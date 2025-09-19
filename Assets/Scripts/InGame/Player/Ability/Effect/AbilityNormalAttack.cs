@@ -16,21 +16,30 @@ namespace InGame.Player.Ability
     [Serializable]
     public class AbilityNormalAttack : AbilityBase
     {
-        [SerializeField] private AnimationClip _normalAttackAnimationClip;
+        [Header("通常攻撃")]
         [SerializeField] protected int _attackDamage = 10;
+        [Header("鬼状態の通常攻撃")]
+        [SerializeField] protected int _ogreAttackDamage = 15;
+        [Header("ヒットチェック開始フレーム")]
         [SerializeField] private int _startHitCheckFrame = 17;
+        [Header("ヒットチェック終了フレーム")]
         [SerializeField] private int _endHitCheckFrame   = 21;
+        [Header("攻撃終了フレーム")]
         [SerializeField] private int _endAttackFrame     = 22;
-        [SerializeField] private bool _isStopWhenAttack = true;
-        [SerializeField] private float _searchRadius = 2f;
+        [Header("ヒットエフェクト")]
         [SerializeField] protected EffectType _hitEffect = EffectType.HitNormal;
+        
+        [Header("参照")]
+        [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
         [SerializeField] private float _moveForwardSpeed = 2f;
+        [Header("どれくらいの距離までの敵を狙って攻撃するか")]
+        [SerializeField] private float _searchRadius = 2f;
         
-        [Header("Hit Box Cast")]
+        [Header("Hit Box 設定")]
         [SerializeField] private Vector3 _boxHalfExtents = new Vector3(0.45f, 0.85f, 0.45f);
         [SerializeField] private Vector3 _boxLocalOffset = new Vector3(0f, 0.9f, 0.6f);
         [SerializeField, Tooltip("前方へ掃引する距離")]
@@ -126,9 +135,13 @@ namespace InGame.Player.Ability
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
             if (damageable == null) return;
+
+            // 鬼状態かどうかでダメージを変更
+            int damage = GetAttackDamage();
+
             var hitData = new HitData(
                 HitActionType.Damage,
-                _attackDamage,
+                damage,
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
@@ -136,7 +149,30 @@ namespace InGame.Player.Ability
             //エフェクトの再生
             _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
         }
-        
+
+        /// <summary>
+        /// 鬼状態かどうかでダメージを決定する
+        /// </summary>
+        protected virtual int GetAttackDamage()
+        {
+            try
+            {
+                var playerDatabase = PlayerDatabase.Instance;
+                if (playerDatabase == null) return _attackDamage;
+
+                if (playerDatabase.PlayerDataDic.TryGet(Parameter.Owner.InputAuthority, out SessionPlayerData playerData))
+                {
+                    return playerData.IsOgre ? _ogreAttackDamage : _attackDamage;
+                }
+            }
+            catch (System.Exception)
+            {
+                // エラーが発生した場合は通常ダメージを返す
+            }
+
+            return _attackDamage;
+        }
+
         private void CastAndApplyHits()
         {
             var t = Parameter.Owner.transform;
