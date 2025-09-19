@@ -27,5 +27,6 @@ public enum EffectType
     Muramasa,
     CooldownBig,
     CooldownPartition,
+    CarDash,
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
