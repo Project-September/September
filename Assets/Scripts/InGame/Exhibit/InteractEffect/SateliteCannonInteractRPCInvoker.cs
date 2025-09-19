@@ -19,10 +19,14 @@ namespace Ingame.Exhibit
             if (target.Runner.TryGetPlayerObject(playerRef, out NetworkObject playerNetworkObject))
             {
                 Vector3 targetPos = _lookPoint.transform.position;
-                Vector3 direction = (targetPos - playerNetworkObject.transform.position).normalized;
-                Quaternion targetRot = Quaternion.LookRotation(direction, Vector3.up);
-                PlayerManager playerManager = playerNetworkObject.GetComponent<PlayerManager>();
-                playerManager?.SetWarpTarget(playerNetworkObject.transform.position, targetRot);
+                Vector3 flatDirection = targetPos - playerNetworkObject.transform.position;
+                flatDirection.y = 0f; // 上下を無視して水平成分だけ
+                if (flatDirection.sqrMagnitude > 0.001f)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(flatDirection.normalized, Vector3.up);
+                    PlayerManager playerManager = playerNetworkObject.GetComponent<PlayerManager>();
+                    playerManager?.SetWarpTarget(playerNetworkObject.transform.position, targetRot);
+                }
             }
         }
 
