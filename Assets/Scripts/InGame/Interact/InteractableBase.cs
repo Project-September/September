@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using Result;
 using September.InGame.Effect;
 using September.InGame;
+using September.InGame.Common;
 using CRISound;
 using WebSocketSharp;
 
@@ -154,7 +155,33 @@ namespace InGame.Interact
         /// </summary>
         protected virtual bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
         {
+            // ゲーム終了状態の時はインタラクトを無効化
+            if (IsGameEnded())
+            {
+                return false;
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// ゲームが終了状態かどうかを判定する
+        /// </summary>
+        private bool IsGameEnded()
+        {
+            try
+            {
+                var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+                if (inGameManager == null) return false;
+
+                // EndingStateかどうかをチェック
+                return inGameManager.CurrentStateName == "EndingState";
+            }
+            catch (System.Exception)
+            {
+                // エラーが発生した場合は安全側にインタラクトを許可
+                return false;
+            }
         }
 
         protected virtual void OnInteract(IInteractableContext context)
