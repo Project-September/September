@@ -18,6 +18,7 @@ namespace InGame.Player.Ability
     {
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] protected int _attackDamage = 10;
+        [SerializeField] protected int _ogreAttackDamage = 15;
         [SerializeField] private int _startHitCheckFrame = 17;
         [SerializeField] private int _endHitCheckFrame   = 21;
         [SerializeField] private int _endAttackFrame     = 22;
@@ -126,9 +127,13 @@ namespace InGame.Player.Ability
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
             if (damageable == null) return;
+
+            // 鬼状態かどうかでダメージを変更
+            int damage = GetAttackDamage();
+
             var hitData = new HitData(
                 HitActionType.Damage,
-                _attackDamage,
+                damage,
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
@@ -136,7 +141,30 @@ namespace InGame.Player.Ability
             //エフェクトの再生
             _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
         }
-        
+
+        /// <summary>
+        /// 鬼状態かどうかでダメージを決定する
+        /// </summary>
+        protected virtual int GetAttackDamage()
+        {
+            try
+            {
+                var playerDatabase = PlayerDatabase.Instance;
+                if (playerDatabase == null) return _attackDamage;
+
+                if (playerDatabase.PlayerDataDic.TryGet(Parameter.Owner.InputAuthority, out SessionPlayerData playerData))
+                {
+                    return playerData.IsOgre ? _ogreAttackDamage : _attackDamage;
+                }
+            }
+            catch (System.Exception)
+            {
+                // エラーが発生した場合は通常ダメージを返す
+            }
+
+            return _attackDamage;
+        }
+
         private void CastAndApplyHits()
         {
             var t = Parameter.Owner.transform;
