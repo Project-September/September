@@ -72,6 +72,7 @@ namespace InGame.Player
         public bool InfiniteStamina { get; set; } = false;
         public CapsuleCollider MoveCapsuleCollider => _moveCapsuleCollider;
         public LayerMask GroundLayer => _groundLayer;
+        [Networked] public bool IgnoreMoveInput { get; set; }
 
         private void Awake()
         {
@@ -85,6 +86,8 @@ namespace InGame.Player
         public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
             CheckGroundManual();
+            
+            if (IgnoreMoveInput) moveInput = Vector2.zero;
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
             
             // set velocity

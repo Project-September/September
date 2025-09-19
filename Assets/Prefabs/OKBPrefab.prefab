@@ -5276,6 +5276,7 @@ MonoBehaviour:
   _colliderObj: {fileID: 2287520664147054077}
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 8
+  _respawnPosition: {x: 0, y: 0, z: 0}
   _IsStun:
     _value: 0
 --- !u!114 &3242880713039265549
@@ -5482,10 +5483,11 @@ MonoBehaviour:
         _endHitCheckFrame: 17
         _endAttackFrame: 22
         _isStopWhenAttack: 1
-        _searchRadius: 2
+        _searchRadius: 5
         _hitEffect: 18
         _animationClipPlayer: {fileID: 8254388696613982807}
         _enableAutoAim: 1
+        _moveForwardSpeed: 2
         _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
         _boxLocalOffset: {x: 0, y: 0.9, z: -0.22}
         _boxCastDistance: 1
@@ -5618,6 +5620,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  EnableFallMotion: 1
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
