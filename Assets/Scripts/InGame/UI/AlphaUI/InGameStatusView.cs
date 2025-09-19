@@ -10,7 +10,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
-using UnityEngine.Serialization;
 
 namespace September.InGame.UI
 {

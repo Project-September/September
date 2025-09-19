@@ -53,9 +53,9 @@ namespace Result
 
             foreach (var kv in _haruDestroyScores)
             {
-                var row = Object.Instantiate(rowPrefab, rowRoot);
+                GameObject row = Object.Instantiate(rowPrefab, rowRoot);
                 var texts = row.GetComponentsInChildren<TextMeshProUGUI>();
-                int count = inbox.ExhibitCounts.GetValueOrDefault(kv.Key, 0);
+                int count = inbox.DestroyedExhibitCounts.GetValueOrDefault(kv.Key, 0);
                 int score = count * kv.Value;
 
                 texts[0].text = kv.Key.ToString();
@@ -98,28 +98,35 @@ namespace Result
     
     public class TanihiraBonusRenderer : IAbilityBonusRenderer
     {
-        private readonly int _scorePerFriend;
+        private readonly Dictionary<ExhibitType, int> _tanihiraSpecialScores;
 
-        public TanihiraBonusRenderer(int scorePerFriend)
+        public TanihiraBonusRenderer(Dictionary<ExhibitType, int> scores)
         {
-            _scorePerFriend = scorePerFriend;
+            _tanihiraSpecialScores = scores;
         }
+
 
         public int Render(ResultDataInbox inbox, Transform rowRoot, GameObject rowPrefab, TextMeshProUGUI abilityTitle)
         {
-            int count = inbox.FriendExhibitCount;
-            int score = count * _scorePerFriend;
-
+            int total = 0;
             abilityTitle.text = "Friend Bonus";
 
-            var row = Object.Instantiate(rowPrefab, rowRoot);
-            var texts = row.GetComponentsInChildren<TextMeshProUGUI>();
+            foreach (var kv in _tanihiraSpecialScores)
+            {
+                var row = Object.Instantiate(rowPrefab, rowRoot);
+                var texts = row.GetComponentsInChildren<TextMeshProUGUI>();
 
-            texts[0].text = "オトモダチ増加";
-            texts[1].text = $"×{count}";
-            texts[2].text = score.ToString();
+                int count = inbox.ExhibitCounts.GetValueOrDefault(kv.Key, 0);
+                int score = count * kv.Value;
 
-            return score;
+                texts[0].text = kv.Key.ToDisplayName();
+                texts[1].text = $"×{count}";
+                texts[2].text = score.ToString();
+
+                total += score;
+            }
+
+            return total;
         }
     }
 }
