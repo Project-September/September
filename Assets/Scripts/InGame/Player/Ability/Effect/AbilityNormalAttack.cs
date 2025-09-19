@@ -16,22 +16,30 @@ namespace InGame.Player.Ability
     [Serializable]
     public class AbilityNormalAttack : AbilityBase
     {
-        [SerializeField] private AnimationClip _normalAttackAnimationClip;
+        [Header("通常攻撃")]
         [SerializeField] protected int _attackDamage = 10;
+        [Header("鬼状態の通常攻撃")]
         [SerializeField] protected int _ogreAttackDamage = 15;
+        [Header("ヒットチェック開始フレーム")]
         [SerializeField] private int _startHitCheckFrame = 17;
+        [Header("ヒットチェック終了フレーム")]
         [SerializeField] private int _endHitCheckFrame   = 21;
+        [Header("攻撃終了フレーム")]
         [SerializeField] private int _endAttackFrame     = 22;
-        [SerializeField] private bool _isStopWhenAttack = true;
-        [SerializeField] private float _searchRadius = 2f;
+        [Header("ヒットエフェクト")]
         [SerializeField] protected EffectType _hitEffect = EffectType.HitNormal;
+        
+        [Header("参照")]
+        [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
         [SerializeField] private float _moveForwardSpeed = 2f;
+        [Header("どれくらいの距離までの敵を狙って攻撃するか")]
+        [SerializeField] private float _searchRadius = 2f;
         
-        [Header("Hit Box Cast")]
+        [Header("Hit Box 設定")]
         [SerializeField] private Vector3 _boxHalfExtents = new Vector3(0.45f, 0.85f, 0.45f);
         [SerializeField] private Vector3 _boxLocalOffset = new Vector3(0f, 0.9f, 0.6f);
         [SerializeField, Tooltip("前方へ掃引する距離")]
