@@ -25,7 +25,9 @@ namespace InGame.Interact
 
         [SerializeField] private ExhibitType _type;
         [SerializeField] private Vector3 _interactEffectOffset = Vector3.zero;
+        [SerializeField] private Transform _cooldownEffectTransform;
         [SerializeField] private Vector3 _cooldownEffectOffset = Vector3.zero;
+        [SerializeField] private Vector3 _cooldownEffectRotation = Vector3.zero;
         [SerializeField] private EffectType _interactEffectType = EffectType.NormalInteractComplete;
         [SerializeField] private EffectType _cooldownEffectType = EffectType.CooldownSquare;
         [SerializeField] private bool _spawnCooldownEffectOnStart = true;
@@ -100,8 +102,9 @@ namespace InGame.Interact
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             var uniqueEffectId = NetworkRunner.Instances.First().LocalPlayer.PlayerId +
                                  DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
+            var effectTransform = _cooldownEffectTransform != null ? _cooldownEffectTransform : transform;
             effectSpawner.RequestPlayLoopEffect(uniqueEffectId, _cooldownEffectType,
-                transform.position + _cooldownEffectOffset, transform.rotation);
+                effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation));
             await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false);
             effectSpawner.StopEffect(uniqueEffectId);
         }

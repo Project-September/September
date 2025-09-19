@@ -168,6 +168,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 536499402856614603, guid: f903b4e5cf48d8c4b88fa1dd7c766e45, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 536499402856614603, guid: f903b4e5cf48d8c4b88fa1dd7c766e45, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
@@ -205,6 +209,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
@@ -417,6 +437,18 @@ PrefabInstance:
       propertyPath: _aimObject
       value: 
       objectReference: {fileID: 1158822629}
+    - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
       propertyPath: _cooldownTimeDictionary.keys.Array.size
       value: 1
@@ -716,6 +748,18 @@ PrefabInstance:
     - target: {fileID: 3184967845531604829, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
@@ -1145,6 +1189,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
@@ -1234,6 +1282,10 @@ PrefabInstance:
       value: Stradivarius
       objectReference: {fileID: 0}
     - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
       propertyPath: managedReferences[4983488310407856386]._characterType
       value: 5
       objectReference: {fileID: 0}
@@ -1304,16 +1356,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
-      value: 5
+      propertyPath: _cooldownEffectOffset.x
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
-      value: 5
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.2
       objectReference: {fileID: 0}
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: managedReferences[3302172163222274142]._characterType
-      value: 5
+      propertyPath: _cooldownEffectOffset.z
+      value: -1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: _cooldownEffectRotation.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5804073900053128395, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
       propertyPath: SortKey
@@ -1322,18 +1378,6 @@ PrefabInstance:
     - target: {fileID: 8301522110719607552, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
       propertyPath: m_Name
       value: Tutankhamun
-      objectReference: {fileID: 0}
-    - target: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1375,53 +1419,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8301522110719607552, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 677699898}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
 --- !u!4 &677699895 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
   m_PrefabInstance: {fileID: 677699894}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &677699896 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8301522110719607552, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-  m_PrefabInstance: {fileID: 677699894}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &677699897 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-  m_PrefabInstance: {fileID: 677699894}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677699896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 076425aa117f6da4e8296801168596ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &677699898
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677699896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 677699897}
 --- !u!1001 &740668966
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1477,6 +1484,22 @@ PrefabInstance:
     - target: {fileID: 1767096008057728453, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
       propertyPath: SortKey
       value: 1372360135
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
@@ -1699,6 +1722,22 @@ PrefabInstance:
       value: Stradivarius2
       objectReference: {fileID: 0}
     - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: -0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
       propertyPath: managedReferences[4983488310407856386]._characterType
       value: 5
       objectReference: {fileID: 0}
@@ -1832,6 +1871,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Stradivarius4
       objectReference: {fileID: 0}
+    - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.55
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1962,8 +2005,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
+  m_LocalRotation: {x: 0.16909811, y: 0.7703555, z: -0.22818965, w: 0.5708658}
+  m_LocalPosition: {x: -22.510273, y: 0.78999996, z: 25.946217}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2345,6 +2388,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: BokeBoke
       objectReference: {fileID: 0}
+    - target: {fileID: 1477976625044136675, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1477976625044136675, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: _cooldownEffectOffset.z
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1477976625044136675, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 1920207787654345179, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.893
@@ -2475,6 +2530,14 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: _cooldownEffectTransform
+      value: 
+      objectReference: {fileID: 1257078259}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _cooldownTimeDictionary.keys.Array.size
       value: 1
@@ -2825,6 +2888,37 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1158822628}
   ForceRemoteRenderTimeframe: 0
+--- !u!1 &1257078258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1257078259}
+  m_Layer: 0
+  m_Name: AirPlanePos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1257078259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1257078258}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1, y: -10.259, z: 0}
+  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1653780193}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1317057244
 GameObject:
   m_ObjectHideFlags: 0
@@ -2959,6 +3053,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
@@ -3075,6 +3173,22 @@ PrefabInstance:
     - target: {fileID: 4264672226570498562, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
       propertyPath: m_Name
       value: Art03_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
@@ -3574,6 +3688,22 @@ PrefabInstance:
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
@@ -3891,6 +4021,22 @@ PrefabInstance:
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: _cooldownEffectRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
@@ -4125,6 +4271,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectOffset.z
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3732242790369884021, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
       propertyPath: SortKey
       value: 2326436131
@@ -4240,6 +4402,22 @@ PrefabInstance:
       value: 1051514724
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: -0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
@@ -4311,6 +4489,7 @@ Transform:
   - {fileID: 2024697704}
   - {fileID: 1864694295}
   - {fileID: 988878217}
+  - {fileID: 1257078259}
   - {fileID: 212486370}
   - {fileID: 1474187224}
   - {fileID: 196039146}
@@ -4655,6 +4834,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Stradivarius3
       objectReference: {fileID: 0}
+    - target: {fileID: 3847222101263874885, guid: f5743e6073ea75f419027d89d072a6c2, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.35
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4780,6 +4963,22 @@ PrefabInstance:
     - target: {fileID: 4431785762032050412, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
@@ -4999,6 +5198,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
+      propertyPath: _cooldownEffectRotation.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
       propertyPath: managedReferences[3302172163222274141]._warpPosition
       value: 
       objectReference: {fileID: 1864694297}
@@ -5087,6 +5302,18 @@ PrefabInstance:
       value: Art03_01
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: -1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
+      propertyPath: _cooldownEffectOffset.z
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
       propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
       value: 5
       objectReference: {fileID: 0}
@@ -5129,6 +5356,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectType
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectOffset.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectOffset.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _cooldownEffectOffset.z
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3732242790369884021, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
       propertyPath: SortKey
       value: 2683630927

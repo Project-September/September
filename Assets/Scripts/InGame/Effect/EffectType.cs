@@ -24,6 +24,8 @@ public enum EffectType
     WarpOut,
     PenguinAttack,
     PenguinRun,
-    Muramasa
+    Muramasa,
+    CooldownBig,
+    CooldownPartition,
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
