@@ -28,6 +28,7 @@ namespace InGame.Player.Ability
         
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
+        [SerializeField] private float _moveForwardSpeed = 2f;
         
         [Header("Hit Box Cast")]
         [SerializeField] private Vector3 _boxHalfExtents = new Vector3(0.45f, 0.85f, 0.45f);
@@ -85,6 +86,7 @@ namespace InGame.Player.Ability
             }
             
             _startHitTick  = FrameToTick(_startHitCheckFrame);
+            
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)
@@ -182,7 +184,7 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (_isStopWhenAttack && _playerMovement) _playerMovement.Stop();
+            //if (_isStopWhenAttack && _playerMovement) _playerMovement.Stop();
             int now    = Runner.Tick;
             int elapsed = now - _attackStartTick;
 
@@ -211,6 +213,8 @@ namespace InGame.Player.Ability
                 if (elapsed >= _endHitTick && _alreadyHit.Count > 0)
                     _alreadyHit.Clear();
             }
+            
+            _playerMovement.AddForce(Parameter.Owner.transform.forward * _moveForwardSpeed);
 
             // 攻撃終了
             if (elapsed >= _endAttackTick)
