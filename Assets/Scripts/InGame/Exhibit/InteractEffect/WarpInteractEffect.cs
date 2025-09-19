@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using CRISound;
 using Cysharp.Threading.Tasks;
@@ -10,6 +10,8 @@ using InGame.Player;
 using Ingame.Tanihira;
 using September.Common;
 using September.InGame.Effect;
+using September.InGame;
+using WebSocketSharp;
 
 namespace InGame.Exhibit
 {
@@ -26,11 +28,13 @@ namespace InGame.Exhibit
         public string _warpInSoundName;
 
         public string _warpOutSoundName;
+
+        public AudioBroadcaster _audioBroadcaster;        
         
         private CancellationTokenSource _cts;
         private InteractableBase  _interactableBase;
         private EffectSpawner _effectSpawner;
-        
+
         public override CharacterInteractEffectBase Clone()
         {
             return new WarpInteractEffect
@@ -38,8 +42,8 @@ namespace InGame.Exhibit
                 _warpDestination = _warpDestination,
                 _warpDuration = _warpDuration,
                 _warpPosition = _warpPosition,
-                _warpInSoundName = _warpInSoundName,
                 _warpOutSoundName = _warpOutSoundName,
+                _audioBroadcaster = _audioBroadcaster,
             };
         }
         
@@ -64,7 +68,6 @@ namespace InGame.Exhibit
             // Effectの再生
             Vector3 effectPos = player.transform.position + Vector3.up * 1.0f;
             PlayEffect(EffectType.WarpIn, effectPos,Quaternion.identity);
-            PlaySE(_warpInSoundName);
 
             // Playerを初期化
             SetPlayerVisible(player, false);
@@ -86,8 +89,12 @@ namespace InGame.Exhibit
             // ゴール側エフェクトの再生
             PlayEffect(EffectType.WarpOut, targetPos, Quaternion.identity);
             SetPlayerVisible(player, true);
-            PlaySE(_warpOutSoundName);
-            _interactableBase.ForceSetInteractable = true;
+                _interactableBase.ForceSetInteractable = true;
+
+            if (_audioBroadcaster != null)
+            {
+                _audioBroadcaster.RPC_PlaySoundFromCode(_warpOutSoundName, SoundTrackingType.Spot, player.Id, default); // 発音元を一旦Playerに
+            }
         }
 
         private void SetPlayerVisible(NetworkObject player, bool isVisible)
@@ -109,11 +116,6 @@ namespace InGame.Exhibit
                     }
                 }
             }
-        }
-
-        private void PlaySE(string soundName)
-        {
-            CRIAudio.PlaySE("Exhibit", soundName);
         }
 
         private void PlayEffect(EffectType effectType,Vector3 effectPos,Quaternion effectRot)

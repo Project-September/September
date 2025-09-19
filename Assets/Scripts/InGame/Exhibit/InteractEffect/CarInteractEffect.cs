@@ -12,13 +12,9 @@ namespace InGame.Exhibit.InteractEffect
         {
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
             CarInteractable.RPC_OnInteractStart(playerRef);
+            CarInteractable.EffectSpawn();
         }
-
-        public override void OnInteractEnd()
-        {
-            CarInteractable.OnInteractEnd();
-        }
-
+        
         public override CharacterInteractEffectBase Clone()
         {
             return new CarInteractEffect

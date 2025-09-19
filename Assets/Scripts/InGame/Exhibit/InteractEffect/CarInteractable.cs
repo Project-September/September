@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Numerics;
 using Fusion;
 using InGame.Health;
+using September.Common;
+using September.InGame.Common;
 using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -42,6 +44,8 @@ namespace InGame.Exhibit.InteractEffect
 
         [SerializeField] private int _damage;
         private PlayerRef _ownerRef;
+        [SerializeField] private List<Transform> _effectPositions = new();
+        private List<string> _ids = new();
 
         public override void Render()
         {
@@ -58,11 +62,14 @@ namespace InGame.Exhibit.InteractEffect
         {
             _initialPos = _target.position;
             _initialRot = _target.rotation;
-
             if (_spline != null)
                 _approxCount = ApproxLength(_spline, 200);
 
             CacheKnotWorldPositions();
+            if (HasStateAuthority)
+            {
+                _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+            }
         }
 
         public override void FixedUpdateNetwork()
@@ -86,11 +93,36 @@ namespace InGame.Exhibit.InteractEffect
             Progress = 0f;
             _delayRemaining = 0;
             _lastDelayKnotIndex = -1;
+           
         }
 
-        public void OnInteractEnd()
+        public void EffectSpawn()
+        {
+            foreach (var trm in _effectPositions)
+            {
+                var id = GenerateEffectId();
+                _effectSpawner?.RequestPlayLoopEffect(
+                    id,
+                    EffectType.CarDash,
+                    trm.position,
+                    transform.rotation,
+                    transform);
+                _ids.Add(id);
+            }
+        }
+        
+        private static string GenerateEffectId()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
+        private void OnInteractEnd()
         {
             _ownerRef = PlayerRef.None;
+            foreach (var id in _ids)
+            {
+                _effectSpawner?.StopEffect(id);
+            }
         }
 
         private void Move()
@@ -159,6 +191,7 @@ namespace InGame.Exhibit.InteractEffect
                     IsMoving = false;
                     // 元の展示位置へ戻す
                     _target.SetPositionAndRotation(_initialPos, _initialRot);
+                    OnInteractEnd();
                 }
             }
         }
@@ -228,11 +261,12 @@ namespace InGame.Exhibit.InteractEffect
         private void RPC_OnHit(NetworkObject other)
         {
             if (!Runner.IsServer) return;
+            if(StaticServiceLocator.Instance.Get<InGameManager>().PlayerDataDic[_ownerRef] == other) return;
             Vector3 playerPos = other.transform.position + Vector3.up * _hitEffectYOffset;
             _effectSpawner?.RequestPlayOneShotEffect(
-                EffectType.CarHit,
+                EffectType.HitNormal,
                 playerPos,
-                Quaternion.identity);
+                other.transform.rotation);
             var damage = other.GetComponentInParent<IDamageable>();
             var hitData = new HitData(HitActionType.Damage, _damage, _ownerRef, damage.OwnerPlayerRef);
             damage.TakeHit(ref hitData);

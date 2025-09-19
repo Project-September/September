@@ -176,12 +176,14 @@ MonoBehaviour:
   - rid: 3302172163222274141
   _type: 3
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
   _audioBroadcaster: {fileID: 2531934738477890898}
-  _interactSoundCueName: 
+  _interactSoundCueName: SE_Painting_Warp_In
   _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
@@ -196,8 +198,9 @@ MonoBehaviour:
         _warpDestination: {fileID: 0}
         _warpDuration: 0.5
         _warpPosition: {fileID: 0}
-        _warpInSoundName: Painting_Warp_In
-        _warpOutSoundName: Painting_Warp_Out
+        _warpInSoundName: SE_Painting_Warp_In
+        _warpOutSoundName: SE_Painting_Warp_Out
+        _audioBroadcaster: {fileID: 2531934738477890898}
 --- !u!114 &5515927971026239416
 MonoBehaviour:
   m_ObjectHideFlags: 0
