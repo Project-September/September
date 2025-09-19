@@ -95,7 +95,7 @@ namespace InGame.Interact
                 PlayerDatabase.Instance.Server_AddExhibit(actor, _type);
             }
 
-            if (_audioBroadcaster != null || !_interactSoundCueName.IsNullOrEmpty())
+            if (_audioBroadcaster != null)
             {
                 _audioBroadcaster.RPC_PlaySoundFromCode(_interactSoundCueName, _interactSoundTrackingType, Object, actor); // 2D + 3D再生
             }

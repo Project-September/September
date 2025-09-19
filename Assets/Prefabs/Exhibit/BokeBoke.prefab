@@ -447,7 +447,7 @@ GameObject:
   - component: {fileID: 1579551504142862245}
   - component: {fileID: 2809273829863893602}
   m_Layer: 0
-  m_Name: Bokeboke
+  m_Name: BokeBoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -507,12 +507,14 @@ MonoBehaviour:
   - rid: 5190192992005652564
   _type: 9
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
   _audioBroadcaster: {fileID: 5813183497944791519}
-  _interactSoundCueName: 
+  _interactSoundCueName: VO_Haru_CharacterSelect
   _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
