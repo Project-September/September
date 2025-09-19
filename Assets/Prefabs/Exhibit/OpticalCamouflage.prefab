@@ -61,12 +61,14 @@ MonoBehaviour:
   - rid: 2742221729578614885
   _type: 5
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 14
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
   _audioBroadcaster: {fileID: 7286847240433619292}
-  _interactSoundCueName: 
+  _interactSoundCueName: SE_OpticalCamo_Activate
   _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0

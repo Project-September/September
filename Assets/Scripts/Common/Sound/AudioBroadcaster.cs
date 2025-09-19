@@ -3,6 +3,7 @@ using CriWare;
 using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
+using WebSocketSharp;
 
 namespace September.InGame
 {
@@ -104,6 +105,7 @@ namespace September.InGame
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_PlaySoundFromCode(string cueName, SoundTrackingType trackingType = default, NetworkId sourceObjId = default, PlayerRef playerRef = default, NetworkObject networkObj = default)
         {
+            if (cueName.IsNullOrEmpty()) return;
             // 2D再生用のプレイヤーも音源もわからない場合 → 3D再生のみ
             if (playerRef.IsNone && (!sourceObjId.IsValid && Object))
             {
@@ -203,6 +205,8 @@ namespace September.InGame
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_Request3DSoundAtPosition(Vector3 worldPos, string sheetName, string cueName)
         {
+            if (cueName.IsNullOrEmpty()) return;
+
             CRIAudio.PlaySE(worldPos, sheetName, cueName);
         }
 

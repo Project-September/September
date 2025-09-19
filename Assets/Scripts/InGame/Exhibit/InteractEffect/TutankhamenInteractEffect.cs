@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CRISound;
 using Fusion;
 using Ingame.Tanihira;
@@ -17,7 +17,6 @@ namespace InGame.Exhibit
     {
         public TutankhamenInteractRPCInvoker Invoker;
         public float EffectDuration;
-        public string SoundName;
         public GameObject EffectPos;
         public float BoostMultiplier = 1.5f;
 
@@ -86,7 +85,6 @@ namespace InGame.Exhibit
             {
                 Invoker = Invoker,
                 EffectDuration = EffectDuration,
-                SoundName = SoundName,
                 EffectPos = EffectPos,
                 OriginalSpeedRate = OriginalSpeedRate,
                 BoostMultiplier = BoostMultiplier,
@@ -101,8 +99,6 @@ namespace InGame.Exhibit
             _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
             _effectSpawner?.RequestPlayOneShotEffect(EffectType.Tutankhamen, EffectPos.transform.position,
                 EffectPos.transform.rotation,EffectPos.transform);
-            // 音量再生
-            CRIAudio.PlaySE("Exhibit",SoundName);
         }
     }
 }
