@@ -94,6 +94,11 @@ namespace InGame.Interact
             {
                 PlayerDatabase.Instance.Server_AddExhibit(actor, _type);
             }
+
+            if (_audioBroadcaster != null || !_interactSoundCueName.IsNullOrEmpty())
+            {
+                _audioBroadcaster.RPC_PlaySoundFromCode(_interactSoundCueName, _interactSoundTrackingType, Object, actor); // 2D + 3D再生
+            }
         }
 
         public async UniTask PlayCooldownEffect(float cooldownTime)
@@ -164,9 +169,6 @@ namespace InGame.Interact
             {
                 _activeEffectBase = effect.Clone();
                 _activeEffectBase.OnInteractStart(context, this);
-
-                if (_interactSoundCueName.IsNullOrEmpty()) return;
-                _audioBroadcaster.PlaySoundFromCode(_interactSoundCueName, (int)_interactSoundTrackingType, Object.Id); // 全体3D再生
             }
             else
             {
