@@ -86,7 +86,7 @@ namespace InGame.Player.Ability
             }
             
             _startHitTick  = FrameToTick(_startHitCheckFrame);
-            
+            _playerMovement.IgnoreMoveInput = true;
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)
@@ -218,7 +218,10 @@ namespace InGame.Player.Ability
 
             // 攻撃終了
             if (elapsed >= _endAttackTick)
+            {
+                _playerMovement.IgnoreMoveInput = false;
                 _phase = AbilityPhase.Ending;
+            }
         }
         
         private Transform GetClosestEnemy()
