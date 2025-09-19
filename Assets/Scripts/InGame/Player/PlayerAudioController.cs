@@ -106,7 +106,7 @@ namespace September.InGame
             // AnimationEvenに設定された Walk or Run の値と現在の優勢クリップが異なっていたら鳴らさない
             if (speedType != domMoveType) return; // walk = 1, run = 2
 
-            _audioBroadcaster.PlaySoundFromCode(cueName, trackingType);
+            _audioBroadcaster.RPC_PlaySoundFromCode(cueName, SoundTrackingType.Spot, Object.Id);
         }
 
         // デバッグ用
