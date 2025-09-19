@@ -75,6 +75,9 @@ namespace InGame.Exhibit
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked] private float GetOnTime { get; set; }
 
+        private Vector3 _initialPosition;
+        private Quaternion _initialRotation;
+
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
@@ -85,6 +88,9 @@ namespace InGame.Exhibit
         public override void Spawned()
         {
             _isSpawned = true;
+            // 初期位置・回転を記録
+            _initialPosition = transform.position;
+            _initialRotation = transform.rotation;
         }
 
         public override void FixedUpdateNetwork()
@@ -298,7 +304,7 @@ namespace InGame.Exhibit
         void GetOff()
         {
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
-            
+
             // Authority
             OwnerPlayerRef = PlayerRef.None;
             Object.RemoveInputAuthority();
@@ -308,6 +314,12 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetMeshActive(true);
             // 降りる場所にセット
             _ownerPlayerManager.transform.position = _getOffPoint.position;
+
+            // 飛行機を初期位置・回転に戻す（ティラノと同じ仕組み）
+            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+            CurrentAccel = 0;
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
         }
 
         void OnChangeOwnerPlayerRef()
