@@ -5,6 +5,7 @@ using InGame.Common;
 using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
+using Ingame.Tanihira;
 using September.Common;
 using September.InGame.Common;
 using TMPro;
@@ -299,6 +300,12 @@ namespace InGame.Exhibit
 
             // 乗った時刻を記録
             GetOnTime = Runner.SimulationTime;
+            
+            //隊列があった場合の処理
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                formationManager.WarpFriendOutField();
+            }
         }
 
         void GetOff()
@@ -320,6 +327,12 @@ namespace InGame.Exhibit
             CurrentAccel = 0;
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
+            
+            //隊列がある場合の処理
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                formationManager.WarpFriendNearPlayer(_ownerPlayerManager.transform.position, _ownerPlayerManager.transform.rotation);
+            }
         }
 
         void OnChangeOwnerPlayerRef()
