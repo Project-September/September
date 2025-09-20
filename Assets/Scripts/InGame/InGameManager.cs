@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Fusion;
@@ -37,9 +38,14 @@ namespace September.InGame.Common
         /// </summary>
         public string CurrentStateName => _stateMachine?.CurrentStateName ?? "";
 
+        private void Start()
+        {
+            StaticServiceLocator.Instance.Register(this);
+        }
+
         public void Register(ServiceLocator locator)
         {
-            locator.Register(this);
+            //locator.Register(this);
         }
 
         public override void Spawned()
