@@ -121,6 +121,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "AirplaneForward",
+                    "type": "Button",
+                    "id": "50142925-4fb9-4a7e-8031-184aeeabcb3d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AirPlaneBack",
+                    "type": "Button",
+                    "id": "d2e62912-53a7-46e3-bfe0-96e6ab7e6bc9",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -357,6 +375,17 @@
                 },
                 {
                     "name": "",
+                    "id": "7bf3469a-1cca-4ad0-b1d6-3527196d7055",
+                    "path": "<XInputController>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "cbac6039-9c09-46a1-b5f2-4e5124ccb5ed",
                     "path": "<Keyboard>/2",
                     "interactions": "",
@@ -561,6 +590,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Warp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4e77072e-4b32-427f-9747-d33275944411",
+                    "path": "<XInputController>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AirplaneForward",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "59e6caf9-8b5e-4795-88cf-0bc25b1e1a89",
+                    "path": "<XInputController>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AirPlaneBack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
