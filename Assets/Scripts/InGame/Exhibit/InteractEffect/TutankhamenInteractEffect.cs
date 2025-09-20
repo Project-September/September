@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using CRISound;
 using Fusion;
 using Ingame.Tanihira;
@@ -7,6 +7,7 @@ using InGame.Interact;
 using InGame.Player;
 using September.Common;
 using September.InGame.Effect;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -16,7 +17,6 @@ namespace InGame.Exhibit
     {
         public TutankhamenInteractRPCInvoker Invoker;
         public float EffectDuration;
-        public string SoundName;
         public GameObject EffectPos;
         public float BoostMultiplier = 1.5f;
 
@@ -57,6 +57,7 @@ namespace InGame.Exhibit
                 _targetPlayerObject = playerNetworkObject;
                 Invoker.RPC_AttachHeadMask(playerNetworkObject, EffectDuration);
                 PlayEffect();
+                Invoker.RPC_ShowStatusUpUI(playerRef);
             }
             else
                 Debug.LogError("Player not found");
@@ -71,7 +72,7 @@ namespace InGame.Exhibit
             Invoker.RPC_DestroyMask();
             RestorePlayerSpeed();
         }
-
+        
         // Buffを初期値に戻す
         private void RestorePlayerSpeed()
         {
@@ -84,7 +85,6 @@ namespace InGame.Exhibit
             {
                 Invoker = Invoker,
                 EffectDuration = EffectDuration,
-                SoundName = SoundName,
                 EffectPos = EffectPos,
                 OriginalSpeedRate = OriginalSpeedRate,
                 BoostMultiplier = BoostMultiplier,
@@ -99,8 +99,6 @@ namespace InGame.Exhibit
             _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
             _effectSpawner?.RequestPlayOneShotEffect(EffectType.Tutankhamen, EffectPos.transform.position,
                 EffectPos.transform.rotation,EffectPos.transform);
-            // 音量再生
-            CRIAudio.PlaySE("Exhibit",SoundName);
         }
     }
 }

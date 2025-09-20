@@ -67,7 +67,8 @@ namespace InGame.Exhibit
                 effectId,
                 EffectType.LondonTelephoneActive,
                 effectPosition + Vector3.up,
-                new()
+                new(),
+                playerObject.transform
             );
 
             // Effectを消す
@@ -83,7 +84,7 @@ namespace InGame.Exhibit
 
         private static string GenerateEffectId()
         {
-            return DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
+            return Guid.NewGuid().ToString();
         }
     }
 }

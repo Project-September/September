@@ -5,6 +5,7 @@ using InGame.Player;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Effect;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -21,6 +22,7 @@ namespace InGame.Exhibit
              var hitdata = new HitData(HitActionType.Heal,_healAmount, playerRef,playerRef);
              playerHealth.TakeHit(ref hitdata);
              PlayEffect(playerObject);
+             RPC_ShowStatusUpUI(playerRef);
         }
         
         private void PlayEffect(NetworkObject netObj)
@@ -30,8 +32,20 @@ namespace InGame.Exhibit
             _effectSpawner?.RequestPlayOneShotEffect(EffectType.Heal, netObj.transform.position + _offset,
                 netObj.transform.rotation,netObj.transform);
         }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_ShowStatusUpUI(PlayerRef playerRef)
+        {
+            if (Runner.LocalPlayer == playerRef)
+            {
+                UIController.I.ShowStatusUpUI(3f, StatusUpType.Heal);
+            }
+        }
+    }
 
-      
+    public enum StatusUpType
+    {
+        Heal,Tutankhamen
     }
 }
 

@@ -1,3 +1,4 @@
+using Fusion;
 using InGame.Interact;
 
 namespace InGame.Exhibit.InteractEffect
@@ -9,9 +10,11 @@ namespace InGame.Exhibit.InteractEffect
         // Interactが完了したら車を動かす
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            CarInteractable.RPC_OnInteractStart();
+            var playerRef = PlayerRef.FromEncoded(context.Interactor);
+            CarInteractable.RPC_OnInteractStart(playerRef);
+            CarInteractable.EffectSpawn();
         }
-
+        
         public override CharacterInteractEffectBase Clone()
         {
             return new CarInteractEffect

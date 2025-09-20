@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 536499402856614603}
   - component: {fileID: 1631707056656396585}
   - component: {fileID: 1109377942412471749}
+  - component: {fileID: -8354369273336728333}
+  - component: {fileID: 2769590208293396546}
   m_Layer: 0
   m_Name: Moniter
   m_TagString: Untagged
@@ -34,6 +36,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6452491875226805584}
+  - {fileID: 2106431266855357117}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9183981716670661821
@@ -55,6 +58,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 536499402856614603}
   - {fileID: 1631707056656396585}
+  - {fileID: 2769590208293396546}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &536499402856614603
 MonoBehaviour:
@@ -69,20 +73,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
-    - 1
+    - 4
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
-    - 1
+    - 4
   _characterEffects:
   - rid: 4146068367287517271
+  _type: 0
   _interactEffectOffset: {x: 0, y: 0, z: 0}
-  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
+  _cooldownEffectOffset: {x: 0, y: -0.5, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 2769590208293396546}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -92,8 +102,9 @@ MonoBehaviour:
     - rid: 4146068367287517271
       type: {class: SateliteCannonInteractEffect, ns: Ingame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         SateliteCannonInteractRPCInvoker: {fileID: 1631707056656396585}
+        _lookPoint: {fileID: 2106431266855357117}
 --- !u!114 &1631707056656396585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +123,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _hitDistance: 1000
+  _isDebug: 0
 --- !u!65 &1109377942412471749
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -131,8 +143,66 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6101073, y: 1, z: 0.2735138}
-  m_Center: {x: 0.0083479285, y: 0, z: 0.025988325}
+  m_Size: {x: 0.6101073, y: 0.9, z: 0.2735138}
+  m_Center: {x: 0, y: 0, z: 0.025988325}
+--- !u!114 &-8354369273336728333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169062250687249688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 536499402856614603}
+--- !u!114 &2769590208293396546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169062250687249688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+--- !u!1 &3324072139451156187
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2106431266855357117}
+  m_Layer: 0
+  m_Name: LookPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2106431266855357117
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3324072139451156187}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -4.93}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 489926245192664035}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &4388365964989820408
 PrefabInstance:
   m_ObjectHideFlags: 0

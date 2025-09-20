@@ -41,15 +41,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -35.06
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.77
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 50.56
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -102,6 +102,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6675958784025676327}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1941025314924722290}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1029180789908668499}
   m_SourcePrefab: {fileID: 100100000, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
 --- !u!1 &7382225231107150572 stripped
 GameObject:
@@ -141,6 +147,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 863788955882466386}
   - {fileID: 2101273202392379923}
+  - {fileID: 1029180789908668499}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2101273202392379923
 MonoBehaviour:
@@ -155,15 +162,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _characterEffects:
   - rid: 3302172481320386636
+  _type: 7
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 1029180789908668499}
+  _interactSoundCueName: SE_LondonPhone_Interact
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -173,7 +189,7 @@ MonoBehaviour:
     - rid: 3302172481320386636
       type: {class: LondonTelephoneInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         LondonTelephoneInteractRPC: {fileID: 863788955882466386}
 --- !u!65 &6675958784025676327
 BoxCollider:
@@ -196,6 +212,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8297157, y: 2.007451, z: 0.8869896}
   m_Center: {x: -0.002817154, y: 0.9833107, z: -0.01614952}
+--- !u!114 &1941025314924722290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7382225231107150572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldownTime: 5
+  _interactable: {fileID: 2101273202392379923}
+--- !u!114 &1029180789908668499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7382225231107150572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!4 &7870390065243949142 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}

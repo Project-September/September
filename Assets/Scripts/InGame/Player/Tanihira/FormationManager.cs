@@ -11,9 +11,16 @@ namespace Ingame.Tanihira
 {
     public class FormationManager : NetworkBehaviour
     {
+        [Header("隊列の設定")]
         [SerializeField] private Transform _firstFormationTransform;
         [SerializeField] private float _formationOffset = 1.0f;
+        [Header("ワープ設定")] 
+        [SerializeField] private float _warpSerchDistance = 10.0f;
         [SerializeField] private float _outFieldWarpHeight = 100.0f;
+        [SerializeField] private float _inFieldWarpHeight = 10.0f;
+        [SerializeField] private float _underWarpHeight = 30.0f;
+        [SerializeField] private float _exceptionSerchDistance = 5.0f;
+        [SerializeField] private LayerMask _raycastMask;
         private List<FriendBase> _friendsList = new List<FriendBase>();
         private List<FriendBase> _currentFriendsList = new List<FriendBase>();
         private Transform _playerTransform;
@@ -100,7 +107,7 @@ namespace Ingame.Tanihira
         }
 
         /// <summary>
-        /// 原罪の隊列を登録する
+        /// 現在の隊列を登録する
         /// </summary>
         public void RegisterFriendFormation()
         {
@@ -122,7 +129,7 @@ namespace Ingame.Tanihira
             //フレンドのステートの切り替え
             foreach (FriendBase friend in _currentFriendsList)
             {
-                friend.Agent.isStopped = true;
+                //friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
                 friend.Animator.SetFloat("MoveBlend", 0);
                 friend.ChangeState(FriendState.Wait);
@@ -136,14 +143,29 @@ namespace Ingame.Tanihira
             {
                 var fixedPos = warpPosition;
                 NavMeshHit hit;
-                if (NavMesh.SamplePosition(warpPosition, out hit, 10.0f, NavMesh.AllAreas))
+                RaycastHit raycastHit;
+                if (NavMesh.SamplePosition(fixedPos, out hit, _warpSerchDistance, NavMesh.AllAreas))
                 {
                     // NavMesh上にワープ
                     fixedPos = hit.position + Vector3.up * friend.Agent.baseOffset;
                 }
                 else
                 {
-                    continue;
+                    if (Physics.Raycast(fixedPos, Vector3.down, out raycastHit, _underWarpHeight,_raycastMask))
+                    {
+                        if (NavMesh.SamplePosition(raycastHit.point, out hit, _warpSerchDistance, NavMesh.AllAreas))
+                        {
+                            fixedPos = hit.position + Vector3.up * friend.Agent.baseOffset;
+                        }
+                    }
+                    else
+                    {
+                        fixedPos.y = _inFieldWarpHeight;
+                        if (NavMesh.SamplePosition(fixedPos, out hit, _exceptionSerchDistance, NavMesh.AllAreas))
+                        {
+                            fixedPos = hit.position + Vector3.up * friend.Agent.baseOffset;
+                        }
+                    }
                 }
                 
                 var networkTransform = friend.GetComponent<NetworkTransform>();
@@ -162,7 +184,7 @@ namespace Ingame.Tanihira
             //フレンドのステートの切り替え
             foreach (FriendBase friend in _friendsList)
             {
-                friend.Agent.isStopped = true;
+                //friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
                 friend.ChangeState(FriendState.None);
             }
@@ -170,7 +192,7 @@ namespace Ingame.Tanihira
             //少し待ってから移動させる
             await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration), cancellationToken: _cts.Token);
             
-            Vector3 warpPos = new Vector3(0, 0 , _outFieldWarpHeight);
+            Vector3 warpPos = new Vector3(0, _outFieldWarpHeight , 0);
             //フレンドを全員ワープさせる
             foreach (FriendBase friend in _friendsList)
             {
@@ -178,5 +200,14 @@ namespace Ingame.Tanihira
                 networkTransform.Teleport(warpPos);
             }
         }
+        
+#if UNITY_EDITOR       
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = new Color(1, 0, 1, 0.5f); // 半透明
+            Vector3 startPos = new Vector3(0, _inFieldWarpHeight, 0);
+            Gizmos.DrawWireCube(startPos, new Vector3(10, 1, 10));
+        }
+#endif
     }
 }

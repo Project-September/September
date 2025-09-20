@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -24,7 +24,7 @@ namespace InGame.Common
         [SerializeField] private AnimationClip _walk;
         [SerializeField] private AnimationClip _run;
         [SerializeField, Range(0f, 2f)] private float _locoWeight = 0f;
-        [SerializeField] private Animator _animator;
+        [SerializeField] protected Animator _animator;
 
         private PlayableGraph _graph;
         private AnimationMixerPlayable _baseMixer;
@@ -36,6 +36,8 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _weightBlendCts = new();
 
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
+
+        public AnimationMixerPlayable BaseMixer => _baseMixer;
 
         public bool IsPlayingTargetClip(AnimationClip clip)
         {

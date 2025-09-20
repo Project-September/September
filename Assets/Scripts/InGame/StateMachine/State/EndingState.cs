@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using CRISound;
 using Cysharp.Threading.Tasks;
-using Fusion;
 using September.InGame.Common;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace September.Common
@@ -18,36 +16,21 @@ namespace September.Common
 
         private async UniTaskVoid GameEnded()
         {
-            GetScore();
             await UniTask.Delay(TimeSpan.FromSeconds(Context.TimerData.EndGameDelay));
             Context.Cts.Cancel();
+            
             ShowCursor();
             if(!string.IsNullOrEmpty(Context.CurrentBGM)) CRIAudio.StopBGM("BGM", Context.CurrentBGM);
-            await NetworkManager.Instance.QuitInGame();
+            // ここにエンド処理
+            PlayerDatabase.Instance.Server_PushResultToClients();
+            UIController.I.ShowResultAnimation();
+            GameInput.I.ToggleMoveInput(false);
+            BGMManager.ChangeBGM("Result");
         }
         private void ShowCursor()
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
-        }
-        private void GetScore()
-        {
-            List<(string playerName,int score,bool isOgre)> data = new();
-            foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
-            {
-                data.Add((pair.Value.DisplayNickName, pair.Value.Score,pair.Value.IsOgre));
-            }
-            var ordered = data.OrderBy(x => x.isOgre ? 1 : 0)
-                .ThenByDescending(x => x.score)
-                .ToList();
-            var names = ordered.Select(x => x.playerName).ToArray();
-            var scores = ordered.Select(x => x.score).ToArray();
-            RPC_SetRankingData(names, scores);
-        }
-        [Rpc]
-        private void RPC_SetRankingData(string[] names, int[] scores)
-        {
-            RankingDataHolder.Instance.SetData(names, scores);
         }
     }
 }

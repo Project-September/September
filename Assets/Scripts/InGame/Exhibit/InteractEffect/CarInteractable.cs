@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Fusion;
+using InGame.Health;
+using September.Common;
+using September.InGame.Common;
 using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -11,23 +15,19 @@ namespace InGame.Exhibit.InteractEffect
 {
     public class CarInteractable : NetworkBehaviour
     {
-        [Header("Spline")]
-        [SerializeField] private SplineContainer _spline;
+        [Header("Spline")] [SerializeField] private SplineContainer _spline;
 
-        [Header("Move")]
-        [SerializeField] private float _speed = 6f;
+        [Header("Move")] [SerializeField] private float _speed = 6f;
         [SerializeField] private Transform _target;
         [SerializeField] private bool _loop = false;
 
-        [Header("EffectSettings")] 
-        [SerializeField] private float _hitEffectYOffset = 0.1f;
+        [Header("EffectSettings")] [SerializeField]
+        private float _hitEffectYOffset = 0.1f;
 
-        [Header("配置位置")] 
-        private Vector3 _initialPos;
+        [Header("配置位置")] private Vector3 _initialPos;
         private Quaternion _initialRot;
 
-        [Header("減速設定")] 
-        [SerializeField] private float _delayTime = 0.3f;
+        [Header("減速設定")] [SerializeField] private float _delayTime = 0.3f;
         [SerializeField] private float _slowdownRadius = 3f;
         [SerializeField] private float _minSpeedFactor = 0.25f;
         [SerializeField] private AnimationCurve _slowdownCurve;
@@ -37,17 +37,22 @@ namespace InGame.Exhibit.InteractEffect
         private EffectSpawner _effectSpawner;
 
         [Networked] private bool IsMoving { get; set; }
-        [Networked] private float Progress {get; set;}
+        [Networked] private float Progress { get; set; }
         private float _approxCount;
 
         private readonly List<Vector3> _knotWorldPositions = new();
 
+        [SerializeField] private int _damage;
+        private PlayerRef _ownerRef;
+        [SerializeField] private List<Transform> _effectPositions = new();
+        private List<string> _ids = new();
+
         public override void Render()
         {
-            if(_spline == null || _target == null)
+            if (_spline == null || _target == null)
                 return;
-            
-            if(IsMoving) 
+
+            if (IsMoving)
                 ApplyPose(Progress);
             else
                 _target.SetPositionAndRotation(_initialPos, _initialRot);
@@ -57,33 +62,67 @@ namespace InGame.Exhibit.InteractEffect
         {
             _initialPos = _target.position;
             _initialRot = _target.rotation;
-            
             if (_spline != null)
                 _approxCount = ApproxLength(_spline, 200);
-            
+
             CacheKnotWorldPositions();
+            if (HasStateAuthority)
+            {
+                _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+            }
         }
-        
+
         public override void FixedUpdateNetwork()
         {
-            if(!Object.HasStateAuthority || !IsMoving)
+            if (!Object.HasStateAuthority || !IsMoving)
                 return;
-            
+
             Move();
         }
 
         [Rpc]
-        public void RPC_OnInteractStart()
+        public void RPC_OnInteractStart(PlayerRef playerRef)
         {
-            OnInteractStart();
+            OnInteractStart(playerRef);
         }
 
-        private void OnInteractStart()
+        private void OnInteractStart(PlayerRef playerRef)
         {
+            _ownerRef = playerRef;
             IsMoving = true;
             Progress = 0f;
             _delayRemaining = 0;
             _lastDelayKnotIndex = -1;
+           
+        }
+
+        public void EffectSpawn()
+        {
+            foreach (var trm in _effectPositions)
+            {
+                var id = GenerateEffectId();
+                _effectSpawner?.RequestPlayLoopEffect(
+                    id,
+                    EffectType.CarDash,
+                    trm.position,
+                    transform.rotation,
+                    transform);
+                _ids.Add(id);
+            }
+        }
+        
+        private static string GenerateEffectId()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
+        private void OnInteractEnd()
+        {
+            _ownerRef = PlayerRef.None;
+            foreach (var id in _ids)
+            {
+                _effectSpawner?.StopEffect(id);
+            }
         }
 
         private void Move()
@@ -99,9 +138,9 @@ namespace InGame.Exhibit.InteractEffect
             if (_delayRemaining > 0f)
             {
                 _delayRemaining -= Runner.DeltaTime;
-                if (_delayRemaining < 0f) 
+                if (_delayRemaining < 0f)
                     _delayRemaining = 0f;
-                
+
                 return;
             }
 
@@ -127,7 +166,7 @@ namespace InGame.Exhibit.InteractEffect
                     float x = Mathf.InverseLerp(0f, _slowdownRadius, nearestDist);
                     float curve = _slowdownCurve != null ? Mathf.Clamp01(_slowdownCurve.Evaluate(x)) : x;
                     slowFactor = Mathf.Lerp(_minSpeedFactor, 1f, curve);
-                    
+
                     if (nearestIndex != -1 && nearestIndex != _lastDelayKnotIndex && nearestDist <= 0.2f)
                     {
                         _delayRemaining = _delayTime;
@@ -135,7 +174,7 @@ namespace InGame.Exhibit.InteractEffect
                     }
                 }
             }
-            
+
             Progress += Runner.DeltaTime * _speed * slowFactor / _approxCount;
 
             // Stop処理
@@ -152,6 +191,7 @@ namespace InGame.Exhibit.InteractEffect
                     IsMoving = false;
                     // 元の展示位置へ戻す
                     _target.SetPositionAndRotation(_initialPos, _initialRot);
+                    OnInteractEnd();
                 }
             }
         }
@@ -208,16 +248,28 @@ namespace InGame.Exhibit.InteractEffect
             return len;
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void OnCollisionEnter(Collision other)
         {
-            if(!Object.HasStateAuthority || !other.CompareTag("Player"))
-                return;
+            if (!other.transform.root.CompareTag("Player")) return;
+            if(!IsMoving) return;
+            var nObj = other.transform.GetComponentInParent<NetworkObject>();
+            RPC_OnHit(nObj);
+        }
 
+
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        private void RPC_OnHit(NetworkObject other)
+        {
+            if (!Runner.IsServer) return;
+            if(StaticServiceLocator.Instance.Get<InGameManager>().PlayerDataDic[_ownerRef] == other) return;
             Vector3 playerPos = other.transform.position + Vector3.up * _hitEffectYOffset;
             _effectSpawner?.RequestPlayOneShotEffect(
-                EffectType.CarHit,
+                EffectType.HitNormal,
                 playerPos,
-                Quaternion.identity);
+                other.transform.rotation);
+            var damage = other.GetComponentInParent<IDamageable>();
+            var hitData = new HitData(HitActionType.Damage, _damage, _ownerRef, damage.OwnerPlayerRef);
+            damage.TakeHit(ref hitData);
         }
     }
 }

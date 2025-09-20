@@ -1,45 +1,67 @@
+using System;
+using System.Threading;
 using CRISound;
+using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Health;
 using InGame.Interact;
 using NaughtyAttributes;
 using September.Common;
 using September.InGame.Effect;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace InGame.Exhibit
 {
     public class PterodactylInteractable : MountableExhibitBase
     {
-        [Header("Sound Settings")] 
-        [SerializeField] private string _crySe = "Pteranodon_cry";
+        [Header("Sound Settings")] [SerializeField]
+        private string _crySe = "Pteranodon_cry";
 
-        [Header("Movement Settings")] 
-        [SerializeField] private float _moveSpeed = 5f;
+        [Header("Movement Settings")] [SerializeField]
+        private float _moveSpeed = 5f;
+
         [SerializeField] private float _rotationSpeed = 5f;
         [SerializeField] private float _turnThreshold = 30f;
 
-        [Header("BulletSettings")]
-        [SerializeField] private Transform _muzzle;
+        [Header("BulletSettings")] [SerializeField]
+        private Transform _muzzle;
+
         [SerializeField] private ParticleSystem _muzzleFlash;
         [SerializeField, Label("Fireの方向")] private float _downwardAngle = 30f;
-        [SerializeField] private GameObject _fireParticle;
+        [SerializeField] private NetworkObject _fireParticle;
         [SerializeField] private float _fireSpeed = 20f;
         [SerializeField] private float _rayDistance = 100f;
-        [SerializeField] private LayerMask _fireHitMask;
+
+        [FormerlySerializedAs("_fireHitMask")] [SerializeField]
+        private LayerMask _playerHitMask;
+
         [SerializeField] private float _fireCooldown = 2f;
-        
+        [SerializeField, Label("爆撃の有効範囲")] private float _radius = 1f;
+        [SerializeField] private GameObject _hitEffect;
+        [SerializeField] private int _damage;
+        [SerializeField] private NetworkObject _aimObject;
         private float _fireCooldownTimerSec;
         private InteractableBase _interactableBase;
         private const float Threshold = 0.02f;
         private const float LerpSpeed = 5f;
-        private Vector3 _initialPosition;
-        private Quaternion _initialRotation;
         private float _currentTargetValue;
         private NetworkMecanimAnimator _mecanimAnimator;
+        private CancellationTokenSource _attackCts;
+        private PlayerRef _owner;
+        private LayerMask _groundLayer;
+        private Vector3 _hitPosition;
 
+        [Networked] private Vector3 AimObjectPosition { get; set; }
+        [Networked] private Quaternion AimObjectRotation { get; set; }
+        
         [Networked, OnChangedRender(nameof(OnChangeAnimation))]
         private float CurrentBlendValue { get; set; }
-        [Networked,OnChangedRender(nameof(OnInteractingChanged))]
+        
+        [Networked, OnChangedRender(nameof(OnAimObjectActiveChanged))]
+        private NetworkBool IsAimObjectActive { get; set; }
+
+        [Networked, OnChangedRender(nameof(OnInteractingChanged))]
         private NetworkBool IsInteracting { get; set; }
 
         #region AnimationHash
@@ -52,16 +74,10 @@ namespace InGame.Exhibit
         public override void Spawned()
         {
             base.Spawned();
-            
             _interactableBase = GetComponent<InteractableBase>();
-            _initialPosition  = transform.position;
-            _initialRotation  = transform.rotation;
-            
-            if (HasStateAuthority)
-                Rigidbody.isKinematic = false;
-            
-            _mecanimAnimator =  GetComponent<NetworkMecanimAnimator>();
+            _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
             Animator.enabled = IsInteracting;
+            IsAimObjectActive = false;
         }
 
         public override void Render()
@@ -69,7 +85,7 @@ namespace InGame.Exhibit
             Animator.enabled = IsInteracting;
 
             float baseMin = IsInteracting ? _currentTargetValue : 0f;
-            float clamped  = Mathf.Max(CurrentBlendValue, baseMin);
+            float clamped = Mathf.Max(CurrentBlendValue, baseMin);
             Animator.SetFloat(FlyStateBlend, clamped);
         }
 
@@ -79,12 +95,13 @@ namespace InGame.Exhibit
                 return;
 
             base.GetOn(ownerPlayerRef);
-            IsInteracting = true; 
-            
+            IsInteracting = true;
             _currentTargetValue = 0.01f;
             CurrentBlendValue = _currentTargetValue;
             _interactableBase.ForceSetInteractable = false;
             OnPlaySE(_crySe);
+            _owner = ownerPlayerRef;
+            IsAimObjectActive = true;
         }
 
         public override void GetOff(PlayerRef ownerPlayerRef)
@@ -93,26 +110,71 @@ namespace InGame.Exhibit
 
             Rigidbody.linearVelocity = Vector3.zero;
             Rigidbody.angularVelocity = Vector3.zero;
-            transform.SetPositionAndRotation(_initialPosition,_initialRotation);
-            
-            IsInteracting = false; 
+            IsInteracting = false;
             _currentTargetValue = 0f;
             CurrentBlendValue = _currentTargetValue;
             _interactableBase.ForceSetInteractable = true;
+            _owner = PlayerRef.None;
+            IsAimObjectActive = false;
         }
 
         public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
         {
-            if (!HasStateAuthority) 
+            if (!HasStateAuthority)
                 return;
-            
+
             HandleMovement(playerInput);
             _fireCooldownTimerSec = Mathf.Min(_fireCooldown, _fireCooldownTimerSec + deltaTime);
-                
+            var hit = GetAimPosition();
             if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _fireCooldownTimerSec >= _fireCooldown)
             {
-                Fire();
+                _attackCts?.Cancel();
+                RPC_SendHitPoint(hit.point);
+                Fire(_owner, _hitPosition);
             }
+
+            _aimObject.transform.position = AimObjectPosition;
+            _aimObject.transform.rotation = AimObjectRotation;
+        }
+
+        [Rpc]
+        private void RPC_SendHitPoint(Vector3 hitPoint)
+        {
+            _hitPosition = hitPoint;
+        }
+
+        private RaycastHit GetAimPosition()
+        {
+            RaycastHit[] hits = new RaycastHit[30];
+
+            Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
+
+            var count = Physics.RaycastNonAlloc(_muzzle.position, angleForward, hits, _rayDistance);
+
+            for (int i = 0; i < count; i++)
+            {
+                // ヒットしたオブジェクトのTransformを取得
+                Transform hitTransform = hits[i].transform;
+                // ヒットしたオブジェクトが自分自身、または自分の子オブジェクトか確認
+                if (hitTransform == transform || hitTransform.IsChildOf(transform)) continue;
+                var point = hits[i].point;
+                if (!IsAimObjectActive)
+                {
+                    IsAimObjectActive = true;
+                }
+                var offset = hits[i].normal * 1f;
+                AimObjectPosition = point + offset;
+                var rot = Quaternion.FromToRotation(Vector3.up,hits[i].normal);
+                AimObjectRotation = rot;
+                return hits[i];
+            }
+
+            if (IsAimObjectActive)
+            {
+                IsAimObjectActive = false;
+            }
+
+            return new RaycastHit();
         }
 
         // Animationの更新処理
@@ -134,7 +196,7 @@ namespace InGame.Exhibit
             if (moveInput == Vector2.zero)
             {
                 Rigidbody.linearVelocity = Vector3.zero;
-                
+
                 float idleTarget = IsInteracting ? _currentTargetValue : 0;
                 SetBlendValue(idleTarget);
                 return;
@@ -165,42 +227,59 @@ namespace InGame.Exhibit
 
         private void SetBlendValue(float target)
         {
-            if (IsInteracting) 
+            if (IsInteracting)
                 target = Mathf.Max(target, _currentTargetValue);
 
-            float src  = CurrentBlendValue;
+            float src = CurrentBlendValue;
             float next = Mathf.Lerp(src, target, Runner.DeltaTime * LerpSpeed);
 
             if (Mathf.Abs(next - src) >= Threshold)
                 CurrentBlendValue = next;
         }
 
-        private void Fire()
+        private void Fire(PlayerRef ownerPlayerRef, Vector3 hitPosition)
         {
+            _attackCts = new CancellationTokenSource();
             if (_muzzle == null)
             {
                 Debug.LogError("Muzzle is null");
                 return;
             }
-            
-            Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
-            
-            if (Physics.Raycast(_muzzle.position, angleForward, out RaycastHit hit, _rayDistance,
-                    _fireHitMask))
-            {
-                // 弾を生成し、ターゲット方向に飛ばす
-                Vector3 dir = (hit.point - _muzzle.position).normalized;
-                Quaternion rotation = Quaternion.LookRotation(dir,Vector3.up);
-                Vector3 velocity = dir * _fireSpeed;
-                
-                Rpc_PlayFireBullet(_muzzle.position, rotation, velocity);
-            }
-            else
-                Debug.LogError("No hit found in angled ray");
 
             _fireCooldownTimerSec = 0f;
+            // 弾を生成し、ターゲット方向に飛ばす
+            Vector3 dir = (hitPosition - _muzzle.position).normalized;
+            Quaternion rotation = Quaternion.LookRotation(dir, Vector3.up);
+            Vector3 velocity = dir * _fireSpeed;
+            var travelTime = Vector3.Distance(_muzzle.position, hitPosition) / _fireSpeed;
+            PlayFireBullet();
+            var instance = Runner.Spawn(_fireParticle, _muzzle.position, rotation);
+            if (instance.TryGetComponent<Rigidbody>(out var rb))
+            {
+                rb.linearVelocity = velocity;
+            }
+
+            AttackAsync(instance, travelTime, hitPosition, ownerPlayerRef).Forget();
         }
-        
+
+        private async UniTaskVoid AttackAsync(NetworkObject explosion, float time, Vector3 point,
+            PlayerRef ownerPlayerRef)
+        {
+            if (!Runner.IsServer) return;
+            await UniTask.Delay(TimeSpan.FromSeconds(time), cancellationToken: _attackCts.Token);
+            var effect = Runner.Spawn(_hitEffect, point, Quaternion.identity);
+            Destroy(effect.gameObject, 3f);
+            Runner.Despawn(explosion);
+            // 当たったものがPlayerであればDamageを与える
+            var cols = Physics.OverlapSphere(point, _radius, _playerHitMask);
+            foreach (var col in cols)
+            {
+                var damageable = col.GetComponentInParent<IDamageable>();
+                var hitData = new HitData(HitActionType.Damage, _damage, ownerPlayerRef, damageable.OwnerPlayerRef);
+                damageable.TakeHit(ref hitData);
+            }
+        }
+
         private void PlayMuzzleFlash(Vector3 pos, Quaternion rot)
         {
             StaticServiceLocator.Instance.Get<EffectSpawner>()
@@ -210,21 +289,21 @@ namespace InGame.Exhibit
                 _muzzleFlash.Play();
         }
 
-        [Rpc]
-        private void Rpc_PlayFireBullet(Vector3 spawnPos, Quaternion rotation, Vector3 initialVelocity)
+        private void PlayFireBullet()
         {
-            if(!_fireParticle)
-                return;
-            
             _mecanimAnimator.SetTrigger(Attack);
             PlayMuzzleFlash(_muzzle.position, _muzzle.rotation);
-            
-            GameObject instance = Instantiate(_fireParticle,spawnPos, rotation);
+        }
 
-            if (instance.TryGetComponent<Rigidbody>(out var rb))
-            {
-                rb.linearVelocity = initialVelocity;
-            }
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            _attackCts?.Dispose();
+        }
+        
+        private void OnAimObjectActiveChanged()
+        {
+            // ネットワーク変数の変更をすべてのクライアントに反映
+            _aimObject.gameObject.SetActive(IsAimObjectActive);
         }
 
         // サウンド設定

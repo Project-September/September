@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 5855297743485364338}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.381}
+  m_LocalPosition: {x: -0, y: 0, z: 0.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -110,6 +110,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4999911576838577376}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4788509961417128256}
   m_SourcePrefab: {fileID: 100100000, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
 --- !u!4 &343203895494176651 stripped
 Transform:
@@ -160,6 +163,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2735281992233445846}
+  - {fileID: 4788509961417128256}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2735281992233445846
 MonoBehaviour:
@@ -174,32 +178,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 2
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 10
   _characterEffects:
   - rid: 3302172163222274141
+  _type: 3
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 4788509961417128256}
+  _interactSoundCueName: SE_Painting_Warp_In
+  _interactSoundTrackingType: 0
+  _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
+  _ForceSetInteractable: 1
   references:
     version: 2
     RefIds:
     - rid: 3302172163222274141
       type: {class: WarpInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 4
+        _characterType: 5
         _warpDestination: {fileID: 0}
         _warpDuration: 0.5
         _warpPosition: {fileID: 0}
-        _warpInSoundName: Painting_Warp_In
-        _warpOutSoundName: Painting_Warp_Out
+        _warpInSoundName: SE_Painting_Warp_In
+        _warpOutSoundName: SE_Painting_Warp_Out
+        _audioBroadcaster: {fileID: 4788509961417128256}
 --- !u!114 &4999911576838577376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,3 +228,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 2735281992233445846}
+--- !u!114 &4788509961417128256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1119319001164789041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue

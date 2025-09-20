@@ -17,6 +17,7 @@ namespace September.Common
         Aim,
         Ability1,
         Ability2,
+        Warp
     }
 
     public struct PlayerInput : INetworkInput
@@ -53,6 +54,7 @@ namespace September.Common
             _mainCamera = Camera.main;
         }
         
+
         /// <summary>
         /// 現在の入力状況をネットワークに登録する
         /// </summary>
@@ -75,6 +77,7 @@ namespace September.Common
                 playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
                 playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
                 playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+                playerInput.Buttons.Set(PlayerButtons.Warp, playerActions.Warp.IsPressed());
             }
             
             if (_mainCamera == null)

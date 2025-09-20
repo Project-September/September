@@ -922,6 +922,7 @@ GameObject:
   - component: {fileID: 6773177065010528805}
   - component: {fileID: -5982283155467583323}
   - component: {fileID: -8190595206022697743}
+  - component: {fileID: 4308694996682901781}
   m_Layer: 0
   m_Name: PropAirplane
   m_TagString: Untagged
@@ -1019,6 +1020,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6751401814558250722}
   - {fileID: 6773177065010528805}
+  - {fileID: 4308694996682901781}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &6751401814558250722
 MonoBehaviour:
@@ -1056,22 +1058,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredInteractTimeDictionary:
-    keys: 0000000001000000
+    keys: 05000000
     values:
-    - 1
-    - 1
+    - 5
   _cooldownTimeDictionary:
-    keys: 0000000001000000
+    keys: 05000000
     values:
-    - 1
-    - 1
+    - 5
   _characterEffects:
   - rid: 5083283082934222954
+  _type: 4
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 4308694996682901781}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -1110,6 +1114,7 @@ MonoBehaviour:
   _currentAccelText: {fileID: 7986310020915403168}
   _angleText: {fileID: 3115068171291840454}
   _isUpText: {fileID: 6362518027200371173}
+  _isSpawned: 0
   references:
     version: 2
     RefIds:
@@ -1156,6 +1161,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldownTime: 5
   _interactable: {fileID: 0}
+--- !u!114 &4308694996682901781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228950578283369073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1 &7384611136017809608
 GameObject:
   m_ObjectHideFlags: 0
@@ -1672,31 +1690,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.99965733
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0000000029326637
+      value: 0.026176924
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.000000003721558
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 1.1363434e-17
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y

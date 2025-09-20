@@ -1,3 +1,4 @@
+//勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 public enum EffectType
 {
     Test,
@@ -19,4 +20,13 @@ public enum EffectType
     CarHit,
     Heal,
     HitNormal,
+    WarpIn,
+    WarpOut,
+    PenguinAttack,
+    PenguinRun,
+    Muramasa,
+    CooldownBig,
+    CooldownPartition,
+    CarDash,
 }
+//勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

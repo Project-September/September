@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8302386863916485195}
   - component: {fileID: 806825774370489575}
   - component: {fileID: 905073906492759685}
+  - component: {fileID: 3580074162540170996}
   m_Layer: 0
   m_Name: SateliteCannon
   m_TagString: Untagged
@@ -55,6 +56,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 8302386863916485195}
   - {fileID: 806825774370489575}
+  - {fileID: 3580074162540170996}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &8302386863916485195
 MonoBehaviour:
@@ -78,11 +80,15 @@ MonoBehaviour:
     - 1
   _characterEffects:
   - rid: 3416131569625071707
+  _type: 0
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 3580074162540170996}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
@@ -112,6 +118,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _hitDistance: 1000
+  _isDebug: 0
 --- !u!65 &905073906492759685
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -133,6 +140,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 5.3605556, y: 4.8451405, z: 5.9996653}
   m_Center: {x: 0.29607427, y: 2.440452, z: -0.1024127}
+--- !u!114 &3580074162540170996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7916347356977786334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
 --- !u!1001 &9049262115522219628
 PrefabInstance:
   m_ObjectHideFlags: 0

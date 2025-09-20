@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace September.Title
 {
@@ -6,11 +8,15 @@ namespace September.Title
     public class PanelController : MonoBehaviour
     {
         [SerializeField] bool _hideOnStart;
+        [SerializeField] Selectable _selectWhenShow;
+        [SerializeField] Selectable _selectWhenHide;
         CanvasGroup _panel;
+        bool _isInitialized;
         private void Awake()
         {
             _panel = GetComponent<CanvasGroup>();
             if(_hideOnStart) HidePanel();
+            _isInitialized = true;
         }
 
         public void ShowPanel()
@@ -18,6 +24,7 @@ namespace September.Title
             _panel.alpha = 1;
             _panel.interactable = true;
             _panel.blocksRaycasts = true;
+            if(_isInitialized) EventSystem.current.SetSelectedGameObject(_selectWhenShow.gameObject);
         }
 
         public void HidePanel()
@@ -25,6 +32,7 @@ namespace September.Title
             _panel.alpha = 0;
             _panel.interactable = false;
             _panel.blocksRaycasts = false;
+            if(_isInitialized) EventSystem.current.SetSelectedGameObject(_selectWhenHide.gameObject);
         }
     }
 }

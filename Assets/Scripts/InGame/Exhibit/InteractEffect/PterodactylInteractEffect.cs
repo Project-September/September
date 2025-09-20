@@ -28,12 +28,8 @@ namespace InGame.Exhibit
             
             _runner = target.Runner;
             _interactable = target;
-            CharacterType characterType = context.CharacterType;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
-            if (characterType == CharacterType.OkabeWright)
-            {
-                GetOn(playerRef);
-            }
+            GetOn(playerRef);
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
@@ -48,10 +44,12 @@ namespace InGame.Exhibit
                     return;
                 }
             }
-            
-            if(CheckInteractEnd())
+
+            if (CheckInteractEnd())
+            {
                 GetOff();
-                
+                return;
+            }
             _pterodactylInteractable.OnInteractFixedUpdate(playerInput,_runner.DeltaTime);
         }
 

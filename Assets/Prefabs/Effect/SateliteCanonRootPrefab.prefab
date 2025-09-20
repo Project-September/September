@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8100763672544996354}
   - component: {fileID: 1641664645383115175}
   - component: {fileID: 6970190030832029459}
+  - component: {fileID: 936718987372956837}
   m_Layer: 0
   m_Name: SateliteCanonRootPrefab
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 1116583463738296954}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 8.82}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -82,6 +83,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: fd1337c8361dc074fb59b7911604ec7f, type: 2}
     - {fileID: 11400000, guid: 5c3203afeb4aad54da00aaa05d71cb41, type: 2}
     - {fileID: 11400000, guid: 65799ce4f8223ef49b8a7297ba227c36, type: 2}
+    - {fileID: 11400000, guid: 1dc92de3f76ebf44a903cf9dc95cb1a4, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -111,6 +113,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 936718987372956837}
+          m_TargetAssemblyTypeName: SateliteCanonAudioController, Scripts
+          m_MethodName: PlaySateliteSound
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: SE_SatelliteCannon_LaserFire
+            m_BoolArgument: 0
+          m_CallState: 2
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1641664645383115175}
@@ -123,6 +137,20 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 936718987372956837}
+          m_TargetAssemblyTypeName: SateliteCanonAudioController, Scripts
+          m_MethodName: PlaySateliteSound
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: SE_SatelliteCannon_LockOn
             m_BoolArgument: 0
           m_CallState: 2
 --- !u!114 &8100763672544996354
@@ -154,7 +182,7 @@ MonoBehaviour:
   - {fileID: 6112215694784724254}
   _radius: 3
   _alreadyHit: []
-  IsFinished: 0
+  IsActive: 0
 --- !u!114 &6970190030832029459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,6 +198,20 @@ MonoBehaviour:
   _hitChecker: {fileID: 1641664645383115175}
   _hitDamage: 999
   _underHitPos: {fileID: 6112215694784724254}
+--- !u!114 &936718987372956837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116583463738296954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76086fa35ec75bd459cef69d69f95418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _satelitePosition: {fileID: 6112215694784724254}
+  _cueSheet: ALLCue
 --- !u!1 &7311707154550156463
 GameObject:
   m_ObjectHideFlags: 0

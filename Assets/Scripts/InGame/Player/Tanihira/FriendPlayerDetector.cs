@@ -14,31 +14,33 @@ namespace Ingame.Tanihira
         [SerializeField] private LayerMask _obstacleMask;
         [SerializeField] private FriendStateChanger _friendStateChanger;
         [SerializeField] private FormationManager _formationManager;
+        [SerializeField] private bool _isWaiting;
         
         private Transform _currentTarget;
-        private bool _isWaiting;
         private InGameManager _inGameManager;
 
         private void Start()
         {
-            _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
-            if (_inGameManager)
+            if (HasStateAuthority)
             {
-                _inGameManager.GameStarted += GameStart;
+                _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+                if (_inGameManager)
+                {
+                    _inGameManager.GameStarted += GameStart;
+                }
             }
         }
 
-        private void Update()
+        public override void FixedUpdateNetwork()
         {
-            if (!HasInputAuthority)
-                return;
+            if (!HasStateAuthority) return;
             
             if (_isWaiting)
             {
                 DetectePlayer();
             }
         }
-
+        
         private void GameStart()
         {
             _isWaiting = true;
@@ -79,13 +81,12 @@ namespace Ingame.Tanihira
                 //間に障害物があった場合には無視
                 if (Physics.Raycast(start, direction, out RaycastHit hit, distance, _obstacleMask))
                 {
-                    Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
+                    //Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
                     continue;
                 }
                 
                 //近い物をターゲットにして攻撃させる
                 _currentTarget = player.gameObject.transform;
-                Debug.Log(player.gameObject.name);
             }
             
             //ペンギンに攻撃指示を飛ばす
@@ -123,11 +124,6 @@ namespace Ingame.Tanihira
             }
 
             return true;
-        }
-
-        private void OnDisable()
-        {
-            _inGameManager.GameStarted -= GameStart;
         }
         
         private void OnDrawGizmosSelected()

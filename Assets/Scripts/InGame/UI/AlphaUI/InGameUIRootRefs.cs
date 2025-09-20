@@ -8,19 +8,20 @@ namespace September.InGame.UI
     public sealed class InGameUIRootRefs : MonoBehaviour
     {
         [Header("Panels / Texts")]
-        [field: SerializeField] public GameObject OptionUI { get; private set; }
-        [field: SerializeField] public GameObject KillLogPanel { get; private set; }
-        [field: SerializeField] public TextMeshProUGUI KillLogText { get; private set; }
-        [field: SerializeField] public GameObject OgreUI { get; private set; }
+        public GameObject OptionUI;
+        public GameObject LogPanel;
+        public GameObject OgreUI;
+        public TextMeshProUGUI OgreMessageText;
+        public TextMeshProUGUI StatusUpText;
 
         [Header("Bars")]
-        [field: SerializeField] public Slider HpBar { get; private set; }
-        [field: SerializeField] public Slider StaminaBar { get; private set; }
+        public Slider HpBar;
+        public Slider StaminaBar;
 
-        [Header("Interact")]
-        [field: SerializeField] public InteractUi InteractUI { get; private set; }
+        [Header("Interact")] 
+        public InteractUi InteractUI;
 
-        [Header("Timer")]
-        [field: SerializeField] public TextMeshProUGUI TimerText { get; private set; }
+        [Header("Timer")] 
+        public TextMeshProUGUI TimerText;
     }
 }

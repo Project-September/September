@@ -1,0 +1,89 @@
+using Fusion;
+using InGame.Health;
+using September.Common;
+using September.InGame.Effect;
+using UnityEngine;
+
+namespace InGame.Exhibit
+{
+    public class MuramasaInteractInvoker : NetworkBehaviour
+    {
+        [SerializeField] private Vector3 _muramasaOffset = new Vector3(0, 0.5f, 0);
+        [SerializeField] private int _attackDamage = 1;
+        [SerializeField] private float _attackInterval = 0.2f;
+        [SerializeField] private float _attackRadius = 2.25f;
+        [SerializeField] private float _muramasaDuration = 10f;
+        [Networked] public TickTimer AttackTimer { get; set; }
+        [Networked] public TickTimer DurationTimer { get; set; }
+        private EffectSpawner EffectSpawner => StaticServiceLocator.Instance.Get<EffectSpawner>();
+        private Transform _currentParent;
+        private PlayerRef _currentOwner;
+        private int _currentOwnerID = -1;
+        private const string MURAMASA_EFFECT_ID = "muramasa";
+        
+        public override void FixedUpdateNetwork()
+        {
+            if (_currentOwnerID == -1) return;
+            if (AttackTimer.ExpiredOrNotRunning(Runner) && HasStateAuthority)
+            {
+                var hits = Physics.OverlapSphere(_currentParent.transform.position + _muramasaOffset, _attackRadius);
+                foreach (var hit in hits)
+                {
+                    var root = hit.transform.root;
+                    if (root.TryGetComponent<IDamageable>(out var damageable) &&
+                        damageable.OwnerPlayerRef != _currentOwner)
+                    {
+                        var hitData = new HitData(HitActionType.Damage, _attackDamage,
+                            _currentOwner, damageable.OwnerPlayerRef);
+                        damageable.TakeHit(ref hitData);
+                    }
+                }
+                AttackTimer = TickTimer.CreateFromSeconds(Runner, _attackInterval);
+            }
+
+            if (DurationTimer.ExpiredOrNotRunning(Runner) && HasStateAuthority)
+            {
+                StopAttack();
+            }
+        }
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+        public void Rpc_StartAttack(int interactor)
+        {
+            if (_currentOwnerID != -1) return;
+            var playerRef = PlayerRef.FromEncoded(interactor);
+            if (!Runner.TryGetPlayerObject(playerRef, out var playerObj)) return;
+            EffectSpawner.RequestPlayLoopEffect(
+                MURAMASA_EFFECT_ID + interactor,
+                EffectType.Muramasa,
+                playerObj.transform.position + _muramasaOffset,
+                Quaternion.identity,
+                playerObj.transform
+            );
+            _currentParent = playerObj.transform;
+            _currentOwner = playerRef;
+            _currentOwnerID = interactor;
+            DurationTimer = TickTimer.CreateFromSeconds(Runner, _muramasaDuration);
+        }
+        
+        private void StopAttack()
+        {
+            EffectSpawner.StopEffect(MURAMASA_EFFECT_ID + _currentOwnerID);
+            _currentOwnerID = -1;
+            _currentOwner = PlayerRef.None;
+            _currentParent = null;
+        }
+        #if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (_currentParent == null)
+            {
+                Gizmos.DrawWireSphere(transform.position + _muramasaOffset, _attackRadius);
+            }
+            else
+            {
+                Gizmos.DrawWireSphere(_currentParent.position + _muramasaOffset, _attackRadius);
+            }
+        }
+        #endif
+    }
+}

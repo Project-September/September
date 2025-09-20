@@ -198,6 +198,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Warp"",
+                    ""type"": ""Button"",
+                    ""id"": ""506da238-3225-4001-9ab0-c119eccd8c05"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -629,6 +638,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""Ability2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1216f590-1ea7-43d8-ad34-7edef8c2e8b1"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Warp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -743,6 +763,24 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""PageSlide"",
+                    ""type"": ""Button"",
+                    ""id"": ""5d1e9a00-f276-4890-8696-cf38c649bb76"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PageSlideBack"",
+                    ""type"": ""Button"",
+                    ""id"": ""fa0d7543-6ecb-4a02-84e9-70026d3c0d2f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1152,6 +1190,137 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""Volume"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0faa6992-57b2-4e55-a3cd-028de6e3e3cc"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PageSlide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b89648cb-2c47-4afa-beec-be7639135f53"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PageSlideBack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Result"",
+            ""id"": ""75076912-f11d-4a71-96c1-54a1466a7512"",
+            ""actions"": [
+                {
+                    ""name"": ""Finish"",
+                    ""type"": ""Button"",
+                    ""id"": ""d05dc7b1-d9ac-4c39-ad42-3d025e774c8f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""9029802e-eab3-4dd6-82b1-a10518eb5a39"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Finish"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6bb43234-90d4-45df-bcc7-e7f0026b25b4"",
+                    ""path"": ""<XInputController>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Finish"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Debug"",
+            ""id"": ""1d700de1-4f73-49ea-ab18-3daeeeea8f8a"",
+            ""actions"": [
+                {
+                    ""name"": ""Title"",
+                    ""type"": ""Button"",
+                    ""id"": ""46f5503c-5515-45fc-9775-f7d97654aac7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Result"",
+                    ""type"": ""Button"",
+                    ""id"": ""ff7d395a-8304-4925-bfe5-33224e087e91"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""db2a8f6b-d75d-49af-84cb-71087a91a835"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Title"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""522ec327-3a09-4ea8-b13e-81b7b0b81211"",
+                    ""path"": ""<XInputController>/{Cancel}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Title"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""37bce03f-82d1-4712-8eed-43a7433c2ca4"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Result"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cf5f80df-ccc2-4164-841a-0f9cdc07e189"",
+                    ""path"": ""<XInputController>/{Cancel}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Result"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1233,6 +1402,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Ability1 = m_Player.FindAction("Ability1", throwIfNotFound: true);
         m_Player_Ability2 = m_Player.FindAction("Ability2", throwIfNotFound: true);
+        m_Player_Warp = m_Player.FindAction("Warp", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1247,16 +1417,23 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_Option = m_UI.FindAction("Option", throwIfNotFound: true);
         m_UI_Volume = m_UI.FindAction("Volume", throwIfNotFound: true);
-        
-        OnConstruct();
+        m_UI_PageSlide = m_UI.FindAction("PageSlide", throwIfNotFound: true);
+        m_UI_PageSlideBack = m_UI.FindAction("PageSlideBack", throwIfNotFound: true);
+        // Result
+        m_Result = asset.FindActionMap("Result", throwIfNotFound: true);
+        m_Result_Finish = m_Result.FindAction("Finish", throwIfNotFound: true);
+        // Debug
+        m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
+        m_Debug_Title = m_Debug.FindAction("Title", throwIfNotFound: true);
+        m_Debug_Result = m_Debug.FindAction("Result", throwIfNotFound: true);
     }
 
     ~@GameInput()
     {
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, GameInput.Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, GameInput.UI.Disable() has not been called.");
-        
-        OnDestruct();
+        UnityEngine.Debug.Assert(!m_Result.enabled, "This will cause a leak and performance issues, GameInput.Result.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Debug.enabled, "This will cause a leak and performance issues, GameInput.Debug.Disable() has not been called.");
     }
 
     /// <summary>
@@ -1344,6 +1521,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Ability1;
     private readonly InputAction m_Player_Ability2;
+    private readonly InputAction m_Player_Warp;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1403,6 +1581,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Ability2".
         /// </summary>
         public InputAction @Ability2 => m_Wrapper.m_Player_Ability2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Warp".
+        /// </summary>
+        public InputAction @Warp => m_Wrapper.m_Player_Warp;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1465,6 +1647,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Ability2.started += instance.OnAbility2;
             @Ability2.performed += instance.OnAbility2;
             @Ability2.canceled += instance.OnAbility2;
+            @Warp.started += instance.OnWarp;
+            @Warp.performed += instance.OnWarp;
+            @Warp.canceled += instance.OnWarp;
         }
 
         /// <summary>
@@ -1512,6 +1697,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Ability2.started -= instance.OnAbility2;
             @Ability2.performed -= instance.OnAbility2;
             @Ability2.canceled -= instance.OnAbility2;
+            @Warp.started -= instance.OnWarp;
+            @Warp.performed -= instance.OnWarp;
+            @Warp.canceled -= instance.OnWarp;
         }
 
         /// <summary>
@@ -1561,6 +1749,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_TrackedDeviceOrientation;
     private readonly InputAction m_UI_Option;
     private readonly InputAction m_UI_Volume;
+    private readonly InputAction m_UI_PageSlide;
+    private readonly InputAction m_UI_PageSlideBack;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1620,6 +1810,14 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/Volume".
         /// </summary>
         public InputAction @Volume => m_Wrapper.m_UI_Volume;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/PageSlide".
+        /// </summary>
+        public InputAction @PageSlide => m_Wrapper.m_UI_PageSlide;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/PageSlideBack".
+        /// </summary>
+        public InputAction @PageSlideBack => m_Wrapper.m_UI_PageSlideBack;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1682,6 +1880,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Volume.started += instance.OnVolume;
             @Volume.performed += instance.OnVolume;
             @Volume.canceled += instance.OnVolume;
+            @PageSlide.started += instance.OnPageSlide;
+            @PageSlide.performed += instance.OnPageSlide;
+            @PageSlide.canceled += instance.OnPageSlide;
+            @PageSlideBack.started += instance.OnPageSlideBack;
+            @PageSlideBack.performed += instance.OnPageSlideBack;
+            @PageSlideBack.canceled += instance.OnPageSlideBack;
         }
 
         /// <summary>
@@ -1729,6 +1933,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Volume.started -= instance.OnVolume;
             @Volume.performed -= instance.OnVolume;
             @Volume.canceled -= instance.OnVolume;
+            @PageSlide.started -= instance.OnPageSlide;
+            @PageSlide.performed -= instance.OnPageSlide;
+            @PageSlide.canceled -= instance.OnPageSlide;
+            @PageSlideBack.started -= instance.OnPageSlideBack;
+            @PageSlideBack.performed -= instance.OnPageSlideBack;
+            @PageSlideBack.canceled -= instance.OnPageSlideBack;
         }
 
         /// <summary>
@@ -1762,6 +1972,209 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="UIActions" /> instance referencing this action map.
     /// </summary>
     public UIActions @UI => new UIActions(this);
+
+    // Result
+    private readonly InputActionMap m_Result;
+    private List<IResultActions> m_ResultActionsCallbackInterfaces = new List<IResultActions>();
+    private readonly InputAction m_Result_Finish;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Result".
+    /// </summary>
+    public struct ResultActions
+    {
+        private @GameInput m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public ResultActions(@GameInput wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Result/Finish".
+        /// </summary>
+        public InputAction @Finish => m_Wrapper.m_Result_Finish;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Result; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="ResultActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(ResultActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="ResultActions" />
+        public void AddCallbacks(IResultActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ResultActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ResultActionsCallbackInterfaces.Add(instance);
+            @Finish.started += instance.OnFinish;
+            @Finish.performed += instance.OnFinish;
+            @Finish.canceled += instance.OnFinish;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="ResultActions" />
+        private void UnregisterCallbacks(IResultActions instance)
+        {
+            @Finish.started -= instance.OnFinish;
+            @Finish.performed -= instance.OnFinish;
+            @Finish.canceled -= instance.OnFinish;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="ResultActions.UnregisterCallbacks(IResultActions)" />.
+        /// </summary>
+        /// <seealso cref="ResultActions.UnregisterCallbacks(IResultActions)" />
+        public void RemoveCallbacks(IResultActions instance)
+        {
+            if (m_Wrapper.m_ResultActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="ResultActions.AddCallbacks(IResultActions)" />
+        /// <seealso cref="ResultActions.RemoveCallbacks(IResultActions)" />
+        /// <seealso cref="ResultActions.UnregisterCallbacks(IResultActions)" />
+        public void SetCallbacks(IResultActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ResultActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ResultActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="ResultActions" /> instance referencing this action map.
+    /// </summary>
+    public ResultActions @Result => new ResultActions(this);
+
+    // Debug
+    private readonly InputActionMap m_Debug;
+    private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
+    private readonly InputAction m_Debug_Title;
+    private readonly InputAction m_Debug_Result;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Debug".
+    /// </summary>
+    public struct DebugActions
+    {
+        private @GameInput m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public DebugActions(@GameInput wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Debug/Title".
+        /// </summary>
+        public InputAction @Title => m_Wrapper.m_Debug_Title;
+        /// <summary>
+        /// Provides access to the underlying input action "Debug/Result".
+        /// </summary>
+        public InputAction @Result => m_Wrapper.m_Debug_Result;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Debug; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="DebugActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(DebugActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="DebugActions" />
+        public void AddCallbacks(IDebugActions instance)
+        {
+            if (instance == null || m_Wrapper.m_DebugActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_DebugActionsCallbackInterfaces.Add(instance);
+            @Title.started += instance.OnTitle;
+            @Title.performed += instance.OnTitle;
+            @Title.canceled += instance.OnTitle;
+            @Result.started += instance.OnResult;
+            @Result.performed += instance.OnResult;
+            @Result.canceled += instance.OnResult;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="DebugActions" />
+        private void UnregisterCallbacks(IDebugActions instance)
+        {
+            @Title.started -= instance.OnTitle;
+            @Title.performed -= instance.OnTitle;
+            @Title.canceled -= instance.OnTitle;
+            @Result.started -= instance.OnResult;
+            @Result.performed -= instance.OnResult;
+            @Result.canceled -= instance.OnResult;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="DebugActions.UnregisterCallbacks(IDebugActions)" />.
+        /// </summary>
+        /// <seealso cref="DebugActions.UnregisterCallbacks(IDebugActions)" />
+        public void RemoveCallbacks(IDebugActions instance)
+        {
+            if (m_Wrapper.m_DebugActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="DebugActions.AddCallbacks(IDebugActions)" />
+        /// <seealso cref="DebugActions.RemoveCallbacks(IDebugActions)" />
+        /// <seealso cref="DebugActions.UnregisterCallbacks(IDebugActions)" />
+        public void SetCallbacks(IDebugActions instance)
+        {
+            foreach (var item in m_Wrapper.m_DebugActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_DebugActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="DebugActions" /> instance referencing this action map.
+    /// </summary>
+    public DebugActions @Debug => new DebugActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -1918,6 +2331,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAbility2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Warp" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnWarp(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
@@ -2010,5 +2430,56 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnVolume(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PageSlide" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPageSlide(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PageSlideBack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPageSlideBack(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Result" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="ResultActions.AddCallbacks(IResultActions)" />
+    /// <seealso cref="ResultActions.RemoveCallbacks(IResultActions)" />
+    public interface IResultActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Finish" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFinish(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Debug" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="DebugActions.AddCallbacks(IDebugActions)" />
+    /// <seealso cref="DebugActions.RemoveCallbacks(IDebugActions)" />
+    public interface IDebugActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Title" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTitle(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Result" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnResult(InputAction.CallbackContext context);
     }
 }

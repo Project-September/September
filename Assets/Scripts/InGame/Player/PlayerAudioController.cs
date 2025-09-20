@@ -2,58 +2,165 @@
 using UnityEngine;
 using CRISound;
 using September.Common;
+using InGame.Common;
+using System.Collections.Generic;
+using UnityEngine.Playables;
+using CriWare;
 
 namespace September.InGame
 {
+    [RequireComponent(typeof (AudioBroadcaster))]
     public class PlayerAudioController : NetworkBehaviour
     {
+        // 現在AnimationClipPlayerと連携してないため値変更の可能性がある…
+        enum MoveType
+        {
+            Walk = 1,
+            Run = 2
+        }
+
         [SerializeField] private string _sheetName = "ALLCue";
         [SerializeField] private string _footstepCueName = SoundCues.SE.OKB_Footstep.Name; // キャラによって変わる
         [SerializeField] private string _punchSwingCueName = SoundCues.SE.Player_Punch_Swing.Name;
         [SerializeField] private string _punchHitCueName = SoundCues.SE.Player_Punch_Hit.Name;
-        private CuePlayAtomExPlayer.SEPlayerWith3D.Sound3D _soundPlayer;
+        [SerializeField] AudioBroadcaster _audioBroadcaster;
+        [SerializeField] private AnimationClipPlayer _clipPlayer; // 再生中のアニメーション取得用
+
+        [Header("足音と被らないように停止アニメーションを設定")]
+        [SerializeField] private List<AnimationClip> _footstepBlockClipList = new List<AnimationClip>();
+
+        [SerializeField] private Transform _playerTransform;
+        [SerializeField] private Transform _cameraTransform;
+        
         private CRIListenerManager _listenerManager;
+        private MoveType _lastDominant = MoveType.Walk; // 揺らぎ防止 初期 Walk
+        private float SwitchThreshold = 0.15f;          // 切替に必要な差
+
+        [Header("Debug用")]
+        [SerializeField, Range(0f, 5f)] private float _debugBGMVolume = 1f;
+        [SerializeField, Range(0f, 5f)] private float _debugSEVolume = 1f;
+
+        // 現在の優勢クリップを判定 Walk or Run
+        private MoveType GetDominantAnimation()
+        {
+            float weightWalk = _clipPlayer.BaseMixer.GetInputWeight((int)MoveType.Walk);
+            float weightRun = _clipPlayer.BaseMixer.GetInputWeight((int)MoveType.Run);
+
+            if (_lastDominant == MoveType.Walk)
+            {
+                if (weightRun - weightWalk > SwitchThreshold)
+                {
+                    _lastDominant = MoveType.Run;
+                }
+            }
+            else
+            {
+                if (weightWalk -  weightRun > SwitchThreshold)
+                {
+                    _lastDominant = MoveType.Walk;
+                }
+            }
+
+            return _lastDominant;
+        }
 
         public override void Spawned()
         {
             // 3Dリスナーの設定(カメラ追従)
             if (!Object.HasInputAuthority) return;
 
+            _audioBroadcaster = GetComponent<AudioBroadcaster>();
+            _clipPlayer = GetComponentInParent<AnimationClipPlayer>();
             _listenerManager = FindFirstObjectByType<CRIListenerManager>();
             if (_listenerManager == null) return;
 
-            _listenerManager.Attach(Camera.main.transform);
+            _playerTransform = transform.root;
+            _cameraTransform = Camera.main.transform;
+            _listenerManager.AttachPlayer(_playerTransform); // 一応Meshではなくルートを設定
+            _listenerManager.AttachCamera(_cameraTransform); // 音の左右を視界基準に設定
         }
 
-        private void LateUpdate()
+        /// <summary> 足音再生用 Animation Eventから使用 </summary>
+        /// <param name="animationEvent">
+        /// string     CueName
+        /// int        FollowType
+        /// float(int) MoveType
+        /// </param>
+        public void PlayFootstepSound(AnimationEvent animationEvent)
         {
-            // 移動しながら鳴る音用
-            if (_soundPlayer == null) return;
-
-            _soundPlayer.UpdateSourcePosition(this.transform.position);
-        }
-        
-        /// <summary> プレイヤー用サウンドの再生 Animation Eventからも使用可 </summary>
-        /// <param name="cueName"></param>
-        public void PlaySound(string cueName)
-        {
+            // 自分からでなければ鳴らさない
             if (!HasInputAuthority) return;
 
-            Play2DSoundLocal(cueName);
-            RPC_Play3DSound(this.transform.position, cueName);
+            if (_clipPlayer == null) return;
+            // 攻撃モーション中などは鳴らさない
+            foreach (var clip in _footstepBlockClipList)
+            {
+                if (_clipPlayer.IsPlayingTargetClip(clip)) return;
+            }
+
+            string cueName = animationEvent.stringParameter;
+            int trackingType = animationEvent.intParameter;
+            int speedType = (int)animationEvent.floatParameter;
+            int domMoveType = (int)GetDominantAnimation();
+
+            // AnimationEvenに設定された Walk or Run の値と現在の優勢クリップが異なっていたら鳴らさない
+            if (speedType != domMoveType) return; // walk = 1, run = 2
+
+            _audioBroadcaster.RPC_PlaySoundFromCode(cueName, SoundTrackingType.Spot, Object.Id);
         }
 
-        private void Play2DSoundLocal(string cueName)
+        // デバッグ用
+        // 音実装終わるまで残す
+        private void Update()
         {
-            CRIAudio.PlaySE(_sheetName, cueName); // 2D再生
-        }
+            // ALLミュート [M]
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                _debugBGMVolume = 0f;
+                _debugSEVolume = 0f;
+                CriAtom.SetCategoryVolume("BGM", _debugBGMVolume);
+                CriAtom.SetCategoryVolume("SE", _debugSEVolume);
+            }
 
-        [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-        private void RPC_Play3DSound(Vector3 pos, string cueName, RpcInfo info = default)
-        {
-            if (info.IsInvokeLocal) return; // 自分に返る場合は音を消す
-
-            CRIAudio.PlaySE(pos, _sheetName, cueName); // 3D再生
+            // BGM音量変更 [V] + [B] + [+ or -]
+            // SE音量変更  [V] + [S] + [+ or -]
+            if (Input.GetKey(KeyCode.V))
+            {
+                if (Input.GetKey(KeyCode.B))
+                {
+                    if (Input.GetKeyDown(KeyCode.Semicolon))
+                    {
+                        if (_debugBGMVolume >= 5f) return;
+                        _debugBGMVolume += 0.5f;
+                        CriAtom.SetCategoryVolume("BGM", _debugBGMVolume);
+                        Debug.Log($"BGM音量変更：{_debugBGMVolume}");
+                    }
+                    if (Input.GetKeyDown(KeyCode.Minus))
+                    {
+                        if (_debugBGMVolume <= 0f) return;
+                        _debugBGMVolume -= 0.5f;
+                        CriAtom.SetCategoryVolume("BGM", _debugBGMVolume);
+                        Debug.Log($"BGM音量変更：{_debugBGMVolume}");
+                    }
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    if (Input.GetKeyDown(KeyCode.Semicolon))
+                    {
+                        if (_debugSEVolume >= 5f) return;
+                        _debugSEVolume += 0.5f;
+                        CriAtom.SetCategoryVolume("SE", _debugSEVolume);
+                        Debug.Log($"SE音量変更：{_debugSEVolume}");
+                    }
+                    if (Input.GetKeyDown(KeyCode.Minus))
+                    {
+                        if (_debugSEVolume <= 0f) return;
+                        _debugSEVolume -= 0.5f;
+                        CriAtom.SetCategoryVolume("SE", _debugSEVolume);
+                        Debug.Log($"SE音量変更：{_debugSEVolume}");
+                    }
+                }
+            }
         }
     }
 }

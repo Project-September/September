@@ -32,6 +32,8 @@ namespace InGame.Exhibit
         [SerializeField] private int _startFrame;
         [SerializeField] private int _endFrame = 34;
         [SerializeField] private int _damageAmount = 100;
+        protected float StartFrame => _startFrame;
+        protected float EndFrame => _endFrame;
         #endregion
         
         #region DamageableParam
@@ -41,6 +43,9 @@ namespace InGame.Exhibit
         private bool _isInvincible ;
     
         private int _currentHealth;
+        
+        private Vector3 _initialPosition;
+        private Quaternion _initialRotation;
     
         [SerializeField] private int _maxHealth;
         
@@ -64,9 +69,13 @@ namespace InGame.Exhibit
              Rigidbody.isKinematic = true;
              _currentHealth = _maxHealth;
              IsSpawned = true;
+             _initialPosition = transform.position;
+             _initialRotation = transform.rotation;
+             if(!Runner.IsServer) return;
+             RPC_SetIsKinematic(true);
         }
         
-        private void CreateHitBox(PlayerRef playerRef)
+        protected void CreateHitBox(PlayerRef playerRef)
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
             {
@@ -108,6 +117,7 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOn(PlayerRef playerRef)
         {
+            _currentHealth = _maxHealth;
             _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>()
                 .PlayerDataDic[playerRef].GetComponent<PlayerManager>();
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
@@ -116,8 +126,7 @@ namespace InGame.Exhibit
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
-            RPC_SetIsKinematic(playerRef,false);
-            CreateHitBox(playerRef);
+            RPC_SetIsKinematic(false);
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
                 formationManager.WarpFriendOutField();
@@ -136,12 +145,13 @@ namespace InGame.Exhibit
             _ownerPlayerManager.transform.position = _getOffPoint.position;
             Object.RemoveInputAuthority();
             RPC_SetCameraPriority(playerRef,5);
-            RPC_SetIsKinematic(playerRef,true);
+            RPC_SetIsKinematic(true);
             var obj = _ownerPlayerManager.GetComponent<NetworkObject>();
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
                 formationManager.WarpFriendNearPlayer(obj.transform.position,obj.transform.rotation);
             }
+            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
             Executor = null;
         }
         
@@ -154,7 +164,7 @@ namespace InGame.Exhibit
             }
         }
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetIsKinematic(PlayerRef player, bool kinematic)
+        private void RPC_SetIsKinematic(bool kinematic)
         {
            Rigidbody.isKinematic = kinematic;
         }
@@ -188,7 +198,6 @@ namespace InGame.Exhibit
                 hitData.Amount = TakeHeal(hitData.Amount);
             }
         }
-    
         int TakeDamage(int damage)
         {
             if (_isInvincible) return 0;

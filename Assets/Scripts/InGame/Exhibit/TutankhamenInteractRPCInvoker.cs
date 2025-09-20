@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Fusion;
 using Ingame.Tanihira;
+using September.InGame.UI;
 
 namespace InGame.Exhibit
 {
@@ -36,7 +37,7 @@ namespace InGame.Exhibit
                 {
                     foreach (FriendBase friend in _friendList)
                     {
-                        friend.StartBuff();
+                        friend.SetMask(true);
                     }
                 }
             }
@@ -87,6 +88,7 @@ namespace InGame.Exhibit
                 foreach (FriendBase friend in _friendList)
                 {
                     friend.StopBuff();
+                    friend.SetMask(false);
                 }
                 _friendList.Clear();
             }
@@ -97,6 +99,15 @@ namespace InGame.Exhibit
             Destroy(_instantiateMask);
             _instantiateMask = null;
             _isMaskAttached = false;
+        }
+        
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_ShowStatusUpUI(PlayerRef playerRef)
+        {
+            if (Runner.LocalPlayer == playerRef)
+            {
+                UIController.I.ShowStatusUpUI(_maskDuration, StatusUpType.Tutankhamen);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ namespace September.Common
         OkabeWright,
         HulkTheButcher,
         Tanihira,
+        Sarutobi,
         All,
     }
 }

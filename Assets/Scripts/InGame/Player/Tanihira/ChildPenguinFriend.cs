@@ -13,11 +13,10 @@ namespace Ingame.Tanihira
         public bool IsAlive => _currentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
         public FriendState StockFriendState => _stockFriendState;
-    
-        protected override void Awake()
+
+        public override void Spawned()
         {
-            base.Awake();
-            _maxHealth = CurrentFriendStatus.MaxHealth;
+            _maxHealth = _friendStatus.MaxHealth;
             _currentHealth = _maxHealth;
             //ペンギンのステートを設定
             _friendStateMappings[FriendState.None] = null;
@@ -27,8 +26,8 @@ namespace Ingame.Tanihira
             _friendStateMappings[FriendState.Attack] = new FriendAttackState();
             _friendStateMappings[FriendState.Stun] = new FriendStunState();
             _friendStateMappings[FriendState.Wait] = new FriendWaitState();
+            base.Spawned();
         }
-
         public override void ChangeState(FriendState newState)
         {
             //スタンしている時には、ステートを記録して変更を加えないようにする

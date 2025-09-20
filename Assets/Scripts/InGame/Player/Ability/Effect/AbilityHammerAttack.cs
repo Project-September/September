@@ -1,22 +1,19 @@
 using System.Linq;
 using Fusion;
-using InGame.Common;
 using InGame.Exhibit.InteractEffect;
 using InGame.Health;
-using InGame.Interact;
 using September.Common;
-using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Ability.Effect
 {
     public class AbilityHammerAttack : AbilityNormalAttack
     {
-        protected override void OnHitEnemy(Collider hitInfo)
+        protected override void OnHitEnemy(Collider hitInfo, Vector3 hitPosition)
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
-            var disableInteractEffect = hitInfo.GetComponent<DisableInteractEffect>();
+            var disableInteractEffect = hitInfo.gameObject.GetComponentInHierarchy<DisableInteractEffect>();
             if (damageable == null && !disableInteractEffect) return;
 
             if (damageable != null)
@@ -31,12 +28,13 @@ namespace InGame.Player.Ability.Effect
 
             if (disableInteractEffect)
             {
+                PlayerRef actor = Parameter.Owner.InputAuthority;
                 disableInteractEffect.OnHitHammerAttack();
+                PlayerDatabase.Instance.Server_AddDestroyExhibit(actor,disableInteractEffect.ExhibitType);
             }
 
             //エフェクトの再生
-            _effectSpawner.RequestPlayOneShotEffect(_hitEffect,
-                hitInfo.ClosestPoint(_hitChecker.HitPoint.First().position), Quaternion.identity);
+            _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
         }
     }
 }

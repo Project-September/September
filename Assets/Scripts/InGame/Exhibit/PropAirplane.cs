@@ -5,6 +5,7 @@ using InGame.Common;
 using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
+using Ingame.Tanihira;
 using September.Common;
 using September.InGame.Common;
 using TMPro;
@@ -69,14 +70,28 @@ namespace InGame.Exhibit
         private bool _sendToHost;
         // MachineGun
         private float _machineGunTimer;
-        
+
         [Networked, OnChangedRender(nameof(OnChangeOwnerPlayerRef))] private PlayerRef OwnerPlayerRef { get; set; }
         [Networked] private float CurrentAccel { get; set; }
+        [Networked] private NetworkButtons PreviousButtons { get; set; }
+        [Networked] private float GetOnTime { get; set; }
+
+        private Vector3 _initialPosition;
+        private Quaternion _initialRotation;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
             _cameraController = GetComponent<AirplaneCamera>();
+        }
+
+        [SerializeField] private bool _isSpawned = false;
+        public override void Spawned()
+        {
+            _isSpawned = true;
+            // 初期位置・回転を記録
+            _initialPosition = transform.position;
+            _initialRotation = transform.rotation;
         }
 
         public override void FixedUpdateNetwork()
@@ -85,6 +100,17 @@ namespace InGame.Exhibit
             {
                 if (GetInput<PlayerInput>(out var input))
                 {
+                    // 乗ってから1秒は降りる処理を無視（ティラノと同じ仕様）
+                    float timeSinceGetOn = Runner.SimulationTime - GetOnTime;
+
+                    // Eキーで降りる（WasPressedで新規押下のみ検知）
+                    if (timeSinceGetOn > 1f && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Interact))
+                    {
+                        GetOff();
+                        Debug.Log("GetOff");
+                        return;
+                    }
+
                     if (input.Buttons.IsSet(PlayerButtons.Dash))
                     {
                         if (IsGround) AddSpeedBack();
@@ -96,6 +122,9 @@ namespace InGame.Exhibit
                     _ownerPlayerManager.transform.position = transform.position;
 
                     UpdateMachineGun(input.Buttons.IsSet(PlayerButtons.Attack), Runner.DeltaTime);
+
+                    // 前フレームのボタン状態を保存
+                    PreviousButtons = input.Buttons;
                 }
                 else
                 {
@@ -259,8 +288,8 @@ namespace InGame.Exhibit
         {
             // 既に誰か乗っていたら乗れないよん
             if (!Runner.IsServer || OwnerPlayerRef != PlayerRef.None) return;
-            
-            // set input authority 
+
+            // set input authority
             OwnerPlayerRef = ownerPlayerRef;
             Object.AssignInputAuthority(ownerPlayerRef);
             // playerの状態切り替え
@@ -268,12 +297,21 @@ namespace InGame.Exhibit
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
+
+            // 乗った時刻を記録
+            GetOnTime = Runner.SimulationTime;
+            
+            //隊列があった場合の処理
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                formationManager.WarpFriendOutField();
+            }
         }
 
         void GetOff()
         {
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
-            
+
             // Authority
             OwnerPlayerRef = PlayerRef.None;
             Object.RemoveInputAuthority();
@@ -283,6 +321,18 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetMeshActive(true);
             // 降りる場所にセット
             _ownerPlayerManager.transform.position = _getOffPoint.position;
+
+            // 飛行機を初期位置・回転に戻す（ティラノと同じ仕組み）
+            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+            CurrentAccel = 0;
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            
+            //隊列がある場合の処理
+            if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
+            {
+                formationManager.WarpFriendNearPlayer(_ownerPlayerManager.transform.position, _ownerPlayerManager.transform.rotation);
+            }
         }
 
         void OnChangeOwnerPlayerRef()
@@ -299,6 +349,7 @@ namespace InGame.Exhibit
 
         private void LateUpdate()
         {
+            if (_isSpawned == false) return;
             // camera 操作
             if (HasInputAuthority)
             {

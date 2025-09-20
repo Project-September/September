@@ -1,6 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
+using CRISound;
 using Fusion;
 using InGame.Health;
+using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -35,6 +39,11 @@ namespace Ingame.Tanihira
         [SerializeField] protected HitChecker _hitChecker;
         [SerializeField, ReadOnly] protected FriendState _currentState;
         [SerializeField] private GameObject _tutankhamen;
+        [SerializeField] private Transform _attackEffectPos;
+        [SerializeField] private GameObject _runEffectObject;
+        [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
+        [Networked] private NetworkBool HasMask { get; set; }
+        [Networked] private NetworkBool HasRunEffect { get; set; }
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -43,6 +52,7 @@ namespace Ingame.Tanihira
         protected FormationManager _formationManager;
         protected FriendState _waitStockState;
         protected FriendStatus _currentStatus;
+        protected EffectSpawner _effectSpawner;
 
         private static int _spawnCount;
         private bool _isAttack;
@@ -52,7 +62,7 @@ namespace Ingame.Tanihira
         public Animator Animator => _animator;
         public FormationManager FormationManager => _formationManager;
         public Transform Destination => _destination;
-        public NetworkRunner NetworkRunner => _networkRunner;
+        public NetworkRunner FriendRunner => _networkRunner;
         public Transform FormationPos => _formationPos;
         public FriendStatus CurrentFriendStatus => _currentStatus;
         public FriendState CurrentState => _currentState;
@@ -60,36 +70,34 @@ namespace Ingame.Tanihira
         public bool IsAttack => _isAttack;
         public FriendState WaitStockState => _waitStockState;
         public NetworkObject OwnerPlayer => _ownerPlayer;
-
-        protected virtual void Awake()
-        {
-            _networkRunner = FindFirstObjectByType<NetworkRunner>();
-            if (_networkRunner == null)
-            {
-                Debug.LogError("NetworkRunnerがありません");
-            }
-            if (!_networkRunner.IsServer) return;
-            
-            //ステータスをコピー
-            _currentStatus = _friendStatus.Clone();
-        }
+        public GameObject Tutankhamen => _tutankhamen;
         
-        protected virtual void Start()
+        public override void Spawned()
         {
+            _currentStatus = _friendStatus.Clone();
             //Noneステートの設定
             _friendStateMappings[FriendState.None] = new FriendNoneState();
             _agent = GetComponent<NavMeshAgent>();
             _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
+            
             InitializeStates();
             ChangeState(_initialState);
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (!_networkRunner.IsServer && !HasInputAuthority) return;
+            if (!HasStateAuthority) return;
             
             // 現在のステートのUpdateを呼び出し
             _friendStateMappings[_currentState]?.OnUpdate(this);
+            transform.position = _agent.nextPosition;
+            if(_agent != null && _agent.enabled && _agent.isOnNavMesh)
+            //位置を更新する
+            if (_agent.remainingDistance >= _agent.stoppingDistance)
+            {
+                if(_agent.desiredVelocity.sqrMagnitude > 0.01f)
+                    transform.rotation = Quaternion.LookRotation(_agent.velocity);
+            }
         }
 
         /// <summary>
@@ -109,8 +117,9 @@ namespace Ingame.Tanihira
             
             _agent.enabled = false;
             _agent.enabled = true;
-            _agent.updatePosition = true;
-            _agent.updateRotation = true;
+            //Agentでの移動を無効かする
+            _agent.updatePosition = false;
+            _agent.updateRotation = false;
             InitializeAgent();
         }
 
@@ -119,6 +128,7 @@ namespace Ingame.Tanihira
         {
             _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
             _agent.speed = _currentStatus.FriendFormationSpeed;
+            _agent.acceleration = _currentStatus.FriendAccleration;
         }
 
         /// <summary>
@@ -137,7 +147,7 @@ namespace Ingame.Tanihira
                 return;
             }
             
-            if (_currentState != FriendState.Wait)
+            if (_currentState == FriendState.Wait)
             {
                 //attackの場合はchaseに変えておく
                 if(newState == FriendState.Attack)
@@ -194,8 +204,15 @@ namespace Ingame.Tanihira
         private void OnHitEnemy(Collider hitInfo)
         {
             if (!HasStateAuthority) return;
+            var targetObj = hitInfo.GetComponentInParent<NetworkObject>();
+            if (targetObj == null || targetObj == _ownerPlayer) return;
+            //隊列の味方も除外
+            if (targetObj.TryGetComponent<FriendBase>(out var friend))
+            {
+                if (_formationManager != null && _formationManager.FriendsList != null && _formationManager.FriendsList.Contains(friend))
+                    return;
+            }
             
-            if (hitInfo.GetComponentInParent<NetworkObject>() == _ownerPlayer) return;
             var damageable = hitInfo.GetComponentInParent<IDamageable>();
             if (damageable == null) return;
             var hitData = new HitData(
@@ -204,6 +221,18 @@ namespace Ingame.Tanihira
                 _ownerPlayer.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
+            //エフェクトを出す
+            PlayEffect();
+        }
+        
+        private void PlayEffect()
+        {
+            // Effect生成処理
+            _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
+            _effectSpawner?.RequestPlayOneShotEffect(EffectType.PenguinAttack, _attackEffectPos.position,
+                _attackEffectPos.rotation);
+            // 音量再生
+            //CRIAudio.PlaySE("ALLCue", SoundCues.SE.Penguin_Attack);
         }
 
         public void FinishWaitTime()
@@ -230,9 +259,35 @@ namespace Ingame.Tanihira
             _isAttack = false;
         }
 
-        public void StartBuff()
+        public override void Render()
         {
-            _tutankhamen.SetActive(true);
+            if(_tutankhamen)
+                _tutankhamen.SetActive(HasMask);
+            if(_runEffectObject)
+                _runEffectObject.SetActive(HasRunEffect);
+        }
+        public void SetMask(bool value)
+        {
+            if (!HasStateAuthority) return;
+            HasMask = value;
+        }
+
+        private void SetRunEffect(bool value)
+        {
+            if (!HasStateAuthority) return;
+            HasRunEffect = value;
+        }
+
+        public void ChangeRunEffect(float value)
+        {
+            if (value >= _maxRunBlendTreeCount)
+            {
+                SetRunEffect(true);
+            }
+            else
+            {
+                SetRunEffect(false);
+            }
         }
 
         public void StartBuff(float buffRate)
@@ -249,7 +304,6 @@ namespace Ingame.Tanihira
             _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
             _currentStatus.AttackPower = _friendStatus.AttackPower;
             ApplyStatus();
-            _tutankhamen.SetActive(false);
         }
 
         private void ApplyStatus()
