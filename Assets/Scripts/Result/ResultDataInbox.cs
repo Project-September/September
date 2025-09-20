@@ -30,6 +30,12 @@ namespace Result
             _destroyedExhibitCounts.Clear();
             OnChanged?.Invoke();
         }
+        
+        public void AddGrapplingHook()
+        {
+            GrapplingHookCount++;
+            OnChanged?.Invoke();
+        }
 
         /// <summary>
         /// サーバーから送られてきた文字列をデコードして保存

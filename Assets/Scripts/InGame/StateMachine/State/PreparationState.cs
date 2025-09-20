@@ -183,7 +183,7 @@ namespace September.Common
         private void OnPlayerKilled(HitData data)
         {
             if (!Context.Runner.IsServer) return; 
-            PlayerDatabase.Instance.Server_AddStun(data.ExecutorRef);
+            //.Instance.Server_AddStun(data.ExecutorRef);
             
             var killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef);
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
@@ -197,7 +197,10 @@ namespace September.Common
             }
             // Log
             UIController.I.ShowLog($"{data.ExecutorRef}が{data.TargetRef}を倒した");
-            if(data.ExecutorRef != data.TargetRef) return;
+            
+            if(data.ExecutorRef == data.TargetRef) 
+                return;
+            
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
         }
         private void HideCursor()

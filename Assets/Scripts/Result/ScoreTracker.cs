@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using September.Common;
+using UnityEngine;
 
 namespace Result
 {
@@ -7,7 +9,6 @@ namespace Result
     {
         // インタラクト回数
         private readonly Dictionary<ExhibitType, int> _count =  new();
-        private int _stunCount;
         private ExhibitScoreConfig _config;
         
         private int _grapplingHookCount;
@@ -20,6 +21,7 @@ namespace Result
         public void AddFriendExhibit() => _friendExhibitCount++;
 
         public int GrapplingHookCount => _grapplingHookCount;
+        // 時間ないからこっちは使わない
         public int FriendExhibitCount => _friendExhibitCount;
 
         public ScoreTracker(ExhibitScoreConfig config)
@@ -30,10 +32,6 @@ namespace Result
         public void SetConfig(ExhibitScoreConfig config) => _config = config;
         public IReadOnlyDictionary<ExhibitType,int> ExhibitCounts => _count;
         public IReadOnlyDictionary<ExhibitType,int> DestroyedExhibitCounts => _destroyedExhibitCounts;
-        
-        // Stun
-        public void AddStun() => _stunCount++;
-        public int StunCount => _stunCount;
         
         // インタラクト回数を追加
         public void AddInteract(ExhibitType t)
@@ -58,31 +56,22 @@ namespace Result
             _destroyedExhibitCounts[t]++;
         }
         
-        public void MergeFrom(ScoreTracker other)
-        {
-            if (other == null) 
-                return;
-
-            foreach (var kv in other._count)
-            {
-                _count.TryAdd(kv.Key, 0);
-                _count[kv.Key] += kv.Value;
-            }
-            _stunCount += other._stunCount;
-        }
-        
         // 合計値を計算
-        public int CalcTotal()
+        public int CalcTotal(SessionPlayerData playerData)
         {
             int sum = 0;
-            
+            // 展示物
             sum += _count.Sum(kv => (_config ? _config.GetPoint(kv.Key) : 0) * kv.Value);
-            
-            const int stunPoint = 150;
-            sum += _stunCount * stunPoint;
-            
+            // 破壊
             sum += _destroyedExhibitCounts.Sum(kv => _config .GetDestroyPoint(kv.Key) * kv.Value);
-
+            // 気絶
+            const int stunPoint = 150;
+            int stunCount = 0;
+            foreach (var kv in playerData.StunData)
+                stunCount += kv.Value;
+            sum += stunCount * stunPoint;
+            
+            Debug.Log($"気絶数{stunCount} スコア{sum}");
             return sum;
         }
 
@@ -90,7 +79,6 @@ namespace Result
         {
             _count.Clear();
             _destroyedExhibitCounts.Clear();
-            _stunCount = 0;
             _grapplingHookCount = 0;
             _friendExhibitCount = 0;
         }

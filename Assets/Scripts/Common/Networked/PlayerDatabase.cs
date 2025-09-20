@@ -51,9 +51,8 @@ namespace September.Common
             tracker.AddInteract(type);
             UpdatePlayerScore(actor, tracker);
         }
-
-        // ホストで集計
-        public void Server_AddStun(PlayerRef actor)
+        
+        public void Server_AddGrapplingHook(PlayerRef actor)
         {
             if (!Object.HasStateAuthority)
                 return;
@@ -61,8 +60,7 @@ namespace September.Common
             if (!_serverTrackers.TryGetValue(actor, out ScoreTracker tracker))
                 _serverTrackers[actor] = tracker = new ScoreTracker(_config);
 
-            tracker.AddStun();
-
+            tracker.AddGrapplingHook();
             UpdatePlayerScore(actor, tracker);
         }
         
@@ -88,16 +86,16 @@ namespace September.Common
                 return 0;
 
             if (!PlayerDataDic.TryGet(actor, out SessionPlayerData d))
-                return tracker.CalcTotal();
+                return tracker.CalcTotal(d);
 
-            return tracker.CalcTotal() + AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
+            return tracker.CalcTotal(d) + AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
         }
         
         private void UpdatePlayerScore(PlayerRef actor, ScoreTracker tracker)
         {
             if (PlayerDataDic.TryGet(actor, out SessionPlayerData d))
             {
-                int baseScore = tracker.CalcTotal();
+                int baseScore = tracker.CalcTotal(d);
                 int bonus = AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
                 
                 d.Score = baseScore + bonus;
@@ -124,7 +122,7 @@ namespace September.Common
                     continue;
                 }
                 
-                int calc = tracker.CalcTotal() + AbilityBonusContainer.CalcBonus(data.CharacterType, tracker);
+                int calc = tracker.CalcTotal(data) + AbilityBonusContainer.CalcBonus(data.CharacterType, tracker);
 
                 if (calc != data.Score)
                 {
@@ -167,7 +165,6 @@ namespace September.Common
                     first = false;
                 }
             }
-            sb.Append("|S:").Append(tracker.StunCount);
             sb.Append("|G:").Append(tracker.GrapplingHookCount);
             sb.Append("|F:").Append(tracker.FriendExhibitCount);
             return sb.ToString();

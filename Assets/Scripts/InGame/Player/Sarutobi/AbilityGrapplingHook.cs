@@ -3,6 +3,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
+using Result;
 using September.Common;
 using UnityEditor;
 using UnityEngine;
@@ -149,6 +150,18 @@ namespace InGame.Player.Sarutobi
             Shot().Forget();
             
             _playerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
+            
+            // ボーナスカウントを更新する
+            PlayerDatabase db = PlayerDatabase.Instance;
+            if (!db.PlayerDataDic.TryGet(Object.InputAuthority, out SessionPlayerData playerData)) 
+                return;
+            if (playerData.CharacterType != CharacterType.Sarutobi) 
+                return;
+            
+            if (HasStateAuthority)
+            {
+                db.Server_AddGrapplingHook(Object.InputAuthority);
+            }
         }
 
         async UniTask Shot()

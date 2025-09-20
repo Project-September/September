@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Fusion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,40 +23,41 @@ namespace Result
         [SerializeField] private PageController _pageController;
         private ResultUIRootRefs _resultUIRoot;
 
-        [Header("Delays")]
-        [SerializeField] private float _startDelay = 0.5f;
+        [Header("Delays")] [SerializeField] private float _startDelay = 0.5f;
 
-        [Header("Text Animation")]
-        [SerializeField] private float _fadeInDuration = 0.6f;
+        [Header("Text Animation")] [SerializeField]
+        private float _fadeInDuration = 0.6f;
+
         [SerializeField] private float _scaleDuration = 0.6f;
         [SerializeField] private float _scaleTarget = 1.8f;
         [SerializeField] private Ease _scaleEase = Ease.OutBack;
         [SerializeField] private float _holdDuration = 1.0f;
         [SerializeField] private float _fadeOutDuration = 1.0f;
 
-        [Header("Background Fade")]
-        [SerializeField] private Ease _bgEase = Ease.Linear;
+        [Header("Background Fade")] [SerializeField]
+        private Ease _bgEase = Ease.Linear;
+
         [SerializeField] private float _bgFadeDuration = 1.0f;
 
-        [Header("List Animation")]
-        [SerializeField] private float _rowStagger = 0.1f;
+        [Header("List Animation")] [SerializeField]
+        private float _rowStagger = 0.1f;
+
         [SerializeField] private float _rowFadeDuration = 0.25f;
         [SerializeField] private float _rowSlideOffset = 40f;
         [SerializeField] private float _scoreRollDuration = 1.2f;
         [SerializeField] private bool _scoreUseThousands = true;
 
-        [Header("Sort Animation")]
-        [SerializeField] private float _sortMoveDuration = 0.5f;
+        [Header("Sort Animation")] [SerializeField]
+        private float _sortMoveDuration = 0.5f;
+
         [SerializeField] private float _sortStagger = 0.06f;
 
-        [Header("Your Rank")]
-        [SerializeField] private float _yourRankFadeDuration = 0.35f;
+        [Header("Your Rank")] [SerializeField] private float _yourRankFadeDuration = 0.35f;
         [SerializeField] private Vector2 _yourRankOffset = new(0f, 20f);
 
-        [Header("Icons")]
-        [SerializeField] private CharacterIconPair[] _iconTable;
+        [Header("Icons")] [SerializeField] private CharacterIconPair[] _iconTable;
         [SerializeField] private Sprite _defaultIcon;
-        
+
         private TextMeshProUGUI _finishText;
         private TextMeshProUGUI _resultText;
         private ResultRowRefs[] _rows;
@@ -103,7 +105,6 @@ namespace Result
                        ?? new Dictionary<CharacterType, Sprite>();
         }
 
-        // ========== Animations ==========
         private async UniTask AnimateIntroTexts()
         {
             await ShowTextAnimation(_finishText);
@@ -118,9 +119,9 @@ namespace Result
 
             Sequence seq = DOTween.Sequence();
             seq.Append(target.DOFade(1f, _fadeInDuration))
-               .Join(target.transform.DOScale(_scaleTarget, _scaleDuration).SetEase(_scaleEase))
-               .AppendInterval(_holdDuration)
-               .Append(target.DOFade(0f, _fadeOutDuration));
+                .Join(target.transform.DOScale(_scaleTarget, _scaleDuration).SetEase(_scaleEase))
+                .AppendInterval(_holdDuration)
+                .Append(target.DOFade(0f, _fadeOutDuration));
 
             await seq.AsyncWaitForCompletion();
         }
@@ -138,10 +139,10 @@ namespace Result
         private async UniTask AnimateRows()
         {
             PlayerDatabase db = PlayerDatabase.Instance;
-            if (!db) 
+            if (!db)
                 return;
             
-            var data = db.PlayerDataDic
+            List<(string DisplayNickName, Sprite Icon, int Score, bool IsOgre)> data = db.PlayerDataDic
                 .Select(kv =>
                 {
                     SessionPlayerData d = kv.Value;
@@ -150,22 +151,22 @@ namespace Result
                         d.DisplayNickName,
                         _iconMap.GetValueOrDefault(d.CharacterType, _defaultIcon),
                         d.Score,
-                        d.IsOgre
+                        (bool)d.IsOgre
                     );
-                })
-                // 鬼は最後　それ以外は降順ソート
-                .OrderBy(x => x.IsOgre ? 1 : 0)
-                .ThenByDescending(x => x.Item3)
-                .ToList();  
-
-            int rowCount = Mathf.Min(data.Count, _rows.Length);
+                }).ToList();
             
+            var ogres = data.Where(x => x.IsOgre).ToList();
+            var nonOgres = data.Where(x => !x.IsOgre).OrderByDescending(x => x.Score).ToList();
+            var orderedData = nonOgres.Concat(ogres).ToList();
+
+            int rowCount = Mathf.Min(orderedData.Count, _rows.Length);
+
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(_rowsRoot);
-
+            
             for (int i = 0; i < rowCount; i++)
             {
-                (string name, Sprite icon, int score, bool isOgre) rowData = data[i];
+                (string name, Sprite icon, int score, bool isOgre) rowData = orderedData[i];
                 ResultRowRefs row = _rows[i];
                 row.gameObject.SetActive(true);
 
@@ -181,7 +182,7 @@ namespace Result
                 if (rt)
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(_rowsRoot);
-                    
+
                     Vector2 endPos = rt.anchoredPosition;
                     rt.anchoredPosition = endPos + new Vector2(-_rowSlideOffset, 0f);
 
@@ -190,8 +191,7 @@ namespace Result
                         .Append(cg.DOFade(1f, _rowFadeDuration))
                         .Join(rt.DOAnchorPos(endPos, _rowFadeDuration).SetEase(Ease.OutQuad));
                 }
-
-                // スコアをロールアップ
+                
                 await UniTask.Delay(TimeSpan.FromSeconds(_rowStagger * i));
                 await RollupScore(row.Score, rowData.score, _scoreRollDuration, _scoreUseThousands);
             }
@@ -214,18 +214,30 @@ namespace Result
 
         private async UniTask AnimateSortByScoreAsync(int rowCount)
         {
-            var rows = new List<(RectTransform rt, TextMeshProUGUI score, TextMeshProUGUI rank, int scoreVal)>();
+            var rows =
+                new List<(RectTransform rt, TextMeshProUGUI score, TextMeshProUGUI rank, int scoreVal, bool isOgre,
+                    string name)>();
+
+            PlayerDatabase db = PlayerDatabase.Instance;
 
             for (int i = 0; i < rowCount; i++)
             {
-                var row = _rows[i];
-                if (!row || !row.Score) continue;
+                ResultRowRefs row = _rows[i];
+                if (!row || !row.Score)
+                    continue;
 
                 RectTransform rt = row.transform as RectTransform;
-                if (!rt) continue;
+                if (!rt)
+                    continue;
 
                 int.TryParse(row.Score.text.Replace(",", ""), out int scoreVal);
-                rows.Add((rt, row.Score, row.Rank, scoreVal));
+                
+                bool isOgre = false;
+                string playerName = row.Name.text;
+                SessionPlayerData playerData = db.PlayerDataDic.FirstOrDefault(kv => kv.Value.DisplayNickName == playerName).Value;
+                isOgre = playerData.IsOgre;
+
+                rows.Add((rt, row.Score, row.Rank, scoreVal, isOgre, playerName));
             }
 
             if (rows.Count <= 1)
@@ -233,13 +245,20 @@ namespace Result
 
             float[] lanesY = rows.OrderByDescending(r => r.rt.position.y)
                 .Select(r => r.rt.anchoredPosition.y).ToArray();
+            
+            var sorted = rows
+                .Where(x => !x.isOgre)
+                .OrderByDescending(x => x.scoreVal)
+                .Concat(rows.Where(x => x.isOgre))
+                .ToList();
 
-            var sorted = rows.OrderByDescending(x => x.scoreVal).ToList();
-
+            
             for (int newIndex = 0; newIndex < sorted.Count; newIndex++)
             {
-                var row = sorted[newIndex];
-                row.rank.text = (newIndex + 1).ToString();
+                (RectTransform rt, TextMeshProUGUI score, TextMeshProUGUI rank, int scoreVal, bool isOgre, string name) row = sorted[newIndex];
+                
+                row.rank.text = row.isOgre ? $"{sorted.Count}" : (newIndex + 1).ToString();
+
                 row.rank.transform.DOKill();
                 row.rank.transform.DOPunchScale(Vector3.one * 0.2f, 0.25f, 8, 0.8f);
 
@@ -257,35 +276,34 @@ namespace Result
 
         private async UniTask AnimateYourRank()
         {
-            if (!_yourRankText) 
+            if (!_yourRankText)
                 return;
 
             PlayerDatabase db = PlayerDatabase.Instance;
-            if (!db) 
+            if (!db)
                 return;
 
             string localName = db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out SessionPlayerData d)
                 ? d.DisplayNickName
                 : null;
-            
-            List<(string DisplayNickName, int total)> ranking = db.PlayerDataDic
+
+            List<(string DisplayNickName, int Total, bool IsOgre)> ranking = db.PlayerDataDic
                 .Select(kv =>
                 {
                     SessionPlayerData data = kv.Value;
-                    int total = data.Score;
-                    
-                    Debug.Log($"Player {data.DisplayNickName} Total={total}");
-                    return (data.DisplayNickName, total);
+                    return (data.DisplayNickName, Total: data.Score, IsOgre: (bool)data.IsOgre);
                 })
-                .OrderByDescending(v => v.total)
+                .OrderBy(x => x.IsOgre)
+                .ThenByDescending(x => x.Total)
                 .ToList();
-            
+
             int rank = ranking.FindIndex(p => p.DisplayNickName == localName);
 
             _yourRankText.text = $"あなたの順位は {rank + 1} 位です";
             _yourRankText.gameObject.SetActive(true);
 
-            CanvasGroup cg = _yourRankText.GetComponent<CanvasGroup>() ?? _yourRankText.gameObject.AddComponent<CanvasGroup>();
+            CanvasGroup cg = _yourRankText.GetComponent<CanvasGroup>() ??
+                             _yourRankText.gameObject.AddComponent<CanvasGroup>();
             cg.alpha = 0f;
 
             RectTransform rt = _yourRankText.rectTransform;
