@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
+using September.Common;
 using UniRx;
 using UnityEngine;
 
@@ -16,6 +17,9 @@ namespace InGame.Player
         [SerializeField] private float _moveSpeed;
         [SerializeField, Tooltip("地面と認識する最大角度")] private float _groundSlopeThreshold = 45f;
         [SerializeField] private LayerMask _groundLayer = ~0;
+        [Header("鬼状態時の移動速度")]
+        [SerializeField] private float _ogreMoveSpeed;
+        [SerializeField] private float _ogreDashSpeed;
         [Header("Dash")]
         [SerializeField] private float _dashSpeed;
         [SerializeField] private float _dashCooldown = 3f;
@@ -63,8 +67,8 @@ namespace InGame.Player
         // Gizmo
         private List<CapsuleCastData> _capsuleCastData = new();
 
-        public float WalkSpeed => _moveSpeed;
-        public float DashMoveSpeed => _dashSpeed;
+        public float WalkSpeed => GetCurrentMoveSpeed();
+        public float DashMoveSpeed => GetCurrentDashSpeed();
         public bool IsGround => (_isGround || _isGroundTimer > 0) && !_knockBackActive;
         [Networked, HideInInspector] 
         public NetworkBool IsGroundNet { get; private set; }
@@ -170,6 +174,8 @@ namespace InGame.Player
                 }
             }
             
+            Debug.LogError(_status.CurrentStamina);
+            
             CalcMoveVelocity(moveDirection, isDash, deltaTime);
         }
         
@@ -193,8 +199,47 @@ namespace InGame.Player
             if (moveDir != Vector2.zero && IsGround)
             {
                 Vector3 moveDir3 = Quaternion.FromToRotation(Vector3.up, _groundNormal) * new Vector3(moveDir.x, 0, moveDir.y);
-                _moveVelocity = moveDir3 * (isDash ? _dashSpeed : _moveSpeed);
+                _moveVelocity = moveDir3 * (isDash ? GetCurrentDashSpeed() : GetCurrentMoveSpeed());
             }
+        }
+
+        /// <summary>
+        /// 現在のプレイヤーが鬼状態かどうかを判定する
+        /// </summary>
+        private bool IsOgreState()
+        {
+            try
+            {
+                var playerDatabase = PlayerDatabase.Instance;
+                if (playerDatabase == null) return false;
+
+                if (playerDatabase.PlayerDataDic.TryGet(Object.InputAuthority, out SessionPlayerData playerData))
+                {
+                    return playerData.IsOgre;
+                }
+            }
+            catch (System.Exception)
+            {
+                // エラーが発生した場合は通常状態として扱う
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 鬼状態に応じた現在の移動速度を取得する
+        /// </summary>
+        private float GetCurrentMoveSpeed()
+        {
+            return IsOgreState() ? _ogreMoveSpeed : _moveSpeed;
+        }
+
+        /// <summary>
+        /// 鬼状態に応じた現在のダッシュ速度を取得する
+        /// </summary>
+        private float GetCurrentDashSpeed()
+        {
+            return IsOgreState() ? _ogreDashSpeed : _dashSpeed;
         }
 
         void AdsorptionOnGround()
