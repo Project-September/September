@@ -31,7 +31,7 @@ namespace InGame.UI
         {
             _cri = CuePlayAtomExPlayer.Instance;
             _optionUIPanel.SetActive(false);
-            _gameInput = new GameInput();
+            _gameInput = GameInput.I;
             _gameInput.Enable();
 
             _bgmVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriBGMVolume());
