@@ -207,6 +207,24 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AirplaneForward"",
+                    ""type"": ""Button"",
+                    ""id"": ""50142925-4fb9-4a7e-8031-184aeeabcb3d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AirPlaneBack"",
+                    ""type"": ""Button"",
+                    ""id"": ""d2e62912-53a7-46e3-bfe0-96e6ab7e6bc9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -443,6 +461,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""7bf3469a-1cca-4ad0-b1d6-3527196d7055"",
+                    ""path"": ""<XInputController>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""cbac6039-9c09-46a1-b5f2-4e5124ccb5ed"",
                     ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
@@ -647,6 +676,28 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Warp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4e77072e-4b32-427f-9747-d33275944411"",
+                    ""path"": ""<XInputController>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AirplaneForward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""59e6caf9-8b5e-4795-88cf-0bc25b1e1a89"",
+                    ""path"": ""<XInputController>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AirPlaneBack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1403,6 +1454,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player_Ability1 = m_Player.FindAction("Ability1", throwIfNotFound: true);
         m_Player_Ability2 = m_Player.FindAction("Ability2", throwIfNotFound: true);
         m_Player_Warp = m_Player.FindAction("Warp", throwIfNotFound: true);
+        m_Player_AirplaneForward = m_Player.FindAction("AirplaneForward", throwIfNotFound: true);
+        m_Player_AirPlaneBack = m_Player.FindAction("AirPlaneBack", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1522,6 +1575,8 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Ability1;
     private readonly InputAction m_Player_Ability2;
     private readonly InputAction m_Player_Warp;
+    private readonly InputAction m_Player_AirplaneForward;
+    private readonly InputAction m_Player_AirPlaneBack;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1585,6 +1640,14 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Warp".
         /// </summary>
         public InputAction @Warp => m_Wrapper.m_Player_Warp;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/AirplaneForward".
+        /// </summary>
+        public InputAction @AirplaneForward => m_Wrapper.m_Player_AirplaneForward;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/AirPlaneBack".
+        /// </summary>
+        public InputAction @AirPlaneBack => m_Wrapper.m_Player_AirPlaneBack;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1650,6 +1713,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Warp.started += instance.OnWarp;
             @Warp.performed += instance.OnWarp;
             @Warp.canceled += instance.OnWarp;
+            @AirplaneForward.started += instance.OnAirplaneForward;
+            @AirplaneForward.performed += instance.OnAirplaneForward;
+            @AirplaneForward.canceled += instance.OnAirplaneForward;
+            @AirPlaneBack.started += instance.OnAirPlaneBack;
+            @AirPlaneBack.performed += instance.OnAirPlaneBack;
+            @AirPlaneBack.canceled += instance.OnAirPlaneBack;
         }
 
         /// <summary>
@@ -1700,6 +1769,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Warp.started -= instance.OnWarp;
             @Warp.performed -= instance.OnWarp;
             @Warp.canceled -= instance.OnWarp;
+            @AirplaneForward.started -= instance.OnAirplaneForward;
+            @AirplaneForward.performed -= instance.OnAirplaneForward;
+            @AirplaneForward.canceled -= instance.OnAirplaneForward;
+            @AirPlaneBack.started -= instance.OnAirPlaneBack;
+            @AirPlaneBack.performed -= instance.OnAirPlaneBack;
+            @AirPlaneBack.canceled -= instance.OnAirPlaneBack;
         }
 
         /// <summary>
@@ -2338,6 +2413,20 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnWarp(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AirplaneForward" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAirplaneForward(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AirPlaneBack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAirPlaneBack(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

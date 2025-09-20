@@ -17,7 +17,9 @@ namespace September.Common
         Aim,
         Ability1,
         Ability2,
-        Warp
+        Warp,
+        AirplaneForward,
+        AirPlaneBack
     }
 
     public struct PlayerInput : INetworkInput
@@ -78,6 +80,8 @@ namespace September.Common
                 playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
                 playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
                 playerInput.Buttons.Set(PlayerButtons.Warp, playerActions.Warp.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.AirplaneForward, playerActions.AirplaneForward.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.AirPlaneBack, playerActions.AirPlaneBack.IsPressed());
             }
             
             if (_mainCamera == null)

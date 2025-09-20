@@ -111,12 +111,20 @@ namespace InGame.Exhibit
                         return;
                     }
 
-                    if (input.Buttons.IsSet(PlayerButtons.Dash))
+                    // 新しい飛行機専用ボタンを使用
+                    if (input.Buttons.IsSet(PlayerButtons.AirPlaneBack))
                     {
                         if (IsGround) AddSpeedBack();
                         else PropSlowDown();
                     }
-                    else AddSpeedForward();
+                    else if (input.Buttons.IsSet(PlayerButtons.AirplaneForward))
+                    {
+                        AddSpeedForward();
+                    }
+                    else
+                    {
+                        PropSlowDown(); // どちらも押されていない場合は減速
+                    }
                     RotatePlane(input.MoveDirection);
                     // playerオブジェクトのpositionを固定する
                     _ownerPlayerManager.transform.position = transform.position;
