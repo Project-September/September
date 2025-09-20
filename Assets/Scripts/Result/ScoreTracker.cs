@@ -70,8 +70,6 @@ namespace Result
             foreach (var kv in playerData.StunData)
                 stunCount += kv.Value;
             sum += stunCount * stunPoint;
-            
-            Debug.Log($"気絶数{stunCount} スコア{sum}");
             return sum;
         }
 

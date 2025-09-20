@@ -93,7 +93,7 @@ namespace September.Common
             //  準備フェーズ
             GameInput.I.ToggleMoveInput(true);
             BGMManager.ReleseFlag();
-            UIController.I.StartTimer();
+            UIController.I.StartTimer(Context.Runner);
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
             //  ゲーム開始
             GameInput.I.ToggleActionInput(true);
