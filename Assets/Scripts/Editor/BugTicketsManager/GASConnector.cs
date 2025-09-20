@@ -24,7 +24,7 @@ namespace September.Editor.BugTicketsManager
             id = "";
             title = "";
             description = "";
-            priority = "Medium";
+            priority = "やる";
             status = "Open";
             assignedTo = "";
             createdAt = ""; // GAS側で設定
