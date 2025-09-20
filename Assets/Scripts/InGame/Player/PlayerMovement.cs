@@ -174,8 +174,6 @@ namespace InGame.Player
                 }
             }
             
-            Debug.LogError(_status.CurrentStamina);
-            
             CalcMoveVelocity(moveDirection, isDash, deltaTime);
         }
         
