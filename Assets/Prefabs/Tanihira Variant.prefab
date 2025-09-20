@@ -5297,6 +5297,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _ogreDashSpeed
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _ogreMoveSpeed
+      value: 1.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _run
       value: 
@@ -5619,6 +5627,7 @@ MonoBehaviour:
   _outFieldWarpHeight: 100
   _inFieldWarpHeight: -7
   _underWarpHeight: 40
+  _exceptionSerchDistance: 5
   _raycastMask:
     serializedVersion: 2
     m_Bits: 128
