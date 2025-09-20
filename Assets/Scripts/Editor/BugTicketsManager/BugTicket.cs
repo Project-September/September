@@ -10,7 +10,7 @@ namespace September.Editor.BugTicketsManager
         public string id;
         public string title;
         public string description;
-        public string priority; // "Low", "Medium", "High", "Critical"
+        public string priority; // "やる", "やらない"
         public string status;   // "Open", "InProgress", "Resolved", "Closed"
         [FormerlySerializedAs("assignee")] public string assignedTo;
         public string createdAt;
@@ -20,7 +20,7 @@ namespace September.Editor.BugTicketsManager
             id = "";
             title = "";
             description = "";
-            priority = "Medium";
+            priority = "やる";
             status = "Open";
             assignedTo = "";
             createdAt = ""; // スプレッドシート側で設定される
