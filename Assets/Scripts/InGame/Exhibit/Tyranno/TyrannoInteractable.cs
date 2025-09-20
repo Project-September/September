@@ -1,6 +1,7 @@
 using System;
 using Fusion;
 using InGame.Exhibit;
+using InGame.Interact;
 using NaughtyAttributes;
 using September.Common;
 using UnityEngine;
@@ -41,9 +42,18 @@ public class TyrannoInteractable : MountableExhibitBase
 
     private float _counter;
     
+    private InteractableBase _interactableBase;
+
+    public override void Spawned()
+    {
+        base.Spawned();
+        _interactableBase = GetComponent<InteractableBase>();
+    }
+
     public override void GetOn(PlayerRef playerRef)
     {
         base.GetOn(playerRef);
+        _interactableBase.ForceSetInteractable = false;
         IsInteracting = true;
         HitAction += OnHit;
         _cooldownTimer = _cooldownTime;
@@ -53,6 +63,7 @@ public class TyrannoInteractable : MountableExhibitBase
     public override void GetOff(PlayerRef playerRef)
     {
         base.GetOff(playerRef);
+        _interactableBase.ForceSetInteractable = true;
         IsInteracting = false;
         IsAttacking = false;
         HitAction -= OnHit;
