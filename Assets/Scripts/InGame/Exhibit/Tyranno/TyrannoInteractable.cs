@@ -31,7 +31,7 @@ public class TyrannoInteractable : MountableExhibitBase
     private float MoveValue { get; set; }
 
     [Networked, OnChangedRender(nameof(SetIsInteracting))]
-    private bool IsInteracting { get; set; }
+    public bool IsInteracting { get; set; }
     
     [Networked, OnChangedRender(nameof(OnAttackStateChanged))] 
     private bool IsAttacking { get; set; }
