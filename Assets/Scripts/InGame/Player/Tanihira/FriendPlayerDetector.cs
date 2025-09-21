@@ -17,11 +17,11 @@ namespace Ingame.Tanihira
         [SerializeField] private FriendStateChanger _friendStateChanger;
         [SerializeField] private FormationManager _formationManager;
         [SerializeField] private bool _isWaiting;
-        [SerializeField] private float _tyrannoOffsetY = -4;
         
         private Transform _currentTarget;
         private InGameManager _inGameManager;
         [SerializeField, ReadOnly] private List<TyrannoInteractable> _tyrannoInteractables = new List<TyrannoInteractable>();
+        private Collider[] _overlapResults = new Collider[50];
 
         private void Start()
         {
@@ -58,7 +58,8 @@ namespace Ingame.Tanihira
                 return;
             
             //範囲内のプレイヤーを検出
-            var players = Physics.OverlapSphere(_detectionCenter.position, _detectionRadius, _detectionMask)
+            int hitPlayerCount = Physics.OverlapSphereNonAlloc(_detectionCenter.position, _detectionRadius, _overlapResults, _detectionMask);
+            var players = _overlapResults.Take(hitPlayerCount)
                 .Select(col => col.transform.root) // ルート Transform を抽出
                 .Where(root => root != transform.root) // 自分自身は除外
                 .Distinct();                                            // 重複排除
