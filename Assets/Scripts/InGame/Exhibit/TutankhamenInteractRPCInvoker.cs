@@ -21,7 +21,7 @@ namespace InGame.Exhibit
         private List<FriendBase> _friendList = new List<FriendBase>();
         
         public bool IsMaskAttached => _isMaskAttached;
-
+        
         [Rpc(RpcSources.StateAuthority,RpcTargets.All)]
         public void RPC_AttachHeadMask(NetworkObject player, float duration)
         {
@@ -58,10 +58,18 @@ namespace InGame.Exhibit
                 Debug.LogError($"AttachHeadMask: No head mask attached to player {player}");
                 return;
             }
-            
+
+            Transform head = null;
+            Transform[] allChildren = player.GetComponentsInChildren<Transform>(true);
             // Playerの頭の位置を探す
-            // ToDo : FIndは負荷が高いので別の手段で生成する(ここでAddComponentでいいかも)
-            Transform head = player.transform.Find("Head");
+            foreach (Transform child in allChildren)
+            {
+                if (child.CompareTag("Head"))
+                {
+                    head = child;
+                    break;
+                }
+            }
             
             if (head == null)
             {
