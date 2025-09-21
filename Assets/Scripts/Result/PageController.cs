@@ -24,6 +24,8 @@ namespace Result
         private bool _isAnimating;
         private float _canvasWidth;
 
+        [SerializeField,Label("ページの説明UI")] private GameObject _icon;
+
         [Header("Pages")]
         [SerializeField] private RectTransform[] _pages;
 
@@ -111,6 +113,7 @@ namespace Result
             SetStunPage();
             SetExhibitPage();
             SetAbilityBonusPage();
+            _icon.SetActive(true);
             _isFinish = true;
         }
 

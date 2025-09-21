@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using Fusion;
+using InGame.Player;
 using September.Common;
 using September.InGame.Common;
 using UnityEngine;
@@ -18,6 +20,8 @@ namespace Ingame.Tanihira
         
         private Transform _currentTarget;
         private InGameManager _inGameManager;
+        [SerializeField, ReadOnly] private List<TyrannoInteractable> _tyrannoInteractables = new List<TyrannoInteractable>();
+        private Collider[] _overlapResults = new Collider[50];
 
         private void Start()
         {
@@ -28,6 +32,7 @@ namespace Ingame.Tanihira
                 {
                     _inGameManager.GameStarted += GameStart;
                 }
+                _tyrannoInteractables = FindObjectsOfType<TyrannoInteractable>().ToList();
             }
         }
 
@@ -53,14 +58,23 @@ namespace Ingame.Tanihira
                 return;
             
             //範囲内のプレイヤーを検出
-            Collider[] players = Physics.OverlapSphere(_detectionCenter.position, _detectionRadius, _detectionMask);
+            int hitPlayerCount = Physics.OverlapSphereNonAlloc(_detectionCenter.position, _detectionRadius, _overlapResults, _detectionMask);
+            var players = _overlapResults.Take(hitPlayerCount)
+                .Select(col => col.transform.root) // ルート Transform を抽出
+                .Where(root => root != transform.root) // 自分自身は除外
+                .Distinct();                                            // 重複排除
+            
+            //ティラノをチェック
+            var tyrannos = _tyrannoInteractables
+                .Where(t => t != null && t.IsInteracting 
+                                      && (t.transform.position - _detectionCenter.position).sqrMagnitude <= _detectionRadius * _detectionRadius)
+                .Select(t => t.transform);
             
             //近い順にソート
-            var uniqueRoots  = players
-                .Select(col => col.transform.root)                         // ルート Transform を抽出
-                .Where(root => root != transform.root)                   // 自分自身は除外
-                .Distinct()                                                // 重複排除
-                .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude) // 距離順
+            var uniqueRoots = players
+                .Concat(tyrannos)
+                .Distinct()
+                .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude)
                 .ToList();
 
             foreach (Transform player in uniqueRoots)
@@ -81,8 +95,15 @@ namespace Ingame.Tanihira
                 //間に障害物があった場合には無視
                 if (Physics.Raycast(start, direction, out RaycastHit hit, distance, _obstacleMask))
                 {
-                    //Debug.Log("障害物ヒット: " + hit.collider.name + " / Layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
-                    continue;
+                    //ティラノに当たった場合は無視をする
+                    if (hit.collider.GetComponent<TyrannoInteractable>() != null)
+                    {
+                        //何もしない
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
                 
                 //近い物をターゲットにして攻撃させる
