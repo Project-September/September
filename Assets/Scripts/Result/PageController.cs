@@ -95,6 +95,7 @@ namespace Result
             RectTransform rootRt = (RectTransform)transform;
             _canvasWidth = rootRt.rect.width;
             _gameInput.ToggleMoveInput(false);
+            _gameInput.ToggleLookInput(false);
 
             for (int i = 0; i < _pages.Length; i++)
             {
