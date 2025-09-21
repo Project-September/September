@@ -23,7 +23,7 @@ namespace InGame.Interact
         [SerializeField] private float _interactAngleBuffer = 10f; // 角度に+10°
         [SerializeField] private float _interactRadiusBuffer = 0.3f; // 距離に+0.3m
         //許容できる高さの差
-        [SerializeField] private float _heightDifference = 0.01f;
+        private float _heightDifference = 0.1f;
         
         private bool _isWaitingForResponse = false;
         private float _interactWaitTimer = 0f;

@@ -44,8 +44,7 @@ namespace September.InGame
         {
             string cueName = animationEvent.stringParameter;
             int trackingType = animationEvent.intParameter;
-
-            RPC_PlaySoundFromCode(cueName, SoundTrackingType.Spot, Object.Id);
+            RPC_PlaySoundFromCode(cueName, (SoundTrackingType)trackingType, Object.Id);
         }
 
         /// <summary>
@@ -61,8 +60,7 @@ namespace September.InGame
 
             string cueName = animationEvent.stringParameter;
             int trackingType = animationEvent.intParameter;
-
-            RPC_PlaySoundFromCode(cueName, SoundTrackingType.Spot, Object.Id);
+            RPC_PlaySoundFromCode(cueName, (SoundTrackingType)trackingType, Object.Id);
         }
 
         /// <summary>
@@ -210,13 +208,25 @@ namespace September.InGame
             CRIAudio.PlaySE(worldPos, sheetName, cueName);
         }
 
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_StopSound(string cueName)
+        {
+            CRIAudio.StopSEFromCueName(cueName); // 特定の音を再生中の2DSoundPlayerを止める
+            CRIAudio.Stop3DSEFromCueName(cueName); // 特定の音を再生中の3DSoundPlayerを止める
+        }
+
+        public void RequestStopSound(string cueName)
+        {
+            RPC_StopSound(cueName);
+        }
+
         void LateUpdate()
         {
             // 移動しながら鳴る音用
             for (int i = _followingList.Count - 1; i >= 0; i--)
             {
                 var sound = _followingList[i];
-                if (sound.Target == null || CRIAudio.IsSePlayingPlaybackOrigin(sound.Playback) == false)
+                if (sound.Target == null || CRIAudio.IsSeStoppedPlaybackOrigin(sound.Playback) == true)
                 {
                     _followingList.RemoveAt(i);
                     continue;

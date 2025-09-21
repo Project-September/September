@@ -25,6 +25,7 @@ namespace September.Common
             PlayerDatabase.Instance.Server_PushResultToClients();
             UIController.I.ShowResultAnimation();
             GameInput.I.ToggleMoveInput(false);
+            GameInput.I.ToggleLookInput(false);
             BGMManager.ChangeBGM("Result");
         }
         private void ShowCursor()

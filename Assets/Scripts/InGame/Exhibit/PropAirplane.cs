@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using DG.Tweening;
 using Fusion;
 using InGame.Common;
@@ -13,6 +13,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using PlayerInput = September.Common.PlayerInput;
+using CRISound;
 
 namespace InGame.Exhibit
 {
@@ -108,6 +109,8 @@ namespace InGame.Exhibit
                     {
                         GetOff();
                         Debug.Log("GetOff");
+                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_Interact"); // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
+                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_TakeoffGunFire"); // もしくは射撃音を止める
                         return;
                     }
 
@@ -254,6 +257,7 @@ namespace InGame.Exhibit
         {
             if (fireInput && _machineGunTimer <= 0)
             {
+                AudioBroadcaster.RPC_PlaySoundFromCode("SE_ZeroFighter_TakeoffGunFire", SoundTrackingType.Spot, Object);
                 Fire();
             }
             else if (_machineGunTimer > 0)

@@ -13256,7 +13256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _colliderObj: {fileID: 2287520664147054077}
-  _meshObj: {fileID: 0}
+  _meshObj: {fileID: 1292013223828287825}
   _stunTime: 3
   _respawnPosition: {x: 0, y: 0, z: 0}
   _IsStun:
@@ -13409,7 +13409,6 @@ MonoBehaviour:
   _interactResponseTimeout: 3
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
-  _heightDifference: 0.01
   _isHoldingInteract: 0
 --- !u!114 &7508249662566368237
 MonoBehaviour:
@@ -13571,7 +13570,7 @@ MonoBehaviour:
         _normalAttackAnimationClip: {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
         _animationClipPlayer: {fileID: 8254388696613982807}
         _enableAutoAim: 1
-        _moveForwardSpeed: 2
+        _moveForwardSpeed: 0
         _searchRadius: 2
         _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
         _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
@@ -13639,10 +13638,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 8254388696613982807}
   _playerMovement: {fileID: 3242880713039265549}
-  _jumpOver: {fileID: 7400000, guid: c8bf40991a82948429bd4affb9557d5b, type: 2}
+  _jumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
   _fallDown: {fileID: 7400000, guid: 7d6ee42e50a5e3046917db7f6ac26f3b, type: 2}
-  _faint: {fileID: 0}
-  _getUp: {fileID: 0}
+  _faint: {fileID: 7400000, guid: 1db06257edec46149998ebdf951acd88, type: 2}
+  _getUp: {fileID: 7400000, guid: 346b2e6ab1af0d4408db526a3c19696a, type: 2}
   _playerManager: {fileID: -4668177863944640257}
   _playerHealth: {fileID: 5358505061852357365}
   _fallInTime: 0.5

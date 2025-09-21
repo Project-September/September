@@ -54,6 +54,8 @@ namespace InGame.Interact
 
         public ExhibitType ExhibitType => _type;
 
+        public AudioBroadcaster AudioBroadcaster => _audioBroadcaster;
+
         private CharacterInteractEffectBase _activeEffectBase;
 
         public void Interact(IInteractableContext context)

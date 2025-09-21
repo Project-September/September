@@ -2,7 +2,8 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
-using Fusion.Addons.Physics; // 追加
+using Fusion.Addons.Physics;
+using InGame.Health; // 追加
 using InGame.Player;
 using UniRx;
 using UnityEngine;
@@ -58,7 +59,7 @@ namespace InGame.Common
                 });
             _playerHealth.OnHitTaken += (hitData) =>
             {
-                if (!_playerManager.IsStun)
+                if (!_playerManager.IsStun && hitData.HitActionType == HitActionType.Damage)
                 {
                     //被ダメのアニメーション再生
                     _animationClipPlayer.PlayClip(_hitReactionClip);

@@ -7,6 +7,7 @@ using Ingame.Tanihira;
 using NaughtyAttributes;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -123,6 +124,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
+            UIController.I.ChangeDescriptionUI(true);
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
@@ -144,6 +146,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetMeshActive(true);
             _ownerPlayerManager.transform.position = _getOffPoint.position;
             Object.RemoveInputAuthority();
+            UIController.I.ChangeDescriptionUI(false);
             RPC_SetCameraPriority(playerRef,5);
             RPC_SetIsKinematic(true);
             var obj = _ownerPlayerManager.GetComponent<NetworkObject>();
