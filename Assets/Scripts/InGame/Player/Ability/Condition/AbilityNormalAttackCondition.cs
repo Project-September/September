@@ -36,13 +36,13 @@ namespace  InGame.Player.Ability
                 var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
                 if (inGameManager == null) return false;
 
-                // EndingStateかどうかをチェック
-                return inGameManager.CurrentStateName == "EndingState";
+                // EndingStateかPlayingState以外の場合は攻撃を無効にする
+                return inGameManager.CurrentStateName != "PlayingState";
             }
             catch (System.Exception)
             {
-                // エラーが発生した場合は安全側にインタラクトを許可
-                return false;
+                // エラーが発生した場合は安全側に攻撃を無効にする
+                return true;
             }
         }
     }
