@@ -56,7 +56,7 @@ namespace September.Lobby
             await UniTask.WaitForSeconds(2);
         }
 
-        private void ApplyContents(string characterName, string abilityName, string abilityExplain)
+        public void ApplyContents(string characterName, string abilityName, string abilityExplain)
         {
             if (_characterName) _characterName.text = characterName;
             if (_abilityNameText) _abilityNameText.text = abilityName;

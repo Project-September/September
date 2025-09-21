@@ -44,6 +44,10 @@ namespace September.Lobby
             _currentCharacterName = characterNames[0];
             _currentCharacterIndex = 0;
             _characterDisplay.SetCharacter(0);
+            var data = CharacterDataContainer.Instance.GetCharacterData(0);
+            
+            _currentBackPanel.ApplyContents (data.DisplayName, data.AbilityName, data.AbilityExplain);
+            _currentFrontPanel.ApplyContents (data.DisplayName, data.AbilityName, data.AbilityExplain);
         }
 
         private void CreateCharacterIcons(string[] characterNames)
