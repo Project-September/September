@@ -232,8 +232,8 @@ namespace September.Common
                 UIController.I.ShowOgreLamp(true);
         }
         
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_ShowStatusUpUI(PlayerRef playerRef,bool showStatusUpUI)
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_ShowStatusUpUI(PlayerRef playerRef,bool showStatusUpUI)
         {
             if (Runner.LocalPlayer == playerRef)
             {
