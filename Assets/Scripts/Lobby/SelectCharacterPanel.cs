@@ -43,8 +43,6 @@ namespace September.Lobby
             SetCharacterIconsNavigation();
             _currentCharacterName = characterNames[0];
             _currentCharacterIndex = 0;
-            var data = CharacterDataContainer.Instance.GetCharacterData(0);
-            _currentFrontPanel.PlayVideo(data.ExplainVideo).Forget();
             _characterDisplay.SetCharacter(0);
         }
 
@@ -113,14 +111,12 @@ namespace September.Lobby
         /// <summary>
         /// キャラクターの表示を切り替える(アニメーション)
         /// </summary>
-        private async UniTaskVoid ChangeCharacterInfo(string characterName, VideoClip videoClip)
+        private async UniTaskVoid ChangeCharacterInfo(string characterName,string abilityName, string abilityExplain)
         {
             _changeCharacterInfo = true;
             _currentCharacterName = characterName;
-            _currentFrontPanel.StopVideo();
             _currentFrontPanel.FadeOut().Forget();
-            _currentBackPanel.PlayVideo(videoClip).Forget();
-            await _currentBackPanel.FadeIn(characterName);
+            await _currentBackPanel.FadeIn(characterName, abilityName, abilityExplain);
             (_currentFrontPanel, _currentBackPanel) = (_currentBackPanel, _currentFrontPanel);
             _changeCharacterInfo = false;
         }
@@ -132,7 +128,7 @@ namespace September.Lobby
             if (_changeCharacterInfo || _currentCharacterName == characterName) return false;
             var data = CharacterDataContainer.Instance.GetCharacterData(index);
             //  表示を切り替え
-            ChangeCharacterInfo(characterName, data.ExplainVideo).Forget();
+            ChangeCharacterInfo(characterName, data.AbilityName, data.AbilityExplain).Forget();
             //  選択しているキャラクターのインデックスを控える
             _currentCharacterIndex = index;
             _characterDisplay.SetCharacter(_currentCharacterIndex);

@@ -12,14 +12,16 @@ namespace September.Lobby
         [SerializeField] private CanvasGroup[] _canvasGroups;
         [SerializeField] private RectTransform[] _rectTransforms;
         [SerializeField] private TextMeshProUGUI _characterName;
-        [SerializeField] private VideoPlayer _videoPlayer;
+        [SerializeField] private TextMeshProUGUI _abilityNameText;
+        [SerializeField] private TextMeshProUGUI _abilityExplainText;
         [SerializeField] private float _delay = 0.2f;
         [SerializeField] private float _moveValue = 100;
         [SerializeField] Ease _easeType = Ease.OutBack;
         Vector2[] _initialPositions;
+
         private void Awake()
         {
-            _initialPositions = _rectTransforms.Select(rect=>rect.anchoredPosition).ToArray();
+            _initialPositions = _rectTransforms.Select(rect => rect.anchoredPosition).ToArray();
         }
 
         public async UniTaskVoid FadeOut()
@@ -38,9 +40,9 @@ namespace September.Lobby
             }
         }
 
-        public async UniTask FadeIn(string characterName)
+        public async UniTask FadeIn(string characterName,string abilityName, string abilityExplain)
         {
-            _characterName.text = characterName;
+            ApplyContents(characterName, abilityName, abilityExplain);
             for (var i = 0; i < _rectTransforms.Length; i++)
             {
                 var pos = _initialPositions[i];
@@ -50,20 +52,15 @@ namespace September.Lobby
                 _canvasGroups[i].DOFade(1, 2);
                 await UniTask.WaitForSeconds(_delay);
             }
+
             await UniTask.WaitForSeconds(2);
         }
 
-        public async UniTaskVoid PlayVideo(VideoClip videoClip)
+        private void ApplyContents(string characterName, string abilityName, string abilityExplain)
         {
-            _videoPlayer.clip = videoClip;
-            _videoPlayer.Prepare();
-            await UniTask.WaitUntil(()=> _videoPlayer.isPrepared);
-            _videoPlayer.Play();
-        }
-
-        public void StopVideo()
-        {
-            if(_videoPlayer.isPlaying) _videoPlayer.Stop();
+            if (_characterName) _characterName.text = characterName;
+            if (_abilityNameText) _abilityNameText.text = abilityName;
+            if (_abilityExplainText) _abilityExplainText.text = abilityExplain;
         }
     }
 }
