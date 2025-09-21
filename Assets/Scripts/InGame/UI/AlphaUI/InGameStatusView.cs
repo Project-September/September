@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using UnityEngine.Serialization;
 
 namespace September.InGame.UI
 {
@@ -31,7 +32,7 @@ namespace September.InGame.UI
         [SerializeField] private GameObject  _killLogItemPrefab;
         [SerializeField] private int _maxLogCount = 5;
         
-        [SerializeField] private TextMeshProUGUI _statusUpUIText;
+        [SerializeField] private CanvasGroup _statusUpUI;
 
         private InGameUIRootRefs _uiRoot;
         private Slider _hpBarSlider;
@@ -87,15 +88,14 @@ namespace September.InGame.UI
             _hpBarSlider = _uiRoot.HpBar;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
-            _statusUpUIText = _uiRoot.StatusUpText;
+            _statusUpUI = _uiRoot.StatusUpGroup;
             _optionUI.SetActive(true);
             _LogPanel.SetActive(true);
             _ogreUiInstance.SetActive(false);
             _hpBarSlider.gameObject.SetActive(true);
             _staminaBarSlider.gameObject.SetActive(true);
             _interactUI.SetActive(false);
-            _statusUpUIText.text = "";
-            _statusUpUIText.gameObject.SetActive(true);
+            _statusUpUI.gameObject.SetActive(true);
         }
 
         private void ChangeHp(int value)
@@ -240,23 +240,19 @@ namespace September.InGame.UI
             {
                 case StatusUpType.Heal:
                 {
-                    var col =Color.green;
-                    col.a = 0;
-                    _statusUpUIText.color = col;
-                    _statusUpUIText.text = "Heal";
-                    await _statusUpUIText.DOFade(1f, 0.5f);
+                    _statusUpUI.alpha = 0;
+                    _statusUpUI.GetComponentInChildren<TextMeshProUGUI>().text = "体力が回復した";
+                    await _statusUpUI.DOFade(1f, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds));
-                    await _statusUpUIText.DOFade(0f, 0.5f);
+                    await _statusUpUI.DOFade(0f, 0.5f);
                     break;
                 }
                 case StatusUpType.Tutankhamen:
                 {
-                    var col = Color.red;
-                    col.a = 1;
-                    _statusUpUIText.color = col;
-                    _statusUpUIText.text = "攻撃力と移動速度が上昇中";
+                    _statusUpUI.alpha = 1;
+                    _statusUpUI.GetComponentInChildren<TextMeshProUGUI>().text = "攻撃力と移動速度が上昇中";
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds - 0.1f));
-                    await _statusUpUIText.DOFade(0f, 0.1f);
+                    await _statusUpUI.DOFade(0f, 0.1f);
                     break;
                 }
                 default:
