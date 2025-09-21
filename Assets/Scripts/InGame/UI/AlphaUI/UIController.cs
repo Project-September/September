@@ -24,8 +24,7 @@ namespace September.InGame.UI
         private readonly Subject<Unit> _onGameEnd = new();
         private readonly Subject<(bool, GameObject)> _isInteracting = new();
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
-        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new(); 
-
+        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
         #endregion
         
         # region 外部公開プロパティ
@@ -45,6 +44,8 @@ namespace September.InGame.UI
         public IObservable<int> OnChangeScoreText => _onchangeScoreText;
         
         #endregion
+        
+        public InGameUIRootRefs UIRootRefs { get; set;}
         
         public void SetUpStartUI()
         {
@@ -108,5 +109,6 @@ namespace September.InGame.UI
         {
             _onInteractStatusUpObject.OnNext((seconds,status));
         }
+        
     }
 }
