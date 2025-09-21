@@ -25,6 +25,7 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private CountdownAnimation _countdownAnimation;
+        [SerializeField] private SetIcon _setIcon;
         private int _spawnPositionIndex; 
         private PlayerRef _firstOgrePlayer;
         protected internal override void OnEnter()
@@ -64,6 +65,7 @@ namespace September.Common
                     spd.StunData.Add(data.Key, 0);
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
+                _setIcon.ShowIcon(pair.Key);
             }
             
             Context.Register(StaticServiceLocator.Instance);
