@@ -3,7 +3,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
-using Result;
 using September.Common;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +15,7 @@ namespace InGame.Player.Sarutobi
     {
         [Header("Ability")]
         [SerializeField] private GameObject _targetUIPrefab;
-        [SerializeField] private float _coolTime;
+        [SerializeField] private float _cooldown;
         [Header("Grappling Hook")]
         [SerializeField] private MinMaxRange _distanceRange;
         [SerializeField] private float _maxAngle;
@@ -54,6 +53,7 @@ namespace InGame.Player.Sarutobi
         
         [Networked] private AbilityStateType AbilityState { get; set; } = AbilityStateType.Ready;
         [Networked] private NetworkButtons PreviousButtons { get; set; }
+        [Networked, HideInInspector] public TickTimer Cooldown { get; set; }
 
         public override void Spawned()
         {
@@ -84,7 +84,10 @@ namespace InGame.Player.Sarutobi
             // input authority で判定
             if (HasInputAuthority)
             {
-                if (AbilityState == AbilityStateType.Ready)
+                _targetUI.gameObject.SetActive(false);
+                
+                // Abilityの状態と入力受付がされているときに判定に入る
+                if (AbilityState == AbilityStateType.Ready && GameInput.I.Player.Ability1.enabled)
                 {
                     bool canUse = FindGrappleablePosition(out var position);
                     DisplayTargetUI(canUse, position);
@@ -118,9 +121,9 @@ namespace InGame.Player.Sarutobi
                     
                     _playerMovement.SetRotationDirection(_targetPosition - _startPosition);
                 }
-                else
+                else if (AbilityState == AbilityStateType.Cooldown && Cooldown.ExpiredOrNotRunning(Runner))
                 {
-                    
+                    AbilityState = AbilityStateType.Ready;
                 }
             }
         }
@@ -150,6 +153,8 @@ namespace InGame.Player.Sarutobi
             Shot().Forget();
             
             _playerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
+            
+            Cooldown = TickTimer.CreateFromSeconds(Runner, _cooldown);
             
             // ボーナスカウントを更新する
             PlayerDatabase db = PlayerDatabase.Instance;
@@ -224,7 +229,7 @@ namespace InGame.Player.Sarutobi
 
             if (_jumpTimer >= _landingDuration)
             {
-                AbilityState = AbilityStateType.Ready;
+                AbilityState = AbilityStateType.Cooldown;
                 _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
                 _jumpTimer = 0;
             }

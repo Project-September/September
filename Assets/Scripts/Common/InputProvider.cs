@@ -51,7 +51,7 @@ namespace September.Common
         private void Awake()
         {
             // InputSystemを有効にする
-            GameInput.I.Enable();
+            // GameInput.I.Enable();
             
             _mainCamera = Camera.main;
         }

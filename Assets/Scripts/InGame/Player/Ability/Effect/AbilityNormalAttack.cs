@@ -21,9 +21,9 @@ namespace InGame.Player.Ability
         [Header("鬼状態の通常攻撃")]
         [SerializeField] protected int _ogreAttackDamage = 15;
         [Header("ヒットチェック開始フレーム")]
-        [SerializeField] private int _startHitCheckFrame = 17;
+        [SerializeField] protected int _startHitCheckFrame = 17;
         [Header("ヒットチェック終了フレーム")]
-        [SerializeField] private int _endHitCheckFrame   = 21;
+        [SerializeField] protected int _endHitCheckFrame   = 21;
         [Header("攻撃終了フレーム")]
         [SerializeField] private int _endAttackFrame     = 22;
         [Header("ヒットエフェクト")]
@@ -35,7 +35,7 @@ namespace InGame.Player.Ability
         
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
-        [SerializeField] private float _moveForwardSpeed = 2f;
+        [SerializeField] protected float _moveForwardSpeed = 2f;
         [Header("どれくらいの距離までの敵を狙って攻撃するか")]
         [SerializeField] private float _searchRadius = 2f;
         
@@ -47,7 +47,7 @@ namespace InGame.Player.Ability
         [SerializeField] private LayerMask _hitLayer = ~0;
         [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Ignore;
         private readonly RaycastHit[] _hitBuffer = new RaycastHit[16];
-        private readonly HashSet<Collider> _alreadyHit = new HashSet<Collider>();
+        protected readonly HashSet<Collider> _alreadyHit = new HashSet<Collider>();
         
         [Header("Debug Draw")]
         [SerializeField] private Color _debugHitBoxColor   = new Color(0f, 0.6f, 1f, 1f);
@@ -55,14 +55,14 @@ namespace InGame.Player.Ability
         private float _debugDrawDuration = 1f; // 例: 0.05f
 
         // 変換後のTickオフセット
-        int _startHitTick, _endHitTick, _endAttackTick;
+        protected int _startHitTick, _endHitTick, _endAttackTick;
 
         // 攻撃開始Tick
-        int _attackStartTick = -1;
+        protected int _attackStartTick = -1;
         
         // 最も近い敵のTransform
-        private Transform _closestEnemyTransform;
-        private PlayerMovement _playerMovement;
+        protected Transform _closestEnemyTransform;
+        protected PlayerMovement _playerMovement;
         protected EffectSpawner _effectSpawner;
 
         protected override void OnStart()
@@ -75,10 +75,6 @@ namespace InGame.Player.Ability
             if (!_effectSpawner)
                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             
-            float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;
-            float dt  = Runner != null ? Runner.DeltaTime : Time.fixedDeltaTime;
-            int FrameToTick(int f) => Mathf.RoundToInt((f / fps) / dt);
-
             _startHitTick  = FrameToTick(_startHitCheckFrame);
             _endHitTick    = FrameToTick(_endHitCheckFrame);
             _endAttackTick = FrameToTick(_endAttackFrame);
@@ -173,7 +169,7 @@ namespace InGame.Player.Ability
             return _attackDamage;
         }
 
-        private void CastAndApplyHits()
+        protected void CastAndApplyHits()
         {
             var t = Parameter.Owner.transform;
 
@@ -258,6 +254,13 @@ namespace InGame.Player.Ability
                 _playerMovement.IgnoreMoveInput = false;
                 _phase = AbilityPhase.Ending;
             }
+        }
+
+        protected int FrameToTick(int f)
+        {
+            float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;
+            float dt  = Runner != null ? Runner.DeltaTime : Time.fixedDeltaTime;
+            return Mathf.RoundToInt((f / fps) / dt);
         }
         
         private Transform GetClosestEnemy()

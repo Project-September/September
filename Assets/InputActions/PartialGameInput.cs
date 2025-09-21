@@ -1,13 +1,72 @@
+using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public partial class GameInput
 {
-    private static readonly GameInput Instance;
-    public static readonly GameInput I = Instance ??= new GameInput();
+    private static GameInput _instance;
+    private bool _subscribed;
+    
+    public static GameInput I => _instance ??= Init();
 
     public DeviceType UseDeviceType { get; private set; } = DeviceType.Unknown;
+    public event Action<DeviceType> OnDeviceTypeChanged;
 
-    void OnAnyInput(InputAction.CallbackContext context)
+    static GameInput Init()
+    {
+        // インスタンスの生成、イベントの購読
+        _instance = new GameInput();
+        _instance.SubscribeToInput();
+        if (Application.isPlaying) _instance.Enable();
+        return _instance;
+    }
+    
+    /// <summary> 再生開始時にリセットをかける </summary>
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void Reset()
+    {
+        if (_instance != null)
+        {
+            _instance.UnsubscribeFromInput();
+            _instance.Disable();
+            _instance.Dispose();
+        }
+        _instance = null;
+    }
+
+    void SubscribeToInput()
+    {
+        if (_subscribed) return;
+        _subscribed = true;
+        
+        foreach (var map in asset.actionMaps)
+        {
+            foreach (var action in map)
+            {
+                action.started += DeviceDetection;
+                action.performed += DeviceDetection;
+                action.canceled += DeviceDetection;
+            }
+        }
+    }
+
+    void UnsubscribeFromInput()
+    {
+        if (!_subscribed) return;
+        _subscribed = false;
+        
+        foreach (var map in asset.actionMaps)
+        {
+            foreach (var action in map)
+            {
+                action.started -= DeviceDetection;
+                action.performed -= DeviceDetection;
+                action.canceled -= DeviceDetection;
+            }
+        }
+    }
+
+    void DeviceDetection(InputAction.CallbackContext context)
     {
         DeviceType lastDeviceType = UseDeviceType;
         UseDeviceType = context.control.device switch
@@ -17,29 +76,13 @@ public partial class GameInput
             Gamepad => DeviceType.Gamepad,
             _ => DeviceType.Other
         };
-        
-        if (lastDeviceType != UseDeviceType) UnityEngine.Debug.Log($"Change Device to : {UseDeviceType}");
-    }
 
-    void OnConstruct()
-    {
-        foreach (var map in asset.actionMaps)
+        if (lastDeviceType != UseDeviceType)
         {
-            foreach (var action in map)
-            {
-                action.performed += OnAnyInput;
-            }
-        }
-    }
-
-    void OnDestruct()
-    {
-        foreach (var map in asset.actionMaps)
-        {
-            foreach (var action in map)
-            {
-                action.performed -= OnAnyInput;
-            }
+            OnDeviceTypeChanged?.Invoke(UseDeviceType);
+#if UNITY_EDITOR
+            UnityEngine.Debug.Log($"Change Device to : {UseDeviceType}");
+#endif
         }
     }
 
@@ -75,6 +118,18 @@ public partial class GameInput
             Player.Ability1.Disable();
             Player.Ability2.Disable();
             Player.Interact.Disable();
+        }
+    }
+
+    public void ToggleLookInput(bool value)
+    {
+        if (value)
+        {
+            Player.Look.Enable();
+        }
+        else
+        {
+            Player.Look.Disable();
         }
     }
 
