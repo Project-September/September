@@ -321,6 +321,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 542693324}
     m_Modifications:
+    - target: {fileID: 849283839332731866, guid: 4bc4ef8f348deec4ea280b95bc81965c, type: 3}
+      propertyPath: m_text
+      value: "\uFF13"
+      objectReference: {fileID: 0}
+    - target: {fileID: 849283839332731866, guid: 4bc4ef8f348deec4ea280b95bc81965c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
+    - target: {fileID: 849283839332731866, guid: 4bc4ef8f348deec4ea280b95bc81965c, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 849283839332731866, guid: 4bc4ef8f348deec4ea280b95bc81965c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -4247787893072867334, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
+    - target: {fileID: 849283839332731866, guid: 4bc4ef8f348deec4ea280b95bc81965c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3184159877813700666, guid: 4bc4ef8f348deec4ea280b95bc81965c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2017,8 +2037,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.16909811, y: 0.7703555, z: -0.22818965, w: 0.5708658}
-  m_LocalPosition: {x: -22.510273, y: 0.78999996, z: 25.946217}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2482,6 +2502,30 @@ PrefabInstance:
       propertyPath: _interactable
       value: 
       objectReference: {fileID: 988878218}
+    - target: {fileID: 793880936398018537, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
+    - target: {fileID: 793880936398018537, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1464172462217974093, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
+    - target: {fileID: 1464172462217974093, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3115068171291840454, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
+    - target: {fileID: 3115068171291840454, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3601072574992580876, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: SortKey
       value: 740563634
@@ -2542,6 +2586,14 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6362518027200371173, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
+    - target: {fileID: 6362518027200371173, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6773177065010528805, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: _cooldownEffectType
       value: 24
@@ -2581,6 +2633,14 @@ PrefabInstance:
     - target: {fileID: 7228950578283369073, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
       propertyPath: m_Name
       value: PropAirplane
+      objectReference: {fileID: 0}
+    - target: {fileID: 7986310020915403168, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
+    - target: {fileID: 7986310020915403168, guid: e1df16895356eb6468d8e3a6b115915e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
