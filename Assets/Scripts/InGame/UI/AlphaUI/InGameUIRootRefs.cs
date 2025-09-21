@@ -15,6 +15,7 @@ namespace September.InGame.UI
         public GameObject OgreUI;
         public TextMeshProUGUI OgreMessageText;
         public CanvasGroup StatusUpGroup;
+        public VerticalLayoutGroup StatusUpUIRoot;
 
         [Header("Bars")]
         public Slider HpBar;
