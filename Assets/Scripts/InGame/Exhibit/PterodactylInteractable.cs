@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using CRISound;
 using Cysharp.Threading.Tasks;
@@ -15,9 +15,6 @@ namespace InGame.Exhibit
 {
     public class PterodactylInteractable : MountableExhibitBase
     {
-        [Header("Sound Settings")] [SerializeField]
-        private string _crySe = "Pteranodon_cry";
-
         [Header("Movement Settings")] [SerializeField]
         private float _moveSpeed = 5f;
 
@@ -99,7 +96,6 @@ namespace InGame.Exhibit
             _currentTargetValue = 0.01f;
             CurrentBlendValue = _currentTargetValue;
             _interactableBase.ForceSetInteractable = false;
-            OnPlaySE(_crySe);
             _owner = ownerPlayerRef;
             IsAimObjectActive = true;
         }
@@ -304,18 +300,6 @@ namespace InGame.Exhibit
         {
             // ネットワーク変数の変更をすべてのクライアントに反映
             _aimObject.gameObject.SetActive(IsAimObjectActive);
-        }
-
-        // サウンド設定
-        private void OnPlaySE(string cueName)
-        {
-            RPC_PlaySE(transform.position, cueName);
-        }
-
-        [Rpc]
-        private void RPC_PlaySE(Vector3 position, string cueName)
-        {
-            CRIAudio.PlaySE(position, "Exhibit", cueName);
         }
     }
 }

@@ -206,9 +206,21 @@ namespace CRISound
                 return playback;
             }
 
+            /// <summary> 2D用SEPlayerを止める </summary>
             public virtual void Stop()
             {
                 _atomExPlayer.Stop();
+            }
+
+            /// <summary> 指定した名前のキューが再生されていたら止める(2D) </summary>
+            /// <param name="cueName"></param>
+            public void StopSEFromCueName(string cueName)
+            {
+                if (IsPlayingCue(cueName))
+                //if (_currentCueName == cueName)
+                {
+                    _atomExPlayer.Stop();
+                }
             }
         }
 
@@ -327,13 +339,20 @@ namespace CRISound
                 return false;
             }
 
-            // 指定したSEの再生が終了しているかどうか
+            // 指定したSEが再生中か
             // 指定した再生元が再生中であれば true 
             public bool Is3DCuePlayingPlaybackOrigin(CriAtomExPlayback playback)
             {
                 return playback.GetStatus() == CriAtomExPlayback.Status.Playing;
             }
-            
+
+            // 指定したSEの再生が終了しているか
+            // 指定した再生元が再生中であれば false
+            public bool Is3DCueStoppedPlaybackOrigin(CriAtomExPlayback playback)
+            {
+                return playback.GetStatus() == CriAtomExPlayback.Status.Removed;
+            }
+
             // すべてのSEの再生が終了しているか確認したいとき
             public bool IsAny3DPlaying()
             {
@@ -351,6 +370,20 @@ namespace CRISound
 
                 player.Play3D(playPos, cueSheet, cueName);
                 return player;
+            }
+
+            /// <summary> 指定した名前のキューが再生されていたら止める(3D) </summary>
+            /// <param name="cueName"></param>
+            public void Stop3DSEFromCueName(string cueName)
+            {
+                foreach (var s in _sound3Ds)
+                {
+                    if (Is3DCuePlaying(cueName))
+                    {
+                        s.CriAtomExPlayer3D.Stop();
+                        return;
+                    }
+                }
             }
         }
     }
