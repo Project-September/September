@@ -13286,7 +13286,7 @@ MonoBehaviour:
   _staminaConsumption: 20
   _rotationSpeed: 720
   _maxLedgeHeight: 1.5
-  _minLedgeHeight: 0.5
+  _minLedgeHeight: 0.4
   _maxLedgeDepth: 0.8
   _reachDistance: 0.2
   _timeToVault: 0.5
@@ -13425,19 +13425,119 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _opticalCamouflageMaterial: {fileID: 2100000, guid: 9c38977772e2e4240ac333399ae5edb9, type: 2}
   _renderers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 2896904429568219425}
+  - {fileID: 4444728715674826767}
+  - {fileID: 365055149935480855}
+  - {fileID: 5473781389967043558}
+  - {fileID: 149377433659285578}
+  - {fileID: 5596678972083998114}
+  - {fileID: 5827349682707840821}
+  - {fileID: 7513904570936225729}
+  - {fileID: 1261932976597184585}
+  - {fileID: 8804039525333242774}
+  - {fileID: 5979821534660379508}
+  - {fileID: 1703150664862478825}
+  - {fileID: 1351741579717565711}
+  - {fileID: 6039235543100286419}
+  - {fileID: 8058342846350357776}
+  - {fileID: 4621308139469665985}
+  - {fileID: 2166951933802374369}
+  - {fileID: 2001195134676978186}
+  - {fileID: 8260757550178271669}
+  - {fileID: 892397742295423257}
+  - {fileID: 2838606169112210644}
+  - {fileID: 8805629527439944337}
+  - {fileID: 352811528529828405}
+  - {fileID: 5785385828133662400}
+  - {fileID: 389380088006588521}
+  - {fileID: 877915642300312570}
+  - {fileID: 8076793057799737832}
+  - {fileID: 6939895171273259112}
+  - {fileID: 5848462867372782247}
+  - {fileID: 431513373132653891}
+  - {fileID: 8562474285782220337}
+  - {fileID: 2458886476202405358}
+  - {fileID: 5768707441036813972}
+  - {fileID: 2456903112496154414}
+  - {fileID: 6099110318339414969}
+  - {fileID: 8384798353231985701}
+  - {fileID: 8800289045824370111}
+  - {fileID: 3796778935081067081}
+  - {fileID: 2870472224819569959}
+  - {fileID: 1501168631846519915}
+  - {fileID: 2218913826007102693}
+  - {fileID: 1664274454561333847}
+  - {fileID: 9048900907412206640}
+  - {fileID: 5927317205183789907}
+  - {fileID: 4031812243975724112}
+  - {fileID: 9032711600205827086}
+  - {fileID: 8344210696975366377}
+  - {fileID: 8463869841207938577}
+  - {fileID: 8072080049481823475}
+  - {fileID: 5828374745380922964}
+  - {fileID: 6441579234642464909}
+  - {fileID: 6574974913939301987}
+  - {fileID: 5862590939041331150}
+  - {fileID: 6267431567861202659}
+  - {fileID: 6421979200392666767}
+  - {fileID: 8420555610962554972}
+  - {fileID: 5387819236802069134}
+  - {fileID: 4278952250820908655}
+  - {fileID: 8455247376040640906}
+  - {fileID: 66513706187858138}
+  - {fileID: 6547920884528566514}
+  - {fileID: 4352558461769174093}
+  - {fileID: 6707048451198872319}
+  - {fileID: 4076710222768347569}
+  - {fileID: 1683599777837876258}
+  - {fileID: 7361068774839641829}
+  - {fileID: 2308698119471520369}
+  - {fileID: 2397150831927829186}
+  - {fileID: 6103296830993517453}
+  - {fileID: 7338545567989594676}
+  - {fileID: 2490929416302300613}
+  - {fileID: 3565048137204435638}
+  - {fileID: 2583488855931202075}
+  - {fileID: 3881556451999445501}
+  - {fileID: 28271765755563731}
+  - {fileID: 6776205213964648726}
+  - {fileID: 3440324317681569850}
+  - {fileID: 5923795721070482802}
+  - {fileID: 8689187346295443853}
+  - {fileID: 6775014460207005048}
+  - {fileID: 3948614313939770389}
+  - {fileID: 8758858775404091065}
+  - {fileID: 4046514115201788446}
+  - {fileID: 1174874607433619082}
+  - {fileID: 3131099285420103600}
+  - {fileID: 938871043094424873}
+  - {fileID: 5331624707108058672}
+  - {fileID: 7696237847894428187}
+  - {fileID: 7453590857805048547}
+  - {fileID: 1975627190041528413}
+  - {fileID: 1268907861885451702}
+  - {fileID: 8056345669874245069}
+  - {fileID: 4035616001853205929}
+  - {fileID: 3595892968237807860}
+  - {fileID: 7083717118911358947}
+  - {fileID: 3229858080353748351}
+  - {fileID: 8971640350598333233}
+  - {fileID: 5011902544045276694}
+  - {fileID: 3029049673784015026}
+  - {fileID: 1750275162740449902}
+  - {fileID: 3309210624664203847}
+  - {fileID: 7946097893601923125}
+  - {fileID: 76980161543502903}
+  - {fileID: 2625300896509775589}
+  - {fileID: 1069705729407931385}
+  - {fileID: 4889391932763338771}
+  - {fileID: 2939391793575383459}
+  - {fileID: 8197948349768192882}
+  - {fileID: 5174431630706120506}
+  - {fileID: 2330041835352895420}
+  - {fileID: 6781588597404791211}
+  - {fileID: 9188357673259769943}
+  - {fileID: 5056338865517135697}
 --- !u!114 &2779401866583128900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13451,24 +13551,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _abilities:
-  - rid: 2879281568291487894
+  - rid: 1755462043767144544
   _conditions:
-  - rid: 2879281568291487895
+  - rid: 1755462043767144548
   references:
     version: 2
     RefIds:
-    - rid: 2879281568291487894
-      type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
+    - rid: 1755462043767144544
+      type: {class: AbilityMultiHitAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
         _cooldown: 0
         _phase: 0
         _attackDamage: 10
         _ogreAttackDamage: 15
-        _startHitCheckFrame: 9
-        _endHitCheckFrame: 17
+        _startHitCheckFrame: 3
+        _endHitCheckFrame: 5
         _endAttackFrame: 22
         _hitEffect: 18
-        _normalAttackAnimationClip: {fileID: 7400000, guid: 5baf9b89bf82cf9419a44964406b2f20, type: 2}
+        _normalAttackAnimationClip: {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
         _animationClipPlayer: {fileID: 8254388696613982807}
         _enableAutoAim: 1
         _moveForwardSpeed: 2
@@ -13482,8 +13582,13 @@ MonoBehaviour:
         _triggerInteraction: 1
         _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
         _debugDrawDuration: 1
-    - rid: 2879281568291487895
-      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
+        _attackFrames:
+        - Start: 8
+          End: 12
+        - Start: 18
+          End: 20
+    - rid: 1755462043767144548
+      type: {class: AbilityMultiHitAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
       data: 
 --- !u!114 &8254388696613982807
 MonoBehaviour:
@@ -13534,7 +13639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationClipPlayer: {fileID: 8254388696613982807}
   _playerMovement: {fileID: 3242880713039265549}
-  _jumpOver: {fileID: 7400000, guid: 0fa62cdfa27db1f4f92d97a10a5d8df5, type: 2}
+  _jumpOver: {fileID: 7400000, guid: c8bf40991a82948429bd4affb9557d5b, type: 2}
   _fallDown: {fileID: 7400000, guid: 7d6ee42e50a5e3046917db7f6ac26f3b, type: 2}
   _faint: {fileID: 0}
   _getUp: {fileID: 0}
@@ -13619,7 +13724,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetUIPrefab: {fileID: 2541600367538618662, guid: a369727939273664ea0cfb03757f02c7, type: 3}
-  _coolTime: 0
+  _cooldown: 5
   _distanceRange:
     Min: 5
     Max: 20
