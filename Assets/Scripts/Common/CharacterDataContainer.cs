@@ -18,7 +18,9 @@ namespace September.Common
         public struct CharacterData
         {
             public CharacterType Type;
-            public string DisplayName;
+            [TextArea(1, 5)] public string DisplayName;
+            [TextArea(2, 5)] public string AbilityName;
+            [TextArea(3, 5)] public string AbilityExplain;
             public NetworkPrefabRef Prefab;
             public VideoClip ExplainVideo;
             public Sprite CharacterIcon;
