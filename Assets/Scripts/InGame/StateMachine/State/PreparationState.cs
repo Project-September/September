@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using InGame.Common;
+using InGame.Exhibit;
 using InGame.Health;
 using InGame.Player;
 using September.InGame.Common;
@@ -25,6 +26,7 @@ namespace September.Common
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private CountdownAnimation _countdownAnimation;
         private int _spawnPositionIndex; 
+        private PlayerRef _firstOgrePlayer;
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -98,6 +100,8 @@ namespace September.Common
             //  ゲーム開始
             GameInput.I.ToggleActionInput(true);
             SetOgreLamp();
+            RPC_ShowStatusUpUI(_firstOgrePlayer,true);
+            _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
             {
                 //  ステート終了
@@ -176,6 +180,7 @@ namespace September.Common
             var data = dic.Get(ogreKey);
             data.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
+            _firstOgrePlayer = ogreKey;
         }
         /// <summary>
         /// 各Playerの気絶時に呼ばれるメソッド
@@ -190,9 +195,11 @@ namespace September.Common
             if (killerData.IsOgre && data.ExecutorRef != data.TargetRef)
             {
                 killerData.IsOgre = false;
+                RPC_ShowStatusUpUI(data.ExecutorRef, false);
                 PlayerDatabase.Instance.PlayerDataDic.Set(data.ExecutorRef, killerData);
                 killedData.IsOgre = true;
                 PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
+                RPC_ShowStatusUpUI(data.TargetRef, true);
                 RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
             }
             // Log
@@ -223,6 +230,22 @@ namespace September.Common
                 UIController.I.ShowOgreLamp(false);
             else if(targetRef == Context.Runner.LocalPlayer)
                 UIController.I.ShowOgreLamp(true);
+        }
+        
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_ShowStatusUpUI(PlayerRef playerRef,bool showStatusUpUI)
+        {
+            if (Runner.LocalPlayer == playerRef)
+            {
+                if (showStatusUpUI)
+                {
+                    UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
+                }
+                else
+                {
+                    UIController.I.ShowStatusUpUI(-1, StatusUpType.None);
+                }
+            }
         }
     }
 }

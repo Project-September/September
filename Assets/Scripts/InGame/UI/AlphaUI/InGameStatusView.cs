@@ -33,6 +33,7 @@ namespace September.InGame.UI
         [SerializeField] private int _maxLogCount = 5;
         
         [SerializeField] private CanvasGroup _statusUpUI;
+        private VerticalLayoutGroup _statusUpLayout;
 
         private InGameUIRootRefs _uiRoot;
         private Slider _hpBarSlider;
@@ -45,13 +46,15 @@ namespace September.InGame.UI
         private GameObject[] _descriptionIcon;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
-
+        private float _tutanCounter;
         private CancellationTokenSource _cts;
-
+        private StatusUpType _currentStatusUpType;
+        private CanvasGroup _ogreGroup;
         private void Awake()
         {
             _cts = new CancellationTokenSource();
             Bind();
+            _tutanCounter = 0;
         }
 
         private void Bind()
@@ -70,7 +73,7 @@ namespace September.InGame.UI
                 .AddTo(_cts.Token);
             ui.OnChangeInteractProgress.Subscribe(progress => _interactUI?.SetInteractProgress(progress))
                 .AddTo(_cts.Token);
-            ui.OnInteractStatusUpObject.Subscribe(info => ShowStatusUpUI(info.Item1, info.Item2).Forget())
+            ui.OnInteractStatusUpObject.Subscribe(info => ShowStatusUpUI(info.Item1, info.Item2))
                 .AddTo(_cts.Token);
             ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
         }
@@ -89,6 +92,7 @@ namespace September.InGame.UI
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
             _statusUpUI = _uiRoot.StatusUpGroup;
+            _statusUpLayout = _uiRoot.StatusUpUIRoot;
             _optionUI.SetActive(true);
             _LogPanel.SetActive(true);
             _ogreUiInstance.SetActive(false);
@@ -240,19 +244,53 @@ namespace September.InGame.UI
             {
                 case StatusUpType.Heal:
                 {
-                    _statusUpUI.alpha = 0;
-                    _statusUpUI.GetComponentInChildren<TextMeshProUGUI>().text = "体力が回復した";
-                    await _statusUpUI.DOFade(1f, 0.5f);
+                    var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
+                    ui.GetComponentInChildren<TextMeshProUGUI>().text = "バイオリン：体力が回復した";
+                    UpdateLayOutGroup();
+                    await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds));
-                    await _statusUpUI.DOFade(0f, 0.5f);
+                    await ui.DOFade(0, 0.5f);
+                    Destroy(ui.gameObject);
+                    UpdateLayOutGroup();
                     break;
                 }
                 case StatusUpType.Tutankhamen:
                 {
-                    _statusUpUI.alpha = 1;
-                    _statusUpUI.GetComponentInChildren<TextMeshProUGUI>().text = "攻撃力と移動速度が上昇中";
-                    await UniTask.Delay(TimeSpan.FromSeconds(seconds - 0.1f));
-                    await _statusUpUI.DOFade(0f, 0.1f);
+                    var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
+                    ui.GetComponentInChildren<TextMeshProUGUI>().text = "ツタンカーメン：移動速度と攻撃力が上昇中";
+                    UpdateLayOutGroup();
+                    await ui.DOFade(1, 0.5f);
+                    await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
+                    await ui.DOFade(0, 0.5f);
+                    Destroy(ui.gameObject);
+                    UpdateLayOutGroup();
+                    break;
+                }
+                case StatusUpType.Ogre:
+                {
+                    var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
+                    ui.GetComponentInChildren<TextMeshProUGUI>().text = "鬼：移動速度と攻撃力が上昇中";
+                    UpdateLayOutGroup();
+                    _ogreGroup = ui;
+                    await ui.DOFade(1, 0.5f);
+                    break;
+                }
+                case StatusUpType.BokeBoke:
+                {
+                    var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
+                    ui.GetComponentInChildren<TextMeshProUGUI>().text = "モアイ：スコアが増えた";
+                    UpdateLayOutGroup();
+                    await ui.DOFade(1, 0.5f);
+                    await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
+                    await ui.DOFade(0, 0.5f);
+                    Destroy(ui.gameObject);
+                    UpdateLayOutGroup();
+                    break;
+                }
+                case StatusUpType.None:
+                {
+                    Destroy(_ogreGroup?.gameObject);
+                    UpdateLayOutGroup();
                     break;
                 }
                 default:
@@ -260,6 +298,14 @@ namespace September.InGame.UI
             }
         }
 
+        private void UpdateLayOutGroup()
+        {
+            // レイアウト内の入力値を再計算
+            _statusUpLayout.CalculateLayoutInputHorizontal();
+
+            // レイアウト再設定(表示更新)
+            _statusUpLayout.SetLayoutHorizontal();
+        }
         private void OnDestroy()
         {
             _cts?.Cancel();
