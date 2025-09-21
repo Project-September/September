@@ -22,6 +22,7 @@ namespace Ingame.Tanihira
         private InGameManager _inGameManager;
         [SerializeField, ReadOnly] private List<TyrannoInteractable> _tyrannoInteractables = new List<TyrannoInteractable>();
         private Collider[] _overlapResults = new Collider[50];
+        private bool _isEnd;
 
         private void Start()
         {
@@ -40,9 +41,22 @@ namespace Ingame.Tanihira
         {
             if (!HasStateAuthority) return;
             
-            if (_isWaiting)
+            if (_isWaiting && !_isEnd)
             {
                 DetectePlayer();
+            }
+            
+            //終わりか動かをチェックする
+            if (_inGameManager.CurrentStateName == "EndingState" && !_isEnd)
+            {
+                _isEnd = true;
+                if (_formationManager)
+                {
+                    foreach (var friend in _formationManager.FriendsList)
+                    {
+                        friend.EndFriend();
+                    }
+                }
             }
         }
         

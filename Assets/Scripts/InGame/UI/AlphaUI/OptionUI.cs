@@ -1,4 +1,5 @@
-using CRISound;
+﻿using CRISound;
+using CriWare;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +12,6 @@ namespace InGame.UI
         [SerializeField, Label("BGMVolume")] private Slider _bgmVolumeSlider;
         [SerializeField, Label("SEVolume")] private Slider _seVolumeSlider;
 
-        private CuePlayAtomExPlayer _cri;
         private GameInput _gameInput;
         private bool _isShow;
         private Vector2 _prevVolumeInput;
@@ -29,10 +29,11 @@ namespace InGame.UI
 
         private void Initialize()
         {
-            _cri = CuePlayAtomExPlayer.Instance;
             _optionUIPanel.SetActive(false);
             _gameInput = GameInput.I;
             _gameInput.Enable();
+            _bgmVolumeSlider.value = 1;
+            _seVolumeSlider.value = 1;
 
             _bgmVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriBGMVolume());
             _seVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriSEVolume());
@@ -73,12 +74,12 @@ namespace InGame.UI
 
         private void OnChangeCriBGMVolume()
         {
-            _cri.Player(SoundType.BGM).SetVolume(_bgmVolumeSlider.value);
+            CriAtom.SetCategoryVolume("BGM", _bgmVolumeSlider.value);
         }
 
         private void OnChangeCriSEVolume()
         {
-            _cri.Player(SoundType.SE).SetVolume(_seVolumeSlider.value);
+            CriAtom.SetCategoryVolume("SE", _seVolumeSlider.value);
         }
     }
 }

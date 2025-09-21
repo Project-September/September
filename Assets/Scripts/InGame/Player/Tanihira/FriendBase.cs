@@ -53,9 +53,11 @@ namespace Ingame.Tanihira
         protected FriendState _waitStockState;
         protected FriendStatus _currentStatus;
         protected EffectSpawner _effectSpawner;
+        protected bool _isEnd;
 
         private static int _spawnCount;
         private bool _isAttack;
+        
         
         // プロパティ
         public NavMeshAgent Agent => _agent;
@@ -137,6 +139,9 @@ namespace Ingame.Tanihira
         /// <param name="newState">新しいステート</param>
         public virtual void ChangeState(FriendState newState)
         {
+            if (_isEnd)
+                return;
+            
             //Noneの時には強制的にステートを変更させる
             if (newState == FriendState.None)
             {
@@ -246,6 +251,15 @@ namespace Ingame.Tanihira
                 ChangeState(_waitStockState);
                 _waitStockState = FriendState.None;
             }
+        }
+
+        public void EndFriend()
+        {
+            _isEnd = true;
+            // 現在のステートのOnExitを呼び出し、コンポーネントを無効化
+            _friendStateMappings[_currentState]?.OnExit(this);
+            // 新しいステートに変更
+            _currentState = FriendState.None;
         }
         
         //アニメーションイベント用

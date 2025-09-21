@@ -30,6 +30,9 @@ namespace Ingame.Tanihira
         }
         public override void ChangeState(FriendState newState)
         {
+            if (_isEnd)
+                return;
+            
             //スタンしている時には、ステートを記録して変更を加えないようにする
             if (!IsAlive)
             {
