@@ -41,6 +41,7 @@ namespace September.InGame.UI
         private GameObject _optionUI;
         private GameObject _LogPanel;
         private GameObject _ogreUiInstance;
+        private GameObject[] _descriptionIcon;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
 
@@ -70,6 +71,7 @@ namespace September.InGame.UI
                 .AddTo(_cts.Token);
             ui.OnInteractStatusUpObject.Subscribe(info => ShowStatusUpUI(info.Item1, info.Item2).Forget())
                 .AddTo(_cts.Token);
+            ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
         }
 
         private void SetupUI()
@@ -81,6 +83,7 @@ namespace September.InGame.UI
             _LogPanel = _uiRoot.LogPanel;
             _ogreUiInstance = _uiRoot.OgreUI;
             _ogreMessageText = _uiRoot.OgreMessageText;
+            _descriptionIcon =  _uiRoot.DescriptionIcon;
             _hpBarSlider = _uiRoot.HpBar;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
@@ -109,6 +112,22 @@ namespace September.InGame.UI
             ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
             ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
             await resultAnim.Play(resultUI);
+        }
+
+        public void ChangeExhibitDescriptionUI(bool value)
+        {
+            if (value)
+            {
+                // 展示物操作方法をアクティブ
+                _descriptionIcon[0].SetActive(false);
+                _descriptionIcon[1].SetActive(true);
+            }
+            else
+            {
+                // Player操作をアクティブ
+                _descriptionIcon[0].SetActive(true);
+                _descriptionIcon[1].SetActive(false);
+            }
         }
 
         private void ChangeStamina(float value)

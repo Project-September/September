@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,5 +24,7 @@ namespace September.InGame.UI
 
         [Header("Timer")] 
         public TextMeshProUGUI TimerText;
+        [Header("Description"),Label("1番目にPlayerの操作UI,2番目に展示物の操作UI")]
+        public GameObject[] DescriptionIcon;
     }
 }
