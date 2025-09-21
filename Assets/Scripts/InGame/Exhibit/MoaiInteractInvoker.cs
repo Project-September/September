@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Interact;
 using NaughtyAttributes;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -15,7 +16,6 @@ namespace InGame.Exhibit
         [SerializeField,Label("話し声")] private string _speakCue;
         [SerializeField, Label("インタラクトの時間")] private float _interactTime;
         [SerializeField,Label("AnimationSpeed")] private float _animationSpeed;
-        
         private Animator _animator;
         private InteractableBase _interactableBase;
 
@@ -45,6 +45,15 @@ namespace InGame.Exhibit
             await UniTask.Delay(TimeSpan.FromSeconds(_interactTime));
             _animator.SetBool(Speak, false);
             _interactableBase.ForceSetInteractable = true;
+        }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_ShowStatusUpUI(PlayerRef playerRef)
+        {
+            if (Runner.LocalPlayer == playerRef)
+            {
+                UIController.I.ShowStatusUpUI(3f, StatusUpType.BokeBoke);
+            }
         }
     }
 }
