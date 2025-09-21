@@ -368,6 +368,7 @@ namespace InGame.Player.Sarutobi
         void RPC_DisplayWireEnd()
         {
             _wireLine.enabled = false;
+            SetWirePosition( _handSocket.position);
         }
 
         void SetWirePosition(Vector3 otherPos)
