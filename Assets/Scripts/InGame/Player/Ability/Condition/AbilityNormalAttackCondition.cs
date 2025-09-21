@@ -16,7 +16,6 @@ namespace  InGame.Player.Ability
 
         public bool IsConditionMatch(in TriggerEventContext context)
         {
-            Debug.LogError($"GameEnded: {IsGameEnded()}");
             if (!context.Owner) return false;
             if (!_playerMovement) _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
