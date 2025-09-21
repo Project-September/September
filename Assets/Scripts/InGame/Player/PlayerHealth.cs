@@ -54,7 +54,6 @@ namespace InGame.Player
             }
             
             //RPC_HitDebug(hitData.HitActionType);
-            Debug.Log(hitData + $"\nHealth:     {_status.CurrentHealth}");
         }
 
         void ApplyHit(ref HitData hitData)
@@ -67,12 +66,10 @@ namespace InGame.Player
 
             if (hitData.HitActionType == HitActionType.Damage)
             {
-                Debug.Log("Damage Taken");
                 hitData.Amount = TakeDamage(hitData.Amount);
             }
             else if (hitData.HitActionType == HitActionType.Heal)
             {
-                Debug.Log("Heal Taken");
                 hitData.Amount = TakeHeal(hitData.Amount);
             }
         }

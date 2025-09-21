@@ -150,7 +150,7 @@ namespace September.Common
         }
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
         {
-            if (killerData.StunData.TryGet(killedPlayer, out var count))
+            if (killerData.StunData.TryGet(killedPlayer, out int count))
             {
                 killerData.StunData.Set(killedPlayer, count + 1);
             }
@@ -159,6 +159,9 @@ namespace September.Common
                 killerData.StunData.Set(killedPlayer, 1);
             }
             PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
+            
+            // スコアの更新処理
+            PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
         }
         private Vector3 GetSpawnPosition()
         {
