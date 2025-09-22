@@ -73,6 +73,7 @@ namespace Ingame.Tanihira
         public FriendState WaitStockState => _waitStockState;
         public NetworkObject OwnerPlayer => _ownerPlayer;
         public GameObject Tutankhamen => _tutankhamen;
+        public bool IsWarp;
         
         public override void Spawned()
         {
@@ -139,7 +140,7 @@ namespace Ingame.Tanihira
         /// <param name="newState">新しいステート</param>
         public virtual void ChangeState(FriendState newState)
         {
-            if (_isEnd)
+            if (_isEnd || IsWarp)
                 return;
             
             //Noneの時には強制的にステートを変更させる
