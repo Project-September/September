@@ -41,12 +41,12 @@ namespace InGame.Exhibit
 
         [Header("MachineGun")] [SerializeField]
         private float _fireInterval;
-
         [SerializeField] private Transform[] _muzzles;
         [SerializeField] private Transform _firePoint;
         [SerializeField] private ParticleSystem _muzzleFlash;
         [SerializeField] private ParticleSystem _ballistic;
         [SerializeField] private ParticleSystem _bulletMark;
+        [SerializeField] private int _damageAmount;
         [SerializeField] private float _gunMaxDistance;
         [SerializeField] private LayerMask _gunLayerMask = ~0;
         [SerializeField] private float _castRadius;
@@ -299,7 +299,7 @@ namespace InGame.Exhibit
                 var direction =  hits[i].point - _firePoint.position;
                 var ray = new Ray(_firePoint.position, direction);
                 if(!Physics.Raycast(ray,out var info) || info.transform !=  hits[i].transform) continue;
-                var hitData = new HitData(HitActionType.Damage, 5, OwnerPlayerRef, damageable.OwnerPlayerRef, null,
+                var hitData = new HitData(HitActionType.Damage, _damageAmount, OwnerPlayerRef, damageable.OwnerPlayerRef, null,
                     damageable);
                 damageable.TakeHit(ref hitData);
                 foreach (var muzzle in _muzzles)
