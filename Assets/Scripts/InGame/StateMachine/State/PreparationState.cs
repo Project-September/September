@@ -195,7 +195,7 @@ namespace September.Common
             if (!Context.Runner.IsServer) return; 
             //.Instance.Server_AddStun(data.ExecutorRef);
             
-            var killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef);
+            SessionPlayerData killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef);
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
             if (killerData.IsOgre && data.ExecutorRef != data.TargetRef)
             {
@@ -207,13 +207,11 @@ namespace September.Common
                 RPC_ShowStatusUpUI(data.TargetRef, true);
                 RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
             }
-            // Log
-            UIController.I.ShowLog($"{data.ExecutorRef}が{data.TargetRef}を倒した");
-            
             if(data.ExecutorRef == data.TargetRef) 
                 return;
             
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
+            Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
         }
         private void HideCursor()
         {
@@ -227,6 +225,19 @@ namespace September.Common
                 UIController.I.ShowOgreLamp(true);
             }
         }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void Rpc_ShowKillLog(PlayerRef killer, PlayerRef killed)
+        {
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(killer, out SessionPlayerData killerData) &&
+                PlayerDatabase.Instance.PlayerDataDic.TryGet(killed, out SessionPlayerData killedData))
+            {
+                string killerName = killerData.DisplayNickName;
+                string killedName = killedData.DisplayNickName;
+                UIController.I.ShowLog($"{killerName} が {killedName} を倒した");
+            }
+        }
+        
         // 鬼変更時のUI更新通知
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)

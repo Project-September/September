@@ -29,6 +29,8 @@ namespace Result
         SateliteCanon,
         [DisplayName("楽器")]
         Instrument,
+        [DisplayName("ムラマサ")]
+        Muramasa,
     }
 
     [Serializable]
