@@ -140,19 +140,27 @@ namespace September.Common
                 var animClipPlayer = Context.Runner.GetPlayerObject(pair.Key).GetComponent<AnimationClipPlayer>();
                 var characterType = pair.Value.CharacterType;
                 var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
-
                 _startCamera.transform.position = _spawnPositions[index].position + _cameraOffset;
                 await UniTask.WaitForSeconds(1f);
                 float delayTime = 1f;
                 if (emoteClip)
                 {
                     if(Context.Runner.IsServer) animClipPlayer.PlayClip(emoteClip);
+                    var cueName = characterDataContainer.GetCharacterData(characterType).StartVoice;
+                    RPC_PlaySE(_cueSheetName,cueName);
                     delayTime = emoteClip.length;
                 }
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
                 index++;
             }
         }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_PlaySE(string cueSheetName,string cueName)
+        {
+            CRIAudio.PlaySE(cueSheetName,cueName);
+        }
+        
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
         {
             if (killerData.StunData.TryGet(killedPlayer, out int count))
