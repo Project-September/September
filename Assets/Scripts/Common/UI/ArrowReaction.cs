@@ -40,9 +40,12 @@ namespace September.Common
 
         private void OnDeselect(BaseEventData eventData)
         {
-            if (!_arrowImage || !_selectFrameImage) return;
+            if(_selectFrameImage)
+            {
+                _selectFrameImage.enabled = false;
+            }
+            if (!_arrowImage) return;
             _arrowImage.enabled = false;
-            _selectFrameImage.enabled = false;
             _arrowImage.transform.rotation = Quaternion.identity;
             _tween?.Kill();
         }
