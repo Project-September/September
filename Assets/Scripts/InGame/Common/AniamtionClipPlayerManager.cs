@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Fusion;
-using Fusion.Addons.Physics;
 using InGame.Health; // 追加
 using InGame.Player;
 using UniRx;
@@ -22,6 +20,8 @@ namespace InGame.Common
         [SerializeField] private PlayerHealth _playerHealth;
 
         // ▼ 追加: ブレンド設定
+        [Header("Loco Blend")]
+        [SerializeField] private float _locoBlendSpeed;
         [Header("Fall Blend")]
         [SerializeField, Range(0f, 1f)] private float _fallInTime = 0.20f;
         [SerializeField] private AnimationCurve _fallInCurve = null;   // null の場合は線形扱い
@@ -36,11 +36,12 @@ namespace InGame.Common
         [SerializeField, Range(0f, 1f)] private float _overrideOutTime = 0.10f;
         [SerializeField] private AnimationCurve _overrideOutCurve = null;
         private bool _hardOverride = false;
-
+        
         private bool _isVaultingLastFrame = false;
         private bool _isFadingOutFall = false;       // 着地フェード多重起動防止
         private CancellationTokenSource _overrideCts;
         private bool _isFainting = false;          // 気絶中フラグ（多重起動防止）
+        private float _locoWeight;
 
         private void Start()
         {
@@ -76,11 +77,14 @@ namespace InGame.Common
             var maxSpeed = _playerMovement.DashMoveSpeed;
             var walkSpeed = _playerMovement.WalkSpeed;
             var moveSpeed = _playerMovement.NetworkVelocity.magnitude;
-            var weight = (moveSpeed <= walkSpeed)
+            var wishWeight = (moveSpeed <= walkSpeed)
                 ? Mathf.InverseLerp(0f, walkSpeed, moveSpeed)         // 0..1
                 : Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed)+1f; // 1..2
-            if (Mathf.Abs(weight) < 1e-3f) weight = 0f;
-            _animationClipPlayer.SetLocoWeight(Mathf.Clamp(weight, 0f, 2f));
+            if (Mathf.Abs(wishWeight) < 1e-3f) wishWeight = 0f;
+            // weight を遷移させる
+            float deltaWeight = _locoBlendSpeed * Time.deltaTime;
+            _locoWeight = Mathf.Abs(_locoWeight - wishWeight) <= deltaWeight ? wishWeight : _locoWeight < wishWeight ? _locoWeight + deltaWeight : _locoWeight - deltaWeight;
+            _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
 
             // Vault: 再生/解除
             if (_playerMovement.DoingVault && !_isVaultingLastFrame)

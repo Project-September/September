@@ -21,6 +21,7 @@ namespace Ingame.Tanihira
         [SerializeField] private float _underWarpHeight = 30.0f;
         [SerializeField] private float _exceptionSerchDistance = 5.0f;
         [SerializeField] private LayerMask _raycastMask;
+        [SerializeField] private float _maxWarpHeight = 5.0f;
         private List<FriendBase> _friendsList = new List<FriendBase>();
         private List<FriendBase> _currentFriendsList = new List<FriendBase>();
         private Transform _playerTransform;
@@ -132,6 +133,7 @@ namespace Ingame.Tanihira
                 //friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
                 friend.Animator.SetFloat("MoveBlend", 0);
+                friend.IsWarp = false;
                 friend.ChangeState(FriendState.Wait);
             }
 
@@ -144,12 +146,19 @@ namespace Ingame.Tanihira
                 var fixedPos = warpPosition;
                 NavMeshHit hit;
                 RaycastHit raycastHit;
+                bool succes = false;
+                
                 if (NavMesh.SamplePosition(fixedPos, out hit, _warpSerchDistance, NavMesh.AllAreas))
                 {
-                    // NavMesh上にワープ
-                    fixedPos = hit.position + Vector3.up * friend.Agent.baseOffset;
+                    if (hit.position.y < _maxWarpHeight)
+                    {
+                        // NavMesh上にワープ
+                        fixedPos = hit.position + Vector3.up * friend.Agent.baseOffset;
+                        succes = true;
+                    }
                 }
-                else
+                
+                if(!succes)
                 {
                     if (Physics.Raycast(fixedPos, Vector3.down, out raycastHit, _underWarpHeight,_raycastMask))
                     {
@@ -187,6 +196,7 @@ namespace Ingame.Tanihira
                 //friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
                 friend.ChangeState(FriendState.None);
+                friend.IsWarp = true;
             }
             
             //少し待ってから移動させる
@@ -207,6 +217,10 @@ namespace Ingame.Tanihira
             Gizmos.color = new Color(1, 0, 1, 0.5f); // 半透明
             Vector3 startPos = new Vector3(0, _inFieldWarpHeight, 0);
             Gizmos.DrawWireCube(startPos, new Vector3(10, 1, 10));
+            
+            Gizmos.color = new Color(1, 1, 1, 0.5f); // 半透明
+            Vector3 maxWarpstartPos = new Vector3(0, _maxWarpHeight, 0);
+            Gizmos.DrawWireCube(maxWarpstartPos, new Vector3(10, 1, 10));
         }
 #endif
     }

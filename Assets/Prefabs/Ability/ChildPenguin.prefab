@@ -228,6 +228,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
       insertIndex: -1
       addedObject: {fileID: -4486910606646759965}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2909109515873043706}
   m_SourcePrefab: {fileID: 100100000, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
 --- !u!4 &3645482351071708722 stripped
 Transform:
@@ -260,6 +263,7 @@ MonoBehaviour:
   - {fileID: 629012738917737373}
   - {fileID: -8609162445061833555}
   - {fileID: -4486910606646759965}
+  - {fileID: 2909109515873043706}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-3961440437649564212
 MonoBehaviour:
@@ -379,6 +383,7 @@ MonoBehaviour:
   _tutankhamen: {fileID: 7779320689186046958}
   _attackEffectPos: {fileID: 3005691076101400526}
   _runEffectObject: {fileID: 8043574276842796753}
+  _maxRunBlendTreeCount: 5
 --- !u!65 &4605572418024795219
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -415,6 +420,19 @@ MonoBehaviour:
   _opticalCamouflageMaterial: {fileID: 2100000, guid: 9c38977772e2e4240ac333399ae5edb9, type: 2}
   _renderers:
   - {fileID: 7754587058459683000}
+--- !u!114 &2909109515873043706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4169359425337138312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 935ad6bc194eb2442a9fd6541c86eea0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: -1932163837093564576}
 --- !u!4 &7561604877310642220 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6768298971197532661, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
