@@ -28,6 +28,8 @@ namespace September.Common
         [SerializeField] private SetIcon _setIcon;
         private int _spawnPositionIndex; 
         private PlayerRef _firstOgrePlayer;
+        private static readonly string _cueSheetName = "ALLCue";
+        private static readonly string _cueName = "SE_UI_ModeChanged";
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -102,6 +104,7 @@ namespace September.Common
             //  ゲーム開始
             GameInput.I.ToggleActionInput(true);
             SetOgreLamp();
+            RPC_PlaySE(_firstOgrePlayer);
             RPC_ShowStatusUpUI(_firstOgrePlayer,true);
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
@@ -137,19 +140,27 @@ namespace September.Common
                 var animClipPlayer = Context.Runner.GetPlayerObject(pair.Key).GetComponent<AnimationClipPlayer>();
                 var characterType = pair.Value.CharacterType;
                 var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
-
                 _startCamera.transform.position = _spawnPositions[index].position + _cameraOffset;
                 await UniTask.WaitForSeconds(1f);
                 float delayTime = 1f;
                 if (emoteClip)
                 {
                     if(Context.Runner.IsServer) animClipPlayer.PlayClip(emoteClip);
+                    var cueName = characterDataContainer.GetCharacterData(characterType).StartVoice;
+                    RPC_PlaySE(_cueSheetName,cueName);
                     delayTime = emoteClip.length;
                 }
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
                 index++;
             }
         }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_PlaySE(string cueSheetName,string cueName)
+        {
+            CRIAudio.PlaySE(cueSheetName,cueName);
+        }
+        
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
         {
             if (killerData.StunData.TryGet(killedPlayer, out int count))
@@ -206,12 +217,20 @@ namespace September.Common
                 PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
                 RPC_ShowStatusUpUI(data.TargetRef, true);
                 RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
+                RPC_PlaySE(data.TargetRef);
             }
             if(data.ExecutorRef == data.TargetRef) 
                 return;
             
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
+        }
+
+        [Rpc]
+        private void RPC_PlaySE(PlayerRef playerRef)
+        {
+            if (Context.Runner.LocalPlayer != playerRef) return;
+            CRIAudio.PlaySE(_cueSheetName, _cueName);
         }
         private void HideCursor()
         {
