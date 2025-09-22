@@ -28,6 +28,8 @@ namespace September.Common
         [SerializeField] private SetIcon _setIcon;
         private int _spawnPositionIndex; 
         private PlayerRef _firstOgrePlayer;
+        private static readonly string _cueSheetName = "ALLCue";
+        private static readonly string _cueName = "SE_UI_ModeChanged";
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -102,6 +104,7 @@ namespace September.Common
             //  ゲーム開始
             GameInput.I.ToggleActionInput(true);
             SetOgreLamp();
+            RPC_PlaySE(_firstOgrePlayer);
             RPC_ShowStatusUpUI(_firstOgrePlayer,true);
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
@@ -206,12 +209,20 @@ namespace September.Common
                 PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
                 RPC_ShowStatusUpUI(data.TargetRef, true);
                 RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
+                RPC_PlaySE(data.TargetRef);
             }
             if(data.ExecutorRef == data.TargetRef) 
                 return;
             
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
+        }
+
+        [Rpc]
+        private void RPC_PlaySE(PlayerRef playerRef)
+        {
+            if (Context.Runner.LocalPlayer != playerRef) return;
+            CRIAudio.PlaySE(_cueSheetName, _cueName);
         }
         private void HideCursor()
         {
