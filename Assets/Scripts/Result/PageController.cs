@@ -14,9 +14,10 @@ namespace Result
     public class PageController : MonoBehaviour
     {
         [Header("Anim Settings")]
-        [SerializeField] private float _slideDuration = 0.45f;
-        [SerializeField] private float _pageGap = 40f;
-        [SerializeField] private Ease _ease = Ease.OutCubic;
+        [SerializeField,Label("スライドにかかる時間 (秒)")] private float _slideDuration = 0.45f;
+        [SerializeField, Label("ページを画面外に置く時の画面幅倍率（例: 1.05 = 画面幅の105%外側）")] private float _offscreenMultiplier = 0.5f;
+        [SerializeField,Label("ページ間の余白 (px)")] private float _pageGap = 40f;
+        [SerializeField,Label("スライド時のイージングカーブ")] private Ease _ease = Ease.OutCubic;
 
         private GameInput _gameInput;
         private readonly Stack<RectTransform> _stack = new();
@@ -24,19 +25,22 @@ namespace Result
         private bool _isAnimating;
         private float _canvasWidth;
 
-        [SerializeField,Label("ページの説明UI")] private GameObject _icon;
+        [Header("共通UI")]
+        [SerializeField, Label("ページの説明アイコン (ページ数などを表示するUI)")]
+        private GameObject _icon;
 
-        [Header("Pages")]
-        [SerializeField] private RectTransform[] _pages;
+        [Header("ページ本体")]
+        [SerializeField, Label("各ページのRectTransform配列 (順番に表示されます)")]
+        private RectTransform[] _pages;
 
         [Header("2ページ目: スタン")]
-        [SerializeField] private Transform _stunRowRoot;
+        [SerializeField,Label("スタン履歴を並べる親オブジェクト")] private Transform _stunRowRoot;
         [SerializeField] private TextMeshProUGUI _stunTotalText;
         [SerializeField,Label("スタンさせたときのスコア")] private int StunPoint = 150;
 
         [Header("3ページ目　インタラクト")]
-        [SerializeField] private Transform _exhibitRowRoot;
-        [SerializeField] private GameObject _exhibitRowPrefab;
+        [SerializeField, Label("展示物の行を並べる親オブジェクト")] private Transform _exhibitRowRoot;
+        [SerializeField, Label("展示物ごとの行プレハブ (名前・回数・スコアを表示する)")] private GameObject _exhibitRowPrefab;
         [SerializeField] private TextMeshProUGUI _exhibitTotalText;
         [SerializeField] private ExhibitScoreConfig _exhibitScoreConfig;
         
@@ -319,8 +323,8 @@ namespace Result
             _isAnimating = false;
         }
         
-        private Vector2 OffRight() => new(_canvasWidth * 1.05f + _pageGap, 0f);
-        private Vector2 OffLeft() => new(-_canvasWidth * 1.05f - _pageGap, 0f);
+        private Vector2 OffRight() => new(_canvasWidth * _offscreenMultiplier + _pageGap, 0f);
+        private Vector2 OffLeft() => new(-_canvasWidth * _offscreenMultiplier - _pageGap, 0f);
 
         private CanvasGroup EnsureCanvasGroup(RectTransform rt)
         {
