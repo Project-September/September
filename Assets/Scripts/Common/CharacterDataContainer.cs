@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -25,6 +25,9 @@ namespace September.Common
             public VideoClip ExplainVideo;
             public Sprite CharacterIcon;
             public AnimationClip EmoteAnimation;
+            public string SelectedVoice;
+            public string StartVoice;
+            public string WinningVoice;
         }
         [SerializeField, ArrayLength(DataCount)] CharacterData[] _characterData;
 
