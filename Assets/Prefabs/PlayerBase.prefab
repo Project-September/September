@@ -5267,6 +5267,7 @@ MonoBehaviour:
   _colliderObj: {fileID: 2287520664147054077}
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 8
+  _respawnPosition: {x: 0, y: 0, z: 0}
   _IsStun:
     _value: 0
 --- !u!114 &3242880713039265549
@@ -5287,6 +5288,8 @@ MonoBehaviour:
   _groundLayer:
     serializedVersion: 2
     m_Bits: 159
+  _ogreMoveSpeed: 0
+  _ogreDashSpeed: 0
   _dashSpeed: 7
   _dashCooldown: 3
   _staminaConsumption: 20
@@ -5325,6 +5328,7 @@ MonoBehaviour:
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
     _value: 0
+  _IgnoreMoveInput: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5414,7 +5418,6 @@ MonoBehaviour:
   _interactResponseTimeout: 3
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
-  _heightDifference: 0.01
   _isHoldingInteract: 0
 --- !u!114 &7508249662566368237
 MonoBehaviour:
@@ -5470,16 +5473,17 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
-        _normalAttackAnimationClip: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
         _attackDamage: 10
+        _ogreAttackDamage: 15
         _startHitCheckFrame: 17
         _endHitCheckFrame: 21
         _endAttackFrame: 22
-        _isStopWhenAttack: 1
-        _searchRadius: 2
         _hitEffect: 18
+        _normalAttackAnimationClip: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
         _animationClipPlayer: {fileID: 3570017578186338863}
         _enableAutoAim: 1
+        _moveForwardSpeed: 2
+        _searchRadius: 2
         _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
         _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
         _boxCastDistance: 1
@@ -5528,6 +5532,7 @@ MonoBehaviour:
   _getUp: {fileID: 7400000, guid: 185b7a4f581769045a34df560bf6ab0c, type: 2}
   _playerManager: {fileID: -4668177863944640257}
   _playerHealth: {fileID: 5358505061852357365}
+  _locoBlendSpeed: 8
   _fallInTime: 0.2
   _fallInCurve:
     serializedVersion: 2
@@ -5557,6 +5562,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  EnableFallMotion: 1
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

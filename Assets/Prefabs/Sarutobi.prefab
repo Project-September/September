@@ -13644,6 +13644,7 @@ MonoBehaviour:
   _getUp: {fileID: 7400000, guid: 346b2e6ab1af0d4408db526a3c19696a, type: 2}
   _playerManager: {fileID: -4668177863944640257}
   _playerHealth: {fileID: 5358505061852357365}
+  _locoBlendSpeed: 8
   _fallInTime: 0.5
   _fallInCurve:
     serializedVersion: 2
@@ -14601,11 +14602,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.24999994
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.z
@@ -14613,19 +14614,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.99904823
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0000000029326637
+      value: 0.043619413
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.000000003721558
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 1.1363434e-17
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
