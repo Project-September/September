@@ -76,7 +76,7 @@ namespace Result
                 }
             }
 
-            if (!_gameInput.UI.PageSlideBack.triggered && !_gameInput.UI.Cancel.triggered)
+            if (!_gameInput.UI.BackPage.triggered && !_gameInput.UI.Cancel.triggered)
                 return;
             
             if (_stack.Count > 1)

@@ -11,6 +11,7 @@ using September.InGame;
 using September.InGame.Common;
 using InGame.Player;
 using CRISound;
+using September.InGame.UI;
 using WebSocketSharp;
 
 namespace InGame.Interact
@@ -103,6 +104,8 @@ namespace InGame.Interact
             {
                 _audioBroadcaster.RPC_PlaySoundFromCode(_interactSoundCueName, _interactSoundTrackingType, Object, actor); // 2D + 3D再生
             }
+            
+            Rpc_ShowInteractLog(actor, _type);
         }
 
         public async UniTask PlayCooldownEffect(float cooldownTime)
@@ -287,6 +290,16 @@ namespace InGame.Interact
         {
             _activeEffectBase?.OnInteractEnd();
             _activeEffectBase = null;
+        }
+        
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void Rpc_ShowInteractLog(PlayerRef actor, ExhibitType exhibitType)
+        {
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(actor, out var data))
+            {
+                string actorName = data.DisplayNickName;
+                UIController.I.ShowLog($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
+            }
         }
     }
 
