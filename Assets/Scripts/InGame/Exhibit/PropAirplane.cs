@@ -291,27 +291,39 @@ namespace InGame.Exhibit
             var hits = new RaycastHit[20];
             var num = Physics.SphereCastNonAlloc(_firePoint.position, _castRadius, transform.forward, hits,
                 _gunMaxDistance, _gunLayerMask);
-            var isHit = num > 0;
             for (int i = 0; i < num; i++)
             {
+                if(hits[i].point == Vector3.zero) continue;
                 if (!hits[i].collider.transform.root.gameObject
                         .TryGetComponent<IDamageable>(out var damageable)) continue;
-                if (damageable != null)
-                {
-                    var hitData = new HitData(HitActionType.Damage, 10, OwnerPlayerRef, damageable.OwnerPlayerRef, null,
-                        damageable);
-                    damageable.TakeHit(ref hitData);
-                }
+                var direction =  hits[i].point - _firePoint.position;
+                var ray = new Ray(_firePoint.position, direction);
+                if(!Physics.Raycast(ray,out var info) || info.transform !=  hits[i].transform) continue;
+                var hitData = new HitData(HitActionType.Damage, 5, OwnerPlayerRef, damageable.OwnerPlayerRef, null,
+                    damageable);
+                damageable.TakeHit(ref hitData);
                 foreach (var muzzle in _muzzles)
                 {
-                    ParticlePool.Play(_muzzleFlash, muzzle.position, transform.rotation);
-                    ParticlePool.Play(_ballistic, muzzle.position, transform.rotation,
-                            0.003f * (isHit ? hits[i].distance : _gunMaxDistance))
-                        .transform.DOMove(isHit ? hits[i].point : muzzle.position + transform.forward * _gunMaxDistance,
-                            0.003f * (isHit ? hits[i].distance : _gunMaxDistance));
-                    ParticlePool.Play(_bulletMark, hits[i].point, Quaternion.Euler(hits[i].normal));
+                    RPC_PlayEffect(muzzle.position, hits[i].point);
                 }
+                return;
             }
+
+            foreach (var muzzle in _muzzles)
+            {
+                var cast = Physics.Raycast(muzzle.position, transform.forward,out var info,_gunMaxDistance);
+                RPC_PlayEffect(muzzle.position, info.point);
+            }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_PlayEffect(Vector3 muzzlePos, Vector3 targetPos)
+        {
+            ParticlePool.Play(_muzzleFlash, muzzlePos, transform.rotation);
+            ParticlePool.Play(_ballistic, muzzlePos, transform.rotation,
+                    0.03f * Vector3.Distance(muzzlePos, targetPos))
+                .transform.DOMove(targetPos, 0.03f * Vector3.Distance(muzzlePos, targetPos));
+            ParticlePool.Play(_bulletMark, targetPos, transform.rotation);
         }
 
         void GetOn(PlayerRef ownerPlayerRef)
