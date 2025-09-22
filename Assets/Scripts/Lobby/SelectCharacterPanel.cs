@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
@@ -145,6 +146,7 @@ namespace September.Lobby
         {
             var data = CharacterDataContainer.Instance.GetCharacterData(_currentCharacterIndex);
             PlayerDatabase.Instance.Rpc_SetCharacter(_localPlayerRef, data.Type);
+            CRIAudio.PlaySE("ALLCue", data.SelectedVoice);
         }
     }
 }
