@@ -208,7 +208,7 @@ namespace September.Common
                 RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
             }
             // Log
-            UIController.I.ShowLog($"{data.ExecutorRef}が{data.TargetRef}を倒した");
+            UIController.I.ShowLog($"{killerData.DisplayNickName}が{killedData.DisplayNickName}を倒した");
             
             if(data.ExecutorRef == data.TargetRef) 
                 return;
