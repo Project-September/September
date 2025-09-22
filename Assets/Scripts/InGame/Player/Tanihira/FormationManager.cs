@@ -132,6 +132,7 @@ namespace Ingame.Tanihira
                 //friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
                 friend.Animator.SetFloat("MoveBlend", 0);
+                friend.IsWarp = true;
                 friend.ChangeState(FriendState.Wait);
             }
 
@@ -187,6 +188,7 @@ namespace Ingame.Tanihira
                 //friend.Agent.isStopped = true;
                 friend.Agent.enabled = false;
                 friend.ChangeState(FriendState.None);
+                friend.IsWarp = true;
             }
             
             //少し待ってから移動させる
