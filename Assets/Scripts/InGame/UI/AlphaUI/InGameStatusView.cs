@@ -7,7 +7,6 @@ using Fusion;
 using InGame.Exhibit;
 using NaughtyAttributes;
 using Result;
-using September.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,7 +28,7 @@ namespace September.InGame.UI
         [SerializeField, Label("TimerData")] private GameTimerData _timerData;
         
         [Header("キルログ")]
-        [SerializeField] private GameObject  _killLogItemPrefab;
+        [SerializeField] private GameObject  _killLogItemText;
         [SerializeField] private int _maxLogCount = 5;
         
         [SerializeField] private CanvasGroup _statusUpUI;
@@ -151,29 +150,42 @@ namespace September.InGame.UI
         }
 
         // キルのログを直接引数に入れる
+        // キルのログを直接引数に入れる
         private async UniTask ShowLog (string killText)
         {
-            GameObject killLog = Instantiate(_killLogItemPrefab, _LogPanel.transform);
-
-            TextMeshProUGUI tmp = killLog.GetComponentInChildren<TextMeshProUGUI>();
+            // プレハブから新しいログを作成
+            GameObject log = Instantiate(_killLogItemText, _LogPanel.transform);
+            TextMeshProUGUI tmp = log.GetComponent<TextMeshProUGUI>();
             tmp.text = killText;
-            
-            
-            // フェード用 CanvasGroup
-            CanvasGroup cg = killLog.GetComponent<CanvasGroup>() ?? killLog.AddComponent<CanvasGroup>();
-            cg.alpha = 0;
-            await cg.DOFade(1f, 0.3f);
 
-            _killLogQueue.Enqueue(killLog);
-            
+            // フェード用CanvasGroup
+            CanvasGroup cg = log.GetComponent<CanvasGroup>() ?? log.AddComponent<CanvasGroup>();
+            cg.alpha = 0;
+
+            // 入場アニメーション (フェードイン＋上からスライド)
+            log.transform.localScale = Vector3.one * 0.9f;
+            await DOTween.Sequence()
+                .Append(cg.DOFade(1f, 0.3f))
+                .Join(log.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));
+
+            // キュー管理
+            _killLogQueue.Enqueue(log);
             if (_killLogQueue.Count > _maxLogCount)
             {
                 GameObject old = _killLogQueue.Dequeue();
                 if (old)
                 {
                     CanvasGroup oldCg = old.GetComponent<CanvasGroup>() ?? old.AddComponent<CanvasGroup>();
-                    oldCg.DOFade(0f, 0.5f).OnComplete(() => Destroy(old));
+                    oldCg.DOFade(0f, 0.5f)
+                        .OnComplete(() => Destroy(old));
                 }
+            }
+
+            // 一定時間後に自動で消えるなら追加
+            await UniTask.Delay(TimeSpan.FromSeconds(3));
+            if (log)
+            {
+                cg.DOFade(0f, 0.5f).OnComplete(() => Destroy(log));
             }
         }
         private async UniTask ShowGameStartTime(NetworkRunner runner)

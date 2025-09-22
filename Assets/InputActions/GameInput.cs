@@ -825,7 +825,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""PageSlideBack"",
+                    ""name"": ""BackPage"",
                     ""type"": ""Button"",
                     ""id"": ""fa0d7543-6ecb-4a02-84e9-70026d3c0d2f"",
                     ""expectedControlType"": """",
@@ -1248,7 +1248,18 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""PageSlide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2eaae0b2-efe6-4f9d-bff0-3dc9eac68208"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
                     ""action"": ""PageSlide"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -1259,8 +1270,19 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""PageSlideBack"",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""BackPage"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1c9f98c3-4262-49dc-9209-819f996c0096"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""BackPage"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1287,7 +1309,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/enter"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Finish"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -1298,7 +1320,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""path"": ""<XInputController>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Gamepad"",
                     ""action"": ""Finish"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -1471,7 +1493,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_Option = m_UI.FindAction("Option", throwIfNotFound: true);
         m_UI_Volume = m_UI.FindAction("Volume", throwIfNotFound: true);
         m_UI_PageSlide = m_UI.FindAction("PageSlide", throwIfNotFound: true);
-        m_UI_PageSlideBack = m_UI.FindAction("PageSlideBack", throwIfNotFound: true);
+        m_UI_BackPage = m_UI.FindAction("BackPage", throwIfNotFound: true);
         // Result
         m_Result = asset.FindActionMap("Result", throwIfNotFound: true);
         m_Result_Finish = m_Result.FindAction("Finish", throwIfNotFound: true);
@@ -1825,7 +1847,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Option;
     private readonly InputAction m_UI_Volume;
     private readonly InputAction m_UI_PageSlide;
-    private readonly InputAction m_UI_PageSlideBack;
+    private readonly InputAction m_UI_BackPage;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1890,9 +1912,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @PageSlide => m_Wrapper.m_UI_PageSlide;
         /// <summary>
-        /// Provides access to the underlying input action "UI/PageSlideBack".
+        /// Provides access to the underlying input action "UI/BackPage".
         /// </summary>
-        public InputAction @PageSlideBack => m_Wrapper.m_UI_PageSlideBack;
+        public InputAction @BackPage => m_Wrapper.m_UI_BackPage;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1958,9 +1980,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @PageSlide.started += instance.OnPageSlide;
             @PageSlide.performed += instance.OnPageSlide;
             @PageSlide.canceled += instance.OnPageSlide;
-            @PageSlideBack.started += instance.OnPageSlideBack;
-            @PageSlideBack.performed += instance.OnPageSlideBack;
-            @PageSlideBack.canceled += instance.OnPageSlideBack;
+            @BackPage.started += instance.OnBackPage;
+            @BackPage.performed += instance.OnBackPage;
+            @BackPage.canceled += instance.OnBackPage;
         }
 
         /// <summary>
@@ -2011,9 +2033,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @PageSlide.started -= instance.OnPageSlide;
             @PageSlide.performed -= instance.OnPageSlide;
             @PageSlide.canceled -= instance.OnPageSlide;
-            @PageSlideBack.started -= instance.OnPageSlideBack;
-            @PageSlideBack.performed -= instance.OnPageSlideBack;
-            @PageSlideBack.canceled -= instance.OnPageSlideBack;
+            @BackPage.started -= instance.OnBackPage;
+            @BackPage.performed -= instance.OnBackPage;
+            @BackPage.canceled -= instance.OnBackPage;
         }
 
         /// <summary>
@@ -2527,12 +2549,12 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPageSlide(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "PageSlideBack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "BackPage" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPageSlideBack(InputAction.CallbackContext context);
+        void OnBackPage(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Result" which allows adding and removing callbacks.
