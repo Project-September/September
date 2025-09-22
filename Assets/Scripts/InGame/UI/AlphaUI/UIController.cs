@@ -11,20 +11,20 @@ namespace September.InGame.UI
     public class UIController : SingletonMonoBehaviour<UIController>
     {
         #region イベント
-
+        
         private readonly Subject<bool> _onClickOptionButton = new();
         private readonly Subject<bool> _onChangeDescriptionUI = new();
         private readonly ReactiveProperty<int> _onChangeSliderValue = new();
         private readonly Subject<NetworkRunner> _onStartTimer = new();
         private readonly Subject<string> _onShowLog = new();
         private readonly ReactiveProperty<bool> _onShowOgreUI = new();
+        private readonly Subject<int> _onchangeScoreText = new();
         private readonly ReactiveProperty<float> _onChangeStaminaValue = new();
         private readonly Subject<Unit> _onGameStart = new();
         private readonly Subject<Unit> _onGameEnd = new();
         private readonly Subject<(bool, GameObject)> _isInteracting = new();
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
-        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new(); 
-
+        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
         #endregion
         
         # region 外部公開プロパティ
@@ -41,8 +41,11 @@ namespace September.InGame.UI
         public IObservable<(bool, GameObject)> IsInteracting => _isInteracting;
         public IReadOnlyReactiveProperty<float> OnChangeInteractProgress => _onChangeInteractProgress;
         public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
+        public IObservable<int> OnChangeScoreText => _onchangeScoreText;
         
         #endregion
+        
+        public InGameUIRootRefs UIRootRefs { get; set;}
         
         public void SetUpStartUI()
         {
@@ -52,6 +55,11 @@ namespace September.InGame.UI
         public void ShowResultAnimation()
         {
             _onGameEnd.OnNext(Unit.Default);
+        }
+
+        public void OnChangeScore(int score)
+        {
+            _onchangeScoreText.OnNext(score);   
         }
 
         public void ShowLog(string text)
@@ -101,5 +109,6 @@ namespace September.InGame.UI
         {
             _onInteractStatusUpObject.OnNext((seconds,status));
         }
+        
     }
 }

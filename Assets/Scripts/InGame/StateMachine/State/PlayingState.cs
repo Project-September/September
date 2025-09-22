@@ -1,6 +1,7 @@
 using CRISound;
 using Fusion;
 using September.InGame.Common;
+using September.InGame.UI;
 
 namespace September.Common
 {
@@ -16,6 +17,12 @@ namespace September.Common
 
         protected internal override void OnNetworkFixedUpdate()
         {
+            if (PlayerDatabase.Instance &&
+                PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData data))
+            {
+                UIController.I?.OnChangeScore(data.Score);
+            }
+            
             if (TickTimer.Expired(Context.Runner))
             {
                 TickTimer = TickTimer.None;

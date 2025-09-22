@@ -4132,6 +4132,71 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6640796709864507861, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
   m_PrefabInstance: {fileID: 1474187219}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1485538669
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1485538672}
+  - component: {fileID: 1485538671}
+  - component: {fileID: 1485538670}
+  m_Layer: 0
+  m_Name: SetIconContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1485538670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485538669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2039386855
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 1485538671}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &1485538671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485538669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4259b3be0feb7074ba2b192a14c5c0a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _iconData: {fileID: 11400000, guid: 858c1da4a84efaf4280036350a8d4c28, type: 2}
+--- !u!4 &1485538672
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485538669}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 30.990318, y: 3.060331, z: 24.149044}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1508911445
 GameObject:
   m_ObjectHideFlags: 1
@@ -6576,6 +6641,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
+      propertyPath: _setIcon
+      value: 
+      objectReference: {fileID: 1485538671}
+    - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
       propertyPath: _fadeImage
       value: 
       objectReference: {fileID: 1428189429}
@@ -6661,6 +6730,7 @@ SceneRoots:
   - {fileID: 1984780381}
   - {fileID: 1653780193}
   - {fileID: 774143898}
+  - {fileID: 1485538672}
   - {fileID: 542693323}
   - {fileID: 1900584299}
   - {fileID: 1087978264}

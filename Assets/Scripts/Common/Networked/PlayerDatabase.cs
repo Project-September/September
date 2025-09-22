@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Fusion;
 using Result;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace September.Common
@@ -64,6 +65,18 @@ namespace September.Common
             UpdatePlayerScore(actor, tracker);
         }
         
+        // スコアを再計算
+        public void Server_RecalculateScore(PlayerRef actor)
+        {
+            if (!Object.HasStateAuthority)
+                return;
+
+            if (!_serverTrackers.TryGetValue(actor, out var tracker))
+                _serverTrackers[actor] = tracker = new ScoreTracker(_config);
+            
+            UpdatePlayerScore(actor, tracker);
+        }
+        
         // ハルクのDestroy処理をここで加算
         public void Server_AddDestroyExhibit(PlayerRef actor, ExhibitType type)
         {
@@ -86,21 +99,21 @@ namespace September.Common
                 return 0;
 
             if (!PlayerDataDic.TryGet(actor, out SessionPlayerData d))
-                return tracker.CalcTotal(d);
+                return tracker.CalcTotal(default);
 
             return tracker.CalcTotal(d) + AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
         }
         
         private void UpdatePlayerScore(PlayerRef actor, ScoreTracker tracker)
         {
-            if (PlayerDataDic.TryGet(actor, out SessionPlayerData d))
-            {
-                int baseScore = tracker.CalcTotal(d);
-                int bonus = AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
+            if (!PlayerDataDic.TryGet(actor, out SessionPlayerData d)) 
+                return;
+            
+            int baseScore = tracker.CalcTotal(d);
+            int bonus = AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
                 
-                d.Score = baseScore + bonus;
-                PlayerDataDic.Set(actor, d);
-            }
+            d.Score = baseScore + bonus;
+            PlayerDataDic.Set(actor, d);
         }
         
         // ホストからクライアントに送信
@@ -206,9 +219,15 @@ namespace September.Common
             PlayerDataDic.Set(playerRef, playerData);
         }
 
-        void OnChangedPlayerData()
+        private void OnChangedPlayerData()
         {
             ChangedDataAction?.Invoke(PlayerDataDic);
+        }
+
+        private void OnDestroy()
+        {
+            if(Object && Object.HasStateAuthority)
+                _serverTrackers.Clear();
         }
     }
 }

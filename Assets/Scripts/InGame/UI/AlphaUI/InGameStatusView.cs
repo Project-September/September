@@ -7,11 +7,11 @@ using Fusion;
 using InGame.Exhibit;
 using NaughtyAttributes;
 using Result;
+using September.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
-using UnityEngine.Serialization;
 
 namespace September.InGame.UI
 {
@@ -46,7 +46,7 @@ namespace September.InGame.UI
         private GameObject[] _descriptionIcon;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
-        private float _tutanCounter;
+        private TextMeshProUGUI _scoreText;
         private CancellationTokenSource _cts;
         private StatusUpType _currentStatusUpType;
         private CanvasGroup _ogreGroup;
@@ -54,13 +54,13 @@ namespace September.InGame.UI
         {
             _cts = new CancellationTokenSource();
             Bind();
-            _tutanCounter = 0;
         }
 
         private void Bind()
         {
             UIController ui = UIController.I;
             ui.OnGameStart.Subscribe(_ => SetupUI()).AddTo(_cts.Token);
+            
             ui.OnChangeSliderValue.Subscribe(ChangeHp).AddTo(_cts.Token);
             ui.OnClickOptionButton.Subscribe(ShowOptionUI).AddTo(_cts.Token);
             ui.OnStartTimer.Subscribe(runner => ShowGameStartTime(runner).Forget()).AddTo(_cts.Token);
@@ -76,19 +76,22 @@ namespace September.InGame.UI
             ui.OnInteractStatusUpObject.Subscribe(info => ShowStatusUpUI(info.Item1, info.Item2))
                 .AddTo(_cts.Token);
             ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
+            ui.OnChangeScoreText.Subscribe(ChangeScore).AddTo(_cts.Token);
         }
 
         private void SetupUI()
         {
             if (!_uiRoot)
                 _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
-
+            
+            UIController.I.UIRootRefs = _uiRoot;
             _optionUI = _uiRoot.OptionUI;
             _LogPanel = _uiRoot.LogPanel;
             _ogreUiInstance = _uiRoot.OgreUI;
             _ogreMessageText = _uiRoot.OgreMessageText;
             _descriptionIcon =  _uiRoot.DescriptionIcon;
             _hpBarSlider = _uiRoot.HpBar;
+            _scoreText =  _uiRoot.ScoreText;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
             _statusUpUI = _uiRoot.StatusUpGroup;
@@ -109,6 +112,11 @@ namespace September.InGame.UI
 
             DOTween.To(() => _hpBarSlider.value, x => _hpBarSlider.value = x, value, 0.3f)
                 .SetEase(Ease.OutQuad);
+        }
+
+        private void ChangeScore(int value)
+        {
+            _scoreText.text = value.ToString();
         }
 
         private async UniTask PlayResultAnimation()
@@ -168,7 +176,6 @@ namespace September.InGame.UI
                 }
             }
         }
-        
         private async UniTask ShowGameStartTime(NetworkRunner runner)
         {
             if (!_uiRoot || !_uiRoot.TimerText) 
@@ -209,7 +216,6 @@ namespace September.InGame.UI
             timer.text = "Time Up!";
             await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
         }
-        
         // 鬼の時にUIを表示する
         private void ShowOgreLamp(bool isShow)
         {

@@ -25,6 +25,7 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private CountdownAnimation _countdownAnimation;
+        [SerializeField] private SetIcon _setIcon;
         private int _spawnPositionIndex; 
         private PlayerRef _firstOgrePlayer;
         protected internal override void OnEnter()
@@ -64,6 +65,7 @@ namespace September.Common
                     spd.StunData.Add(data.Key, 0);
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
+                _setIcon.ShowIcon(pair.Key);
             }
             
             Context.Register(StaticServiceLocator.Instance);
@@ -150,7 +152,7 @@ namespace September.Common
         }
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
         {
-            if (killerData.StunData.TryGet(killedPlayer, out var count))
+            if (killerData.StunData.TryGet(killedPlayer, out int count))
             {
                 killerData.StunData.Set(killedPlayer, count + 1);
             }
@@ -159,6 +161,9 @@ namespace September.Common
                 killerData.StunData.Set(killedPlayer, 1);
             }
             PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
+            
+            // スコアの更新処理
+            PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
         }
         private Vector3 GetSpawnPosition()
         {
