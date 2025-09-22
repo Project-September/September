@@ -29,7 +29,7 @@ namespace InGame.Player.Ability.Effect
             if (disableInteractEffect)
             {
                 PlayerRef actor = Parameter.Owner.InputAuthority;
-                disableInteractEffect.OnHitHammerAttack();
+                disableInteractEffect.OnHitHammerAttack(actor);
                 PlayerDatabase.Instance.Server_AddDestroyExhibit(actor,disableInteractEffect.ExhibitType);
             }
 
