@@ -84,7 +84,12 @@ namespace September.InGame.UI
         private void SetupUI()
         {
             if (!_uiRoot)
+            {
                 _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
+                //  フェードより後ろに表示するためヒエラルキー一番上に移動
+                _uiRoot.transform.SetAsFirstSibling();
+            }
+                
             
             UIController.I.UIRootRefs = _uiRoot;
             _optionUI = _uiRoot.OptionUI;
