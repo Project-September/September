@@ -9,6 +9,7 @@ using September.Common;
 using September.InGame.Common;
 using September.InGame.UI;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace InGame.Exhibit
 {
@@ -59,7 +60,8 @@ namespace InGame.Exhibit
         [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
         
         private Collider _collider;
-        
+
+        [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
         public override void Spawned()
         {
              Rigidbody = GetComponent<Rigidbody>();
@@ -143,10 +145,14 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
+            
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 9999f, NavMesh.AllAreas))
+            {
+                _ownerPlayerManager.transform.position = hit.position + Vector3.up * _height;
+            }
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
-            _ownerPlayerManager.transform.position = _getOffPoint.position;
             Object.RemoveInputAuthority();
             UIController.I.ChangeDescriptionUI(false);
             RPC_SetCameraPriority(playerRef,5);
