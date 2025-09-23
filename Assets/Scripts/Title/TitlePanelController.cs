@@ -23,6 +23,7 @@ namespace September.Title
             Credits,
             UserProfile,
             Idle,
+            HowToPlay
         }
 
         [Header("Panels (PanelController付き)")]
@@ -34,6 +35,8 @@ namespace September.Title
         [SerializeField] private PanelController _creditsPanel;
         [SerializeField] private PanelController _userProfilePanel;
         [SerializeField] private PanelController _idlePanel;
+        [SerializeField] private PanelController _howToPlayPanel;
+        
 
         private Dictionary<PanelType, PanelController> _map;
 
@@ -61,6 +64,7 @@ namespace September.Title
                 { PanelType.Credits, _creditsPanel },
                 { PanelType.UserProfile, _userProfilePanel },
                 { PanelType.Idle, _idlePanel },
+                { PanelType.HowToPlay, _howToPlayPanel}
             };
         }
 
@@ -150,6 +154,7 @@ namespace September.Title
         public void ShowCredits()     => ShowPanel(PanelType.Credits);
         public void ShowUserProfile() => ShowPanel(PanelType.UserProfile);
         public void ShowIdle()        => ShowPanel(PanelType.Idle);
+        public void ShowHowToPlay()   => ShowPanel(PanelType.HowToPlay);
 
         // Esc/キャンセルでメインに戻す
         public void BackToMain()
