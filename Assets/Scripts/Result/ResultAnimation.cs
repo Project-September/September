@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -301,6 +302,7 @@ namespace Result
 
             _yourRankText.text = $"あなたの順位は {rank + 1} 位です";
             _yourRankText.gameObject.SetActive(true);
+            PlayCue(d);
 
             CanvasGroup cg = _yourRankText.GetComponent<CanvasGroup>() ??
                              _yourRankText.gameObject.AddComponent<CanvasGroup>();
@@ -315,6 +317,27 @@ namespace Result
                 .Join(rt.DOAnchorPos(end, _yourRankFadeDuration).SetEase(Ease.OutQuad))
                 .Append(rt.DOPunchScale(Vector3.one * 0.08f, 0.2f, 8, 0.9f))
                 .AsyncWaitForCompletion();
+        }
+
+        private void PlayCue(SessionPlayerData player)
+        {
+            switch (player.CharacterType)
+            {
+                case CharacterType.OkabeWright:
+                    CRIAudio.PlaySE("ALLCue", "VO_OKB_Win");
+                    break;
+                case CharacterType.HulkTheButcher:
+                    CRIAudio.PlaySE("ALLCue", "VO_Haru_Win");
+                    break;
+                case CharacterType.Tanihira:
+                    CRIAudio.PlaySE("ALLCue", "VO_Tanihira_Win");
+                    break;
+                case CharacterType.Sarutobi:
+                    CRIAudio.PlaySE("ALLCue", "VO_Koinuma_Win");
+                    break;
+                default:
+                    return;
+            }
         }
     }
 }
