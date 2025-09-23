@@ -9,7 +9,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
     private readonly LayerMask _hitMask = default;
     private readonly HashSet<Collider> _alreadyHit = new();
     private RaycastHit[] _hitBuffer = new RaycastHit[32]; // バッファサイズは必要に応じて調整
-    public Action<Collider> OnHit;
+    public Action<Collider,Vector3> OnHit;
 
     public MeleeHitboxExecutor(
         List<Transform> points,
@@ -79,7 +79,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
                     var collider = _hitBuffer[j].collider;
                     if (_alreadyHit.Add(collider))
                     {
-                        OnHit?.Invoke(collider);
+                        OnHit?.Invoke(collider,start);
                     }
                 }
 
@@ -120,7 +120,7 @@ public class MeleeHitboxExecutor : IHitboxExecutor
             var collider = _hitBuffer[j].collider;
             if (_alreadyHit.Add(collider))
             {
-                OnHit?.Invoke(collider);
+                OnHit?.Invoke(collider,_hitBuffer[j].collider.transform.root.position);
             }
         }
 
