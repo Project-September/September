@@ -108,7 +108,6 @@ namespace InGame.Common
             if (_isFadingOutFall) return;
             _isFadingOutFall = true;
             //topレイヤーにFallアニメーションがある場合は除外する
-            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown)) _animationClipPlayer.SetTopPriorityClip(null);
             FadeOutAndClearFall().Forget();
         }
 
@@ -140,16 +139,15 @@ namespace InGame.Common
 
         public async UniTask TriggerVault()
         {
-            _animationClipPlayer.SetTopPriorityClip(_jumpOver);
             
             if (_jumpOverTokenSrc != null)
             {
                 _jumpOverTokenSrc.Cancel();
                 _jumpOverTokenSrc.Dispose();
             }
+            _animationClipPlayer.SetTopPriorityClip(_jumpOver);
             
             _jumpOverTokenSrc = new CancellationTokenSource();
-            Debug.LogError("ジャンプ開始！ JumpOver length: " + _jumpOver.length);
             // ジャンプオーバークリップの長さだけ待機（速度変更を考慮しない場合は length をそのまま使用）
             if (_jumpOver && _jumpOver.length > 0f)
             {
@@ -162,7 +160,6 @@ namespace InGame.Common
                     return;
                 }
             }
-            Debug.LogError("ジャンプ終了！");
             _animationClipPlayer.SetTopPriorityClip(null);
             if (!_playerMovement.IsGround) SetFallAnim(false);
         }
@@ -252,11 +249,15 @@ namespace InGame.Common
             await _animationClipPlayer.BlendLayerWeight(
                 LayerInfo.LayerType.TopLayer,
                 0f,
-                new LayerInfo.Blend {
+                new LayerInfo.Blend
+                {
                     BlendTime = _landOutTime,
                     BlendCurve = _landOutCurve
                 }
             );
+            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown) &&
+                _animationClipPlayer.GetTargetLayerWeight(LayerInfo.LayerType.TopLayer) == 0)
+                _animationClipPlayer.SetTopPriorityClip(null);
         }
     }
 }

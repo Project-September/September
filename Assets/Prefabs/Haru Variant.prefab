@@ -4420,6 +4420,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6413160085543732377}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _jumpOverDuration
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _fallInCurve.m_Curve.Array.size
       value: 2
       objectReference: {fileID: 0}
