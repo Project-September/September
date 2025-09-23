@@ -486,7 +486,6 @@ MonoBehaviour:
   _damageAmount: 100
   _maxHealth: 10
   _getOffPoint: {fileID: 302465785191893965}
-  _crySe: Pteranodon_cry
   _moveSpeed: 5
   _rotationSpeed: 5
   _turnThreshold: 30
@@ -519,11 +518,11 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 05000000
     values:
-    - 5
+    - 4
   _cooldownTimeDictionary:
     keys: 05000000
     values:
-    - 5
+    - 10
   _characterEffects:
   - rid: 5190193564749135961
   _type: 1

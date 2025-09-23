@@ -164,7 +164,7 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 05000000
     values:
-    - 5
+    - 3
   _cooldownTimeDictionary:
     keys: 05000000
     values:
@@ -173,7 +173,9 @@ MonoBehaviour:
   - rid: 3302172481320386636
   _type: 7
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
