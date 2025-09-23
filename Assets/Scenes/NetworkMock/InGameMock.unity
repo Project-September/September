@@ -2107,8 +2107,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.15260132, y: -0.8086604, z: 0.23953608, w: 0.5151735}
-  m_LocalPosition: {x: 20.002966, y: 0.77697897, z: 26.767498}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4820,6 +4820,18 @@ PrefabInstance:
       propertyPath: _cooldownEffectOffset.z
       value: 0.8
       objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: managedReferences[731403362977185879]._tyrannoInteractable
+      value: 
+      objectReference: {fileID: 1634083771}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: managedReferences[731403362977185880]._tyrannoInteractable
+      value: 
+      objectReference: {fileID: 1634083771}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: managedReferences[731403362977185882]._tyrannoInteractable
+      value: 
+      objectReference: {fileID: 1634083771}
     - target: {fileID: 3732242790369884021, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
       propertyPath: SortKey
       value: 2326436131
@@ -4878,6 +4890,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7863198875755268588, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
   m_PrefabInstance: {fileID: 1634083769}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1634083771 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3688485294182597585, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+  m_PrefabInstance: {fileID: 1634083769}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05d3b908be554f1498b8bb71ffb69021, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1636136028
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6211,6 +6234,18 @@ PrefabInstance:
       propertyPath: _cooldownEffectOffset.z
       value: 0.8
       objectReference: {fileID: 0}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: managedReferences[731403362977185879]._tyrannoInteractable
+      value: 
+      objectReference: {fileID: 1505184955015907377}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: managedReferences[731403362977185880]._tyrannoInteractable
+      value: 
+      objectReference: {fileID: 1505184955015907377}
+    - target: {fileID: 1044747457554308472, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: managedReferences[731403362977185882]._tyrannoInteractable
+      value: 
+      objectReference: {fileID: 1505184955015907377}
     - target: {fileID: 3732242790369884021, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
       propertyPath: SortKey
       value: 2683630927
@@ -6268,6 +6303,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+--- !u!114 &1505184955015907377 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3688485294182597585, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+  m_PrefabInstance: {fileID: 1505184955015907376}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05d3b908be554f1498b8bb71ffb69021, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &2290742082368327193 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7863198875755268588, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
