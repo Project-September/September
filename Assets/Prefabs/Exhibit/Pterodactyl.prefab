@@ -176,7 +176,7 @@ Transform:
   m_GameObject: {fileID: 1918040745492258685}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.655, z: 0}
+  m_LocalPosition: {x: 0, y: 0.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -223,44 +223,60 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -8.41
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -9.72
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 60.89
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.27259576
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.016911458
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.96013415
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.059565376
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -7.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 148.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 54cdbd83ad7084a478239646a1752e89, type: 3}
       propertyPath: m_Name
@@ -497,7 +513,7 @@ MonoBehaviour:
   _rayDistance: 9999
   _playerHitMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 4294967295
   _fireCooldown: 2
   _radius: 3
   _hitEffect: {fileID: 3681082649069878751, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
@@ -525,13 +541,16 @@ MonoBehaviour:
     - 10
   _characterEffects:
   - rid: 5190193564749135961
+  - rid: 731403362977185875
+  - rid: 731403362977185876
+  - rid: 731403362977185877
   _type: 1
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectTransform: {fileID: 0}
-  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
-  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0, y: -0.3, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 90, z: 0}
   _interactEffectType: 9
-  _cooldownEffectType: 11
+  _cooldownEffectType: 24
   _spawnCooldownEffectOnStart: 1
   _audioBroadcaster: {fileID: 130707149095327359}
   _interactSoundCueName: SE_Pteranodon_RideStart
@@ -542,11 +561,29 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 731403362977185875
+      type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 2
+        _interactTime: 20
+        _pterodactylInteractable: {fileID: 575448598117113101}
+    - rid: 731403362977185876
+      type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 3
+        _interactTime: 20
+        _pterodactylInteractable: {fileID: 575448598117113101}
+    - rid: 731403362977185877
+      type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 4
+        _interactTime: 20
+        _pterodactylInteractable: {fileID: 575448598117113101}
     - rid: 5190193564749135961
       type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 5
-        _interactTime: 20
+        _characterType: 1
+        _interactTime: 30
         _pterodactylInteractable: {fileID: 575448598117113101}
 --- !u!114 &729834472514017027
 MonoBehaviour:
