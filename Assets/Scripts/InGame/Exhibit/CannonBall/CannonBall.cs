@@ -115,9 +115,9 @@ namespace InGame.Exhibit
                 }).AddTo(this);
 
             _flyingHitBoxExecutor = new MeleeHitboxExecutor(new List<Transform>() { _model.transform }, hitboxRadius: _model.transform.localScale.x * 0.5f);
-            _flyingHitBoxExecutor.OnHit += OnHitSomething;
+            //_flyingHitBoxExecutor.OnHit += OnHitSomething;
             _explodeHitBoxExecutor = new MeleeHitboxExecutor(new List<Transform>() { transform }, hitboxRadius: _explosionRadius);
-            _explodeHitBoxExecutor.OnHit += OnExplodeHit;
+            //_explodeHitBoxExecutor.OnHit += OnExplodeHit;
             
             State = CannonBallState.Idle;
         }

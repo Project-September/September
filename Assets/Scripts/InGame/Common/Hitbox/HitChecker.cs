@@ -20,12 +20,12 @@ public class HitChecker : MonoBehaviour
     {
         _executor = new MeleeHitboxExecutor(_hitPoints, _radius)
         {
-            OnHit = item =>
+            OnHit = (col,pos) =>
             {
-                if (!item) return;
-                if (_alreadyHit.Contains(item)) return; // 既にヒット済みのColliderは無視
-                _alreadyHit.Add(item); // ヒット済みとして登録
-                OnHit?.Invoke(item); // ヒットイベントを発火
+                if (!col) return;
+                if (_alreadyHit.Contains(col)) return; // 既にヒット済みのColliderは無視
+                _alreadyHit.Add(col); // ヒット済みとして登録
+                OnHit?.Invoke(col); // ヒットイベントを発火
             }
         };
         IsActive = true;
