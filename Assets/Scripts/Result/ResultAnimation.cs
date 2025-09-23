@@ -299,8 +299,11 @@ namespace Result
                 .ToList();
 
             int rank = ranking.FindIndex(p => p.DisplayNickName == localName);
+            int displayRank = rank + 1;
+            int lastRank = ranking.Count; // 最下位の順位
 
-            _yourRankText.text = $"あなたの順位は {rank + 1} 位です";
+            _yourRankText.text = displayRank == lastRank ? $"あなたの順位は {displayRank} 位です(鬼)" : $"あなたの順位は {displayRank} 位です";
+            
             _yourRankText.gameObject.SetActive(true);
             if (rank + 1 == 1)
             {
