@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 public class SliderValueViewer : MonoBehaviour
 {
-    [SerializeField] Text _text;
+    [SerializeField] TMP_Text _text;
     [SerializeField] Slider _slider;
 
     private void Start()
