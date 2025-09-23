@@ -24,7 +24,6 @@ namespace September.Common
         [SerializeField] private Image _fadeImage;
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
-        [SerializeField] private CountdownAnimation _countdownAnimation;
         [SerializeField] private SetIcon _setIcon;
         private int _spawnPositionIndex; 
         private PlayerRef _firstOgrePlayer;
@@ -109,7 +108,6 @@ namespace September.Common
                 task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
             else
                 SetOgreLamp();
-            SetOgreLamp();
             RPC_PlaySE(_firstOgrePlayer);
             RPC_ShowStatusUpUI(_firstOgrePlayer,true);
             _firstOgrePlayer = PlayerRef.None;

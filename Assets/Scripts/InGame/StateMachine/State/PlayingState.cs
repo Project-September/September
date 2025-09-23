@@ -10,6 +10,7 @@ namespace September.Common
         private bool _hasTriggeredTimeNotice;
         private float _timeRemaining;
         private float _gameTime;
+        private int _lastScore = -1;
         protected internal override void OnEnter()
         {
             //  制限時間カウント開始
@@ -18,6 +19,7 @@ namespace September.Common
             _hasTriggeredTimeNotice = false;
             _timeRemaining = Context.TimerData.TimeRemaining;
             _gameTime = Context.TimerData.GameTime;
+            if(PlayerDatabase.Instance) PlayerDatabase.Instance.ChangedDataAction += OnChangedData;
         }
 
         protected internal override void OnNetworkFixedUpdate()
@@ -29,17 +31,26 @@ namespace September.Common
                 _hasTriggeredTimeNotice = true;
                 UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.TimeRemainingAlert);
             }
-            //  時間切れで次のステートへ
-            if (PlayerDatabase.Instance &&
-                PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData data))
-            {
-                UIController.I?.OnChangeScore(data.Score);
-            }
             
             if (TickTimer.Expired(Context.Runner))
             {
                 TickTimer = TickTimer.None;
                 Context.Rpc_SendEvent((int)StateEventId.Finish);
+            }
+        }
+
+        protected internal override void OnExit()
+        {
+            PlayerDatabase.Instance.ChangedDataAction -= OnChangedData;
+        }
+
+        private void OnChangedData(NetworkDictionary<PlayerRef, SessionPlayerData> dic)
+        {
+            if (!dic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData data)) return;
+            if (_lastScore != data.Score) 
+            {
+                UIController.I?.OnChangeScore(data.Score);
+                _lastScore = data.Score;
             }
         }
     }

@@ -28,7 +28,6 @@ namespace September.InGame.UI
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
         private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
 
-        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
         #endregion
         
         # region 外部公開プロパティ
