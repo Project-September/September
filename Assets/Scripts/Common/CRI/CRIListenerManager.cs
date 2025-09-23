@@ -8,7 +8,7 @@ namespace September.Common
         [SerializeField] private Transform _follow;   // Player をアタッチ（実行時に差し替え可）
         [SerializeField] private Transform _camera;   // MainCamera をアタッチ（実行時に差し替え可）
 
-        /// <summary> リスナーを探すもしくは作る </summary>
+        /// <summary> リスナーを探し、なければ生成する </summary>
         /// <returns></returns>
         public static CRIListenerManager GetOrCreateInLocalListener()
         {
