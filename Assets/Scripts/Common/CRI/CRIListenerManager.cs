@@ -8,19 +8,17 @@ namespace September.Common
         [SerializeField] private Transform _follow;   // Player をアタッチ（実行時に差し替え可）
         [SerializeField] private Transform _camera;   // MainCamera をアタッチ（実行時に差し替え可）
 
-        private static CRIListenerManager _instance;
-
-        private void Awake()
+        /// <summary> リスナーを探すもしくは作る </summary>
+        /// <returns></returns>
+        public static CRIListenerManager GetOrCreateInLocalListener()
         {
-            if (_instance == null)
-            {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            var found = FindFirstObjectByType<CRIListenerManager>();
+            if (found) return found;
+
+            var obj = new GameObject("Listener");
+            var newManager = obj.AddComponent<CRIListenerManager>();
+            DontDestroyOnLoad(obj);
+            return newManager;
         }
 
         private void LateUpdate()
