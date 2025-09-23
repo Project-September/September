@@ -85,7 +85,10 @@ namespace InGame.Exhibit
 
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
+        private float _interactTimer;
 
+        [SerializeField] private float _interactTime;
+        
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
@@ -110,9 +113,19 @@ namespace InGame.Exhibit
             {
                 if (GetInput<PlayerInput>(out var input))
                 {
+                    _interactTimer += Time.fixedDeltaTime;
+                    
+                    if (CheckInteractEnd())
+                    {
+                        GetOff();
+                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_Interact"); // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
+                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_TakeoffGunFire"); // もしくは射撃音を止める
+                        return;
+                    }
+                    
                     // 乗ってから1秒は降りる処理を無視（ティラノと同じ仕様）
                     float timeSinceGetOn = Runner.SimulationTime - GetOnTime;
-
+                    
                     // Eキーで降りる（WasPressedで新規押下のみ検知）
                     if (timeSinceGetOn > 1f && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Interact))
                     {
@@ -122,7 +135,7 @@ namespace InGame.Exhibit
                         AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_TakeoffGunFire"); // もしくは射撃音を止める
                         return;
                     }
-
+                    
                     // 新しい飛行機専用ボタンを使用
                     if (input.Buttons.IsSet(PlayerButtons.AirPlaneBack))
                     {
@@ -162,6 +175,11 @@ namespace InGame.Exhibit
                 _onGround = false;
                 _onGroundWheel = false;
             }
+        }
+        
+        private bool CheckInteractEnd()
+        {
+            return _interactTimer > _interactTime;
         }
 
         void AddSpeedForward()
@@ -370,6 +388,7 @@ namespace InGame.Exhibit
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
             RPC_SetIsKinematic(true);
+            _interactTimer = 0f;
             //隊列がある場合の処理
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
@@ -432,7 +451,7 @@ namespace InGame.Exhibit
             if (OwnerPlayerRef == PlayerRef.None) GetOn(PlayerRef.FromEncoded(context.Interactor));
             else if (OwnerPlayerRef == PlayerRef.FromEncoded(context.Interactor)) GetOff();
         }
-
+        
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetIsKinematic(bool kinematic)
         {
