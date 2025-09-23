@@ -56,8 +56,6 @@ namespace InGame.Exhibit
         
         private PlayerManager _ownerPlayerManager;
         
-        private Vector3 _hidePosition = new Vector3(0, 0, 0);
-        
         [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
         
         private Collider _collider;
