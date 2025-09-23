@@ -499,9 +499,10 @@ MonoBehaviour:
     m_Bits: 0
   _startFrame: 0
   _endFrame: 34
-  _damageAmount: 100
-  _maxHealth: 10
+  _damageAmount: 80
+  _maxHealth: 100
   _getOffPoint: {fileID: 302465785191893965}
+  _height: 10
   _moveSpeed: 5
   _rotationSpeed: 5
   _turnThreshold: 30
@@ -565,25 +566,25 @@ MonoBehaviour:
       type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 2
-        _interactTime: 20
+        _interactTime: 15
         _pterodactylInteractable: {fileID: 575448598117113101}
     - rid: 731403362977185876
       type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 3
-        _interactTime: 20
+        _interactTime: 15
         _pterodactylInteractable: {fileID: 575448598117113101}
     - rid: 731403362977185877
       type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 4
-        _interactTime: 20
+        _interactTime: 15
         _pterodactylInteractable: {fileID: 575448598117113101}
     - rid: 5190193564749135961
       type: {class: PterodactylInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 1
-        _interactTime: 30
+        _interactTime: 22.5
         _pterodactylInteractable: {fileID: 575448598117113101}
 --- !u!114 &729834472514017027
 MonoBehaviour:
