@@ -62,6 +62,9 @@ namespace Ingame.Tanihira
         /// <param name="friend"></param>
         public void DeleteFriend(FriendBase friend)
         {
+            if(!HasStateAuthority)
+                return;
+            
             int index = _currentFriendsList.IndexOf(friend);
             if (index >= 0)
             {
@@ -89,6 +92,9 @@ namespace Ingame.Tanihira
         /// </summary>
         public void SortFormation()
         {
+            if(!HasStateAuthority)
+                return;
+            
             if(_currentFriendsList.Count > 0)
             {
                 for(int i = 0; i < _currentFriendsList.Count; i++)
@@ -112,6 +118,9 @@ namespace Ingame.Tanihira
         /// </summary>
         public void RegisterFriendFormation()
         {
+            if(!HasStateAuthority)
+                return;
+            
             _friendsList.Clear();
             foreach (FriendBase friend in _currentFriendsList)
             {
