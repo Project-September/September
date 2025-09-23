@@ -38,10 +38,11 @@ namespace September.InGame.UI
         private Slider _hpBarSlider;
         private Slider _staminaBarSlider;
         private readonly Queue<GameObject> _killLogQueue = new();
-        private TextMeshProUGUI _ogreMessageText;
         private GameObject _optionUI;
         private GameObject _LogPanel;
         private GameObject _ogreUiInstance;
+        private ChangeTagOverlayMessage _changeTagOverlayMessage;
+        private TimeOverlayMessage _timeOverlayMessage;
         private GameObject[] _descriptionIcon;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
@@ -65,6 +66,8 @@ namespace September.InGame.UI
             ui.OnStartTimer.Subscribe(runner => ShowGameStartTime(runner).Forget()).AddTo(_cts.Token);
             ui.OnShowLog.Subscribe(killText => ShowLog(killText).Forget()).AddTo(_cts.Token);
             ui.OnShowOgreUI.Subscribe(ShowOgreLamp).AddTo(_cts.Token);
+            //  Bind前に_uiRootが生成されないのでChangeTagNoticeを直接Subscribeできない
+            ui.ChangeTagNoticeObserver.Subscribe(index=>_changeTagOverlayMessage.ChangeTagNotice(index)).AddTo(_cts.Token);
             ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
             ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
             ui.IsInteracting
@@ -76,18 +79,24 @@ namespace September.InGame.UI
                 .AddTo(_cts.Token);
             ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
             ui.OnChangeScoreText.Subscribe(ChangeScore).AddTo(_cts.Token);
+            ui.TimeOverlayMessage += TimeOverlayMessage;
         }
-
         private void SetupUI()
         {
             if (!_uiRoot)
+            {
                 _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
+                //  フェードより後ろに表示するためヒエラルキー一番上に移動
+                _uiRoot.transform.SetAsFirstSibling();
+            }
+                
             
             UIController.I.UIRootRefs = _uiRoot;
             _optionUI = _uiRoot.OptionUI;
             _LogPanel = _uiRoot.LogPanel;
             _ogreUiInstance = _uiRoot.OgreUI;
-            _ogreMessageText = _uiRoot.OgreMessageText;
+            _changeTagOverlayMessage = _uiRoot.ChangeTagOverlayMessage;
+            _timeOverlayMessage = _uiRoot.TimeOverlayMessage;
             _descriptionIcon =  _uiRoot.DescriptionIcon;
             _hpBarSlider = _uiRoot.HpBar;
             _scoreText =  _uiRoot.ScoreText;
@@ -234,21 +243,6 @@ namespace September.InGame.UI
         {
             if (!_ogreUiInstance) return;
             _ogreUiInstance.gameObject.SetActive(isShow);
-            if (isShow && _ogreMessageTask.Status.IsCompleted())
-            {
-                _ogreMessageTask = OgreMessage().Preserve();
-            }
-        }
-        //  鬼になったことを伝えるメッセージ
-        private async UniTask OgreMessage()
-        {
-            var col = _ogreMessageText.color;
-            col.a = 0;
-            _ogreMessageText.color = col;
-            _ogreMessageText.text = "あなたが鬼です";
-            await _ogreMessageText.DOFade(1, 1f);
-            await UniTask.WaitForSeconds(2f);
-            await _ogreMessageText.DOFade(0, 1f);
         }
 
         private void ShowOptionUI(bool isShow)
@@ -325,10 +319,15 @@ namespace September.InGame.UI
             // レイアウト再設定(表示更新)
             _statusUpLayout.SetLayoutHorizontal();
         }
+        /// <summary>
+        /// Bind時に_timeOverlayMessageが生成されないのでメソッドを挟む
+        /// </summary>
+        private UniTask TimeOverlayMessage(TimeMessageType type) =>_timeOverlayMessage.CallTask(type);
         private void OnDestroy()
         {
             _cts?.Cancel();
             _cts?.Dispose();
+            if (UIController.I) UIController.I.TimeOverlayMessage -= TimeOverlayMessage;
         }
     }
 }

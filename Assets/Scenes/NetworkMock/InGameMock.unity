@@ -172,15 +172,15 @@ PrefabInstance:
       value: -0.4
       objectReference: {fileID: 0}
     - target: {fileID: 536499402856614603, guid: f903b4e5cf48d8c4b88fa1dd7c766e45, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 536499402856614603, guid: f903b4e5cf48d8c4b88fa1dd7c766e45, type: 3}
-      propertyPath: '_cooldownTimeDictionary.values.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.values.Array.data[0]
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 536499402856614603, guid: f903b4e5cf48d8c4b88fa1dd7c766e45, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3169062250687249688, guid: f903b4e5cf48d8c4b88fa1dd7c766e45, type: 3}
@@ -335,11 +335,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
@@ -404,10 +404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6640796709864507861, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1257078259}
+    m_AddedGameObjects: [{targetCorrespondingSourceObject: {fileID: 6640796709864507861, guid: 05d807727e1158f4784407803d8c4a69, type: 3}, insertIndex: -1, addedObject: {fileID: 1257078259}}]
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
 --- !u!4 &196039146 stripped
@@ -466,7 +463,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
@@ -478,7 +475,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
@@ -589,8 +586,7 @@ Transform:
   m_LocalPosition: {x: -32.255386, y: 0, z: 71.98181}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1718653787}
+  m_Children: [{fileID: 1718653787}]
   m_Father: {fileID: 1377654576}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!64 &219337901
@@ -815,15 +811,15 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
-      propertyPath: '_cooldownTimeDictionary.values.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.values.Array.data[0]
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4731277372856524398, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
@@ -1216,11 +1212,11 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
@@ -1611,11 +1607,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
@@ -1737,7 +1733,7 @@ GameObject:
   m_Component:
   - component: {fileID: 774143898}
   m_Layer: 0
-  m_Name: ---UI---
+  m_Name: '---UI---'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2208,15 +2204,15 @@ PrefabInstance:
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
     - target: {fileID: 2101273202392379923, guid: 402fb5d7117a91d4b827fc6a0e8e68d7, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2101273202392379923, guid: 402fb5d7117a91d4b827fc6a0e8e68d7, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2101273202392379923, guid: 402fb5d7117a91d4b827fc6a0e8e68d7, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.values.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.values.Array.data[0]
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2101273202392379923, guid: 402fb5d7117a91d4b827fc6a0e8e68d7, type: 3}
@@ -2478,15 +2474,15 @@ PrefabInstance:
     m_TransformParent: {fileID: 1653780193}
     m_Modifications:
     - target: {fileID: 1248590409878750981, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1248590409878750981, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
-      propertyPath: '_cooldownTimeDictionary.values.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.values.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1248590409878750981, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1248590409878750981, guid: d159e012360deb34592c1ee7d241d97d, type: 3}
@@ -3147,11 +3143,11 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7624587381050686148, guid: 561e4d034db32a648a3773416834e59b, type: 3}
@@ -3290,11 +3286,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
@@ -3686,11 +3682,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1602652095538394138, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
@@ -4491,11 +4487,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1960778445117928785, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
@@ -4958,11 +4954,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2735281992233445846, guid: 5e551616aca88c54a850d59914d3fbe2, type: 3}
@@ -5718,11 +5714,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7031200934987414312, guid: afc04671bcad5504f93766d7c821d95d, type: 3}
@@ -5825,7 +5821,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1900584299}
   m_Layer: 0
-  m_Name: ---System---
+  m_Name: '---System---'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5861,7 +5857,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1984780381}
   m_Layer: 0
-  m_Name: ---Model---
+  m_Name: '---Model---'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6160,11 +6156,11 @@ PrefabInstance:
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
-      propertyPath: '_cooldownTimeDictionary.keys.Array.data[0]'
+      propertyPath: _cooldownTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
-      propertyPath: '_requiredInteractTimeDictionary.keys.Array.data[0]'
+      propertyPath: _requiredInteractTimeDictionary.keys.Array.data[0]
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7269486754156783961, guid: 2b4c81473edd5b64badb8e931e57bd3d, type: 3}
@@ -6300,24 +6296,36 @@ PrefabInstance:
       propertyPath: _countdownAnimation
       value: 
       objectReference: {fileID: 542693324}
+    - target: {fileID: 2175680204289375604, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
+      propertyPath: _overlayMessage
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: '_spawnPositions.Array.data[0]'
+      propertyPath: _countdownAnimation
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
+      propertyPath: _timeOverlayMessage
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
+      propertyPath: _spawnPositions.Array.data[0]
       value: 
       objectReference: {fileID: 644244726}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: '_spawnPositions.Array.data[1]'
+      propertyPath: _spawnPositions.Array.data[1]
       value: 
       objectReference: {fileID: 1833310474}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: '_spawnPositions.Array.data[2]'
+      propertyPath: _spawnPositions.Array.data[2]
       value: 
       objectReference: {fileID: 1682867989}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: '_spawnPositions.Array.data[3]'
+      propertyPath: _spawnPositions.Array.data[3]
       value: 
       objectReference: {fileID: 1558513582}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: '_spawnPositions.Array.data[4]'
+      propertyPath: _spawnPositions.Array.data[4]
       value: 
       objectReference: {fileID: 1156707168}
     - target: {fileID: 3786701965843191928, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
