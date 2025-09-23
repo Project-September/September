@@ -56,7 +56,7 @@ namespace Ingame.Tanihira
         protected bool _isEnd;
 
         private static int _spawnCount;
-        private bool _isAttack;
+        public bool IsAttack;
         
         
         // プロパティ
@@ -69,7 +69,6 @@ namespace Ingame.Tanihira
         public FriendStatus CurrentFriendStatus => _currentStatus;
         public FriendState CurrentState => _currentState;
         public NetworkMecanimAnimator MecanimAnimator => _mecanimAnimator;
-        public bool IsAttack => _isAttack;
         public FriendState WaitStockState => _waitStockState;
         public NetworkObject OwnerPlayer => _ownerPlayer;
         public GameObject Tutankhamen => _tutankhamen;
@@ -153,6 +152,11 @@ namespace Ingame.Tanihira
                 // 新しいステートに変更
                 _currentState = newState;
                 return;
+            }
+            else if (newState == FriendState.Attack)
+            {
+                if (IsAttack)
+                    return;
             }
             
             if (_currentState == FriendState.Wait)
@@ -268,12 +272,12 @@ namespace Ingame.Tanihira
         //アニメーションイベント用
         public void StartAttack()
         {
-            _isAttack = true;
+            IsAttack = true;
         }
 
         public void EndAttack()
         {
-            _isAttack = false;
+            IsAttack = false;
         }
 
         public override void Render()

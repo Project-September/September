@@ -63,6 +63,7 @@ namespace Ingame.Tanihira
             else
             {
                 _mecanimAnimator?.SetTrigger("Damage");
+                IsAttack = false;
             }
             _currentHealth -= damage;
         }
