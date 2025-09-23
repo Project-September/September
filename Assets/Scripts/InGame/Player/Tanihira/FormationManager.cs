@@ -94,6 +94,9 @@ namespace Ingame.Tanihira
         {
             if(!HasStateAuthority)
                 return;
+
+            if (_currentFriendsList[0].CurrentState is FriendState.Chase or FriendState.Attack)
+                return;
             
             if(_currentFriendsList.Count > 0)
             {
