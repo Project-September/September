@@ -10,12 +10,13 @@ namespace September.Title
         [SerializeField] bool _hideOnStart;
         [SerializeField] Selectable _selectWhenShow;
         [SerializeField] Selectable _selectWhenHide;
-        CanvasGroup _panel;
-        bool _isInitialized;
+        private CanvasGroup _panel;
+        private bool _isInitialized;
+
         private void Awake()
         {
             _panel = GetComponent<CanvasGroup>();
-            if(_hideOnStart) HidePanel();
+            if (_hideOnStart) HidePanel();
             _isInitialized = true;
         }
 
@@ -24,7 +25,10 @@ namespace September.Title
             _panel.alpha = 1;
             _panel.interactable = true;
             _panel.blocksRaycasts = true;
-            if(_isInitialized) EventSystem.current.SetSelectedGameObject(_selectWhenShow.gameObject);
+
+            if (!_isInitialized) return;
+            if (_selectWhenShow == null) return;
+            EventSystem.current.SetSelectedGameObject(_selectWhenShow.gameObject);
         }
 
         public void HidePanel()
@@ -32,7 +36,9 @@ namespace September.Title
             _panel.alpha = 0;
             _panel.interactable = false;
             _panel.blocksRaycasts = false;
-            if(_isInitialized) EventSystem.current.SetSelectedGameObject(_selectWhenHide.gameObject);
+            if (!_isInitialized) return;
+            if (_selectWhenHide == null) return;
+            EventSystem.current.SetSelectedGameObject(_selectWhenHide.gameObject);
         }
     }
 }

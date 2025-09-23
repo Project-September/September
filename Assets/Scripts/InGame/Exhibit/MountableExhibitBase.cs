@@ -58,6 +58,8 @@ namespace InGame.Exhibit
         
         [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
         
+        private Collider _collider;
+        
         public override void Spawned()
         {
              Rigidbody = GetComponent<Rigidbody>();
@@ -72,6 +74,7 @@ namespace InGame.Exhibit
              IsSpawned = true;
              _initialPosition = transform.position;
              _initialRotation = transform.rotation;
+             _collider = gameObject.GetComponentInHierarchy<Collider>();
              if(!Runner.IsServer) return;
              RPC_SetIsKinematic(true);
         }
@@ -80,15 +83,14 @@ namespace InGame.Exhibit
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
             {
-                OnHit = collider =>
+                OnHit = coll =>
                 {
-                    var damageable = collider.GetComponentInParent<IDamageable>();
-                    if (damageable != null)
-                    {
-                        var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
-                            damageable.OwnerPlayerRef);
-                        damageable.TakeHit(ref hitData);
-                    }
+                    var damageable = coll.GetComponentInParent<IDamageable>();
+                    if(coll == _collider) return;
+                    if (damageable == null) return;
+                    var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
+                        damageable.OwnerPlayerRef);
+                    damageable.TakeHit(ref hitData);
                 }
             };
         }
