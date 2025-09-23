@@ -151,18 +151,12 @@ namespace September.Common
                 {
                     if(Context.Runner.IsServer) animClipPlayer.PlayClip(emoteClip);
                     var cueName = characterDataContainer.GetCharacterData(characterType).StartVoice;
-                    RPC_PlaySE(_cueSheetName,cueName);
+                    CRIAudio.PlaySE(_cueSheetName,cueName); // ボイス呼び出し
                     delayTime = emoteClip.length;
                 }
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
                 index++;
             }
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_PlaySE(string cueSheetName,string cueName)
-        {
-            CRIAudio.PlaySE(cueSheetName,cueName);
         }
         
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
