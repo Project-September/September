@@ -642,6 +642,9 @@ MonoBehaviour:
   _tutankhamen: {fileID: 5865289518634062692}
   _attackEffectPos: {fileID: 1881937996601921261}
   _runEffectObject: {fileID: 6303266605181236520}
+  _maxRunBlendTreeCount: 5
+  IsAttack: 0
+  IsWarp: 0
 --- !u!195 &-3575381120417351687
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -678,7 +681,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hitPoints:
   - {fileID: 7561604877310642220}
-  _radius: 0.5
+  _radius: 0.33
   _alreadyHit: []
   IsActive: 0
 --- !u!114 &2752708787275688132
