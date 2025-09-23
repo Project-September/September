@@ -60,6 +60,8 @@ namespace InGame.Exhibit
 
         [Networked, OnChangedRender(nameof(OnInteractingChanged))]
         private NetworkBool IsInteracting { get; set; }
+        [Networked, OnChangedRender(nameof(OnAttackTriggered))]
+        private NetworkBool AttackTrigger { get; set; }
 
         #region AnimationHash
 
@@ -121,6 +123,13 @@ namespace InGame.Exhibit
 
             HandleMovement(playerInput);
             _fireCooldownTimerSec = Mathf.Min(_fireCooldown, _fireCooldownTimerSec + deltaTime);
+            
+            if (_fireCooldownTimerSec >= _fireCooldown && AttackTrigger)
+            {
+                // クールタイム満了 → トリガーをリセット
+                AttackTrigger = false;
+            }
+            
             var hit = GetAimPosition();
             if (playerInput.Buttons.IsSet(PlayerButtons.Attack) && _fireCooldownTimerSec >= _fireCooldown)
             {
@@ -255,7 +264,17 @@ namespace InGame.Exhibit
                 rb.linearVelocity = velocity;
             }
 
+            AttackTrigger = true;
             AttackAsync(instance, travelTime, hitPosition, ownerPlayerRef).Forget();
+        }
+        
+        private void OnAttackTriggered()
+        {
+            if (!AttackTrigger) 
+                return;
+            
+            _mecanimAnimator.SetTrigger(Attack);
+            PlayMuzzleFlash(_muzzle.position, _muzzle.rotation);
         }
 
         private async UniTaskVoid AttackAsync(NetworkObject explosion, float time, Vector3 point,
