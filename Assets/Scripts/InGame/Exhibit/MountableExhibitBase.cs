@@ -7,6 +7,7 @@ using Ingame.Tanihira;
 using NaughtyAttributes;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.Effect;
 using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.AI;
@@ -62,6 +63,7 @@ namespace InGame.Exhibit
         private Collider _collider;
 
         [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
+        EffectSpawner _effectSpawner;
         public override void Spawned()
         {
              Rigidbody = GetComponent<Rigidbody>();
@@ -77,6 +79,8 @@ namespace InGame.Exhibit
              _initialPosition = transform.position;
              _initialRotation = transform.rotation;
              _collider = gameObject.GetComponentInHierarchy<Collider>();
+             if (!_effectSpawner)
+                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
              if(!Runner.IsServer) return;
              RPC_SetIsKinematic(true);
         }
@@ -85,14 +89,15 @@ namespace InGame.Exhibit
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
             {
-                OnHit = coll =>
+                OnHit = (col,pos) =>
                 {
-                    var damageable = coll.GetComponentInParent<IDamageable>();
-                    if(coll == _collider) return;
+                    var damageable = col.GetComponentInParent<IDamageable>();
+                    if(col == _collider) return;
                     if (damageable == null) return;
                     var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
                         damageable.OwnerPlayerRef);
                     damageable.TakeHit(ref hitData);
+                    _effectSpawner.RequestPlayOneShotEffect(EffectType.HitNormal,col.ClosestPoint(pos), Quaternion.identity);
                 }
             };
         }
@@ -145,11 +150,7 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
-            
-            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 9999f, NavMesh.AllAreas))
-            {
-                _ownerPlayerManager.transform.position = hit.position + Vector3.up * _height;
-            }
+            _ownerPlayerManager.transform.position = _getOffPoint.position;
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
