@@ -246,11 +246,11 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 05000000
     values:
-    - 2
+    - 4
   _cooldownTimeDictionary:
     keys: 05000000
     values:
-    - 10
+    - 7.5
   _characterEffects:
   - rid: 3302172163222274142
   _type: 6
@@ -276,7 +276,6 @@ MonoBehaviour:
         _characterType: 5
         Invoker: {fileID: 7869224748463613965}
         EffectDuration: 5
-        SoundName: Tutankhamun
         EffectPos: {fileID: 1814807729897626833}
         BoostMultiplier: 1.5
         _buffEffect: {fileID: 11400000, guid: d03292c0d5fa02441a73a4c8a85c9066, type: 2}

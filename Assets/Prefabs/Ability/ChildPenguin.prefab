@@ -358,7 +358,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hitPoints:
   - {fileID: 7561604877310642220}
-  _radius: 0.5
+  _radius: 0.33
   _alreadyHit: []
   IsActive: 0
 --- !u!114 &-8609162445061833555
@@ -384,6 +384,8 @@ MonoBehaviour:
   _attackEffectPos: {fileID: 3005691076101400526}
   _runEffectObject: {fileID: 8043574276842796753}
   _maxRunBlendTreeCount: 5
+  IsAttack: 0
+  IsWarp: 0
 --- !u!65 &4605572418024795219
 BoxCollider:
   m_ObjectHideFlags: 0

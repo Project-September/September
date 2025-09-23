@@ -5347,11 +5347,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._attackDamage
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._searchRadius
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._enableAutoAim
@@ -5371,15 +5371,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._boxHalfExtents.x
-      value: 0.45
-      objectReference: {fileID: 0}
-    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: managedReferences[4146068609868497005]._boxHalfExtents.y
       value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[4146068609868497005]._boxHalfExtents.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._boxHalfExtents.z
-      value: 0.45
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._boxLocalOffset.x
@@ -5387,11 +5387,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._boxLocalOffset.y
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._boxLocalOffset.z
-      value: 0.6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._endHitCheckFrame
@@ -5399,11 +5399,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._moveForwardSpeed
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._ogreAttackDamage
-      value: 15
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._debugDrawDuration
@@ -5462,12 +5462,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _dashSpeed
+      value: 7.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _moveSpeed
+      value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _ogreDashSpeed
-      value: 7
+      value: 8.58
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _ogreMoveSpeed
-      value: 1.8
+      value: 2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _staminaConsumption
+      value: 26
       objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _run

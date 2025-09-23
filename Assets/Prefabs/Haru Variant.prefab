@@ -4548,11 +4548,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[5091638614146416869]._attackDamage
-      value: 100
+      value: 55
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[5091638614146416869]._searchRadius
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[5091638408297054335]._enableAutoAim
@@ -4580,7 +4580,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[5091638614146416869]._boxLocalOffset.z
-      value: -0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[5091638614146416869]._endHitCheckFrame
@@ -4588,7 +4588,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[5091638614146416869]._moveForwardSpeed
-      value: 0
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[5091638614146416869]._ogreAttackDamage
+      value: 110
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[5091638408297054335]._startHitCheckFrame
@@ -4620,11 +4624,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _dashSpeed
-      value: 7
+      value: 7.1
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _moveSpeed
-      value: 1.8
+      value: 1.7
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _maxLedgeDepth
@@ -4632,15 +4636,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _ogreDashSpeed
-      value: 7
+      value: 8.52
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _ogreMoveSpeed
-      value: 1.8
+      value: 2.04
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _reachDistance
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _staminaConsumption
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _moveCapsuleCollider
