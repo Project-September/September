@@ -119,6 +119,13 @@ namespace InGame.Interact
                 effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation));
             await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false);
             effectSpawner.StopEffect(uniqueEffectId);
+            Rpc_PlaySE(SoundCues.SE.Exhibit_Revive.Sheet, SoundCues.SE.Exhibit_Revive.Name, effectTransform.position); // クールダウン回復音
+        }
+
+        [Rpc]
+        private void Rpc_PlaySE(string sheet, string cueName, Vector3 position)
+        {
+            CRIAudio.PlaySE(position, sheet, cueName);
         }
 
         /// <summary>
