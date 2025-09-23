@@ -1,7 +1,6 @@
 using NaughtyAttributes;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace September.InGame.UI
@@ -17,6 +16,8 @@ namespace September.InGame.UI
         public TimeOverlayMessage TimeOverlayMessage;
         public CanvasGroup StatusUpGroup;
         public VerticalLayoutGroup StatusUpUIRoot;
+        public TextMeshProUGUI ScoreText;
+        public Image IconImage;
 
         [Header("Bars")]
         public Slider HpBar;

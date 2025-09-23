@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -18,11 +18,16 @@ namespace September.Common
         public struct CharacterData
         {
             public CharacterType Type;
-            public string DisplayName;
+            [TextArea(1, 5)] public string DisplayName;
+            [TextArea(2, 5)] public string AbilityName;
+            [TextArea(3, 5)] public string AbilityExplain;
             public NetworkPrefabRef Prefab;
             public VideoClip ExplainVideo;
             public Sprite CharacterIcon;
             public AnimationClip EmoteAnimation;
+            public string SelectedVoice;
+            public string StartVoice;
+            public string WinningVoice;
         }
         [SerializeField, ArrayLength(DataCount)] CharacterData[] _characterData;
 

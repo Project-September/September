@@ -13,16 +13,22 @@ namespace Ingame.Tanihira
         public void OnEnter(FriendBase friend)
         {
             //navmeshでの処理
-            friend.Agent.isStopped = true;
-            _friendObject = friend.Agent.gameObject.transform;
-            LookTarget(friend.Agent.destination);
+            if (friend.Agent.enabled)
+            {
+                friend.Agent.isStopped = true;
+                _friendObject = friend.Agent.gameObject.transform;
+                LookTarget(friend.Agent.destination);
+            }
             friend.MecanimAnimator?.SetTrigger("Attack"); // アニメーターにAttackトリガーがある前提
         }
 
         public void OnExit(FriendBase friend)
         {
-            //Navmeshを再開
-            friend.Agent.isStopped = false;
+            if (friend.Agent.enabled)
+            {
+                //Navmeshを再開
+                friend.Agent.isStopped = false;
+            }
         }
 
         public void OnUpdate(FriendBase friend)

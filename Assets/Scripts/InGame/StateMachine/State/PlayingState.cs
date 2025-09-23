@@ -30,6 +30,12 @@ namespace September.Common
                 UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.TimeRemainingAlert);
             }
             //  時間切れで次のステートへ
+            if (PlayerDatabase.Instance &&
+                PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData data))
+            {
+                UIController.I?.OnChangeScore(data.Score);
+            }
+            
             if (TickTimer.Expired(Context.Runner))
             {
                 TickTimer = TickTimer.None;

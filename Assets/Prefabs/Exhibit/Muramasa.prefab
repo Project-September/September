@@ -99,12 +99,14 @@ MonoBehaviour:
   - rid: 8434327638283649242
   _type: 0
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
   _audioBroadcaster: {fileID: 884689928168090516}
-  _interactSoundCueName: 
+  _interactSoundCueName: SE_Muramasa_Interact
   _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0

@@ -606,8 +606,30 @@
                 },
                 {
                     "name": "",
+                    "id": "d2273bc7-10db-4ccb-90b9-cc68f682d73a",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AirplaneForward",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "59e6caf9-8b5e-4795-88cf-0bc25b1e1a89",
                     "path": "<XInputController>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AirPlaneBack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "acdd2ce7-a8ca-4e9e-9ee2-e92c158316db",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -739,7 +761,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "PageSlideBack",
+                    "name": "BackPage",
                     "type": "Button",
                     "id": "fa0d7543-6ecb-4a02-84e9-70026d3c0d2f",
                     "expectedControlType": "",
@@ -1162,7 +1184,18 @@
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "PageSlide",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2eaae0b2-efe6-4f9d-bff0-3dc9eac68208",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
                     "action": "PageSlide",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1173,8 +1206,19 @@
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "PageSlideBack",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "BackPage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1c9f98c3-4262-49dc-9209-819f996c0096",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "BackPage",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -1201,7 +1245,7 @@
                     "path": "<Keyboard>/enter",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard&Mouse",
                     "action": "Finish",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1212,7 +1256,7 @@
                     "path": "<XInputController>/buttonSouth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Gamepad",
                     "action": "Finish",
                     "isComposite": false,
                     "isPartOfComposite": false

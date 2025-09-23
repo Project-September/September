@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
-using InGame.Common;
 using September.Common;
 using UniRx;
 using UnityEngine;
@@ -336,9 +335,12 @@ namespace InGame.Player
                 IsHit = hit,
                 HitInfo = heightHitInfo
             });
+
+            bool checkCapsule = 
+                Physics.CheckCapsule(heightHitInfo.point + Vector3.up * capsuleRadius, heightHitInfo.point + Vector3.up * (capsuleRadius + _moveCapsuleCollider.height), capsuleRadius);
             
             // min height 以下はステップ1ではじかれる
-            if (!(hit && ledgeHeight <= _maxLedgeHeight)) return;
+            if (!(hit && ledgeHeight <= _maxLedgeHeight) && !checkCapsule) return;
             
             // ステップ3：乗り越えられる障害物の奥行とスペースがあるかの判定
             float underPoint = transform.position.y + 0.01f; // ほんの少し高くする ここの高さは要検討

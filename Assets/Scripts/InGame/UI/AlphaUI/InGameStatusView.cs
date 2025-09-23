@@ -28,7 +28,7 @@ namespace September.InGame.UI
         [SerializeField, Label("TimerData")] private GameTimerData _timerData;
         
         [Header("キルログ")]
-        [SerializeField] private GameObject  _killLogItemPrefab;
+        [SerializeField] private GameObject  _killLogItemText;
         [SerializeField] private int _maxLogCount = 5;
         
         [SerializeField] private CanvasGroup _statusUpUI;
@@ -45,7 +45,8 @@ namespace September.InGame.UI
         private TimeOverlayMessage _timeOverlayMessage;
         private GameObject[] _descriptionIcon;
         private InteractUi _interactUI;
-        private float _tutanCounter;
+        private UniTask _ogreMessageTask;
+        private TextMeshProUGUI _scoreText;
         private CancellationTokenSource _cts;
         private StatusUpType _currentStatusUpType;
         private CanvasGroup _ogreGroup;
@@ -53,13 +54,13 @@ namespace September.InGame.UI
         {
             _cts = new CancellationTokenSource();
             Bind();
-            _tutanCounter = 0;
         }
 
         private void Bind()
         {
             UIController ui = UIController.I;
             ui.OnGameStart.Subscribe(_ => SetupUI()).AddTo(_cts.Token);
+            
             ui.OnChangeSliderValue.Subscribe(ChangeHp).AddTo(_cts.Token);
             ui.OnClickOptionButton.Subscribe(ShowOptionUI).AddTo(_cts.Token);
             ui.OnStartTimer.Subscribe(runner => ShowGameStartTime(runner).Forget()).AddTo(_cts.Token);
@@ -77,13 +78,15 @@ namespace September.InGame.UI
             ui.OnInteractStatusUpObject.Subscribe(info => ShowStatusUpUI(info.Item1, info.Item2))
                 .AddTo(_cts.Token);
             ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
+            ui.OnChangeScoreText.Subscribe(ChangeScore).AddTo(_cts.Token);
             ui.TimeOverlayMessage += TimeOverlayMessage;
         }
         private void SetupUI()
         {
             if (!_uiRoot)
                 _uiRoot = Instantiate(_inGameUiRootPrefab, _mainCanvas.transform);
-
+            
+            UIController.I.UIRootRefs = _uiRoot;
             _optionUI = _uiRoot.OptionUI;
             _LogPanel = _uiRoot.LogPanel;
             _ogreUiInstance = _uiRoot.OgreUI;
@@ -91,6 +94,7 @@ namespace September.InGame.UI
             _timeOverlayMessage = _uiRoot.TimeOverlayMessage;
             _descriptionIcon =  _uiRoot.DescriptionIcon;
             _hpBarSlider = _uiRoot.HpBar;
+            _scoreText =  _uiRoot.ScoreText;
             _staminaBarSlider = _uiRoot.StaminaBar;
             _interactUI = _uiRoot.InteractUI;
             _statusUpUI = _uiRoot.StatusUpGroup;
@@ -113,9 +117,15 @@ namespace September.InGame.UI
                 .SetEase(Ease.OutQuad);
         }
 
+        private void ChangeScore(int value)
+        {
+            _scoreText.text = value.ToString();
+        }
+
         private async UniTask PlayResultAnimation()
         {
             ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
+            Destroy(_uiRoot.gameObject);
             ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
             await resultAnim.Play(resultUI);
         }
@@ -145,32 +155,44 @@ namespace September.InGame.UI
         }
 
         // キルのログを直接引数に入れる
+        // キルのログを直接引数に入れる
         private async UniTask ShowLog (string killText)
         {
-            GameObject killLog = Instantiate(_killLogItemPrefab, _LogPanel.transform);
-
-            TextMeshProUGUI tmp = killLog.GetComponentInChildren<TextMeshProUGUI>();
+            // プレハブから新しいログを作成
+            GameObject log = Instantiate(_killLogItemText, _LogPanel.transform);
+            TextMeshProUGUI tmp = log.GetComponent<TextMeshProUGUI>();
             tmp.text = killText;
-            
-            
-            // フェード用 CanvasGroup
-            CanvasGroup cg = killLog.GetComponent<CanvasGroup>() ?? killLog.AddComponent<CanvasGroup>();
-            cg.alpha = 0;
-            await cg.DOFade(1f, 0.3f);
 
-            _killLogQueue.Enqueue(killLog);
-            
+            // フェード用CanvasGroup
+            CanvasGroup cg = log.GetComponent<CanvasGroup>() ?? log.AddComponent<CanvasGroup>();
+            cg.alpha = 0;
+
+            // 入場アニメーション (フェードイン＋上からスライド)
+            log.transform.localScale = Vector3.one * 0.9f;
+            await DOTween.Sequence()
+                .Append(cg.DOFade(1f, 0.3f))
+                .Join(log.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));
+
+            // キュー管理
+            _killLogQueue.Enqueue(log);
             if (_killLogQueue.Count > _maxLogCount)
             {
                 GameObject old = _killLogQueue.Dequeue();
                 if (old)
                 {
                     CanvasGroup oldCg = old.GetComponent<CanvasGroup>() ?? old.AddComponent<CanvasGroup>();
-                    oldCg.DOFade(0f, 0.5f).OnComplete(() => Destroy(old));
+                    oldCg.DOFade(0f, 0.5f)
+                        .OnComplete(() => Destroy(old));
                 }
             }
+
+            // 一定時間後に自動で消えるなら追加
+            await UniTask.Delay(TimeSpan.FromSeconds(3));
+            if (log)
+            {
+                cg.DOFade(0f, 0.5f).OnComplete(() => Destroy(log));
+            }
         }
-        
         private async UniTask ShowGameStartTime(NetworkRunner runner)
         {
             if (!_uiRoot || !_uiRoot.TimerText) 
@@ -211,7 +233,6 @@ namespace September.InGame.UI
             timer.text = "Time Up!";
             await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
         }
-        
         // 鬼の時にUIを表示する
         private void ShowOgreLamp(bool isShow)
         {

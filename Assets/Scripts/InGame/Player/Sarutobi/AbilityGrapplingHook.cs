@@ -34,6 +34,8 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private AnimationClip _animLanding;
         [Header("WireDisplay")] 
         [SerializeField] private Transform _handSocket;
+        [SerializeField] private Material _wireMaterial;
+        [SerializeField] private float _wireWidth;
 
         private PlayerManager _playerManager;
         private PlayerMovement _playerMovement;
@@ -73,7 +75,11 @@ namespace InGame.Player.Sarutobi
                 _mainCamera = Camera.main;
             }
             
-            _wireLine = GetComponent<LineRenderer>();
+            var wireObject = new GameObject("GrapplingWire");
+            _wireLine = wireObject.AddComponent<LineRenderer>();
+            _wireLine.material = _wireMaterial;
+            _wireLine.startWidth = _wireWidth;
+            _wireLine.endWidth = _wireWidth;
             _wireLine.enabled = false;
         }
 
