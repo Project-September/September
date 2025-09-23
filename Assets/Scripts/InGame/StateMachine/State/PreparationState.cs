@@ -108,8 +108,9 @@ namespace September.Common
                 task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
             else
                 SetOgreLamp();
-            RPC_PlaySE(_firstOgrePlayer);
+            await UniTask.WaitForSeconds(3f); // SetOgreLampでUIのAnimationが発火するがそれをどう待てばいいのか
             RPC_ShowStatusUpUI(_firstOgrePlayer,true);
+            RPC_PlaySE(_firstOgrePlayer);
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
             {
