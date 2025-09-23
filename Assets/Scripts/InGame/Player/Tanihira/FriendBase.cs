@@ -140,6 +140,8 @@ namespace Ingame.Tanihira
         /// <param name="newState">新しいステート</param>
         public virtual void ChangeState(FriendState newState)
         {
+            if (!HasStateAuthority) return;
+            
             if (_isEnd || IsWarp)
                 return;
             
