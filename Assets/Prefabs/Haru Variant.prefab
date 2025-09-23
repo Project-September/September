@@ -4416,6 +4416,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _fallInTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _landOutTime
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _playerManager
       value: 
       objectReference: {fileID: 6413160085543732377}
@@ -4448,20 +4456,36 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _fallInCurve.m_Curve.Array.data[0].inSlope
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _fallInCurve.m_Curve.Array.data[1].inSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _fallInCurve.m_Curve.Array.data[0].outSlope
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _fallInCurve.m_Curve.Array.data[1].outSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _landOutCurve.m_Curve.Array.data[0].inSlope
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _landOutCurve.m_Curve.Array.data[1].inSlope
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _landOutCurve.m_Curve.Array.data[0].outSlope
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _landOutCurve.m_Curve.Array.data[1].outSlope
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: SortKey
