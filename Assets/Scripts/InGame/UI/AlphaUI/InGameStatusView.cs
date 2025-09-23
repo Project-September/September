@@ -124,7 +124,23 @@ namespace September.InGame.UI
 
         private void ChangeScore(int value)
         {
-            _scoreText.text = value.ToString();
+            if (!_scoreText) return;
+
+            int.TryParse(_scoreText.text, out int currentValue);
+
+            DOTween.To(() => currentValue, x =>
+                {
+                    currentValue = Mathf.RoundToInt(x);
+                    _scoreText.text = currentValue.ToString();
+                }, value, 0.5f)
+                .SetEase(Ease.OutCubic)
+                .OnComplete(() => _scoreText.text = value.ToString());
+
+            // ポップアニメ
+            _scoreText.transform
+                .DOScale(1.2f, 0.2f)
+                .SetEase(Ease.OutBack)
+                .OnComplete(() => _scoreText.transform.DOScale(1f, 0.2f));
         }
 
         private async UniTask PlayResultAnimation()
