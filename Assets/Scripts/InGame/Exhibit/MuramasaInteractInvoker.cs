@@ -1,5 +1,6 @@
 using Fusion;
 using InGame.Health;
+using Ingame.Tanihira;
 using September.Common;
 using September.InGame.Effect;
 using UnityEngine;
@@ -27,8 +28,20 @@ namespace InGame.Exhibit
             if (AttackTimer.ExpiredOrNotRunning(Runner) && HasStateAuthority)
             {
                 var hits = Physics.OverlapSphere(_currentParent.transform.position + _muramasaOffset, _attackRadius);
+                //タニヒラ用にformationManagerを取得
+                Runner.TryGetPlayerObject(_currentOwner, out NetworkObject player);
+                FormationManager formationManager = player.GetComponent<FormationManager>(); 
+                
                 foreach (var hit in hits)
                 {
+                    //隊列がいる場合ははじく
+                    if (formationManager)
+                    {
+                        var friendBase = hit.GetComponent<FriendBase>();
+                        if(friendBase != null && formationManager.FriendsList.Contains(friendBase))
+                            continue;
+                    }
+                    
                     var root = hit.transform.root;
                     if (root.TryGetComponent<IDamageable>(out var damageable) &&
                         damageable.OwnerPlayerRef != _currentOwner)
