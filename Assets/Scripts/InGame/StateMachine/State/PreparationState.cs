@@ -24,7 +24,6 @@ namespace September.Common
         [SerializeField] private Image _fadeImage;
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
-        [SerializeField] private CountdownAnimation _countdownAnimation;
         private int _spawnPositionIndex; 
         private PlayerRef _firstOgrePlayer;
         protected internal override void OnEnter()
@@ -90,7 +89,7 @@ namespace September.Common
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始 
-            _countdownAnimation.StartCountdown();
+            UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ
             GameInput.I.ToggleMoveInput(true);
@@ -99,7 +98,12 @@ namespace September.Common
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
             //  ゲーム開始
             GameInput.I.ToggleActionInput(true);
-            SetOgreLamp();
+            var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
+            //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
+            if (task != null)
+                task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
+            else
+                SetOgreLamp();
             RPC_ShowStatusUpUI(_firstOgrePlayer,true);
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
@@ -220,6 +224,11 @@ namespace September.Common
             if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
             {
                 UIController.I.ShowOgreLamp(true);
+                UIController.I.ChangeTagNotice(0);
+            }
+            else
+            {
+                UIController.I.ChangeTagNotice(1);
             }
         }
         // 鬼変更時のUI更新通知
@@ -227,9 +236,14 @@ namespace September.Common
         private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
         {
             if (executor == Context.Runner.LocalPlayer)
+            {
                 UIController.I.ShowOgreLamp(false);
-            else if(targetRef == Context.Runner.LocalPlayer)
+            }
+            else if (targetRef == Context.Runner.LocalPlayer)
+            {
                 UIController.I.ShowOgreLamp(true);
+                UIController.I.ChangeTagNotice(2);
+            }
         }
         
         [Rpc(RpcSources.All, RpcTargets.All)]

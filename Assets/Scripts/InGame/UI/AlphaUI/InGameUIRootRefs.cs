@@ -13,7 +13,8 @@ namespace September.InGame.UI
         public GameObject OptionUI;
         public GameObject LogPanel;
         public GameObject OgreUI;
-        public TextMeshProUGUI OgreMessageText;
+        public ChangeTagOverlayMessage ChangeTagOverlayMessage;
+        public TimeOverlayMessage TimeOverlayMessage;
         public CanvasGroup StatusUpGroup;
         public VerticalLayoutGroup StatusUpUIRoot;
 

@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Exhibit;
 using UniRx;
@@ -18,12 +19,13 @@ namespace September.InGame.UI
         private readonly Subject<NetworkRunner> _onStartTimer = new();
         private readonly Subject<string> _onShowLog = new();
         private readonly ReactiveProperty<bool> _onShowOgreUI = new();
+        private readonly Subject<int> _changeTagNoticeObserver = new();
         private readonly ReactiveProperty<float> _onChangeStaminaValue = new();
         private readonly Subject<Unit> _onGameStart = new();
         private readonly Subject<Unit> _onGameEnd = new();
         private readonly Subject<(bool, GameObject)> _isInteracting = new();
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
-        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new(); 
+        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
 
         #endregion
         
@@ -34,6 +36,7 @@ namespace September.InGame.UI
         public IObservable<NetworkRunner> OnStartTimer => _onStartTimer;
         public IObservable<string> OnShowLog => _onShowLog;
         public IObservable<bool> OnShowOgreUI => _onShowOgreUI;
+        public IObservable<int> ChangeTagNoticeObserver => _changeTagNoticeObserver;
         public IReadOnlyReactiveProperty<float> OnChangeStaminaValue => _onChangeStaminaValue;
         public IObservable<bool> OnChangeDescriptionUI => _onChangeDescriptionUI;
         public IObservable<Unit> OnGameStart => _onGameStart;
@@ -41,6 +44,7 @@ namespace September.InGame.UI
         public IObservable<(bool, GameObject)> IsInteracting => _isInteracting;
         public IReadOnlyReactiveProperty<float> OnChangeInteractProgress => _onChangeInteractProgress;
         public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
+        public Func<TimeMessageType, UniTask> TimeOverlayMessage { get; set; }
         
         #endregion
         
@@ -72,6 +76,11 @@ namespace September.InGame.UI
         public void ShowOgreLamp(bool isShow)
         {
             _onShowOgreUI.Value = isShow;
+        }
+
+        public void ChangeTagNotice(int messageType)
+        {
+            _changeTagNoticeObserver.OnNext(messageType);
         }
 
         public void ChangeSliderValue(int value)
