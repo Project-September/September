@@ -1,8 +1,14 @@
 using System;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Fusion;
+using InGame.Exhibit;
+using September.Common;
+using September.InGame.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace September.InGame
@@ -23,24 +29,28 @@ namespace September.InGame
         [SerializeField] private float _waitDuration = 1f;
         [SerializeField] private float _hideDuration = 1f;
         private UniTask _currentTask;
+        private static readonly string _cueSheetName = "ALLCue";
+        private static readonly string _cueName = "SE_UI_ModeChanged";
+        private NetworkRunner _networkRunner;
         
         public void ChangeTagNotice(int messageIndex)
         {
             if (!_currentTask.Status.IsCompleted()) return;
-            _currentTask = ChangeTagNoticeTask(messageIndex).Preserve();;
+            _currentTask = ChangeTagNoticeTask(messageIndex).Preserve();
         }
         private async UniTask ChangeTagNoticeTask(int messageIndex)
         {
             if (messageIndex >= _messageList.Length || messageIndex < 0) return;
             var padding = _rectMask.padding;
             _messageList[messageIndex].ApplyText(_text);
+            CRIAudio.PlaySE(_cueSheetName,_cueName);
             await DOVirtual.Float(1000f, 0f, _showDuration, t =>
             {
                 padding[0] = t;
                 padding[2] = t;
                 _rectMask.padding = padding;
             }).SetEase(_showEase);
-            await UniTask.WaitForSeconds(_waitDuration);
+            await UniTask.WaitForSeconds(_waitDuration );
             await DOVirtual.Float(0f, 1000f, _hideDuration, t =>
             {
                 padding[0] = t;
