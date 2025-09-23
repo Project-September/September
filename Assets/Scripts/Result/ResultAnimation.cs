@@ -302,7 +302,10 @@ namespace Result
 
             _yourRankText.text = $"あなたの順位は {rank + 1} 位です";
             _yourRankText.gameObject.SetActive(true);
-            PlayCue(d);
+            if (rank + 1 == 1)
+            {
+                PlayCue(d);
+            }
 
             CanvasGroup cg = _yourRankText.GetComponent<CanvasGroup>() ??
                              _yourRankText.gameObject.AddComponent<CanvasGroup>();
