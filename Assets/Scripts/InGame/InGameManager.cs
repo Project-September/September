@@ -36,6 +36,8 @@ namespace September.InGame.Common
         /// 現在のゲーム状態名を取得する
         /// </summary>
         public string CurrentStateName => _stateMachine?.CurrentStateName ?? "";
+        
+        public Action GameEnded { get; set; }
 
         private void Start()
         {

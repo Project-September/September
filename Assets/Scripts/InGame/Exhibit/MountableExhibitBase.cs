@@ -65,8 +65,11 @@ namespace InGame.Exhibit
         [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
         EffectSpawner _effectSpawner;
         [SerializeField] private InteractableBase _interactable;
+        private InGameManager _inGameManager;
+        public bool IsEnding;
         public override void Spawned()
         {
+             IsEnding = false;
              Rigidbody = GetComponent<Rigidbody>();
              if (TryGetComponent(out CameraController cameraController))
              {
@@ -83,6 +86,8 @@ namespace InGame.Exhibit
              if (!_effectSpawner)
                  _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
              if(!Runner.IsServer) return;
+             _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+             _inGameManager.GameEnded += () => {IsEnding = true;};
              RPC_SetIsKinematic(true);
         }
         
@@ -136,6 +141,7 @@ namespace InGame.Exhibit
                 .PlayerDataDic[playerRef];
             _ownerPlayerManager = obj.GetComponent<PlayerManager>();
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
+            _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
             UIController.I.ChangeDescriptionUI(0);
@@ -161,8 +167,9 @@ namespace InGame.Exhibit
                 : _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
             _interactable.PlayCooldownEffect(time).Forget();
             _interactable.LastUsedCooldownTime = time;
-                _interactable.LastInteractTime = Runner.SimulationTime;
+            _interactable.LastInteractTime = Runner.SimulationTime;
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _ownerPlayerManager.RPC_SetUseGrav(true);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
             Object.RemoveInputAuthority();
@@ -177,7 +184,6 @@ namespace InGame.Exhibit
             Executor = null;
             transform.SetPositionAndRotation(_initialPosition, _initialRotation);
         }
-        
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetCameraPriority(PlayerRef player,int priority)
         {

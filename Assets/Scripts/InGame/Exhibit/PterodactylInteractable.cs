@@ -93,7 +93,6 @@ namespace InGame.Exhibit
         public override void Render()
         {
             Animator.enabled = IsInteracting;
-
             float baseMin = IsInteracting ? _currentTargetValue : 0f;
             float clamped = Mathf.Max(CurrentBlendValue, baseMin);
             Animator.SetFloat(FlyStateBlend, clamped);
@@ -142,7 +141,6 @@ namespace InGame.Exhibit
             base.OnInteractFixedUpdate(playerInput, deltaTime);
             if (!HasStateAuthority)
                 return;
-
             if (!_isTakingOff)
             {
                 HandleMovement(playerInput);

@@ -28,6 +28,12 @@ namespace InGame.Exhibit
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
             _interactTimer += _networkRunner.DeltaTime;
+
+            if (_tyrannoInteractable.IsEnding)
+            {
+                GetOff();
+                return;
+            }
             
             if (CheckInteractEnd())
             {
