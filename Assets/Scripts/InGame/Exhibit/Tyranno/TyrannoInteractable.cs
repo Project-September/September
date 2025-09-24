@@ -71,6 +71,7 @@ public class TyrannoInteractable : MountableExhibitBase
 
     public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
     {
+        base.OnInteractFixedUpdate(playerInput, deltaTime);
         if(!HasStateAuthority) return;
         CheckIsGround();
         var moveDirection = Move(playerInput);

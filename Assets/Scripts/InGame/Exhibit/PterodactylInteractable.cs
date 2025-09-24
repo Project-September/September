@@ -118,6 +118,7 @@ namespace InGame.Exhibit
 
         public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
         {
+            base.OnInteractFixedUpdate(playerInput, deltaTime);
             if (!HasStateAuthority)
                 return;
 

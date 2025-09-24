@@ -2964,7 +2964,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sens: 10
-  _padSens: 100
+  _padSens: 50
   _characterTf: {fileID: 7863198875755268588}
   _cameraPivot: {fileID: 5314376893517561015}
   _cameraTf: {fileID: 7322555774191184680}
@@ -3045,19 +3045,19 @@ MonoBehaviour:
       data:
         _characterType: 2
         _interactTime: 15
-        _tyrannoInteractable: {fileID: 0}
+        _tyrannoInteractable: {fileID: 3688485294182597585}
     - rid: 731403362977185880
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 3
         _interactTime: 15
-        _tyrannoInteractable: {fileID: 0}
+        _tyrannoInteractable: {fileID: 3688485294182597585}
     - rid: 731403362977185882
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 4
         _interactTime: 15
-        _tyrannoInteractable: {fileID: 0}
+        _tyrannoInteractable: {fileID: 3688485294182597585}
     - rid: 6899644472827052118
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
@@ -3118,6 +3118,7 @@ MonoBehaviour:
   _startFrame: 15
   _endFrame: 50
   _damageAmount: 100
+  CurrentHealth: 0
   _maxHealth: 100
   _getOffPoint: {fileID: 7330491210482851106}
   _height: 10
