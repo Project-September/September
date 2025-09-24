@@ -119,6 +119,13 @@ namespace CRISound
             _instance._defaultSoundList.Add(new Tuple<SoundType, string, string>(type, acb, name));
         }
 
+        public void ResetCategoryVolume()
+        {
+            CriAtom.SetCategoryVolume("BGM", 1.0f);
+            CriAtom.SetCategoryVolume("SE", 1.0f);
+            //CriAtom.SetCategoryVolume("Voice", 1.0f);
+        }
+
         private class SoundDic
         {
             private CriAtomExAcb _atomExAcb;
@@ -176,7 +183,7 @@ namespace CRISound
                 _volume = volume;
                 _atomExPlayer.SetVolume(_volume);
             }
-            
+
             public bool IsPlayingCue(string cueName)
             {
                 return _atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing &&
@@ -383,6 +390,15 @@ namespace CRISound
                         s.CriAtomExPlayer3D.Stop();
                         return;
                     }
+                }
+            }
+
+            /// <summary> 全ての3D再生を止める </summary>
+            public void Stop3DSEAll()
+            {
+                foreach (var s in _sound3Ds)
+                {
+                    s.CriAtomExPlayer3D.Stop();
                 }
             }
         }

@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Fusion;
 using September.Common;
 using System;
 using UnityEngine.SceneManagement;
@@ -34,10 +33,14 @@ namespace CRISound
         /// <param name="sceneName"></param>
         public static async void ChangeBGM(string sceneName, CharacterType characterType = default)
         {
-            //if (sceneName == "InGameMock") return;
             // 待機フラグが立っているときは現在のBGMを止め、解除されるまで流さない
             string newCueName = GetCueNameByScene(sceneName);
             _isWaiting = GetWaitFlagByScene(sceneName);
+            
+            if (newCueName == _currentCueName)
+            {
+                return;
+            }
 
             if (_isWaiting)
             {
@@ -52,12 +55,10 @@ namespace CRISound
                 return;
             }
 
+            if (!string.IsNullOrEmpty(newCueName))
             {
-                if (!string.IsNullOrEmpty(newCueName))
-                {
-                    CRIAudio.PlayBGM("ALLCue", newCueName);
-                    _currentCueName = newCueName;
-                }
+                CRIAudio.PlayBGM("ALLCue", newCueName);
+                _currentCueName = newCueName;
             }
         }
 
@@ -84,6 +85,12 @@ namespace CRISound
             if (!CuePlayAtomExPlayer.Instance.IsReady)
             {
                 await UniTask.WaitUntil(() => CuePlayAtomExPlayer.Instance.IsReady);
+            }
+
+            // タイトルに戻った時音量をリセット(SEも含め)
+            if (scene.name == "Title")
+            {
+                CuePlayAtomExPlayer.Instance.ResetCategoryVolume();
             }
 
             ChangeBGM(scene.name);

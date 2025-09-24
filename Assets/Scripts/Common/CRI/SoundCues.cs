@@ -91,9 +91,10 @@ namespace CRISound
             public static readonly CueData Painting_Warp_In = new CueData(SheetName, "SE_Painting_Warp_In");
             public static readonly CueData Painting_Warp_Out = new CueData(SheetName, "SE_Painting_Warp_Out");
             public static readonly CueData Player_Hit_Generic = new CueData(SheetName, "SE_Player_Hit_Generic");
-            public static readonly CueData UI_CountDown = new CueData(SheetName, "SE_UI_CountDown");
+            public static readonly CueData UI_CountDown_Count = new CueData(SheetName, "SE_UI_CountDown_Count");
             public static readonly CueData UI_GameFinish = new CueData(SheetName, "SE_UI_GameFinish");
             public static readonly CueData BokeBoke_Interact = new CueData(SheetName, "SE_BokeBoke_Interact");
+            public static readonly CueData UI_CountDown_End = new CueData(SheetName, "SE_UI_CountDown_End");
         }
 
         public static class VOICE
