@@ -3030,7 +3030,7 @@ MonoBehaviour:
   _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 24
-  _spawnCooldownEffectOnStart: 1
+  _spawnCooldownEffectOnStart: 0
   _audioBroadcaster: {fileID: 3724488099250409318}
   _interactSoundCueName: SE_Tyranno_Interact
   _interactSoundTrackingType: 0
@@ -3122,6 +3122,7 @@ MonoBehaviour:
   _maxHealth: 100
   _getOffPoint: {fileID: 7330491210482851106}
   _height: 10
+  _interactable: {fileID: 1044747457554308472}
   _walkSpeed: 4
   _dashSpeed: 8
   _rayDirection: {x: 0, y: -1, z: 0}
