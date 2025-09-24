@@ -167,9 +167,13 @@ namespace InGame.Common
             }
             
             RPC_PlayAsync(index);
+            
+            var montage = AnimationClipsContainer.Instance.AnimationMontages[index];
+            PlayAsync(montage.AnimClip, montage.TargetLayer, 1f, montage.BlendIn, montage.BlendOut,
+                montage.IsAdditive, montage.PlaySpeed).Forget();
         }
 
-        [Rpc(RpcSources.All, RpcTargets.All)]
+        [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
         private void RPC_PlayAsync(int clipIndex)
         {
             var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
@@ -188,7 +192,7 @@ namespace InGame.Common
         /// <param name="external">外部から再生処理を止めるトークン。デフォルトではゲームオブジェクトのトークンに紐づく</param>
         /// <param name="blendIn">アニメーション再生開始時のブレンド</param>
         /// <param name="outBlend">アニメーション再生終了時のブレンド</param>
-        private async UniTask PlayAsync(
+        private async UniTask<EndClipType> PlayAsync(
             AnimationClip clip,
             LayerInfo.LayerType layerType,
             float weight,
@@ -198,17 +202,17 @@ namespace InGame.Common
             float playSpeed = 1f,
             CancellationToken external = default)
         {
-            if (!clip) return;
+            if (!clip) return EndClipType.Failed;
             if (layerType == LayerInfo.LayerType.Base)
             {
                 Debug.LogWarning("Base レイヤーには PlayAsync() できません。");
-                return;
+                return EndClipType.Failed;
             }
 
             if (!_slotOf.TryGetValue(layerType, out int slot))
             {
                 Debug.LogWarning($"未定義のレイヤー {layerType}");
-                return;
+                return EndClipType.Failed;
             }
 
             // 同レイヤーの前回待機をキャンセルして新トークン
@@ -226,7 +230,7 @@ namespace InGame.Common
             _layerInfo[slot] = liNow;
 
             // 再生中 Playable を取得
-            if (!_runtimeClips.TryGetValue(layerType, out var played) || !played.IsValid()) return;
+            if (!_runtimeClips.TryGetValue(layerType, out var played) || !played.IsValid()) return EndClipType.Failed;
 
             if (useBlendIn)
             {
@@ -236,7 +240,7 @@ namespace InGame.Common
                 }
                 catch (OperationCanceledException)
                 {
-                    return;
+                    return EndClipType.Interrupted;
                 }
 
                 // 最終スナップ
@@ -267,10 +271,10 @@ namespace InGame.Common
                     _layerInfo[slot] = li;
                 }
 
-                return;
+                return EndClipType.Interrupted;
             }
 
-            if (this == null || !_graph.IsValid()) return;
+            if (this == null || !_graph.IsValid()) return EndClipType.Interrupted;
 
             var from = Mathf.Clamp01(_layerInfo[slot].Weight);
             if (outBlend.BlendTime > 0f)
@@ -281,7 +285,7 @@ namespace InGame.Common
                 }
                 catch (OperationCanceledException)
                 {
-                    return;
+                    return EndClipType.Interrupted;
                 }
             }
 
@@ -299,6 +303,8 @@ namespace InGame.Common
                 _runtimeClips.Remove(layerType);
                 _clipOf.Remove(LayerInfo.LayerType.TopLayer);
             }
+
+            return EndClipType.Complete;
         }
 
         private async UniTask BlendWeightAsync(LayerInfo.Blend outBlend, CancellationToken token, float from, float to,
@@ -329,12 +335,12 @@ namespace InGame.Common
         /// <param name="layer"></param>
         /// <param name="external"></param>
         /// <returns></returns>
-        private CancellationToken RenewLayerCts(LayerInfo.LayerType layer, CancellationToken external)
+        private CancellationToken RenewLayerCts(LayerInfo.LayerType layer, CancellationToken external = default)
         {
             if (_layerCts.TryGetValue(layer, out var old))
             {
-                old.Cancel();
-                old.Dispose();
+                old?.Cancel();
+                old?.Dispose();
             }
 
             var linked =
@@ -575,6 +581,55 @@ namespace InGame.Common
             li.Weight = w;
             _layerInfo[slot] = li;
         }
+
+        /// <summary> 再生したClipが終了または中断されるまで待機 </summary>
+        public async UniTask<EndClipType> PlayClipAndWait(AnimationClip clip, CancellationToken ct = default)
+        {
+            if (AnimationClipsContainer.Instance.AnimationMontages == null)
+            {
+                Debug.LogWarning("AnimationClipsContainer Instance is null");
+                return EndClipType.Failed;
+            }
+            
+            // AnimationClipsContainer から探して再生
+            var index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
+                x => x.AnimClip.name == clip.name);
+
+            if (index < 0)
+            {
+                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
+                return EndClipType.Failed;
+            }
+            
+            RPC_PlayAsync(index);
+            
+            var montage = AnimationClipsContainer.Instance.AnimationMontages[index];
+            return await PlayAsync(montage.AnimClip, montage.TargetLayer, 1f, montage.BlendIn, montage.BlendOut,
+                montage.IsAdditive, montage.PlaySpeed, ct);
+        }
+
+        public bool StopClip(AnimationClip clip)
+        {
+            foreach (var kv in _clipOf)
+            {
+                if (kv.Value == clip && _runtimeClips.TryGetValue(kv.Key, out var p) && p.IsValid())
+                {
+                    RenewLayerCts(kv.Key);
+                    
+                    _slotOf.TryGetValue(kv.Key, out int slot);
+                    
+                    if (_runtimeClips.TryGetValue(kv.Key, out var prev) && prev.IsValid())
+                    {
+                        _layerMixer.DisconnectInput(slot);
+                        prev.Destroy();
+                    }
+                    
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     [Serializable]
@@ -599,5 +654,12 @@ namespace InGame.Common
             public float BlendTime;
             public AnimationCurve BlendCurve;
         }
+    }
+
+    public enum EndClipType
+    {
+        Failed,
+        Complete,
+        Interrupted
     }
 }
