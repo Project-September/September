@@ -28,6 +28,7 @@ namespace September.Common
             public string SelectedVoice;
             public string StartVoice;
             public string WinningVoice;
+            public string BGM;
         }
         [SerializeField, ArrayLength(DataCount)] CharacterData[] _characterData;
 
