@@ -183,6 +183,7 @@ namespace InGame.Exhibit
             }
             Executor = null;
             transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+            CameraController.CameraReset();
         }
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetCameraPriority(PlayerRef player,int priority)
