@@ -137,6 +137,7 @@ namespace September.Lobby
             //  選択しているキャラクターのインデックスを控える
             _currentCharacterIndex = index;
             _characterDisplay.SetCharacter(_currentCharacterIndex);
+            CRIAudio.PlaySE("ALLCue", data.SelectedVoice); // キャラ選択ボイス再生
             return true;
         }
         /// <summary>
@@ -146,7 +147,6 @@ namespace September.Lobby
         {
             var data = CharacterDataContainer.Instance.GetCharacterData(_currentCharacterIndex);
             PlayerDatabase.Instance.Rpc_SetCharacter(_localPlayerRef, data.Type);
-            CRIAudio.PlaySE("ALLCue", data.SelectedVoice);
         }
     }
 }
