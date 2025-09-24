@@ -10247,6 +10247,37 @@ Transform:
   - {fileID: 2225804028943680571}
   m_Father: {fileID: 9124607305837121220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6629897024395720772
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5246278993902121081}
+  m_Layer: 6
+  m_Name: KunaiMuzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5246278993902121081
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6629897024395720772}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.245, y: 0.903, z: 0.279}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8736522266100138394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6646162484013552410
 GameObject:
   m_ObjectHideFlags: 0
@@ -13116,6 +13147,7 @@ GameObject:
   - component: {fileID: 8254388696613982807}
   - component: {fileID: 7344648055957507413}
   - component: {fileID: 4940562243900058895}
+  - component: {fileID: -3421365915295316578}
   m_Layer: 6
   m_Name: Sarutobi
   m_TagString: Player
@@ -13142,6 +13174,7 @@ Transform:
   - {fileID: 8156254438002643843}
   - {fileID: 5242763545905317136}
   - {fileID: 8668728296515204595}
+  - {fileID: 5246278993902121081}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &6099435784402053345
@@ -13200,6 +13233,7 @@ MonoBehaviour:
   - {fileID: 8254388696613982807}
   - {fileID: 7344648055957507413}
   - {fileID: 4940562243900058895}
+  - {fileID: -3421365915295316578}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -13289,7 +13323,7 @@ MonoBehaviour:
   _rotationSpeed: 720
   _maxLedgeHeight: 1.5
   _minLedgeHeight: 0.4
-  _maxLedgeDepth: 0.8
+  _maxLedgeDepth: 0.9
   _reachDistance: 0.2
   _timeToVault: 0.5
   _vaultCurve:
@@ -13555,7 +13589,7 @@ MonoBehaviour:
   _abilities:
   - rid: 1755462043767144544
   _conditions:
-  - rid: 1755462043767144548
+  - rid: 1755462127588212827
   references:
     version: 2
     RefIds:
@@ -13589,8 +13623,8 @@ MonoBehaviour:
           End: 12
         - Start: 18
           End: 20
-    - rid: 1755462043767144548
-      type: {class: AbilityMultiHitAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+    - rid: 1755462127588212827
+      type: {class: SarutobiAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
       data: 
 --- !u!114 &8254388696613982807
 MonoBehaviour:
@@ -13747,6 +13781,36 @@ MonoBehaviour:
   _handSocket: {fileID: 1661348190536254133}
   _wireMaterial: {fileID: 2100000, guid: 3e33a38e2349f447d9fb9ae62269009c, type: 2}
   _wireWidth: 0.05
+--- !u!114 &-3421365915295316578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 777d1a8aadc7a2d4b9d370ed9eabcd47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  _damage: 5
+  _ogreDamage: 8
+  _maxDistance: 100
+  _hitLayer:
+    serializedVersion: 2
+    m_Bits: 203
+  _muzzleTf: {fileID: 5246278993902121081}
+  _stanceCameraOffset: {x: 0.5, y: -0.5, z: -1}
+  _changeOffsetDuration: 0.2
+  _stance: {fileID: 7400000, guid: f0fc32250dd58af46bcf550907312b7d, type: 2}
+  _stanceLoop: {fileID: 7400000, guid: 3219ec83e3c65ab4ab202264540d13b6, type: 2}
+  _throw: {fileID: 7400000, guid: 6bb4907bebb67584ab8af42caa53f9b9, type: 2}
+  _kunaiParticle: {fileID: 4006192185989889383, guid: 8de09788dfd492e448d21078b5517ada, type: 3}
+  _kunaiSpeed: 100
+  _bulletMark: {fileID: 7762581465889203969, guid: 052631cb43762b9479c2428dc1d6ca4d, type: 3}
+  _crosshairPrefab: {fileID: 2541600367538618662, guid: a369727939273664ea0cfb03757f02c7, type: 3}
+  _State: 0
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0

@@ -52,9 +52,10 @@ namespace InGame.Player.Sarutobi
         private Vector3 _targetPosition;
         private Vector3 _startPosition;
         private float _distanceMag;
+        private NetworkButtons PreviousButtons { get; set; }
         
-        [Networked] private AbilityStateType AbilityState { get; set; } = AbilityStateType.Ready;
-        [Networked] private NetworkButtons PreviousButtons { get; set; }
+        [Networked, HideInInspector] public AbilityStateType AbilityState { get; private set; } = AbilityStateType.Ready;
+        public event Action OnAbilityStart;
         [Networked, HideInInspector] public TickTimer Cooldown { get; set; }
 
         public override void Spawned()
@@ -142,6 +143,8 @@ namespace InGame.Player.Sarutobi
         [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
         void RPC_GrappleStart(Vector3 targetPosition)
         {
+            OnAbilityStart?.Invoke();
+            
             if (!HasStateAuthority)
             {
                 _targetPosition = targetPosition + Vector3.up * 0.05f;
@@ -177,7 +180,13 @@ namespace InGame.Player.Sarutobi
 
         async UniTask Shot()
         {
-            await PlayClipAndWait(_animShot);
+            var endType = await _clipPlayer.PlayClipAndWait(_animShot);
+
+            if (endType != EndClipType.Complete)
+            {
+                GrappleEnd();
+            }
+            
             _grappleState = GrappleStateType.ShotWait;
             _clipPlayer.PlayClip(_animShotWait);
             RPC_DisplayWireStart();
@@ -199,7 +208,13 @@ namespace InGame.Player.Sarutobi
 
         async UniTask PreJump()
         {
-            await PlayClipAndWait(_animMoveStart);
+            var endType = await _clipPlayer.PlayClipAndWait(_animMoveStart);
+
+            if (endType != EndClipType.Complete)
+            {
+                GrappleEnd();
+            }
+            
             _grappleState = GrappleStateType.Jumping;
             _clipPlayer.PlayClip(_animMoveLoop);
         }
@@ -235,10 +250,17 @@ namespace InGame.Player.Sarutobi
 
             if (_jumpTimer >= _landingDuration)
             {
-                AbilityState = AbilityStateType.Cooldown;
-                _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
-                _jumpTimer = 0;
+                GrappleEnd();
             }
+        }
+
+        void GrappleEnd()
+        {
+            AbilityState = AbilityStateType.Cooldown;
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _jumpTimer = 0;
+            RPC_DisplayWireEnd();
+            _clipPlayerManager.EnableFallMotion = true;
         }
 
         bool FindGrappleablePosition(out Vector3 position)
@@ -382,13 +404,7 @@ namespace InGame.Player.Sarutobi
             _wireLine.SetPosition(1, otherPos);
         }
 
-        async UniTask PlayClipAndWait(AnimationClip clip)
-        {
-            _clipPlayer.PlayClip(clip);
-            await UniTask.Delay(TimeSpan.FromSeconds(clip.length), cancellationToken: this.GetCancellationTokenOnDestroy());
-        }
-
-        private enum AbilityStateType
+        public enum AbilityStateType
         {
             Ready,
             Active,
