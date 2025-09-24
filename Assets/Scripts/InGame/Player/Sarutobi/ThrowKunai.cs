@@ -34,10 +34,13 @@ namespace InGame.Player.Sarutobi
         private AnimationClipPlayer _clipPlayer;
         private PlayerMovement _movement;
         private CameraController _cameraController;
+        private AbilityGrapplingHook _grapplingHook;
         private GameObject _crosshair;
         private float _cooldownTimer;
         private NetworkButtons PreviousButtons { get; set; }
-        private bool CanThrow => _cooldownTimer <= 0 && State == KunaiStateType.Ready;
+
+        private bool CanThrow => _cooldownTimer <= 0 && State == KunaiStateType.Ready && _grapplingHook &&
+                                 _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active;
 
         [Networked, HideInInspector] public KunaiStateType State { get; private set; } = KunaiStateType.Idol;
 
@@ -48,14 +51,25 @@ namespace InGame.Player.Sarutobi
                 _playerManager = GetComponent<PlayerManager>();
                 _clipPlayer = GetComponent<AnimationClipPlayer>();
                 _movement = GetComponent<PlayerMovement>();
+                _grapplingHook = GetComponent<AbilityGrapplingHook>();
+                _grapplingHook.OnAbilityStart += EndStance;
             }
 
             if (HasInputAuthority)
             {
                 _mainCamera = Camera.main;
                 _cameraController = GetComponent<CameraController>();
+                if (!_grapplingHook) _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _crosshair = Instantiate(_crosshairPrefab);
                 _crosshair.SetActive(false);
+            }
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (HasStateAuthority && _grapplingHook)
+            {
+                _grapplingHook.OnAbilityStart -= EndStance;
             }
         }
 
@@ -63,7 +77,8 @@ namespace InGame.Player.Sarutobi
         {
             if (!GetInput<PlayerInput>(out var input)) return;
             
-            if (State == KunaiStateType.Idol && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability2))
+            if (State == KunaiStateType.Idol && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability2)
+                                             && _grapplingHook && _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active)
             {
                 StartStance().Forget();
             }
@@ -95,9 +110,9 @@ namespace InGame.Player.Sarutobi
             {
                 _cameraController.ChangeOffset(_stanceCameraOffset, _changeOffsetDuration);
                 _crosshair.SetActive(true);
-                return;
             }
-            
+            if (!HasStateAuthority) return;
+
             State = KunaiStateType.Stance;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             var endType = await _clipPlayer.PlayClipAndWait(_stance, this.GetCancellationTokenOnDestroy());
@@ -110,7 +125,6 @@ namespace InGame.Player.Sarutobi
             else
             {
                 EndStance();
-                Rpc_EndStance();
             }
         }
 
@@ -119,9 +133,9 @@ namespace InGame.Player.Sarutobi
             if (HasInputAuthority)
             {
                 KunaiTargetDetection();
-                return;
             }
 
+            if (!HasStateAuthority) return;
             State = KunaiStateType.Stance;
             var endType = await _clipPlayer.PlayClipAndWait(_throw, this.GetCancellationTokenOnDestroy());
 
@@ -137,6 +151,10 @@ namespace InGame.Player.Sarutobi
             {
                 _cameraController.ResetOffset(_changeOffsetDuration);
                 _crosshair.SetActive(false);
+            }
+            else
+            {
+                Rpc_EndStance();
             }
             
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);

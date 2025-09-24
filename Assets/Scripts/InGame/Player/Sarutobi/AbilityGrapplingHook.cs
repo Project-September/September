@@ -54,7 +54,8 @@ namespace InGame.Player.Sarutobi
         private float _distanceMag;
         private NetworkButtons PreviousButtons { get; set; }
         
-        [Networked] private AbilityStateType AbilityState { get; set; } = AbilityStateType.Ready;
+        [Networked, HideInInspector] public AbilityStateType AbilityState { get; private set; } = AbilityStateType.Ready;
+        public event Action OnAbilityStart;
         [Networked, HideInInspector] public TickTimer Cooldown { get; set; }
 
         public override void Spawned()
@@ -142,6 +143,8 @@ namespace InGame.Player.Sarutobi
         [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
         void RPC_GrappleStart(Vector3 targetPosition)
         {
+            OnAbilityStart?.Invoke();
+            
             if (!HasStateAuthority)
             {
                 _targetPosition = targetPosition + Vector3.up * 0.05f;
@@ -401,7 +404,7 @@ namespace InGame.Player.Sarutobi
             _wireLine.SetPosition(1, otherPos);
         }
 
-        private enum AbilityStateType
+        public enum AbilityStateType
         {
             Ready,
             Active,
