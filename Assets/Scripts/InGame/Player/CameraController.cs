@@ -23,6 +23,7 @@ namespace InGame.Player
         
         // camera rotation
         Quaternion _defaultRotation;
+        private float _defaultPitch;
         private float _cameraPitch;
         private float _cameraYaw;
         private bool _isInRotation;
@@ -40,6 +41,7 @@ namespace InGame.Player
 
             // Prefabの初期状態をデフォルトとして保存
             _defaultRotation = _cameraPivot.localRotation;
+            _defaultPitch = _defaultRotation.eulerAngles.x;
             _currentOffset = _cameraTf.localPosition;
             _defaultOffset = _cameraTf.localPosition;
         }
@@ -58,7 +60,7 @@ namespace InGame.Player
             float sens = GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse ? _sens : _padSens;
             float deltaX = mouseInput.y, deltaY = mouseInput.x;
             _cameraPitch -= deltaX * deltaTime * sens;
-            _cameraPitch = Mathf.Clamp(_cameraPitch, -90, 90);
+            _cameraPitch = Mathf.Clamp(_cameraPitch, -90 + _defaultPitch, 90 - _defaultPitch);
             _cameraYaw += deltaY * sens * deltaTime;
             _cameraYaw = ToAngle(_cameraYaw);
             
