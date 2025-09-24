@@ -124,6 +124,7 @@ namespace InGame.Exhibit
 
         public override void GetOff(PlayerRef ownerPlayerRef)
         {
+            _takeOffTween?.Kill();
             base.GetOff(ownerPlayerRef);
 
             Rigidbody.linearVelocity = Vector3.zero;
@@ -314,6 +315,7 @@ namespace InGame.Exhibit
             foreach (var col in cols)
             {
                 var damageable = col.GetComponentInParent<IDamageable>();
+                if (damageable == null) continue;
                 var hitData = new HitData(HitActionType.Damage, _damage, ownerPlayerRef, damageable.OwnerPlayerRef);
                 damageable.TakeHit(ref hitData);
             }
