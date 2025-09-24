@@ -27,6 +27,8 @@ namespace September.Common
             UIController.I.ShowResultAnimation();
             GameInput.I.ToggleMoveInput(false);
             GameInput.I.ToggleLookInput(false);
+            CRIAudio.StopSE();      // 鳴ってるSEを止める 2DPlayer用
+            CRIAudio.Stop3DSEAll(); // 3DPlayer用
             BGMManager.ChangeBGM("Result"); // リザルトシーン用のBGMを再生
         }
         private void ShowCursor()
