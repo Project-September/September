@@ -13316,7 +13316,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _visible: 0
+  _printVaultFailedLog: 0
+  _visibleGizmos: 0
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
@@ -13726,7 +13727,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbd17a7a6e4380c499c268f3eb49b17f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _targetUIPrefab: {fileID: 2541600367538618662, guid: a369727939273664ea0cfb03757f02c7, type: 3}
+  _targetUIPrefab: {fileID: 2541600367538618662, guid: 75486eea2ad212347a79bfb2c68532b7, type: 3}
   _cooldown: 5
   _distanceRange:
     Min: 5
