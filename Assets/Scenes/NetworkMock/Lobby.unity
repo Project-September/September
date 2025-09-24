@@ -732,7 +732,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u30A2\u30A4\u30A6\u30A8\u30AA"
+  m_text: "\u9F8D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
   m_sharedMaterial: {fileID: -4247787893072867334, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
@@ -1672,19 +1672,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 492611202}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: September.Title.TitlePanelController, Scripts
-        m_MethodName: BackToMain
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &492611202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2281,7 +2269,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 40.102837}
+  m_AnchoredPosition: {x: 0, y: -0.0000076293945}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &618147049
@@ -2867,7 +2855,6 @@ GameObject:
   - component: {fileID: 734173532}
   - component: {fileID: 734173531}
   - component: {fileID: 734173530}
-  - component: {fileID: 734173529}
   m_Layer: 5
   m_Name: HowToPlayPanel
   m_TagString: Untagged
@@ -2893,23 +2880,8 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 800, y: 450.13333}
+  m_SizeDelta: {x: 800, y: 450.13336}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &734173529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 734173527}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a9666c299d1430e88ca20e11722b885, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hideOnStart: 0
-  _selectWhenShow: {fileID: 492611201}
-  _selectWhenHide: {fileID: 881544211}
 --- !u!225 &734173530
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3854,8 +3826,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 598347563}
   m_HandleRect: {fileID: 598347562}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4694,8 +4666,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1017903993}
   m_HandleRect: {fileID: 1017903992}
   m_Direction: 2
-  m_Value: -0.00000076098405
-  m_Size: 0.86632407
+  m_Value: 1
+  m_Size: 0.8663239
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5031,6 +5003,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _howToPlayPanel: {fileID: 734173527}
   _closeButton: {fileID: 492611201}
+  _selectWhenShow: {fileID: 492611201}
+  _selectWhenHide: {fileID: 881544211}
 --- !u!1 &1305405541
 GameObject:
   m_ObjectHideFlags: 0
@@ -5067,7 +5041,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 65, y: -10}
-  m_SizeDelta: {x: 105.679, y: 10.14}
+  m_SizeDelta: {x: 105.679, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1305405543
 MonoBehaviour:

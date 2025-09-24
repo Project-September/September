@@ -27,7 +27,7 @@ namespace September.Common
             UIController.I.ShowResultAnimation();
             GameInput.I.ToggleMoveInput(false);
             GameInput.I.ToggleLookInput(false);
-            BGMManager.ChangeBGM(SoundCues.BGM.Result_01_Loop.Name);
+            BGMManager.ChangeBGM("Result"); // リザルトシーン用のBGMを再生
         }
         private void ShowCursor()
         {

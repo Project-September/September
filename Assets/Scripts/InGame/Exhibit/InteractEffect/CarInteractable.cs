@@ -217,13 +217,14 @@ namespace InGame.Exhibit.InteractEffect
         private void CacheKnotWorldPositions()
         {
             _knotWorldPositions.Clear();
-            Spline spline = _spline.Spline;
+            Spline spline = _spline?.Spline;
 
-            foreach (var knot in spline)
-            {
-                Vector3 wp = _spline.transform.TransformPoint(knot.Position);
-                _knotWorldPositions.Add(wp);
-            }
+            if (spline != null)
+                foreach (var knot in spline)
+                {
+                    Vector3 wp = _spline.transform.TransformPoint(knot.Position);
+                    _knotWorldPositions.Add(wp);
+                }
         }
 
         // Splineの長さを取得する
