@@ -89,6 +89,34 @@ namespace September.InGame
             PlaySoundAtPosition(cueName, transform.position);
         }
 
+        ///// <summary>
+        ///// Follow固定の音再生
+        ///// NetworkObject以外のポジション指定用(Vector3)
+        ///// 3D再生
+        ///// </summary>
+        ///// <param name="cueName"></param>
+        ///// <param name="worldPos"></param>
+        //public void PlaySoundAtPositionFollow(string cueName, Vector3 worldPos)
+        //{
+        //    if (!HasStateAuthority) return;
+        //    RPC_Request3DSoundAtPosition(worldPos, _cueSheet, cueName);
+        //}
+
+        /// <summary>
+        /// Follow固定の音再生
+        /// NetworkObject以外のポジション指定用(Transform)
+        /// 3D再生
+        /// </summary>
+        /// <param name="cueName"></param>
+        /// <param name="transform"></param>
+        public void PlaySoundAtTransformFollow(string cueName, NetworkObject obj)
+        {
+            if (!obj) return;
+            RPC_Request3DSoundAtTransformFollow(obj, _cueSheet, cueName);
+            //PlaySoundAtPositionFollow(cueName, transform.position);
+        }
+
+
         //-------------------------------------------------------//
         /// <summary>
         /// スクリプトから直接呼び出す再生
@@ -206,6 +234,16 @@ namespace September.InGame
             if (cueName.IsNullOrEmpty()) return;
 
             CRIAudio.PlaySE(worldPos, sheetName, cueName);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_Request3DSoundAtTransformFollow(NetworkObject obj, string sheetName, string cueName)
+        {
+            if (cueName.IsNullOrEmpty()) return;
+
+            var sePlayer = CRIAudio.PlaySE(obj.transform.position, sheetName, cueName);
+            var followSound = new FollowEntry(obj.transform, sePlayer);
+            _followingList.Add(followSound);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]

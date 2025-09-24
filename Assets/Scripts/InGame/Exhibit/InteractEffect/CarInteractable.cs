@@ -1,13 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using CRISound;
 using Fusion;
 using InGame.Health;
 using September.Common;
+using September.InGame;
 using September.InGame.Common;
 using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.Splines;
+using static CRISound.CuePlayAtomExPlayer.SEPlayerWith3D;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
@@ -47,6 +50,8 @@ namespace InGame.Exhibit.InteractEffect
         [SerializeField] private List<Transform> _effectPositions = new();
         private List<string> _ids = new();
 
+        AudioBroadcaster _audioBroadcaster;
+
         public override void Render()
         {
             if (_spline == null || _target == null)
@@ -70,6 +75,7 @@ namespace InGame.Exhibit.InteractEffect
             {
                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             }
+            _audioBroadcaster = GetComponent<AudioBroadcaster>();
         }
 
         public override void FixedUpdateNetwork()
@@ -93,7 +99,9 @@ namespace InGame.Exhibit.InteractEffect
             Progress = 0f;
             _delayRemaining = 0;
             _lastDelayKnotIndex = -1;
-           
+            //_audioBroadcaster.PlaySoundAtPosition(SoundCues.SE.Car_Interact.Name, this.transform.position);
+            _audioBroadcaster.PlaySoundAtTransformFollow(SoundCues.SE.Car_Interact.Name, Object);
+            Debug.Log("再生");
         }
 
         public void EffectSpawn()
@@ -122,14 +130,15 @@ namespace InGame.Exhibit.InteractEffect
             foreach (var id in _ids)
             {
                 _effectSpawner?.StopEffect(id);
+
             }
+            CRIAudio.Stop3DSEFromCueName(SoundCues.SE.Car_Interact.Name);
         }
 
         private void Move()
         {
             if (_approxCount <= 0f)
                 return;
-
             Spline spline = _spline.Spline;
             // Spline上の現在位置と姿勢を算出する
             spline.Evaluate(Progress, out var localPos, out _, out _);
