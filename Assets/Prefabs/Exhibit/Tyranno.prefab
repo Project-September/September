@@ -2675,7 +2675,7 @@ Transform:
   m_GameObject: {fileID: 5271512722364737905}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.077, y: 1.005, z: -0.618}
+  m_LocalPosition: {x: 0.23, y: 4.15, z: -1.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3013,20 +3013,23 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 05000000
     values:
-    - 3
+    - 4
   _cooldownTimeDictionary:
     keys: 05000000
     values:
-    - 5
+    - 10
   _characterEffects:
   - rid: 6899644472827052118
+  - rid: 731403362977185879
+  - rid: 731403362977185880
+  - rid: 731403362977185882
   _type: 2
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectTransform: {fileID: 0}
-  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectOffset: {x: 0.1, y: 0.1, z: 0.8}
   _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
-  _cooldownEffectType: 11
+  _cooldownEffectType: 24
   _spawnCooldownEffectOnStart: 1
   _audioBroadcaster: {fileID: 3724488099250409318}
   _interactSoundCueName: SE_Tyranno_Interact
@@ -3037,11 +3040,29 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 731403362977185879
+      type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 2
+        _interactTime: 15
+        _tyrannoInteractable: {fileID: 0}
+    - rid: 731403362977185880
+      type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 3
+        _interactTime: 15
+        _tyrannoInteractable: {fileID: 0}
+    - rid: 731403362977185882
+      type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 4
+        _interactTime: 15
+        _tyrannoInteractable: {fileID: 0}
     - rid: 6899644472827052118
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 5
-        _interactTime: 10
+        _characterType: 1
+        _interactTime: 22.5
         _tyrannoInteractable: {fileID: 3688485294182597585}
 --- !u!114 &4658893626954123635
 MonoBehaviour:
@@ -3090,22 +3111,24 @@ MonoBehaviour:
   _points:
   - {fileID: 2685553553420266245}
   - {fileID: 1532904449675534629}
-  _hitboxRadius: 0.5
+  _hitboxRadius: 5
   _hitMask:
     serializedVersion: 2
     m_Bits: 0
   _startFrame: 15
-  _endFrame: 34
+  _endFrame: 50
   _damageAmount: 100
-  _maxHealth: 10
+  _maxHealth: 100
   _getOffPoint: {fileID: 7330491210482851106}
-  _walkSpeed: 2.5
-  _dashSpeed: 5
+  _height: 10
+  _walkSpeed: 4
+  _dashSpeed: 8
   _rayDirection: {x: 0, y: -1, z: 0}
   _rayDistance: 1.3
   _gravity: {x: 0, y: -200, z: 0}
   _maxRotateValue: 250
   _cooldownTime: 3
+  _IsInteracting: 0
 --- !u!114 &3724488099250409318
 MonoBehaviour:
   m_ObjectHideFlags: 0

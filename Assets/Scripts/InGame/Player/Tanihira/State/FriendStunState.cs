@@ -19,8 +19,9 @@ namespace Ingame.Tanihira
             _stunTime = friend.CurrentFriendStatus.FriendStunTime;
             _stunTimer = 0;
             _isStun = true;
+            friend.IsAttack = false;
             //隊列から離れる
-            friend.FormationManager.DeleteFriend(friend);
+            friend.FormationManager?.DeleteFriend(friend);
             if (_friendAnimationController)
             {
                 //スタン時のアニメーション

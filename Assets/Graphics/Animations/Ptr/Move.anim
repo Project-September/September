@@ -37632,9 +37632,9 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.5
-    functionName: OnPlaySE
-    data: Pteranodon_Flapping_1
-    objectReferenceParameter: {fileID: 3084925805453180816, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
+    functionName: PlaySoundFromAnimationEventForExhibit
+    data: SE_Pteranodon_FlapLoop
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

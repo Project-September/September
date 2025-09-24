@@ -28,19 +28,19 @@ namespace InGame.Exhibit
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
             _interactTimer += _networkRunner.DeltaTime;
+            
+            if (CheckInteractEnd())
+            {
+                GetOff();
+                return;
+            }
 
             if (playerInput.Buttons.IsSet(PlayerButtons.Interact) && _interactTimer > 1f)
             {
                 GetOff();
                 return;
             }
-
-
-            if (CheckInteractEnd())
-            {
-                GetOff();
-            }
-
+            
             _tyrannoInteractable.OnInteractFixedUpdate(playerInput, _networkRunner.DeltaTime);
         }
 

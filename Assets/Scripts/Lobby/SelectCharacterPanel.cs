@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
@@ -136,6 +137,7 @@ namespace September.Lobby
             //  選択しているキャラクターのインデックスを控える
             _currentCharacterIndex = index;
             _characterDisplay.SetCharacter(_currentCharacterIndex);
+            CRIAudio.PlaySE("ALLCue", data.SelectedVoice); // キャラ選択ボイス再生
             return true;
         }
         /// <summary>

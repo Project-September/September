@@ -30,6 +30,9 @@ namespace Ingame.Tanihira
         }
         public override void ChangeState(FriendState newState)
         {
+            if (!HasStateAuthority)
+                return;
+            
             if (_isEnd)
                 return;
             
@@ -60,6 +63,7 @@ namespace Ingame.Tanihira
             else
             {
                 _mecanimAnimator?.SetTrigger("Damage");
+                IsAttack = false;
             }
             _currentHealth -= damage;
         }
@@ -69,6 +73,9 @@ namespace Ingame.Tanihira
         /// </summary>
         public void RecoverStun()
         {
+            if (!HasStateAuthority)
+                return;
+            
             _formationManager.Register(this.gameObject.GetComponent<FriendBase>());
             _currentHealth = _maxHealth;
             ChangeState(_stockFriendState);

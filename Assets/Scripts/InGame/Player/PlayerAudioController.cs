@@ -6,6 +6,8 @@ using InGame.Common;
 using System.Collections.Generic;
 using UnityEngine.Playables;
 using CriWare;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace September.InGame
 {
@@ -67,17 +69,31 @@ namespace September.InGame
         public override void Spawned()
         {
             // 3Dリスナーの設定(カメラ追従)
-            if (!Object.HasInputAuthority) return;
+            if (!HasInputAuthority) return;
 
             _audioBroadcaster = GetComponent<AudioBroadcaster>();
             _clipPlayer = GetComponentInParent<AnimationClipPlayer>();
-            _listenerManager = FindFirstObjectByType<CRIListenerManager>();
-            if (_listenerManager == null) return;
-
             _playerTransform = transform.root;
             _cameraTransform = Camera.main.transform;
-            _listenerManager.AttachPlayer(_playerTransform); // 一応Meshではなくルートを設定
-            _listenerManager.AttachCamera(_cameraTransform); // 音の左右を視界基準に設定
+            SetupListenerAsync(this.GetCancellationTokenOnDestroy()).Forget();
+        }
+
+        private async UniTask SetupListenerAsync(CancellationToken ct)
+        {
+            CRIListenerManager listenerManager = null;
+            await UniTask.WaitUntil(() =>
+            {
+                listenerManager = CRIListenerManager.GetOrCreateInLocalListener();
+                return listenerManager != null;
+            }, cancellationToken: ct);
+
+            _listenerManager = listenerManager;
+
+            await UniTask.WaitUntil(() => Camera.main != null, cancellationToken: ct);
+            if (ct.IsCancellationRequested) return;
+
+            listenerManager.AttachPlayer(transform.root);        // 一応Meshではなくルートを設定
+            listenerManager.AttachCamera(Camera.main.transform); // 音の左右を視界基準に設定
         }
 
         /// <summary> 足音再生用 Animation Eventから使用 </summary>
@@ -88,6 +104,8 @@ namespace September.InGame
         /// </param>
         public void PlayFootstepSound(AnimationEvent animationEvent)
         {
+            if (_listenerManager == null) return;
+
             // 自分からでなければ鳴らさない
             if (!HasInputAuthority) return;
 

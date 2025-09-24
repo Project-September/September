@@ -6,10 +6,6 @@ public class FriendChaseState : IFriendState
 {
     public void OnEnter(FriendBase friend)
     {
-        //目的地を設定
-        if (friend.Destination != null)
-            friend.Agent.SetDestination(friend.Destination.position);
-        
         friend.Agent.speed = friend.CurrentFriendStatus.FriendChaseSpeed;
         friend.Agent.stoppingDistance = friend.CurrentFriendStatus.FriendChaseDistance;
     }
@@ -23,6 +19,7 @@ public class FriendChaseState : IFriendState
     {
         if (friend.Destination == null || !friend.Agent.isOnNavMesh) return;
             
+        friend.Agent.SetDestination(friend.Destination.position);
         //速度に応じて、アニメーションを変化させる
         friend.Animator.SetFloat("MoveBlend", friend.Agent.velocity.magnitude);
         friend.ChangeRunEffect(friend.Agent.velocity.magnitude);

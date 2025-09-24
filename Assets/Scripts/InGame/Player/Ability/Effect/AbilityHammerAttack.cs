@@ -2,6 +2,7 @@ using System.Linq;
 using Fusion;
 using InGame.Exhibit.InteractEffect;
 using InGame.Health;
+using InGame.Interact;
 using September.Common;
 using UnityEngine;
 
@@ -28,8 +29,9 @@ namespace InGame.Player.Ability.Effect
 
             if (disableInteractEffect)
             {
+                if (disableInteractEffect.gameObject.GetComponent<InteractableBase>().IsInCooldown()) return;
                 PlayerRef actor = Parameter.Owner.InputAuthority;
-                disableInteractEffect.OnHitHammerAttack();
+                disableInteractEffect.OnHitHammerAttack(actor);
                 PlayerDatabase.Instance.Server_AddDestroyExhibit(actor,disableInteractEffect.ExhibitType);
             }
 

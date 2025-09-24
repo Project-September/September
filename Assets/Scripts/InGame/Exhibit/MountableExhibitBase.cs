@@ -7,8 +7,10 @@ using Ingame.Tanihira;
 using NaughtyAttributes;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.Effect;
 using September.InGame.UI;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace InGame.Exhibit
 {
@@ -54,10 +56,12 @@ namespace InGame.Exhibit
         
         private PlayerManager _ownerPlayerManager;
         
-        private Vector3 _hidePosition = new Vector3(0, 0, 0);
-        
         [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
         
+        private Collider _collider;
+
+        [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
+        EffectSpawner _effectSpawner;
         public override void Spawned()
         {
              Rigidbody = GetComponent<Rigidbody>();
@@ -72,6 +76,9 @@ namespace InGame.Exhibit
              IsSpawned = true;
              _initialPosition = transform.position;
              _initialRotation = transform.rotation;
+             _collider = gameObject.GetComponentInHierarchy<Collider>();
+             if (!_effectSpawner)
+                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
              if(!Runner.IsServer) return;
              RPC_SetIsKinematic(true);
         }
@@ -80,15 +87,15 @@ namespace InGame.Exhibit
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
             {
-                OnHit = collider =>
+                OnHit = (col,pos) =>
                 {
-                    var damageable = collider.GetComponentInParent<IDamageable>();
-                    if (damageable != null)
-                    {
-                        var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
-                            damageable.OwnerPlayerRef);
-                        damageable.TakeHit(ref hitData);
-                    }
+                    var damageable = col.GetComponentInParent<IDamageable>();
+                    if(col == _collider) return;
+                    if (damageable == null) return;
+                    var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
+                        damageable.OwnerPlayerRef);
+                    damageable.TakeHit(ref hitData);
+                    _effectSpawner.RequestPlayOneShotEffect(EffectType.HitNormal,col.ClosestPoint(pos), Quaternion.identity);
                 }
             };
         }
@@ -141,10 +148,10 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
+            _ownerPlayerManager.transform.position = _getOffPoint.position;
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
-            _ownerPlayerManager.transform.position = _getOffPoint.position;
             Object.RemoveInputAuthority();
             UIController.I.ChangeDescriptionUI(false);
             RPC_SetCameraPriority(playerRef,5);

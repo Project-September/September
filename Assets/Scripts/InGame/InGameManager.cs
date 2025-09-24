@@ -6,7 +6,6 @@ using NaughtyAttributes;
 using September.Common;
 using September.InGame.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace September.InGame.Common
 {

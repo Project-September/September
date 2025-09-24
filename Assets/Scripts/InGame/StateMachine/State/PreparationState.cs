@@ -24,10 +24,10 @@ namespace September.Common
         [SerializeField] private Image _fadeImage;
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
-        [SerializeField] private CountdownAnimation _countdownAnimation;
         [SerializeField] private SetIcon _setIcon;
         private int _spawnPositionIndex; 
         private PlayerRef _firstOgrePlayer;
+        private static readonly string _cueSheetName = "ALLCue";
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -92,7 +92,7 @@ namespace September.Common
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始 
-            _countdownAnimation.StartCountdown();
+            UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ
             GameInput.I.ToggleMoveInput(true);
@@ -101,8 +101,14 @@ namespace September.Common
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
             //  ゲーム開始
             GameInput.I.ToggleActionInput(true);
-            SetOgreLamp();
-            RPC_ShowStatusUpUI(_firstOgrePlayer,true);
+            var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
+            //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
+            if (task != null)
+                task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
+            else
+                SetOgreLamp();
+            await UniTask.WaitForSeconds(3f);
+            ShowStatusUpUI();
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
             {
@@ -137,19 +143,21 @@ namespace September.Common
                 var animClipPlayer = Context.Runner.GetPlayerObject(pair.Key).GetComponent<AnimationClipPlayer>();
                 var characterType = pair.Value.CharacterType;
                 var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
-
                 _startCamera.transform.position = _spawnPositions[index].position + _cameraOffset;
                 await UniTask.WaitForSeconds(1f);
                 float delayTime = 1f;
                 if (emoteClip)
                 {
                     if(Context.Runner.IsServer) animClipPlayer.PlayClip(emoteClip);
+                    var cueName = characterDataContainer.GetCharacterData(characterType).StartVoice;
+                    CRIAudio.PlaySE(_cueSheetName,cueName); // ボイス呼び出し
                     delayTime = emoteClip.length;
                 }
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
                 index++;
             }
         }
+        
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
         {
             if (killerData.StunData.TryGet(killedPlayer, out int count))
@@ -223,6 +231,11 @@ namespace September.Common
             if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
             {
                 UIController.I.ShowOgreLamp(true);
+                UIController.I.ChangeTagNotice(0);
+            }
+            else
+            {
+                UIController.I.ChangeTagNotice(1);
             }
         }
 
@@ -243,12 +256,17 @@ namespace September.Common
         private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
         {
             if (executor == Context.Runner.LocalPlayer)
+            {
                 UIController.I.ShowOgreLamp(false);
-            else if(targetRef == Context.Runner.LocalPlayer)
+            }
+            else if (targetRef == Context.Runner.LocalPlayer)
+            {
                 UIController.I.ShowOgreLamp(true);
+                UIController.I.ChangeTagNotice(2);
+            }
         }
         
-        [Rpc(RpcSources.All, RpcTargets.All)]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_ShowStatusUpUI(PlayerRef playerRef,bool showStatusUpUI)
         {
             if (Runner.LocalPlayer == playerRef)
@@ -263,5 +281,14 @@ namespace September.Common
                 }
             }
         }
+
+        private void ShowStatusUpUI()
+        {
+            if (PlayerDatabase.Instance.PlayerDataDic[Runner.LocalPlayer].IsOgre)
+            {
+                UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
+            }
+        }
+       
     }
 }

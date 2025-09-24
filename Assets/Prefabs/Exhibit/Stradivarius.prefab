@@ -134,16 +134,18 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 05000000
     values:
-    - 5
+    - 3
   _cooldownTimeDictionary:
     keys: 05000000
     values:
-    - 10
+    - 5
   _characterEffects:
   - rid: 4983488310407856386
   _type: 11
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
@@ -174,7 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healAmount: 50
-  _offset: {x: 0, y: 0.9, z: 0}
+  _offset: {x: 0, y: 1, z: 0}
 --- !u!114 &1264278398715580977
 MonoBehaviour:
   m_ObjectHideFlags: 0

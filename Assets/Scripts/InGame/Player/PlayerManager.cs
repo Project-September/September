@@ -1,5 +1,6 @@
 using Fusion;
 using InGame.Health;
+using Ingame.Tanihira;
 using September.Common;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
@@ -203,6 +204,12 @@ namespace InGame.Player
             if (!HasStateAuthority) return;
             
             _playerMovement.Teleport(_respawnPosition);
+            
+            //タニヒラ用の処理を追記
+            if (this.gameObject.TryGetComponent<FormationManager>(out FormationManager formationManager))
+            {
+                formationManager.WarpFriendNearPlayer(_respawnPosition, Quaternion.identity);
+            }
         }
 
         /// <summary> スタンの経過時間を取得する </summary>

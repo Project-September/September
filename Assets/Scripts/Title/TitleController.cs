@@ -1,16 +1,18 @@
 using September.Common;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace September.Title
 {
     public class TitleController : MonoBehaviour
     {
         [Header("Create Lobby")]
-        [SerializeField] InputField _createLobbyName;
+        
+        [SerializeField] TMP_InputField _createLobbyName;
         [SerializeField] Slider _maxPlayers;
         [Header("Join Lobby")]
-        [SerializeField] InputField _joinLobbyName;
+        [SerializeField] TMP_InputField _joinLobbyName;
         
         public void CreateLobby()
         {

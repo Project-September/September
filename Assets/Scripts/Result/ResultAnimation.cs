@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -266,6 +267,10 @@ namespace Result
                 row.rt.DOAnchorPosY(targetY, _sortMoveDuration)
                     .SetEase(Ease.InOutCubic)
                     .SetDelay(_sortStagger * newIndex);
+
+                if (newIndex != sorted.Count - 1) 
+                    continue;
+                row.score.color = Color.red;
             }
 
             await UniTask.Delay(TimeSpan.FromSeconds(_sortMoveDuration + _sortStagger * (sorted.Count - 1)));
@@ -298,9 +303,16 @@ namespace Result
                 .ToList();
 
             int rank = ranking.FindIndex(p => p.DisplayNickName == localName);
+            int displayRank = rank + 1;
+            //int lastRank = ranking.Count; = displayRank == lastRank ? $"あなたの順位は {displayRank} 位です(鬼)" :
 
-            _yourRankText.text = $"あなたの順位は {rank + 1} 位です";
+            _yourRankText.text = $"あなたの順位は {displayRank} 位です";
+            
             _yourRankText.gameObject.SetActive(true);
+            if (rank + 1 == 1)
+            {
+                PlayCue(d);
+            }
 
             CanvasGroup cg = _yourRankText.GetComponent<CanvasGroup>() ??
                              _yourRankText.gameObject.AddComponent<CanvasGroup>();
@@ -315,6 +327,27 @@ namespace Result
                 .Join(rt.DOAnchorPos(end, _yourRankFadeDuration).SetEase(Ease.OutQuad))
                 .Append(rt.DOPunchScale(Vector3.one * 0.08f, 0.2f, 8, 0.9f))
                 .AsyncWaitForCompletion();
+        }
+
+        private void PlayCue(SessionPlayerData player)
+        {
+            switch (player.CharacterType)
+            {
+                case CharacterType.OkabeWright:
+                    CRIAudio.PlaySE("ALLCue", "VO_OKB_Win");
+                    break;
+                case CharacterType.HulkTheButcher:
+                    CRIAudio.PlaySE("ALLCue", "VO_Haru_Win");
+                    break;
+                case CharacterType.Tanihira:
+                    CRIAudio.PlaySE("ALLCue", "VO_Tanihira_Win");
+                    break;
+                case CharacterType.Sarutobi:
+                    CRIAudio.PlaySE("ALLCue", "VO_Koinuma_Win");
+                    break;
+                default:
+                    return;
+            }
         }
     }
 }

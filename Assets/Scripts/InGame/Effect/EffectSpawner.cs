@@ -16,6 +16,8 @@ namespace September.InGame.Effect
         
         private void Awake()
         {
+                  
+            StaticServiceLocator.Instance.Register<EffectSpawner>(this);
             _networkRunner = FindFirstObjectByType<NetworkRunner>();
             if (_networkRunner == null)
             {
@@ -45,8 +47,7 @@ namespace September.InGame.Effect
             
             if (_activeEffects == null)
                 _activeEffects = new Dictionary<string, GameObject>();
-            
-            StaticServiceLocator.Instance.Register<EffectSpawner>(this);
+      
         }
 
         /// <summary>

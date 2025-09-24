@@ -52,7 +52,7 @@ MonoBehaviour:
   _requiredInteractTimeDictionary:
     keys: 05000000
     values:
-    - 1
+    - 2
   _cooldownTimeDictionary:
     keys: 05000000
     values:
@@ -80,7 +80,7 @@ MonoBehaviour:
       type: {class: OpticalCamouflageInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 5
-        _duration: 5
+        _duration: 7.5
 --- !u!114 &439631256018364724
 MonoBehaviour:
   m_ObjectHideFlags: 0
