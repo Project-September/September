@@ -112,6 +112,18 @@ namespace InGame.Common
             FadeOutAndClearFall().Forget();
         }
 
+        /// <summary>
+        /// TopLayerで何かアクティブなクリップが再生されているかをチェック
+        /// </summary>
+        private bool HasActiveTopLayerClip()
+        {
+            // 管理対象のアニメーションクリップをチェック
+            return _animationClipPlayer.IsPlayingTargetClip(_jumpOver) ||
+                   _animationClipPlayer.IsPlayingTargetClip(_fallDown) ||
+                   _animationClipPlayer.IsPlayingTargetClip(_faint) ||
+                   _animationClipPlayer.IsPlayingTargetClip(_getUp);
+        }
+
         public bool EnableFallMotion = true;
 
         private void LateUpdate()
@@ -130,10 +142,17 @@ namespace InGame.Common
             _locoWeight = Mathf.Abs(_locoWeight - wishWeight) <= deltaWeight ? wishWeight : _locoWeight < wishWeight ? _locoWeight + deltaWeight : _locoWeight - deltaWeight;
             _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
 
-            if (_playerMovement.IsGroundNet && _animationClipPlayer.IsPlayingTargetClip(_fallDown))
+            // TopLayerで何も再生していないときはWeightを0にする
+            if (!HasActiveTopLayerClip())
             {
-                SetFallAnim(true);
+                _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
             }
+            //
+            // Debug.LogError($"IsGroundNet:{_playerMovement.IsGroundNet}, IsPlaying:{_animationClipPlayer.IsPlayingTargetClip(_fallDown)}");
+            // if (_playerMovement.IsGroundNet && _animationClipPlayer.IsPlayingTargetClip(_fallDown))
+            // {
+            //     SetFallAnim(true);
+            // }
         }
         
         public void TriggerFaint()
