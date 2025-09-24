@@ -2,6 +2,7 @@
 using System.Threading;
 using CRISound;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Fusion;
 using InGame.Health;
 using InGame.Interact;
@@ -48,6 +49,15 @@ namespace InGame.Exhibit
         private PlayerRef _owner;
         private LayerMask _groundLayer;
         private Vector3 _hitPosition;
+        
+        [Header("乗った時の上昇アニメーション")]
+        [SerializeField, Tooltip("GetOnした時に上昇する高さ")]
+        private float _takeOffHeight = 5f;
+
+        [SerializeField, Tooltip("上昇にかかる時間(秒)")]
+        private float _takeOffDuration = 1.5f;
+        
+        private Tween _takeOffTween;
 
         [Networked] private Vector3 AimObjectPosition { get; set; }
         [Networked] private Quaternion AimObjectRotation { get; set; }
@@ -62,6 +72,7 @@ namespace InGame.Exhibit
         private NetworkBool IsInteracting { get; set; }
         [Networked, OnChangedRender(nameof(OnAttackTriggered))]
         private NetworkBool AttackTrigger { get; set; }
+        private bool _isTakingOff;
 
         #region AnimationHash
 
@@ -100,6 +111,16 @@ namespace InGame.Exhibit
             _interactableBase.ForceSetInteractable = false;
             _owner = ownerPlayerRef;
             IsAimObjectActive = true;
+
+            _isTakingOff = true;
+            
+            // 既存のTweenを止めてから新しいTween開始
+            _takeOffTween?.Kill();
+
+            Vector3 targetPos = transform.position + Vector3.up * _takeOffHeight;
+            _takeOffTween = Rigidbody.DOMove(targetPos, _takeOffDuration)
+                .SetEase(Ease.OutSine)
+                .OnComplete(() => _isTakingOff = false); 
         }
 
         public override void GetOff(PlayerRef ownerPlayerRef)
@@ -122,7 +143,11 @@ namespace InGame.Exhibit
             if (!HasStateAuthority)
                 return;
 
-            HandleMovement(playerInput);
+            if (!_isTakingOff)
+            {
+                HandleMovement(playerInput);
+            }
+            
             _fireCooldownTimerSec = Mathf.Min(_fireCooldown, _fireCooldownTimerSec + deltaTime);
             
             if (_fireCooldownTimerSec >= _fireCooldown && AttackTrigger)
