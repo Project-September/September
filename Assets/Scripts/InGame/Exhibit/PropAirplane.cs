@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using Fusion;
 using InGame.Common;
@@ -14,6 +15,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using PlayerInput = September.Common.PlayerInput;
 using CRISound;
+using Cysharp.Threading.Tasks;
 
 namespace InGame.Exhibit
 {
@@ -130,7 +132,6 @@ namespace InGame.Exhibit
                     if (timeSinceGetOn > 1f && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Interact))
                     {
                         GetOff();
-                        Debug.Log("GetOff");
                         AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_Interact"); // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
                         AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_TakeoffGunFire"); // もしくは射撃音を止める
                         return;
@@ -351,6 +352,7 @@ namespace InGame.Exhibit
 
             // set input authority
             OwnerPlayerRef = ownerPlayerRef;
+            LastUsedCooldownTime = -9999f;
             Object.AssignInputAuthority(ownerPlayerRef);
             // playerの状態切り替え
             _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>().PlayerDataDic[ownerPlayerRef]
@@ -371,6 +373,14 @@ namespace InGame.Exhibit
         void GetOff()
         {
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
+            
+            var chara = PlayerDatabase.Instance.PlayerDataDic[OwnerPlayerRef].CharacterType;
+            var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all
+                : CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
+            PlayCooldownEffect(time).Forget();
+            LastUsedCooldownTime = time;
+            LastInteractTime = Runner.SimulationTime;
 
             // Authority
             OwnerPlayerRef = PlayerRef.None;
