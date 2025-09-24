@@ -294,7 +294,11 @@ namespace InGame.Player
 
         private void TryVault(Vector2 moveDirection)
         {
-            if (!IsGround) return;
+            if (!IsGround)
+            {
+                if (_printVaultFailedLog) Debug.Log("Vault Failed : Not IsGround");
+                return;
+            }
 
             _capsuleCastData.Clear();
             
@@ -326,7 +330,7 @@ namespace InGame.Player
             }
             
             // ステップ2：乗り越えることのできる高さであるかの判定
-            Vector3 origin = frontHitInfo.point + _maxLedgeDepth * 0.5f * -frontHitInfo.normal;
+            Vector3 origin = frontHitInfo.point + 0.3f * -frontHitInfo.normal;
             origin.y = transform.position.y + _maxLedgeHeight + capsuleRadius;
             hit = Physics.SphereCast(origin, capsuleRadius, Vector3.down, out var heightHitInfo, _maxLedgeHeight - _minLedgeHeight, _groundLayer);
             float ledgeHeight = heightHitInfo.point.y - transform.position.y;
