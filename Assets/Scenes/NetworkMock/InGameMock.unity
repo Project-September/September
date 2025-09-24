@@ -364,7 +364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6640796709864507861, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 34.468
+      value: 34.448
       objectReference: {fileID: 0}
     - target: {fileID: 6640796709864507861, guid: 05d807727e1158f4784407803d8c4a69, type: 3}
       propertyPath: m_LocalPosition.y
@@ -677,7 +677,7 @@ PrefabInstance:
     - target: {fileID: 1470605871195394660, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
       propertyPath: m_Target
       value: 
-      objectReference: {fileID: 1405967101}
+      objectReference: {fileID: 0}
     - target: {fileID: 1470605871195394660, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
       propertyPath: m_MaxSpeed
       value: 13.194931
@@ -697,7 +697,7 @@ PrefabInstance:
     - target: {fileID: 2605522184190301224, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
       propertyPath: _spline
       value: 
-      objectReference: {fileID: 1405967101}
+      objectReference: {fileID: 0}
     - target: {fileID: 2844190075288522215, guid: d55d3e47098eb8e4c878985018cd023f, type: 3}
       propertyPath: m_Name
       value: Car
@@ -3579,17 +3579,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d27b857b4ff377f4880123c92ca46d5d, type: 3}
---- !u!114 &1405967101 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5740423139910319215, guid: d27b857b4ff377f4880123c92ca46d5d, type: 3}
-  m_PrefabInstance: {fileID: 1405967100}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1474187219
 PrefabInstance:
   m_ObjectHideFlags: 0
