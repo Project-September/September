@@ -267,6 +267,10 @@ namespace Result
                 row.rt.DOAnchorPosY(targetY, _sortMoveDuration)
                     .SetEase(Ease.InOutCubic)
                     .SetDelay(_sortStagger * newIndex);
+
+                if (newIndex != sorted.Count - 1) 
+                    continue;
+                row.score.color = Color.red;
             }
 
             await UniTask.Delay(TimeSpan.FromSeconds(_sortMoveDuration + _sortStagger * (sorted.Count - 1)));
@@ -300,9 +304,9 @@ namespace Result
 
             int rank = ranking.FindIndex(p => p.DisplayNickName == localName);
             int displayRank = rank + 1;
-            int lastRank = ranking.Count; // 最下位の順位
+            //int lastRank = ranking.Count; = displayRank == lastRank ? $"あなたの順位は {displayRank} 位です(鬼)" :
 
-            _yourRankText.text = displayRank == lastRank ? $"あなたの順位は {displayRank} 位です(鬼)" : $"あなたの順位は {displayRank} 位です";
+            _yourRankText.text = $"あなたの順位は {displayRank} 位です";
             
             _yourRankText.gameObject.SetActive(true);
             if (rank + 1 == 1)
