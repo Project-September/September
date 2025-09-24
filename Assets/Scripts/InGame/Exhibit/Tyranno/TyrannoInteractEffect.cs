@@ -46,8 +46,7 @@ namespace InGame.Exhibit
 
         private bool CheckInteractEnd()
         {
-            if (_interactTimer > _interactTime) return true;
-            return !_tyrannoInteractable.IsAlive;
+            return _interactTimer > _interactTime || !_tyrannoInteractable.IsAlive;
         }
 
         private void GetOn(PlayerRef ownerPlayerRef)
