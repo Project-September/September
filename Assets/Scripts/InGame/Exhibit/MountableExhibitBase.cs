@@ -12,7 +12,6 @@ using September.InGame.Common;
 using September.InGame.Effect;
 using September.InGame.UI;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace InGame.Exhibit
 {

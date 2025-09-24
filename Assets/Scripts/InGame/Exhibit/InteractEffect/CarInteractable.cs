@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using CRISound;
 using Fusion;
 using InGame.Health;
@@ -10,7 +9,6 @@ using September.InGame.Common;
 using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.Splines;
-using static CRISound.CuePlayAtomExPlayer.SEPlayerWith3D;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 

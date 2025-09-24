@@ -1,11 +1,9 @@
-using System;
 using Fusion;
 using InGame.Exhibit;
 using InGame.Interact;
 using NaughtyAttributes;
 using September.Common;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class TyrannoInteractable : MountableExhibitBase
 {
