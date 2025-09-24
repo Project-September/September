@@ -94,7 +94,7 @@ namespace InGame.Player.Sarutobi
                 _targetUI.gameObject.SetActive(false);
                 
                 // Abilityの状態と入力受付がされているときに判定に入る
-                if (AbilityState == AbilityStateType.Ready && GameInput.I.Player.Ability1.enabled)
+                if (AbilityState == AbilityStateType.Ready && GameInput.I.Player.Ability1.enabled && !IsRidingExhibit())
                 {
                     bool canUse = FindGrappleablePosition(out var position);
                     DisplayTargetUI(canUse, position);
@@ -133,6 +133,11 @@ namespace InGame.Player.Sarutobi
                     AbilityState = AbilityStateType.Ready;
                 }
             }
+        }
+
+        bool IsRidingExhibit()
+        {
+            return _playerManager.CurrentPlayerControlState != PlayerManager.PlayerControlState.Normal;
         }
 
         public void AfterTick()
