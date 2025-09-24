@@ -18,7 +18,8 @@ namespace September.Lobby
         [SerializeField] private CharacterInfoPanel _frontCharacterInfoPanel;
         [SerializeField] private CharacterInfoPanel _backCharacterInfoPanel;
         [SerializeField] private Transform _content;
-        [SerializeField] private CharacterDisplay _characterDisplay;
+        //[SerializeField] private CharacterDisplay _characterDisplay;
+        [SerializeField] private TextureCharacterDisplay _characterDisplay;
         [SerializeField] private ToggleTweenAnimation _toggleTweenAnimation;
         private CharacterInfoPanel _currentFrontPanel;
         private CharacterInfoPanel _currentBackPanel;
