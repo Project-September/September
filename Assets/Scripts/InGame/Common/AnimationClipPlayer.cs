@@ -147,6 +147,16 @@ namespace InGame.Common
         
         public void SetLocoWeight(float w) => _locoWeight = w;
         
+        public float GetTargetLayerWeight(LayerInfo.LayerType layer)
+        {
+            if (!_slotOf.TryGetValue(layer, out int slot))
+            {
+                Debug.LogWarning($"未定義のレイヤー {layer}");
+                return 0f;
+            }
+
+            return _layerInfo[slot].Weight;
+        }
 
         public void PlayClip(AnimationClip clip)
         {

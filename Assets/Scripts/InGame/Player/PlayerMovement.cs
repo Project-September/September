@@ -54,6 +54,7 @@ namespace InGame.Player
         private bool _doingVault;
         
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
+        public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
@@ -398,6 +399,7 @@ namespace InGame.Player
         {
             _vaultTimer = 0;
             DoingVault = true;
+            OnStartVault?.Invoke();
             Stop();
         }
 
