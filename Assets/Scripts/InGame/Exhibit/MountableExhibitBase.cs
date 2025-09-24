@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
+using InGame.Interact;
 using InGame.Player;
 using Ingame.Tanihira;
 using NaughtyAttributes;
@@ -40,12 +42,12 @@ namespace InGame.Exhibit
         #endregion
         
         #region DamageableParam
-        public bool IsAlive =>_currentHealth > 0;
+        public bool IsAlive =>CurrentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
 
         private bool _isInvincible ;
     
-        private int _currentHealth;
+        public int CurrentHealth;
         
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
@@ -62,6 +64,7 @@ namespace InGame.Exhibit
 
         [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
         EffectSpawner _effectSpawner;
+        [SerializeField] private InteractableBase _interactable;
         public override void Spawned()
         {
              Rigidbody = GetComponent<Rigidbody>();
@@ -72,7 +75,7 @@ namespace InGame.Exhibit
              }
              Animator = GetComponent<Animator>();
              Rigidbody.isKinematic = true;
-             _currentHealth = _maxHealth;
+             CurrentHealth = _maxHealth;
              IsSpawned = true;
              _initialPosition = transform.position;
              _initialRotation = transform.rotation;
@@ -105,7 +108,8 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
         {
-          
+            if(_ownerPlayerManager == null) return;
+            _ownerPlayerManager.transform.position = transform.position;
         }
         
         private void LateUpdate()
@@ -125,9 +129,12 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOn(PlayerRef playerRef)
         {
-            _currentHealth = _maxHealth;
-            _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>()
-                .PlayerDataDic[playerRef].GetComponent<PlayerManager>();
+            CameraController.CameraReset();
+            _interactable.LastUsedCooldownTime = -9999f;
+            CurrentHealth = _maxHealth;
+            var obj = StaticServiceLocator.Instance.Get<InGameManager>()
+                .PlayerDataDic[playerRef];
+            _ownerPlayerManager = obj.GetComponent<PlayerManager>();
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
@@ -148,7 +155,13 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
-            _ownerPlayerManager.transform.position = _getOffPoint.position;
+            var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
+            var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all
+                : _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
+            _interactable.PlayCooldownEffect(time).Forget();
+            _interactable.LastUsedCooldownTime = time;
+                _interactable.LastInteractTime = Runner.SimulationTime;
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
@@ -161,8 +174,8 @@ namespace InGame.Exhibit
             {
                 formationManager.WarpFriendNearPlayer(obj.transform.position,obj.transform.rotation);
             }
-            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
             Executor = null;
+            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -211,17 +224,17 @@ namespace InGame.Exhibit
         int TakeDamage(int damage)
         {
             if (_isInvincible) return 0;
-            var prevHealth = _currentHealth;
-            _currentHealth = Mathf.Clamp(_currentHealth - damage, 0, _maxHealth);
-            return prevHealth - _currentHealth;
+            var prevHealth = CurrentHealth;
+            CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, _maxHealth);
+            return prevHealth - CurrentHealth;
         }
 
         int TakeHeal(int heal)
         {
             if (_isInvincible) return 0;
-            var prevHealth = _currentHealth;
-            _currentHealth = Mathf.Clamp(_currentHealth + heal, 0, _maxHealth);
-            return prevHealth - _currentHealth;
+            var prevHealth = CurrentHealth;
+            CurrentHealth = Mathf.Clamp(CurrentHealth + heal, 0, _maxHealth);
+            return prevHealth - CurrentHealth;
         }
 
     }

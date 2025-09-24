@@ -2964,7 +2964,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sens: 10
-  _padSens: 100
+  _padSens: 50
   _characterTf: {fileID: 7863198875755268588}
   _cameraPivot: {fileID: 5314376893517561015}
   _cameraTf: {fileID: 7322555774191184680}
@@ -3030,7 +3030,7 @@ MonoBehaviour:
   _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 24
-  _spawnCooldownEffectOnStart: 1
+  _spawnCooldownEffectOnStart: 0
   _audioBroadcaster: {fileID: 3724488099250409318}
   _interactSoundCueName: SE_Tyranno_Interact
   _interactSoundTrackingType: 0
@@ -3045,19 +3045,19 @@ MonoBehaviour:
       data:
         _characterType: 2
         _interactTime: 15
-        _tyrannoInteractable: {fileID: 0}
+        _tyrannoInteractable: {fileID: 3688485294182597585}
     - rid: 731403362977185880
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 3
         _interactTime: 15
-        _tyrannoInteractable: {fileID: 0}
+        _tyrannoInteractable: {fileID: 3688485294182597585}
     - rid: 731403362977185882
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 4
         _interactTime: 15
-        _tyrannoInteractable: {fileID: 0}
+        _tyrannoInteractable: {fileID: 3688485294182597585}
     - rid: 6899644472827052118
       type: {class: TyrannoInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
@@ -3118,9 +3118,11 @@ MonoBehaviour:
   _startFrame: 15
   _endFrame: 50
   _damageAmount: 100
+  CurrentHealth: 0
   _maxHealth: 100
   _getOffPoint: {fileID: 7330491210482851106}
   _height: 10
+  _interactable: {fileID: 1044747457554308472}
   _walkSpeed: 4
   _dashSpeed: 8
   _rayDirection: {x: 0, y: -1, z: 0}
