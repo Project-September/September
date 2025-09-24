@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Fusion;
 using InGame.Health; // 追加
 using InGame.Player;
 using UniRx;
@@ -9,7 +10,7 @@ using UnityEngine;
 
 namespace InGame.Common
 {
-    public class AnimationClipPlayerManager : MonoBehaviour
+    public class AnimationClipPlayerManager : NetworkBehaviour
     {
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         [SerializeField] private PlayerMovement _playerMovement;
@@ -73,7 +74,7 @@ namespace InGame.Common
             {
                 if (!_hardOverride)
                 {
-                    _ = TriggerVault();
+                    RPC_TriggerVault();
                 }
             };
             
@@ -137,6 +138,15 @@ namespace InGame.Common
             _ = PlayFaintSequenceAsync();
         }
 
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_TriggerVault()
+        {
+            if (!_hardOverride)
+            {
+                _ = TriggerVault();
+            }
+        }
+        
         public async UniTask TriggerVault()
         {
             
@@ -161,9 +171,9 @@ namespace InGame.Common
                 }
             }
             _animationClipPlayer.SetTopPriorityClip(null);
-            if (!_playerMovement.IsGround) SetFallAnim(false);
+            if (!_playerMovement.IsGroundNet) SetFallAnim(false);
         }
-
+        
         /// <summary>強制解除（リスポーン等）</summary>
         public void ForceClearOverride()
         {
