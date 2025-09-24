@@ -89,7 +89,6 @@ namespace September.InGame.UI
                 //  フェードより後ろに表示するためヒエラルキー一番上に移動
                 _uiRoot.transform.SetAsFirstSibling();
             }
-                
             
             UIController.I.UIRootRefs = _uiRoot;
             _optionUI = _uiRoot.OptionUI;
@@ -111,6 +110,8 @@ namespace September.InGame.UI
             _staminaBarSlider.gameObject.SetActive(true);
             _interactUI.SetActive(false);
             _statusUpUI.gameObject.SetActive(true);
+            
+            
         }
 
         private void ChangeHp(int value)
@@ -151,19 +152,27 @@ namespace September.InGame.UI
             await resultAnim.Play(resultUI);
         }
 
-        public void ChangeExhibitDescriptionUI(bool value)
+        private void ChangeExhibitDescriptionUI(int value)
         {
-            if (value)
+            if (value == 1)
             {
                 // 展示物操作方法をアクティブ
                 _descriptionIcon[0].SetActive(false);
                 _descriptionIcon[1].SetActive(true);
             }
-            else
+            else if(value == 2)
             {
                 // Player操作をアクティブ
                 _descriptionIcon[0].SetActive(true);
                 _descriptionIcon[1].SetActive(false);
+                _descriptionIcon[2].SetActive(false);
+            }
+            else if (value == 3)
+            {
+                // サルトビ
+                _descriptionIcon[0].SetActive(false);
+                _descriptionIcon[1].SetActive(false);
+                _descriptionIcon[2].SetActive(true);
             }
         }
 
@@ -325,6 +334,8 @@ namespace September.InGame.UI
                 default:
                     break;
             }
+            
+            
         }
 
         private void UpdateLayOutGroup()
