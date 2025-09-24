@@ -25,6 +25,7 @@ MonoBehaviour:
     SelectedVoice: VO_OKB_CharacterSelect
     StartVoice: VO_OKB_GameStart
     WinningVoice: VO_OKB_Win
+    BGM: BGM_Ingame_01
   - Type: 2
     DisplayName: "\u30CF\u30EB\u30AF\u30FB\n\u30B6\u30FB\u30D6\u30C3\u30C1\u30E3\u30FC"
     AbilityName: 
@@ -37,6 +38,7 @@ MonoBehaviour:
     SelectedVoice: VO_Haru_CharacterSelect
     StartVoice: VO_Haru_GameStart
     WinningVoice: VO_Haru_Win
+    BGM: BGM_Haruku_01
   - Type: 3
     DisplayName: "\u30BF\u30CB\u30D2\u30E9\u30FB\u30A2\u30E0\u30F3\u30BB\u30F3"
     AbilityName: 
@@ -49,6 +51,7 @@ MonoBehaviour:
     SelectedVoice: VO_Tanihira_CharacterSelect
     StartVoice: VO_Tanihira_GameStart
     WinningVoice: VO_Tanihira_Win
+    BGM: BGM_Tanihira_01
   - Type: 4
     DisplayName: "\u30B5\u30EB\u30C8\u30D3\u30FB\u30B7\u30E7\u30A6\u30B4"
     AbilityName: 
@@ -61,3 +64,4 @@ MonoBehaviour:
     SelectedVoice: VO_Koinuma_CharacterSelect
     StartVoice: VO_Koinuma_GameStart
     WinningVoice: VO_Koinuma_Win
+    BGM: BGM_Koinuma_01
