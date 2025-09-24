@@ -42,7 +42,7 @@ namespace September.Common
                 }
                 else
                 {
-                    UIController.I.ChangeDescriptionUI(1);
+                    UIController.I.ChangeDescriptionUI(2);
                 }
             }
             
