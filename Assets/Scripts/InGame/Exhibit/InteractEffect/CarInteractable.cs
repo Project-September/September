@@ -217,7 +217,7 @@ namespace InGame.Exhibit.InteractEffect
         private void CacheKnotWorldPositions()
         {
             _knotWorldPositions.Clear();
-            Spline spline = _spline.Spline;
+            Spline spline = _spline?.Spline;
 
             foreach (var knot in spline)
             {

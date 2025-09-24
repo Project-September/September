@@ -78,8 +78,8 @@ namespace InGame.Common
             };
             
             _playerMovement.UpdateAsObservable()
-                .Select(_ => _playerMovement.IsGround)
-                .DistinctUntilChanged().Subscribe(SetFallAnim).AddTo(this);
+                .Select(_ => _playerMovement.IsGroundNet)
+                .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(this);
         }
 
         private void SetFallAnim(bool isGround)
