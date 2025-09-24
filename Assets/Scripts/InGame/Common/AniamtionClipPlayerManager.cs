@@ -129,6 +129,11 @@ namespace InGame.Common
             float deltaWeight = _locoBlendSpeed * Time.deltaTime;
             _locoWeight = Mathf.Abs(_locoWeight - wishWeight) <= deltaWeight ? wishWeight : _locoWeight < wishWeight ? _locoWeight + deltaWeight : _locoWeight - deltaWeight;
             _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
+
+            if (_playerMovement.IsGroundNet && _animationClipPlayer.IsPlayingTargetClip(_fallDown))
+            {
+                SetFallAnim(true);
+            }
         }
         
         public void TriggerFaint()

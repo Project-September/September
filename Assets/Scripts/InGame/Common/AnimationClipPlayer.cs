@@ -44,9 +44,18 @@ namespace InGame.Common
             foreach (var kv in _clipOf)
             {
                 if (kv.Value == clip && _runtimeClips.TryGetValue(kv.Key, out var p) && p.IsValid())
-                    return true;
+                {
+                    // レイヤー重みもチェック
+                    if (_slotOf.TryGetValue(kv.Key, out int slot) && _layerMixer.GetInputWeight(slot) > 0.001f)
+                    {
+                        // アニメーション完了状態もチェック
+                        if (p.GetTime() < p.GetDuration() - 0.01) // まだ再生中
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
-
             return false;
         }
 
@@ -311,7 +320,7 @@ namespace InGame.Common
                 _layerMixer.DisconnectInput(slot);
                 current.Destroy();
                 _runtimeClips.Remove(layerType);
-                _clipOf.Remove(LayerInfo.LayerType.TopLayer);
+                _clipOf.Remove(layerType);
             }
 
             return EndClipType.Complete;
