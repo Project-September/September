@@ -67,7 +67,7 @@ namespace September.Lobby
                     nav.selectOnLeft = selectCharacterIcon.Button;
                     _submitButton.navigation = nav;
                     _toggleTweenAnimation.SelectWhenOpen = selectCharacterIcon.Button;
-                    EventSystem.current.SetSelectedGameObject(selectCharacterIcon.gameObject);
+                    //EventSystem.current.SetSelectedGameObject(selectCharacterIcon.gameObject);
                 }
                 selectCharacterIcon.Button.onClick.AddListener(()=>
                 {
