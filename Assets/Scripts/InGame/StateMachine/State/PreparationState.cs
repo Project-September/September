@@ -40,6 +40,10 @@ namespace September.Common
                 {
                     UIController.I.ChangeDescriptionUI(3);
                 }
+                else
+                {
+                    UIController.I.ChangeDescriptionUI(1);
+                }
             }
             
             if (Context.Runner.IsServer)
