@@ -449,6 +449,10 @@ PrefabInstance:
       propertyPath: _cooldownEffectTransform
       value: 
       objectReference: {fileID: 1629732432}
+    - target: {fileID: 1450576261565196690, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
+      propertyPath: _spawnCooldownEffectOnStart
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2415067396731086122, guid: 34a99ff59a26e2b43ab2a19c54797ecd, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.41
@@ -2074,8 +2078,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.064683594, y: 0.9346123, z: -0.22782795, w: 0.2653497}
-  m_LocalPosition: {x: -11.53545, y: -5.868456, z: 65.95054}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

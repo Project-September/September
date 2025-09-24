@@ -22,6 +22,10 @@ namespace September.Lobby
         [SerializeField] private TextureCharacterDisplay _characterDisplay;
         [SerializeField] private ToggleTweenAnimation _toggleTweenAnimation;
         [SerializeField] private Button _closeExplainButton;
+        
+        [SerializeField] private Image _selectedCharacterImage;
+        [SerializeField] private Sprite[] _selectedCharacterSprites;
+        
         private CharacterInfoPanel _currentFrontPanel;
         private CharacterInfoPanel _currentBackPanel;
         private bool _changeCharacterInfo;
@@ -79,6 +83,7 @@ namespace September.Lobby
                 selectCharacterIcon.Button.onClick.AddListener(()=>
                 {
                     if (!SelectCharacter(characterNames[temp], temp)) return;
+                    SetSelectedCharacterImage(temp);
                     foreach (var icon in _selectCharacterIcons)
                     {
                         if (icon == selectCharacterIcon)
@@ -88,6 +93,12 @@ namespace September.Lobby
                     }
                 });
             }
+        }
+        
+        private void SetSelectedCharacterImage(int index)
+        {
+            if (index < 0 || index >= _selectedCharacterSprites.Length) return;
+            _selectedCharacterImage.sprite = _selectedCharacterSprites[index];
         }
 
         private void SetCharacterIconsNavigation()

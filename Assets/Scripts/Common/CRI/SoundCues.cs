@@ -95,6 +95,7 @@ namespace CRISound
             public static readonly CueData UI_GameFinish = new CueData(SheetName, "SE_UI_GameFinish");
             public static readonly CueData BokeBoke_Interact = new CueData(SheetName, "SE_BokeBoke_Interact");
             public static readonly CueData UI_CountDown_End = new CueData(SheetName, "SE_UI_CountDown_End");
+            public static readonly CueData Car_Interact = new CueData(SheetName, "SE_Car_Interact");
         }
 
         public static class VOICE

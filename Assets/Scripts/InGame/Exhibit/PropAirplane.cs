@@ -99,13 +99,16 @@ namespace InGame.Exhibit
 
         [SerializeField] private bool _isSpawned = false;
 
+        private bool _isEnd;
         public override void Spawned()
         {
+            _isSpawned = false;
             _isSpawned = true;
             // 初期位置・回転を記録
             _initialPosition = transform.position;
             _initialRotation = transform.rotation;
             if (!Runner.IsServer) return;
+            StaticServiceLocator.Instance.Get<InGameManager>().GameEnded += () => _isEnd = true;
             RPC_SetIsKinematic(true);
         }
 
@@ -116,6 +119,13 @@ namespace InGame.Exhibit
                 if (GetInput<PlayerInput>(out var input))
                 {
                     _interactTimer += Time.fixedDeltaTime;
+                    
+                    if (_isEnd)
+                    {
+                        GetOff();
+                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_Interact"); // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
+                        return;
+                    }
                     
                     if (CheckInteractEnd())
                     {
@@ -358,6 +368,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager = StaticServiceLocator.Instance.Get<InGameManager>().PlayerDataDic[ownerPlayerRef]
                 .GetComponent<PlayerManager>();
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
+            _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
             RPC_SetIsKinematic(false);
@@ -387,6 +398,7 @@ namespace InGame.Exhibit
             Object.RemoveInputAuthority();
             // playerの状態切り替えよん
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _ownerPlayerManager.RPC_SetUseGrav(true);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
             // 降りる場所にセット

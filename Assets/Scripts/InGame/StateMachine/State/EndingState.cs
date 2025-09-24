@@ -11,6 +11,7 @@ namespace September.Common
     {
         protected internal override void OnEnter()
         {
+            Context.GameEnded?.Invoke();
             GameEnded().Forget();
         }
 

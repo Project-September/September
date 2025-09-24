@@ -34,6 +34,12 @@ namespace InGame.Exhibit
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
+            if (_pterodactylInteractable.IsEnding)
+            {
+                GetOff();
+                return;
+            }
+            
             if (_isInteracting)
             {
                 _interactTimer += _runner.DeltaTime;
@@ -43,13 +49,13 @@ namespace InGame.Exhibit
                     GetOff();
                     return;
                 }
+                if (CheckInteractEnd())
+                {
+                    GetOff();
+                    return;
+                }
             }
-
-            if (CheckInteractEnd())
-            {
-                GetOff();
-                return;
-            }
+            
             _pterodactylInteractable.OnInteractFixedUpdate(playerInput,_runner.DeltaTime);
         }
 

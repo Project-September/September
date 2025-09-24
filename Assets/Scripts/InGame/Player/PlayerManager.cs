@@ -23,7 +23,7 @@ namespace InGame.Player
         PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
         PlayerEffectController _playerEffectController;
-
+        Rigidbody _rigidbody;
         private bool _shouldWarp = false;
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
@@ -57,7 +57,7 @@ namespace InGame.Player
         {
             _playerMovement = GetComponent<PlayerMovement>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
-
+            _rigidbody = GetComponent<Rigidbody>();
             if (TryGetComponent(out CameraController cameraController))
             {
                 _cameraController = cameraController;
@@ -196,6 +196,12 @@ namespace InGame.Player
         public void RPC_SetMeshActive(NetworkBool active)
         {
             _meshObj.SetActive(active);
+        }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetUseGrav(NetworkBool active)
+        {
+           _rigidbody.useGravity = active;
         }
 
         /// <summary> 非常用リスポーン </summary>
