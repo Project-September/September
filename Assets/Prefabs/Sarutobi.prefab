@@ -13310,16 +13310,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveCapsuleCollider: {fileID: 3128034714514688337}
-  _moveSpeed: 1.8
+  _moveSpeed: 1.7
   _groundSlopeThreshold: 45
   _groundLayer:
     serializedVersion: 2
     m_Bits: 159
-  _ogreMoveSpeed: 1.8
-  _ogreDashSpeed: 7
-  _dashSpeed: 7
-  _dashCooldown: 3
-  _staminaConsumption: 20
+  _ogreMoveSpeed: 2.04
+  _ogreDashSpeed: 8.52
+  _dashSpeed: 7.1
+  _dashCooldown: 1
+  _staminaConsumption: 27
   _rotationSpeed: 720
   _maxLedgeHeight: 1.5
   _minLedgeHeight: 0.4
@@ -13598,8 +13598,8 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
-        _attackDamage: 10
-        _ogreAttackDamage: 15
+        _attackDamage: 55
+        _ogreAttackDamage: 110
         _startHitCheckFrame: 3
         _endHitCheckFrame: 5
         _endAttackFrame: 22
@@ -13607,10 +13607,10 @@ MonoBehaviour:
         _normalAttackAnimationClip: {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
         _animationClipPlayer: {fileID: 8254388696613982807}
         _enableAutoAim: 1
-        _moveForwardSpeed: 2
-        _searchRadius: 2
-        _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
-        _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
+        _moveForwardSpeed: 3
+        _searchRadius: 3
+        _boxHalfExtents: {x: 0.85, y: 1, z: 0.85}
+        _boxLocalOffset: {x: 0, y: 1, z: 0}
         _boxCastDistance: 1
         _hitLayer:
           serializedVersion: 2
@@ -13770,7 +13770,7 @@ MonoBehaviour:
   _distanceReflectionRate: 0
   _angleReflectionRate: 1
   _wireSpeed: 130
-  _pullingSpeed: 13
+  _pullingSpeed: 18
   _pullLastForce: {x: 0, y: 0, z: 3}
   _landingDuration: 0.967
   _animShot: {fileID: 7400000, guid: 08ec66ed4679d824c9bb6bb9e78c77b2, type: 2}
@@ -13781,6 +13781,7 @@ MonoBehaviour:
   _handSocket: {fileID: 1661348190536254133}
   _wireMaterial: {fileID: 2100000, guid: 3e33a38e2349f447d9fb9ae62269009c, type: 2}
   _wireWidth: 0.05
+  _AbilityState: 0
 --- !u!114 &-3421365915295316578
 MonoBehaviour:
   m_ObjectHideFlags: 0

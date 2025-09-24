@@ -5296,8 +5296,8 @@ MonoBehaviour:
   _staminaConsumption: 25
   _rotationSpeed: 720
   _maxLedgeHeight: 1.5
-  _minLedgeHeight: 0.5
-  _maxLedgeDepth: 0.8
+  _minLedgeHeight: 0.4
+  _maxLedgeDepth: 0.9
   _reachDistance: 0.2
   _timeToVault: 0.5
   _vaultCurve:
@@ -5324,7 +5324,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _visible: 0
+  _printVaultFailedLog: 0
+  _visibleGizmos: 0
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
