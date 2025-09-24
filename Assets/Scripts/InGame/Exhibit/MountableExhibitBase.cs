@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
+using InGame.Interact;
 using InGame.Player;
 using Ingame.Tanihira;
 using NaughtyAttributes;
@@ -62,6 +64,7 @@ namespace InGame.Exhibit
 
         [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
         EffectSpawner _effectSpawner;
+        [SerializeField] private InteractableBase _interactable;
         public override void Spawned()
         {
              Rigidbody = GetComponent<Rigidbody>();
@@ -127,6 +130,7 @@ namespace InGame.Exhibit
         public virtual void GetOn(PlayerRef playerRef)
         {
             CameraController.CameraReset();
+            _interactable.LastUsedCooldownTime = -9999f;
             CurrentHealth = _maxHealth;
             var obj = StaticServiceLocator.Instance.Get<InGameManager>()
                 .PlayerDataDic[playerRef];
@@ -151,6 +155,13 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
+            var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
+            var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all
+                : _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
+            _interactable.PlayCooldownEffect(time).Forget();
+            _interactable.LastUsedCooldownTime = time;
+                _interactable.LastInteractTime = Runner.SimulationTime;
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
