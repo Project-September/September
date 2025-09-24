@@ -14,7 +14,7 @@ namespace September.InGame.UI
         #region イベント
         
         private readonly Subject<bool> _onClickOptionButton = new();
-        private readonly Subject<bool> _onChangeDescriptionUI = new();
+        private readonly Subject<int> _onChangeDescriptionUI = new();
         private readonly ReactiveProperty<int> _onChangeSliderValue = new();
         private readonly Subject<NetworkRunner> _onStartTimer = new();
         private readonly Subject<string> _onShowLog = new();
@@ -39,7 +39,7 @@ namespace September.InGame.UI
         public IObservable<bool> OnShowOgreUI => _onShowOgreUI;
         public IObservable<int> ChangeTagNoticeObserver => _changeTagNoticeObserver;
         public IReadOnlyReactiveProperty<float> OnChangeStaminaValue => _onChangeStaminaValue;
-        public IObservable<bool> OnChangeDescriptionUI => _onChangeDescriptionUI;
+        public IObservable<int> OnChangeDescriptionUI => _onChangeDescriptionUI;
         public IObservable<Unit> OnGameStart => _onGameStart;
         public IObservable<Unit> OnGameEnd => _onGameEnd;
         public IObservable<(bool, GameObject)> IsInteracting => _isInteracting;
@@ -72,7 +72,7 @@ namespace September.InGame.UI
             _onShowLog.OnNext(text);
         }
 
-        public void ChangeDescriptionUI(bool value)
+        public void ChangeDescriptionUI(int value)
         {
             _onChangeDescriptionUI.OnNext(value);
         }

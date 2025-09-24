@@ -33,6 +33,19 @@ namespace September.Common
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
             UIController.I.SetUpStartUI();
+            
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData localData))
+            {
+                if (localData.CharacterType == CharacterType.Sarutobi) 
+                {
+                    UIController.I.ChangeDescriptionUI(3);
+                }
+                else
+                {
+                    UIController.I.ChangeDescriptionUI(2);
+                }
+            }
+            
             if (Context.Runner.IsServer)
             {
                 ChooseOgre();

@@ -167,13 +167,17 @@ namespace September.InGame
         private void Update()
         {
             // ALLミュート [M]
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                _debugBGMVolume = 0f;
-                _debugSEVolume = 0f;
-                CriAtom.SetCategoryVolume("BGM", _debugBGMVolume);
-                CriAtom.SetCategoryVolume("SE", _debugSEVolume);
-            }
+            //if (Input.GetKeyDown(KeyCode.M))
+            //{
+            //    _debugBGMVolume = 0f;
+            //    _debugSEVolume = 0f;
+            //    CriAtom.SetCategoryVolume("BGM", _debugBGMVolume);
+            //    CriAtom.SetCategoryVolume("SE", _debugSEVolume);
+            ////}
+            //if (Input.GetKeyDown(KeyCode.C))
+            //{
+            //    CRIAudio.Stop3DSEAll();
+            //}
 
             // BGM音量変更 [V] + [B] + [+ or -]
             // SE音量変更  [V] + [S] + [+ or -]

@@ -1,3 +1,4 @@
+﻿using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using NaughtyAttributes;
@@ -44,11 +45,15 @@ public class TimeOverlayMessage : MonoBehaviour
         col.a = 1;
         _text.color = col;
         _text.text = "3";
+        CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_Count.Name); // カウントダウン音
         await _text.transform.DOScale(Vector3.one, 0.5f).SetLoops(2,LoopType.Yoyo).SetEase(_ease);
         _text.text = "2";
+        CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_Count.Name); // カウントダウン音
         await _text.transform.DOScale(Vector3.one, 0.5f).SetLoops(2,LoopType.Yoyo).SetEase(_ease);
         _text.text = "1";
+        CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_Count.Name); // カウントダウン音
         await _text.transform.DOScale(Vector3.one, 0.5f).SetLoops(2,LoopType.Yoyo).SetEase(_ease);
+        CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_End.Name); // ゲーム開始音
         _text.text = _readyTimeMessage;
         await _text.transform.DOScale(Vector3.one, 0.5f).SetEase(_ease);
         await _text.DOFade(0f, _fadeOutDuration).SetEase(Ease.Linear);

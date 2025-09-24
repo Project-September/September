@@ -18,8 +18,10 @@ namespace September.Lobby
         [SerializeField] private CharacterInfoPanel _frontCharacterInfoPanel;
         [SerializeField] private CharacterInfoPanel _backCharacterInfoPanel;
         [SerializeField] private Transform _content;
-        [SerializeField] private CharacterDisplay _characterDisplay;
+        //[SerializeField] private CharacterDisplay _characterDisplay;
+        [SerializeField] private TextureCharacterDisplay _characterDisplay;
         [SerializeField] private ToggleTweenAnimation _toggleTweenAnimation;
+        [SerializeField] private Button _closeExplainButton;
         private CharacterInfoPanel _currentFrontPanel;
         private CharacterInfoPanel _currentBackPanel;
         private bool _changeCharacterInfo;
@@ -49,6 +51,11 @@ namespace September.Lobby
             
             _currentBackPanel.ApplyContents (data.DisplayName, data.AbilityName, data.AbilityExplain);
             _currentFrontPanel.ApplyContents (data.DisplayName, data.AbilityName, data.AbilityExplain);
+            _closeExplainButton.onClick.AddListener(() =>
+            {
+               //ボイス鳴らす
+                CRIAudio.PlaySE("ALLCue", data.SelectedVoice);
+            });
         }
 
         private void CreateCharacterIcons(string[] characterNames)

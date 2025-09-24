@@ -2443,8 +2443,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4748061609918609059}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.08, y: 0.93, z: 0.05}
+  m_LocalRotation: {x: 0.000000006206776, y: -0.000000002209545, z: 0.0000001341104, w: 1}
+  m_LocalPosition: {x: 1.5394996, y: -0.2749996, z: -0.0028007124}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3109,9 +3109,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _points:
-  - {fileID: 2685553553420266245}
+  - {fileID: 3560132879713733590}
   - {fileID: 1532904449675534629}
-  _hitboxRadius: 5
+  _hitboxRadius: 3
   _hitMask:
     serializedVersion: 2
     m_Bits: 0

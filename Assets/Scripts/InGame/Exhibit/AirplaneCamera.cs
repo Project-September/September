@@ -85,18 +85,34 @@ namespace InGame.Exhibit
         /// <summary> 障害物に応じてカメラの距離を変える </summary>
         void CheckCameraDistance()
         {
-            var isHit = Physics.SphereCast(_cameraPivot.position, _cameraRadius, 
-                _cameraTf.position - _cameraPivot.position, out var hit, _defaultCameraSettings.MaxDistance, _collideAgainst);
-            
-            if (isHit)
-            {
-                Vector3 sphereCenter = hit.point + hit.normal * _cameraRadius;
-                _cameraTf.position = sphereCenter;
-            }
-            else
-            {
-                _cameraTf.localPosition = _defaultCameraSettings.DefaultPosition;
-            }
+            // ワールド基準の基点と理想位置
+            Vector3 pivotPos = _cameraPivot.position;
+            Vector3 desiredWorld = _cameraPivot.TransformPoint(_defaultCameraSettings.DefaultPosition);
+
+            Vector3 toDesired = desiredWorld - pivotPos;
+            float maxDist = toDesired.magnitude;
+            if (maxDist <= 1e-4f) return;
+
+            Vector3 dir = toDesired / maxDist;
+
+            // 半径つきでヒット確認
+            bool hit = Physics.SphereCast(
+                pivotPos,
+                _cameraRadius,
+                dir,
+                out RaycastHit hitInfo,
+                maxDist,
+                _collideAgainst,
+                QueryTriggerInteraction.Ignore
+            );
+
+            // ヒット時は半径ぶん手前、わずかにε引く
+            const float epsilon = 0.01f;
+            float dist = hit ? Mathf.Max(0f, hitInfo.distance - _cameraRadius - epsilon) : maxDist;
+
+            // 最終位置（ワールド）
+            Vector3 camWorld = pivotPos + dir * dist;
+            _cameraTf.position = camWorld;
         }
 
         /// <summary> デフォルト位置にリセットする </summary>

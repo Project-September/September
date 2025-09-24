@@ -500,9 +500,11 @@ MonoBehaviour:
   _startFrame: 0
   _endFrame: 34
   _damageAmount: 80
+  CurrentHealth: 0
   _maxHealth: 100
   _getOffPoint: {fileID: 302465785191893965}
   _height: 10
+  _interactable: {fileID: 1450576261565196690}
   _moveSpeed: 5
   _rotationSpeed: 5
   _turnThreshold: 30
@@ -520,6 +522,8 @@ MonoBehaviour:
   _hitEffect: {fileID: 3681082649069878751, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
   _damage: 50
   _aimObject: {fileID: 0}
+  _takeOffHeight: 7
+  _takeOffDuration: 1.5
 --- !u!114 &1450576261565196690
 MonoBehaviour:
   m_ObjectHideFlags: 0

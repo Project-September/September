@@ -26,6 +26,9 @@ namespace CRISound
         public static void Stop3DSEFromCueName(string cueName) =>
             CuePlayAtomExPlayer.SE.Stop3DSEFromCueName(cueName);
 
+        public static void Stop3DSEAll() =>
+            CuePlayAtomExPlayer.SE.Stop3DSEAll();
+
         public static void PlaySE(string cueSheet, string cueName) =>
         CuePlayAtomExPlayer.Instance.Player(SoundType.SE).Play(cueSheet, cueName);
         
