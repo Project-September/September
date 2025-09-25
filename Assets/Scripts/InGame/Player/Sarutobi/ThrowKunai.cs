@@ -49,8 +49,8 @@ namespace InGame.Player.Sarutobi
             if (HasStateAuthority)
             {
                 _playerManager = GetComponent<PlayerManager>();
-                _clipPlayer = GetComponent<AnimationClipPlayer>();
                 _movement = GetComponent<PlayerMovement>();
+                _clipPlayer = GetComponent<AnimationClipPlayer>();
                 _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _grapplingHook.OnAbilityStart += EndStance;
             }
@@ -58,6 +58,8 @@ namespace InGame.Player.Sarutobi
             if (HasInputAuthority)
             {
                 _mainCamera = Camera.main;
+                _playerManager = GetComponent<PlayerManager>();
+                _movement = GetComponent<PlayerMovement>();
                 _cameraController = GetComponent<CameraController>();
                 if (!_grapplingHook) _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _crosshair = Instantiate(_crosshairPrefab);
@@ -160,7 +162,7 @@ namespace InGame.Player.Sarutobi
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             State = KunaiStateType.Idol;
             
-            if (!_clipPlayer.StopClip(_stanceLoop))
+            if (_clipPlayer && !_clipPlayer.StopClip(_stanceLoop))
             {
                 if (!_clipPlayer.StopClip(_stance))
                 {
