@@ -1,4 +1,5 @@
 using Fusion;
+using InGame.Player;
 using UnityEngine;
 
 namespace Ingame.Exhibit
@@ -17,7 +18,7 @@ namespace Ingame.Exhibit
         [SerializeField] private bool _isDebug;
         
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_RequestInteraction(PlayerRef requestingPlayer)
+        public void Rpc_RequestInteraction(PlayerRef requestingPlayer, Vector3 target)
         {
             if(!_isDebug)
             {
@@ -38,6 +39,23 @@ namespace Ingame.Exhibit
                 {
                     NetworkObject playerObject = Runner.GetPlayerObject(player);
                     ShotCannon(playerObject.transform, requestingPlayer);
+                }
+            }
+            
+            //プレイヤーの向きを後ろにする
+            if (Runner.TryGetPlayerObject(requestingPlayer, out NetworkObject playerNetworkObject))
+            {
+                Vector3 targetPos = target;
+                Vector3 flatDirection = targetPos - playerNetworkObject.transform.position;
+                flatDirection.y = 0f; // 上下を無視して水平成分だけ
+                if (flatDirection.sqrMagnitude > 0.001f)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(flatDirection.normalized, Vector3.up);
+                    playerNetworkObject.transform.rotation = targetRot;
+                    if (playerNetworkObject.TryGetComponent<CameraController>(out var cameraController))
+                    {
+                        cameraController.SmoothRotateCameraTo(targetRot);
+                    }
                 }
             }
         }
