@@ -600,50 +600,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 3994454256290933762, guid: e5f2324cbf4d5f24a8a6eab9ef219aca, type: 3}
---- !u!114 &240089887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec0b4dd729a12d046982652f834580a2, type: 3}
-  m_Name: Field_LM0
-  m_EditorClassIdentifier: 
-  resolution: 4096
-  bitmask: 1
-  id: 0
-  sortingID: 0
-  isImplicit: 1
-  area: 59520.19
-  totalVertexCount: 0
-  vertexCounter: 0
-  sceneLodLevel: -1
-  autoResolution: 0
-  sceneName: Field
-  tag: -1
-  containsTerrains: 0
-  probes: 0
-  mode: 1
-  renderMode: 1000
-  renderDirMode: 1000
-  atlasPacker: 1000
-  holeFilling: 0
-  computeSSS: 0
-  sssSamples: 16
-  sssDensity: 10
-  sssColor: {r: 1, g: 1, b: 1, a: 1}
-  sssScale: 1
-  fakeShadowBias: 0
-  transparentSelfShadow: 0
-  flipNormal: 0
-  parentName: 
-  overridePath: 
-  fixPos3D: 0
-  voxelSize: {x: 1, y: 1, z: 1}
-  passedFilter: 0
 --- !u!1 &330490198
 GameObject:
   m_ObjectHideFlags: 0
@@ -2078,8 +2034,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
+  m_LocalRotation: {x: 0.15260132, y: -0.8086604, z: 0.23953608, w: 0.5151735}
+  m_LocalPosition: {x: 20.002966, y: 0.77697897, z: 26.767498}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2801,50 +2757,6 @@ Transform:
   - {fileID: 1156707168}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1125848749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec0b4dd729a12d046982652f834580a2, type: 3}
-  m_Name: Field_LMA1
-  m_EditorClassIdentifier: 
-  resolution: 4096
-  bitmask: 1
-  id: 1
-  sortingID: 1
-  isImplicit: 1
-  area: 0
-  totalVertexCount: 0
-  vertexCounter: 0
-  sceneLodLevel: -1
-  autoResolution: 0
-  sceneName: Field
-  tag: -1
-  containsTerrains: 0
-  probes: 0
-  mode: 1
-  renderMode: 1000
-  renderDirMode: 1000
-  atlasPacker: 1000
-  holeFilling: 0
-  computeSSS: 0
-  sssSamples: 16
-  sssDensity: 10
-  sssColor: {r: 1, g: 1, b: 1, a: 1}
-  sssScale: 1
-  fakeShadowBias: 0
-  transparentSelfShadow: 0
-  flipNormal: 0
-  parentName: 
-  overridePath: 
-  fixPos3D: 0
-  voxelSize: {x: 1, y: 1, z: 1}
-  passedFilter: 0
 --- !u!1 &1156707167
 GameObject:
   m_ObjectHideFlags: 0
@@ -3953,22 +3865,22 @@ MonoBehaviour:
   renderSettingsRTPVHDR: 0
   renderSettingsRTPVWidth: 640
   renderSettingsRTPVHeight: 360
-  lastBakeTime: 42
+  lastBakeTime: 47
   enlightenWarningShown: 0
   enlightenWarningShown2: 0
   uniqueLights: []
   lights: []
   implicitGroups:
-  - {fileID: 240089887}
-  - {fileID: 1125848749}
+  - {fileID: 2061954880}
+  - {fileID: 2061954880}
   implicitGroupedObjects:
   - {fileID: 655736677}
   - {fileID: 1326835816}
   bounds:
-  - m_Center: {x: -0.8023453, y: -2.8208218, z: 33.93157}
-    m_Extent: {x: 35.298172, y: 10.755522, z: 37.096565}
-  - m_Center: {x: -0.8023491, y: -2.713478, z: 33.30769}
-    m_Extent: {x: 35.298172, y: 10.14242, z: 36.471573}
+  - m_Center: {x: -0.8023453, y: -2.8208218, z: 33.220753}
+    m_Extent: {x: 35.298172, y: 10.755522, z: 37.80738}
+  - m_Center: {x: -0.8629341, y: -2.7022648, z: 33.30769}
+    m_Extent: {x: 35.54157, y: 10.131206, z: 36.47158}
   hasEmissive: 0101
   uvBuffOffsets: 
   uvBuffLengths: 
@@ -3986,11 +3898,12 @@ MonoBehaviour:
   lightmapHasDir: 0000
   lightmapHasRNM: 0000
   modifiedAssetPathList:
+  - Assets/Model/OpticalCamouflage/EhMD_OpticalCamouflage_0101.fbx
+  - Assets/Model/Bg_Museum/SideWall_0918/sideWall_Plane_001.fbx
   - Assets/Model/Bg_Museum/Museum0911/BgMD_MuseumModel_0910.fbx
   - Assets/Model/Bg_Museum/SideWall_0918/BgMD_Museum_SideWall_0919_2.fbx
   - Assets/Model/tank/BgMD_Tank_01.fbx
   - Assets/Model/Lamp002/BgMD_Lamp002_001.fbx
-  - Assets/Model/Muramasa/EhMD_MuramasaSet_0101.fbx
   - Assets/Model/Stand001_stradi/BgMD_Stand_001_LongStand.fbx
   - Assets/Model/Stand001_stradi/BgMD_Stand_001_ShortStand.fbx
   - Assets/Model/stand_soil/BgMD_TRex_Stand_Low.fbx
@@ -4003,8 +3916,16 @@ MonoBehaviour:
   - Assets/Model/zero_sen/EhMD_jet01.fbx
   - Assets/Model/Stand002_Zero/BgMD_Stand_002_Light.fbx
   - Assets/Model/BeltPole/EhMD_BeltPleSingle_0101.fbx
-  - Assets/Model/OpticalCamouflage/EhMD_OpticalCamouflage_0101.fbx
   modifiedAssets:
+  - meshName:
+    - OpticalCamouflage1
+    padding: 51000000
+    unwrapper: 00000000
+  - meshName:
+    - sideWall_Plane002
+    - sideWall_Plane001
+    padding: 0c0000000c000000
+    unwrapper: 0000000000000000
   - meshName:
     - polySurface2908
     - polySurface2907
@@ -4324,11 +4245,6 @@ MonoBehaviour:
     padding: 76000000
     unwrapper: 00000000
   - meshName:
-    - EhMD_Muramasa1
-    - BgMD_Muramasa_Dai1
-    padding: 000100006f000000
-    unwrapper: 0000000000000000
-  - meshName:
     - Stand_004
     padding: 7d000000
     unwrapper: 00000000
@@ -4353,10 +4269,6 @@ MonoBehaviour:
     padding: 00010000
     unwrapper: 00000000
   - meshName:
-    - polySurface490
-    - polySurface190
-    - eyes_iris_R1
-    - polySurface492
     - polySurface488
     - polySurface487
     - polySurface486
@@ -4371,7 +4283,11 @@ MonoBehaviour:
     - polySurface477
     - polySurface476
     - polySurface475
-    padding: 1a0000000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000
+    - polySurface490
+    - polySurface190
+    - eyes_iris_R1
+    - polySurface492
+    padding: 00010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100001a000000000100000001000000010000
     unwrapper: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   - meshName:
     - pCube1
@@ -4394,13 +4310,7 @@ MonoBehaviour:
     - EhMD_BeltPoleSingle_0101
     padding: 00010000
     unwrapper: 00000000
-  - meshName:
-    - OpticalCamouflage1
-    padding: 51000000
-    unwrapper: 00000000
-  maps:
-  - {fileID: 2800000, guid: c81e766dea2664947bca5aa4e404ef94, type: 3}
-  - {fileID: 2800000, guid: e51bcad89f6bee44eaedd1527fe23a4b, type: 3}
+  maps: []
   masks: []
   dirMaps: []
   rnmMaps0: []
@@ -4410,10 +4320,10 @@ MonoBehaviour:
   bakedRenderers:
   - {fileID: 655736676}
   - {fileID: 1326835815}
-  bakedIDs: 0000000001000000
+  bakedIDs: 0100000001000000
   bakedScaleOffset:
-  - {x: 0.014711287, y: 0.014759522, z: 0.8979324, w: 0.98588365}
-  - {x: 0.01646522, y: 0.01634057, z: 0.9721731, w: 0.3914583}
+  - {x: 0.016501348, y: 0.015893497, z: 0.37797672, w: 0.8395742}
+  - {x: 0.016501315, y: 0.015893497, z: 0.3933234, w: 0.8395742}
   bakedVertexOffset: ffffffffffffffff
   bakedVertexColorMesh:
   - {fileID: 0}
@@ -4434,7 +4344,7 @@ MonoBehaviour:
   sectors:
   - name: $G
     maps:
-    - {fileID: 2800000, guid: c81e766dea2664947bca5aa4e404ef94, type: 3}
+    - {fileID: 2800000, guid: 8f01f18390e876743b3cfd239fe326ae, type: 3}
     - {fileID: 2800000, guid: e51bcad89f6bee44eaedd1527fe23a4b, type: 3}
     masks: []
     dirMaps: []
@@ -4445,10 +4355,10 @@ MonoBehaviour:
     bakedRenderers:
     - {fileID: 655736676}
     - {fileID: 1326835815}
-    bakedIDs: 0000000001000000
+    bakedIDs: 0100000001000000
     bakedScaleOffset:
-    - {x: 0.014711287, y: 0.014759522, z: 0.8979324, w: 0.98588365}
-    - {x: 0.01646522, y: 0.01634057, z: 0.9721731, w: 0.3914583}
+    - {x: 0.016501348, y: 0.015893497, z: 0.37797672, w: 0.8395742}
+    - {x: 0.016501315, y: 0.015893497, z: 0.3933234, w: 0.8395742}
     bakedVertexColorMesh:
     - {fileID: 0}
     - {fileID: 0}
@@ -6186,6 +6096,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7878489705219026827, guid: d07a2d10572def144a5c6f6cb8ccf707, type: 3}
   m_PrefabInstance: {fileID: 2026286964}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2061954880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0b4dd729a12d046982652f834580a2, type: 3}
+  m_Name: Field_LMA1
+  m_EditorClassIdentifier: 
+  resolution: 4096
+  bitmask: 1
+  id: 1
+  sortingID: 1
+  isImplicit: 1
+  area: 0
+  totalVertexCount: 0
+  vertexCounter: 0
+  sceneLodLevel: -1
+  autoResolution: 0
+  sceneName: Field
+  tag: -1
+  containsTerrains: 0
+  probes: 0
+  mode: 1
+  renderMode: 1000
+  renderDirMode: 1000
+  atlasPacker: 1000
+  holeFilling: 0
+  computeSSS: 0
+  sssSamples: 16
+  sssDensity: 10
+  sssColor: {r: 1, g: 1, b: 1, a: 1}
+  sssScale: 1
+  fakeShadowBias: 0
+  transparentSelfShadow: 0
+  flipNormal: 0
+  parentName: 
+  overridePath: 
+  fixPos3D: 0
+  voxelSize: {x: 1, y: 1, z: 1}
+  passedFilter: 0
 --- !u!1 &2110382577
 GameObject:
   m_ObjectHideFlags: 0

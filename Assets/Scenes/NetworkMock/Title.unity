@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7fa80e7116296f4eb4f49ec1544ee22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderSettingsBounces: 5
+  renderSettingsBounces: 2
   renderSettingsGISamples: 16
   renderSettingsGIBackFaceWeight: 0
   renderSettingsTileSize: 512
@@ -236,8 +236,8 @@ MonoBehaviour:
   renderSettingsForceRebuildGeometry: 1
   renderSettingsPerformRendering: 1
   renderSettingsUserRenderMode: 0
-  renderSettingsDistanceShadowmask: 0
-  renderSettingsSettingsMode: 0
+  renderSettingsDistanceShadowmask: 1
+  renderSettingsSettingsMode: 1
   renderSettingsFixSeams: 1
   renderSettingsDenoise: 1
   renderSettingsDenoise2x: 0
@@ -245,25 +245,25 @@ MonoBehaviour:
   renderSettingsEncodeMode: 0
   renderSettingsOverwriteWarning: 0
   renderSettingsAutoAtlas: 1
-  renderSettingsUnwrapUVs: 1
+  renderSettingsUnwrapUVs: 0
   renderSettingsForceDisableUnwrapUVs: 0
   renderSettingsMaxAutoResolution: 4096
   renderSettingsMinAutoResolution: 16
-  renderSettingsUnloadScenes: 1
+  renderSettingsUnloadScenes: 0
   renderSettingsAdjustSamples: 1
   renderSettingsGILODMode: 2
   renderSettingsGILODModeEnabled: 0
   renderSettingsCheckOverlaps: 0
   renderSettingsSkipOutOfBoundsUVs: 1
-  renderSettingsHackEmissiveBoost: 1
-  renderSettingsHackIndirectBoost: 1
+  renderSettingsHackEmissiveBoost: 0.5
+  renderSettingsHackIndirectBoost: 0.5
   renderSettingsTempPath: 
-  renderSettingsOutPath: 
+  renderSettingsOutPath: BakeryLightmaps
   renderSettingsUseScenePath: 0
-  renderSettingsHackAOIntensity: 0
+  renderSettingsHackAOIntensity: 2
   renderSettingsHackAOSamples: 16
-  renderSettingsHackAORadius: 1
-  renderSettingsShowAOSettings: 0
+  renderSettingsHackAORadius: 1.5
+  renderSettingsShowAOSettings: 1
   renderSettingsShowTasks: 1
   renderSettingsShowTasks2: 0
   renderSettingsShowPaths: 1
@@ -274,7 +274,7 @@ MonoBehaviour:
   renderSettingsTexelsMask: 1
   renderSettingsTexelsDir: 1
   renderSettingsShowDirWarning: 1
-  renderSettingsRenderDirMode: 0
+  renderSettingsRenderDirMode: 2
   renderSettingsShowCheckerSettings: 0
   renderSettingsSamplesWarning: 1
   renderSettingsSuppressPopups: 0
@@ -285,9 +285,9 @@ MonoBehaviour:
   renderSettingsPostPacking: 1
   renderSettingsHoleFilling: 0
   renderSettingsBeepOnFinish: 0
-  renderSettingsExportTerrainAsHeightmap: 1
-  renderSettingsRTXMode: 0
-  renderSettingsLightProbeMode: 1
+  renderSettingsExportTerrainAsHeightmap: 0
+  renderSettingsRTXMode: 1
+  renderSettingsLightProbeMode: 0
   renderSettingsClientMode: 0
   renderSettingsServerAddress: 127.0.0.1
   renderSettingsUnwrapper: 0
@@ -356,7 +356,23 @@ MonoBehaviour:
   emptyDirectionTex: {fileID: 0}
   anyVolumes: 0
   compressedVolumes: 0
-  sectors: []
+  sectors:
+  - name: $G
+    maps: []
+    masks: []
+    dirMaps: []
+    rnmMaps0: []
+    rnmMaps1: []
+    rnmMaps2: []
+    mapsMode: 
+    bakedRenderers: []
+    bakedIDs: 
+    bakedScaleOffset: []
+    bakedVertexColorMesh: []
+    bakedRenderersTerrain: []
+    bakedIDsTerrain: 
+    bakedScaleOffsetTerrain: []
+    nonBakedRenderers: []
   prevBakedProbes: []
   prevBakedProbePos: []
 --- !u!4 &33236158
