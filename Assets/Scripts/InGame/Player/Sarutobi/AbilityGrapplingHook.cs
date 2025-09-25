@@ -297,7 +297,8 @@ namespace InGame.Player.Sarutobi
             if (minSpline == null) return false;
             
             // そのポイント周辺で最もポイントが低い点を探す
-            if (!GetMinPoint(minSpline, new MinMaxRange(minT - 0.05f, minT + 0.05f), out _, out var ansPosition, out _)) Debug.Log("nanikaga okasii");
+            if (!GetMinPoint(minSpline, new MinMaxRange(minT - 0.05f, minT + 0.05f), out _, out var ansPosition,
+                    out _))
             
             position = ansPosition;
             
