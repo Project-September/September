@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DG.Tweening;
 using Fusion;
 using InGame.Common;
@@ -10,9 +9,7 @@ using Ingame.Tanihira;
 using September.Common;
 using September.InGame.Common;
 using TMPro;
-using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using PlayerInput = September.Common.PlayerInput;
 using CRISound;
 using Cysharp.Threading.Tasks;
