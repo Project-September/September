@@ -126,6 +126,8 @@ namespace InGame.Player.Sarutobi
             }
             else
             {
+                // 中断された場合は明示的にクリップを停止してからEndStanceを呼ぶ
+                _clipPlayer.StopClip(_stance);
                 EndStance();
             }
         }
@@ -145,6 +147,12 @@ namespace InGame.Player.Sarutobi
             {
                 StartStance().Forget();
             }
+            else
+            {
+                // 投げモーションが中断された場合も明示的にクリップを停止してからEndStanceを呼ぶ
+                _clipPlayer.StopClip(_throw);
+                EndStance();
+            }
         }
 
         void EndStance()
@@ -158,16 +166,16 @@ namespace InGame.Player.Sarutobi
             {
                 Rpc_EndStance();
             }
-            
+
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             State = KunaiStateType.Idol;
-            
-            if (_clipPlayer && !_clipPlayer.StopClip(_stanceLoop))
+
+            // より確実にすべての関連アニメーションクリップを停止
+            if (_clipPlayer)
             {
-                if (!_clipPlayer.StopClip(_stance))
-                {
-                    _clipPlayer.StopClip(_throw);
-                }
+                _clipPlayer.StopClip(_stanceLoop);
+                _clipPlayer.StopClip(_stance);
+                _clipPlayer.StopClip(_throw);
             }
         }
 

@@ -629,20 +629,55 @@ namespace InGame.Common
 
         public bool StopClip(AnimationClip clip)
         {
+            if (AnimationClipsContainer.Instance.AnimationMontages == null)
+            {
+                return StopClipLocal(clip);
+            }
+
+            // AnimationClipsContainer から探してRPCで停止を全クライアントに通知
+            var index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
+                x => x.AnimClip.name == clip.name);
+
+            if (index >= 0)
+            {
+                RPC_StopClip(index);
+            }
+
+            return StopClipLocal(clip);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_StopClip(int clipIndex)
+        {
+            var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
+            StopClipLocal(montage.AnimClip);
+        }
+
+        private bool StopClipLocal(AnimationClip clip)
+        {
             foreach (var kv in _clipOf)
             {
                 if (kv.Value == clip && _runtimeClips.TryGetValue(kv.Key, out var p) && p.IsValid())
                 {
                     RenewLayerCts(kv.Key);
-                    
+
                     _slotOf.TryGetValue(kv.Key, out int slot);
-                    
+
+                    // レイヤーウェイトを0にリセット
+                    _layerMixer.SetInputWeight(slot, 0f);
+                    var li = _layerInfo[slot];
+                    li.Weight = 0f;
+                    _layerInfo[slot] = li;
+
                     if (_runtimeClips.TryGetValue(kv.Key, out var prev) && prev.IsValid())
                     {
                         _layerMixer.DisconnectInput(slot);
                         prev.Destroy();
                     }
-                    
+
+                    _clipOf.Remove(kv.Key);
+                    _runtimeClips.Remove(kv.Key);
+
                     return true;
                 }
             }
