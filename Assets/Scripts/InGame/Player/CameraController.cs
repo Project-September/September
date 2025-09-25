@@ -96,7 +96,7 @@ namespace InGame.Player
         }
 
         /// <summary> カメラを指定方向に回転させる </summary>
-        void SmoothRotateCameraTo(Quaternion targetWorldRotation)
+        public void SmoothRotateCameraTo(Quaternion targetWorldRotation)
         {
             _isInRotation = true;
 
