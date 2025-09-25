@@ -309,7 +309,6 @@ namespace September.Common
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_ToggleInputs(bool moveInputEnabled, bool actionInputEnabled)
         {
-            Debug.LogError($"入力切りかえし RPC 受信 move:{moveInputEnabled} action:{actionInputEnabled}");
             GameInput.I.ToggleMoveInput(moveInputEnabled);
             GameInput.I.ToggleActionInput(actionInputEnabled);
         }
