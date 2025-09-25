@@ -462,7 +462,7 @@ namespace InGame.Exhibit
 
         protected override bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
         {
-            return OwnerPlayerRef == PlayerRef.None || OwnerPlayerRef == PlayerRef.FromEncoded(context.Interactor);
+            return OwnerPlayerRef == PlayerRef.None;
         }
 
         protected override void OnInteract(IInteractableContext context)

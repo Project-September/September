@@ -70,6 +70,7 @@ namespace InGame.Player.Sarutobi
             
             if (HasInputAuthority)
             {
+                _playerManager = GetComponent<PlayerManager>();
                 _playerMovement = GetComponent<PlayerMovement>();
                 _grappleableSpline = GrapplingSpline.I.GrapplingTargetSpline;
                 _targetUI = Instantiate(_targetUIPrefab).GetComponentInChildren<Image>().transform;
@@ -91,7 +92,14 @@ namespace InGame.Player.Sarutobi
             // input authority で判定
             if (HasInputAuthority)
             {
-                _targetUI.gameObject.SetActive(false);
+                if (_targetUI)
+                {
+                    _targetUI.gameObject.SetActive(false);
+                }
+                else
+                {
+                    return;
+                }
                 
                 // Abilityの状態と入力受付がされているときに判定に入る
                 if (AbilityState == AbilityStateType.Ready && GameInput.I.Player.Ability1.enabled && !IsRidingExhibit())
@@ -294,9 +302,10 @@ namespace InGame.Player.Sarutobi
             }
             
             if (minSpline == null) return false;
-            
+
             // そのポイント周辺で最もポイントが低い点を探す
-            if (!GetMinPoint(minSpline, new MinMaxRange(minT - 0.05f, minT + 0.05f), out _, out var ansPosition, out _)) Debug.Log("nanikaga okasii");
+            if (!GetMinPoint(minSpline, new MinMaxRange(minT - 0.05f, minT + 0.05f), out _, out var ansPosition,
+                    out _)) return false;
             
             position = ansPosition;
             
@@ -390,7 +399,7 @@ namespace InGame.Player.Sarutobi
 
         private void Update()
         {
-            if (_wireLine.enabled)
+            if (_wireLine && _wireLine.enabled)
             {
                 _wireTimer += Time.deltaTime;
                 float t = Math.Clamp(_wireTimer * _wireSpeed / _distanceMag, 0, 1);

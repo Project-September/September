@@ -70,15 +70,41 @@ namespace September.Common
             else
             {
                 var playerActions = GameInput.I.Player;
-                //  Input Actionからデータを取り出してネットワークに登録する
-                playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
-                playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
-                playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
-                playerInput.Buttons.Set(PlayerButtons.Attack, playerActions.Attack.IsPressed());
-                playerInput.Buttons.Set(PlayerButtons.Ability1, playerActions.Ability1.IsPressed());
-                playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
-                playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
-                playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+                //  Input Actionからデータを取り出してネットワークに登録する（有効化されている場合のみ）
+
+                // 移動関連の入力（Move、Jump、Dash、Aim）
+                if (playerActions.Move.enabled)
+                {
+                    playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+                    playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
+                }
+                else
+                {
+                    playerInput.MoveDirection = Vector2.zero;
+                    playerInput.Buttons.Set(PlayerButtons.Jump, false);
+                    playerInput.Buttons.Set(PlayerButtons.Dash, false);
+                    playerInput.Buttons.Set(PlayerButtons.Aim, false);
+                }
+
+                // アクション関連の入力
+                if (playerActions.Attack.enabled)
+                {
+                    playerInput.Buttons.Set(PlayerButtons.Attack, playerActions.Attack.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Ability1, playerActions.Ability1.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
+                }
+                else
+                {
+                    playerInput.Buttons.Set(PlayerButtons.Attack, false);
+                    playerInput.Buttons.Set(PlayerButtons.Ability1, false);
+                    playerInput.Buttons.Set(PlayerButtons.Ability2, false);
+                    playerInput.Buttons.Set(PlayerButtons.Interact, false);
+                }
+
+                // その他の入力（常に有効）
                 playerInput.Buttons.Set(PlayerButtons.Warp, playerActions.Warp.IsPressed());
                 playerInput.Buttons.Set(PlayerButtons.AirplaneForward, playerActions.AirplaneForward.IsPressed());
                 playerInput.Buttons.Set(PlayerButtons.AirPlaneBack, playerActions.AirPlaneBack.IsPressed());

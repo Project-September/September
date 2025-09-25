@@ -49,8 +49,8 @@ namespace InGame.Player.Sarutobi
             if (HasStateAuthority)
             {
                 _playerManager = GetComponent<PlayerManager>();
-                _clipPlayer = GetComponent<AnimationClipPlayer>();
                 _movement = GetComponent<PlayerMovement>();
+                _clipPlayer = GetComponent<AnimationClipPlayer>();
                 _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _grapplingHook.OnAbilityStart += EndStance;
             }
@@ -58,6 +58,8 @@ namespace InGame.Player.Sarutobi
             if (HasInputAuthority)
             {
                 _mainCamera = Camera.main;
+                _playerManager = GetComponent<PlayerManager>();
+                _movement = GetComponent<PlayerMovement>();
                 _cameraController = GetComponent<CameraController>();
                 if (!_grapplingHook) _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _crosshair = Instantiate(_crosshairPrefab);
@@ -124,6 +126,8 @@ namespace InGame.Player.Sarutobi
             }
             else
             {
+                // 中断された場合は明示的にクリップを停止してからEndStanceを呼ぶ
+                _clipPlayer.StopClip(_stance);
                 EndStance();
             }
         }
@@ -143,6 +147,12 @@ namespace InGame.Player.Sarutobi
             {
                 StartStance().Forget();
             }
+            else
+            {
+                // 投げモーションが中断された場合も明示的にクリップを停止してからEndStanceを呼ぶ
+                _clipPlayer.StopClip(_throw);
+                EndStance();
+            }
         }
 
         void EndStance()
@@ -156,16 +166,16 @@ namespace InGame.Player.Sarutobi
             {
                 Rpc_EndStance();
             }
-            
+
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             State = KunaiStateType.Idol;
-            
-            if (!_clipPlayer.StopClip(_stanceLoop))
+
+            // より確実にすべての関連アニメーションクリップを停止
+            if (_clipPlayer)
             {
-                if (!_clipPlayer.StopClip(_stance))
-                {
-                    _clipPlayer.StopClip(_throw);
-                }
+                _clipPlayer.StopClip(_stanceLoop);
+                _clipPlayer.StopClip(_stance);
+                _clipPlayer.StopClip(_throw);
             }
         }
 

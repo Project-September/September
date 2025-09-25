@@ -131,7 +131,7 @@ namespace InGame.Player
                 if (!IsStun && _playerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する
-                    _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash), 
+                    _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
                         input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
                 }
                 
