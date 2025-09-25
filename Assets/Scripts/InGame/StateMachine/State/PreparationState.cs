@@ -93,8 +93,8 @@ namespace September.Common
 
         private async UniTaskVoid OpeningSequence()
         {
-            GameInput.I.ToggleMoveInput(false);
-            GameInput.I.ToggleActionInput(false);
+            // 全クライアントで入力を無効化
+            if (HasStateAuthority) RPC_ToggleInputs(false, false);
             _startCamera.Priority = 999;
             _startCamera.ForceCameraPosition(_spawnPositions[0].position + _cameraOffset, Quaternion.identity);
             //  黒画面フェードアウト
@@ -104,16 +104,16 @@ namespace September.Common
             _startCamera.Priority = -999;
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
-            //  カウントダウン開始 
+            //  カウントダウン開始
             UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             await UniTask.WaitForSeconds(3f);
-            //  準備フェーズ
-            GameInput.I.ToggleMoveInput(true);
+            //  準備フェーズ - 全クライアントで移動入力を有効化
+            if (HasStateAuthority) RPC_ToggleInputs(true, false);
             BGMManager.ReleseFlag();
             UIController.I.StartTimer(Context.Runner);
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
-            //  ゲーム開始
-            GameInput.I.ToggleActionInput(true);
+            //  ゲーム開始 - 全クライアントでアクション入力も有効化
+            if (HasStateAuthority) RPC_ToggleInputs(true, true);
             var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
             //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
             if (task != null)
@@ -302,6 +302,16 @@ namespace September.Common
                 UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
             }
         }
-       
+
+        /// <summary>
+        /// 全クライアントの入力状態を切り替えるRPC
+        /// </summary>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_ToggleInputs(bool moveInputEnabled, bool actionInputEnabled)
+        {
+            GameInput.I.ToggleMoveInput(moveInputEnabled);
+            GameInput.I.ToggleActionInput(actionInputEnabled);
+        }
+
     }
 }
