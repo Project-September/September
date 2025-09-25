@@ -143,7 +143,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
-            UIController.I.ChangeDescriptionUI(0);
+            UIController.I.ChangeDescriptionUI(1);
             Object.AssignInputAuthority(playerRef);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);

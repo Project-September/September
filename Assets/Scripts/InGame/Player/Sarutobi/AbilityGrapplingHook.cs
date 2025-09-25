@@ -70,6 +70,7 @@ namespace InGame.Player.Sarutobi
             
             if (HasInputAuthority)
             {
+                _playerManager = GetComponent<PlayerManager>();
                 _playerMovement = GetComponent<PlayerMovement>();
                 _grappleableSpline = GrapplingSpline.I.GrapplingTargetSpline;
                 _targetUI = Instantiate(_targetUIPrefab).GetComponentInChildren<Image>().transform;
