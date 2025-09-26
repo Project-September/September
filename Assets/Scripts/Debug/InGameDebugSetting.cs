@@ -62,7 +62,7 @@ public class InGameDebugSetting : MonoBehaviour
         _playMotionButton.onClick.AddListener(PlayMotionOnLocalPlayer);
 
         // 利用可能なアニメーションクリップをログ出力
-        _logPlayableMotionButton.onClick.AddListener(LogAvailableAnimations);
+        _logPlayableMotionButton?.onClick.AddListener(LogAvailableAnimations);
     }
 
     private void PlayMotionOnLocalPlayer()
