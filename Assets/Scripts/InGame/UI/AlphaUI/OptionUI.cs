@@ -31,7 +31,6 @@ namespace InGame.UI
         {
             _optionUIPanel.SetActive(false);
             _gameInput = GameInput.I;
-            _gameInput.Enable();
             _bgmVolumeSlider.value = 1;
             _seVolumeSlider.value = 1;
 
