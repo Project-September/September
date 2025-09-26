@@ -7,6 +7,7 @@ using InGame.Health;
 using InGame.Interact;
 using NaughtyAttributes;
 using September.Common;
+using September.InGame.Common;
 using September.InGame.Effect;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -315,6 +316,8 @@ namespace InGame.Exhibit
             {
                 var damageable = col.GetComponentInParent<IDamageable>();
                 if (damageable == null) continue;
+                var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+                if(damageable.OwnerPlayerRef == OwnerPlayerRef) continue;
                 var hitData = new HitData(HitActionType.Damage, _damage, ownerPlayerRef, damageable.OwnerPlayerRef);
                 damageable.TakeHit(ref hitData);
             }
