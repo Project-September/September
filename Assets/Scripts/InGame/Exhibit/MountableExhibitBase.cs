@@ -170,7 +170,8 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
-            RPC_ChangeDescriptionUI(playerRef,2);
+            PlayerDatabase.Instance.PlayerDataDic.TryGet(playerRef, out var playerData);
+            RPC_ChangeDescriptionUI(playerRef, playerData.CharacterType == CharacterType.Sarutobi? 3 : 2);
             var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all

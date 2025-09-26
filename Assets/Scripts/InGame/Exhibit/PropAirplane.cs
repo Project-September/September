@@ -13,6 +13,7 @@ using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 using CRISound;
 using Cysharp.Threading.Tasks;
+using September.InGame.UI;
 
 namespace InGame.Exhibit
 {
@@ -368,6 +369,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
+            RPC_ChangeDescriptionUI(ownerPlayerRef,1);
             RPC_SetIsKinematic(false);
             // 乗った時刻を記録
             GetOnTime = Runner.SimulationTime;
@@ -377,11 +379,23 @@ namespace InGame.Exhibit
                 formationManager.WarpFriendOutField();
             }
         }
+        
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_ChangeDescriptionUI(PlayerRef target, int mode)
+        {
+            if (Runner.LocalPlayer == target)
+            {
+                UIController.I.ChangeDescriptionUI(mode);
+            }
+            UIController.I.ChangeDescriptionUI(mode);
+        }
 
         void GetOff()
         {
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
             
+            PlayerDatabase.Instance.PlayerDataDic.TryGet(OwnerPlayerRef, out var playerData);
+            RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? 3 : 2);
             var chara = PlayerDatabase.Instance.PlayerDataDic[OwnerPlayerRef].CharacterType;
             var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
