@@ -387,7 +387,6 @@ namespace InGame.Exhibit
             {
                 UIController.I.ChangeDescriptionUI(mode);
             }
-            UIController.I.ChangeDescriptionUI(mode);
         }
 
         void GetOff()
