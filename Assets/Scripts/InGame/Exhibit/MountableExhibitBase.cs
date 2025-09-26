@@ -143,8 +143,8 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
-            UIController.I.ChangeDescriptionUI(1);
             Object.AssignInputAuthority(playerRef);
+            RPC_ChangeDescriptionUI(playerRef,1);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
             RPC_SetIsKinematic(false);
@@ -154,12 +154,23 @@ namespace InGame.Exhibit
             }
         }
         
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_ChangeDescriptionUI(PlayerRef target, int mode)
+        {
+            if (Runner.LocalPlayer == target)
+            {
+                UIController.I.ChangeDescriptionUI(mode);
+            }
+            UIController.I.ChangeDescriptionUI(mode);
+        }
+        
         /// <summary>
         /// インタラクト終了時の切り替え処理
         /// ホストでのみ実行される点に注意
         /// </summary>
         public virtual void GetOff(PlayerRef playerRef)
         {
+            RPC_ChangeDescriptionUI(playerRef,2);
             var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
@@ -172,7 +183,6 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
             Object.RemoveInputAuthority();
-            UIController.I.ChangeDescriptionUI(2);
             RPC_SetCameraPriority(playerRef,5);
             RPC_SetIsKinematic(true);
             var obj = _ownerPlayerManager.GetComponent<NetworkObject>();
@@ -197,6 +207,7 @@ namespace InGame.Exhibit
         {
            Rigidbody.isKinematic = kinematic;
         }
+        
         
         public void TakeHit(ref HitData hitData)
         {

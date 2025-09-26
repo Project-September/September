@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -8,6 +9,7 @@ using September.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Result
 {
@@ -37,6 +39,7 @@ namespace Result
         [SerializeField,Label("スタン履歴を並べる親オブジェクト")] private Transform _stunRowRoot;
         [SerializeField] private TextMeshProUGUI _stunTotalText;
         [SerializeField,Label("スタンさせたときのスコア")] private int StunPoint = 150;
+        [SerializeField] private CharacterIconPair[] _iconTable;
 
         [Header("3ページ目　インタラクト")]
         [SerializeField, Label("展示物の行を並べる親オブジェクト")] private Transform _exhibitRowRoot;
@@ -49,7 +52,7 @@ namespace Result
         [SerializeField] private GameObject _abilityRowPrefab;
         [SerializeField] private TextMeshProUGUI _abilityTitle;
         [SerializeField] private TextMeshProUGUI _abilityTotalText;
-        
+        private Dictionary<CharacterType, Sprite> _iconMap;
         private ResultDataInbox _resultDataInbox;
         private bool _isFinish;
 
@@ -92,6 +95,10 @@ namespace Result
             _gameInput = GameInput.I;
             _isActive = true;
             _resultDataInbox = ResultDataInbox.I;
+            _iconMap = _iconTable?
+                           .GroupBy(x => x.Type)
+                           .ToDictionary(g => g.Key, g => g.Last().Icon)
+                       ?? new Dictionary<CharacterType, Sprite>();
             
             _resultDataInbox.OnChanged += SetExhibitPage;
 
@@ -147,6 +154,11 @@ namespace Result
                 string targetName = db.PlayerDataDic.TryGet(targetRef, out SessionPlayerData targetData)
                     ? targetData.DisplayNickName
                     : $"Player {targetRef.RawEncoded}";
+                
+                CharacterType targetChara = db.PlayerDataDic.TryGet(targetRef, out SessionPlayerData td)
+                    ? td.CharacterType
+                    : CharacterType.None;
+                Debug.Log(targetChara);
 
                 int score = count * StunPoint;
 
@@ -163,8 +175,13 @@ namespace Result
                         texts[1].text = $"{count}回";
                         texts[2].text = $"{score}点";
                     }
-                    else
-                        Debug.LogError("[SetStunPage] Row に Text が3つ無い");
+                    // アイコン
+                    Image icon = row.GetComponentInChildren<Image>(true);
+                    if (icon && _iconMap.TryGetValue(targetChara, out Sprite sprite))
+                    {
+                        icon.sprite = sprite;
+                        icon.gameObject.SetActive(true);
+                    }
                 }
                 
                 totalScore += score;

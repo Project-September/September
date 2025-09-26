@@ -50,6 +50,9 @@ namespace September.InGame.UI
         private CancellationTokenSource _cts;
         private StatusUpType _currentStatusUpType;
         private CanvasGroup _ogreGroup;
+
+        public InGameUIRootRefs UIRoot => _uiRoot;
+
         private void Awake()
         {
             _cts = new CancellationTokenSource();
@@ -147,7 +150,6 @@ namespace September.InGame.UI
         private async UniTask PlayResultAnimation()
         {
             ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
-            Destroy(_uiRoot.gameObject);
             ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
             await resultAnim.Play(resultUI);
         }

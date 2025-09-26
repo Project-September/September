@@ -9,6 +9,7 @@ namespace September.Common
 {
     public class EndingState : ImtStateMachine<InGameManager>.State
     {
+        [SerializeField] private InGameStatusView _statusView;
         protected internal override void OnEnter()
         {
             Context.GameEnded?.Invoke();
@@ -26,12 +27,14 @@ namespace September.Common
             // ここにエンド処理
             PlayerDatabase.Instance.Server_PushResultToClients();
             UIController.I.ShowResultAnimation();
+            Destroy(_statusView.UIRoot.gameObject);
             GameInput.I.ToggleMoveInput(false);
             GameInput.I.ToggleLookInput(false);
             CRIAudio.StopSE();      // 鳴ってるSEを止める 2DPlayer用
             CRIAudio.Stop3DSEAll(); // 3DPlayer用
             BGMManager.ChangeBGM("Result"); // リザルトシーン用のBGMを再生
         }
+        
         private void ShowCursor()
         {
             Cursor.visible = true;

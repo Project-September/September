@@ -296,7 +296,14 @@ namespace InGame.Interact
         public void EndInteract()
         {
             _activeEffectBase?.OnInteractEnd();
+            RPC_ChangeDescriptionUI(2);
             _activeEffectBase = null;
+        }
+        
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+        private void RPC_ChangeDescriptionUI(int mode)
+        {
+            UIController.I.ChangeDescriptionUI(mode);
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
