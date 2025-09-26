@@ -112,8 +112,7 @@ namespace InGame.Interact
         {
             if (cooldownTime <= 0f) return;
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
-            var uniqueEffectId = NetworkRunner.Instances.First().LocalPlayer.PlayerId +
-                                 DateTime.UtcNow.ToString("yyyy-MM-dd-HH:mm:ss");
+            var uniqueEffectId = $"cooldown_{Object.Id}";
             var effectTransform = _cooldownEffectTransform != null ? _cooldownEffectTransform : transform;
             effectSpawner.RequestPlayLoopEffect(uniqueEffectId, _cooldownEffectType,
                 effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation));
