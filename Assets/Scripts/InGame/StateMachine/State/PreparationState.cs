@@ -5,6 +5,7 @@ using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
+using GameEvent;
 using InGame.Common;
 using InGame.Exhibit;
 using InGame.Health;
@@ -72,13 +73,22 @@ namespace September.Common
                 //PlayerHealthのOnDeathに登録
                 playerHealth.OnDeath += OnPlayerKilled;
                 var spd = pair.Value;
-                foreach (var data in PlayerDatabase.Instance.PlayerDataDic)
+                foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
                 {
-                    if(pair.Key == data.Key) continue;
-                    spd.StunData.Add(data.Key, 0);
+                    if(pair.Key == playerData.Key) continue;
+                    spd.StunData.Add(playerData.Key, 0);
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
                 _setIcon.ShowIcon(pair.Key);
+
+                //GameEventRecorder.GameStart();
+                // プレイヤーのキャラクター選択を記録
+                var data = new GameEventData();
+                data.DataPack("Player", pair.Key.ToString());
+                data.DataPack("Chara", pair.Value.CharacterType.ToString());
+                data.DataPack("Name", pair.Value.DisplayNickName);
+                GameEventRecorder.SendEventData("UserSelect", data);
+                //GameEventRecorder.GameEnd(null);
             }
             
             Context.Register(StaticServiceLocator.Instance);
