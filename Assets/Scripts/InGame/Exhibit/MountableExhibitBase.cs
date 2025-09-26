@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -23,7 +24,7 @@ namespace InGame.Exhibit
 
         protected Rigidbody Rigidbody { get; private set; }
         
-        protected Action HitAction { get; set; }
+       // protected Action HitAction { get; set; }
 
         protected bool IsSpawned { get; private set; }
         
@@ -66,6 +67,8 @@ namespace InGame.Exhibit
         [SerializeField] private InteractableBase _interactable;
         private InGameManager _inGameManager;
         public bool IsEnding;
+        private CancellationTokenSource _cts;
+        [SerializeField,Label("降りた後の無敵時間")] private float _invincibleTime;
         public override void Spawned()
         {
              IsEnding = false;
@@ -133,6 +136,7 @@ namespace InGame.Exhibit
         /// </summary>
         public virtual void GetOn(PlayerRef playerRef)
         {
+            _cts = new CancellationTokenSource();
             CameraController.CameraReset();
             _interactable.LastUsedCooldownTime = -9999f;
             CurrentHealth = _maxHealth;
@@ -182,6 +186,8 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(true);
             _ownerPlayerManager.RPC_SetColliderActive(true);
             _ownerPlayerManager.RPC_SetMeshActive(true);
+            var health = _ownerPlayerManager.GetComponent<PlayerHealth>();
+            SetInvincible(health,true).Forget();
             Object.RemoveInputAuthority();
             RPC_SetCameraPriority(playerRef,5);
             RPC_SetIsKinematic(true);
@@ -231,7 +237,7 @@ namespace InGame.Exhibit
             if (hitData.HitActionType == HitActionType.Damage)
             {
                 hitData.Amount = TakeDamage(hitData.Amount);
-                HitAction?.Invoke();
+                //HitAction?.Invoke();
             }
             else if (hitData.HitActionType == HitActionType.Heal)
             {
@@ -254,6 +260,19 @@ namespace InGame.Exhibit
             return prevHealth - CurrentHealth;
         }
 
+        private async UniTaskVoid SetInvincible(PlayerHealth playerHealth,bool isInvincible)
+        {
+            if(!HasStateAuthority) return; 
+            playerHealth.IsInvincible = isInvincible;
+            await UniTask.WaitForSeconds(_invincibleTime,cancellationToken: _cts.Token); // 展示物から降りて〇秒間は無敵
+            playerHealth.IsInvincible = !isInvincible;
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+        }
     }
 }
 

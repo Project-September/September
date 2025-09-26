@@ -401,7 +401,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sens: 10
-  _padSens: 100
+  _padSens: 50
   _characterTf: {fileID: 2415067396731086122}
   _cameraPivot: {fileID: 8449239177780970302}
   _cameraTf: {fileID: 7890379895551007981}
@@ -505,6 +505,8 @@ MonoBehaviour:
   _getOffPoint: {fileID: 302465785191893965}
   _height: 10
   _interactable: {fileID: 1450576261565196690}
+  IsEnding: 0
+  _invincibleTime: 0.5
   _moveSpeed: 5
   _rotationSpeed: 5
   _turnThreshold: 30
@@ -556,7 +558,7 @@ MonoBehaviour:
   _cooldownEffectRotation: {x: 0, y: 90, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 24
-  _spawnCooldownEffectOnStart: 1
+  _spawnCooldownEffectOnStart: 0
   _audioBroadcaster: {fileID: 130707149095327359}
   _interactSoundCueName: SE_Pteranodon_RideStart
   _interactSoundTrackingType: 0
