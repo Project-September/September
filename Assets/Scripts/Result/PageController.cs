@@ -90,7 +90,6 @@ namespace Result
         public void Initialize()
         {
             _gameInput = GameInput.I;
-            _gameInput.Enable();
             _isActive = true;
             _resultDataInbox = ResultDataInbox.I;
             
