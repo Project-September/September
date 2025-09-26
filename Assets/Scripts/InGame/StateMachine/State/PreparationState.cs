@@ -5,6 +5,7 @@ using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
+using GameEvent;
 using InGame.Common;
 using InGame.Exhibit;
 using InGame.Health;
@@ -25,8 +26,9 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
-        private int _spawnPositionIndex; 
+        private int _spawnPositionIndex;
         private PlayerRef _firstOgrePlayer;
+        private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
         protected internal override void OnEnter()
         {
@@ -72,13 +74,27 @@ namespace September.Common
                 //PlayerHealthのOnDeathに登録
                 playerHealth.OnDeath += OnPlayerKilled;
                 var spd = pair.Value;
-                foreach (var data in PlayerDatabase.Instance.PlayerDataDic)
+                foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
                 {
-                    if(pair.Key == data.Key) continue;
-                    spd.StunData.Add(data.Key, 0);
+                    if(pair.Key == playerData.Key) continue;
+                    spd.StunData.Add(playerData.Key, 0);
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
                 _setIcon.ShowIcon(pair.Key);
+            }
+
+            // プレイヤーのキャラクター選択を一度だけ記録
+            if (!_hasRecordedPlayerSelection)
+            {
+                _hasRecordedPlayerSelection = true;
+                foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
+                {
+                    var data = new GameEventData();
+                    data.DataPack("Player", pair.Key.ToString());
+                    data.DataPack("Chara", pair.Value.CharacterType.ToString());
+                    data.DataPack("Name", pair.Value.DisplayNickName);
+                    GameEventRecorder.SendEventData("UserSelect", data);
+                }
             }
             
             Context.Register(StaticServiceLocator.Instance);
