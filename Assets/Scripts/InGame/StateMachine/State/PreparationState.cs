@@ -26,8 +26,9 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
-        private int _spawnPositionIndex; 
+        private int _spawnPositionIndex;
         private PlayerRef _firstOgrePlayer;
+        private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
         protected internal override void OnEnter()
         {
@@ -80,15 +81,20 @@ namespace September.Common
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
                 _setIcon.ShowIcon(pair.Key);
+            }
 
-                //GameEventRecorder.GameStart();
-                // プレイヤーのキャラクター選択を記録
-                var data = new GameEventData();
-                data.DataPack("Player", pair.Key.ToString());
-                data.DataPack("Chara", pair.Value.CharacterType.ToString());
-                data.DataPack("Name", pair.Value.DisplayNickName);
-                GameEventRecorder.SendEventData("UserSelect", data);
-                //GameEventRecorder.GameEnd(null);
+            // プレイヤーのキャラクター選択を一度だけ記録
+            if (!_hasRecordedPlayerSelection)
+            {
+                _hasRecordedPlayerSelection = true;
+                foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
+                {
+                    var data = new GameEventData();
+                    data.DataPack("Player", pair.Key.ToString());
+                    data.DataPack("Chara", pair.Value.CharacterType.ToString());
+                    data.DataPack("Name", pair.Value.DisplayNickName);
+                    GameEventRecorder.SendEventData("UserSelect", data);
+                }
             }
             
             Context.Register(StaticServiceLocator.Instance);
