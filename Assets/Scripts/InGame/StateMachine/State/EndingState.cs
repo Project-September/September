@@ -27,13 +27,21 @@ namespace September.Common
             // ここにエンド処理
             PlayerDatabase.Instance.Server_PushResultToClients();
             UIController.I.ShowResultAnimation();
-            Destroy(_statusView.UIRoot.gameObject);
+
+            // UI削除処理をクライアントでも確実に実行
+            if (_statusView?.UIRoot?.gameObject != null)
+            {
+                Destroy(_statusView.UIRoot.gameObject);
+            }
+
             GameInput.I.ToggleMoveInput(false);
             GameInput.I.ToggleLookInput(false);
             CRIAudio.StopSE();      // 鳴ってるSEを止める 2DPlayer用
             CRIAudio.Stop3DSEAll(); // 3DPlayer用
             BGMManager.ChangeBGM("Result"); // リザルトシーン用のBGMを再生
         }
+        
+        
         
         private void ShowCursor()
         {
