@@ -53,7 +53,7 @@ public class TyrannoInteractable : MountableExhibitBase
         base.GetOn(playerRef);
         _interactableBase.ForceSetInteractable = false;
         IsInteracting = true;
-        HitAction += OnHit;
+        //HitAction += OnHit;
         _cooldownTimer = _cooldownTime;
         _counter = 0;
     }
@@ -64,7 +64,7 @@ public class TyrannoInteractable : MountableExhibitBase
         _interactableBase.ForceSetInteractable = true;
         IsInteracting = false;
         IsAttacking = false;
-        HitAction -= OnHit;
+        //HitAction -= OnHit;
     }
 
     public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
