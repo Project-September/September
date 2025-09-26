@@ -13293,7 +13293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _colliderObj: {fileID: 2287520664147054077}
   _meshObj: {fileID: 1292013223828287825}
-  _stunTime: 3
+  _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
   _IsStun:
     _value: 0
@@ -13310,16 +13310,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveCapsuleCollider: {fileID: 3128034714514688337}
-  _moveSpeed: 1.7
+  _moveSpeed: 1.9
   _groundSlopeThreshold: 45
   _groundLayer:
     serializedVersion: 2
     m_Bits: 159
-  _ogreMoveSpeed: 2.04
-  _ogreDashSpeed: 8.52
-  _dashSpeed: 7.1
+  _ogreMoveSpeed: 2.28
+  _ogreDashSpeed: 8.76
+  _dashSpeed: 7.3
   _dashCooldown: 1
-  _staminaConsumption: 27
+  _staminaConsumption: 23
   _rotationSpeed: 720
   _maxLedgeHeight: 1.5
   _minLedgeHeight: 0.4
@@ -13598,8 +13598,8 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
-        _attackDamage: 55
-        _ogreAttackDamage: 110
+        _attackDamage: 10
+        _ogreAttackDamage: 13
         _startHitCheckFrame: 3
         _endHitCheckFrame: 5
         _endAttackFrame: 22
