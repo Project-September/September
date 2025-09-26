@@ -161,6 +161,7 @@ namespace September.InGame.UI
                 // 展示物操作方法をアクティブ
                 _descriptionIcon[0].SetActive(false);
                 _descriptionIcon[1].SetActive(true);
+                _descriptionIcon[2].SetActive(false);
             }
             else if(value == 2)
             {
