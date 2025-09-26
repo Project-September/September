@@ -70,8 +70,12 @@ namespace September.Lobby
             NetworkManager.Instance.Fade(_fadePanel).Forget();
         }
 
+        bool _isStartingGame = false;
         private async UniTaskVoid DelayStartGame(float delay)
         {
+            //Debug.Log("DelayStartGame");
+            if (_isStartingGame) return;
+            _isStartingGame = true;
             await UniTask.WaitForSeconds(delay);
             NetworkManager.Instance.StartGame().Forget();
         }
