@@ -110,7 +110,7 @@ namespace September.Common
         private async UniTaskVoid OpeningSequence()
         {
             // 全クライアントで入力を無効化
-            if (HasStateAuthority) RPC_ToggleInputs(false, false);
+            if (HasStateAuthority) RPC_ToggleInputs(false, false, false);
             _startCamera.Priority = 999;
             _startCamera.ForceCameraPosition(_spawnPositions[0].position + _cameraOffset, Quaternion.identity);
             //  黒画面フェードアウト
@@ -118,18 +118,20 @@ namespace September.Common
             //  各プレイヤーに注目 + エモート
             await StartAnimation();
             _startCamera.Priority = -999;
+            // カメラが変わったタイミングで視点入力だけ有効化
+            if (HasStateAuthority) RPC_ToggleInputs(false, false, true);
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始
             UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ - 全クライアントで移動入力を有効化
-            if (HasStateAuthority) RPC_ToggleInputs(true, false);
+            if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
             BGMManager.ReleseFlag();
             UIController.I.StartTimer(Context.Runner);
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
             //  ゲーム開始 - 全クライアントでアクション入力も有効化
-            if (HasStateAuthority) RPC_ToggleInputs(true, true);
+            if (HasStateAuthority) RPC_ToggleInputs(true, true, true);
             var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
             //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
             if (task != null)
@@ -323,10 +325,11 @@ namespace September.Common
         /// 全クライアントの入力状態を切り替えるRPC
         /// </summary>
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ToggleInputs(bool moveInputEnabled, bool actionInputEnabled)
+        private void RPC_ToggleInputs(bool moveInputEnabled, bool actionInputEnabled, bool lookInputEnabled)
         {
             GameInput.I.ToggleMoveInput(moveInputEnabled);
             GameInput.I.ToggleActionInput(actionInputEnabled);
+            GameInput.I.ToggleLookInput(lookInputEnabled);
         }
 
     }

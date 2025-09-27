@@ -44,7 +44,7 @@ namespace InGame.Player.Sarutobi
         private SplineContainer _grappleableSpline;
         private Transform _targetUI;
         private Camera _mainCamera;
-        private LineRenderer _wireLine;
+        private Transform _wireCyl;
         
         private GrappleStateType _grappleState = GrappleStateType.ShotWait;
         private float _jumpTimer;
@@ -76,13 +76,13 @@ namespace InGame.Player.Sarutobi
                 _targetUI = Instantiate(_targetUIPrefab).GetComponentInChildren<Image>().transform;
                 _mainCamera = Camera.main;
             }
-            
-            var wireObject = new GameObject("GrapplingWire");
-            _wireLine = wireObject.AddComponent<LineRenderer>();
-            _wireLine.material = _wireMaterial;
-            _wireLine.startWidth = _wireWidth;
-            _wireLine.endWidth = _wireWidth;
-            _wireLine.enabled = false;
+
+            var wireObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            wireObj.name = "WireCylinder";
+            _wireCyl = wireObj.transform;
+            wireObj.GetComponent<Renderer>().sharedMaterial = _wireMaterial;
+            if (wireObj.TryGetComponent(out Collider col)) Destroy(col);
+            _wireCyl.gameObject.SetActive(false);
         }
 
         public override void FixedUpdateNetwork()
@@ -393,13 +393,13 @@ namespace InGame.Player.Sarutobi
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         void RPC_DisplayWireStart()
         {
-            _wireLine.enabled = true;
             _wireTimer = 0;
+            _wireCyl.gameObject.SetActive(true);
         }
 
         private void Update()
         {
-            if (_wireLine && _wireLine.enabled)
+            if (_wireCyl && _wireCyl.gameObject.activeSelf)
             {
                 _wireTimer += Time.deltaTime;
                 float t = Math.Clamp(_wireTimer * _wireSpeed / _distanceMag, 0, 1);
@@ -410,13 +410,25 @@ namespace InGame.Player.Sarutobi
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         void RPC_DisplayWireEnd()
         {
-            _wireLine.enabled = false;
+            _wireCyl.gameObject.SetActive(false);
         }
 
         void SetWirePosition(Vector3 otherPos)
         {
-            _wireLine.SetPosition(0, _handSocket.position);
-            _wireLine.SetPosition(1, otherPos);
+            var dir = otherPos - _handSocket.position;
+            var len = dir.magnitude;
+
+            if (len < 1e-5f)
+            {
+                _wireCyl.gameObject.SetActive(false); 
+                return;
+            }
+
+            // transform の変更
+            _wireCyl.position = (otherPos + _handSocket.position) * 0.5f;
+            _wireCyl.rotation = Quaternion.FromToRotation(Vector3.up, dir.normalized);
+            var sy = len * 0.5f;
+            _wireCyl.localScale = new Vector3(_wireWidth, sy, _wireWidth);
         }
 
         public enum AbilityStateType
