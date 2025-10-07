@@ -11,10 +11,10 @@ namespace InGame.Common
     {
         private const string AssetPath = "AnimationClipsContainer";
         
-        [SerializeField] private AnimationMontage[] _animationMontages;
+        [SerializeField] private AnimationMontageStruct[] _animationMontages;
         
         public static AnimationClipsContainer Instance { get; private set; }
-        public AnimationMontage[] AnimationMontages => _animationMontages;
+        public AnimationMontageStruct[] AnimationMontages => _animationMontages;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static async void Init()
@@ -31,7 +31,7 @@ namespace InGame.Common
     }
 
     [Serializable]
-    public struct AnimationMontage
+    public struct AnimationMontageStruct
     {
         public AnimationClip AnimClip;
         public float PlaySpeed;
@@ -43,7 +43,7 @@ namespace InGame.Common
         public LayerInfo.LayerType TargetLayer;
         public bool IsAdditive;
 
-        public AnimationMontage(float playSpeed = 1)
+        public AnimationMontageStruct(float playSpeed = 1)
         {
             AnimClip = null;
             PlaySpeed = playSpeed;
