@@ -12,6 +12,7 @@ using InGame.Health;
 using InGame.Player;
 using September.InGame.Common;
 using September.InGame.UI;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -30,21 +31,33 @@ namespace September.Common
         private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
+        
+        // ToDo : UI工事中
+        private readonly Subject<Unit> _onSetUI = new();
+        private readonly Subject<int> _onChangeDescriptionUI = new();
+        private readonly Subject<NetworkRunner> _onStartTimer  = new();
+        private readonly Subject<bool> _onShowOgreUI = new();
+        public Func<TimeMessageType, UniTask> TimeOverlayMessage { get; private set; }
+        
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
-            UIController.I.SetUpStartUI();
+            _onSetUI.OnNext(Unit.Default);
+            //UIPresenter.I.SetUpStartUI();
             
+            // ToDo : あとで修正します
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData localData))
             {
                 if (localData.CharacterType == CharacterType.Sarutobi) 
                 {
-                    UIController.I.ChangeDescriptionUI(3);
+                    _onChangeDescriptionUI.OnNext(3);
+                    //UIPresenter.I.ChangeDescriptionUI(3);
                 }
                 else
                 {
-                    UIController.I.ChangeDescriptionUI(2);
+                    _onChangeDescriptionUI.OnNext(2);
+                    //UIPresenter.I.ChangeDescriptionUI(2);
                 }
             }
             
@@ -123,16 +136,20 @@ namespace September.Common
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始
-            UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
+            TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
+            //UIPresenter.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ - 全クライアントで移動入力を有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
             BGMManager.ReleseFlag();
-            UIController.I.StartTimer(Context.Runner);
+            _onStartTimer.OnNext(Context.Runner);
+            //UIPresenter.I.StartTimer(Context.Runner);
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
             //  ゲーム開始 - 全クライアントでアクション入力も有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, true, true);
-            var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
+            var task = 
+                //UIPresenter.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart)
+                TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
             if (task != null)
                 task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
@@ -261,12 +278,13 @@ namespace September.Common
         {
             if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
             {
-                UIController.I.ShowOgreLamp(true);
-                UIController.I.ChangeTagNotice(0);
+                //UIPresenter.I.ShowOgreLamp(true);
+                _onShowOgreUI.OnNext(true);
+                UIPresenter.I.ChangeTagNotice(0);
             }
             else
             {
-                UIController.I.ChangeTagNotice(1);
+                UIPresenter.I.ChangeTagNotice(1);
             }
         }
 
@@ -278,7 +296,7 @@ namespace September.Common
             {
                 string killerName = killerData.DisplayNickName;
                 string killedName = killedData.DisplayNickName;
-                UIController.I.ShowLog($"{killerName} が {killedName} を倒した");
+                UIPresenter.I.ShowLog($"{killerName} が {killedName} を倒した");
             }
         }
         
@@ -288,12 +306,12 @@ namespace September.Common
         {
             if (executor == Context.Runner.LocalPlayer)
             {
-                UIController.I.ShowOgreLamp(false);
+                UIPresenter.I.ShowOgreLamp(false);
             }
             else if (targetRef == Context.Runner.LocalPlayer)
             {
-                UIController.I.ShowOgreLamp(true);
-                UIController.I.ChangeTagNotice(2);
+                UIPresenter.I.ShowOgreLamp(true);
+                UIPresenter.I.ChangeTagNotice(2);
             }
         }
         
@@ -304,11 +322,11 @@ namespace September.Common
             {
                 if (showStatusUpUI)
                 {
-                    UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
+                    UIPresenter.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
                 }
                 else
                 {
-                    UIController.I.ShowStatusUpUI(-1, StatusUpType.None);
+                    UIPresenter.I.ShowStatusUpUI(-1, StatusUpType.None);
                 }
             }
         }
@@ -317,7 +335,7 @@ namespace September.Common
         {
             if (PlayerDatabase.Instance.PlayerDataDic[Runner.LocalPlayer].IsOgre)
             {
-                UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
+                UIPresenter.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
             }
         }
 

@@ -33,7 +33,7 @@ public class SetIcon : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_SetIcon(PlayerRef playerRef, CharacterType characterType)
     {
-        _image = UIController.I.UIRootRefs.IconImage;
+        _image = UIPresenter.I.UIRootRefs.IconImage;
         if (playerRef != Runner.LocalPlayer) return;
         _image.sprite = GetIcon(characterType);
     }

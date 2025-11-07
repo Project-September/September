@@ -163,7 +163,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == target)
             {
-                UIController.I.ChangeDescriptionUI(mode);
+                UIPresenter.I.ChangeDescriptionUI(mode);
             }
         }
         

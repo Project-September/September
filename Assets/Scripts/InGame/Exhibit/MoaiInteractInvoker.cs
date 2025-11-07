@@ -52,7 +52,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == playerRef)
             {
-                UIController.I.ShowStatusUpUI(3f, StatusUpType.BokeBoke);
+                UIPresenter.I.ShowStatusUpUI(3f, StatusUpType.BokeBoke);
             }
         }
     }

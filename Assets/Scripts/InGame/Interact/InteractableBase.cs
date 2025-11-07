@@ -302,7 +302,7 @@ namespace InGame.Interact
         [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
         private void RPC_ChangeDescriptionUI(int mode)
         {
-            UIController.I.ChangeDescriptionUI(mode);
+            UIPresenter.I.ChangeDescriptionUI(mode);
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -311,7 +311,7 @@ namespace InGame.Interact
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(actor, out var data))
             {
                 string actorName = data.DisplayNickName;
-                UIController.I.ShowLog($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
+                UIPresenter.I.ShowLog($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
             }
         }
     }

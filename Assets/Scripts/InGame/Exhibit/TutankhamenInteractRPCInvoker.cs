@@ -114,7 +114,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == playerRef)
             {
-                UIController.I.ShowStatusUpUI(_maskDuration, StatusUpType.Tutankhamen);
+                UIPresenter.I.ShowStatusUpUI(_maskDuration, StatusUpType.Tutankhamen);
             }
         }
     }

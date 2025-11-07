@@ -158,7 +158,6 @@ namespace Result
                 CharacterType targetChara = db.PlayerDataDic.TryGet(targetRef, out SessionPlayerData td)
                     ? td.CharacterType
                     : CharacterType.None;
-                Debug.Log(targetChara);
 
                 int score = count * StunPoint;
 

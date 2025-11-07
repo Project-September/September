@@ -1,11 +1,11 @@
-using CRISound;
+using System;
 using Fusion;
 using InGame.Health;
 using InGame.Player;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Effect;
-using September.InGame.UI;
+using UniRx;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -15,6 +15,9 @@ namespace InGame.Exhibit
         [SerializeField] private int _healAmount;
         private EffectSpawner _effectSpawner;
         [SerializeField] private Vector3 _offset;
+        
+        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
+        public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
         public void HealPlayer(PlayerRef playerRef)
         {
              var playerObject = StaticServiceLocator.Instance.Get<InGameManager>().PlayerDataDic[playerRef];
@@ -38,7 +41,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == playerRef)
             {
-                UIController.I.ShowStatusUpUI(3f, StatusUpType.Heal);
+                _onInteractStatusUpObject.OnNext((3f,StatusUpType.Heal));
             }
         }
     }

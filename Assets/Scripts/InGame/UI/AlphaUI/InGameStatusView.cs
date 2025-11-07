@@ -10,7 +10,6 @@ using Result;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UniRx;
 
 namespace September.InGame.UI
 {
@@ -41,10 +40,10 @@ namespace September.InGame.UI
         private GameObject _optionUI;
         private GameObject _LogPanel;
         private GameObject _ogreUiInstance;
-        private ChangeTagOverlayMessage _changeTagOverlayMessage;
+        public ChangeTagOverlayMessage _changeTagOverlayMessage;
         private TimeOverlayMessage _timeOverlayMessage;
         private GameObject[] _descriptionIcon;
-        private InteractUi _interactUI;
+        public InteractUi _interactUI;
         private UniTask _ogreMessageTask;
         private TextMeshProUGUI _scoreText;
         private CancellationTokenSource _cts;
@@ -56,35 +55,35 @@ namespace September.InGame.UI
         private void Awake()
         {
             _cts = new CancellationTokenSource();
-            Bind();
+            //Bind();
         }
 
         private void Bind()
         {
-            UIController ui = UIController.I;
-            ui.OnGameStart.Subscribe(_ => SetupUI()).AddTo(_cts.Token);
-            
-            ui.OnChangeSliderValue.Subscribe(ChangeHp).AddTo(_cts.Token);
-            ui.OnClickOptionButton.Subscribe(ShowOptionUI).AddTo(_cts.Token);
-            ui.OnStartTimer.Subscribe(runner => ShowGameStartTime(runner).Forget()).AddTo(_cts.Token);
-            ui.OnShowLog.Subscribe(killText => ShowLog(killText).Forget()).AddTo(_cts.Token);
-            ui.OnShowOgreUI.Subscribe(ShowOgreLamp).AddTo(_cts.Token);
+            //UIPresenter ui = UIPresenter.I;
+            //ui.OnGameStart.Subscribe(_ => SetupUI()).AddTo(_cts.Token);
+            //ui.OnChangeSliderValue.Subscribe(ChangeHp).AddTo(_cts.Token);
+            //ui.OnClickOptionButton.Subscribe(ShowOptionUI).AddTo(_cts.Token);
+            //ui.OnDestroyInGameUI.Subscribe(_ => DestroyInGameUI()).AddTo(_cts.Token);
+            //ui.OnStartTimer.Subscribe(runner => ShowGameStartTime(runner).Forget()).AddTo(_cts.Token);
+            //ui.OnShowLog.Subscribe(killText => ShowLog(killText).Forget()).AddTo(_cts.Token);
+            //ui.OnShowOgreUI.Subscribe(ShowOgreLamp).AddTo(_cts.Token);
             //  Bind前に_uiRootが生成されないのでChangeTagNoticeを直接Subscribeできない
-            ui.ChangeTagNoticeObserver.Subscribe(index=>_changeTagOverlayMessage.ChangeTagNotice(index)).AddTo(_cts.Token);
-            ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
-            ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
-            ui.IsInteracting
-                .Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2))
-                .AddTo(_cts.Token);
-            ui.OnChangeInteractProgress.Subscribe(progress => _interactUI?.SetInteractProgress(progress))
-                .AddTo(_cts.Token);
-            ui.OnInteractStatusUpObject.Subscribe(info => ShowStatusUpUI(info.Item1, info.Item2))
-                .AddTo(_cts.Token);
-            ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
-            ui.OnChangeScoreText.Subscribe(ChangeScore).AddTo(_cts.Token);
-            ui.TimeOverlayMessage += TimeOverlayMessage;
+            //ui.ChangeTagNoticeObserver.Subscribe(index=>_changeTagOverlayMessage.ChangeTagNotice(index)).AddTo(_cts.Token);
+            //ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
+            //ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
+            // ui.IsInteracting
+            //     .Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2))
+            //     .AddTo(_cts.Token);
+            // ui.OnChangeInteractProgress.Subscribe(progress => _interactUI?.SetInteractProgress(progress))
+            //     .AddTo(_cts.Token);
+             // ui.OnInteractStatusUpObject.Subscribe(info => ShowStatusUpUI(info.Item1, info.Item2))
+             //     .AddTo(_cts.Token);
+            //ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
+            //ui.OnChangeScoreText.Subscribe(ChangeScore).AddTo(_cts.Token);
+            //ui.TimeOverlayMessage += TimeOverlayMessage;
         }
-        private void SetupUI()
+        public void SetupUI()
         {
             if (!_uiRoot)
             {
@@ -93,7 +92,7 @@ namespace September.InGame.UI
                 _uiRoot.transform.SetAsFirstSibling();
             }
             
-            UIController.I.UIRootRefs = _uiRoot;
+            //UIPresenter.I.UIRootRefs = _uiRoot;
             _optionUI = _uiRoot.OptionUI;
             _LogPanel = _uiRoot.LogPanel;
             _ogreUiInstance = _uiRoot.OgreUI;
@@ -117,7 +116,7 @@ namespace September.InGame.UI
             
         }
 
-        private void ChangeHp(int value)
+        public void ChangeHp(int value)
         {
             if (!_hpBarSlider)
                 return;
@@ -126,7 +125,7 @@ namespace September.InGame.UI
                 .SetEase(Ease.OutQuad);
         }
 
-        private void ChangeScore(int value)
+        public void ChangeScore(int value)
         {
             if (!_scoreText) return;
 
@@ -147,14 +146,14 @@ namespace September.InGame.UI
                 .OnComplete(() => _scoreText.transform.DOScale(1f, 0.2f));
         }
 
-        private async UniTask PlayResultAnimation()
+        public async UniTask PlayResultAnimation()
         {
             ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
             ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
             await resultAnim.Play(resultUI);
         }
 
-        private void ChangeExhibitDescriptionUI(int value)
+        public void ChangeExhibitDescriptionUI(int value)
         {
             if (value == 1)
             {
@@ -179,7 +178,7 @@ namespace September.InGame.UI
             }
         }
 
-        private void ChangeStamina(float value)
+        public void ChangeStamina(float value)
         {
             if (!_staminaBarSlider) 
                 return;
@@ -189,7 +188,7 @@ namespace September.InGame.UI
 
         // キルのログを直接引数に入れる
         // キルのログを直接引数に入れる
-        private async UniTask ShowLog (string killText)
+        public async UniTask ShowLog (string killText)
         {
             // プレハブから新しいログを作成
             GameObject log = Instantiate(_killLogItemText, _LogPanel.transform);
@@ -226,7 +225,7 @@ namespace September.InGame.UI
                 cg.DOFade(0f, 0.5f).OnComplete(() => Destroy(log));
             }
         }
-        private async UniTask ShowGameStartTime(NetworkRunner runner)
+        public async UniTask ShowGameStartTime(NetworkRunner runner)
         {
             if (!_uiRoot || !_uiRoot.TimerText) 
                 return;
@@ -267,32 +266,46 @@ namespace September.InGame.UI
             await UniTask.Delay(TimeSpan.FromSeconds(_timerData.Duration), cancellationToken: _cts.Token);
         }
         // 鬼の時にUIを表示する
-        private void ShowOgreLamp(bool isShow)
+        public void ShowOgreLamp(bool isShow)
         {
             if (!_ogreUiInstance) return;
             _ogreUiInstance.gameObject.SetActive(isShow);
         }
 
-        private void ShowOptionUI(bool isShow)
+        public void ShowOptionUI(bool isShow)
         {
             if (_optionUI)
                 _optionUI.SetActive(isShow);
         }
 
-        private async UniTaskVoid ShowStatusUpUI(float seconds,StatusUpType statusUpType)
+        public void DestroyInGameUI()
+        {
+            Destroy(_uiRoot.gameObject);
+        }
+
+        public async UniTaskVoid ShowStatusUpUI(float seconds,StatusUpType statusUpType)
         {
             switch (statusUpType)
             {
                 case StatusUpType.Heal:
                 {
-                    var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
-                    ui.GetComponentInChildren<TextMeshProUGUI>().text = "バイオリン：体力が回復した";
+                    var go = Instantiate(_statusUpUI.gameObject, _statusUpLayout.transform);
+                    var cg = go.GetComponent<CanvasGroup>();
+                    cg.alpha = 0;
+
+                    go.GetComponentInChildren<TextMeshProUGUI>().text = "バイオリン：体力が回復した";
                     UpdateLayOutGroup();
-                    await ui.DOFade(1, 0.5f);
+
+                    await cg.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds));
-                    await ui.DOFade(0, 0.5f);
-                    Destroy(ui.gameObject);
-                    UpdateLayOutGroup();
+
+                    await cg.DOFade(0, 0.5f)
+                        .OnComplete(() =>
+                        {
+                            if (go) 
+                                Destroy(go);
+                            UpdateLayOutGroup();
+                        });
                     break;
                 }
                 case StatusUpType.Tutankhamen:
@@ -334,11 +347,7 @@ namespace September.InGame.UI
                     UpdateLayOutGroup();
                     break;
                 }
-                default:
-                    break;
             }
-            
-            
         }
 
         private void UpdateLayOutGroup()
@@ -352,12 +361,13 @@ namespace September.InGame.UI
         /// <summary>
         /// Bind時に_timeOverlayMessageが生成されないのでメソッドを挟む
         /// </summary>
-        private UniTask TimeOverlayMessage(TimeMessageType type) =>_timeOverlayMessage.CallTask(type);
+        public UniTask TimeOverlayMessage(TimeMessageType type) =>_timeOverlayMessage.CallTask(type);
         private void OnDestroy()
         {
             _cts?.Cancel();
             _cts?.Dispose();
-            if (UIController.I) UIController.I.TimeOverlayMessage -= TimeOverlayMessage;
+            // if (UIPresenter.I) 
+            //     UIPresenter.I.TimeOverlayMessage -= TimeOverlayMessage;
         }
     }
 }

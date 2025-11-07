@@ -74,9 +74,9 @@ namespace InGame.Interact
                     {
                         _hasCompletedInteraction = true;
                         CompleteInteraction();
-                        UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        UIPresenter.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
                     }
-                    UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    UIPresenter.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
                 }
             }
             else
@@ -150,17 +150,17 @@ namespace InGame.Interact
                 {
                     Interactor = Object.InputAuthority.RawEncoded,
                 };
-                if (UIController.I)
+                if (UIPresenter.I)
                 {
                     var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                         PlayerManager.PlayerControlState.ForcedControl;
-                    UIController.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+                    UIPresenter.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
                 }
             }
             else
             {
-                if (UIController.I)
-                    UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
+                if (UIPresenter.I)
+                    UIPresenter.I.ShowInteractUI(false, _focusedObj?.gameObject);
             }
             //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
@@ -267,7 +267,7 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIController.I?.SetInteractProgress(0f);
+            UIPresenter.I?.SetInteractProgress(0f);
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
