@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using Fusion;
 using InGame.Common;
@@ -13,7 +14,7 @@ using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 using CRISound;
 using Cysharp.Threading.Tasks;
-using September.InGame.UI;
+using UniRx;
 
 namespace InGame.Exhibit
 {
@@ -55,6 +56,9 @@ namespace InGame.Exhibit
         [SerializeField] private TMP_Text _currentAccelText;
         [SerializeField] private TMP_Text _angleText;
         [SerializeField] private TMP_Text _isUpText;
+        
+        private readonly Subject<int> _onChangeDescriptionUI = new();
+        public IObservable<int> OnChangeDescriptionUI => _onChangeDescriptionUI;
 
         private Rigidbody _rb;
         private AirplaneCamera _cameraController;
@@ -385,7 +389,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == target)
             {
-                UIPresenter.I.ChangeDescriptionUI(mode);
+                _onChangeDescriptionUI.OnNext(mode);
             }
         }
 

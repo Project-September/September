@@ -11,7 +11,6 @@ using InGame.Exhibit;
 using InGame.Health;
 using InGame.Player;
 using September.InGame.Common;
-using September.InGame.UI;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -31,41 +30,48 @@ namespace September.Common
         private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
-        
-        // ToDo : UI工事中
+
+        #region イベント
+
         private readonly Subject<Unit> _onSetUI = new();
         private readonly Subject<int> _onChangeDescriptionUI = new();
-        private readonly Subject<NetworkRunner> _onStartTimer  = new();
+        private readonly Subject<NetworkRunner> _onStartTimer = new();
         private readonly Subject<bool> _onShowOgreUI = new();
-        public Func<TimeMessageType, UniTask> TimeOverlayMessage { get; private set; }
-        
+        private readonly Subject<int> _changeTagNoticeObserver = new();
+        private readonly Subject<string> _onShowLog = new();
+        private readonly Subject<(float, StatusUpType)> _onInteractStatusUpObject = new();
+
+        #endregion
+
+        #region 外部公開
+
+        public IObservable<Unit> OnSetUI => _onSetUI;
+        public IObservable<int> OnChangeDescriptionUI => _onChangeDescriptionUI;
+        public IObservable<NetworkRunner> OnStartTimer => _onStartTimer;
+        public IObservable<bool> OnShowOgreUI => _onShowOgreUI;
+        public IObservable<string> OnShowLog => _onShowLog;
+        public IObservable<(float, StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
+        public Func<TimeMessageType, UniTask> TimeOverlayMessage { get; set; }
+
+        #endregion
+
+
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
             _onSetUI.OnNext(Unit.Default);
-            //UIPresenter.I.SetUpStartUI();
-            
+
             // ToDo : あとで修正します
-            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData localData))
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer,
+                    out SessionPlayerData localData))
             {
-                if (localData.CharacterType == CharacterType.Sarutobi) 
-                {
-                    _onChangeDescriptionUI.OnNext(3);
-                    //UIPresenter.I.ChangeDescriptionUI(3);
-                }
-                else
-                {
-                    _onChangeDescriptionUI.OnNext(2);
-                    //UIPresenter.I.ChangeDescriptionUI(2);
-                }
+                _onChangeDescriptionUI.OnNext(localData.CharacterType == CharacterType.Sarutobi ? 3 : 2);
             }
-            
-            if (Context.Runner.IsServer)
-            {
-                ChooseOgre();
-                Initialize().Forget();
-            }
+
+            if (!Context.Runner.IsServer) return;
+            ChooseOgre();
+            Initialize().Forget();
         }
 
         private async UniTask Initialize()
@@ -83,16 +89,18 @@ namespace September.Common
                 {
                     Context.AddPlayerObject(pair.Key, player);
                 }
+
                 var playerHealth = player.GetComponent<PlayerHealth>();
                 //PlayerHealthのOnDeathに登録
                 playerHealth.OnDeath += OnPlayerKilled;
                 var spd = pair.Value;
                 foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
                 {
-                    if(pair.Key == playerData.Key) continue;
+                    if (pair.Key == playerData.Key) continue;
                     spd.StunData.Add(playerData.Key, 0);
                 }
-                PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key,spd);
+
+                PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key, spd);
                 _setIcon.ShowIcon(pair.Key);
             }
 
@@ -109,7 +117,7 @@ namespace September.Common
                     GameEventRecorder.SendEventData("UserSelect", data);
                 }
             }
-            
+
             Context.Register(StaticServiceLocator.Instance);
             RPC_OpeningSequence();
         }
@@ -137,18 +145,15 @@ namespace September.Common
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始
             TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
-            //UIPresenter.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ - 全クライアントで移動入力を有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
             BGMManager.ReleseFlag();
             _onStartTimer.OnNext(Context.Runner);
-            //UIPresenter.I.StartTimer(Context.Runner);
             await UniTask.Delay(TimeSpan.FromSeconds(10f));
             //  ゲーム開始 - 全クライアントでアクション入力も有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, true, true);
-            var task = 
-                //UIPresenter.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart)
+            var task =
                 TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
             if (task != null)
@@ -164,7 +169,7 @@ namespace September.Common
                 Context.Rpc_SendEvent((int)StateEventId.Finish);
             }
         }
-        
+
         // 全ての準備が整ったらFadeをあける
         private async UniTask FadeOut()
         {
@@ -196,16 +201,17 @@ namespace September.Common
                 float delayTime = 1f;
                 if (emoteClip)
                 {
-                    if(Context.Runner.IsServer) animClipPlayer.PlayClip(emoteClip);
+                    if (Context.Runner.IsServer) animClipPlayer.PlayClip(emoteClip);
                     var cueName = characterDataContainer.GetCharacterData(characterType).StartVoice;
-                    CRIAudio.PlaySE(_cueSheetName,cueName); // ボイス呼び出し
+                    CRIAudio.PlaySE(_cueSheetName, cueName); // ボイス呼び出し
                     delayTime = emoteClip.length;
                 }
+
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
                 index++;
             }
         }
-        
+
         private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
         {
             if (killerData.StunData.TryGet(killedPlayer, out int count))
@@ -216,26 +222,29 @@ namespace September.Common
             {
                 killerData.StunData.Set(killedPlayer, 1);
             }
+
             PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
-            
+
             // スコアの更新処理
             PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
         }
+
         private Vector3 GetSpawnPosition()
         {
             var result = _spawnPositions[_spawnPositionIndex].position;
             _spawnPositionIndex = (_spawnPositionIndex + 1) % _spawnPositions.Length;
             return result;
         }
+
         /// <summary>
         /// 鬼を抽選するメソッド
         /// </summary>
         private void ChooseOgre()
         {
             var dic = PlayerDatabase.Instance.PlayerDataDic;
-            if (dic.Count <= 0 || !Context.Runner.IsServer) 
+            if (dic.Count <= 0 || !Context.Runner.IsServer)
                 return;
-            
+
             var index = Random.Range(0, dic.Count);
             var ogreKey = dic.ToArray()[index].Key;
             var data = dic.Get(ogreKey);
@@ -243,14 +252,14 @@ namespace September.Common
             PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
             _firstOgrePlayer = ogreKey;
         }
+
         /// <summary>
         /// 各Playerの気絶時に呼ばれるメソッド
         /// </summary>
         private void OnPlayerKilled(HitData data)
         {
-            if (!Context.Runner.IsServer) return; 
-            //.Instance.Server_AddStun(data.ExecutorRef);
-            
+            if (!Context.Runner.IsServer) return;
+
             SessionPlayerData killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef);
             var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
             if (killerData.IsOgre && data.ExecutorRef != data.TargetRef)
@@ -261,30 +270,32 @@ namespace September.Common
                 killedData.IsOgre = true;
                 PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
                 RPC_ShowStatusUpUI(data.TargetRef, true);
-                RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
+                RPC_SetOgreUI(data.ExecutorRef, data.TargetRef);
             }
-            if(data.ExecutorRef == data.TargetRef) 
+
+            if (data.ExecutorRef == data.TargetRef)
                 return;
-            
+
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
         }
+
         private void HideCursor()
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
+
         private void SetOgreLamp()
         {
             if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
             {
-                //UIPresenter.I.ShowOgreLamp(true);
                 _onShowOgreUI.OnNext(true);
-                UIPresenter.I.ChangeTagNotice(0);
+                _changeTagNoticeObserver.OnNext(0);
             }
             else
             {
-                UIPresenter.I.ChangeTagNotice(1);
+                _changeTagNoticeObserver.OnNext(1);
             }
         }
 
@@ -296,38 +307,31 @@ namespace September.Common
             {
                 string killerName = killerData.DisplayNickName;
                 string killedName = killedData.DisplayNickName;
-                UIPresenter.I.ShowLog($"{killerName} が {killedName} を倒した");
+                _onShowLog.OnNext($"{killerName} が {killedName} を倒した");
             }
         }
-        
+
         // 鬼変更時のUI更新通知
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
         {
             if (executor == Context.Runner.LocalPlayer)
             {
-                UIPresenter.I.ShowOgreLamp(false);
+                _onShowOgreUI.OnNext(false);
             }
             else if (targetRef == Context.Runner.LocalPlayer)
             {
-                UIPresenter.I.ShowOgreLamp(true);
-                UIPresenter.I.ChangeTagNotice(2);
+                _onShowOgreUI.OnNext(true);
+                _changeTagNoticeObserver.OnNext(2);
             }
         }
-        
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ShowStatusUpUI(PlayerRef playerRef,bool showStatusUpUI)
+        private void RPC_ShowStatusUpUI(PlayerRef playerRef, bool showStatusUpUI)
         {
             if (Runner.LocalPlayer == playerRef)
             {
-                if (showStatusUpUI)
-                {
-                    UIPresenter.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
-                }
-                else
-                {
-                    UIPresenter.I.ShowStatusUpUI(-1, StatusUpType.None);
-                }
+                _onInteractStatusUpObject.OnNext(showStatusUpUI ? (-1, StatusUpType.Ogre) : (-1, StatusUpType.None));
             }
         }
 
@@ -335,7 +339,7 @@ namespace September.Common
         {
             if (PlayerDatabase.Instance.PlayerDataDic[Runner.LocalPlayer].IsOgre)
             {
-                UIPresenter.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
+                _onInteractStatusUpObject.OnNext((-1, StatusUpType.Ogre));
             }
         }
 
@@ -349,6 +353,5 @@ namespace September.Common
             GameInput.I.ToggleActionInput(actionInputEnabled);
             GameInput.I.ToggleLookInput(lookInputEnabled);
         }
-
     }
 }

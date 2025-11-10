@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using September.InGame.Common;
 using UniRx;
@@ -13,10 +14,9 @@ namespace September.Common
         private float _gameTime;
         private int _lastScore = -1;
         
-        // ここにUIPresenterが渡しにいく
-        // ToDo : UI工事中
-        private readonly Subject<Unit> OnChangeScore = new();
-        private readonly Subject<Unit> OnChangeTime = new();
+        private readonly Subject<int> _onChangeScore = new();
+        public Func<TimeMessageType, UniTask> TimeOverlayMessage { get; set; }
+        public IObservable<int> OnChangeScore => _onChangeScore;
         
         protected internal override void OnEnter()
         {
@@ -37,15 +37,12 @@ namespace September.Common
             {
                 _hasTriggeredTimeNotice = true;
                 // タイマーUIの減算
-                OnChangeTime.OnNext(Unit.Default);
-                //_uiPresenter.TimeOverlayMessage?.Invoke(TimeMessageType.TimeRemainingAlert);
+                TimeOverlayMessage?.Invoke(TimeMessageType.TimeRemainingAlert);
             }
-            
-            if (TickTimer.Expired(Context.Runner))
-            {
-                TickTimer = TickTimer.None;
-                Context.Rpc_SendEvent((int)StateEventId.Finish);
-            }
+
+            if (!TickTimer.Expired(Context.Runner)) return;
+            TickTimer = TickTimer.None;
+            Context.Rpc_SendEvent((int)StateEventId.Finish);
         }
 
         protected internal override void OnExit()
@@ -58,8 +55,7 @@ namespace September.Common
             if (!dic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData data)) return;
             if (_lastScore != data.Score) 
             {
-                OnChangeScore.OnNext(Unit.Default);
-                //UIPresenter.I?.OnChangeScore(data.Score);
+                _onChangeScore.OnNext(data.Score);
                 _lastScore = data.Score;
             }
         }

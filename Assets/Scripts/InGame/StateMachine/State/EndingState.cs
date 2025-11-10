@@ -9,8 +9,8 @@ namespace September.Common
 {
     public class EndingState : ImtStateMachine<InGameManager>.State
     {
-        // ToDo : UI工事中
-        private readonly Subject<Unit> StartAnimation = new();
+        private readonly Subject<Unit> _startAnimation = new();
+        public IObservable<Unit> StartAnimation => _startAnimation;
         protected internal override void OnEnter()
         {
             Context.GameEnded?.Invoke();
@@ -24,11 +24,9 @@ namespace September.Common
             Context.Cts.Cancel();
             
             ShowCursor();
-            //if(!string.IsNullOrEmpty(Context.CurrentBGM)) CRIAudio.StopBGM("BGM", Context.CurrentBGM);
             // ここにエンド処理
             PlayerDatabase.Instance.Server_PushResultToClients();
-            StartAnimation.OnNext(Unit.Default);
-            //UIPresenter.I.ShowResultAnimation();
+            _startAnimation.OnNext(Unit.Default);
             GameInput.I.ToggleMoveInput(false);
             GameInput.I.ToggleLookInput(false);
             CRIAudio.StopSE();      // 鳴ってるSEを止める 2DPlayer用

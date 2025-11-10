@@ -12,6 +12,7 @@ using UnityEngine.UI;
 public class SetIcon : NetworkBehaviour
 {
     [SerializeField] private IconData _iconData;
+    [SerializeField] private InGameUIRootRefs _inGameUIRootRefs;
     
     private CancellationTokenSource _cts;
     
@@ -33,7 +34,7 @@ public class SetIcon : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_SetIcon(PlayerRef playerRef, CharacterType characterType)
     {
-        _image = UIPresenter.I.UIRootRefs.IconImage;
+        _image = _inGameUIRootRefs.IconImage;
         if (playerRef != Runner.LocalPlayer) return;
         _image.sprite = GetIcon(characterType);
     }

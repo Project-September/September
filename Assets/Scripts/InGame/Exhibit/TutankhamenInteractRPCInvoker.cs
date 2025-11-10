@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Fusion;
 using Ingame.Tanihira;
-using September.InGame.UI;
+using UniRx;
 
 namespace InGame.Exhibit
 {
@@ -19,6 +19,9 @@ namespace InGame.Exhibit
         private bool _isMaskAttached;
 
         private List<FriendBase> _friendList = new List<FriendBase>();
+        
+        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
+        public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
         
         public bool IsMaskAttached => _isMaskAttached;
         
@@ -114,7 +117,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == playerRef)
             {
-                UIPresenter.I.ShowStatusUpUI(_maskDuration, StatusUpType.Tutankhamen);
+                _onInteractStatusUpObject.OnNext((_maskDuration, StatusUpType.Tutankhamen));
             }
         }
     }

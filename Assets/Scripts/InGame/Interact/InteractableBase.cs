@@ -11,8 +11,7 @@ using September.InGame;
 using September.InGame.Common;
 using InGame.Player;
 using CRISound;
-using September.InGame.UI;
-using WebSocketSharp;
+using UniRx;
 
 namespace InGame.Interact
 {
@@ -37,6 +36,10 @@ namespace InGame.Interact
         [SerializeField] private AudioBroadcaster _audioBroadcaster;
         [SerializeField] private string _interactSoundCueName;
         [SerializeField] private SoundTrackingType _interactSoundTrackingType = SoundTrackingType.Spot;
+        
+        // ToDo : UI工事中
+        private readonly Subject<int> _onChangeDescriptionUI = new();
+        private readonly Subject<string> _onShowLog = new();
 
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
@@ -302,7 +305,8 @@ namespace InGame.Interact
         [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
         private void RPC_ChangeDescriptionUI(int mode)
         {
-            UIPresenter.I.ChangeDescriptionUI(mode);
+            _onChangeDescriptionUI.OnNext(mode);
+            //UIPresenter.I.ChangeDescriptionUI(mode);
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -311,7 +315,8 @@ namespace InGame.Interact
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(actor, out var data))
             {
                 string actorName = data.DisplayNickName;
-                UIPresenter.I.ShowLog($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
+                _onShowLog.OnNext($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
+                //UIPresenter.I.ShowLog($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
             }
         }
     }

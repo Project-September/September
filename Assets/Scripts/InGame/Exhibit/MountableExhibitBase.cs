@@ -12,6 +12,7 @@ using September.Common;
 using September.InGame.Common;
 using September.InGame.Effect;
 using September.InGame.UI;
+using UniRx;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -69,6 +70,9 @@ namespace InGame.Exhibit
         public bool IsEnding;
         private CancellationTokenSource _cts;
         [SerializeField,Label("降りた後の無敵時間")] private float _invincibleTime;
+        
+        // ToDo : UI工事中
+        private readonly Subject<int> _onChangeDescriptionUI = new();
         public override void Spawned()
         {
              IsEnding = false;
@@ -163,7 +167,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == target)
             {
-                UIPresenter.I.ChangeDescriptionUI(mode);
+                _onChangeDescriptionUI.OnNext(mode);
             }
         }
         

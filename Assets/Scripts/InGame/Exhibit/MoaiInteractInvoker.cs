@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Interact;
 using NaughtyAttributes;
-using September.InGame.UI;
+using UniRx;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -18,6 +18,9 @@ namespace InGame.Exhibit
         [SerializeField,Label("AnimationSpeed")] private float _animationSpeed;
         private Animator _animator;
         private InteractableBase _interactableBase;
+        
+        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
+        public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
 
         #region Animation
 
@@ -52,7 +55,7 @@ namespace InGame.Exhibit
         {
             if (Runner.LocalPlayer == playerRef)
             {
-                UIPresenter.I.ShowStatusUpUI(3f, StatusUpType.BokeBoke);
+                _onInteractStatusUpObject.OnNext((3f, StatusUpType.BokeBoke));
             }
         }
     }

@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Player;
 using UnityEngine;
 using September.Common;
 using September.InGame.UI;
+using UniRx;
 
 namespace InGame.Interact
 {
@@ -22,6 +21,8 @@ namespace InGame.Interact
         [SerializeField] private float _interactResponseTimeout = 3f;
         [SerializeField] private float _interactAngleBuffer = 10f; // 角度に+10°
         [SerializeField] private float _interactRadiusBuffer = 0.3f; // 距離に+0.3m
+
+        [SerializeField] private UIPresenter _uiPresenter;
         //許容できる高さの差
         private float _heightDifference = 0.1f;
         
@@ -35,6 +36,10 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
+        
+        // ToDo : UI工事中
+        private readonly Subject<(bool, GameObject)> _onInteract = new();
+        private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
 
         private void Awake()
         {
@@ -74,9 +79,10 @@ namespace InGame.Interact
                     {
                         _hasCompletedInteraction = true;
                         CompleteInteraction();
-                        UIPresenter.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        _onInteract.OnNext((false, null));
+                        //UIPresenter.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
                     }
-                    UIPresenter.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    _onChangeInteractProgress.Value = Mathf.Clamp01(_currentInteractTime / _requiredInteractTime);
                 }
             }
             else
@@ -150,17 +156,17 @@ namespace InGame.Interact
                 {
                     Interactor = Object.InputAuthority.RawEncoded,
                 };
-                if (UIPresenter.I)
+                if (_uiPresenter)
                 {
                     var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                         PlayerManager.PlayerControlState.ForcedControl;
-                    UIPresenter.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+                    _onInteract.OnNext((!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject));
                 }
             }
             else
             {
-                if (UIPresenter.I)
-                    UIPresenter.I.ShowInteractUI(false, _focusedObj?.gameObject);
+                if (_uiPresenter)
+                    _onInteract.OnNext((false, _focusedObj?.gameObject));
             }
             //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
@@ -267,7 +273,8 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIPresenter.I?.SetInteractProgress(0f);
+            //UIPresenter.I?.SetInteractProgress(0f);
+            _onChangeInteractProgress.Value = 0f;
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
