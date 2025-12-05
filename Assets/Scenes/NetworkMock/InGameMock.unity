@@ -868,50 +868,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &534335533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec0b4dd729a12d046982652f834580a2, type: 3}
-  m_Name: Field_LMA1
-  m_EditorClassIdentifier: 
-  resolution: 4096
-  bitmask: 1
-  id: 1
-  sortingID: 1
-  isImplicit: 1
-  area: 0
-  totalVertexCount: 0
-  vertexCounter: 0
-  sceneLodLevel: -1
-  autoResolution: 0
-  sceneName: Field
-  tag: -1
-  containsTerrains: 0
-  probes: 0
-  mode: 1
-  renderMode: 1000
-  renderDirMode: 1000
-  atlasPacker: 1000
-  holeFilling: 0
-  computeSSS: 0
-  sssSamples: 16
-  sssDensity: 10
-  sssColor: {r: 1, g: 1, b: 1, a: 1}
-  sssScale: 1
-  fakeShadowBias: 0
-  transparentSelfShadow: 0
-  flipNormal: 0
-  parentName: 
-  overridePath: 
-  fixPos3D: 0
-  voxelSize: {x: 1, y: 1, z: 1}
-  passedFilter: 0
 --- !u!1001 &542693323
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1431,6 +1387,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8682727655756143034, guid: 0e9ce377153c45c4cb7b44eab2f327b1, type: 3}
   m_PrefabInstance: {fileID: 677699894}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &715350722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec0b4dd729a12d046982652f834580a2, type: 3}
+  m_Name: Field_LMA1
+  m_EditorClassIdentifier: 
+  resolution: 4096
+  bitmask: 1
+  id: 1
+  sortingID: 1
+  isImplicit: 1
+  area: 0
+  totalVertexCount: 0
+  vertexCounter: 0
+  sceneLodLevel: -1
+  autoResolution: 0
+  sceneName: Field
+  tag: -1
+  containsTerrains: 0
+  probes: 0
+  mode: 1
+  renderMode: 1000
+  renderDirMode: 1000
+  atlasPacker: 1000
+  holeFilling: 0
+  computeSSS: 0
+  sssSamples: 16
+  sssDensity: 10
+  sssColor: {r: 1, g: 1, b: 1, a: 1}
+  sssScale: 1
+  fakeShadowBias: 0
+  transparentSelfShadow: 0
+  flipNormal: 0
+  parentName: 
+  overridePath: 
+  fixPos3D: 0
+  voxelSize: {x: 1, y: 1, z: 1}
+  passedFilter: 0
 --- !u!1 &728341767
 GameObject:
   m_ObjectHideFlags: 0
@@ -2093,8 +2093,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.15260132, y: -0.8086604, z: 0.23953608, w: 0.5151735}
-  m_LocalPosition: {x: 20.002966, y: 0.77697897, z: 26.767498}
+  m_LocalRotation: {x: 0.064683594, y: 0.9346123, z: -0.22782795, w: 0.2653497}
+  m_LocalPosition: {x: -11.53545, y: -5.868456, z: 65.95054}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3924,14 +3924,14 @@ MonoBehaviour:
   renderSettingsRTPVHDR: 0
   renderSettingsRTPVWidth: 640
   renderSettingsRTPVHeight: 360
-  lastBakeTime: 135
+  lastBakeTime: 108
   enlightenWarningShown: 0
   enlightenWarningShown2: 0
   uniqueLights: []
   lights: []
   implicitGroups:
-  - {fileID: 534335533}
-  - {fileID: 534335533}
+  - {fileID: 715350722}
+  - {fileID: 715350722}
   implicitGroupedObjects:
   - {fileID: 655736677}
   - {fileID: 1326835816}
@@ -4370,11 +4370,11 @@ MonoBehaviour:
     padding: 51000000
     unwrapper: 00000000
   maps:
-  - {fileID: 2800000, guid: fd3e45530a416674ab05e7e08fd5e1f2, type: 3}
+  - {fileID: 2800000, guid: 5e999683a8443134aa941c6efdf2f165, type: 3}
   - {fileID: 2800000, guid: e51bcad89f6bee44eaedd1527fe23a4b, type: 3}
   masks: []
   dirMaps:
-  - {fileID: 2800000, guid: c0051746c253bbe4cbf7cd68638bddab, type: 3}
+  - {fileID: 2800000, guid: b6e2911f35870cf47b2d3524fc654e30, type: 3}
   - {fileID: 2800000, guid: c7cd9fdf6600bee4ab531db1eaa98fe6, type: 3}
   rnmMaps0: []
   rnmMaps1: []
@@ -4407,11 +4407,11 @@ MonoBehaviour:
   sectors:
   - name: $G
     maps:
-    - {fileID: 2800000, guid: c81e766dea2664947bca5aa4e404ef94, type: 3}
+    - {fileID: 2800000, guid: 5e999683a8443134aa941c6efdf2f165, type: 3}
     - {fileID: 2800000, guid: e51bcad89f6bee44eaedd1527fe23a4b, type: 3}
     masks: []
     dirMaps:
-    - {fileID: 2800000, guid: 1e6a2a2cdfe1bc247baa02e732cc8ae2, type: 3}
+    - {fileID: 2800000, guid: b6e2911f35870cf47b2d3524fc654e30, type: 3}
     - {fileID: 2800000, guid: c7cd9fdf6600bee4ab531db1eaa98fe6, type: 3}
     rnmMaps0: []
     rnmMaps1: []
