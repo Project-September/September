@@ -59,6 +59,9 @@ namespace InGame.Player.Ability
             
             foreach (var ability in _abilities)
             {
+                //入力を保持　山本
+                ability.SetPlayerInput(input);
+                
                 ability.Tick(Time.deltaTime);
             }
         }

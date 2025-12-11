@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Fusion;
+using September.Common;
 using UnityEngine;
 
 namespace  InGame.Player.Ability
@@ -88,6 +89,17 @@ namespace  InGame.Player.Ability
             {
                 _phase = AbilityPhase.Available;
             }
+        }
+        
+        //inputを保持するために追加　山本
+        protected PlayerInput _playerInput;
+        /// <summary>
+        /// プレイヤーの入力を設定する
+        /// </summary>
+        /// <param name="playerInput">入力</param>
+        public void SetPlayerInput(PlayerInput playerInput)
+        {
+            _playerInput = playerInput;
         }
     }
 }
