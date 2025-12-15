@@ -108,6 +108,23 @@ namespace InGame.Interact
             _isHoldingInteract = input.Buttons.IsSet(PlayerButtons.Interact);
         }
 
+        /// <summary>
+        /// 遠距離からのインタラクション用
+        /// </summary>
+        /// <param name="timer">インタラクションタイマー</param>
+        /// <param name="time">インタラクション必要時間</param>
+        /// <param name="interactableBase">Rayで当たったインタラクション可能なオブジェクト</param>>
+        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase)
+        {
+            timer += Runner.DeltaTime;
+            if (timer >= time)
+            {
+                _focusedObj = interactableBase;
+                CompleteInteraction();
+                timer = 0f;
+            }
+        }
+
         private void UpdateFocusedInteractable()
         {
             // 現在の focusedObj がまだ有効な範囲内かチェック

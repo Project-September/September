@@ -94,6 +94,78 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6063272011640703568}
   m_LocalEulerAnglesHint: {x: -1.1730033e-15, y: -5.8650165e-16, z: -1.0996906e-15}
+--- !u!1 &198376030454981436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2616265153135106295}
+  - component: {fileID: 1599464012499452082}
+  m_Layer: 0
+  m_Name: PlayerAimVirtualCamera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2616265153135106295
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198376030454981436}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: -0, z: -0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 278806787924565266}
+  m_Father: {fileID: 8156254438002643843}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1599464012499452082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198376030454981436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ExcludedPropertiesInInspector:
+  - m_Script
+  m_LockStageInInspector: 
+  m_StreamingVersion: 20170927
+  m_Priority: 10
+  m_StandbyUpdate: 2
+  m_LookAt: {fileID: 0}
+  m_Follow: {fileID: 0}
+  m_Lens:
+    FieldOfView: 60.000004
+    OrthographicSize: 5
+    NearClipPlane: 0.3
+    FarClipPlane: 1000
+    Dutch: 0
+    ModeOverride: 0
+    LensShift: {x: 0, y: 0}
+    GateFit: 2
+    FocusDistance: 10
+    m_SensorSize: {x: 1, y: 1}
+  m_Transitions:
+    m_BlendHint: 0
+    m_InheritPosition: 0
+    m_OnCameraLive:
+      m_PersistentCalls:
+        m_Calls: []
+  m_LegacyBlendHint: 0
+  m_ComponentOwner: {fileID: 278806787924565266}
 --- !u!1 &222055179418498548
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,6 +730,37 @@ Transform:
   - {fileID: 6987235468022793764}
   m_Father: {fileID: 4169774940667772143}
   m_LocalEulerAnglesHint: {x: -7.6873945e-11, y: 0.0035653727, z: 33.402584}
+--- !u!1 &1857654648114766886
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 915611406105039834}
+  m_Layer: 6
+  m_Name: LaserMuzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &915611406105039834
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1857654648114766886}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8736522266100138394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1881658727365545810
 GameObject:
   m_ObjectHideFlags: 0
@@ -1529,6 +1632,37 @@ Transform:
   - {fileID: 935597248029074648}
   m_Father: {fileID: 6570564073283710742}
   m_LocalEulerAnglesHint: {x: -0.36825395, y: 3.0265172, z: 67.41925}
+--- !u!1 &3232309722296574328
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6159245481983791538}
+  m_Layer: 6
+  m_Name: RocketlauncherMuzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6159245481983791538
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3232309722296574328}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8736522266100138394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3275749819414075280
 GameObject:
   m_ObjectHideFlags: 0
@@ -2229,6 +2363,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 339817392409267713}
+  - {fileID: 2616265153135106295}
   m_Father: {fileID: 8736522266100138394}
   m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
 --- !u!1 &4234629462919546141
@@ -4279,6 +4414,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3012030035658215528}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6497403946853277605
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 278806787924565266}
+  - component: {fileID: 7084069655909045258}
+  m_Layer: 0
+  m_Name: cm
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &278806787924565266
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6497403946853277605}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2616265153135106295}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7084069655909045258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6497403946853277605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6579507936105284779
 GameObject:
   m_ObjectHideFlags: 0
@@ -5125,6 +5304,7 @@ GameObject:
   - component: {fileID: 2779401866583128900}
   - component: {fileID: 3570017578186338863}
   - component: {fileID: 2447315062394318487}
+  - component: {fileID: 2677403803585906037}
   m_Layer: 6
   m_Name: HatanoErikson
   m_TagString: Player
@@ -5151,6 +5331,8 @@ Transform:
   - {fileID: 5242763545905317136}
   - {fileID: 8668728296515204595}
   - {fileID: 5750209683938712753}
+  - {fileID: 915611406105039834}
+  - {fileID: 6159245481983791538}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &6099435784402053345
@@ -5462,8 +5644,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abilities:
   - rid: 1502005709025574997
+  - rid: 1502005779782697044
   _conditions:
   - rid: 1502005709025574999
+  - rid: 1502005779782697045
   references:
     version: 2
     RefIds:
@@ -5473,11 +5657,29 @@ MonoBehaviour:
         _cooldown: 0
         _phase: 0
         _playerInteractionController: {fileID: 7710838205980989238}
-        _laserDistance: 0
-        _laserStartPoint: {fileID: 0}
+        _aimCameraController: {fileID: 2677403803585906037}
+        _laserDistance: 100
+        _laserStartPoint: {fileID: 915611406105039834}
+        _interactionTime: 2
         _shootingStateType: 0
     - rid: 1502005709025574999
       type: {class: AbilityLaserSkillCondition, ns: InGame.Player.Ability, asm: Scripts}
+      data: 
+    - rid: 1502005779782697044
+      type: {class: AbilityRocketLauncher, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        _playerInteractionController: {fileID: 7710838205980989238}
+        _aimCameraController: {fileID: 2677403803585906037}
+        _rocketLauncherDistance: 100
+        _rocketLauncherStartPos: {fileID: 6159245481983791538}
+        _rocketLauncherRadius: 10
+        _damage: 5
+        _ogreDamage: 10
+        _shootingStateType: 0
+    - rid: 1502005779782697045
+      type: {class: AbilityRocketLauncherSkillCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
 --- !u!114 &3570017578186338863
 MonoBehaviour:
@@ -5566,6 +5768,21 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   EnableFallMotion: 1
+--- !u!114 &2677403803585906037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96f72b5efdfed6c40b5441640927b4ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _normalCamera: {fileID: 1140998407376993141}
+  _aimCamera: {fileID: 1599464012499452082}
+  _crosshairPrefab: {fileID: 3758444813883266440, guid: 012a53cb75eae6d42a003f1bb6bd8628, type: 3}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,48 +10,65 @@ namespace InGame.Player.Ability
     public class AbilityLaserGun : AbilityBase
     {
         [Header("参照")]
+        [Header("PlayerInteractionController")]
         [SerializeField] private PlayerInteractionController _playerInteractionController;
-        
+        [Header("AimCameraController")]
+        [SerializeField] private AimCameraController _aimCameraController;
+        [Space(30)]
         [Header("○○距離")]
         [SerializeField] private float _laserDistance;
         [Header("○○発射位置")]
         [SerializeField] private Transform _laserStartPoint;
-        
+        //[Header("○○発射インターバル")] 
+        //[SerializeField] private float _intervalTime;
+        //private float _intervalTimer; //インターバル用のタイマー
+        [Header("○○使用時のインタラクション必要時間")] 
+        [SerializeField] private float _interactionTime;
+        private float _interactionTimer;
         [Header("射撃のステート")]
         [SerializeField] private ShootingStateType _shootingStateType;
-
-        private SessionPlayerData _data;
-        
+        //private SessionPlayerData _data;
         /// <summary>
         /// true：撃った　false：撃ってない
         /// </summary>
-        private bool _isShoot;
-        
-        //TODO：入力をしているが、アビリティが発動しない
+        //private bool _isShoot;
         
         protected override void OnStart()
         {
             //構えている状態にする
             _shootingStateType = ShootingStateType.Stance;
-            Debug.Log("構える");
+            _aimCameraController.CrosshairToggleChange(true);
+            //カメラをAimカメラに変更する
+            _aimCameraController.CameraToggleChange();
         }
 
         protected override void OnUpdate(float deltaTime)
         {
+            /*
+            //発射直後にインターバルを開始する
+            if (_isShoot)
+            {
+                //インターバル時間を過ぎたら、再度発射を可能にする
+                _intervalTimer = Time.deltaTime;
+                if (_intervalTimer >= _intervalTime)
+                {
+                    _isShoot = false;
+                    _intervalTimer = 0;
+                }
+            }
+            */
+            
             //構えている状態
             if (_shootingStateType == ShootingStateType.Stance)
             {
-                //撃つ入力をしていて撃っていない時、Rayを飛ばす
-                if (_playerInput.Buttons.IsSet(PlayerButtons.Ability2) && !_isShoot)
-                {
-                    Debug.Log("Rayを飛ばす");
-                }
+                //var origin = _aimCameraController.MainCamera.transform.position;
+                //var dir = _aimCameraController.MainCamera.transform.forward;
+                //Debug.DrawRay(origin, dir * _laserDistance, Color.red);
                 
-                //離したらフラグをリセットして、再度撃てるようにする
-                if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2) && _isShoot)
+                //撃つ入力をしている時、Rayを飛ばす
+                if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
-                    _isShoot = false;
-                    Debug.Log("ボタンを離した");
+                    LaserTargetDetection();
                 }
             }
             
@@ -59,6 +76,8 @@ namespace InGame.Player.Ability
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability1))
             {
                 _phase = AbilityPhase.Ending;
+                _aimCameraController.CameraToggleChange();
+                _aimCameraController.CrosshairToggleChange(false);
             }
         }
 
@@ -68,22 +87,61 @@ namespace InGame.Player.Ability
         }
 
         /// <summary>
-        /// 撃Rayを飛ばして判定を取る
-        ///インタラクトオブジェクトに当たったときにインタラクト
+        /// Rayを飛ばす
+        /// カメラ基準
         /// </summary>
-        private void LaserShooting()
+        private void LaserTargetDetection()
         {
-            //修正
-            //インタラクションが出来るんじゃなくて、インタラクションを判定を得る
-            //→インタラクションできるゲームオブジェクトに近づいてキーを押している状態のこと
+            var origin = _aimCameraController.MainCamera.transform.position;
+            var dir = _aimCameraController.MainCamera.transform.forward;
+            Debug.DrawRay(origin, dir * _laserDistance, Color.red);
             
-            //Rayを飛ばして、インタラクトオブジェクトを取得する
-            if (Physics.Raycast(_laserStartPoint.position, _laserStartPoint.transform.forward, out RaycastHit hit))
+            var hit = Physics.Raycast(origin, dir, out RaycastHit hitInfo, _laserDistance);
+            //hitがtrueなら当たった場所を渡す　falseなら最大距離を渡す
+            LaserShootingDetection(hit? hitInfo.point :
+                origin + dir * _laserDistance);
+        }
+
+        /// <summary>
+        /// インタラクトオブジェクトに当たったか判定する
+        /// 当たっていたら、インタラクションを行う（キーを入力している状態のこと）
+        /// </summary>
+        /// <param name="targetPos">Rayの当たった場所</param>
+        private void LaserShootingDetection(Vector3 targetPos)
+        {
+            var origin = _laserStartPoint.position;
+            var dir = targetPos - origin;
+            Debug.DrawRay(origin, dir * _laserDistance, Color.blue);
+            
+            //hitした場所に向かってRayを飛ばす
+            var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _laserDistance);
+            
+            if (laserPoint)
             {
-                //InteractableBaseを取得する
-                if(hit.collider.gameObject.TryGetComponent<InteractableBase>(out InteractableBase interactableBase))
+                //ヒットしたオブジェクトのInteractableBaseを取得する
+                var hit = laseHitInfo.collider.gameObject;
+                var interactable = hit.GetComponentInParent<InteractableBase>()
+                        ?? hit.GetComponent<InteractableBase>()
+                        ?? hit.GetComponentInChildren<InteractableBase>();
+                if (interactable != null)
                 {
-                    //インタラクションするキャラクターを取得
+                    //インタラクションを行う
+                    _playerInteractionController.RemoteInteraction(
+                        ref _interactionTimer, _interactionTime, interactable);
+                }
+                
+                /*
+                //インタラクションオブジェクトにhitしていた場合
+                //これだと、本体についている場合になってしまうため親、子から取得する必要がある
+                if (laseHitInfo.collider.gameObject.TryGetComponent<InteractableBase>(out InteractableBase interactableBase))
+                {
+                    _playerInteractionController.RemoteInteraction
+                        (ref _interactionTimer, _interactionTime, interactableBase);
+                    
+                    
+                    //これだと、インタラクションが一瞬で終わってしまう
+                    /*
+                    //インタラクションするキャラクターを取得（自身）
                     var interactor = _playerInteractionController.Object.InputAuthority.RawEncoded;
                     if (PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(interactor), out _data))
                     {
@@ -94,8 +152,11 @@ namespace InGame.Player.Ability
                             CharacterType = _data.CharacterType,
                         };
                         interactableBase.Interact(context);
+                        Debug.Log("インタラクション");
                     }
+                    
                 }
+                */
             }
         }
     }
