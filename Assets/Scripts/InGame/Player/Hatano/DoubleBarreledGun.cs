@@ -15,6 +15,9 @@ namespace InGame.Player.Ability
         [Space(30)] 
         [Header("射程距離")] 
         [SerializeField] private float _doubleBarreledGunDistance;
+        [Header("射撃インターバル")] 
+        [SerializeField] private float _shootingInterval;
+        private float _shootingIntervalTimer;
         [Header("マズル（左）")]
         [SerializeField] private Transform _doubleBarreledGunLeftMuzzle;
         [Header("マズル（右）")] 
@@ -25,8 +28,6 @@ namespace InGame.Player.Ability
         [SerializeField] private int _ogreDamage;
         [Header("射撃のステート")] 
         [SerializeField] private ShootingStateType _shootingStateType;
-
-        //これだと、キーを押している間連射出来てしまうためステートで管理したほうがいいかも
         
         protected override void OnStart()
         {
@@ -45,15 +46,34 @@ namespace InGame.Player.Ability
             {
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
-                    DoubleBarreledGunTargetDetection();
+                    GunTargetDetection();
+                    _shootingStateType = ShootingStateType.Shooting;
+                    Debug.Log("二丁銃を射撃");
                 }
             }
             
-            //通常攻撃の入力が終了したら、構えを辞める
-            //if()
+            //射撃後、インターバルを開始する
+            if (_shootingStateType == ShootingStateType.Shooting)
+            {
+                Debug.Log("インターバル開始");
+                _shootingIntervalTimer += Runner.DeltaTime;
+                if (_shootingIntervalTimer >= _shootingInterval)
+                {
+                    _shootingStateType = ShootingStateType.Stance;
+                    _shootingIntervalTimer = 0;
+                }
+            }
+            
+            //構えの入力が終了後
+            if (!_playerInput.Buttons.IsSet(PlayerButtons.GunAim))
+            {
+                _phase = AbilityPhase.Ending;
+                _aimCameraController.CameraToggleChange();
+                _aimCameraController.CrosshairToggleChange(false);
+            }
         }
         
-        private void DoubleBarreledGunTargetDetection()
+        private void GunTargetDetection()
         {
             var origin = _aimCameraController.MainCamera.transform.position;
             var dir = _aimCameraController.MainCamera.transform.forward;
@@ -61,11 +81,11 @@ namespace InGame.Player.Ability
             
             var hit = Physics.Raycast(origin, dir, out RaycastHit hitInfo, _doubleBarreledGunDistance);
             //hitがtrueなら当たった場所を渡す　falseなら最大距離を渡す
-            DoubleBarreledGunShootingDetection(hit? hitInfo.point :
+            GunShootingDetection(hit? hitInfo.point :
                 origin + dir * _doubleBarreledGunDistance);
         }
 
-        private void DoubleBarreledGunShootingDetection(Vector3 targetPos)
+        private void GunShootingDetection(Vector3 targetPos)
         {
             //左
             var originLeft = _doubleBarreledGunLeftMuzzle.position;

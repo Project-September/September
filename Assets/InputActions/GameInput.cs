@@ -234,6 +234,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""GunAim"",
+                    ""type"": ""Button"",
+                    ""id"": ""29a706d0-4d2f-4947-8cc2-417e62319340"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -762,6 +771,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Shooting"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""49945011-ce4a-41ae-a3fe-938540ef7ec8"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""GunAim"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1543,6 +1563,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player_AirplaneForward = m_Player.FindAction("AirplaneForward", throwIfNotFound: true);
         m_Player_AirPlaneBack = m_Player.FindAction("AirPlaneBack", throwIfNotFound: true);
         m_Player_Shooting = m_Player.FindAction("Shooting", throwIfNotFound: true);
+        m_Player_GunAim = m_Player.FindAction("GunAim", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1665,6 +1686,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_AirplaneForward;
     private readonly InputAction m_Player_AirPlaneBack;
     private readonly InputAction m_Player_Shooting;
+    private readonly InputAction m_Player_GunAim;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1741,6 +1763,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Shooting => m_Wrapper.m_Player_Shooting;
         /// <summary>
+        /// Provides access to the underlying input action "Player/GunAim".
+        /// </summary>
+        public InputAction @GunAim => m_Wrapper.m_Player_GunAim;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -1814,6 +1840,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Shooting.started += instance.OnShooting;
             @Shooting.performed += instance.OnShooting;
             @Shooting.canceled += instance.OnShooting;
+            @GunAim.started += instance.OnGunAim;
+            @GunAim.performed += instance.OnGunAim;
+            @GunAim.canceled += instance.OnGunAim;
         }
 
         /// <summary>
@@ -1873,6 +1902,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Shooting.started -= instance.OnShooting;
             @Shooting.performed -= instance.OnShooting;
             @Shooting.canceled -= instance.OnShooting;
+            @GunAim.started -= instance.OnGunAim;
+            @GunAim.performed -= instance.OnGunAim;
+            @GunAim.canceled -= instance.OnGunAim;
         }
 
         /// <summary>
@@ -2532,6 +2564,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnShooting(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "GunAim" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnGunAim(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

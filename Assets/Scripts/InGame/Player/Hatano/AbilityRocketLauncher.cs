@@ -42,7 +42,7 @@ namespace InGame.Player.Ability
                 //一度撃ったら、アビリティを終了する
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
-                    RocketLauncherTargetDetection();
+                    LauncherTargetDetection();
                     _phase = AbilityPhase.Ending;
                     _aimCameraController.CameraToggleChange();
                     _aimCameraController.CrosshairToggleChange(false);
@@ -63,7 +63,7 @@ namespace InGame.Player.Ability
             
         }
         
-        private void RocketLauncherTargetDetection()
+        private void LauncherTargetDetection()
         {
             var origin = _aimCameraController.MainCamera.transform.position;
             var dir = _aimCameraController.MainCamera.transform.forward;
@@ -71,7 +71,7 @@ namespace InGame.Player.Ability
             
             var hit = Physics.Raycast(origin, dir, out RaycastHit hitInfo, _rocketLauncherDistance);
             //hitがtrueなら当たった場所を渡す　falseなら最大距離を渡す
-            RocketLauncherShootingDetection(hit? hitInfo.point :
+            LauncherShootingDetection(hit? hitInfo.point :
                 origin + dir * _rocketLauncherDistance);
         }
 
@@ -79,7 +79,7 @@ namespace InGame.Player.Ability
         /// ロケットランチャーを発射する
         /// </summary>
         /// <param name="targetPos">ヒットした場所</param>
-        private void RocketLauncherShootingDetection(Vector3 targetPos)
+        private void LauncherShootingDetection(Vector3 targetPos)
         {
             var origin = _rocketLauncherStartPos.position;
             var dir = targetPos - origin;
@@ -106,19 +106,21 @@ namespace InGame.Player.Ability
         {
             //攻撃範囲内のオブジェクトを取得
             Collider[] radiusObjs = Physics.OverlapSphere(targetPos, _rocketLauncherRadius);
+            var playerInput = Parameter.Owner.InputAuthority;
             foreach (var obj in radiusObjs)
             {
-                //ダメージ処理
                 var damageable = obj.GetComponentInParent<IDamageable>();
-                if (damageable != null)
-                {
-                    var player = _playerInteractionController.Object;
-                    bool enableData = PlayerDatabase.Instance.PlayerDataDic.TryGet(player.InputAuthority, out var sessionData);
-                    var hitData = new HitData(HitActionType.Damage,
-                        enableData ? sessionData.IsOgre ? _ogreDamage : _damage : _damage, player.InputAuthority,
-                        damageable.OwnerPlayerRef, null, damageable);
-                    damageable.TakeHit(ref hitData);
-                }
+                if(damageable == null) continue;
+                
+                //自身に当たっていたらスキップ
+                if(damageable.OwnerPlayerRef == playerInput) continue;
+                
+                //ダメージ処理
+                bool enableData = PlayerDatabase.Instance.PlayerDataDic.TryGet(playerInput, out var sessionData);
+                var hitData = new HitData(HitActionType.Damage,
+                    enableData ? sessionData.IsOgre ? _ogreDamage : _damage : _damage, playerInput,
+                    damageable.OwnerPlayerRef, null, damageable);
+                damageable.TakeHit(ref hitData);
             }
         }
     }

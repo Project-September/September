@@ -115,7 +115,6 @@ namespace InGame.Player.Ability
             
             //hitした場所に向かってRayを飛ばす
             var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _laserDistance);
-            
             if (laserPoint)
             {
                 //ヒットしたオブジェクトのInteractableBaseを取得する
@@ -129,34 +128,6 @@ namespace InGame.Player.Ability
                     _playerInteractionController.RemoteInteraction(
                         ref _interactionTimer, _interactionTime, interactable);
                 }
-                
-                /*
-                //インタラクションオブジェクトにhitしていた場合
-                //これだと、本体についている場合になってしまうため親、子から取得する必要がある
-                if (laseHitInfo.collider.gameObject.TryGetComponent<InteractableBase>(out InteractableBase interactableBase))
-                {
-                    _playerInteractionController.RemoteInteraction
-                        (ref _interactionTimer, _interactionTime, interactableBase);
-                    
-                    
-                    //これだと、インタラクションが一瞬で終わってしまう
-                    /*
-                    //インタラクションするキャラクターを取得（自身）
-                    var interactor = _playerInteractionController.Object.InputAuthority.RawEncoded;
-                    if (PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(interactor), out _data))
-                    {
-                        //インタラクションを行う
-                        var context = new InteractableContext
-                        {
-                            Interactor = interactor,
-                            CharacterType = _data.CharacterType,
-                        };
-                        interactableBase.Interact(context);
-                        Debug.Log("インタラクション");
-                    }
-                    
-                }
-                */
             }
         }
     }
