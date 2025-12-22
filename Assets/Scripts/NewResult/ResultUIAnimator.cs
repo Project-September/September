@@ -1,20 +1,36 @@
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
+using September.Common;
 using UnityEngine;
 
 namespace NewResult
 {
     public class ResultUIAnimator : MonoBehaviour
     {
-        [SerializeField] private float _showDuration = 0.3f;
-        [SerializeField] private float _hideDuration = 0.3f;
-        [SerializeField] private CanvasGroup _selectMenu;
+        [SerializeField] private Animator _animator;
+        [SerializeField] private string _animationName;
         
         public async UniTask ShowResultUI()
         {
-            var pos = _selectMenu.transform.position;
-            _selectMenu.transform.position += Vector3.up * 200f;
-            await _selectMenu.transform.DOMove(pos, _showDuration);
+            _animator.Play(_animationName);
+            await UniTask.WaitUntil(
+                new AnimatorStateInfo(_animator, _animationName), 
+                static state =>
+                {
+                    var info = state.Animator.GetCurrentAnimatorStateInfo(0);
+                    return info.IsName(state.StateName) && info.normalizedTime >= 1f;
+                });
+        }
+
+        private readonly struct AnimatorStateInfo
+        {
+            public readonly Animator Animator;
+            public readonly string StateName;
+
+            public AnimatorStateInfo(Animator animator, string stateName)
+            {
+                Animator = animator;
+                StateName = stateName;
+            }
         }
     }
 }

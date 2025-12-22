@@ -42,6 +42,7 @@ namespace NewResult
             
             // 演出終了⇒UI表示
             await _resultUIAnimator.ShowResultUI();
+            Debug.Log("Result Performance End");
         }
     }
 }
