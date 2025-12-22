@@ -7,6 +7,7 @@ namespace NewResult
     public class ResultPerformanceManager : MonoBehaviour
     {
         [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
+        [SerializeField] private ResultUIAnimator _resultUIAnimator;
 
         private void Start()
         {
@@ -22,7 +23,7 @@ namespace NewResult
             StartResultPerformance(_resultCharacterDataContainer, resultInfo);
         }
 
-        private static async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
+        private async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
         {
             var ranking = gameResultInfo.Ranking;
             foreach (var entry in ranking)
@@ -40,7 +41,7 @@ namespace NewResult
             await UniTask.Delay(3000);
             
             // 演出終了⇒UI表示
-            
+            await _resultUIAnimator.ShowResultUI();
         }
     }
 }
