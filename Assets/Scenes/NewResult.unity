@@ -698,8 +698,9 @@ GameObject:
   - component: {fileID: 604539267}
   - component: {fileID: 604539268}
   - component: {fileID: 604539266}
+  - component: {fileID: 604539269}
   m_Layer: 0
-  m_Name: UIManager
+  m_Name: UI Components
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -751,6 +752,20 @@ MonoBehaviour:
   - {fileID: 2124443982}
   - {fileID: 730766898}
   - {fileID: 1058681047}
+--- !u!114 &604539269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 604539265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05fb2fcb5f0a40338689cf652fa65550, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rankingRoot: {fileID: 1467904095}
+  _rankingItemPrefab: {fileID: 3679387045715231859, guid: 79822fa001b0dcd4ab1e956e5ac160c1, type: 3}
 --- !u!1 &623170195
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,7 +1594,7 @@ GameObject:
   - component: {fileID: 1467904095}
   - component: {fileID: 1467904096}
   m_Layer: 5
-  m_Name: LayoutGroup
+  m_Name: Ranking_LayoutGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2487,7 +2502,7 @@ GameObject:
   - component: {fileID: 2039946326}
   - component: {fileID: 2039946327}
   m_Layer: 0
-  m_Name: ResultPerformanceManager
+  m_Name: ResultPerformance Components
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2522,6 +2537,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _resultCharacterDataContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
   _resultUIAnimator: {fileID: 2039946327}
+  _rankingView: {fileID: 604539269}
 --- !u!114 &2039946327
 MonoBehaviour:
   m_ObjectHideFlags: 0

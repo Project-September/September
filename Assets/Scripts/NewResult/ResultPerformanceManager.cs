@@ -1,3 +1,4 @@
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using September.Common;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace NewResult
     {
         [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
         [SerializeField] private ResultUIAnimator _resultUIAnimator;
+        [SerializeField] private RankingView _rankingView;
 
         private void Start()
         {
@@ -19,6 +21,14 @@ namespace NewResult
                 new RankingEntry(5, "五位あいうえおかきくけこさしすせそ", CharacterType.Sarutobi),
                 new RankingEntry(4, "Fourth long long long long Name", CharacterType.Tanihira),
             });
+
+            var rankingNames = 
+                resultInfo.Ranking.Where(x => x.Rank >= 2)
+                .OrderBy(x => x.Rank)
+                .Select(x => x.PlayerName)
+                .ToArray();
+            
+            _rankingView.CreateRanking(rankingNames);
             
             StartResultPerformance(_resultCharacterDataContainer, resultInfo);
         }
