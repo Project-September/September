@@ -10,9 +10,12 @@ namespace NewResult
         [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
         [SerializeField] private ResultUIAnimator _resultUIAnimator;
         [SerializeField] private RankingView _rankingView;
+        [SerializeField] private MenuActiveController _menuActiveController;
 
-        private void Start()
+        private async void Start()
         {
+            _menuActiveController.Deactivate();
+            
             var resultInfo = new GameResultInfo("Test", new[]
             {
                 new RankingEntry(2, "Second Octane", CharacterType.HulkTheButcher),
@@ -22,15 +25,19 @@ namespace NewResult
                 new RankingEntry(4, "Fourth long long long long Name", CharacterType.Tanihira),
             });
 
-            var rankingNames = 
+            var rankingListNames = 
                 resultInfo.Ranking.Where(x => x.Rank >= 2)
                 .OrderBy(x => x.Rank)
                 .Select(x => x.PlayerName)
                 .ToArray();
             
-            _rankingView.CreateRanking(rankingNames);
+            _rankingView.CreateRankingList(rankingListNames);
+            _rankingView.SetWinnerPlayerNameText(resultInfo.Ranking.FirstOrDefault(x => x.Rank == 1).PlayerName);
             
-            StartResultPerformance(_resultCharacterDataContainer, resultInfo);
+            await StartResultPerformance(_resultCharacterDataContainer, resultInfo);
+            
+            _menuActiveController.Activate();
+            _menuActiveController.SetEventSystemSelected();
         }
 
         private async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)

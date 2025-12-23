@@ -1,4 +1,4 @@
-using System;
+using TMPro;
 using UnityEngine;
 
 namespace NewResult
@@ -7,8 +7,9 @@ namespace NewResult
     {
         [SerializeField] private Transform _rankingRoot;
         [SerializeField] private RankingItemView _rankingItemPrefab;
-
-        public void CreateRanking(string[] playerNames)
+        [SerializeField] private TextMeshProUGUI _winnerPlayerNameText;
+        
+        public void CreateRankingList(string[] playerNames)
         {
             for (int i = _rankingRoot.childCount - 1; i >= 0; i--)
             {
@@ -22,6 +23,11 @@ namespace NewResult
                 var item = Instantiate(_rankingItemPrefab, _rankingRoot);
                 item.Init(rank, playerNames[i]);
             }
+        }
+
+        public void SetWinnerPlayerNameText(string playerName)
+        {
+            _winnerPlayerNameText.text = playerName;
         }
     }
 }
