@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using September.Common;
 using UnityEngine;
 
-namespace NewResult
+namespace September.NewResult
 {
     public class ResultPerformanceManager : MonoBehaviour
     {

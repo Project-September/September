@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace NewResult
+namespace September.NewResult
 {
     public class RankingView : MonoBehaviour
     {

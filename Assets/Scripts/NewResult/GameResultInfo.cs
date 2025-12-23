@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Result;
 using September.Common;
 
-namespace NewResult
+namespace September.NewResult
 {
     public readonly struct RankingEntry
     {

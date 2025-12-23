@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace NewResult
+namespace September.NewResult
 {
     public class MenuActiveController : MonoBehaviour
     {

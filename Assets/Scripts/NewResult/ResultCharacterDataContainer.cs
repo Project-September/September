@@ -4,7 +4,7 @@ using Fusion;
 using September.Common;
 using UnityEngine;
 
-namespace NewResult
+namespace September.NewResult
 {
     [CreateAssetMenu(fileName = "ResultCharacterDataContainer", menuName = "ScriptableObjects/ResultCharacterDataContainer", order = 0)]
     public class ResultCharacterDataContainer : ScriptableObject

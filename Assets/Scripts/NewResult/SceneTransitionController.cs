@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace NewResult
+namespace September.NewResult
 {
     public class SceneTransitionController : MonoBehaviour
     {
