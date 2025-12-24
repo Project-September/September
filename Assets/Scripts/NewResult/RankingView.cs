@@ -11,9 +11,9 @@ namespace September.NewResult
         
         public void CreateRankingList(string[] playerNames)
         {
-            for (int i = _rankingRoot.childCount - 1; i >= 0; i--)
+            foreach (Transform child in _rankingRoot)
             {
-                DestroyImmediate(_rankingRoot.GetChild(i).gameObject);
+                Destroy(child.gameObject);
             }
             
             for (int i = 0; i < playerNames.Length; i++)
