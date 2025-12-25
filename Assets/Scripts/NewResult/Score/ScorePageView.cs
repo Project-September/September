@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Result;
 using TMPro;
 using UnityEngine;
@@ -29,7 +30,7 @@ namespace September.NewResult
             _showButton.onClick.AddListener(Show);
         }
 
-        public void SetScore(ResultExhibitScoreEntry[] entries)
+        public void SetScore(IReadOnlyList<ResultExhibitScoreEntry> entries)
         {
             foreach (Transform child in _scorePanelRoot)
             {

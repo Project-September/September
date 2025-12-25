@@ -27,15 +27,11 @@ namespace September.NewResult
 
             // アセットの取得
             var ranking = gameResultInfo.Ranking;
+            Debug.Log("Get Asset Process");
+            Debug.Log(gameResultInfo.StageName);
             foreach (var entry in ranking)
             {
                 Debug.Log($"{entry.Rank}, {entry.PlayerName}, {entry.CharacterType}");
-            }
-
-            foreach (var entry in ranking)
-            {
-                var assets = resultCharacterDataContainer.GetAssets(entry.CharacterType);
-                Debug.Log(assets.TestString);
             }
 
             // 演出開始

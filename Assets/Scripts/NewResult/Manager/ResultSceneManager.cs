@@ -7,19 +7,39 @@ namespace September.NewResult
     {
         [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
         [SerializeField] private ResultPerformanceManager _resultPerformanceManager;
-        
-        private GameResultInfo _testResultInfo = new GameResultInfo("Test", new[]
-        {
-            new RankingEntry(2, "Second Octane", CharacterType.HulkTheButcher),
-            new RankingEntry(1, "First the Winner with Long Name", CharacterType.OkabeWright),
-            new RankingEntry(3, "Thirdlongestlongestlongestname", CharacterType.OkabeWright),
-            new RankingEntry(5, "五位あいうえおかきくけこさしすせそ", CharacterType.Sarutobi),
-            new RankingEntry(4, "Fourth long long long long Name", CharacterType.Tanihira),
-        });
+        [SerializeField] private ResultUIInitializer _resultUIInitializer;
+        [SerializeField] private ExhibitScoreConfig _config;
 
         private async void Start()
         {
-            await _resultPerformanceManager.StartResultPerformance(_resultCharacterDataContainer, _testResultInfo);
+            var gameResultInfo = MockData.Create(_config);
+            
+            _resultUIInitializer.Initialize(gameResultInfo.Players[0].ExhibitScoreEntries);
+            
+            await _resultPerformanceManager.StartResultPerformance(_resultCharacterDataContainer, gameResultInfo);
+        }
+    }
+
+    public static class MockData
+    {
+        public static GameResultInfo Create(ExhibitScoreConfig config)
+        {
+            var builder = new GameResultInfoBuilder();
+            builder.SetStageName("Test");
+            builder.SetRanking(new RankingEntry[]
+            {
+                new(2, "Second Octane", CharacterType.HulkTheButcher),
+                new(1, "First the Winner with Long Name", CharacterType.OkabeWright),
+                new(3, "Thirdlongestlongestlongestname", CharacterType.OkabeWright),
+                new(5, "五位あいうえおかきくけこさしすせそ", CharacterType.Sarutobi),
+                new(4, "Fourth long long long long Name", CharacterType.Tanihira),
+            });
+
+            builder.AddPlayer(new PlayerResultEntry(config.Entries, "Test_FirstPlayer"));
+            builder.AddPlayer(new PlayerResultEntry(config.Entries, "Test_SecondPlayer"));
+
+            var gameResultInfo = builder.BuildInstance();
+            return gameResultInfo;
         }
     }
 }
