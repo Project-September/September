@@ -7,41 +7,25 @@ namespace September.NewResult
 {
     public class ResultPerformanceManager : MonoBehaviour
     {
-        [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
         [SerializeField] private ResultUIAnimator _resultUIAnimator;
         [SerializeField] private RankingView _rankingView;
         [SerializeField] private MenuActiveController _menuActiveController;
-
-        private async void Start()
+        
+        public async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
         {
             _menuActiveController.Deactivate();
             
-            var resultInfo = new GameResultInfo("Test", new[]
-            {
-                new RankingEntry(2, "Second Octane", CharacterType.HulkTheButcher),
-                new RankingEntry(1, "First the Winner with Long Name", CharacterType.OkabeWright),
-                new RankingEntry(3, "Thirdlongestlongestlongestname", CharacterType.OkabeWright),
-                new RankingEntry(5, "五位あいうえおかきくけこさしすせそ", CharacterType.Sarutobi),
-                new RankingEntry(4, "Fourth long long long long Name", CharacterType.Tanihira),
-            });
-
+            // ランキングの作成
             var rankingListNames = 
-                resultInfo.Ranking.Where(x => x.Rank >= 2)
-                .OrderBy(x => x.Rank)
-                .Select(x => x.PlayerName)
-                .ToArray();
+                gameResultInfo.Ranking.Where(x => x.Rank >= 2)
+                    .OrderBy(x => x.Rank)
+                    .Select(x => x.PlayerName)
+                    .ToArray();
             
             _rankingView.CreateRankingList(rankingListNames);
-            _rankingView.SetWinnerPlayerNameText(resultInfo.Ranking.FirstOrDefault(x => x.Rank == 1).PlayerName);
-            
-            await StartResultPerformance(_resultCharacterDataContainer, resultInfo);
-            
-            _menuActiveController.Activate();
-            _menuActiveController.SetEventSystemSelected();
-        }
+            _rankingView.SetWinnerPlayerNameText(gameResultInfo.Ranking.FirstOrDefault(x => x.Rank == 1).PlayerName);
 
-        private async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
-        {
+            // アセットの取得
             var ranking = gameResultInfo.Ranking;
             foreach (var entry in ranking)
             {
@@ -54,12 +38,16 @@ namespace September.NewResult
                 Debug.Log(assets.TestString);
             }
 
-            // 演出待機
+            // 演出開始
             await UniTask.Delay(3000);
             
             // 演出終了⇒UI表示
             await _resultUIAnimator.ShowResultUI();
             Debug.Log("Result Performance End");
+            
+            // メニューを選択可能に
+            _menuActiveController.Activate();
+            _menuActiveController.SetEventSystemSelected();
         }
     }
 }
