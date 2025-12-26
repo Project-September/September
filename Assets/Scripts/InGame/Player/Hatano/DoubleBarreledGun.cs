@@ -47,6 +47,8 @@ namespace InGame.Player.Ability
             
             if (_shootingStateType == ShootingStateType.Stance)
             {
+                _aimCameraController.PlayerDirectionAIMCamera();
+                
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
                     GunTargetDetection();

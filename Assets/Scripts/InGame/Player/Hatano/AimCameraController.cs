@@ -68,4 +68,12 @@ public class AimCameraController : MonoBehaviour
             _crosshair.SetActive(isFlag);
         }
     }
+
+    /// <summary>
+    /// カメラの方向にプレイヤーを向かせる
+    /// </summary>
+    public void PlayerDirectionAIMCamera()
+    {
+        this.gameObject.transform.forward = MainCamera.transform.forward;
+    }
 }

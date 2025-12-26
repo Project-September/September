@@ -44,6 +44,8 @@ namespace InGame.Player.Ability
             //構えている状態
             if (_shootingStateType == ShootingStateType.Stance)
             {
+                _aimCameraController.PlayerDirectionAIMCamera();
+                
                 //撃つ入力をしている時、Rayを飛ばす
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {

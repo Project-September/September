@@ -42,6 +42,8 @@ namespace InGame.Player.Ability
             
             if (_shootingStateType == ShootingStateType.Stance)
             {
+                _aimCameraController.PlayerDirectionAIMCamera();
+                
                 //一度撃ったら、アビリティを終了する
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {

@@ -91,7 +91,7 @@ namespace  InGame.Player.Ability
             }
         }
         
-        //inputを保持するために追加　山本
+        //inputを保持するために追加
         protected PlayerInput _playerInput;
         /// <summary>
         /// プレイヤーの入力を設定する
