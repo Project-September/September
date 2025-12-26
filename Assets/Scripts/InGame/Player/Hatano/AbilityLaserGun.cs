@@ -1,6 +1,6 @@
 using System;
-using Fusion;
 using InGame.Interact;
+using InGame.Player.Hatano;
 using September.Common;
 using UnityEngine;
 
@@ -19,19 +19,13 @@ namespace InGame.Player.Ability
         [SerializeField] private float _laserDistance;
         [Header("○○発射位置")]
         [SerializeField] private Transform _laserStartPoint;
-        //[Header("○○発射インターバル")] 
-        //[SerializeField] private float _intervalTime;
-        //private float _intervalTimer; //インターバル用のタイマー
         [Header("○○使用時のインタラクション必要時間")] 
         [SerializeField] private float _interactionTime;
         private float _interactionTimer;
         [Header("射撃のステート")]
         [SerializeField] private ShootingStateType _shootingStateType;
-        //private SessionPlayerData _data;
-        /// <summary>
-        /// true：撃った　false：撃ってない
-        /// </summary>
-        //private bool _isShoot;
+        [Header("判定を取るためのBoxの大きさ")]
+        [SerializeField] private Vector3 _judgmentBoxSize;
         
         protected override void OnStart()
         {
@@ -39,45 +33,37 @@ namespace InGame.Player.Ability
             _shootingStateType = ShootingStateType.Stance;
             _aimCameraController.CrosshairToggleChange(true);
             //カメラをAimカメラに変更する
-            _aimCameraController.CameraToggleChange();
+            _aimCameraController.AimCamera();
         }
 
         protected override void OnUpdate(float deltaTime)
         {
-            /*
-            //発射直後にインターバルを開始する
-            if (_isShoot)
-            {
-                //インターバル時間を過ぎたら、再度発射を可能にする
-                _intervalTimer = Time.deltaTime;
-                if (_intervalTimer >= _intervalTime)
-                {
-                    _isShoot = false;
-                    _intervalTimer = 0;
-                }
-            }
-            */
+            //現在のAbilityが遠距離インタラクションの場合、処理を通す
+            if(AbilityStatusManagement.instance.AbilityStatus != HatanoAbilityStatus.RemoteInteraction) return;
             
             //構えている状態
             if (_shootingStateType == ShootingStateType.Stance)
             {
-                //var origin = _aimCameraController.MainCamera.transform.position;
-                //var dir = _aimCameraController.MainCamera.transform.forward;
-                //Debug.DrawRay(origin, dir * _laserDistance, Color.red);
-                
                 //撃つ入力をしている時、Rayを飛ばす
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
                     LaserTargetDetection();
                 }
+                else if (!_playerInput.Buttons.IsSet(PlayerButtons.Shooting)) //撃つ入力を離したらインタラクションを中止する
+                {
+                    _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
+                }
             }
             
             //構える入力を離したら、アビリティを終了する
-            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability1))
+            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
                 _phase = AbilityPhase.Ending;
-                _aimCameraController.CameraToggleChange();
+                _aimCameraController.NormalCamera();
                 _aimCameraController.CrosshairToggleChange(false);
+                
+                //一応、インタラクション中にエイムを辞めたときもインタラクションを中止する
+                _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
             }
         }
 
@@ -117,16 +103,33 @@ namespace InGame.Player.Ability
             var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _laserDistance);
             if (laserPoint)
             {
-                //ヒットしたオブジェクトのInteractableBaseを取得する
-                var hit = laseHitInfo.collider.gameObject;
-                var interactable = hit.GetComponentInParent<InteractableBase>()
-                        ?? hit.GetComponent<InteractableBase>()
-                        ?? hit.GetComponentInChildren<InteractableBase>();
-                if (interactable != null)
+                //Rayが当たった場所のColliderを取得して、小さいインタラクションオブジェクトも取得出来るようにする
+                Collider[] boxColliders = Physics.OverlapBox(
+                    laseHitInfo.point,
+                    _judgmentBoxSize,
+                    Quaternion.identity);
+                
+                //インタラクションオブジェクトを取得する
+                InteractableBase interactableBase = null;
+                foreach (var collider in boxColliders)
                 {
-                    //インタラクションを行う
+                    var obj = collider.gameObject;
+                    interactableBase = obj.GetComponentInParent<InteractableBase>()
+                                       ?? obj.GetComponent<InteractableBase>()
+                                       ?? obj.GetComponentInChildren<InteractableBase>();
+                    //一番最初にインタラクションオブジェクトを見つけ次第、ループを抜ける
+                    if(interactableBase != null) break;
+                }
+
+                //インタラクションオブジェクトを取得出来た場合、インタラクションを行う
+                if (interactableBase != null)
+                {
                     _playerInteractionController.RemoteInteraction(
-                        ref _interactionTimer, _interactionTime, interactable);
+                        ref _interactionTimer, _interactionTime, interactableBase);
+                }
+                else //インタラクションを中止する
+                {
+                    _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
                 }
             }
         }

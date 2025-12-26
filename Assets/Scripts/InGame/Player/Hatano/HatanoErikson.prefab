@@ -5336,6 +5336,8 @@ GameObject:
   - component: {fileID: 3570017578186338863}
   - component: {fileID: 2447315062394318487}
   - component: {fileID: 2677403803585906037}
+  - component: {fileID: -3242926656974808753}
+  - component: {fileID: -3759821598390054299}
   m_Layer: 6
   m_Name: HatanoErikson
   m_TagString: Player
@@ -5423,6 +5425,7 @@ MonoBehaviour:
   - {fileID: 2779401866583128900}
   - {fileID: 3570017578186338863}
   - {fileID: 2447315062394318487}
+  - {fileID: -3242926656974808753}
   - {fileID: 4810525472409146702}
   - {fileID: 2132102575819528591}
   - {fileID: 3043690341386287730}
@@ -5697,6 +5700,7 @@ MonoBehaviour:
         _laserStartPoint: {fileID: 915611406105039834}
         _interactionTime: 2
         _shootingStateType: 0
+        _judgmentBoxSize: {x: 1, y: 1, z: 1}
     - rid: 1502005709025574999
       type: {class: AbilityLaserSkillCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
@@ -5834,6 +5838,32 @@ MonoBehaviour:
   _normalCamera: {fileID: 1140998407376993141}
   _aimCamera: {fileID: 1599464012499452082}
   _crosshairPrefab: {fileID: 3758444813883266440, guid: 012a53cb75eae6d42a003f1bb6bd8628, type: 3}
+--- !u!114 &-3242926656974808753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e154282f1fa7874ab49e1f29c118239, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _abilityStatus: 3
+--- !u!114 &-3759821598390054299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71704002cd06cb8409cf481de46249e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _selectedAbilityUIPrefab: {fileID: 3758444813883266440, guid: 17cdfb5a7c7423a4ebe8dca521964dc1, type: 3}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

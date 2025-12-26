@@ -1,4 +1,5 @@
 using Cinemachine;
+using Fusion;
 using UnityEngine;
 
 public class AimCameraController : MonoBehaviour
@@ -18,34 +19,36 @@ public class AimCameraController : MonoBehaviour
     /// <summary>
     /// true：構えている状態　false：構えていない状態
     /// </summary>
-    private bool _isAim;
-    
+    public bool IsAim { get; private set; }
+
     void Start()
     {
         MainCamera = Camera.main;
     }
 
     /// <summary>
-    /// カメラの切り替えを行う
+    /// 通常カメラに変更する
+    /// ハタノAbilityが終了、AIM入力が辞めたとき
     /// </summary>
-    public void CameraToggleChange()
+    public void NormalCamera()
     {
-        if (_isAim) //構えている状態
-        {
-            //カメラを通常に戻す
-            _normalCamera.gameObject.SetActive(true);
-            _aimCamera.gameObject.SetActive(false);
-            
-            _isAim = false;
-        }
-        else
-        {
-            //カメラをAIMにする
-            _normalCamera.gameObject.SetActive(false);
-            _aimCamera.gameObject.SetActive(true);
-            
-            _isAim = true;
-        }
+        IsAim = false;
+        _normalCamera.gameObject.SetActive(true);
+        _aimCamera.gameObject.SetActive(false);
+    }
+    
+    /// <summary>
+    /// AIMカメラに変更する
+    /// ハタノAbilityを発動したとき
+    /// </summary>
+    public void AimCamera()
+    {
+        IsAim = true;
+        _normalCamera.gameObject.SetActive(false);
+        _aimCamera.gameObject.SetActive(true);
+        
+        //プレイヤーの向きをカメラの方向に合わせる
+        this.gameObject.transform.forward = MainCamera.transform.forward;
     }
 
     /// <summary>

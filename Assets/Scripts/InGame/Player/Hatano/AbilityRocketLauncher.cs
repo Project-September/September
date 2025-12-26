@@ -1,6 +1,7 @@
 using System;
 using InGame.Health;
 using InGame.Interact;
+using InGame.Player.Hatano;
 using September.Common;
 using UnityEngine;
 
@@ -32,11 +33,13 @@ namespace InGame.Player.Ability
         {
             _shootingStateType = ShootingStateType.Stance;
             _aimCameraController.CrosshairToggleChange(true);
-            _aimCameraController.CameraToggleChange();
+            _aimCameraController.AimCamera();
         }
 
         protected override void OnUpdate(float deltaTime)
         {
+            if(AbilityStatusManagement.instance.AbilityStatus != HatanoAbilityStatus.RocketLauncher) return;
+            
             if (_shootingStateType == ShootingStateType.Stance)
             {
                 //一度撃ったら、アビリティを終了する
@@ -44,16 +47,16 @@ namespace InGame.Player.Ability
                 {
                     LauncherTargetDetection();
                     _phase = AbilityPhase.Ending;
-                    _aimCameraController.CameraToggleChange();
+                    _aimCameraController.NormalCamera();
                     _aimCameraController.CrosshairToggleChange(false);
                 }
             }
-
+            
             //撃つ入力を終了したら、アビリティを終了する
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
                 _phase = AbilityPhase.Ending;
-                _aimCameraController.CameraToggleChange();
+                _aimCameraController.NormalCamera();
                 _aimCameraController.CrosshairToggleChange(false);
             }
         }

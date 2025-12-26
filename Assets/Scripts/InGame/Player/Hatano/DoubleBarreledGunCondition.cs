@@ -5,9 +5,9 @@ using September.Common;
 namespace InGame.Player.Ability
 {
     [Serializable]
-    public class AbilityLaserSkillCondition : IAbilityExecuteCondition
+    public class DoubleBarreledGunCondition : IAbilityExecuteCondition
     {
-        public string TargetAbilityName => nameof(AbilityLaserGun);
+        public string TargetAbilityName => nameof(DoubleBarreledGun);
 
         // キャッシュ用
         private PlayerMovement _playerMovement;
@@ -18,9 +18,9 @@ namespace InGame.Player.Ability
             if (!context.Owner) return false;
             if (!_playerMovement) _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
-            
-            if(AbilityStatusManagement.instance.AbilityStatus == HatanoAbilityStatus.None) return false;
 
+            if(AbilityStatusManagement.instance.AbilityStatus == HatanoAbilityStatus.None) return false;
+            
             // 条件を定義
             return context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available
                    && context.AbilityRef.CanStartAbilityOverride()

@@ -1,6 +1,7 @@
 using System;
 using Fusion;
 using InGame.Health;
+using InGame.Player.Hatano;
 using September.Common;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ namespace InGame.Player.Ability
         {
             _shootingStateType = ShootingStateType.Stance;
             _aimCameraController.CrosshairToggleChange(true);
-            _aimCameraController.CameraToggleChange();
+            _aimCameraController.AimCamera();
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)
@@ -42,6 +43,8 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
+            if(AbilityStatusManagement.instance.AbilityStatus != HatanoAbilityStatus.DoubleBarreledGun) return;
+            
             if (_shootingStateType == ShootingStateType.Stance)
             {
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
@@ -65,10 +68,10 @@ namespace InGame.Player.Ability
             }
             
             //構えの入力が終了後
-            if (!_playerInput.Buttons.IsSet(PlayerButtons.GunAim))
+            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
                 _phase = AbilityPhase.Ending;
-                _aimCameraController.CameraToggleChange();
+                _aimCameraController.NormalCamera();
                 _aimCameraController.CrosshairToggleChange(false);
             }
         }
