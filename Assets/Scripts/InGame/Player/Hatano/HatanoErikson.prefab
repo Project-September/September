@@ -5682,10 +5682,12 @@ MonoBehaviour:
   - rid: 1502005709025574997
   - rid: 1502005779782697044
   - rid: 1502005889970208852
+  - rid: 1502006044739502163
   _conditions:
   - rid: 1502005709025574999
   - rid: 1502005779782697045
   - rid: 1502005889970208853
+  - rid: 1502006044739502164
   references:
     version: 2
     RefIds:
@@ -5735,6 +5737,34 @@ MonoBehaviour:
         _shootingStateType: 0
     - rid: 1502005889970208853
       type: {class: DoubleBarreledGunCondition, ns: InGame.Player.Ability, asm: Scripts}
+      data: 
+    - rid: 1502006044739502163
+      type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        _attackDamage: 10
+        _ogreAttackDamage: 15
+        _startHitCheckFrame: 17
+        _endHitCheckFrame: 21
+        _endAttackFrame: 22
+        _hitEffect: 18
+        _normalAttackAnimationClip: {fileID: 0}
+        _animationClipPlayer: {fileID: 0}
+        _enableAutoAim: 1
+        _moveForwardSpeed: 2
+        _searchRadius: 2
+        _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
+        _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
+        _boxCastDistance: 1
+        _hitLayer:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        _triggerInteraction: 1
+        _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
+        _debugDrawDuration: 1
+    - rid: 1502006044739502164
+      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
 --- !u!114 &3570017578186338863
 MonoBehaviour:
