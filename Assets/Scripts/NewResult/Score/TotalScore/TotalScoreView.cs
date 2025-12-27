@@ -7,17 +7,17 @@ namespace September.NewResult
         [SerializeField] private Transform _parent;
         [SerializeField] private TotalScoreEntryView _entryPrefab;
         
-        public void Setup((Sprite icon, string playerName, int score)[] entries)
+        public void Setup(TotalScoreViewEntry[] entries)
         {
             foreach (Transform child in _parent)
             {
                 Destroy(child.gameObject);
             }
             
-            foreach ((Sprite icon, string playerName, int score) in entries)
+            foreach (var entry in entries)
             {
                 var entryView = Instantiate(_entryPrefab, _parent);
-                entryView.Setup(icon, playerName, score);
+                entryView.Setup(entry);
             }
         }
     }

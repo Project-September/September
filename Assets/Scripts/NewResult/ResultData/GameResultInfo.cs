@@ -25,12 +25,14 @@ namespace September.NewResult
         public readonly CharacterType CharacterType;
         public readonly ResultExhibitScoreEntry[] ExhibitScoreEntries;
         public readonly int TotalScore;
+        public readonly bool IsOgre;
 
-        public PlayerResultEntry(string playerName, CharacterType characterType, ResultExhibitScoreEntry[] exhibitScoreEntries)
+        public PlayerResultEntry(string playerName, CharacterType characterType, ResultExhibitScoreEntry[] exhibitScoreEntries, bool isOgre)
         {
             PlayerName = playerName;
             CharacterType = characterType;
             ExhibitScoreEntries = exhibitScoreEntries;
+            IsOgre = isOgre;
 
             TotalScore = 0;
             foreach (var entry in ExhibitScoreEntries)
@@ -39,7 +41,7 @@ namespace September.NewResult
             }
         }
         
-        public PlayerResultEntry(string playerName, CharacterType characterType, IReadOnlyList<ExhibitScoreEntry> config)
+        public PlayerResultEntry(string playerName, CharacterType characterType, IReadOnlyList<ExhibitScoreEntry> config, bool isOgre)
         {
             var entries = new ResultExhibitScoreEntry[config.Count];
             
@@ -61,6 +63,7 @@ namespace September.NewResult
             PlayerName = playerName;
             CharacterType = characterType;
             ExhibitScoreEntries = entries;
+            IsOgre = isOgre;
         }
     }
     

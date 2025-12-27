@@ -23,14 +23,16 @@ namespace September.NewResult
         {
             _exhibitScoreView?.Setup(gameResultInfo.Players[0].ExhibitScoreEntries);
 
-            var totalScoreViewEntries = new (Sprite, string, int)[gameResultInfo.Players.Count];
+            var totalScoreViewEntries = new TotalScoreViewEntry[gameResultInfo.Players.Count];
             for (int i = 0; i < gameResultInfo.Players.Count; i++)
             {
                 var player = gameResultInfo.Players[i];
                 var sprite = _resultCharacterDataContainer.GetAssets(player.CharacterType).Icon;
                 var name = player.PlayerName;
+                var isOgre = player.IsOgre;
+                
                 var score = player.TotalScore;
-                totalScoreViewEntries[i] = (sprite, name, score);
+                totalScoreViewEntries[i] = new TotalScoreViewEntry(sprite, name, score, isOgre);
             }
             _totalScoreView?.Setup(totalScoreViewEntries);
         }

@@ -35,10 +35,10 @@ namespace September.NewResult
                 new(4, "Fourth long long long long Name", CharacterType.Tanihira),
             });
 
-            builder.AddPlayer(new PlayerResultEntry("Test_FirstPlayer", CharacterType.HulkTheButcher, config.Entries));
-            builder.AddPlayer(new PlayerResultEntry("Test_SecondPlayer", CharacterType.OkabeWright, config.Entries));
-            builder.AddPlayer(new PlayerResultEntry("Test_ThirdPlayer", CharacterType.Tanihira, config.Entries));
-            builder.AddPlayer(new PlayerResultEntry("Test_ForcePlayer", CharacterType.Sarutobi, config.Entries));
+            builder.AddPlayer(new PlayerResultEntry("Test_FirstPlayer", CharacterType.HulkTheButcher, config.Entries, false));
+            builder.AddPlayer(new PlayerResultEntry("Test_SecondPlayer", CharacterType.OkabeWright, config.Entries, true));
+            builder.AddPlayer(new PlayerResultEntry("Test_ThirdPlayer", CharacterType.Tanihira, config.Entries, false));
+            builder.AddPlayer(new PlayerResultEntry("Test_ForcePlayer", CharacterType.Sarutobi, config.Entries, false));
 
             var gameResultInfo = builder.BuildInstance();
             return gameResultInfo;

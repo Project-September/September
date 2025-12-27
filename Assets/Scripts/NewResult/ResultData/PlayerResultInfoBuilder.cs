@@ -10,6 +10,7 @@ namespace September.NewResult
         private readonly List<ExhibitScoreEntry> _entries;
         private string _playerName;
         private CharacterType _characterType;
+        private bool _isOrge;
 
         public void SetScoreConfig(ExhibitScoreEntry[] scoreConfig)
         {
@@ -24,6 +25,11 @@ namespace September.NewResult
         public void SetCharacterType(CharacterType characterType)
         {
             _characterType = characterType;
+        }
+
+        public void SetIsOgre(bool isOgre)
+        {
+            _isOrge = isOgre;
         }
         
         public PlayerResultEntry BuildInstance()
@@ -42,7 +48,7 @@ namespace September.NewResult
                 entries[i] = new ResultExhibitScoreEntry(type, count, score);
             }
 
-            return new PlayerResultEntry(_playerName, _characterType, entries);
+            return new PlayerResultEntry(_playerName, _characterType, entries, _isOrge);
         }
     }
 }
