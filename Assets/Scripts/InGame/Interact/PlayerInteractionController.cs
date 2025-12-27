@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Player;
+using InGame.Player.Ability;
 using UnityEngine;
 using September.Common;
 using September.InGame.UI;
@@ -117,7 +118,10 @@ namespace InGame.Interact
         /// <param name="timer">インタラクションタイマー</param>
         /// <param name="time">インタラクション必要時間</param>
         /// <param name="interactableBase">Rayで当たったインタラクション可能なオブジェクト</param>>
-        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase)
+        /// <param name="abilityPhase">アビリティの状態</param>>
+        /// <param name="aimCameraController">このAbilityを使っているキャラのカメラ</param>>
+        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase, 
+            ref AbilityBase.AbilityPhase abilityPhase, AimCameraController aimCameraController)
         {
             var context = new InteractableContext
             {
@@ -138,6 +142,11 @@ namespace InGame.Interact
                 timer = 0f;
                 CompleteInteraction();
                 UIController.I.ShowInteractUI(false);
+                
+                //インタラクションに成功したらアビリティを終了
+                abilityPhase = AbilityBase.AbilityPhase.Ending;
+                aimCameraController.NormalCamera();
+                aimCameraController.CrosshairToggleChange(false);
             }
             UIController.I.SetInteractProgress(Mathf.Clamp01(timer / time));
         }

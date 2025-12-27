@@ -5694,7 +5694,7 @@ MonoBehaviour:
     - rid: 1502005709025574997
       type: {class: AbilityLaserGun, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _cooldown: 0
+        _cooldown: 3
         _phase: 0
         _playerInteractionController: {fileID: 7710838205980989238}
         _aimCameraController: {fileID: 2677403803585906037}
@@ -5709,7 +5709,7 @@ MonoBehaviour:
     - rid: 1502005779782697044
       type: {class: AbilityRocketLauncher, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _cooldown: 0
+        _cooldown: 5
         _phase: 0
         _playerInteractionController: {fileID: 7710838205980989238}
         _aimCameraController: {fileID: 2677403803585906037}
@@ -5725,11 +5725,11 @@ MonoBehaviour:
     - rid: 1502005889970208852
       type: {class: DoubleBarreledGun, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _cooldown: 0
+        _cooldown: 3
         _phase: 0
         _aimCameraController: {fileID: 2677403803585906037}
         _doubleBarreledGunDistance: 100
-        _shootingInterval: 0.5
+        _shootingInterval: 2
         _doubleBarreledGunLeftMuzzle: {fileID: 9070121316509825322}
         _doubleBarreledGunRightMuzzle: {fileID: 900395334813402302}
         _damage: 5

@@ -57,7 +57,7 @@ namespace InGame.Player.Ability
             //撃つ入力を終了したら、アビリティを終了する
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
-                _phase = AbilityPhase.Ending;
+                _phase = AbilityPhase.Available;
                 _aimCameraController.NormalCamera();
                 _aimCameraController.CrosshairToggleChange(false);
             }

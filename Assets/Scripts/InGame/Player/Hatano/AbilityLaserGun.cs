@@ -60,7 +60,7 @@ namespace InGame.Player.Ability
             //構える入力を離したら、アビリティを終了する
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
-                _phase = AbilityPhase.Ending;
+                _phase = AbilityPhase.Available;
                 _aimCameraController.NormalCamera();
                 _aimCameraController.CrosshairToggleChange(false);
                 
@@ -127,7 +127,7 @@ namespace InGame.Player.Ability
                 if (interactableBase != null)
                 {
                     _playerInteractionController.RemoteInteraction(
-                        ref _interactionTimer, _interactionTime, interactableBase);
+                        ref _interactionTimer, _interactionTime, interactableBase, ref _phase, _aimCameraController);
                 }
                 else //インタラクションを中止する
                 {

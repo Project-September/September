@@ -72,7 +72,7 @@ namespace InGame.Player.Ability
             //構えの入力が終了後
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
-                _phase = AbilityPhase.Ending;
+                _phase = AbilityPhase.Available;
                 _aimCameraController.NormalCamera();
                 _aimCameraController.CrosshairToggleChange(false);
             }
