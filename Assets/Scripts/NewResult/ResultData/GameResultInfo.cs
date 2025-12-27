@@ -22,18 +22,28 @@ namespace September.NewResult
     public readonly struct PlayerResultEntry
     {
         public readonly string PlayerName;
+        public readonly CharacterType CharacterType;
         public readonly ResultExhibitScoreEntry[] ExhibitScoreEntries;
+        public readonly int TotalScore;
 
-        public PlayerResultEntry(string playerName, ResultExhibitScoreEntry[] exhibitScoreEntries)
+        public PlayerResultEntry(string playerName, CharacterType characterType, ResultExhibitScoreEntry[] exhibitScoreEntries)
         {
             PlayerName = playerName;
+            CharacterType = characterType;
             ExhibitScoreEntries = exhibitScoreEntries;
+
+            TotalScore = 0;
+            foreach (var entry in ExhibitScoreEntries)
+            {
+                TotalScore += entry.Score;
+            }
         }
         
-        public PlayerResultEntry(IReadOnlyList<ExhibitScoreEntry> config, string playerName)
+        public PlayerResultEntry(string playerName, CharacterType characterType, IReadOnlyList<ExhibitScoreEntry> config)
         {
             var entries = new ResultExhibitScoreEntry[config.Count];
             
+            var totalScore = 0;
             // インタラクトできる種類とスコアを取得
             for (var i = 0; i < config.Count; i++)
             {
@@ -44,9 +54,12 @@ namespace September.NewResult
                 var score = count * entry.Points;
 
                 entries[i] = new ResultExhibitScoreEntry(type, count, score);
+                totalScore += score;
             }
+            TotalScore = totalScore;
 
             PlayerName = playerName;
+            CharacterType = characterType;
             ExhibitScoreEntries = entries;
         }
     }
@@ -61,7 +74,10 @@ namespace September.NewResult
         public IReadOnlyList<RankingEntry> Ranking { get; }
         public IReadOnlyList<PlayerResultEntry> Players { get; }
 
-        public GameResultInfo(string stageName, IReadOnlyList<RankingEntry> rankingEntries, IReadOnlyList<PlayerResultEntry> players)
+        public GameResultInfo(
+            string stageName, 
+            IReadOnlyList<RankingEntry> rankingEntries, 
+            IReadOnlyList<PlayerResultEntry> players)
         {
             StageName = stageName;
             Ranking = rankingEntries;

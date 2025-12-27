@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Result;
+using September.Common;
 using Random = UnityEngine.Random;
 
 namespace September.NewResult
@@ -8,6 +9,7 @@ namespace September.NewResult
     {
         private readonly List<ExhibitScoreEntry> _entries;
         private string _playerName;
+        private CharacterType _characterType;
 
         public void SetScoreConfig(ExhibitScoreEntry[] scoreConfig)
         {
@@ -17,6 +19,11 @@ namespace September.NewResult
         public void SetPlayerName(string playerName)
         {
             _playerName = playerName;
+        }
+
+        public void SetCharacterType(CharacterType characterType)
+        {
+            _characterType = characterType;
         }
         
         public PlayerResultEntry BuildInstance()
@@ -35,7 +42,7 @@ namespace September.NewResult
                 entries[i] = new ResultExhibitScoreEntry(type, count, score);
             }
 
-            return new PlayerResultEntry(_playerName, entries);
+            return new PlayerResultEntry(_playerName, _characterType, entries);
         }
     }
 }

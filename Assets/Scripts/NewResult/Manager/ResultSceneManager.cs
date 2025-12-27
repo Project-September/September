@@ -14,7 +14,7 @@ namespace September.NewResult
         {
             var gameResultInfo = MockData.Create(_config);
             
-            _resultUIInitializer.Initialize(gameResultInfo.Players[0].ExhibitScoreEntries);
+            _resultUIInitializer.Initialize(gameResultInfo);
             
             await _resultPerformanceManager.StartResultPerformance(_resultCharacterDataContainer, gameResultInfo);
         }
@@ -35,8 +35,10 @@ namespace September.NewResult
                 new(4, "Fourth long long long long Name", CharacterType.Tanihira),
             });
 
-            builder.AddPlayer(new PlayerResultEntry(config.Entries, "Test_FirstPlayer"));
-            builder.AddPlayer(new PlayerResultEntry(config.Entries, "Test_SecondPlayer"));
+            builder.AddPlayer(new PlayerResultEntry("Test_FirstPlayer", CharacterType.HulkTheButcher, config.Entries));
+            builder.AddPlayer(new PlayerResultEntry("Test_SecondPlayer", CharacterType.OkabeWright, config.Entries));
+            builder.AddPlayer(new PlayerResultEntry("Test_ThirdPlayer", CharacterType.Tanihira, config.Entries));
+            builder.AddPlayer(new PlayerResultEntry("Test_ForcePlayer", CharacterType.Sarutobi, config.Entries));
 
             var gameResultInfo = builder.BuildInstance();
             return gameResultInfo;

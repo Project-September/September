@@ -2,35 +2,18 @@ using System.Collections.Generic;
 using Result;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace September.NewResult
 {
-    public class ScorePageView : MonoBehaviour
+    public class ExhibitScoreView : MonoBehaviour, IExhibitScoreView
     {
-        [SerializeField] private Transform _root;
         [SerializeField] private Transform _scorePanelRoot;
         [SerializeField] private ExhibitScoreEntryView _exhibitScoreEntryViewPrefab;
-        [Space(16)]
-        [SerializeField] private string _pageName;
-        [SerializeField] private TextMeshProUGUI _pageNameText;
         [SerializeField] private TextMeshProUGUI _totalScoreText;
-        [Space(16)]
-        [SerializeField] private Selectable _defaultSelect;
-        [SerializeField] private Button _showButton;
         
         private GameObject _prevSelected;
 
-        private void Start()
-        {
-            Hide();
-            _pageNameText.text = _pageName;
-            
-            _showButton.onClick.AddListener(Show);
-        }
-
-        public void SetScore(IReadOnlyList<ResultExhibitScoreEntry> entries)
+        public void Setup(IReadOnlyList<ResultExhibitScoreEntry> entries)
         {
             foreach (Transform child in _scorePanelRoot)
             {
@@ -47,19 +30,6 @@ namespace September.NewResult
             }
             
             _totalScoreText.text = totalScore.ToString();
-        }
-        
-        public void Show()
-        {
-            _prevSelected = EventSystem.current.currentSelectedGameObject;
-            _root.gameObject.SetActive(true);
-            EventSystem.current.SetSelectedGameObject(_defaultSelect.gameObject);
-        }
-
-        public void Hide()
-        {
-            _root.gameObject.SetActive(false);
-            EventSystem.current.SetSelectedGameObject(_prevSelected);
         }
     }
 

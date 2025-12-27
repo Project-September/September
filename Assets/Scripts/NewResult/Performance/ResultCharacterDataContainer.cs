@@ -24,9 +24,11 @@ namespace September.NewResult
     {
         [SerializeField] private CharacterType _type;
         [SerializeField] private GameObject _resultCharacterPrefab;
+        [SerializeField] private Sprite _icon;
         
         public CharacterType Type => _type;
         public GameObject ResultCharacterPrefab => _resultCharacterPrefab;
+        public Sprite Icon => _icon;
         
         [SerializeField] private string _testString;
         public string TestString => _testString;
