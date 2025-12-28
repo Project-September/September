@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,14 +15,18 @@ namespace September.NewResult
         
         private void Start()
         {
-            _titleButton.onClick.AddListener( () =>
+            _titleButton.onClick.AddListener(async () =>
             {
-                SceneManager.LoadSceneAsync(_titleSceneName);
+                await FadePanel.FadeOut();
+                await SceneManager.LoadSceneAsync(_titleSceneName).ToUniTask();
+                await FadePanel.FadeIn();
             });
             
-            _lobbyButton.onClick.AddListener(() =>
+            _lobbyButton.onClick.AddListener(async () =>
             {
-                SceneManager.LoadSceneAsync(_lobbySceneName);
+                await FadePanel.FadeOut();
+                await SceneManager.LoadSceneAsync(_lobbySceneName).ToUniTask();
+                await FadePanel.FadeIn();
             });
         }
     }

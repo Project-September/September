@@ -73,16 +73,16 @@ namespace September.NewResult
     /// </summary>
     public class GameResultInfo
     {
-        public string StageName { get; }
+        public string StageSceneName { get; }
         public IReadOnlyList<RankingEntry> Ranking { get; }
         public IReadOnlyList<PlayerResultEntry> Players { get; }
 
         public GameResultInfo(
-            string stageName, 
+            string stageSceneName, 
             IReadOnlyList<RankingEntry> rankingEntries, 
             IReadOnlyList<PlayerResultEntry> players)
         {
-            StageName = stageName;
+            StageSceneName = stageSceneName;
             Ranking = rankingEntries;
             Players = players;
         }

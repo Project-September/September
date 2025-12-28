@@ -1,7 +1,9 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using NaughtyAttributes;
 using September.Common;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace September.NewResult
 {
@@ -28,13 +30,14 @@ namespace September.NewResult
             // アセットの取得
             var ranking = gameResultInfo.Ranking;
             Debug.Log("Get Asset Process");
-            Debug.Log(gameResultInfo.StageName);
+            Debug.Log(gameResultInfo.StageSceneName);
             foreach (var entry in ranking)
             {
                 Debug.Log($"{entry.Rank}, {entry.PlayerName}, {entry.CharacterType}");
             }
 
             // 演出開始
+            await SceneManager.LoadSceneAsync(gameResultInfo.StageSceneName, LoadSceneMode.Additive);
             await UniTask.Delay(3000);
             
             // 演出終了⇒UI表示
