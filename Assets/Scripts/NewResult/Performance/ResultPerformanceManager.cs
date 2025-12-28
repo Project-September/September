@@ -1,7 +1,5 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using NaughtyAttributes;
-using September.Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,7 +19,7 @@ namespace September.NewResult
             var rankingListNames = 
                 gameResultInfo.Ranking.Where(x => x.Rank >= 2)
                     .OrderBy(x => x.Rank)
-                    .Select(x => x.PlayerName)
+                    .Select(x => new RankingItemModel(x.Rank, x.PlayerName, x.CharacterType))
                     .ToArray();
             
             _rankingView.CreateRankingList(rankingListNames);

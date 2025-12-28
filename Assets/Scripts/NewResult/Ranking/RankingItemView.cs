@@ -1,16 +1,19 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace September.NewResult
 {
     public class RankingItemView : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI _rankText;
+        [SerializeField] private Image _rankIcon;
+        [SerializeField] private Image _characterIcon;
         [SerializeField] private TextMeshProUGUI _playerNameText;
         
-        public void Init(int rank, string playerName)
+        public void Init(Sprite rankIcon, Sprite characterIcon, string playerName)
         {
-            _rankText.text = rank.ToString();
+            _rankIcon.sprite = rankIcon;
+            _characterIcon.sprite = characterIcon;
             _playerNameText.text = playerName;
         }
     }
