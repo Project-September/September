@@ -1,5 +1,6 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +11,7 @@ namespace September.NewResult
         [SerializeField] private ResultUIAnimator _resultUIAnimator;
         [SerializeField] private RankingView _rankingView;
         [SerializeField] private MenuActiveController _menuActiveController;
+        [SerializeField] private SceneTransitionEffect _transitionEffect;
         
         public async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
         {
@@ -35,7 +37,9 @@ namespace September.NewResult
             }
 
             // 演出開始
-            await SceneManager.LoadSceneAsync(gameResultInfo.StageSceneName, LoadSceneMode.Additive);
+            var loadSceneTask = SceneManager.LoadSceneAsync(gameResultInfo.StageSceneName, LoadSceneMode.Additive).ToUniTask();
+            await _transitionEffect.FadeIn(loadSceneTask);
+            
             await UniTask.Delay(3000);
             
             // 演出終了⇒UI表示
