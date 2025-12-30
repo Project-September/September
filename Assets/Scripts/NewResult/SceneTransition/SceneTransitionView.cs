@@ -5,29 +5,37 @@ namespace September.NewResult
 {
     public abstract class SceneTransitionView : MonoBehaviour
     {
+        public bool IsTransitioning { get; private set; }
+        
         public async UniTask FadeIn()
         {
-            SceneTransitionState.IsTransitioning = true;
-            await FadeInPanel();
-            SceneTransitionState.IsTransitioning = false;
+            IsTransitioning = true;
+            await FadeInPanel(UniTask.CompletedTask);
+            IsTransitioning = false;
         }
 
-        public async UniTask FadeIn(UniTask backgroundTask)
+        public async UniTask FadeIn(UniTask loadingTask)
         {
-            SceneTransitionState.IsTransitioning = true;
-            await FadeInPanel(backgroundTask);
-            SceneTransitionState.IsTransitioning = false;
+            IsTransitioning = true;
+            await FadeInPanel(loadingTask);
+            IsTransitioning = false;
         }
 
         public async UniTask FadeOut()
         {
-            SceneTransitionState.IsTransitioning = true;
-            await FadeOutPanel();
-            SceneTransitionState.IsTransitioning = false;
+            IsTransitioning = true;
+            await FadeOutPanel(UniTask.CompletedTask);
+            IsTransitioning = false;
+        }
+        
+        public async UniTask FadeOut(UniTask loadingTask)
+        {
+            IsTransitioning = true;
+            await FadeOutPanel(loadingTask);
+            IsTransitioning = false;
         }
 
-        protected abstract UniTask FadeInPanel();
-        protected abstract UniTask FadeInPanel(UniTask backgroundTask);
-        protected abstract UniTask FadeOutPanel();
+        protected abstract UniTask FadeInPanel(UniTask loadingTask);
+        protected abstract UniTask FadeOutPanel(UniTask loadingTask);
     }
 }

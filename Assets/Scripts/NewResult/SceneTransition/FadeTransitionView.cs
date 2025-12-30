@@ -7,33 +7,30 @@ namespace September.NewResult
 {
     public class FadeTransitionView : SceneTransitionView
     {
-        [SerializeField] private float _fadeDuration = 0.5f; 
+        [SerializeField] private float _fadeDuration = 0.5f;
+        [SerializeField] private Ease _ease = Ease.Linear;
         [SerializeField] private Image _fadePanel;
         
-        protected override async UniTask FadeInPanel()
+        protected override async UniTask FadeInPanel(UniTask loadingTask)
         {
             _fadePanel.gameObject.SetActive(true);
-            var c = _fadePanel.color;
-            await DOTween.To(() => 1f, x => _fadePanel.color = new Color(c.r, c.g, c.b, x), 0f, _fadeDuration);
+            await Transition(1f, 0f, _fadeDuration, loadingTask);
             _fadePanel.gameObject.SetActive(false);
-        }
-
-        protected override async UniTask FadeOutPanel()
-        {
-            _fadePanel.gameObject.SetActive(true);
-            var c = _fadePanel.color;
-            await DOTween.To(() => 0f, x => _fadePanel.color = new Color(c.r, c.g, c.b, x), 1f, _fadeDuration);
         }
         
-        protected override async UniTask FadeInPanel(UniTask backgroundTask)
+        protected override async UniTask FadeOutPanel(UniTask loadingTask)
         {
             _fadePanel.gameObject.SetActive(true);
+            await Transition(0f, 1f, _fadeDuration, loadingTask);
+        }
+
+        private async UniTask Transition(float from, float to, float duration, UniTask loadingTask)
+        {
             var c = _fadePanel.color;
-            c.a = 1.0f;
+            c.a = from;
             _fadePanel.color = c;
-            await backgroundTask;
-            await DOTween.To(() => 1f, x => _fadePanel.color = new Color(c.r, c.g, c.b, x), 0f, _fadeDuration);
-            _fadePanel.gameObject.SetActive(false);
+            await loadingTask;
+            await _fadePanel.DOFade(to, duration).SetEase(_ease);
         }
     }
 }
