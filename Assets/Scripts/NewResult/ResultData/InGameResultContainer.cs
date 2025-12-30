@@ -5,11 +5,11 @@ namespace September.NewResult
 {
     public static class InGameResultContainer
     {
-        public static IReadOnlyDictionary<ExhibitType,int> ExhibitInteractCounts { get; private set; }
+        public static GameResultInfo Info { get; private set; }
 
-        public static void SetExhibitInteractCounts(IReadOnlyDictionary<ExhibitType,int> exhibitInteractCounts)
+        public static void Set(GameResultInfo info)
         {
-            ExhibitInteractCounts = new Dictionary<ExhibitType, int>(exhibitInteractCounts);
+            Info = info;
         }
     }
 }

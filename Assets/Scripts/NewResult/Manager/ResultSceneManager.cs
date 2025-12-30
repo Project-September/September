@@ -1,3 +1,4 @@
+using System.Linq;
 using September.Common;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace September.NewResult
 
         private async void Start()
         {
-            var gameResultInfo = MockData.Create(_config);
+            var gameResultInfo = InGameResultContainer.Info ?? MockData.Create(_config);
             
             _resultUIInitializer.Initialize(gameResultInfo);
             
@@ -35,10 +36,26 @@ namespace September.NewResult
                 new(4, "Fourth long long long long Name", CharacterType.Tanihira),
             });
 
-            builder.AddPlayer(new PlayerResultEntry("Test_FirstPlayer", CharacterType.HulkTheButcher, config.Entries, false));
-            builder.AddPlayer(new PlayerResultEntry("Test_SecondPlayer", CharacterType.OkabeWright, config.Entries, true));
-            builder.AddPlayer(new PlayerResultEntry("Test_ThirdPlayer", CharacterType.Tanihira, config.Entries, false));
-            builder.AddPlayer(new PlayerResultEntry("Test_ForcePlayer", CharacterType.Sarutobi, config.Entries, false));
+            var playerCount = Random.Range(0, 6);
+            var ogrePlayerIndex = Random.Range(0, playerCount - 1);
+            for (var i = 0; i < playerCount; i++)
+            {
+                var exhibitInteractCounts = 
+                    config.Entries
+                        .Select(x => new { key = x.Type, value = Random.Range(0, 10)})
+                        .ToDictionary(x => x.key, x => x.value);
+
+                var score = exhibitInteractCounts.Select((x, i) => x.Value * config.Entries[i].Points).Sum();
+                
+                var player = new PlayerResultInfoBuilder();
+                player.SetPlayerName($"Test_Player{i + 1}");
+                player.SetCharacterType((CharacterType)(i % 4 + 1));
+                player.SetTotalScore(score);
+                player.SetScoreConfig(config.Entries);
+                player.SetIsOgre(i == ogrePlayerIndex);
+                player.SetExhibitInteractCounts(exhibitInteractCounts);
+                builder.AddPlayer(player.BuildInstance());
+            }
 
             var gameResultInfo = builder.BuildInstance();
             return gameResultInfo;

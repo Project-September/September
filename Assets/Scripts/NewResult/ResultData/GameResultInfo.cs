@@ -27,43 +27,49 @@ namespace September.NewResult
         public readonly int TotalScore;
         public readonly bool IsOgre;
 
-        public PlayerResultEntry(string playerName, CharacterType characterType, ResultExhibitScoreEntry[] exhibitScoreEntries, bool isOgre)
+        public PlayerResultEntry(string playerName, 
+            CharacterType characterType,
+            int totalScore,
+            ResultExhibitScoreEntry[] exhibitScoreEntries,
+            bool isOgre)
         {
             PlayerName = playerName;
             CharacterType = characterType;
             ExhibitScoreEntries = exhibitScoreEntries;
             IsOgre = isOgre;
-
-            TotalScore = 0;
-            foreach (var entry in ExhibitScoreEntries)
-            {
-                TotalScore += entry.Score;
-            }
+            TotalScore = totalScore;
         }
         
-        public PlayerResultEntry(string playerName, CharacterType characterType, IReadOnlyList<ExhibitScoreEntry> config, bool isOgre)
+        public PlayerResultEntry(string playerName, 
+            CharacterType characterType,
+            int totalScore,
+            IReadOnlyList<ExhibitScoreEntry> config,
+            IReadOnlyDictionary<ExhibitType,int> exhibitInteractCounts,
+            bool isOgre)
         {
-            var entries = new ResultExhibitScoreEntry[config.Count];
+            PlayerName = playerName;
+            CharacterType = characterType;
+            TotalScore = totalScore;
+            IsOgre = isOgre;
             
-            var totalScore = 0;
+            var result = new ResultExhibitScoreEntry[config.Count];
+            
             // インタラクトできる種類とスコアを取得
             for (var i = 0; i < config.Count; i++)
             {
                 var entry = config[i];
-                var type = entry.Type;
-                var count = InGameResultContainer.ExhibitInteractCounts?.GetValueOrDefault(type, 0) ??
-                            Random.Range(0, 10);
-                var score = count * entry.Points;
+                // 展示物の種類　例　プテラ
+                ExhibitType type = entry.Type;
+                // 登録した種類
+                int point = entry.Points;
+                // 何回インタラクトしたか
+                int count = exhibitInteractCounts.GetValueOrDefault(type, 0);
+                // スコアとインタラクト回数を乗算
+                int score = count * point;
 
-                entries[i] = new ResultExhibitScoreEntry(type, count, score);
-                totalScore += score;
+                result[i] = new ResultExhibitScoreEntry(type, count, score);
             }
-            TotalScore = totalScore;
-
-            PlayerName = playerName;
-            CharacterType = characterType;
-            ExhibitScoreEntries = entries;
-            IsOgre = isOgre;
+            ExhibitScoreEntries = result;
         }
     }
     

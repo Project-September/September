@@ -7,12 +7,19 @@ namespace September.NewResult
 {
     public class PlayerResultInfoBuilder
     {
-        private readonly List<ExhibitScoreEntry> _entries;
+        private readonly List<ExhibitScoreEntry> _entries = new();
+        private Dictionary<ExhibitType, int> _exhibitInteractCounts;
         private string _playerName;
         private CharacterType _characterType;
-        private bool _isOrge;
+        private int _totalScore;
+        private bool _isOgre;
 
-        public void SetScoreConfig(ExhibitScoreEntry[] scoreConfig)
+        public void SetExhibitInteractCounts(Dictionary<ExhibitType, int> exhibitInteractCounts)
+        {
+            _exhibitInteractCounts = exhibitInteractCounts;
+        }
+
+        public void SetScoreConfig(IReadOnlyList<ExhibitScoreEntry> scoreConfig)
         {
             _entries.AddRange(scoreConfig);
         }
@@ -27,9 +34,14 @@ namespace September.NewResult
             _characterType = characterType;
         }
 
+        public void SetTotalScore(int totalScore)
+        {
+            _totalScore = totalScore;
+        }
+
         public void SetIsOgre(bool isOgre)
         {
-            _isOrge = isOgre;
+            _isOgre = isOgre;
         }
         
         public PlayerResultEntry BuildInstance()
@@ -41,14 +53,13 @@ namespace September.NewResult
             {
                 var entry = _entries[i];
                 var type = entry.Type;
-                var count = InGameResultContainer.ExhibitInteractCounts?.GetValueOrDefault(type, 0) ??
-                            Random.Range(0, 10);
+                var count = _exhibitInteractCounts.GetValueOrDefault(type, 0);
                 var score = count * entry.Points;
 
                 entries[i] = new ResultExhibitScoreEntry(type, count, score);
             }
 
-            return new PlayerResultEntry(_playerName, _characterType, entries, _isOrge);
+            return new PlayerResultEntry(_playerName, _characterType, _totalScore, entries, _isOgre);
         }
     }
 }
