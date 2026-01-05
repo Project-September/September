@@ -26,7 +26,7 @@ namespace September.NewResult
         public static GameResultInfo Create(ExhibitScoreConfig config)
         {
             var builder = new GameResultInfoBuilder();
-            builder.SetStageName("Field");
+            builder.SetStageName("Result_Field");
             builder.SetRanking(new RankingEntry[]
             {
                 new(2, "Second Octane", CharacterType.HulkTheButcher),
