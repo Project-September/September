@@ -32,24 +32,6 @@ namespace September.NewResult
             }
             return IsTransitioning;
         }
-
-        /// <summary>
-        /// 遷移先でのロード処理が不要な場合にのみ使用してください
-        /// </summary>
-        /// <param name="sceneName"></param>
-        /// <param name="mode"></param>
-        public async UniTask LoadScene(string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
-        {
-            if (CheckTransitionDuplicated()) return;
-            var view = GetInstance();
-            DontDestroyOnLoad(view);
-            
-            await view.FadeOut();
-            await SceneManager.LoadSceneAsync(sceneName, mode);
-            await view.FadeIn();
-            
-            Destroy(view.gameObject);
-        }
         
         public async UniTask<bool> TryFadeIn()
         {
@@ -68,11 +50,7 @@ namespace September.NewResult
             Destroy(view.gameObject);
             return true;
         }
-
-        /// <summary>
-        /// 遷移先でロード処理を行う場合にのみ使用してください
-        /// </summary>
-        /// <returns></returns>
+        
         public async UniTask<bool> TryFadeOut()
         {
             if (CheckTransitionDuplicated()) return false;
