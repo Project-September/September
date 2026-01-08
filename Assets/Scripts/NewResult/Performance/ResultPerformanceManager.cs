@@ -39,8 +39,9 @@ namespace September.NewResult
             // 演出開始
             var loadSceneTask = UniTask.Create(async () =>
             {
-                await SceneManager.LoadSceneAsync(gameResultInfo.StageSceneName, LoadSceneMode.Additive);
-                SceneManager.SetActiveScene(SceneManager.GetSceneByName(gameResultInfo.StageSceneName));
+                var loadSceneName = "Result_" + gameResultInfo.StageSceneName;
+                await SceneManager.LoadSceneAsync(loadSceneName, LoadSceneMode.Additive);
+                SceneManager.SetActiveScene(SceneManager.GetSceneByName(loadSceneName));
             });
             
             await _transitionEffect.TryFadeIn(loadSceneTask);
