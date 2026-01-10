@@ -36,8 +36,8 @@ namespace September.NewResult
                 new(4, "Fourth long long long long Name", CharacterType.Tanihira),
             });
 
-            var playerCount = Random.Range(0, 6);
-            var ogrePlayerIndex = Random.Range(0, playerCount - 1);
+            var playerCount = Random.Range(1, 6);
+            var ogrePlayerIndex = Random.Range(0, playerCount);
             for (var i = 0; i < playerCount; i++)
             {
                 var exhibitInteractCounts = 
