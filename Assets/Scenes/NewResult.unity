@@ -4412,7 +4412,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1709059048}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.012675401, y: 0.00006771467, z: 0.000010542413, w: 0.99991965}
+  m_LocalRotation: {x: -0.00000019745025, y: 0.00006859939, z: 0.0000000035350949, w: 1}
   m_LocalPosition: {x: -0.9617311, y: -2.435, z: 52.37001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4841,7 +4841,6 @@ MonoBehaviour:
   _resultCharacterDataContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
   _resultPerformanceManager: {fileID: 2039946326}
   _resultUIInitializer: {fileID: 1806641913}
-  _config: {fileID: 11400000, guid: 8eb18aeb7d46cbf40b30e62329bbbba2, type: 2}
 --- !u!4 &1806641912
 Transform:
   m_ObjectHideFlags: 0
@@ -5300,6 +5299,67 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5903100781957005999, guid: d5b3f0b93d785284f9ddbba9758490f5, type: 3}
   m_PrefabInstance: {fileID: 1968089833}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1995224801
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1995224803}
+  - component: {fileID: 1995224802}
+  m_Layer: 0
+  m_Name: Debugger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1995224802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995224801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b92ddd5f41f4ae2a52e10e06d8fc584, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _exhibitScoreConfig: {fileID: 11400000, guid: 8eb18aeb7d46cbf40b30e62329bbbba2, type: 2}
+  _rankings:
+  - _rank: 2
+    _playerName: Test_Player_2
+    _characterType: 2
+  - _rank: 1
+    _playerName: Test_Player_1
+    _characterType: 1
+  - _rank: 3
+    _playerName: Test_Player_3
+    _characterType: 1
+  - _rank: 5
+    _playerName: Test_Player_5
+    _characterType: 4
+  - _rank: 4
+    _playerName: Test_Player_4
+    _characterType: 3
+--- !u!4 &1995224803
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995224801}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1122.4371, y: 674.89374, z: 3.657661}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2039946324
 GameObject:
   m_ObjectHideFlags: 0
@@ -5986,3 +6046,4 @@ SceneRoots:
   - {fileID: 604539267}
   - {fileID: 1806641912}
   - {fileID: 1173942416}
+  - {fileID: 1995224803}
