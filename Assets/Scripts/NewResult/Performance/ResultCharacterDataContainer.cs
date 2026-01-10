@@ -23,11 +23,11 @@ namespace September.NewResult
     public struct ResultPerformanceCharacterAssets
     {
         [SerializeField] private CharacterType _type;
-        [SerializeField] private GameObject _resultCharacterPrefab;
+        [SerializeField] private ResultPerformanceState _resultCharacterPrefab;
         [SerializeField] private Sprite _icon;
         
         public CharacterType Type => _type;
-        public GameObject ResultCharacterPrefab => _resultCharacterPrefab;
+        public ResultPerformanceState ResultCharacterPrefab => _resultCharacterPrefab;
         public Sprite Icon => _icon;
         
         [SerializeField] private string _testString;

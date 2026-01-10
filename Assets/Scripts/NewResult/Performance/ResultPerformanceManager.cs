@@ -1,6 +1,5 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -36,6 +35,10 @@ namespace September.NewResult
                 Debug.Log($"{entry.Rank}, {entry.PlayerName}, {entry.CharacterType}");
             }
 
+            var winner = gameResultInfo.Ranking.FirstOrDefault(r => r.Rank == 1);
+            var winnerAssets = resultCharacterDataContainer.GetAssets(winner.CharacterType);
+            var winnerPrefab = winnerAssets.ResultCharacterPrefab;
+
             // 演出開始
             var loadSceneTask = UniTask.Create(async () =>
             {
@@ -43,10 +46,18 @@ namespace September.NewResult
                 await SceneManager.LoadSceneAsync(loadSceneName, LoadSceneMode.Additive);
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(loadSceneName));
             });
-            
-            await _transitionEffect.TryFadeIn(loadSceneTask);
-            
-            await UniTask.Delay(3000);
+
+            if (winnerPrefab != null)
+            {
+                var state = Instantiate(winnerPrefab);
+                state.Play();
+                await _transitionEffect.TryFadeIn(loadSceneTask);
+                await state.WaitFinish();
+            }
+            else
+            {
+                await _transitionEffect.TryFadeIn(loadSceneTask);
+            }
             
             // 演出終了⇒UI表示
             await _resultUIAnimator.ShowResultUI();
