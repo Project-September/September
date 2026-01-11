@@ -18,8 +18,7 @@ namespace September.NewResult
             {
                 var rank = i + 1;
                 var playerName = ordered[i].PlayerName;
-                var characterType = ordered[i].CharacterType;
-                var rankingEntry = new RankingEntry(rank, playerName, characterType);
+                var rankingEntry = new RankingEntry(rank, playerName);
                 ranking[i] = rankingEntry;
             }
             

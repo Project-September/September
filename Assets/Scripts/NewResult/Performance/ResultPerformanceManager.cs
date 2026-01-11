@@ -15,11 +15,20 @@ namespace September.NewResult
         public async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
         {
             _menuActiveController.Deactivate();
+
+            // リザルト情報から演出とUI表示に必要なデータを取得
+            var result = gameResultInfo.Ranking
+                .OrderBy(x => x.Rank)
+                .Join(
+                    gameResultInfo.Players,
+                    r => r.PlayerName,
+                    p => p.PlayerName,
+                    (r, p) => (r.Rank, r.PlayerName, p.CharacterType))
+                .ToArray();
             
-            // ランキングの作成
+            // ランキング表示用モデル
             var rankingListNames = 
-                gameResultInfo.Ranking.Where(x => x.Rank >= 2)
-                    .OrderBy(x => x.Rank)
+                result.Where(x => x.Rank >= 2)
                     .Select(x => new RankingItemModel(x.Rank, x.PlayerName, x.CharacterType))
                     .ToArray();
             
@@ -27,15 +36,10 @@ namespace September.NewResult
             _rankingView.SetWinnerPlayerNameText(gameResultInfo.Ranking.FirstOrDefault(x => x.Rank == 1).PlayerName);
 
             // アセットの取得
-            var ranking = gameResultInfo.Ranking;
             Debug.Log("Get Asset Process");
             Debug.Log(gameResultInfo.StageSceneName);
-            foreach (var entry in ranking)
-            {
-                Debug.Log($"{entry.Rank}, {entry.PlayerName}, {entry.CharacterType}");
-            }
 
-            var winner = gameResultInfo.Ranking.FirstOrDefault(r => r.Rank == 1);
+            var winner = result.FirstOrDefault(r => r.Rank == 1);
             var winnerAssets = resultCharacterDataContainer.GetAssets(winner.CharacterType);
             var winnerPrefab = winnerAssets.ResultCharacterPrefab;
 

@@ -9,13 +9,11 @@ namespace September.NewResult
     {
         public readonly int Rank;
         public readonly string PlayerName;
-        public readonly CharacterType CharacterType;
 
-        public RankingEntry(int rank, string playerName, CharacterType characterType)
+        public RankingEntry(int rank, string playerName)
         {
             Rank = rank;
             PlayerName = playerName;
-            CharacterType = characterType;
         }
     }
 

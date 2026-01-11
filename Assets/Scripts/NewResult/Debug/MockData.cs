@@ -6,7 +6,7 @@ namespace September.NewResult
 {
     public class MockData
     {
-        private readonly RankingEntry[] _data;
+        private readonly RankingEntryData[] _data;
 
         [System.Serializable]
         public struct RankingEntryData
@@ -17,13 +17,13 @@ namespace September.NewResult
 
             public RankingEntry Convert()
             {
-                return new RankingEntry(_rank, _playerName, _characterType);
+                return new RankingEntry(_rank, _playerName);
             }
         }
         
         public MockData(RankingEntryData[] data)
         {
-            _data = data.Select(x => x.Convert()).OrderBy(x => x.Rank).ToArray();
+            _data = data.OrderBy(x => x._rank).ToArray();
         }
 
         public GameResultInfo Create(ExhibitScoreConfig config)
@@ -58,8 +58,8 @@ namespace September.NewResult
             {
                 var data = ranking[i];
                 var player = new PlayerResultInfoBuilder();
-                player.SetPlayerName(_data[i].PlayerName);
-                player.SetCharacterType(_data[i].CharacterType);
+                player.SetPlayerName(_data[i]._playerName);
+                player.SetCharacterType(_data[i]._characterType);
                 player.SetTotalScore(data.score);
                 player.SetScoreConfig(config.Entries);
                 player.SetIsOgre(data.isOgre);
