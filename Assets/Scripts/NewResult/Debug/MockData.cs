@@ -23,9 +23,9 @@ namespace September.NewResult
         
         public MockData(RankingEntryData[] data)
         {
-            _data = data.Select(x => x.Convert()).ToArray();
+            _data = data.Select(x => x.Convert()).OrderBy(x => x.Rank).ToArray();
         }
-        
+
         public GameResultInfo Create(ExhibitScoreConfig config)
         {
             var builder = new GameResultInfoBuilder();
@@ -33,25 +33,39 @@ namespace September.NewResult
             builder.SetRanking(_data);
 
             var playerCount = _data.Length;
-            var ogrePlayerIndex = Random.Range(0, playerCount);
+            var ogrePlayerIndex = playerCount - 1;
             var localPlayerIndex = Random.Range(0, playerCount);
-            for (var i = 0; i < playerCount; i++)
-            {
-                var exhibitInteractCounts = 
-                    config.Entries
-                        .Select(x => new { key = x.Type, value = Random.Range(0, 10)})
-                        .ToDictionary(x => x.key, x => x.value);
 
-                var score = exhibitInteractCounts.Select((x, i) => x.Value * config.Entries[i].Points).Sum();
-                
+            var db = Enumerable.Range(0, playerCount).Select((_, i) =>
+                {
+                    var exhibitInteractCounts =
+                        config.Entries
+                            .Select(x => new { key = x.Type, value = Random.Range(0, 10) })
+                            .ToDictionary(x => x.key, x => x.value);
+
+                    var score = exhibitInteractCounts.Select((x, i) => x.Value * config.Entries[i].Points).Sum();
+                    return (
+                        score,
+                        exhibitInteractCounts,
+                        isOgre: ogrePlayerIndex == i,
+                        isSelf: localPlayerIndex == i
+                        );
+                }
+            );
+            var ordered = db.OrderByDescending(x => x.score).ToArray();
+            var ranking = ordered.Where(x => !x.isOgre).Concat(ordered.Where(x => x.isOgre)).ToArray();
+            
+            for (var i = 0; i < ranking.Length; i++)
+            {
+                var data = ranking[i];
                 var player = new PlayerResultInfoBuilder();
                 player.SetPlayerName(_data[i].PlayerName);
-                player.SetCharacterType((CharacterType)(i % 4 + 1));
-                player.SetTotalScore(score);
+                player.SetCharacterType(_data[i].CharacterType);
+                player.SetTotalScore(data.score);
                 player.SetScoreConfig(config.Entries);
-                player.SetIsOgre(i == ogrePlayerIndex);
-                player.SetIsSelf(i == localPlayerIndex);
-                player.SetExhibitInteractCounts(exhibitInteractCounts);
+                player.SetIsOgre(data.isOgre);
+                player.SetIsSelf(data.isSelf);
+                player.SetExhibitInteractCounts(data.exhibitInteractCounts);
                 builder.AddPlayer(player.BuildInstance());
             }
 
