@@ -70,15 +70,12 @@ namespace September.InGame
                 
             for (var i = 0; i < ranking.Length; i++)
             {
-                var rank = i + 1;
                 var playerName = ranking[i].name;
                 var characterType = ranking[i].type;
                 var score = ranking[i].score;
                 var isOgre = ranking[i].isOgre;
                 var isSelf = ranking[i].isSelf;
                     
-                builder.AddRankingEntry(new RankingEntry(rank, playerName, characterType));
-                
                 var player = new PlayerResultInfoBuilder();
                 player.SetPlayerName(playerName);
                 player.SetCharacterType(characterType);

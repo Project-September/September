@@ -30,7 +30,6 @@ namespace September.NewResult
         {
             var builder = new GameResultInfoBuilder();
             builder.SetStageName("Field");
-            builder.SetRanking(_data);
 
             var playerCount = _data.Length;
             var ogrePlayerIndex = playerCount - 1;
