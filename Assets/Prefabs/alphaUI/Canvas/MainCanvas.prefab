@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &294724611427822424
 RectTransform:
   m_ObjectHideFlags: 0
@@ -74,7 +74,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 16777215
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -183,7 +183,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _finishAnimation: {fileID: 1368587738737192783}
   _sceneTransitionEffect: {fileID: 11400000, guid: f9b1c4a2c4de81148b236a1d78204cfe, type: 2}
-  _gameResultInfoContainer: {fileID: 11400000, guid: a79af01a770f1fa418ecc3efdeb7cc35, type: 2}
 --- !u!114 &1368587738737192783
 MonoBehaviour:
   m_ObjectHideFlags: 0
