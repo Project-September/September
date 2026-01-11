@@ -6,6 +6,7 @@ using DG.Tweening;
 using Fusion;
 using NaughtyAttributes;
 using September.Common;
+using September.NewResult;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -55,6 +56,8 @@ namespace Result
         private Dictionary<CharacterType, Sprite> _iconMap;
         private ResultDataInbox _resultDataInbox;
         private bool _isFinish;
+        
+        [SerializeField] private SceneTransitionEffect _sceneTransitionEffect;
 
         private void Awake()
         {
@@ -66,11 +69,10 @@ namespace Result
             if (!_isActive || _isAnimating) 
                 return;
 
-            // リザルト画面に以降する
+            // リザルト画面に移行する
             if (_isFinish && _gameInput.Result.Finish.triggered)
             {
-                SceneManager.UnloadSceneAsync("Field");
-                SceneManager.LoadSceneAsync("Result", LoadSceneMode.Single);
+                TransitionToResultScene().Forget(Debug.LogException);
             }
 
             if (_gameInput.UI.PageSlide.triggered)
@@ -90,6 +92,15 @@ namespace Result
                 PopAsync().Forget();
         }
 
+        private async UniTask<bool> TransitionToResultScene()
+        {
+            var success = await _sceneTransitionEffect.TryFadeOut();
+            if (success)
+            {
+                SceneManager.LoadSceneAsync("NewResult");
+            }
+            return false;
+        }
         public void Initialize()
         {
             _gameInput = GameInput.I;
