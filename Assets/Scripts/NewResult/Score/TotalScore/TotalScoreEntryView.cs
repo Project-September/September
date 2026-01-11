@@ -9,6 +9,7 @@ namespace September.NewResult
         [SerializeField] private Image _characterIcon;
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private TextMeshProUGUI _scoreText;
+        [SerializeField] private Image _isSelfBar;
         
         public void Setup(TotalScoreViewEntry entry)
         {
@@ -19,6 +20,8 @@ namespace September.NewResult
             var textColor = entry.IsOgre ? Color.red : Color.white;
             _playerNameText.color = textColor;
             _scoreText.color = textColor;
+            
+            _isSelfBar.gameObject.SetActive(entry.IsSelf);
         }
     }
 }

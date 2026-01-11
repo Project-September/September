@@ -34,6 +34,7 @@ namespace September.NewResult
 
             var playerCount = _data.Length;
             var ogrePlayerIndex = Random.Range(0, playerCount);
+            var localPlayerIndex = Random.Range(0, playerCount);
             for (var i = 0; i < playerCount; i++)
             {
                 var exhibitInteractCounts = 
@@ -49,6 +50,7 @@ namespace September.NewResult
                 player.SetTotalScore(score);
                 player.SetScoreConfig(config.Entries);
                 player.SetIsOgre(i == ogrePlayerIndex);
+                player.SetIsSelf(i == localPlayerIndex);
                 player.SetExhibitInteractCounts(exhibitInteractCounts);
                 builder.AddPlayer(player.BuildInstance());
             }

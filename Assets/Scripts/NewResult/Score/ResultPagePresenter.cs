@@ -30,9 +30,10 @@ namespace September.NewResult
                 var sprite = _resultCharacterDataContainer.GetAssets(player.CharacterType).Icon;
                 var name = player.PlayerName;
                 var isOgre = player.IsOgre;
+                var isSelf = player.IsSelf;
                 
                 var score = player.TotalScore;
-                totalScoreViewEntries[i] = new TotalScoreViewEntry(sprite, name, score, isOgre);
+                totalScoreViewEntries[i] = new TotalScoreViewEntry(sprite, name, score, isOgre, isSelf);
             }
             _totalScoreView?.Setup(totalScoreViewEntries);
         }

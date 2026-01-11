@@ -45,6 +45,12 @@ namespace September.InGame
             if (!db)
                 return false;
 
+            if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out SessionPlayerData localPlayerData))
+            {
+                Debug.LogError("No local player data found");
+                return false;
+            }
+            
             var data = db.PlayerDataDic
                 .Select(kv =>
                 {
@@ -54,6 +60,7 @@ namespace September.InGame
                         score = d.Score,
                         isOgre = (bool)d.IsOgre,
                         type = d.CharacterType,
+                        isSelf = d.DisplayNickName == localPlayerData.DisplayNickName,
                     };
                 }).ToArray();
 
@@ -68,6 +75,7 @@ namespace September.InGame
                 var characterType = ranking[i].type;
                 var score = ranking[i].score;
                 var isOgre = ranking[i].isOgre;
+                var isSelf = ranking[i].isSelf;
                     
                 builder.AddRankingEntry(new RankingEntry(rank, playerName, characterType));
                 
@@ -76,6 +84,7 @@ namespace September.InGame
                 player.SetCharacterType(characterType);
                 player.SetTotalScore(score);
                 player.SetIsOgre(isOgre);
+                player.SetIsSelf(isSelf);
                 
                 builder.AddPlayer(player.BuildInstance());
             }

@@ -13,13 +13,15 @@ namespace September.NewResult
         public readonly string PlayerName;
         public readonly int Score;
         public readonly bool IsOgre;
+        public readonly bool IsSelf;
 
-        public TotalScoreViewEntry(Sprite icon, string playerName, int score, bool isOgre)
+        public TotalScoreViewEntry(Sprite icon, string playerName, int score, bool isOgre, bool isSelf)
         {
             Icon = icon;
             PlayerName = playerName;
             Score = score;
             IsOgre = isOgre;
+            IsSelf = isSelf;
         }
     }
 }

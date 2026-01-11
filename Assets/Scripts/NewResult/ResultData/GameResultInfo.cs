@@ -26,50 +26,21 @@ namespace September.NewResult
         public readonly ResultExhibitScoreEntry[] ExhibitScoreEntries;
         public readonly int TotalScore;
         public readonly bool IsOgre;
+        public readonly bool IsSelf;
 
         public PlayerResultEntry(string playerName, 
             CharacterType characterType,
             int totalScore,
             ResultExhibitScoreEntry[] exhibitScoreEntries,
-            bool isOgre)
+            bool isOgre,
+            bool isSelf)
         {
             PlayerName = playerName;
             CharacterType = characterType;
             ExhibitScoreEntries = exhibitScoreEntries;
             IsOgre = isOgre;
             TotalScore = totalScore;
-        }
-        
-        public PlayerResultEntry(string playerName, 
-            CharacterType characterType,
-            int totalScore,
-            IReadOnlyList<ExhibitScoreEntry> config,
-            IReadOnlyDictionary<ExhibitType,int> exhibitInteractCounts,
-            bool isOgre)
-        {
-            PlayerName = playerName;
-            CharacterType = characterType;
-            TotalScore = totalScore;
-            IsOgre = isOgre;
-            
-            var result = new ResultExhibitScoreEntry[config.Count];
-            
-            // インタラクトできる種類とスコアを取得
-            for (var i = 0; i < config.Count; i++)
-            {
-                var entry = config[i];
-                // 展示物の種類　例　プテラ
-                ExhibitType type = entry.Type;
-                // 登録した種類
-                int point = entry.Points;
-                // 何回インタラクトしたか
-                int count = exhibitInteractCounts.GetValueOrDefault(type, 0);
-                // スコアとインタラクト回数を乗算
-                int score = count * point;
-
-                result[i] = new ResultExhibitScoreEntry(type, count, score);
-            }
-            ExhibitScoreEntries = result;
+            IsSelf = isSelf;
         }
     }
     

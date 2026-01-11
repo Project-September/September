@@ -13,6 +13,7 @@ namespace September.NewResult
         private CharacterType _characterType;
         private int _totalScore;
         private bool _isOgre;
+        private bool _isSelf;
 
         public void SetExhibitInteractCounts(Dictionary<ExhibitType, int> exhibitInteractCounts)
         {
@@ -43,6 +44,11 @@ namespace September.NewResult
         {
             _isOgre = isOgre;
         }
+
+        public void SetIsSelf(bool isSelf)
+        {
+            _isSelf = isSelf;
+        }
         
         public PlayerResultEntry BuildInstance()
         {
@@ -59,7 +65,7 @@ namespace September.NewResult
                 entries[i] = new ResultExhibitScoreEntry(type, count, score);
             }
 
-            return new PlayerResultEntry(_playerName, _characterType, _totalScore, entries, _isOgre);
+            return new PlayerResultEntry(_playerName, _characterType, _totalScore, entries, _isOgre, _isSelf);
         }
     }
 }
