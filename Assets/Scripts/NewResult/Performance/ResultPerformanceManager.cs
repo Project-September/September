@@ -44,9 +44,9 @@ namespace September.NewResult
             var winnerPrefab = winnerAssets.ResultCharacterPrefab;
 
             // 演出開始
-            var loadSceneTask = UniTask.Create(async () =>
+            var loadSceneTask = UniTask.Create(gameResultInfo.StageSceneName, async stageSceneName =>
             {
-                var loadSceneName = "Result_" + gameResultInfo.StageSceneName;
+                var loadSceneName = "Result_" + stageSceneName;
                 await SceneManager.LoadSceneAsync(loadSceneName, LoadSceneMode.Additive);
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(loadSceneName));
             });
