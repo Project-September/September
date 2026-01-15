@@ -54,8 +54,9 @@ namespace September.NewResult
             if (winnerPrefab != null)
             {
                 var state = Instantiate(winnerPrefab);
+                _transitionEffect.TryFadeIn(loadSceneTask).Forget();
+                await _transitionEffect.WaitStateIs(TransitionState.Opening);
                 state.Play();
-                await _transitionEffect.TryFadeIn(loadSceneTask);
                 await state.WaitFinish();
             }
             else

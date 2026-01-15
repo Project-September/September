@@ -12,6 +12,8 @@ namespace September.NewResult
         private static SceneTransitionView _currentView;
         private static bool IsTransitioning => _currentView != null && _currentView.IsTransitioning;
         
+        public TransitionState State => _currentView.State;
+        
         private SceneTransitionView GetInstance()
         {
             if (_currentView == null)
@@ -65,6 +67,12 @@ namespace September.NewResult
             var view = GetInstance();
             await view.FadeOut(loadingTask);
             return true;
+        }
+
+        public async UniTask WaitStateIs(TransitionState transitionState)
+        {
+            await UniTask.WaitUntil(transitionState,
+                state => _currentView.State == state || !_currentView);
         }
     }
 }
