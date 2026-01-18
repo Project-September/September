@@ -5,28 +5,21 @@ namespace September.NewResult
 {
     public static class ExtensionMethods
     {
-        private readonly struct AnimatorStateInfo
-        {
-            public readonly Animator Animator;
-            public readonly string StateName;
-
-            public AnimatorStateInfo(Animator animator, string stateName)
-            {
-                Animator = animator;
-                StateName = stateName;
-            }
-        }
-        
         public static async UniTask PlayAsync(this Animator animator, string animationName)
         {
             animator.Play(animationName);
+            await UniTask.DelayFrame(1);
+            await WaitUntilEndState(animator, animationName);
+        }
+
+        public static async UniTask WaitUntilEndState(this Animator animator, string stateName)
+        {
             await UniTask.WaitUntil(
-                new AnimatorStateInfo(animator, animationName), 
+                (animator, stateName), 
                 static state =>
                 {
-                    var info = state.Animator.GetCurrentAnimatorStateInfo(0);
-                    return info.IsName(state.StateName) && info.normalizedTime >= 1f ||
-                           !info.IsName(state.StateName) && info.normalizedTime is < 1f and > 0f;
+                    var info = state.animator.GetCurrentAnimatorStateInfo(0);
+                    return !info.IsName(state.stateName) || info.normalizedTime >= 1f;
                 });
         }
 

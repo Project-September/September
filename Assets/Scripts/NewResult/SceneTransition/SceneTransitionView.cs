@@ -21,14 +21,7 @@ namespace September.NewResult
         public async UniTask FadeIn()
         {
             IsTransitioning = true;
-            await FadeInPanel(UniTask.CompletedTask);
-            IsTransitioning = false;
-        }
-
-        public async UniTask FadeIn(UniTask loadingTask)
-        {
-            IsTransitioning = true;
-            await FadeInPanel(loadingTask);
+            await FadeInPanel();
             IsTransitioning = false;
         }
 
@@ -36,18 +29,12 @@ namespace September.NewResult
         public async UniTask FadeOut()
         {
             IsTransitioning = true;
-            await FadeOutPanel(UniTask.CompletedTask);
+            await FadeOutPanel();
             IsTransitioning = false;
         }
         
-        public async UniTask FadeOut(UniTask loadingTask)
-        {
-            IsTransitioning = true;
-            await FadeOutPanel(loadingTask);
-            IsTransitioning = false;
-        }
-
-        protected abstract UniTask FadeInPanel(UniTask loadingTask);
-        protected abstract UniTask FadeOutPanel(UniTask loadingTask);
+        protected abstract UniTask FadeInPanel();
+        protected abstract UniTask FadeOutPanel();
+        public abstract void SetCovered();
     }
 }

@@ -16,23 +16,44 @@ namespace September.NewResult
 
         public override TransitionState State { get; protected internal set; }
         
-        protected override async UniTask FadeInPanel(UniTask loadingTask)
+        protected override async UniTask FadeInPanel()
         {
-            _animator.Play(_holdStateName);
-            await loadingTask;
-            await _animator.PlayAsync(_openingCoveredStateName);
+            await PlayAsync(_openingCoveredStateName);
             State = TransitionState.Opening;
-            await _animator.WaitState(_completedStateName);
+            await PlayAsync(_openingStateName);
+            if (!string.IsNullOrEmpty(_completedStateName)) _animator.Play(_completedStateName);
             State = TransitionState.Opened;
         }
 
-        protected override async UniTask FadeOutPanel(UniTask loadingTask)
+        protected override async UniTask FadeOutPanel()
         {
             State = TransitionState.Closing;
-            await _animator.PlayAsync(_closingStateName);
+            await PlayAsync(_closingStateName);
             State = TransitionState.Covered;
-            await _animator.WaitState(_holdStateName);
-            await loadingTask;
+            await PlayAsync(_closingCoveredStateName);
+            if (!string.IsNullOrEmpty(_holdStateName)) _animator.Play(_holdStateName);
+        }
+
+        public override void SetCovered()
+        {
+            _animator.Play(_holdStateName);
+            State = TransitionState.Covered;
+        }
+
+        private async UniTask PlayAsync(string stateName)
+        {
+            if (!string.IsNullOrEmpty(stateName))
+            {
+                await _animator.PlayAsync(stateName);
+            }
+        }
+
+        private async UniTask WaitState(string stateName)
+        {
+            if (!string.IsNullOrEmpty(stateName))
+            {
+                await _animator.WaitState(stateName);
+            }
         }
     }
 }

@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 
 namespace September.NewResult
 {
+    /// <summary>
+    /// シーン遷移演出を管理するクラス
+    /// </summary>
     [CreateAssetMenu(fileName = "SceneTransitionEffect", menuName = "ScriptableObjects/SceneTransitionEffect")]
     public class SceneTransitionEffect : ScriptableObject
     {
@@ -35,7 +38,10 @@ namespace September.NewResult
             return IsTransitioning;
         }
         
-        public async UniTask<bool> TryFadeIn()
+        /// <summary>
+        /// 遷移演出を終了する。既に実行中ならキャンセルする
+        /// </summary>
+        public async UniTask<bool> TryTransitionIn()
         {
             if (CheckTransitionDuplicated()) return false;
             var view = GetInstance();
@@ -44,16 +50,10 @@ namespace September.NewResult
             return true;
         }
         
-        public async UniTask<bool> TryFadeIn(UniTask loadingTask)
-        {
-            if (CheckTransitionDuplicated()) return false;
-            var view = GetInstance();
-            await view.FadeIn(loadingTask);
-            Destroy(view.gameObject);
-            return true;
-        }
-        
-        public async UniTask<bool> TryFadeOut()
+        /// <summary>
+        /// 遷移を開始する。既に実行中ならキャンセルする
+        /// </summary>
+        public async UniTask<bool> TryTransitionOut()
         {
             if (CheckTransitionDuplicated()) return false;
             var view = GetInstance();
@@ -61,17 +61,21 @@ namespace September.NewResult
             return true;
         }
         
-        public async UniTask<bool> TryFadeOut(UniTask loadingTask)
+        /// <summary>
+        /// 強制的に静止状態に移行する
+        /// </summary>
+        public void SetHoldState()
         {
-            if (CheckTransitionDuplicated()) return false;
             var view = GetInstance();
-            await view.FadeOut(loadingTask);
-            return true;
+            view.SetCovered();
         }
 
-        public async UniTask WaitStateIs(TransitionState transitionState)
+        /// <summary>
+        /// 引数に指定したステートまで待機
+        /// </summary>
+        public async UniTask WaitUntilState(TransitionState targetState)
         {
-            await UniTask.WaitUntil(transitionState,
+            await UniTask.WaitUntil(targetState,
                 state => _currentView.State == state || !_currentView);
         }
     }

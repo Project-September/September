@@ -28,7 +28,7 @@ namespace September.InGame
 
         private static async UniTask<bool> TransitionToResultScene(SceneTransitionEffect effect)
         {
-            var success = await effect.TryFadeOut();
+            var success = await effect.TryTransitionOut();
             if (success)
             {
                 SceneManager.LoadSceneAsync("NewResult");

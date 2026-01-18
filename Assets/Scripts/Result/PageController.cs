@@ -94,7 +94,7 @@ namespace Result
 
         private async UniTask<bool> TransitionToResultScene()
         {
-            var success = await _sceneTransitionEffect.TryFadeOut();
+            var success = await _sceneTransitionEffect.TryTransitionOut();
             if (success)
             {
                 SceneManager.LoadSceneAsync("NewResult");

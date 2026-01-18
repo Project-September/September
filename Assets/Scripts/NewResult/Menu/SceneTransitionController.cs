@@ -33,13 +33,13 @@ namespace September.NewResult
 
         private async UniTask Title()
         {
-            await _transitionEffect.TryFadeOut();
+            await _transitionEffect.TryTransitionOut();
             if (NetworkManager.Instance)
             {
                 await NetworkManager.Instance.InitializeRunner();
             }
             await SceneManager.LoadSceneAsync(_titleSceneName);
-            await _transitionEffect.TryFadeIn();
+            await _transitionEffect.TryTransitionIn();
         }
     }
 }

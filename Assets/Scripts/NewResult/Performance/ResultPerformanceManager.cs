@@ -51,17 +51,20 @@ namespace September.NewResult
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(loadSceneName));
             });
 
+            _transitionEffect.SetHoldState();
+            await loadSceneTask;
+            
             if (winnerPrefab != null)
             {
                 var state = Instantiate(winnerPrefab);
-                _transitionEffect.TryFadeIn(loadSceneTask).Forget();
-                await _transitionEffect.WaitStateIs(TransitionState.Opening);
+                _transitionEffect.TryTransitionIn().Forget();
+                await _transitionEffect.WaitUntilState(TransitionState.Opening);
                 state.Play();
                 await state.WaitFinish();
             }
             else
             {
-                await _transitionEffect.TryFadeIn(loadSceneTask);
+                await _transitionEffect.TryTransitionIn();
             }
             
             // 演出終了⇒UI表示
