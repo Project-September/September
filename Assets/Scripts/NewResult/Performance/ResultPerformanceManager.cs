@@ -11,6 +11,12 @@ namespace September.NewResult
         [SerializeField] private RankingView _rankingView;
         [SerializeField] private MenuActiveController _menuActiveController;
         [SerializeField] private SceneTransitionEffect _transitionEffect;
+
+        [SerializeField] private float _uiAnimationStartTime = 4.4f;
+        
+        [Header("決めポーズ中の停止/スローモーション設定")]
+        [SerializeField] private float _stopTimeScale = 0.1f;
+        [SerializeField] private float _stopTimeDuration = 1.0f;
         
         public async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
         {
@@ -43,7 +49,7 @@ namespace September.NewResult
             var winnerAssets = resultCharacterDataContainer.GetAssets(winner.CharacterType);
             var winnerPrefab = winnerAssets.ResultCharacterPrefab;
 
-            // 演出開始
+            // リザルト用のステージをロード
             var loadSceneTask = UniTask.Create(gameResultInfo.StageSceneName, async stageSceneName =>
             {
                 var loadSceneName = "Result_" + stageSceneName;
@@ -54,26 +60,39 @@ namespace September.NewResult
             _transitionEffect.SetHoldState();
             await loadSceneTask;
             
+            // 演出開始
             if (winnerPrefab != null)
             {
                 var state = Instantiate(winnerPrefab);
                 _transitionEffect.TryTransitionIn().Forget();
                 await _transitionEffect.WaitUntilState(TransitionState.Opening);
                 state.Play();
+                ShowResultUIAsync().Forget();
                 await state.WaitFinish();
+                Time.timeScale = _stopTimeScale;
+                await UniTask.Delay((int)(_stopTimeDuration * _stopTimeScale * 1000), DelayType.DeltaTime);
+                Time.timeScale = 1f;
             }
             else
             {
                 await _transitionEffect.TryTransitionIn();
+                _resultUIAnimator.ShowWinner().Forget();
             }
             
-            // 演出終了⇒UI表示
-            await _resultUIAnimator.ShowResultUI();
+            // UI表示
+            await _resultUIAnimator.ShowRankingItems();
+            await _resultUIAnimator.ShowMenu();
             Debug.Log("Result Performance End");
             
-            // メニューを選択可能に
+            // 演出終了⇒メニューを選択可能に
             _menuActiveController.Activate();
             _menuActiveController.SetEventSystemSelected();
+        }
+
+        private async UniTask ShowResultUIAsync()
+        {
+            await UniTask.Delay((int)(_uiAnimationStartTime * 1000));
+            await _resultUIAnimator.ShowWinner();
         }
     }
 }
