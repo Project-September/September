@@ -102,6 +102,32 @@ namespace September.Common
 
             return tracker.CalcTotal(d) + AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
         }
+
+        public void Server_AddDamageDealt(PlayerRef actor, int damage)
+        {
+            if (!TryGetPlayerSessionData(actor, out var data)) return;
+            data.DamageDealt += damage;
+            PlayerDataDic.Set(actor, data);
+        }
+
+        public void Server_AddDamageReceived(PlayerRef actor, int damage)
+        {
+            if (!TryGetPlayerSessionData(actor, out var data)) return;
+            data.DamageReceived += damage;
+            PlayerDataDic.Set(actor, data);
+        }
+
+        public void Server_AddOgreCount(PlayerRef actor)
+        {
+            if (!TryGetPlayerSessionData(actor, out var data)) return;
+            data.OgreCount += 1;
+            PlayerDataDic.Set(actor, data);
+        }
+
+        private bool TryGetPlayerSessionData(PlayerRef actor, out SessionPlayerData data)
+        {
+            return PlayerDataDic.TryGet(actor, out data) && Object.HasStateAuthority;
+        }
         
         private void UpdatePlayerScore(PlayerRef actor, ScoreTracker tracker)
         {
@@ -112,6 +138,7 @@ namespace September.Common
             int bonus = AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
                 
             d.Score = baseScore + bonus;
+            d.TotalInteractCount = tracker.GetTotalInteractCount();
             PlayerDataDic.Set(actor, d);
         }
         

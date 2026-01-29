@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
+using September.Common;
 using UnityEngine;
 
 namespace InGame.Player
@@ -51,6 +52,9 @@ namespace InGame.Player
                 OnHitTaken?.Invoke(hitData);
                 if (!IsAlive) OnDeath?.Invoke(hitData);
                 hitData.Executor?.HitExecution(hitData);
+                
+                PlayerDatabase.Instance.Server_AddDamageDealt(hitData.ExecutorRef, hitData.Amount);
+                PlayerDatabase.Instance.Server_AddDamageReceived(hitData.TargetRef, hitData.Amount);
             }
             
             //RPC_HitDebug(hitData.HitActionType);

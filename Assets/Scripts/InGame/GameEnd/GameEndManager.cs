@@ -61,6 +61,10 @@ namespace September.InGame
                         isOgre = (bool)d.IsOgre,
                         type = d.CharacterType,
                         isSelf = d.DisplayNickName == localPlayerData.DisplayNickName,
+                        damageDealt = d.DamageDealt,
+                        damageReceived = d.DamageReceived,
+                        ogreCount = d.OgreCount,
+                        totalInteractCount = d.TotalInteractCount,
                     };
                 }).ToArray();
 
@@ -70,18 +74,15 @@ namespace September.InGame
                 
             for (var i = 0; i < ranking.Length; i++)
             {
-                var playerName = ranking[i].name;
-                var characterType = ranking[i].type;
-                var score = ranking[i].score;
-                var isOgre = ranking[i].isOgre;
-                var isSelf = ranking[i].isSelf;
-                    
                 var player = new PlayerResultInfoBuilder();
-                player.SetPlayerName(playerName);
-                player.SetCharacterType(characterType);
-                player.SetTotalScore(score);
-                player.SetIsOgre(isOgre);
-                player.SetIsSelf(isSelf);
+                player.SetPlayerName(ranking[i].name);
+                player.SetCharacterType(ranking[i].type);
+                player.SetTotalScore(ranking[i].score);
+                player.SetIsOgre(ranking[i].isOgre);
+                player.SetIsSelf(ranking[i].isSelf);
+                player.SetDamage(ranking[i].damageDealt, ranking[i].damageReceived);
+                player.SetOgreCount(ranking[i].ogreCount);
+                player.SetTotalInteractCount(ranking[i].totalInteractCount);
                 
                 builder.AddPlayer(player.BuildInstance());
             }

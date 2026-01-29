@@ -26,6 +26,11 @@ namespace September.Common
         public NetworkBool IsOgre;
         public int Score;
         [Networked, Capacity(3)] public NetworkDictionary<PlayerRef, int> StunData => default;
+        
+        public int DamageReceived;
+        public int DamageDealt;
+        public int OgreCount;
+        public int TotalInteractCount;
 
         public  SessionPlayerData(NetworkString<_16> nickName, int nickNameOrder)
         {
@@ -34,6 +39,11 @@ namespace September.Common
             CharacterType = CharacterType.OkabeWright;
             IsOgre = false;
             Score = 0;
+            
+            DamageDealt = 0;
+            DamageReceived = 0;
+            OgreCount = 0;
+            TotalInteractCount = 0;
         }
     }
 }
