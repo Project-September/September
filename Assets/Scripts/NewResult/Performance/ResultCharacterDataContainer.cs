@@ -25,10 +25,12 @@ namespace September.NewResult
         [SerializeField] private CharacterType _type;
         [SerializeField] private ResultPerformanceState _resultCharacterPrefab;
         [SerializeField] private Sprite _icon;
+        [SerializeField] private Sprite _resultDetailViewIcon;
         
         public CharacterType Type => _type;
         public ResultPerformanceState ResultCharacterPrefab => _resultCharacterPrefab;
         public Sprite Icon => _icon;
+        public Sprite ResultDetailViewIcon => _resultDetailViewIcon;
         
         [SerializeField] private string _testString;
         public string TestString => _testString;
