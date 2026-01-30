@@ -30,8 +30,8 @@ namespace NewResult.UI
             _playerDamageReceived.text = model.PlayerDamageReceived.ToString();
             _playerOgreCount.text = model.PlayerOgreCount.ToString();
             _playerExhibitsInteractCount.text = model.PlayerExhibitsInteractCount.ToString();
-            _ogreIcon.enabled = model.IsOgre;
-            _winDisplayIcon.enabled = model.IsWinner;
+            _ogreIcon.gameObject.SetActive(model.IsOgre);
+            _winDisplayIcon.gameObject.SetActive(model.IsWinner);
         }
     }
 }
