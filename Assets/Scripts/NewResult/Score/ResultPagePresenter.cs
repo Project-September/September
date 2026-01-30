@@ -48,6 +48,7 @@ namespace September.NewResult
                     PlayerDamageReceived = player.DamageReceived,
                     PlayerExhibitsInteractCount = player.ExhibitInteractCount,
                     PlayerOgreCount = player.OgreCount,
+                    IsOgre = isOgre,
                 };
             }
             _totalScoreView?.Setup(totalScoreViewEntries);
