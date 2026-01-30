@@ -309,7 +309,7 @@ MonoBehaviour:
   _rankingItemPrefab: {fileID: 3679387045715231859, guid: 79822fa001b0dcd4ab1e956e5ac160c1, type: 3}
   _winnerPlayerNameText: {fileID: 974409956}
   _rankIconContainer: {fileID: 11400000, guid: c3d9be1a73fa28443a11d51794d01a4d, type: 2}
-  _resultCharacterDataContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
+  _resultCharacterAssetsContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
 --- !u!114 &604539271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,7 +707,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be9aaaf6c4544c88a11eb61ffd4232da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _resultCharacterDataContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
+  _resultCharacterAssetsContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
   _resultPerformanceManager: {fileID: 2039946326}
   _resultUIInitializer: {fileID: 1806641913}
 --- !u!4 &1806641912
@@ -740,7 +740,7 @@ MonoBehaviour:
   _exhibitScoreView: {fileID: 604539271}
   _totalScoreView: {fileID: 604539272}
   _resultDetailsView: {fileID: 1336185332}
-  _resultCharacterDataContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
+  _resultCharacterAssetsContainer: {fileID: 11400000, guid: 6e308357f076c724aabbe9267902915c, type: 2}
   _pageController:
     _page: {fileID: 1336185329}
     _selectWhenShowPage: {fileID: 1978561814}

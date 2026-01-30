@@ -8,7 +8,7 @@ namespace September.NewResult
         [SerializeField] private ExhibitScoreView _exhibitScoreView;
         [SerializeField] private TotalScoreView _totalScoreView;
         [SerializeField] private ResultDetailsView _resultDetailsView;
-        [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
+        [SerializeField] private ResultCharacterAssetsContainer _resultCharacterAssetsContainer;
         [SerializeField] private PageController _pageController;
         
         private ResultPagePresenter _resultPagePresenter;
@@ -19,7 +19,7 @@ namespace September.NewResult
                 _exhibitScoreView,
                 _totalScoreView,
                 _resultDetailsView,
-                _resultCharacterDataContainer);
+                _resultCharacterAssetsContainer);
             _resultPagePresenter.Update(gameResultInfo);
             
             _pageController.Init();

@@ -18,7 +18,7 @@ namespace September.NewResult
         [SerializeField] private float _stopTimeScale = 0.1f;
         [SerializeField] private float _stopTimeDuration = 1.0f;
         
-        public async UniTask StartResultPerformance(ResultCharacterDataContainer resultCharacterDataContainer, GameResultInfo gameResultInfo)
+        public async UniTask StartResultPerformance(ResultCharacterAssetsContainer resultCharacterAssetsContainer, GameResultInfo gameResultInfo)
         {
             _menuActiveController.Deactivate();
 
@@ -46,7 +46,7 @@ namespace September.NewResult
             Debug.Log(gameResultInfo.StageSceneName);
 
             var winner = result.FirstOrDefault(r => r.Rank == 1);
-            var winnerAssets = resultCharacterDataContainer.GetAssets(winner.CharacterType);
+            var winnerAssets = resultCharacterAssetsContainer.GetAssets(winner.CharacterType);
             var winnerPrefab = winnerAssets.ResultCharacterPrefab;
 
             // リザルト用のステージをロード

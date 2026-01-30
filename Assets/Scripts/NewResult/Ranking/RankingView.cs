@@ -10,7 +10,7 @@ namespace September.NewResult
         [SerializeField] private RankingItemView _rankingItemPrefab;
         [SerializeField] private TextMeshProUGUI _winnerPlayerNameText;
         [SerializeField] private RankIconContainer _rankIconContainer;
-        [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
+        [SerializeField] private ResultCharacterAssetsContainer _resultCharacterAssetsContainer;
         
         public void CreateRankingList(RankingItemModel[] players)
         {
@@ -23,7 +23,7 @@ namespace September.NewResult
             {
                 var player = players[i];
                 var rankIcon = _rankIconContainer.GetRankIcon(player.Rank);
-                var characterIcon = _resultCharacterDataContainer.GetAssets(player.Type).Icon;
+                var characterIcon = _resultCharacterAssetsContainer.GetAssets(player.Type).Icon;
                 
                 var item = Instantiate(_rankingItemPrefab, _rankingRoot);
                 item.Init(rankIcon, characterIcon, player.PlayerName);

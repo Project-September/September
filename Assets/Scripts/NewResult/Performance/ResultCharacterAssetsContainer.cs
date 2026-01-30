@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace September.NewResult
 {
-    [CreateAssetMenu(fileName = "ResultCharacterDataContainer", menuName = "ScriptableObjects/ResultCharacterDataContainer", order = 0)]
-    public class ResultCharacterDataContainer : ScriptableObject
+    [CreateAssetMenu(fileName = "ResultCharacterAssetsContainer", menuName = "ScriptableObjects/ResultCharacterAssetsContainer", order = 0)]
+    public class ResultCharacterAssetsContainer : ScriptableObject
     {
         private const int DataCount = 4;
         
@@ -31,8 +31,5 @@ namespace September.NewResult
         public ResultPerformanceState ResultCharacterPrefab => _resultCharacterPrefab;
         public Sprite Icon => _icon;
         public Sprite ResultDetailViewIcon => _resultDetailViewIcon;
-        
-        [SerializeField] private string _testString;
-        public string TestString => _testString;
     }
 }

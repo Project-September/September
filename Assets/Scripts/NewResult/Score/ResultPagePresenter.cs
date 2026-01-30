@@ -8,18 +8,18 @@ namespace September.NewResult
         private readonly IExhibitScoreView _exhibitScoreView;
         private readonly ITotalScoreView _totalScoreView;
         private readonly IResultDetailsView _resultDetailsView;
-        private readonly ResultCharacterDataContainer _resultCharacterDataContainer;
+        private readonly ResultCharacterAssetsContainer _resultCharacterAssetsContainer;
 
         public ResultPagePresenter(
             IExhibitScoreView exhibitScoreView, 
             ITotalScoreView totalScoreView,
             IResultDetailsView resultDetailsView,
-            ResultCharacterDataContainer resultCharacterDataContainer)
+            ResultCharacterAssetsContainer resultCharacterAssetsContainer)
         {
             _exhibitScoreView = exhibitScoreView;
             _totalScoreView = totalScoreView;
             _resultDetailsView = resultDetailsView;
-            _resultCharacterDataContainer = resultCharacterDataContainer;
+            _resultCharacterAssetsContainer = resultCharacterAssetsContainer;
         }
         
         public void Update(GameResultInfo gameResultInfo)
@@ -33,7 +33,7 @@ namespace September.NewResult
             for (int i = 0; i < gameResultInfo.Players.Count; i++)
             {
                 var player = gameResultInfo.Players[i];
-                var assets = _resultCharacterDataContainer.GetAssets(player.CharacterType);
+                var assets = _resultCharacterAssetsContainer.GetAssets(player.CharacterType);
                 var sprite = assets.Icon;
                 var detailSprite = assets.ResultDetailViewIcon;
                 var name = player.PlayerName;
