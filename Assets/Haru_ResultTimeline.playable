@@ -9,12 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52e0d0cb91cf4eb6bee422d511654a13, type: 3}
-  m_Name: September_UI_GameTimerData
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: Haru_ResultTimeline
   m_EditorClassIdentifier: 
-  PreStartTime: 10
-  Duration: 1
-  AfterReadyDelay: 1
-  GameTime: 0
-  TimeRemaining: 30
-  EndGameDelay: 0
+  m_Version: 0
+  m_Tracks: []
+  m_FixedDuration: 0
+  m_EditorSettings:
+    m_Framerate: 60
+    m_ScenePreview: 1
+  m_DurationMode: 0
+  m_MarkerTrack: {fileID: 0}
