@@ -1,3 +1,4 @@
+using System.Linq;
 using NewResult.UI;
 
 namespace September.NewResult
@@ -25,6 +26,8 @@ namespace September.NewResult
         {
             _exhibitScoreView?.Setup(gameResultInfo.Players[0].ExhibitScoreEntries);
 
+            var winner = gameResultInfo.Ranking.FirstOrDefault(x => x.Rank == 1);
+            
             var totalScoreViewEntries = new TotalScoreViewEntry[gameResultInfo.Players.Count];
             var playerDetailsModels = new PlayerDetailsModel[gameResultInfo.Players.Count];
             for (int i = 0; i < gameResultInfo.Players.Count; i++)
@@ -36,6 +39,7 @@ namespace September.NewResult
                 var name = player.PlayerName;
                 var isOgre = player.IsOgre;
                 var isSelf = player.IsSelf;
+                var isWinner = player.PlayerName == winner.PlayerName;
                 
                 var score = player.TotalScore;
                 totalScoreViewEntries[i] = new TotalScoreViewEntry(sprite, name, score, isOgre, isSelf);
@@ -49,6 +53,7 @@ namespace September.NewResult
                     PlayerExhibitsInteractCount = player.ExhibitInteractCount,
                     PlayerOgreCount = player.OgreCount,
                     IsOgre = isOgre,
+                    IsWinner = isWinner,
                 };
             }
             _totalScoreView?.Setup(totalScoreViewEntries);

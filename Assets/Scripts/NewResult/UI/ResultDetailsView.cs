@@ -38,5 +38,6 @@ namespace NewResult.UI
         public int PlayerOgreCount;
         public int PlayerExhibitsInteractCount;
         public bool IsOgre;
+        public bool IsWinner;
     }
 }

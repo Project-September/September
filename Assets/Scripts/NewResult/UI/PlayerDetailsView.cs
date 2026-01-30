@@ -13,6 +13,7 @@ namespace NewResult.UI
     {
         [SerializeField] private Image _characterIcon;
         [SerializeField] private Image _ogreIcon;
+        [SerializeField] private Image _winDisplayIcon;
         [SerializeField] private TextMeshProUGUI _playerName;
         [SerializeField] private TextMeshProUGUI _playerScore;
         [SerializeField] private TextMeshProUGUI _playerDamageDealt;
@@ -30,6 +31,7 @@ namespace NewResult.UI
             _playerOgreCount.text = model.PlayerOgreCount.ToString();
             _playerExhibitsInteractCount.text = model.PlayerExhibitsInteractCount.ToString();
             _ogreIcon.enabled = model.IsOgre;
+            _winDisplayIcon.enabled = model.IsWinner;
         }
     }
 }
