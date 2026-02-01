@@ -49,5 +49,13 @@ namespace September.NewResult
                     
             graph.Play();
         }
+        
+        public static string ToFieldName(this string value)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+            value = value.TrimStart('_');
+            value = char.ToUpper(value[0]) + value[1..];
+            return value;
+        }
     }
 }
