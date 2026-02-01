@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 
 namespace September.NewResult
 {
@@ -35,6 +37,17 @@ namespace September.NewResult
         public static bool IsPlaying(this Animator animator, string stateName)
         {
             return !string.IsNullOrEmpty(stateName) && animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
+        }
+        
+        public static void PlayInstant(this Animator animator, AnimationClip clip)
+        {
+            var graph = PlayableGraph.Create("IdlePlayableGraph");
+            var output = AnimationPlayableOutput.Create(graph, "Animation", animator);
+                    
+            var clipPlayable = AnimationClipPlayable.Create(graph, clip);
+            output.SetSourcePlayable(clipPlayable);
+                    
+            graph.Play();
         }
     }
 }
