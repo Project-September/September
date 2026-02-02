@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace September.NewResult
 {
     public class ResultSceneManager : MonoBehaviour
     {
-        [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
+        [SerializeField] private ResultCharacterAssetsContainer _resultCharacterAssetsContainer;
         [SerializeField] private ResultPerformanceManager _resultPerformanceManager;
         [SerializeField] private ResultUIInitializer _resultUIInitializer;
 
@@ -14,7 +15,7 @@ namespace September.NewResult
             
             _resultUIInitializer.Initialize(gameResultInfo);
             
-            await _resultPerformanceManager.StartResultPerformance(_resultCharacterDataContainer, gameResultInfo);
+            await _resultPerformanceManager.StartResultPerformance(_resultCharacterAssetsContainer, gameResultInfo);
         }
     }
 }

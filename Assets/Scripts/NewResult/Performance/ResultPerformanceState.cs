@@ -9,7 +9,7 @@ namespace September.NewResult
     {
         [SerializeField] private PlayableDirector _playableDirector;
         [SerializeField] private Animator _characterIdleAnimator;
-        [SerializeField] private string _idleStateName = "Idle";
+        [SerializeField] private AnimationClip _idleAnimationClip;
 
         private bool _isFinished = false;
 
@@ -24,12 +24,29 @@ namespace September.NewResult
         public async UniTask WaitFinish()
         {
             UniTask.WaitUntil(_playableDirector, p => p.state != PlayState.Playing)
-                .ContinueWith(() => _characterIdleAnimator.Play(_idleStateName)).Forget();
+                .ContinueWith(() =>
+                {
+                    if (!_idleAnimationClip || !_characterIdleAnimator) return;
+                    _characterIdleAnimator.PlayInstant(_idleAnimationClip);
+                }).Forget();
             
             await UniTask.WhenAny(
                 UniTask.WaitUntil(this, o => o._isFinished),
                 UniTask.WaitUntil(_playableDirector, p => p.state != PlayState.Playing)
             );
+        }
+
+        private void Start()
+        {
+            if (_characterIdleAnimator == null)
+            {
+                Debug.LogWarning($"[{nameof(ResultPerformanceState)}] {nameof(_characterIdleAnimator).ToFieldName()}にアニメーターが設定されていません。呼吸モーションのループは実行されません", this);
+            }
+            
+            if (_idleAnimationClip == null)
+            {
+                Debug.LogWarning($"[{nameof(ResultPerformanceState)}] {nameof(_idleAnimationClip).ToFieldName()}にアニメーションクリップが設定されていません。呼吸モーションのループは実行されません", this);
+            }
         }
     }
 }
