@@ -65,6 +65,9 @@ namespace September.NewResult
                 player.SetIsOgre(data.isOgre);
                 player.SetIsSelf(data.isSelf);
                 player.SetExhibitInteractCounts(data.exhibitInteractCounts);
+                player.SetDamage(Random.Range(0, 1000), Random.Range(0, 1000));
+                player.SetTotalInteractCount(data.exhibitInteractCounts.Values.Sum());
+                player.SetOgreCount(Random.Range(0, 10));
                 builder.AddPlayer(player.BuildInstance());
             }
 

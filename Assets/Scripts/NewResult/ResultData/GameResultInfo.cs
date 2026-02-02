@@ -25,13 +25,22 @@ namespace September.NewResult
         public readonly int TotalScore;
         public readonly bool IsOgre;
         public readonly bool IsSelf;
+        
+        public readonly int DamageDealt;
+        public readonly int DamageReceived;
+        public readonly int ExhibitInteractCount;
+        public readonly int OgreCount;
 
         public PlayerResultEntry(string playerName, 
             CharacterType characterType,
             int totalScore,
             ResultExhibitScoreEntry[] exhibitScoreEntries,
             bool isOgre,
-            bool isSelf)
+            bool isSelf, 
+            int damageDealt, 
+            int damageReceived, 
+            int exhibitInteractCount, 
+            int ogreCount)
         {
             PlayerName = playerName;
             CharacterType = characterType;
@@ -39,6 +48,10 @@ namespace September.NewResult
             IsOgre = isOgre;
             TotalScore = totalScore;
             IsSelf = isSelf;
+            DamageDealt = damageDealt;
+            DamageReceived = damageReceived;
+            ExhibitInteractCount = exhibitInteractCount;
+            OgreCount = ogreCount;
         }
     }
     

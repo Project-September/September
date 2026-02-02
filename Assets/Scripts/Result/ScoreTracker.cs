@@ -49,6 +49,11 @@ namespace Result
         {
             return _count.GetValueOrDefault(type, 0);
         }
+
+        public int GetTotalInteractCount()
+        {
+            return _count.Values.Sum();
+        }
         
         public void AddDestroyed(ExhibitType t)
         {

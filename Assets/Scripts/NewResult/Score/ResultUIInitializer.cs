@@ -1,5 +1,5 @@
+using NewResult.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace September.NewResult
 {
@@ -7,6 +7,7 @@ namespace September.NewResult
     {
         [SerializeField] private ExhibitScoreView _exhibitScoreView;
         [SerializeField] private TotalScoreView _totalScoreView;
+        [SerializeField] private ResultDetailsView _resultDetailsView;
         [SerializeField] private ResultCharacterDataContainer _resultCharacterDataContainer;
         [SerializeField] private PageController _pageController;
         
@@ -17,6 +18,7 @@ namespace September.NewResult
             _resultPagePresenter = new ResultPagePresenter(
                 _exhibitScoreView,
                 _totalScoreView,
+                _resultDetailsView,
                 _resultCharacterDataContainer);
             _resultPagePresenter.Update(gameResultInfo);
             

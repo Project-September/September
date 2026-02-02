@@ -1,3 +1,5 @@
+using NaughtyAttributes;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace September.NewResult
@@ -13,6 +15,12 @@ namespace September.NewResult
             {
                 InGameResultContainer.Set(new MockData(_rankings).Create(_exhibitScoreConfig));
             }
+        }
+
+        [Button("Log Result")]
+        private void Log()
+        {
+            Debug.Log(JsonConvert.SerializeObject(InGameResultContainer.Info, Formatting.Indented));
         }
     }
 }
