@@ -1,5 +1,6 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,11 +13,7 @@ namespace September.NewResult
         [SerializeField] private MenuActiveController _menuActiveController;
         [SerializeField] private SceneTransitionEffect _transitionEffect;
 
-        [SerializeField] private float _uiAnimationStartTime = 4.4f;
-        
-        [Header("決めポーズ中の停止/スローモーション設定")]
-        [SerializeField] private float _stopTimeScale = 0.1f;
-        [SerializeField] private float _stopTimeDuration = 1.0f;
+        [SerializeField, Expandable] private ResultPerformanceSettings _resultPerformanceSettings;
         
         public async UniTask StartResultPerformance(ResultCharacterAssetsContainer resultCharacterAssetsContainer, GameResultInfo gameResultInfo)
         {
@@ -69,9 +66,7 @@ namespace September.NewResult
                 state.Play();
                 ShowResultUIAsync().Forget();
                 await state.WaitFinish();
-                Time.timeScale = _stopTimeScale;
-                await UniTask.Delay((int)(_stopTimeDuration * _stopTimeScale * 1000), DelayType.DeltaTime);
-                Time.timeScale = 1f;
+                await _resultPerformanceSettings.PlaySlowMotion();
             }
             else
             {
@@ -91,7 +86,7 @@ namespace September.NewResult
 
         private async UniTask ShowResultUIAsync()
         {
-            await UniTask.Delay((int)(_uiAnimationStartTime * 1000));
+            await UniTask.WaitForSeconds(_resultPerformanceSettings.UIAnimationStartTime);
             await _resultUIAnimator.ShowWinner();
         }
     }
