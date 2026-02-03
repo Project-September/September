@@ -40,7 +40,6 @@ namespace September.NewResult
 
             // アセットの取得
             Debug.Log("Get Asset Process");
-            Debug.Log(gameResultInfo.StageSceneName);
 
             var winner = result.FirstOrDefault(r => r.Rank == 1);
             var winnerAssets = resultCharacterAssetsContainer.GetAssets(winner.CharacterType);
