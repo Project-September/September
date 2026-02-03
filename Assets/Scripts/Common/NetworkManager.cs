@@ -77,7 +77,7 @@ namespace September.Common
                 await InitializeRunner();
             }
         }
-        async UniTask InitializeRunner()
+        public async UniTask InitializeRunner()
         {
             await _networkRunner.Shutdown();
             _networkRunner = Instantiate(_runnerPrefab);
