@@ -61,7 +61,7 @@ namespace Editor.AssetAutomation
             var stateMachine = controller.layers[0].stateMachine;
 
             // 直下のサブフォルダ取得
-            string[] subFolders = AssetDatabase.GetSubFolders(spriteRoot);
+            string[] subFolders = AssetDatabase.GetSubFolders(spriteRoot).OrderBy(x => x).ToArray();
             var createdClips = new List<AnimationClip>
             {
                 new(){name = "Before Start"}
