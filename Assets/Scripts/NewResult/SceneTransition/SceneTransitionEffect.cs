@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.Search;
 
 namespace September.NewResult
 {
@@ -10,7 +10,7 @@ namespace September.NewResult
     [CreateAssetMenu(fileName = "SceneTransitionEffect", menuName = "ScriptableObjects/SceneTransitionEffect")]
     public class SceneTransitionEffect : ScriptableObject
     {
-        [SerializeField] private SceneTransitionView _transitionView;
+        [SerializeField, SearchContext("p: t:SceneTransitionView")] private SceneTransitionView _transitionView;
 
         private static SceneTransitionView _currentView;
         private static bool IsTransitioning => _currentView != null && _currentView.IsTransitioning;
