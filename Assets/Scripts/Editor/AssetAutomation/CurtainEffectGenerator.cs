@@ -21,8 +21,8 @@ namespace Editor.AssetAutomation
 
             var prefix = Path.GetFileName(spriteRoot);
         
-            var controllerPath = spriteRoot + "/" + prefix + ".controller";
-            var prefabPath = spriteRoot + "/" + prefix + ".prefab";
+            var controllerPath = $"{spriteRoot}/{prefix}.controller";
+            var prefabPath = $"{spriteRoot}/{prefix}.prefab";
         
             const string templatePath = "Assets/DriveData/Templates/Curtain/Clip.anim";
             const string templatePrefabPath = "Assets/DriveData/Templates/Curtain/Curtain.prefab";
@@ -70,7 +70,7 @@ namespace Editor.AssetAutomation
             for (var i = 0; i < subFolders.Length; i++)
             {
                 var folder = subFolders[i];
-                string clipName = prefix + "_" + clipNames[i];
+                string clipName = $"{prefix}_{clipNames[i]}";
                 Sprite[] sprites = LoadSprites(folder);
 
                 if (sprites.Length == 0)
@@ -101,21 +101,19 @@ namespace Editor.AssetAutomation
             // ステート配置
             createdClips.Add(new(){name = "End"});
         
-            int index = 0;
-            foreach (var clip in createdClips)
+            for (var i = 0; i < createdClips.Count; i++)
             {
-                Vector3 pos; 
-                if (index == 0) pos =  new Vector3(30, 175, 0);
-                else if (index != createdClips.Count - 1) pos = new Vector3(300, 50 * index, 0);
+                var clip = createdClips[i];
+                Vector3 pos;
+                if (i == 0) pos = new Vector3(30, 175, 0);
+                else if (i != createdClips.Count - 1) pos = new Vector3(300, 50 * i, 0);
                 else pos = new Vector3(30, 225, 0);
-            
+
                 var state = stateMachine.AddState(
                     clip.name,
                     pos
                 );
                 state.motion = clip;
-
-                index++;
             }
 
             CurtainPrefabGenerator.CreatePrefabFromTemplate(templatePrefabPath, prefabPath, controller, createdClips.Select(x => x.name).ToList());
@@ -150,7 +148,7 @@ namespace Editor.AssetAutomation
             return "Assets" + fullPath.Substring(Application.dataPath.Length);
         }
 
-        static Sprite[] LoadSprites(string folder)
+        private static Sprite[] LoadSprites(string folder)
         {
             var guids = AssetDatabase.FindAssets("t:Sprite", new[] { folder });
 
@@ -162,7 +160,7 @@ namespace Editor.AssetAutomation
                 .ToArray();
         }
 
-        static void ApplySpriteKeys(AnimationClip clip, Sprite[] sprites)
+        private static void ApplySpriteKeys(AnimationClip clip, Sprite[] sprites)
         {
             var binding = new EditorCurveBinding
             {
