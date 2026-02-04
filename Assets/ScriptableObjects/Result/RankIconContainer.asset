@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 212871c30abf4221aa68047eba343137, type: 3}
+  m_Name: RankIconContainer
+  m_EditorClassIdentifier: 
+  _rankIcons:
+  - Rank: 1
+    Icon: {fileID: 21300000, guid: 27080e8480f51e24a89d1de72a6d6d6e, type: 3}
+  - Rank: 2
+    Icon: {fileID: 21300000, guid: 3ef46b46609c4fb47a65dc9fa7c69c21, type: 3}
+  - Rank: 3
+    Icon: {fileID: 21300000, guid: 3865ebb47c852aa4c8eadd564605d886, type: 3}
+  - Rank: 4
+    Icon: {fileID: 21300000, guid: 3fd332f95535deb4b9d28633adb8e5d3, type: 3}
+  - Rank: 5
+    Icon: {fileID: 0}
+  - Rank: 6
+    Icon: {fileID: 0}

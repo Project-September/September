@@ -1,0 +1,63 @@
+using System.Linq;
+using NewResult.UI;
+
+namespace September.NewResult
+{
+    public class ResultPagePresenter
+    {
+        private readonly IExhibitScoreView _exhibitScoreView;
+        private readonly ITotalScoreView _totalScoreView;
+        private readonly IResultDetailsView _resultDetailsView;
+        private readonly ResultCharacterAssetsContainer _resultCharacterAssetsContainer;
+
+        public ResultPagePresenter(
+            IExhibitScoreView exhibitScoreView, 
+            ITotalScoreView totalScoreView,
+            IResultDetailsView resultDetailsView,
+            ResultCharacterAssetsContainer resultCharacterAssetsContainer)
+        {
+            _exhibitScoreView = exhibitScoreView;
+            _totalScoreView = totalScoreView;
+            _resultDetailsView = resultDetailsView;
+            _resultCharacterAssetsContainer = resultCharacterAssetsContainer;
+        }
+        
+        public void Update(GameResultInfo gameResultInfo)
+        {
+            _exhibitScoreView?.Setup(gameResultInfo.Players[0].ExhibitScoreEntries);
+
+            var winner = gameResultInfo.Ranking.FirstOrDefault(x => x.Rank == 1);
+            
+            var totalScoreViewEntries = new TotalScoreViewEntry[gameResultInfo.Players.Count];
+            var playerDetailsModels = new PlayerDetailsModel[gameResultInfo.Players.Count];
+            for (int i = 0; i < gameResultInfo.Players.Count; i++)
+            {
+                var player = gameResultInfo.Players[i];
+                var assets = _resultCharacterAssetsContainer.GetAssets(player.CharacterType);
+                var sprite = assets.Icon;
+                var detailSprite = assets.ResultDetailViewIcon;
+                var name = player.PlayerName;
+                var isOgre = player.IsOgre;
+                var isSelf = player.IsSelf;
+                var isWinner = player.PlayerName == winner.PlayerName;
+                
+                var score = player.TotalScore;
+                totalScoreViewEntries[i] = new TotalScoreViewEntry(sprite, name, score, isOgre, isSelf);
+                playerDetailsModels[i] = new PlayerDetailsModel()
+                {
+                    CharacterSprite = detailSprite, 
+                    PlayerName = name, 
+                    PlayerScore = score,
+                    PlayerDamageDealt = player.DamageDealt, 
+                    PlayerDamageReceived = player.DamageReceived,
+                    PlayerExhibitsInteractCount = player.ExhibitInteractCount,
+                    PlayerOgreCount = player.OgreCount,
+                    IsOgre = isOgre,
+                    IsWinner = isWinner,
+                };
+            }
+            _totalScoreView?.Setup(totalScoreViewEntries);
+            _resultDetailsView?.Setup(playerDetailsModels);
+        }
+    }
+}

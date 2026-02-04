@@ -225,6 +225,7 @@ namespace September.Common
             data.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
             _firstOgrePlayer = ogreKey;
+            PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
         }
         /// <summary>
         /// 各Playerの気絶時に呼ばれるメソッド
@@ -245,6 +246,7 @@ namespace September.Common
                 PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
                 RPC_ShowStatusUpUI(data.TargetRef, true);
                 RPC_SetOgreUI(data.ExecutorRef,data.TargetRef);
+                PlayerDatabase.Instance.Server_AddOgreCount(data.TargetRef);
             }
             if(data.ExecutorRef == data.TargetRef) 
                 return;

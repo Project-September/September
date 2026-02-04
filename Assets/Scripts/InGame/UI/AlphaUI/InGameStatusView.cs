@@ -19,7 +19,7 @@ namespace September.InGame.UI
     {
         [Header("UI Root Prefab")] 
         [SerializeField, Label("InGameUIRoot")] private InGameUIRootRefs _inGameUiRootPrefab;
-        [SerializeField] private ResultUIRootRefs _resultUIRootPrefab;
+        // [SerializeField] private ResultUIRootRefs _resultUIRootPrefab;
 
         [Header("Canvas")] 
         [SerializeField, Label("MainCanvas")] private Canvas _mainCanvas;
@@ -72,7 +72,7 @@ namespace September.InGame.UI
             //  Bind前に_uiRootが生成されないのでChangeTagNoticeを直接Subscribeできない
             ui.ChangeTagNoticeObserver.Subscribe(index=>_changeTagOverlayMessage.ChangeTagNotice(index)).AddTo(_cts.Token);
             ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
-            ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
+            // ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
             ui.IsInteracting
                 .Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2))
                 .AddTo(_cts.Token);
@@ -147,12 +147,12 @@ namespace September.InGame.UI
                 .OnComplete(() => _scoreText.transform.DOScale(1f, 0.2f));
         }
 
-        private async UniTask PlayResultAnimation()
-        {
-            ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
-            ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
-            await resultAnim.Play(resultUI);
-        }
+        // private async UniTask PlayResultAnimation()
+        // {
+        //     ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
+        //     ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
+        //     await resultAnim.Play(resultUI);
+        // }
 
         private void ChangeExhibitDescriptionUI(int value)
         {
