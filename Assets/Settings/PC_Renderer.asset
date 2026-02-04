@@ -27,8 +27,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 7833122117494664109}
   - {fileID: 8955535515390061746}
-  - {fileID: 347441566708889152}
-  m_RendererFeatureMap: ad6b866f10d7b46cb22c38501a74487c4076e39b435cd204
+  - {fileID: 672589107370144232}
+  m_RendererFeatureMap: ad6b866f10d7b46cb22c38501a74487ce83198c83a845509
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -54,7 +54,7 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
---- !u!114 &347441566708889152
+--- !u!114 &672589107370144232
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63,39 +63,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Exclude Post Process Layer
+  m_Script: {fileID: 11500000, guid: bbd6e526a1bb489a8df34cbfcfca6bfc, type: 3}
+  m_Name: OutlineRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  settings:
-    passTag: Exclude Post Process Layer
-    Event: 600
-    filterSettings:
-      RenderQueueType: 1
-      LayerMask:
-        serializedVersion: 2
-        m_Bits: 512
-      PassNames: []
-    overrideMaterial: {fileID: 0}
-    overrideMaterialPassIndex: 0
-    overrideShader: {fileID: 0}
-    overrideShaderPassIndex: 0
-    overrideMode: 1
-    overrideDepthState: 0
-    depthCompareFunction: 8
-    enableWrite: 0
-    stencilSettings:
-      overrideStencilState: 0
-      stencilReference: 0
-      stencilCompareFunction: 8
-      passOperation: 0
-      failOperation: 0
-      zFailOperation: 0
-    cameraSettings:
-      overrideCamera: 0
-      restoreCamera: 1
-      offset: {x: 0, y: 0, z: 0, w: 0}
-      cameraFieldOfView: 60
+  FeatureSettings:
+    RenderPassEvent: 500
+    LayerMask:
+      serializedVersion: 2
+      m_Bits: 2112
+    RenderingLayerMask:
+      serializedVersion: 0
+      m_Bits: 1
+    OverrideMaterial: {fileID: -876546973899608171, guid: 4f3bc6b888d3080448e0c3bb6fc9deb0, type: 3}
+    BlitMaterial: {fileID: -876546973899608171, guid: 6c897a44b62e6d84e9b0f6d5238a158e, type: 3}
+    ClearDepth: 0
+  MaterialSettings:
+    OutlineScale: 1.63
+    RobertsCrossMultiplier: 100
+    DepthThreshold: 10
+    NormalThreshold: 10
+    SteepAngleThreshold: 2.4
+    SteepAngleMultiplier: 25
+    OutlineColor: {r: 0.13084802, g: 0.24532546, b: 0.376, a: 1}
 --- !u!114 &7833122117494664109
 MonoBehaviour:
   m_ObjectHideFlags: 0
