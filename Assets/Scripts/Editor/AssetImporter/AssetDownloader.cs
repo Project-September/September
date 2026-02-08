@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using System.Threading;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
+using System.Threading.Tasks;
 using UnityEngine.Networking;
 using sepLog = September.Editor.Logger;
 
@@ -19,7 +18,7 @@ namespace September.Editor.AssetImporter
             _enableLogger = enableLogger;
         }
 
-        public async UniTask<string> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken)
+        public async Task<string> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken)
         {
             var url = $"{AssetImportConstants.ApiUrl}/{route}?id={assetId}";
 
@@ -51,10 +50,9 @@ namespace September.Editor.AssetImporter
                             Detail = $"ダウンロード進捗: {progress * 100:F1}%"
                         });
 
-                        await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await Task.Yield();
                     }
-
-                    await operation.ToUniTask(cancellationToken: cancellationToken);
 
                     if (request.result != UnityWebRequest.Result.Success)
                     {

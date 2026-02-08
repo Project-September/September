@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEditor;
 using sepLog = September.Editor.Logger;
 
@@ -36,7 +35,7 @@ namespace September.Editor.AssetImporter
                 extractReporter.OnProgressChanged += ReportProgress;
         }
 
-        public async UniTask<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
+        public async Task<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
         {
             try
             {
@@ -49,7 +48,7 @@ namespace September.Editor.AssetImporter
             }
         }
 
-        public async UniTask<string> DownloadAndExtractAssetAsync(string route, int assetId, CancellationToken cancellationToken)
+        public async Task<string> DownloadAndExtractAssetAsync(string route, int assetId, CancellationToken cancellationToken)
         {
             try
             {
