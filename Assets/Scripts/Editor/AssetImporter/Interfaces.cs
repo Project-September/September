@@ -36,7 +36,7 @@ namespace September.Editor.AssetImporter
     public interface IAssetImportService
     {
         Task<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken);
-        Task<string> DownloadAndExtractAssetAsync(string route, int assetId, CancellationToken cancellationToken);
+        Task<string> DownloadAndExtractAssetAsync(string route, List<Asset> assets, CancellationToken cancellationToken);
         void ImportUnityPackages(string extractPath, bool showImportDialog = false);
         event Action<ProgressInfo> OnProgressChanged;
     }

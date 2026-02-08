@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEditor;
@@ -48,21 +49,50 @@ namespace September.Editor.AssetImporter
             }
         }
 
-        public async Task<string> DownloadAndExtractAssetAsync(string route, int assetId, CancellationToken cancellationToken)
+        public async Task<string> DownloadAndExtractAssetAsync(string route, List<Asset> assets, CancellationToken cancellationToken)
         {
             try
             {
-                // ダウンロード（DownloadHandlerFile により直接ディスクへ保存）
-                var tempPath = await _assetDownloader.DownloadAssetAsync(route, assetId, cancellationToken);
+                // アセット名順にソートして正しいパート順序を保証
+                var sortedAssets = assets.OrderBy(a => a.Name).ToList();
+
+                // 全パーツをダウンロード
+                var tempPaths = new List<string>();
+                foreach (var asset in sortedAssets)
+                {
+                    var path = await _assetDownloader.DownloadAssetAsync(route, asset.ID, cancellationToken);
+                    tempPaths.Add(path);
+                }
+
+                // 複数パーツの場合は結合
+                string zipPath;
+                if (tempPaths.Count > 1)
+                {
+                    ReportProgress(new ProgressInfo
+                    {
+                        Status = AssetImportConstants.ProgressMessages.FileSaving,
+                        Progress = 0.5f,
+                        Detail = $"{tempPaths.Count}個のパーツを結合しています..."
+                    });
+                    zipPath = CombinePartFiles(tempPaths);
+                    foreach (var path in tempPaths)
+                    {
+                        CleanupTemporaryFile(path);
+                    }
+                }
+                else
+                {
+                    zipPath = tempPaths[0];
+                }
 
                 // 解凍
-                var extractPath = GetExtractionPath(tempPath);
+                var extractPath = GetExtractionPath(zipPath);
                 sepLog.Logger.LogInfo($"解凍先パス: {extractPath}", _enableLogger);
 
-                var result = await _fileExtractor.ExtractZipFileAsync(tempPath, extractPath, cancellationToken);
+                var result = await _fileExtractor.ExtractZipFileAsync(zipPath, extractPath, cancellationToken);
 
                 // 一時ファイルの削除
-                CleanupTemporaryFile(tempPath);
+                CleanupTemporaryFile(zipPath);
 
                 ReportProgress(new ProgressInfo
                 {
@@ -83,6 +113,30 @@ namespace September.Editor.AssetImporter
                 });
                 throw;
             }
+        }
+
+        private string CombinePartFiles(List<string> partPaths)
+        {
+            var combinedPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                $"Combined_{DateTime.Now:yyyyMMdd_HHmmss}{AssetImportConstants.FileExtensions.Zip}");
+
+            sepLog.Logger.LogInfo($"ファイル結合開始: {partPaths.Count}パーツ -> {combinedPath}", _enableLogger);
+
+            using (var outStream = File.Create(combinedPath))
+            {
+                foreach (var partPath in partPaths)
+                {
+                    using (var inStream = File.OpenRead(partPath))
+                    {
+                        inStream.CopyTo(outStream);
+                    }
+                    sepLog.Logger.LogInfo($"パーツ結合完了: {partPath}", _enableLogger);
+                }
+            }
+
+            sepLog.Logger.LogInfo($"ファイル結合完了: {combinedPath} ({new FileInfo(combinedPath).Length} bytes)", _enableLogger);
+            return combinedPath;
         }
 
         public void ImportUnityPackages(string extractPath, bool showImportDialog = false)
