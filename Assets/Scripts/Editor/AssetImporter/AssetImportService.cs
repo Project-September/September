@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEditor;
 using sepLog = September.Editor.Logger;
 
@@ -36,7 +35,7 @@ namespace September.Editor.AssetImporter
                 extractReporter.OnProgressChanged += ReportProgress;
         }
 
-        public async UniTask<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
+        public async Task<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
         {
             try
             {
@@ -49,27 +48,17 @@ namespace September.Editor.AssetImporter
             }
         }
 
-        public async UniTask<string> DownloadAndExtractAssetAsync(string route, int assetId, CancellationToken cancellationToken)
+        public async Task<string> DownloadAndExtractAssetAsync(string route, int assetId, CancellationToken cancellationToken)
         {
             try
             {
-                // ダウンロード
-                var fileData = await _assetDownloader.DownloadAssetAsync(route, assetId, cancellationToken);
-
-                ReportProgress(new ProgressInfo
-                {
-                    Status = AssetImportConstants.ProgressMessages.FileSaving,
-                    Progress = 1f,
-                    Detail = AssetImportConstants.ProgressMessages.FileSaveDetail
-                });
-
-                // 一時ファイルの保存
-                var tempPath = await SaveTemporaryFile(fileData, assetId, cancellationToken);
+                // ダウンロード（DownloadHandlerFile により直接ディスクへ保存）
+                var tempPath = await _assetDownloader.DownloadAssetAsync(route, assetId, cancellationToken);
 
                 // 解凍
                 var extractPath = GetExtractionPath(tempPath);
                 sepLog.Logger.LogInfo($"解凍先パス: {extractPath}", _enableLogger);
-                
+
                 var result = await _fileExtractor.ExtractZipFileAsync(tempPath, extractPath, cancellationToken);
 
                 // 一時ファイルの削除
@@ -127,38 +116,6 @@ namespace September.Editor.AssetImporter
                 sepLog.Logger.LogError(error);
                 throw new AssetImportException(error, e);
             }
-        }
-
-        private async UniTask<string> SaveTemporaryFile(byte[] fileData, int assetId, CancellationToken cancellationToken)
-        {
-            if (fileData == null || fileData.Length == 0)
-            {
-                throw new AssetImportException("ダウンロードしたファイルデータが空です");
-            }
-
-            // 一意なファイル名を生成
-            var fileName = $"Asset_{assetId}_{DateTime.Now:yyyyMMdd_HHmmss}{AssetImportConstants.FileExtensions.Zip}";
-            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
-
-            sepLog.Logger.LogInfo($"一時ファイル保存開始: {tempPath} ({fileData.Length} bytes)", _enableLogger);
-
-            await File.WriteAllBytesAsync(tempPath, fileData, cancellationToken);
-            
-            // ファイルが正常に作成されたか確認
-            if (!File.Exists(tempPath))
-            {
-                throw new AssetImportException($"一時ファイルの作成に失敗しました: {tempPath}");
-            }
-
-            var actualSize = new FileInfo(tempPath).Length;
-            if (actualSize != fileData.Length)
-            {
-                throw new AssetImportException($"ファイルサイズの不一致: 期待値={fileData.Length}, 実際={actualSize}");
-            }
-
-            sepLog.Logger.LogInfo($"一時ファイル保存完了: {tempPath} ({actualSize} bytes)", _enableLogger);
-
-            return tempPath;
         }
 
         private static string GetExtractionPath(string zipPath)

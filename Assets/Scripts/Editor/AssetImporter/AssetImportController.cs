@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using sepLog = September.Editor.Logger;
 
 namespace September.Editor.AssetImporter
@@ -79,7 +79,7 @@ namespace September.Editor.AssetImporter
             SubscribeToServiceEvents();
         }
 
-        public async UniTask InitializeAsync()
+        public async Task InitializeAsync()
         {
             try
             {
@@ -106,7 +106,7 @@ namespace September.Editor.AssetImporter
             }
         }
 
-        public async UniTask ImportSelectedAssetAsync()
+        public async Task ImportSelectedAssetAsync()
         {
             if (IsImporting) return;
             

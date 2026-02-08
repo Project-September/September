@@ -1,10 +1,8 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using sepLog = September.Editor.Logger;
 
 namespace September.Editor.AssetImporter
@@ -20,7 +18,7 @@ namespace September.Editor.AssetImporter
             _enableLogger = enableLogger;
         }
 
-        public async UniTask<string> ExtractZipFileAsync(string zipPath, string extractPath, CancellationToken cancellationToken)
+        public async Task<string> ExtractZipFileAsync(string zipPath, string extractPath, CancellationToken cancellationToken)
         {
             try
             {
