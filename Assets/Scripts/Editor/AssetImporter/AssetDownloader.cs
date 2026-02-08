@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -18,9 +19,12 @@ namespace September.Editor.AssetImporter
             _enableLogger = enableLogger;
         }
 
-        public async UniTask<byte[]> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken)
+        public async UniTask<string> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken)
         {
             var url = $"{AssetImportConstants.ApiUrl}/{route}?id={assetId}";
+
+            var fileName = $"Asset_{assetId}_{DateTime.Now:yyyyMMdd_HHmmss}{AssetImportConstants.FileExtensions.Zip}";
+            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
 
             ReportProgress(new ProgressInfo
             {
@@ -31,6 +35,8 @@ namespace September.Editor.AssetImporter
 
             using (var request = UnityWebRequest.Get(url))
             {
+                request.downloadHandler = new DownloadHandlerFile(tempPath) { removeFileOnAbort = true };
+
                 try
                 {
                     var operation = request.SendWebRequest();
@@ -57,8 +63,8 @@ namespace September.Editor.AssetImporter
                         throw new AssetDownloadException(error);
                     }
 
-                    sepLog.Logger.LogInfo($"アセットダウンロード完了: ID={assetId}", _enableLogger);
-                    return request.downloadHandler.data;
+                    sepLog.Logger.LogInfo($"アセットダウンロード完了: ID={assetId}, Path={tempPath}", _enableLogger);
+                    return tempPath;
                 }
                 catch (Exception e) when (!(e is AssetDownloadException))
                 {

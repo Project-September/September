@@ -20,7 +20,7 @@ namespace September.Editor.AssetImporter
 
     public interface IAssetDownloader
     {
-        UniTask<byte[]> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken);
+        UniTask<string> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken);
     }
 
     public interface IFileExtractor
