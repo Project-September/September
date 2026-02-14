@@ -70,6 +70,7 @@ namespace CRISound
             public static readonly CueData StrikeBarricade_Interact = new CueData(SheetName, "SE_StrikeBarricade_Interact");
             public static readonly CueData BeltBall_Shoot = new CueData(SheetName, "SE_BeltBall_Shoot");
             public static readonly CueData BeltBall_Roll = new CueData(SheetName, "SE_BeltBall_Roll");
+            public static readonly CueData SatelliteCannon_Interact = new CueData(SheetName, "SE_SatelliteCannon_Interact");
             public static readonly CueData SatelliteCannon_LockOn = new CueData(SheetName, "SE_SatelliteCannon_LockOn");
             public static readonly CueData SatelliteCannon_LaserFire = new CueData(SheetName, "SE_SatelliteCannon_LaserFire");
             //public static readonly CueData SatelliteCannon_LaserCharge = new CueData(SheetName, "SE_SatelliteCannon_LaserCharge");
@@ -119,6 +120,11 @@ namespace CRISound
             //public static readonly CueData OKB_Win_03 = new CueData(SheetName, "VO_OKB_Win_03"); // 未
             public static readonly CueData Haru_CharacterSelect = new CueData(SheetName, "VO_Haru_CharacterSelect");
             public static readonly CueData Haru_GameStart = new CueData(SheetName, "VO_Haru_GameStart");
+            public static readonly CueData Haru_Attack_01 = new CueData(SheetName, "VO_Haru_Attack_01");
+            public static readonly CueData Haru_Attack_02 = new CueData(SheetName, "VO_Haru_Attack_02");
+            public static readonly CueData Haru_Damage_01 = new CueData(SheetName, "VO_Haru_Damage_01");
+            public static readonly CueData Haru_Damage_02 = new CueData(SheetName, "VO_Haru_Damage_02");
+            public static readonly CueData Haru_Interact_01 = new CueData(SheetName, "VO_Haru_Interact_01");
             //public static readonly CueData Haru_GameStart_02 = new CueData(SheetName, "VO_Haru_GameStart_02");
             public static readonly CueData Haru_Win = new CueData(SheetName, "VO_Haru_Win");
             //public static readonly CueData Haru_Win_02 = new CueData(SheetName, "VO_Haru_Win_02");
@@ -128,6 +134,10 @@ namespace CRISound
             //public static readonly CueData Koinuma_Win_02 = new CueData(SheetName, "VO_Koinuma_Win_02");
             public static readonly CueData Tanihira_CharacterSelect = new CueData(SheetName, "VO_Tanihira_CahracterSelect");
             public static readonly CueData Tanihira_GameStart = new CueData(SheetName, "VO_Tanihira_GameStart");
+            public static readonly CueData Tanihira_Attack_01 = new CueData(SheetName, "VO_Tanihira_Attack_01");
+            public static readonly CueData Tanihira_Damage_01 = new CueData(SheetName, "VO_Tanihira_Damage_01");
+            public static readonly CueData Tanihira_Damage_02 = new CueData(SheetName, "VO_Tanihira_Damage_02");
+            public static readonly CueData Tanihira_Interact_01 = new CueData(SheetName, "VO_Tanihira_Interact_01");
             //public static readonly CueData Tanihira_GameStart_02 = new CueData(SheetName, "VO_Tanihira_GameStart_02");
             public static readonly CueData Tanihira_Win = new CueData(SheetName, "VO_Tanihira_Win");
             //public static readonly CueData Tanihira_Win_02 = new CueData(SheetName, "VO_Tanihira_Win_02");
