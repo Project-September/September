@@ -9,9 +9,11 @@ namespace September.NewResult
         [SerializeField] private ExhibitScoreConfig _exhibitScoreConfig;
         [SerializeField] private MockData.RankingEntryData[] _rankings;
         
+        [ShowNonSerializedField] private bool _forceInject;
+        
         private void Awake()
         {
-            if (InGameResultContainer.Info == null)
+            if (InGameResultContainer.Info == null || _forceInject)
             {
                 InGameResultContainer.Set(new MockData(_rankings).Create(_exhibitScoreConfig));
             }
@@ -21,6 +23,12 @@ namespace September.NewResult
         private void Log()
         {
             Debug.Log(JsonConvert.SerializeObject(InGameResultContainer.Info, Formatting.Indented));
+        }
+
+        [Button("Toggle Force Inject")]
+        private void ToggleForceInject()
+        {
+            _forceInject = !_forceInject;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using Fusion;
 using September.Common;
 using UnityEngine;
+using UnityEngine.Search;
 
 namespace September.NewResult
 {
@@ -23,7 +24,7 @@ namespace September.NewResult
     public struct ResultPerformanceCharacterAssets
     {
         [SerializeField] private CharacterType _type;
-        [SerializeField] private ResultPerformanceState _resultCharacterPrefab;
+        [SerializeField, SearchContext("p: t:ResultPerformanceState")] private ResultPerformanceState _resultCharacterPrefab;
         [SerializeField] private Sprite _icon;
         [SerializeField] private Sprite _resultDetailViewIcon;
         
