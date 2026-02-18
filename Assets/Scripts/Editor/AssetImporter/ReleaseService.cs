@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using sepLog = September.Editor.Logger;
@@ -17,7 +17,7 @@ namespace September.Editor.AssetImporter
             _enableLogger = enableLogger;
         }
 
-        public async UniTask<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
+        public async Task<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
         {
             var url = $"{AssetImportConstants.ApiUrl}/{route}";
 
@@ -25,7 +25,12 @@ namespace September.Editor.AssetImporter
             {
                 try
                 {
-                    await request.SendWebRequest().ToUniTask(cancellationToken: cancellationToken);
+                    var operation = request.SendWebRequest();
+                    while (!operation.isDone)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await Task.Yield();
+                    }
 
                     if (request.result != UnityWebRequest.Result.Success)
                     {

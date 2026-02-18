@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEditor;
 using sepLog = September.Editor.Logger;
 
@@ -36,7 +36,7 @@ namespace September.Editor.AssetImporter
                 extractReporter.OnProgressChanged += ReportProgress;
         }
 
-        public async UniTask<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
+        public async Task<List<Release>> GetReleasesAsync(string route, CancellationToken cancellationToken)
         {
             try
             {
@@ -49,31 +49,50 @@ namespace September.Editor.AssetImporter
             }
         }
 
-        public async UniTask<string> DownloadAndExtractAssetAsync(string route, int assetId, CancellationToken cancellationToken)
+        public async Task<string> DownloadAndExtractAssetAsync(string route, List<Asset> assets, CancellationToken cancellationToken)
         {
             try
             {
-                // ダウンロード
-                var fileData = await _assetDownloader.DownloadAssetAsync(route, assetId, cancellationToken);
+                // アセット名順にソートして正しいパート順序を保証
+                var sortedAssets = assets.OrderBy(a => a.Name).ToList();
 
-                ReportProgress(new ProgressInfo
+                // 全パーツをダウンロード
+                var tempPaths = new List<string>();
+                foreach (var asset in sortedAssets)
                 {
-                    Status = AssetImportConstants.ProgressMessages.FileSaving,
-                    Progress = 1f,
-                    Detail = AssetImportConstants.ProgressMessages.FileSaveDetail
-                });
+                    var path = await _assetDownloader.DownloadAssetAsync(route, asset.ID, cancellationToken);
+                    tempPaths.Add(path);
+                }
 
-                // 一時ファイルの保存
-                var tempPath = await SaveTemporaryFile(fileData, assetId, cancellationToken);
+                // 複数パーツの場合は結合
+                string zipPath;
+                if (tempPaths.Count > 1)
+                {
+                    ReportProgress(new ProgressInfo
+                    {
+                        Status = AssetImportConstants.ProgressMessages.FileSaving,
+                        Progress = 0.5f,
+                        Detail = $"{tempPaths.Count}個のパーツを結合しています..."
+                    });
+                    zipPath = CombinePartFiles(tempPaths);
+                    foreach (var path in tempPaths)
+                    {
+                        CleanupTemporaryFile(path);
+                    }
+                }
+                else
+                {
+                    zipPath = tempPaths[0];
+                }
 
                 // 解凍
-                var extractPath = GetExtractionPath(tempPath);
+                var extractPath = GetExtractionPath(zipPath);
                 sepLog.Logger.LogInfo($"解凍先パス: {extractPath}", _enableLogger);
-                
-                var result = await _fileExtractor.ExtractZipFileAsync(tempPath, extractPath, cancellationToken);
+
+                var result = await _fileExtractor.ExtractZipFileAsync(zipPath, extractPath, cancellationToken);
 
                 // 一時ファイルの削除
-                CleanupTemporaryFile(tempPath);
+                CleanupTemporaryFile(zipPath);
 
                 ReportProgress(new ProgressInfo
                 {
@@ -94,6 +113,30 @@ namespace September.Editor.AssetImporter
                 });
                 throw;
             }
+        }
+
+        private string CombinePartFiles(List<string> partPaths)
+        {
+            var combinedPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                $"Combined_{DateTime.Now:yyyyMMdd_HHmmss}{AssetImportConstants.FileExtensions.Zip}");
+
+            sepLog.Logger.LogInfo($"ファイル結合開始: {partPaths.Count}パーツ -> {combinedPath}", _enableLogger);
+
+            using (var outStream = File.Create(combinedPath))
+            {
+                foreach (var partPath in partPaths)
+                {
+                    using (var inStream = File.OpenRead(partPath))
+                    {
+                        inStream.CopyTo(outStream);
+                    }
+                    sepLog.Logger.LogInfo($"パーツ結合完了: {partPath}", _enableLogger);
+                }
+            }
+
+            sepLog.Logger.LogInfo($"ファイル結合完了: {combinedPath} ({new FileInfo(combinedPath).Length} bytes)", _enableLogger);
+            return combinedPath;
         }
 
         public void ImportUnityPackages(string extractPath, bool showImportDialog = false)
@@ -127,38 +170,6 @@ namespace September.Editor.AssetImporter
                 sepLog.Logger.LogError(error);
                 throw new AssetImportException(error, e);
             }
-        }
-
-        private async UniTask<string> SaveTemporaryFile(byte[] fileData, int assetId, CancellationToken cancellationToken)
-        {
-            if (fileData == null || fileData.Length == 0)
-            {
-                throw new AssetImportException("ダウンロードしたファイルデータが空です");
-            }
-
-            // 一意なファイル名を生成
-            var fileName = $"Asset_{assetId}_{DateTime.Now:yyyyMMdd_HHmmss}{AssetImportConstants.FileExtensions.Zip}";
-            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
-
-            sepLog.Logger.LogInfo($"一時ファイル保存開始: {tempPath} ({fileData.Length} bytes)", _enableLogger);
-
-            await File.WriteAllBytesAsync(tempPath, fileData, cancellationToken);
-            
-            // ファイルが正常に作成されたか確認
-            if (!File.Exists(tempPath))
-            {
-                throw new AssetImportException($"一時ファイルの作成に失敗しました: {tempPath}");
-            }
-
-            var actualSize = new FileInfo(tempPath).Length;
-            if (actualSize != fileData.Length)
-            {
-                throw new AssetImportException($"ファイルサイズの不一致: 期待値={fileData.Length}, 実際={actualSize}");
-            }
-
-            sepLog.Logger.LogInfo($"一時ファイル保存完了: {tempPath} ({actualSize} bytes)", _enableLogger);
-
-            return tempPath;
         }
 
         private static string GetExtractionPath(string zipPath)
