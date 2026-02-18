@@ -25,6 +25,10 @@ MonoBehaviour:
     SelectedVoice: VO_OKB_CharacterSelect
     StartVoice: VO_OKB_GameStart
     WinningVoice: VO_OKB_Win
+    AttackVoice: VO_OKB_Attack_01
+    DamageVoice: VO_OKB_Damage_01
+    InteractVoice: VO_OKB_Interact_01
+    UniqueActionVoice: 
     BGM: BGM_Ingame_01
   - Type: 2
     DisplayName: "\u30CF\u30EB\u30AF\n\u30B6\u30FB\u30D6\u30C3\u30C1\u30E3\u30FC"
@@ -38,6 +42,10 @@ MonoBehaviour:
     SelectedVoice: VO_Haru_CharacterSelect
     StartVoice: VO_Haru_GameStart
     WinningVoice: VO_Haru_Win
+    AttackVoice: VO_Haru_Attack_01
+    DamageVoice: VO_Haru_Damage_01
+    InteractVoice: VO_Haru_Interact_01
+    UniqueActionVoice: 
     BGM: BGM_Haruku_01
   - Type: 3
     DisplayName: "\u30BF\u30CB\u30D2\u30E9\u30FB\u30A2\u30E0\u30F3\u30BB\u30F3"
@@ -51,6 +59,10 @@ MonoBehaviour:
     SelectedVoice: VO_Tanihira_CharacterSelect
     StartVoice: VO_Tanihira_GameStart
     WinningVoice: VO_Tanihira_Win
+    AttackVoice: VO_Tanihira_Attack_01
+    DamageVoice: VO_Tanihira_Damage_01
+    InteractVoice: VO_Tanihira_Interact_01
+    UniqueActionVoice: 
     BGM: BGM_Tanihira_01
   - Type: 4
     DisplayName: "\uFF1F\uFF1F\uFF1F"
@@ -64,4 +76,8 @@ MonoBehaviour:
     SelectedVoice: VO_Koinuma_CharacterSelect
     StartVoice: VO_Koinuma_GameStart
     WinningVoice: VO_Koinuma_Win
+    AttackVoice: VO_Koinuma_Attack_01
+    DamageVoice: VO_Koinuma_Damage_01
+    InteractVoice: VO_Koinuma_Interact_01
+    UniqueActionVoice: VO_Koinuma_Grapple
     BGM: BGM_Koinuma_01
