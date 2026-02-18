@@ -79,6 +79,7 @@ namespace InGame.UI
         private void OnChangeCriSEVolume()
         {
             CriAtom.SetCategoryVolume("SE", _seVolumeSlider.value);
+            CriAtom.SetCategoryVolume("Voice", _seVolumeSlider.value);   // 仮
         }
     }
 }
