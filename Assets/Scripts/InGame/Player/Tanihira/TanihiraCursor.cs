@@ -103,7 +103,7 @@ namespace Ingame.Tanihira
             if (!HasStateAuthority) return;
             
             _state = TanihiraCursorState.Active;
-            //_playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
         }
 
         private void MoveCursor()
@@ -141,7 +141,7 @@ namespace Ingame.Tanihira
 
             if (!HasStateAuthority) return;
             _state = TanihiraCursorState.Idol;
-            //_playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
         }
 
         private Vector3 MoveCursorPos()

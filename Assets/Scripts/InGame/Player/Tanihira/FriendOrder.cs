@@ -24,7 +24,7 @@ namespace Ingame.Tanihira
         {
             if (!GetInput<PlayerInput>(out var input)) return;
             
-            if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability4))
+            if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability1))
             {
                 OrderReturnFriend();
             }
