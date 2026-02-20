@@ -229,6 +229,19 @@ namespace InGame.Interact
 
             return true;
         }
+        
+        public void ForceStartCooldown(float seconds)
+        {
+            if (!HasStateAuthority) return;
+
+            LastUsedCooldownTime = seconds;
+            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
+
+            if (_spawnCooldownEffectOnStart && seconds > 0f)
+            {
+                PlayCooldownEffect(seconds).Forget();
+            }
+        }
 
         /// <summary>
         /// 派生クラスで個別のバリデーション条件を追加する仮想メソッド
