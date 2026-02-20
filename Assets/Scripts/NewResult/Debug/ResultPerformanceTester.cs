@@ -1,3 +1,4 @@
+using CRISound;
 using Cysharp.Threading.Tasks;
 using NaughtyAttributes;
 using UnityEngine;
@@ -31,6 +32,7 @@ namespace September.NewResult
             await _transitionEffect.WaitUntilState(TransitionState.Opening);
             
             _performanceState.Play();
+            PlayBGM().Forget();
             ShowResultUIAsync().Forget();
             await _performanceState.WaitFinish();
 
@@ -44,6 +46,12 @@ namespace September.NewResult
         {
             await UniTask.WaitForSeconds(_resultPerformanceSettings.UIAnimationStartTime);
             await _resultUIAnimator.ShowWinner();
+        }
+
+        private async UniTask PlayBGM()
+        {
+            await UniTask.WaitForSeconds(_resultPerformanceSettings.BgmStartTime);
+            CRIAudio.PlayBGM("ALLCue", "BGM_ResultVictory");
         }
     }
 }
