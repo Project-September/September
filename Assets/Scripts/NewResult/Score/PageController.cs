@@ -12,6 +12,7 @@ namespace September.NewResult
         [SerializeField] private Selectable _selectWhenHidePage;
         [SerializeField] private Button _showButton;
         [SerializeField] private Button _hideButton;
+        [SerializeField] private NavigationBar _navigationBar;
         [SerializeField] private Transform _background;
 
         public void Init()
@@ -20,6 +21,7 @@ namespace September.NewResult
             _background.gameObject.SetActive(false);
             _showButton.onClick.AddListener(ShowPage);
             _hideButton.onClick.AddListener(HidePage);
+            _navigationBar.onBack.AddListener(HidePage);
         }
 
         public void ShowPage()

@@ -37,7 +37,7 @@ namespace NewResult.UI
         public int PlayerDamageReceived;
         public int PlayerOgreCount;
         public int PlayerExhibitsInteractCount;
+        public int Rank;
         public bool IsOgre;
-        public bool IsWinner;
     }
 }

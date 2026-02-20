@@ -39,7 +39,8 @@ namespace September.NewResult
                 var name = player.PlayerName;
                 var isOgre = player.IsOgre;
                 var isSelf = player.IsSelf;
-                var isWinner = player.PlayerName == winner.PlayerName;
+                // Todo:（卒展後）Playersにrank情報入れる
+                var rank = gameResultInfo.Ranking.First(x => x.PlayerName == player.PlayerName).Rank;
                 
                 var score = player.TotalScore;
                 totalScoreViewEntries[i] = new TotalScoreViewEntry(sprite, name, score, isOgre, isSelf);
@@ -53,7 +54,7 @@ namespace September.NewResult
                     PlayerExhibitsInteractCount = player.ExhibitInteractCount,
                     PlayerOgreCount = player.OgreCount,
                     IsOgre = isOgre,
-                    IsWinner = isWinner,
+                    Rank = rank,
                 };
             }
             _totalScoreView?.Setup(totalScoreViewEntries);
