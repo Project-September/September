@@ -13,6 +13,7 @@ using InGame.Player;
 using CRISound;
 using September.InGame.UI;
 using WebSocketSharp;
+using System.Threading;
 
 namespace InGame.Interact
 {
@@ -167,10 +168,10 @@ namespace InGame.Interact
                 effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation));
 
             // クールダウン時間待機
-            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false);
+            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false,cancellationToken: this.GetCancellationTokenOnDestroy());
 
             // エフェクトを停止
-            effectSpawner.StopEffect(uniqueEffectId);
+            effectSpawner?.StopEffect(uniqueEffectId);
 
             // クールダウン回復音を全クライアントで再生
             Rpc_PlaySE(SoundCues.SE.Exhibit_Revive.Sheet, SoundCues.SE.Exhibit_Revive.Name, effectTransform.position);
