@@ -291,7 +291,7 @@ namespace September.InGame.UI
                     await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds));
                     await ui.DOFade(0, 0.5f);
-                    Destroy(ui.gameObject);
+                    Destroy(ui?.gameObject);
                     UpdateLayOutGroup();
                     break;
                 }
@@ -303,7 +303,7 @@ namespace September.InGame.UI
                     await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
                     await ui.DOFade(0, 0.5f);
-                    Destroy(ui.gameObject);
+                    Destroy(ui?.gameObject);
                     UpdateLayOutGroup();
                     break;
                 }
@@ -324,7 +324,7 @@ namespace September.InGame.UI
                     await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
                     await ui.DOFade(0, 0.5f);
-                    Destroy(ui.gameObject);
+                    Destroy(ui?.gameObject);
                     UpdateLayOutGroup();
                     break;
                 }
