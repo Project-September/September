@@ -121,15 +121,12 @@ namespace InGame.Exhibit
                     if (_isEnd)
                     {
                         GetOff();
-                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_Interact"); // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
                         return;
                     }
                     
                     if (CheckInteractEnd())
                     {
                         GetOff();
-                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_Interact"); // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
-                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_TakeoffGunFire"); // もしくは射撃音を止める
                         return;
                     }
                     
@@ -140,8 +137,6 @@ namespace InGame.Exhibit
                     if (timeSinceGetOn > 1f && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Interact))
                     {
                         GetOff();
-                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_Interact"); // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
-                        AudioBroadcaster.RPC_StopSound("SE_ZeroFighter_TakeoffGunFire"); // もしくは射撃音を止める
                         return;
                     }
                     
@@ -303,7 +298,7 @@ namespace InGame.Exhibit
         {
             if (fireInput && _machineGunTimer <= 0)
             {
-                AudioBroadcaster.RPC_PlaySoundFromCode("SE_ZeroFighter_TakeoffGunFire", SoundTrackingType.Spot, Object);
+                AudioBroadcaster.RPC_PlaySoundFromCode(SoundCues.SE.ZeroFighter_TakeoffGunFire.Name, SoundTrackingType.Spot, Object); // 射撃音
                 Fire();
             }
             else if (_machineGunTimer > 0)
@@ -427,6 +422,8 @@ namespace InGame.Exhibit
                 formationManager.WarpFriendNearPlayer(_ownerPlayerManager.transform.position,
                     _ownerPlayerManager.transform.rotation);
             }
+            AudioBroadcaster.RequestStopSound(SoundCues.SE.ZeroFighter_Interact.Name);          // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
+            AudioBroadcaster.RequestStopSound(SoundCues.SE.ZeroFighter_TakeoffGunFire.Name);    // もしくは射撃音を止める
         }
 
         void OnChangeOwnerPlayerRef()
