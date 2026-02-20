@@ -34,11 +34,11 @@ namespace September.NewResult
         private async UniTask Title()
         {
             await _transitionEffect.TryTransitionOut();
+            await SceneManager.LoadSceneAsync(_titleSceneName);
             if (NetworkManager.Instance)
             {
                 await NetworkManager.Instance.InitializeRunner();
             }
-            await SceneManager.LoadSceneAsync(_titleSceneName);
             await _transitionEffect.TryTransitionIn();
         }
     }
