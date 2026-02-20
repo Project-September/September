@@ -6,23 +6,26 @@ namespace September.NewResult
     /// <summary>
     /// 順位決めのルールを適用するサービス
     /// </summary>
-    public class RankingService
+    public struct RankingService
     {
-        public RankingEntry[] Create(IEnumerable<PlayerResultEntry> playerResultInfo)
+        public static IEnumerable<PlayerResultEntry> Apply(IEnumerable<PlayerResultEntry> playerResultInfo)
         {
             var ordered = playerResultInfo.OrderByDescending(x => x.TotalScore).ToArray();
             ordered = ordered.Where(x => !x.IsOgre).Concat(ordered.Where(x => x.IsOgre)).ToArray();
 
-            var ranking = new RankingEntry[ordered.Length];
             for (var i = 0; i < ordered.Length; i++)
             {
-                var rank = i + 1;
-                var playerName = ordered[i].PlayerName;
-                var rankingEntry = new RankingEntry(rank, playerName);
-                ranking[i] = rankingEntry;
+                if (i != 0 && !ordered[i].IsOgre && ordered[i].TotalScore == ordered[i - 1].TotalScore)
+                {
+                    ordered[i].Rank = ordered[i - 1].Rank;
+                }
+                else
+                {
+                    ordered[i].Rank = i + 1;
+                }
             }
             
-            return ranking;
+            return ordered;
         }
     }
 }

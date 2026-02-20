@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace September.NewResult
 {
@@ -24,8 +25,8 @@ namespace September.NewResult
 
         public GameResultInfo BuildInstance()
         {
-            var ranking = new RankingService().Create(_players);
-            return new GameResultInfo(_stageName, ranking, _players);
+            var ranking = RankingService.Apply(_players).ToArray();
+            return new GameResultInfo(_stageName, ranking);
         }
     }
 }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Result;
 using September.Common;
-using Random = UnityEngine.Random;
 
 namespace September.NewResult
 {
@@ -86,7 +85,7 @@ namespace September.NewResult
                 entries[i] = new ResultExhibitScoreEntry(type, count, score);
             }
 
-            return new PlayerResultEntry(_playerName, _characterType, _totalScore, entries, _isOgre, _isSelf, _damageDealt, _damageReceived, _totalInteractCount, _ogreCount);
+            return new PlayerResultEntry(_playerName, _characterType, entries, _totalScore, _isOgre, _isSelf, _damageDealt, _damageReceived, _totalInteractCount, _ogreCount);
         }
     }
 }

@@ -26,8 +26,6 @@ namespace September.NewResult
         {
             _exhibitScoreView?.Setup(gameResultInfo.Players[0].ExhibitScoreEntries);
 
-            var winner = gameResultInfo.Ranking.FirstOrDefault(x => x.Rank == 1);
-            
             var totalScoreViewEntries = new TotalScoreViewEntry[gameResultInfo.Players.Count];
             var playerDetailsModels = new PlayerDetailsModel[gameResultInfo.Players.Count];
             for (int i = 0; i < gameResultInfo.Players.Count; i++)
@@ -39,8 +37,7 @@ namespace September.NewResult
                 var name = player.PlayerName;
                 var isOgre = player.IsOgre;
                 var isSelf = player.IsSelf;
-                // Todo:（卒展後）Playersにrank情報入れる
-                var rank = gameResultInfo.Ranking.First(x => x.PlayerName == player.PlayerName).Rank;
+                var rank = gameResultInfo.Players.First(x => x.PlayerName == player.PlayerName).Rank;
                 
                 var score = player.TotalScore;
                 totalScoreViewEntries[i] = new TotalScoreViewEntry(sprite, name, score, isOgre, isSelf);

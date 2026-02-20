@@ -14,11 +14,6 @@ namespace September.NewResult
             public int _rank;
             public string _playerName;
             public CharacterType _characterType;
-
-            public RankingEntry Convert()
-            {
-                return new RankingEntry(_rank, _playerName);
-            }
         }
         
         public MockData(RankingEntryData[] data)
