@@ -123,7 +123,7 @@ namespace CRISound
         {
             CriAtom.SetCategoryVolume("BGM", 1.0f);
             CriAtom.SetCategoryVolume("SE", 1.0f);
-            //CriAtom.SetCategoryVolume("Voice", 1.0f);
+            CriAtom.SetCategoryVolume("Voice", 1.0f);
         }
 
         private class SoundDic
@@ -186,8 +186,12 @@ namespace CRISound
 
             public bool IsPlayingCue(string cueName)
             {
-                return _atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing &&
-                       _currentCueName == cueName;
+                if (_atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing ||
+                    _atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Prep && _currentCueName == cueName) // 準備状態も追加
+                {
+                    return true;
+                }
+                return false;
             }
 
             public virtual CriAtomExPlayback Play(string cueSheet, string cueName, float delay = 0.0f)
@@ -273,7 +277,12 @@ namespace CRISound
                 {
                     var status = _atomExPlayer3D.GetStatus();
                     var isNameMatch = _currentCueName == cueName;
-                    return status == CriAtomExPlayer.Status.Playing && isNameMatch;
+                    if (status == CriAtomExPlayer.Status.Playing ||
+                        status == CriAtomExPlayer.Status.Prep && isNameMatch) // 準備状態も追加
+                    {
+                        return true;
+                    }
+                    return false;
                 }
 
                 /// <summary>
