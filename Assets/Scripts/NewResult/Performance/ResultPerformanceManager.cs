@@ -21,28 +21,18 @@ namespace September.NewResult
             _menuActiveController.Deactivate();
 
             // リザルト情報から演出とUI表示に必要なデータを取得
-            var result = gameResultInfo.Ranking
-                .OrderBy(x => x.Rank)
-                .Join(
-                    gameResultInfo.Players,
-                    r => r.PlayerName,
-                    p => p.PlayerName,
-                    (r, p) => (r.Rank, r.PlayerName, p.CharacterType))
+            var rankingListNames = gameResultInfo.Players
+                .Skip(1) // 最初のプレイヤーは表示しない
+                .Select(x => new RankingItemModel(x.Rank, x.PlayerName, x.CharacterType))
                 .ToArray();
             
-            // ランキング表示用モデル
-            var rankingListNames = 
-                result.Where(x => x.Rank >= 2)
-                    .Select(x => new RankingItemModel(x.Rank, x.PlayerName, x.CharacterType))
-                    .ToArray();
-            
             _rankingView.CreateRankingList(rankingListNames);
-            _rankingView.SetWinnerPlayerNameText(gameResultInfo.Ranking.FirstOrDefault(x => x.Rank == 1).PlayerName);
+            _rankingView.SetWinnerPlayerNameText(gameResultInfo.Players.FirstOrDefault(x => x.Rank == 1).PlayerName);
 
             // アセットの取得
             Debug.Log("Get Asset Process");
 
-            var winner = result.FirstOrDefault(r => r.Rank == 1);
+            var winner = gameResultInfo.Players.FirstOrDefault(r => r.Rank == 1);
             var winnerAssets = resultCharacterAssetsContainer.GetAssets(winner.CharacterType);
             var winnerPrefab = winnerAssets.ResultCharacterPrefab;
 
