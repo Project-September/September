@@ -56,8 +56,8 @@ namespace InGame.Player
 
         private void RotateToCamera()
         {
-            // ★ 位置は一切触らない
-            _root.transform.rotation = _camera.transform.rotation;
+            _root.transform.rotation =
+                Quaternion.LookRotation(-_camera.transform.forward);
         }
     }
 }
