@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using NaughtyAttributes;
 using September.Common;
@@ -40,6 +41,13 @@ namespace September.NewResult
                 await NetworkManager.Instance.InitializeRunner();
             }
             await _transitionEffect.TryTransitionIn();
+            ShowCursor();
+        }
+        
+        private static void ShowCursor()
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 }

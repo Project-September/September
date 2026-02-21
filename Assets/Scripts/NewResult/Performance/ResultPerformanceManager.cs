@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading;
 using CRISound;
 using Cysharp.Threading.Tasks;
 using NaughtyAttributes;
@@ -73,6 +74,7 @@ namespace September.NewResult
             Debug.Log("Result Performance End");
             
             // 演出終了⇒メニューを選択可能に
+            ShowCursor(destroyCancellationToken).Forget();
             _menuActiveController.Activate();
             _menuActiveController.SetEventSystemSelected();
         }
@@ -87,6 +89,14 @@ namespace September.NewResult
         {
             await UniTask.WaitForSeconds(_resultPerformanceSettings.BgmStartTime);
             CRIAudio.PlayBGM("ALLCue", "BGM_ResultVictory");
+        }
+        
+        private static async UniTask ShowCursor(CancellationToken token)
+        {
+            await UniTask.WaitUntil(() => GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse, cancellationToken: token);
+            
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 }
