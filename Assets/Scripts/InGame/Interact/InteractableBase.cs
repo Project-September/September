@@ -450,6 +450,33 @@ namespace InGame.Interact
         }
     }
 
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            // クールダウンエフェクトの位置と向きを表示
+            var effectTransform = _cooldownEffectTransform != null ? _cooldownEffectTransform : transform;
+            var effectPos = effectTransform.position + _cooldownEffectOffset;
+            var effectRot = Quaternion.Euler(_cooldownEffectRotation);
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(effectPos, 0.3f);
+
+            // 向きを矢印で表示（Forward=青, Up=緑, Right=赤）
+            float arrowLength = 0.8f;
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(effectPos, effectRot * Vector3.forward * arrowLength);
+            Gizmos.color = Color.green;
+            Gizmos.DrawRay(effectPos, effectRot * Vector3.up * arrowLength);
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(effectPos, effectRot * Vector3.right * arrowLength);
+
+            // インタラクトエフェクトの位置を表示
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position + _interactEffectOffset, 0.2f);
+        }
+#endif
+    }
+
     /// <summary>
     /// インタラクト時のコンテキスト情報を保持するインターフェース
     /// </summary>
