@@ -192,7 +192,6 @@ namespace InGame.Exhibit
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
                 : _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
-            _interactable.PlayCooldownEffect(time).Forget();
             _interactable.LastUsedCooldownTime = time;
             _interactable.LastInteractTime = Runner.SimulationTime;
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
@@ -211,6 +210,7 @@ namespace InGame.Exhibit
             }
             Executor = null;
             transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+            _interactable.PlayCooldownEffect(time).Forget();
             CameraController.CameraReset();
         }
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
