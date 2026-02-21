@@ -14,6 +14,7 @@ public class InteractableBaseEditor : UnityEditor.Editor
     private SerializedProperty _cooldownEffectTransform;
     private SerializedProperty _cooldownEffectOffset;
     private SerializedProperty _cooldownEffectRotation;
+    private SerializedProperty _cooldownEffectScale;
     private SerializedProperty _cooldownEffectType;
 
     private void OnEnable()
@@ -21,6 +22,7 @@ public class InteractableBaseEditor : UnityEditor.Editor
         _cooldownEffectTransform = serializedObject.FindProperty("_cooldownEffectTransform");
         _cooldownEffectOffset = serializedObject.FindProperty("_cooldownEffectOffset");
         _cooldownEffectRotation = serializedObject.FindProperty("_cooldownEffectRotation");
+        _cooldownEffectScale = serializedObject.FindProperty("_cooldownEffectScale");
         _cooldownEffectType = serializedObject.FindProperty("_cooldownEffectType");
 
         CreatePreview();
@@ -126,6 +128,7 @@ public class InteractableBaseEditor : UnityEditor.Editor
 
         _previewInstance.transform.position = baseTransform.position + _cooldownEffectOffset.vector3Value;
         _previewInstance.transform.rotation = Quaternion.Euler(_cooldownEffectRotation.vector3Value);
+        _previewInstance.transform.localScale = _cooldownEffectScale.vector3Value;
     }
 
     private static void DisableRuntimeComponents(GameObject obj)

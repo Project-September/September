@@ -49,6 +49,8 @@ namespace InGame.Interact
         [SerializeField] private Vector3 _cooldownEffectOffset = Vector3.zero;
         /// <summary>クールダウンエフェクトの回転（Euler角）</summary>
         [SerializeField] private Vector3 _cooldownEffectRotation = Vector3.zero;
+        /// <summary>クールダウンエフェクトのスケール</summary>
+        [SerializeField] private Vector3 _cooldownEffectScale = Vector3.one;
         /// <summary>インタラクト完了時のエフェクトタイプ</summary>
         [SerializeField] private EffectType _interactEffectType = EffectType.NormalInteractComplete;
         /// <summary>クールダウン中のエフェクトタイプ</summary>
@@ -165,7 +167,8 @@ namespace InGame.Interact
 
             // ループエフェクトを開始
             effectSpawner.RequestPlayLoopEffect(uniqueEffectId, _cooldownEffectType,
-                effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation));
+                effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation),
+                _cooldownEffectScale);
 
             // クールダウン時間待機
             await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false, cancellationToken: this.GetCancellationTokenOnDestroy());

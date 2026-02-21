@@ -72,10 +72,10 @@ namespace September.InGame.Effect
                     parentNetworkId = parentNetworkObject.Id;
                 }
             }
-            
+
             RPC_PlayEffect(effectType, position, rotation, false, string.Empty, parentNetworkId);
         }
-        
+
         // ToDo : Effectを返してほしい
 
         /// <summary>
@@ -85,6 +85,14 @@ namespace September.InGame.Effect
         public void RequestPlayLoopEffect(string effectId, EffectType effectType, Vector3 position, Quaternion rotation)
         {
             RPC_PlayEffect(effectType, position, rotation, true, effectId, default(NetworkId));
+        }
+
+        /// <summary>
+        /// 手動で削除するエフェクトのリクエスト（スケール指定）
+        /// </summary>
+        public void RequestPlayLoopEffect(string effectId, EffectType effectType, Vector3 position, Quaternion rotation, Vector3 scale)
+        {
+            RPC_PlayEffectWithScale(effectType, position, rotation, scale, true, effectId, default(NetworkId));
         }
 
         /// <summary>
@@ -102,7 +110,7 @@ namespace September.InGame.Effect
                     parentNetworkId = parentNetworkObject.Id;
                 }
             }
-            
+
             RPC_PlayEffect(effectType, position, rotation, true, effectId, parentNetworkId);
         }
 
@@ -197,6 +205,72 @@ namespace September.InGame.Effect
             }
         }
         
+        /// <summary>
+        /// スケール付きエフェクト再生RPC
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_PlayEffectWithScale(EffectType effectType, Vector3 position, Quaternion rotation, Vector3 scale, bool isLoop, string effectId, NetworkId parentNetworkId)
+        {
+            if (_effectDatabase == null)
+            {
+                InitializeEffectDatabase();
+            }
+
+            var effectData = _effectDatabase.GetEffectData(effectType);
+
+            if (effectData.Prefab == null)
+            {
+                Debug.LogError($"'{effectType}' に対応するプレハブが見つかりません");
+                return;
+            }
+
+            Transform parent = null;
+            if (parentNetworkId != default(NetworkId))
+            {
+                if (_networkRunner.TryFindObject(parentNetworkId, out NetworkObject parentNetworkObject))
+                {
+                    parent = parentNetworkObject.transform;
+                }
+            }
+
+            GameObject effect;
+            if (parent != null)
+            {
+                effect = Instantiate(effectData.Prefab, position, rotation, parent);
+            }
+            else
+            {
+                effect = Instantiate(effectData.Prefab, position, rotation);
+            }
+
+            effect.transform.localScale = scale;
+
+            ParticleSystem system = effect.GetComponent<ParticleSystem>();
+            if (system != null)
+            {
+                var main = system.main;
+                main.loop = isLoop;
+
+                if (isLoop)
+                {
+                    system.Play();
+                    _activeEffects[effectId] = effect;
+                }
+                else
+                {
+                    main.stopAction = ParticleSystemStopAction.Destroy;
+                    system.Play();
+                }
+            }
+            else
+            {
+                if (isLoop && !string.IsNullOrEmpty(effectId))
+                {
+                    _activeEffects[effectId] = effect;
+                }
+            }
+        }
+
         //エフェクトを止める
         [Rpc(RpcSources.All, RpcTargets.All)]
         private void RPC_StopEffectById(string effectId)
