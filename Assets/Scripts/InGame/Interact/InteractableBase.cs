@@ -26,7 +26,7 @@ namespace InGame.Interact
     /// - バリデーション処理（クールダウン中、ゲーム終了、プレイヤースタン状態）
     /// - 展示物タイプの登録とログ表示
     /// </summary>
-    [RequireComponent(typeof (AudioBroadcaster))] // サウンド再生用のコンポーネント
+    [RequireComponent(typeof(AudioBroadcaster))] // サウンド再生用のコンポーネント
     [DisallowMultipleComponent]
     public class InteractableBase : NetworkBehaviour
     {
@@ -168,7 +168,7 @@ namespace InGame.Interact
                 effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation));
 
             // クールダウン時間待機
-            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false,cancellationToken: this.GetCancellationTokenOnDestroy());
+            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false, cancellationToken: this.GetCancellationTokenOnDestroy());
 
             // エフェクトを停止
             effectSpawner?.StopEffect(uniqueEffectId);
@@ -229,7 +229,7 @@ namespace InGame.Interact
 
             return true;
         }
-        
+
         public void ForceStartCooldown(float seconds)
         {
             if (!HasStateAuthority) return;
@@ -448,7 +448,7 @@ namespace InGame.Interact
                 UIController.I.ShowLog($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
             }
         }
-    }
+
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
@@ -476,6 +476,7 @@ namespace InGame.Interact
         }
 #endif
     }
+}
 
     /// <summary>
     /// インタラクト時のコンテキスト情報を保持するインターフェース
@@ -497,4 +498,3 @@ namespace InGame.Interact
         public int Interactor { get; set; }
         public CharacterType CharacterType { get; set; }
     }
-}
