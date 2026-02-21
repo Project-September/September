@@ -394,7 +394,6 @@ namespace InGame.Exhibit
             var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
                 : CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
-            PlayCooldownEffect(time).Forget();
             LastUsedCooldownTime = time;
             LastInteractTime = Runner.SimulationTime;
 
@@ -411,6 +410,7 @@ namespace InGame.Exhibit
 
             // 飛行機を初期位置・回転に戻す（ティラノと同じ仕組み）
             transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+            PlayCooldownEffect(time).Forget();
             CurrentAccel = 0;
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
