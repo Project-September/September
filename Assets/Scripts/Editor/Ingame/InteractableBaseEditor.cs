@@ -7,7 +7,9 @@ using UnityEngine;
 public class InteractableBaseEditor : UnityEditor.Editor
 {
     private GameObject _previewInstance;
+    private ParticleSystem[] _particleSystems;
     private EffectType _currentEffectType;
+    private double _lastTime;
 
     private SerializedProperty _cooldownEffectTransform;
     private SerializedProperty _cooldownEffectOffset;
@@ -22,10 +24,12 @@ public class InteractableBaseEditor : UnityEditor.Editor
         _cooldownEffectType = serializedObject.FindProperty("_cooldownEffectType");
 
         CreatePreview();
+        EditorApplication.update += OnEditorUpdate;
     }
 
     private void OnDisable()
     {
+        EditorApplication.update -= OnEditorUpdate;
         DestroyPreview();
     }
 
@@ -34,7 +38,6 @@ public class InteractableBaseEditor : UnityEditor.Editor
         serializedObject.Update();
         DrawDefaultInspector();
 
-        // EffectTypeが変更されたらプレビューを再生成
         var newEffectType = (EffectType)_cooldownEffectType.enumValueIndex;
         if (_previewInstance == null || newEffectType != _currentEffectType)
         {
@@ -48,6 +51,23 @@ public class InteractableBaseEditor : UnityEditor.Editor
     private void OnSceneGUI()
     {
         UpdatePreviewTransform();
+    }
+
+    private void OnEditorUpdate()
+    {
+        if (_particleSystems == null || _particleSystems.Length == 0) return;
+
+        var currentTime = EditorApplication.timeSinceStartup;
+        var deltaTime = (float)(currentTime - _lastTime);
+        _lastTime = currentTime;
+
+        foreach (var ps in _particleSystems)
+        {
+            if (ps == null) continue;
+            ps.Simulate(deltaTime, false, false);
+        }
+
+        SceneView.RepaintAll();
     }
 
     private void CreatePreview()
@@ -64,10 +84,21 @@ public class InteractableBaseEditor : UnityEditor.Editor
 
         DisableRuntimeComponents(_previewInstance);
         UpdatePreviewTransform();
+
+        _particleSystems = _previewInstance.GetComponentsInChildren<ParticleSystem>(true);
+        _lastTime = EditorApplication.timeSinceStartup;
+
+        foreach (var ps in _particleSystems)
+        {
+            var main = ps.main;
+            main.simulationSpeed = 1f;
+            ps.Play();
+        }
     }
 
     private void DestroyPreview()
     {
+        _particleSystems = null;
         if (_previewInstance != null)
         {
             DestroyImmediate(_previewInstance);
