@@ -93,6 +93,8 @@ namespace InGame.Interact
         /// <summary>現在アクティブなインタラクト効果</summary>
         private CharacterInteractEffectBase _activeEffectBase;
 
+        private CharacterType _characterType; 
+
         /// <summary>
         /// インタラクトのメイン処理（Host側でのみ実行）
         /// バリデーション → クールダウン設定 → エフェクト再生 → 効果発動 → 展示物登録・音声再生・ログ表示
@@ -110,12 +112,12 @@ namespace InGame.Interact
                 return;
             }
 
-            var charaType = context.CharacterType;
+            _characterType = context.CharacterType;
 
             // CharacterType.All を優先、なければキャラ固有のクールダウン時間を取得
             LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
-                : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
+                : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(_characterType, 0f);
 
             // インタラクト時刻を記録（NetworkRunnerがあればシミュレーション時刻、なければローカル時刻）
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
@@ -423,8 +425,22 @@ namespace InGame.Interact
         public void EndInteract()
         {
             _activeEffectBase?.OnInteractEnd();
-            RPC_ChangeDescriptionUI(2);
+            int num;
+            if(_characterType == CharacterType.Tanihira)
+            {
+                num = 4;
+            }
+            else if(_characterType == CharacterType.Sarutobi)
+            {
+                num = 3;
+            }
+            else
+            {
+                num = 2;
+            }
+            RPC_ChangeDescriptionUI(num);
             _activeEffectBase = null;
+            _characterType = CharacterType.None;
         }
 
         /// <summary>
