@@ -2,7 +2,7 @@ using Cinemachine;
 using Fusion;
 using UnityEngine;
 
-public class AimCameraController : MonoBehaviour
+public class AimCameraController : NetworkBehaviour
 {
     [Header("通常のカメラ")]
     [SerializeField] private CinemachineVirtualCamera _normalCamera;
@@ -12,7 +12,6 @@ public class AimCameraController : MonoBehaviour
     [Header("CrosshairPrefab(照準のUI)")]
     [SerializeField] private GameObject _crosshairPrefab;
     private GameObject _crosshair;
-    private bool _isCrosshairGeneration; //照準のUIを生成済みか
     
     public Camera MainCamera { get; private set; }
 
@@ -21,9 +20,14 @@ public class AimCameraController : MonoBehaviour
     /// </summary>
     public bool IsAim { get; private set; }
 
-    void Start()
+    public override void Spawned()
     {
-        MainCamera = Camera.main;
+        if (HasInputAuthority)
+        {
+            MainCamera = Camera.main;
+            _crosshair = Instantiate(_crosshairPrefab);
+            _crosshair.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -43,12 +47,22 @@ public class AimCameraController : MonoBehaviour
     /// </summary>
     public void AimCamera()
     {
+        if(!HasInputAuthority) return;
+        
         IsAim = true;
         _normalCamera.gameObject.SetActive(false);
         _aimCamera.gameObject.SetActive(true);
         
         //プレイヤーの向きをカメラの方向に合わせる
-        this.gameObject.transform.forward = MainCamera.transform.forward;
+        if (MainCamera == null)
+        {
+            MainCamera = Camera.main;
+            Debug.LogWarning("MainCameraがnull");
+            return;
+        }
+        var camForward = MainCamera.transform.forward;
+        camForward.y = 0;
+        gameObject.transform.forward = camForward;
     }
 
     /// <summary>
@@ -57,16 +71,13 @@ public class AimCameraController : MonoBehaviour
     /// </summary>
     public void CrosshairToggleChange(bool isFlag)
     {
-        if (!_isCrosshairGeneration) //照準を生成していない場合、照準を表示する
+        if(!HasInputAuthority) return;
+        if(_crosshair == null)
         {
-            _crosshair = Instantiate(_crosshairPrefab);
-            _crosshair.SetActive(true);
-            _isCrosshairGeneration = true;
+            Debug.LogWarning("Crosshairが生成されてない");
+            return;
         }
-        else //照準を生成している場合、照準の表示、非表示を行う
-        {
-            _crosshair.SetActive(isFlag);
-        }
+        _crosshair.SetActive(isFlag);
     }
 
     /// <summary>
@@ -74,6 +85,14 @@ public class AimCameraController : MonoBehaviour
     /// </summary>
     public void PlayerDirectionAIMCamera()
     {
-        this.gameObject.transform.forward = MainCamera.transform.forward;
+        if (MainCamera == null)
+        {
+            MainCamera = Camera.main;
+            Debug.LogWarning("MainCameraが設定されてない");
+            return;
+        }
+        var camForward = MainCamera.transform.forward;
+        camForward.y = 0;
+        gameObject.transform.forward = camForward;
     }
 }

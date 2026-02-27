@@ -1,9 +1,10 @@
+using Fusion;
 using TMPro;
 using UnityEngine;
 
 namespace InGame.Player.Hatano
 {
-    public class AbilityStatusUIManager : MonoBehaviour
+    public class AbilityStatusUIManager : NetworkBehaviour
     {
         [Header("選択中のAbilityを表示するUI")]
         [SerializeField] private GameObject _selectedAbilityUIPrefab;
@@ -15,15 +16,13 @@ namespace InGame.Player.Hatano
         /// </summary>
         private HatanoAbilityStatusNameManager _hatanoAbilityStatusNameManager;
 
-        private void Awake()
+        public override void Spawned()
         {
-            _hatanoAbilityStatusNameManager = new  HatanoAbilityStatusNameManager();
-            
-            //UIの生成
-            if (_selectedAbilityUIObject == null)
+            if (HasInputAuthority)
             {
+                _hatanoAbilityStatusNameManager = new HatanoAbilityStatusNameManager();
+                //UIの生成
                 _selectedAbilityUIObject = Instantiate(_selectedAbilityUIPrefab);
-                
                 var textObj = _selectedAbilityUIObject.transform.GetChild(0).gameObject;
                 _selectedAbilityUIText = textObj.GetComponent<TextMeshProUGUI>();
                 _selectedAbilityUIText.text =
@@ -37,6 +36,7 @@ namespace InGame.Player.Hatano
         /// <param name="status">選択したAbility</param>
         public void SelectedAbilityUITextChanged(HatanoAbilityStatus status)
         {
+            if(!HasInputAuthority) return;
             _selectedAbilityUIText.text = _hatanoAbilityStatusNameManager.abilityStatusNames[status];
         }
     }
