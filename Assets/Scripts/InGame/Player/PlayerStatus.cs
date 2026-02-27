@@ -19,6 +19,11 @@ namespace InGame.Player
         private void OnChangeStamina() => _currentStamina.Value = CurrentStamina;
         public float StaminaRegen { get; private set; }
         public int AttackDamage { get; set; }
+        
+        /// <summary>
+        /// 無敵時間
+        /// </summary>
+        public float InvincibilityTime {get; private set;}
 
         private Stat _speedStat;
         private Stat _staminaStat;
@@ -47,6 +52,7 @@ namespace InGame.Player
             CurrentStamina = _param.Stamina;
             StaminaRegen = _param.StaminaRegen;
             AttackDamage = _param.AttackDamage;
+            InvincibilityTime = _param.InvincibilityTime;
 
             if (HasStateAuthority)
             {
