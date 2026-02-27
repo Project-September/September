@@ -4,7 +4,11 @@ using UnityEngine.Playables;
 
 namespace September.NewResult
 {
-    public class AudioController : MonoBehaviour, INotificationReceiver
+    /// <summary>
+    /// <see cref="AudioMarker"/>を受け取り、サウンドを再生するコンポーネント
+    /// </summary>
+    [RequireComponent(typeof(PlayableDirector))]
+    public class AudioMarkerReceiver : MonoBehaviour, INotificationReceiver
     {
         [SerializeField] private string _cueSheet = "ALLCue";
 
@@ -17,7 +21,6 @@ namespace September.NewResult
         {
             if (notification is AudioMarker marker)
             {
-                Debug.Log(marker.CueName);
                 PlaySound(marker.CueName);
             }
         }
