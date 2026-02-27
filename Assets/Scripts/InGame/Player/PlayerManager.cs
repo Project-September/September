@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using Fusion;
 using InGame.Health;
 using Ingame.Tanihira;
@@ -22,6 +23,10 @@ namespace InGame.Player
         PlayerHealth _playerHealth;
         PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
+        /// <summary>
+        /// 無敵時間のタイマー
+        /// </summary>
+        private TickTimer _invincibleTickTimer;
         PlayerEffectController _playerEffectController;
         Rigidbody _rigidbody;
         private bool _shouldWarp = false;
@@ -44,12 +49,15 @@ namespace InGame.Player
         
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
+        
+        private PlayerStatus _playerStatus;
 
         public override void Spawned()
         {
             InitComponents();
             
             _respawnPosition = transform.position;
+            _playerStatus = GetComponent<PlayerStatus>();
         }
 
         /// <summary> Player関連コンポーネントの初期化 </summary>
@@ -123,6 +131,12 @@ namespace InGame.Player
                 {
                     Restart();
                 }
+                
+                //無敵時間終了の判定
+                if (_invincibleTickTimer.Expired(Runner) && _playerHealth.IsInvincible)
+                {
+                    InvincibilityEnd();
+                }
             }
             
             // プレイヤーの入力の管理
@@ -165,6 +179,19 @@ namespace InGame.Player
             IsStun = false;
             _playerHealth.IsInvincible = false;
             _playerEffectController.StopStunEffect();
+            
+            //気絶終了後、無敵時間を設ける
+            _playerHealth.IsInvincible = true;
+            _invincibleTickTimer = TickTimer.CreateFromSeconds(Runner, _playerStatus.InvincibilityTime);
+        }
+        
+        /// <summary>
+        /// 無敵時間終了後
+        /// </summary>
+        private void InvincibilityEnd()
+        {
+            _playerHealth.IsInvincible = false;
+            Debug.LogWarning("無敵時間終了");
         }
 
         void OnDeath(HitData lastHitData)

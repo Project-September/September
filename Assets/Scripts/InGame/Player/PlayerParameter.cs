@@ -11,7 +11,7 @@ namespace InGame.Player
         [SerializeField] private float _staminaConsumption;
         [SerializeField] float _staminaRegen;
         [SerializeField] int _attackDamage;
-        [Header("復帰後の無敵時間")]
+        [Header("無敵時間")]
         [SerializeField] private float _invincibilityTime;
         
         public int Health => _health;
