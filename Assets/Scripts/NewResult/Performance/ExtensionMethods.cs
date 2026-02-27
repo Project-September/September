@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -38,16 +39,31 @@ namespace September.NewResult
         {
             return !string.IsNullOrEmpty(stateName) && animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
         }
-        
+
+        /// <summary>
+        /// アニメーションクリップを再生します。
+        /// 他のアニメーション処理との併用はしないでください。
+        /// ループが有効なアニメーションクリップはループ再生し続けます。
+        /// </summary>
         public static void PlayInstant(this Animator animator, AnimationClip clip)
         {
-            var graph = PlayableGraph.Create("IdlePlayableGraph");
-            var output = AnimationPlayableOutput.Create(graph, "Animation", animator);
-                    
-            var clipPlayable = AnimationClipPlayable.Create(graph, clip);
-            output.SetSourcePlayable(clipPlayable);
-                    
+            PlayInstantAsync(animator, clip).Forget();
+        }
+        
+        private static async UniTaskVoid PlayInstantAsync(this Animator animator, AnimationClip clip)
+        {
+            var graph = PlayableGraph.Create();
+            var output = AnimationPlayableOutput.Create(graph, string.Empty, animator);
+            
+            var playable = AnimationClipPlayable.Create(graph, clip);
+            if (!clip.isLooping) playable.SetDuration(clip.length);
+            
+            output.SetSourcePlayable(playable);
             graph.Play();
+
+            await UniTask.WhenAny(animator.OnDestroyAsync(), UniTask.WaitUntil(playable, p => p.IsDone()));
+            
+            graph.Destroy();
         }
         
         public static string ToFieldName(this string value)
