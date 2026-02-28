@@ -40,6 +40,13 @@ namespace September.NewResult
                 var winner = gameResultInfo.Players.FirstOrDefault(r => r.Rank == 1);
                 var winnerAssets = resultCharacterAssetsContainer.GetAssets(winner.CharacterType);
                 var winnerPrefab = winnerAssets.ResultCharacterPrefab;
+
+                if (winnerPrefab == null)
+                {
+                    Debug.LogError($"Result character {winner.CharacterType} assets contains no winner prefab.", resultCharacterAssetsContainer);
+                    return null;
+                }
+                
                 state = Instantiate(winnerPrefab);
             }
             return state;
