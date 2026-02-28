@@ -9,9 +9,16 @@ namespace September.NewResult
         public static async UniTask SetSlow(float timeScale, float duration, CancellationToken token)
         {
             var originalTimeScale = Time.timeScale;
-            Time.timeScale = timeScale;
-            await UniTask.WaitForSeconds(duration, true, cancellationToken: token);
-            Time.timeScale = originalTimeScale;
+            
+            try
+            {
+                Time.timeScale = timeScale;
+                await UniTask.WaitForSeconds(duration, true, cancellationToken: token);
+            }
+            finally
+            {
+                Time.timeScale = originalTimeScale;
+            }
         }
     }
 }
