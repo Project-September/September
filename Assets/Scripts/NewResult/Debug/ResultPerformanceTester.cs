@@ -10,9 +10,7 @@ namespace September.NewResult
         
         private void Start()
         {
-            if (!_performanceState) return;
-
-            if (!_performanceState.gameObject.activeInHierarchy)
+            if (!_performanceState || !_performanceState.gameObject.activeInHierarchy)
             {
                 _performanceState = FindFirstObjectByType<ResultPerformanceState>(FindObjectsInactive.Exclude);
             }
