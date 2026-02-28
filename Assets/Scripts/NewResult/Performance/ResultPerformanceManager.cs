@@ -1,8 +1,5 @@
 using System.Linq;
-using System.Threading;
-using CRISound;
 using Cysharp.Threading.Tasks;
-using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,34 +7,22 @@ namespace September.NewResult
 {
     public class ResultPerformanceManager : MonoBehaviour
     {
-        [SerializeField] private ResultUIAnimator _resultUIAnimator;
-        [SerializeField] private RankingView _rankingView;
-        [SerializeField] private MenuActiveController _menuActiveController;
-        [SerializeField] private SceneTransitionEffect _transitionEffect;
-
-        [SerializeField, Expandable] private ResultPerformanceSettings _resultPerformanceSettings;
+        [SerializeField] private ResultPerformanceHandler _handler;
         
         public async UniTask StartResultPerformance(ResultCharacterAssetsContainer resultCharacterAssetsContainer, GameResultInfo gameResultInfo)
         {
-            _menuActiveController.Deactivate();
-
-            // リザルト情報から演出とUI表示に必要なデータを取得
-            var rankingListNames = gameResultInfo.Players
-                .Skip(1) // 最初のプレイヤーは表示しない
-                .Select(x => new RankingItemModel(x.Rank, x.PlayerName, x.CharacterType))
-                .ToArray();
-            
-            _rankingView.CreateRankingList(rankingListNames);
-            _rankingView.SetWinnerPlayerNameText(gameResultInfo.Players.FirstOrDefault(x => x.Rank == 1).PlayerName);
-
-            // アセットの取得
-            Debug.Log("Get Asset Process");
-
-            var winner = gameResultInfo.Players.FirstOrDefault(r => r.Rank == 1);
-            var winnerAssets = resultCharacterAssetsContainer.GetAssets(winner.CharacterType);
-            var winnerPrefab = winnerAssets.ResultCharacterPrefab;
-
             // リザルト用のステージをロード
+            await LoadResultScene(gameResultInfo);
+            
+            // リザルトキャラクターを生成して取得
+            var state = GetState(resultCharacterAssetsContainer, gameResultInfo);
+            
+            // リザルト演出の再生
+            await _handler.Play(state, destroyCancellationToken);
+        }
+
+        private static async UniTask LoadResultScene(GameResultInfo gameResultInfo)
+        {
             var loadSceneTask = UniTask.Create(gameResultInfo.StageSceneName, async stageSceneName =>
             {
                 var loadSceneName = "Result_" + stageSceneName;
@@ -45,58 +30,26 @@ namespace September.NewResult
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(loadSceneName));
             });
 
-            _transitionEffect.SetHoldState();
             await loadSceneTask;
-            
-            // 演出開始
-            if (winnerPrefab != null)
-            {
-                var state = Instantiate(winnerPrefab);
-                _transitionEffect.TryTransitionIn().Forget();
-                await _transitionEffect.WaitUntilState(TransitionState.Opening);
-                
-                state.Play();
-                PlayBGM().Forget();
-                ShowResultUIAsync().Forget();
-                
-                await state.WaitFinish();
-                await _resultPerformanceSettings.PlaySlowMotion();
-            }
-            else
-            {
-                await _transitionEffect.TryTransitionIn();
-                _resultUIAnimator.ShowWinner().Forget();
-            }
-            
-            // UI表示
-            await _resultUIAnimator.ShowRankingItems();
-            await _resultUIAnimator.ShowMenu();
-            Debug.Log("Result Performance End");
-            
-            // 演出終了⇒メニューを選択可能に
-            ShowCursor(destroyCancellationToken).Forget();
-            _menuActiveController.Activate();
-            _menuActiveController.SetEventSystemSelected();
         }
 
-        private async UniTask ShowResultUIAsync()
+        private static ResultPerformanceState GetState(ResultCharacterAssetsContainer resultCharacterAssetsContainer, GameResultInfo gameResultInfo)
         {
-            await UniTask.WaitForSeconds(_resultPerformanceSettings.UIAnimationStartTime);
-            await _resultUIAnimator.ShowWinner();
-        }
-        
-        private async UniTask PlayBGM()
-        {
-            await UniTask.WaitForSeconds(_resultPerformanceSettings.BgmStartTime);
-            CRIAudio.PlayBGM("ALLCue", "BGM_ResultVictory");
-        }
-        
-        private static async UniTask ShowCursor(CancellationToken token)
-        {
-            await UniTask.WaitUntil(() => GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse, cancellationToken: token);
-            
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
+            ResultPerformanceState state;
+            {
+                var winner = gameResultInfo.Players.FirstOrDefault(r => r.Rank == 1);
+                var winnerAssets = resultCharacterAssetsContainer.GetAssets(winner.CharacterType);
+                var winnerPrefab = winnerAssets.ResultCharacterPrefab;
+
+                if (winnerPrefab == null)
+                {
+                    Debug.LogError($"Result character {winner.CharacterType} assets contains no winner prefab.", resultCharacterAssetsContainer);
+                    return null;
+                }
+                
+                state = Instantiate(winnerPrefab);
+            }
+            return state;
         }
     }
 }
