@@ -281,6 +281,7 @@ GameObject:
   - component: {fileID: 1306304631}
   - component: {fileID: 1306304630}
   - component: {fileID: 1306304632}
+  - component: {fileID: 1306304633}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -330,10 +331,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d66e8cba2b724418854ab690daebd23d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _resultUIAnimator: {fileID: 6039519051073967527}
-  _menuActiveController: {fileID: 6039519051073967526}
-  _transitionEffect: {fileID: 11400000, guid: 22b0754ead133274e868eaaf968644d2, type: 2}
-  _resultPerformanceSettings: {fileID: 11400000, guid: 54c5bab4db8ac5a47a47f57f948281ad, type: 2}
+  _handler:
+    _resultUIAnimator: {fileID: 6039519051073967527}
+    _transitionEffect: {fileID: 11400000, guid: 22b0754ead133274e868eaaf968644d2, type: 2}
+    _menuActiveController: {fileID: 6039519051073967526}
+    _settings: {fileID: 11400000, guid: 54c5bab4db8ac5a47a47f57f948281ad, type: 2}
+--- !u!114 &1306304633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306304629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b000d96a344d400596705495d418974b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1709059048
 GameObject:
   m_ObjectHideFlags: 0

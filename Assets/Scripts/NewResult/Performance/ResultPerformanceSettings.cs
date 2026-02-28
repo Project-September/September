@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -21,9 +22,9 @@ namespace September.NewResult
         public float TimeScale => _timeScale;
         public float Duration => _duration;
         
-        public async UniTask PlaySlowMotion()
+        public async UniTask PlaySlowMotion(CancellationToken token)
         {
-            await TimeEx.SetSlow(_timeScale, _duration);
+            await TimeEx.SetSlow(_timeScale, _duration, token);
         }
     }
 }

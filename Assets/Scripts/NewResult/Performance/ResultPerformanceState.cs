@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -21,9 +22,9 @@ namespace September.NewResult
         public void Finish() => _isFinished = true;
         public void Play() => _playableDirector.Play();
 
-        public async UniTask WaitFinish()
+        public async UniTask WaitFinish(CancellationToken token = default)
         {
-            UniTask.WaitUntil(_playableDirector, p => p.state != PlayState.Playing)
+            UniTask.WaitUntil(_playableDirector, p => p.state != PlayState.Playing, cancellationToken: token)
                 .ContinueWith(() =>
                 {
                     if (!_idleAnimationClip || !_characterIdleAnimator) return;
@@ -31,8 +32,8 @@ namespace September.NewResult
                 }).Forget();
             
             await UniTask.WhenAny(
-                UniTask.WaitUntil(this, o => o._isFinished),
-                UniTask.WaitUntil(_playableDirector, p => p.state != PlayState.Playing)
+                UniTask.WaitUntil(this, o => o._isFinished, cancellationToken: token),
+                UniTask.WaitUntil(_playableDirector, p => p.state != PlayState.Playing, cancellationToken: token)
             );
         }
 

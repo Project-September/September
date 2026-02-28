@@ -193,6 +193,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3201440052781324212, guid: c70b93a10a8736648a5ecd9821988a89, type: 3}
   m_PrefabInstance: {fileID: 6119602}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &9192733 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1212921000645406764, guid: 22212d468063faa4b8fbb28c59f44dc9, type: 3}
+  m_PrefabInstance: {fileID: 1320883860}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f3c3eeb566f4eb7bcfb9e1e76604ea6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &9444167
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5025,10 +5036,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff2449aa5be8419fb9cabbaa81a1a490, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _resultUIAnimator: {fileID: 1608665928}
   _performanceState: {fileID: 3808725401786073962}
-  _transitionEffect: {fileID: 11400000, guid: 22b0754ead133274e868eaaf968644d2, type: 2}
-  _resultPerformanceSettings: {fileID: 11400000, guid: 54c5bab4db8ac5a47a47f57f948281ad, type: 2}
+  _handler:
+    _resultUIAnimator: {fileID: 1608665928}
+    _performanceState: {fileID: 3808725401786073962}
+    _transitionEffect: {fileID: 11400000, guid: 22b0754ead133274e868eaaf968644d2, type: 2}
+    _menuActiveController: {fileID: 9192733}
+    _settings: {fileID: 11400000, guid: 54c5bab4db8ac5a47a47f57f948281ad, type: 2}
 --- !u!4 &302604613
 Transform:
   m_ObjectHideFlags: 0

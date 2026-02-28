@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -5,11 +6,11 @@ namespace September.NewResult
 {
     public static class TimeEx
     {
-        public static async UniTask SetSlow(float timeScale, float duration)
+        public static async UniTask SetSlow(float timeScale, float duration, CancellationToken token)
         {
             var originalTimeScale = Time.timeScale;
             Time.timeScale = timeScale;
-            await UniTask.WaitForSeconds(duration, true);
+            await UniTask.WaitForSeconds(duration, true, cancellationToken: token);
             Time.timeScale = originalTimeScale;
         }
     }
