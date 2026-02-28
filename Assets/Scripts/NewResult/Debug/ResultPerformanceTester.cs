@@ -7,9 +7,9 @@ namespace September.NewResult
 {
     public class ResultPerformanceTester : MonoBehaviour
     {
-        [SerializeField] private SceneTransitionEffect _transitionEffect;
         [SerializeField] private ResultUIAnimator _resultUIAnimator;
         [SerializeField] private ResultPerformanceState _performanceState;
+        [SerializeField] private SceneTransitionEffect _transitionEffect;
         
         [SerializeField, Expandable] private ResultPerformanceSettings _resultPerformanceSettings;
         
@@ -22,10 +22,10 @@ namespace September.NewResult
                 _performanceState = FindFirstObjectByType<ResultPerformanceState>(FindObjectsInactive.Exclude);
             }
             
-            NewMethod().Forget();
+            PlayResultPerformanceAsync().Forget();
         }
 
-        private async UniTask NewMethod()
+        private async UniTask PlayResultPerformanceAsync()
         {
             _transitionEffect.SetHoldState();
             _transitionEffect.TryTransitionIn().Forget();
@@ -35,7 +35,8 @@ namespace September.NewResult
             PlayBGM().Forget();
             ShowResultUIAsync().Forget();
             await _performanceState.WaitFinish();
-
+            if (!_performanceState.gameObject) return;
+            
             await _resultPerformanceSettings.PlaySlowMotion();
             
             await _resultUIAnimator.ShowRankingItems();

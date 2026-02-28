@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using NaughtyAttributes;
 using UnityEngine;
 
 namespace September.NewResult
