@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 718009802592381381}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: EffectPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -79,9 +79,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -4366729490715177201, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: -1145033522437499592, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 49355217895645427, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 403792381808512371, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       propertyPath: m_Name
       value: LondonTelephone
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

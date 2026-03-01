@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -881610955048844292}
   - component: {fileID: 884689928168090516}
   - component: {fileID: -5957367846671423442}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muramasa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,9 +260,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -98.519
       objectReference: {fileID: 0}
+    - target: {fileID: 349703318797222849, guid: 4b279324092a16f409651a96006157be, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4b279324092a16f409651a96006157be, type: 3}
       propertyPath: m_Name
       value: EhMD_MuramasaSet_0101
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4b279324092a16f409651a96006157be, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8511333895338062456, guid: 4b279324092a16f409651a96006157be, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
