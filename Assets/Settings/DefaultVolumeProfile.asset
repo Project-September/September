@@ -481,7 +481,23 @@ MonoBehaviour:
   - {fileID: -6288072647309666549}
   - {fileID: 7518938298396184218}
   - {fileID: -1410297666881709256}
-  - {fileID: -4408645427167090405}
+  - {fileID: 247140063400915542}
+--- !u!114 &247140063400915542
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 604f6ea12ba7c71448fd52f16e6a2fcf, type: 3}
+  m_Name: NewPostProcessEffectVolumeComponent
+  m_EditorClassIdentifier: 
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &853819529557874667
 MonoBehaviour:
   m_ObjectHideFlags: 3
