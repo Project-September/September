@@ -1,7 +1,8 @@
-﻿using CRISound;
+﻿using Common.UserSettings;
 using CriWare;
 using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace InGame.UI
@@ -11,6 +12,8 @@ namespace InGame.UI
         [SerializeField, Label("表示非表示させるUI")] private GameObject _optionUIPanel;
         [SerializeField, Label("BGMVolume")] private Slider _bgmVolumeSlider;
         [SerializeField, Label("SEVolume")] private Slider _seVolumeSlider;
+        [SerializeField, Label("VoiceVolume")] private Slider _voiceVolumeSlider;
+        [SerializeField] private Selectable _selectWhenOpen;
 
         private GameInput _gameInput;
         private bool _isShow;
@@ -25,17 +28,22 @@ namespace InGame.UI
         {
             _bgmVolumeSlider.onValueChanged.RemoveAllListeners();
             _seVolumeSlider.onValueChanged.RemoveAllListeners();
+            _voiceVolumeSlider.onValueChanged.RemoveAllListeners();
         }
 
         private void Initialize()
         {
+            var settings = UserSettings.Load();
+            
             _optionUIPanel.SetActive(false);
             _gameInput = GameInput.I;
-            _bgmVolumeSlider.value = 1;
-            _seVolumeSlider.value = 1;
+            _bgmVolumeSlider.value = settings.BGMVolume;
+            _seVolumeSlider.value = settings.SEVolume;
+            _voiceVolumeSlider.value = settings.VoiceVolume;
 
             _bgmVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriBGMVolume());
             _seVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriSEVolume());
+            _voiceVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriVoiceVolume());
         }
 
         
@@ -50,36 +58,39 @@ namespace InGame.UI
                 if (_isShow)
                 {
                     _optionUIPanel.transform.SetAsLastSibling();
+                    EventSystem.current.SetSelectedGameObject(_selectWhenOpen.gameObject);
                 }
+                
                 Cursor.visible = _isShow;
                 Cursor.lockState = _isShow ? CursorLockMode.None : CursorLockMode.Locked;
             }
-            Vector2 currentInput = _gameInput.UI.Volume.ReadValue<Vector2>();
-
-            // Y軸（上下）：BGM調整
-            if (currentInput.y > 0.5f && _prevVolumeInput.y <= 0.5f)
-                _bgmVolumeSlider.value = Mathf.Clamp01(_bgmVolumeSlider.value + 0.05f);
-            else if (currentInput.y < -0.5f && _prevVolumeInput.y >= -0.5f)
-                _bgmVolumeSlider.value = Mathf.Clamp01(_bgmVolumeSlider.value - 0.05f);
-
-            // X軸（左右）：SE調整
-            if (currentInput.x > 0.5f && _prevVolumeInput.x <= 0.5f)
-                _seVolumeSlider.value = Mathf.Clamp01(_seVolumeSlider.value + 0.05f);
-            else if (currentInput.x < -0.5f && _prevVolumeInput.x >= -0.5f)
-                _seVolumeSlider.value = Mathf.Clamp01(_seVolumeSlider.value - 0.05f);
-
-            _prevVolumeInput = currentInput;
         }
 
         private void OnChangeCriBGMVolume()
         {
-            CriAtom.SetCategoryVolume("BGM", _bgmVolumeSlider.value);
+            CriAtom.SetCategoryVolume("BGM", _bgmVolumeSlider.normalizedValue);
+            
+            var settings = UserSettings.Load();
+            settings.BGMVolume = _bgmVolumeSlider.normalizedValue;
+            UserSettings.Save(settings);
         }
 
         private void OnChangeCriSEVolume()
         {
-            CriAtom.SetCategoryVolume("SE", _seVolumeSlider.value);
-            CriAtom.SetCategoryVolume("Voice", _seVolumeSlider.value);   // 仮
+            CriAtom.SetCategoryVolume("SE", _seVolumeSlider.normalizedValue);
+            
+            var settings = UserSettings.Load();
+            settings.SEVolume = _seVolumeSlider.normalizedValue;
+            UserSettings.Save(settings);
+        }
+
+        private void OnChangeCriVoiceVolume()
+        {
+            CriAtom.SetCategoryVolume("Voice", _voiceVolumeSlider.normalizedValue);
+            
+            var settings = UserSettings.Load();
+            settings.VoiceVolume = _voiceVolumeSlider.normalizedValue;
+            UserSettings.Save(settings);
         }
     }
 }
