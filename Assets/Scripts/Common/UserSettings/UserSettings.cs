@@ -1,0 +1,34 @@
+using System;
+using System.IO;
+using UnityEngine;
+
+namespace Common.UserSettings
+{
+    [Serializable]
+    public class UserSettings
+    {
+        public float BGMVolume;
+        public float SEVolume;
+        public float VoiceVolume;
+        
+        // private static readonly UserSettings Instance = Load();
+
+        private static readonly string FilePath = Application.persistentDataPath + "/UserSettings.json";
+
+        public static void Save(UserSettings settings)
+        {
+            var json = JsonUtility.ToJson(settings, false);
+            File.WriteAllText(FilePath, json);
+        }
+
+        public static UserSettings Load()
+        {
+            var userSettings = new UserSettings();
+            if (File.Exists(FilePath))
+            {
+                JsonUtility.FromJsonOverwrite(File.ReadAllText(FilePath), userSettings);
+            }
+            return userSettings;
+        }
+    }
+}
