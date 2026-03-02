@@ -1,4 +1,5 @@
 using Cinemachine;
+using Common.UserSettings;
 using DG.Tweening;
 using UnityEngine;
 
@@ -74,7 +75,13 @@ namespace InGame.Exhibit
 
         void RotateCamera(Vector2 mouseInput, float deltaTime)
         {
-            float sens = GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse ? _sens : _padSens;
+            var settings = UserSettings.Load();
+
+            float sens = 
+                GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse 
+                    ? _sens * settings.MouseSensitivity 
+                    : _padSens * settings.PadSensitivity;
+            
             float deltaX = mouseInput.y, deltaY = mouseInput.x;
             _cameraPitch -= deltaX * deltaTime * sens;
             _cameraPitch = Mathf.Clamp(_cameraPitch, -90, 90);
