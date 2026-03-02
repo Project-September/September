@@ -7,9 +7,11 @@ namespace Common.UserSettings
     [Serializable]
     public class UserSettings
     {
-        public float BGMVolume;
-        public float SEVolume;
-        public float VoiceVolume;
+        public float BGMVolume = 1f;
+        public float SEVolume = 1f;
+        public float VoiceVolume = 1f;
+        public float MouseSensitivity = 1f;
+        public float PadSensitivity = 1f;
         
         // private static readonly UserSettings Instance = Load();
 
