@@ -81,7 +81,7 @@ namespace September.Common
             var dir = currentInput > 0 ? 1 : -1;
             var moveValue = dir * _stepValue;
             
-            _slider.value = Mathf.Clamp01(_slider.value + moveValue);
+            _slider.value += moveValue;
         }
     }
 }

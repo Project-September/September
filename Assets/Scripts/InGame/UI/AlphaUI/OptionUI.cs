@@ -1,6 +1,8 @@
-﻿using Common.UserSettings;
+﻿using System;
+using Common.UserSettings;
 using CriWare;
 using NaughtyAttributes;
+using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,40 +12,44 @@ namespace InGame.UI
     public class OptionUI : MonoBehaviour
     {
         [SerializeField, Label("表示非表示させるUI")] private GameObject _optionUIPanel;
+        [SerializeField, Label("表示時に選択するUI")] private Selectable _selectWhenOpen;
+        [Space(16)]
         [SerializeField, Label("BGMVolume")] private Slider _bgmVolumeSlider;
         [SerializeField, Label("SEVolume")] private Slider _seVolumeSlider;
         [SerializeField, Label("VoiceVolume")] private Slider _voiceVolumeSlider;
-        [SerializeField] private Selectable _selectWhenOpen;
+        [SerializeField, Label("CameraSensitivity")] private Slider _cameraSensitivitySlider;
 
         private GameInput _gameInput;
         private bool _isShow;
-        private Vector2 _prevVolumeInput;
         
         private void Start()
         {
             Initialize();
         }
 
-        private void OnDestroy()
-        {
-            _bgmVolumeSlider.onValueChanged.RemoveAllListeners();
-            _seVolumeSlider.onValueChanged.RemoveAllListeners();
-            _voiceVolumeSlider.onValueChanged.RemoveAllListeners();
-        }
-
         private void Initialize()
         {
-            var settings = UserSettings.Load();
-            
             _optionUIPanel.SetActive(false);
             _gameInput = GameInput.I;
-            _bgmVolumeSlider.value = settings.BGMVolume;
-            _seVolumeSlider.value = settings.SEVolume;
-            _voiceVolumeSlider.value = settings.VoiceVolume;
 
-            _bgmVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriBGMVolume());
-            _seVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriSEVolume());
-            _voiceVolumeSlider.onValueChanged.AddListener(_ => OnChangeCriVoiceVolume());
+            {
+                var settings = UserSettings.Load();
+
+                _bgmVolumeSlider.value = settings.BGMVolume;
+                _seVolumeSlider.value = settings.SEVolume;
+                _voiceVolumeSlider.value = settings.VoiceVolume;
+                _cameraSensitivitySlider.value = settings.MouseSensitivity;
+            }
+
+            SubscribeVolumeSliderSetting(_bgmVolumeSlider, "BGM", (v, s) => s.BGMVolume = v);
+            SubscribeVolumeSliderSetting(_seVolumeSlider, "SE", (v, s) => s.SEVolume = v);
+            SubscribeVolumeSliderSetting(_voiceVolumeSlider, "Voice", (v, s) => s.VoiceVolume = v);
+            
+            SubscribeSliderSetting(_cameraSensitivitySlider, (v, s) =>
+            {
+                s.MouseSensitivity = v;
+                s.PadSensitivity = v;
+            });
         }
 
         
@@ -66,31 +72,32 @@ namespace InGame.UI
             }
         }
 
-        private void OnChangeCriBGMVolume()
+        private static void SubscribeVolumeSliderSetting(Slider slider, string category, Action<float, UserSettings> paramUpdate)
         {
-            CriAtom.SetCategoryVolume("BGM", _bgmVolumeSlider.normalizedValue);
-            
-            var settings = UserSettings.Load();
-            settings.BGMVolume = _bgmVolumeSlider.normalizedValue;
-            UserSettings.Save(settings);
-        }
+            slider
+                .OnValueChangedAsObservable()
+                .Subscribe(value =>
+                {
+                    CriAtom.SetCategoryVolume(category, value);
 
-        private void OnChangeCriSEVolume()
-        {
-            CriAtom.SetCategoryVolume("SE", _seVolumeSlider.normalizedValue);
-            
-            var settings = UserSettings.Load();
-            settings.SEVolume = _seVolumeSlider.normalizedValue;
-            UserSettings.Save(settings);
+                    var settings = UserSettings.Load();
+                    paramUpdate?.Invoke(value, settings);
+                    UserSettings.Save(settings);
+                })
+                .AddTo(slider);
         }
-
-        private void OnChangeCriVoiceVolume()
+        
+        private static void SubscribeSliderSetting(Slider slider, Action<float, UserSettings> paramUpdate)
         {
-            CriAtom.SetCategoryVolume("Voice", _voiceVolumeSlider.normalizedValue);
-            
-            var settings = UserSettings.Load();
-            settings.VoiceVolume = _voiceVolumeSlider.normalizedValue;
-            UserSettings.Save(settings);
+            slider
+                .OnValueChangedAsObservable()
+                .Subscribe(value =>
+                {
+                    var settings = UserSettings.Load();
+                    paramUpdate?.Invoke(value, settings);
+                    UserSettings.Save(settings);
+                })
+                .AddTo(slider);
         }
     }
 }
