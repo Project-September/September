@@ -33,7 +33,7 @@ namespace InGame.UI
             _gameInput = GameInput.I;
 
             {
-                var settings = UserSettings.Load();
+                var settings = UserSettings.Get();
 
                 _bgmVolumeSlider.value = settings.BGMVolume;
                 _seVolumeSlider.value = settings.SEVolume;
@@ -80,7 +80,7 @@ namespace InGame.UI
                 {
                     CriAtom.SetCategoryVolume(category, value);
 
-                    var settings = UserSettings.Load();
+                    var settings = UserSettings.Get();
                     paramUpdate?.Invoke(value, settings);
                     UserSettings.Save(settings);
                 })
@@ -93,7 +93,7 @@ namespace InGame.UI
                 .OnValueChangedAsObservable()
                 .Subscribe(value =>
                 {
-                    var settings = UserSettings.Load();
+                    var settings = UserSettings.Get();
                     paramUpdate?.Invoke(value, settings);
                     UserSettings.Save(settings);
                 })

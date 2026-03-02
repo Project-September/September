@@ -75,7 +75,7 @@ namespace InGame.Exhibit
 
         void RotateCamera(Vector2 mouseInput, float deltaTime)
         {
-            var settings = UserSettings.Load();
+            var settings = UserSettings.Get();
 
             float sens = 
                 GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse 

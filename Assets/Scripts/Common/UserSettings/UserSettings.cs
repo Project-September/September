@@ -12,8 +12,20 @@ namespace Common.UserSettings
         public float VoiceVolume = 1f;
         public float MouseSensitivity = 1f;
         public float PadSensitivity = 1f;
+
+        private static UserSettings Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = Load();
+                }
+                return _instance;
+            }
+        }
         
-        // private static readonly UserSettings Instance = Load();
+        private static UserSettings _instance;
 
         private static readonly string FilePath = Application.persistentDataPath + "/UserSettings.json";
 
@@ -23,13 +35,19 @@ namespace Common.UserSettings
             File.WriteAllText(FilePath, json);
         }
 
-        public static UserSettings Load()
+        public static UserSettings Get()
+        {
+            return Instance;
+        }
+
+        private static UserSettings Load()
         {
             var userSettings = new UserSettings();
             if (File.Exists(FilePath))
             {
                 JsonUtility.FromJsonOverwrite(File.ReadAllText(FilePath), userSettings);
             }
+
             return userSettings;
         }
     }

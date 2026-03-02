@@ -58,7 +58,7 @@ namespace InGame.Player
             // 他で回転中なら
             if (_isInRotation) return;
 
-            var settings = UserSettings.Load();
+            var settings = UserSettings.Get();
             
             float sens = 
                 GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse 
