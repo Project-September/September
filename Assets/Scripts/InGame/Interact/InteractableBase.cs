@@ -13,114 +13,181 @@ using InGame.Player;
 using CRISound;
 using September.InGame.UI;
 using WebSocketSharp;
+using System.Threading;
 
 namespace InGame.Interact
 {
-    [RequireComponent(typeof (AudioBroadcaster))] // サウンド再生用のコンポーネント
+    /// <summary>
+    /// プレイヤーがインタラクトできるオブジェクトの基底クラス
+    /// 展示物などのインタラクト可能なオブジェクトに必要な共通機能を提供する
+    /// - クールダウン管理
+    /// - エフェクト再生（インタラクト完了、クールダウン）
+    /// - 音声再生
+    /// - バリデーション処理（クールダウン中、ゲーム終了、プレイヤースタン状態）
+    /// - 展示物タイプの登録とログ表示
+    /// </summary>
+    [RequireComponent(typeof(AudioBroadcaster))] // サウンド再生用のコンポーネント
     [DisallowMultipleComponent]
     public class InteractableBase : NetworkBehaviour
     {
+        /// <summary>キャラクタータイプごとのインタラクト所要時間（秒）</summary>
         [SerializeField] private SerializableDictionary<CharacterType, float> _requiredInteractTimeDictionary = new();
 
+        /// <summary>キャラクタータイプごとのクールダウン時間（秒）</summary>
         [SerializeField] private SerializableDictionary<CharacterType, float> _cooldownTimeDictionary = new();
 
+        /// <summary>キャラクタータイプごとのインタラクト効果リスト</summary>
         [SerializeReference, SubclassSelector] private List<CharacterInteractEffectBase> _characterEffects = new();
 
+        /// <summary>この展示物のタイプ</summary>
         [SerializeField] private ExhibitType _type;
+        /// <summary>インタラクトエフェクトの位置オフセット</summary>
         [SerializeField] private Vector3 _interactEffectOffset = Vector3.zero;
+        /// <summary>クールダウンエフェクトを再生するTransform（未設定の場合は自身）</summary>
         [SerializeField] private Transform _cooldownEffectTransform;
+        /// <summary>クールダウンエフェクトの位置オフセット</summary>
         [SerializeField] private Vector3 _cooldownEffectOffset = Vector3.zero;
+        /// <summary>クールダウンエフェクトの回転（Euler角）</summary>
         [SerializeField] private Vector3 _cooldownEffectRotation = Vector3.zero;
+        /// <summary>クールダウンエフェクトのスケール</summary>
+        [SerializeField] private Vector3 _cooldownEffectScale = Vector3.one;
+        /// <summary>インタラクト完了時のエフェクトタイプ</summary>
         [SerializeField] private EffectType _interactEffectType = EffectType.NormalInteractComplete;
+        /// <summary>クールダウン中のエフェクトタイプ</summary>
         [SerializeField] private EffectType _cooldownEffectType = EffectType.CooldownSquare;
+        /// <summary>クールダウンエフェクトをインタラクト直後に再生するか</summary>
         [SerializeField] private bool _spawnCooldownEffectOnStart = true;
+        /// <summary>サウンド再生用コンポーネント</summary>
         [SerializeField] private AudioBroadcaster _audioBroadcaster;
+        /// <summary>インタラクト時のサウンドCue名</summary>
         [SerializeField] private string _interactSoundCueName;
+        /// <summary>サウンドの再生タイプ（2D/3D）</summary>
         [SerializeField] private SoundTrackingType _interactSoundTrackingType = SoundTrackingType.Spot;
 
+        /// <summary>最後にインタラクトされた時刻（ネットワーク同期）</summary>
         [Networked] public float LastInteractTime { get; set; } = -9999f;
 
+        /// <summary>最後に使用されたクールダウン時間（ネットワーク同期）</summary>
         [Networked] public float LastUsedCooldownTime { get; set; } = 0f;
 
         /// <summary>
-        /// 外部から強制的にインタラクト可能にするかどうかを設定するために使う
+        /// 外部から強制的にインタラクト可否を設定するフラグ（ネットワーク同期）
+        /// falseに設定するとインタラクトを無効化できる
         /// </summary>
         [Networked]
         public bool ForceSetInteractable { get; set; } = true;
 
+        /// <summary>インタラクト所要時間の読み取り専用プロパティ</summary>
         public SerializableDictionary<CharacterType, float> RequiredInteractTimeDictionary =>
             _requiredInteractTimeDictionary;
 
+        /// <summary>クールダウン時間の読み取り専用プロパティ</summary>
         public SerializableDictionary<CharacterType, float> CooldownTimeDictionary => _cooldownTimeDictionary;
 
+        /// <summary>展示物タイプの読み取り専用プロパティ</summary>
         public ExhibitType ExhibitType => _type;
 
+        /// <summary>AudioBroadcasterの読み取り専用プロパティ</summary>
         public AudioBroadcaster AudioBroadcaster => _audioBroadcaster;
 
+        /// <summary>現在アクティブなインタラクト効果</summary>
         private CharacterInteractEffectBase _activeEffectBase;
 
+        private CharacterType _characterType; 
+
+        /// <summary>
+        /// インタラクトのメイン処理（Host側でのみ実行）
+        /// バリデーション → クールダウン設定 → エフェクト再生 → 効果発動 → 展示物登録・音声再生・ログ表示
+        /// </summary>
+        /// <param name="context">インタラクトのコンテキスト（実行者、キャラクタータイプ）</param>
         public void Interact(IInteractableContext context)
         {
+            // Host側でのみ実行
             if (!HasStateAuthority) return;
 
+            // バリデーションチェック（クールダウン、ゲーム状態など）
             if (!ValidateInteraction(context))
             {
                 Debug.Log($"[InteractableBase] OnValidateInteraction により拒否: {context.Interactor}");
                 return;
             }
 
-            var charaType = context.CharacterType;
+            _characterType = context.CharacterType;
 
-            // All 優先でクールダウン時間を取得
+            // CharacterType.All を優先、なければキャラ固有のクールダウン時間を取得
             LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
-                : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(charaType, 0f);
+                : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(_characterType, 0f);
 
-            // クールダウン登録（サーバ時刻 or ローカル時刻）
+            // インタラクト時刻を記録（NetworkRunnerがあればシミュレーション時刻、なければローカル時刻）
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
 
-            // クールダウンのループエフェクト（必要なら）
+            // クールダウンのループエフェクトを再生（設定がONで、クールダウン時間が0より大きい場合）
             if (_spawnCooldownEffectOnStart && LastUsedCooldownTime > 0f)
             {
                 PlayCooldownEffect(LastUsedCooldownTime).Forget();
             }
 
-            // ワンショットの相互作用エフェクト（ホスト側でのみ再生。見た目の同期は別途やる場合はRPC/OnChangedで）
+            // インタラクト完了エフェクトを再生（ワンショット）
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             effectSpawner.RequestPlayOneShotEffect(_interactEffectType, transform.position + _interactEffectOffset, transform.rotation);
 
-            // このインタラクトに紐づく派生処理
+            // 派生クラスの個別処理を実行
             OnInteract(context);
 
-            // 実行者
+            // インタラクト実行者のPlayerRefを取得
             PlayerRef actor = PlayerRef.FromEncoded(context.Interactor);
-            
+
+            // 展示物タイプが設定されていればPlayerDatabaseに登録
             if (_type != ExhibitType.None)
             {
                 PlayerDatabase.Instance.Server_AddExhibit(actor, _type);
             }
 
+            // インタラクト音を再生
             if (_audioBroadcaster != null)
             {
-                _audioBroadcaster.RPC_PlaySoundFromCode(_interactSoundCueName, _interactSoundTrackingType, Object, actor); // 2D + 3D再生
+                _audioBroadcaster.RPC_PlaySoundFromCode(_interactSoundCueName, _interactSoundTrackingType, Object, actor);
             }
-            
+
+            // 全クライアントにインタラクトログを表示
             Rpc_ShowInteractLog(actor, _type);
         }
 
+        /// <summary>
+        /// クールダウンエフェクトを再生する非同期処理
+        /// 指定時間経過後にエフェクトを停止し、回復音を再生
+        /// </summary>
+        /// <param name="cooldownTime">クールダウン時間（秒）</param>
         public async UniTask PlayCooldownEffect(float cooldownTime)
         {
             if (cooldownTime <= 0f) return;
+
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
-            var uniqueEffectId = $"cooldown_{Object.Id}";
+            var uniqueEffectId = $"cooldown_{Object.Id}"; // オブジェクトIDを使って一意なIDを生成
             var effectTransform = _cooldownEffectTransform != null ? _cooldownEffectTransform : transform;
+
+            // ループエフェクトを開始
             effectSpawner.RequestPlayLoopEffect(uniqueEffectId, _cooldownEffectType,
-                effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation));
-            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false);
-            effectSpawner.StopEffect(uniqueEffectId);
-            Rpc_PlaySE(SoundCues.SE.Exhibit_Revive.Sheet, SoundCues.SE.Exhibit_Revive.Name, effectTransform.position); // クールダウン回復音
+                effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation),
+                _cooldownEffectScale);
+
+            // クールダウン時間待機
+            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false, cancellationToken: this.GetCancellationTokenOnDestroy());
+
+            // エフェクトを停止
+            effectSpawner?.StopEffect(uniqueEffectId);
+
+            // クールダウン回復音を全クライアントで再生
+            Rpc_PlaySE(SoundCues.SE.Exhibit_Revive.Sheet, SoundCues.SE.Exhibit_Revive.Name, effectTransform.position);
         }
 
+        /// <summary>
+        /// 全クライアントでSEを再生するRPC
+        /// </summary>
+        /// <param name="sheet">サウンドシート名</param>
+        /// <param name="cueName">サウンドCue名</param>
+        /// <param name="position">再生位置</param>
         [Rpc]
         private void Rpc_PlaySE(string sheet, string cueName, Vector3 position)
         {
@@ -128,30 +195,37 @@ namespace InGame.Interact
         }
 
         /// <summary>
-        /// 共通のバリデーション（null, クールダウン）
-        /// インタラクト可能なときは true を返す
+        /// インタラクト可否の共通バリデーション
+        /// クールダウン中、オブジェクト無効、強制無効化、派生クラスの条件をチェック
         /// </summary>
+        /// <param name="context">インタラクトのコンテキスト</param>
+        /// <returns>true: インタラクト可能、false: インタラクト不可</returns>
         public bool ValidateInteraction(IInteractableContext context)
         {
             var type = context.CharacterType;
+
+            // クールダウン中はインタラクト不可
             if (IsInCooldown())
             {
                 //Debug.LogError("[InteractableBase] クールダウン中のためインタラクトできません");
                 return false;
             }
 
+            // オブジェクトが無効な場合はインタラクト不可
             if (!Object.isActiveAndEnabled)
             {
                 //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが無効です");
                 return false;
             }
 
+            // 強制無効化フラグがfalseの場合はインタラクト不可
             if (!ForceSetInteractable)
             {
                 //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
                 return false;
             }
 
+            // 派生クラスの個別条件をチェック
             if (!OnValidateInteraction(context, type))
             {
                 //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
@@ -161,10 +235,26 @@ namespace InGame.Interact
             return true;
         }
 
+        public void ForceStartCooldown(float seconds)
+        {
+            if (!HasStateAuthority) return;
+
+            LastUsedCooldownTime = seconds;
+            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
+
+            if (_spawnCooldownEffectOnStart && seconds > 0f)
+            {
+                PlayCooldownEffect(seconds).Forget();
+            }
+        }
+
         /// <summary>
-        /// 派生クラスでの個別条件（ロック中、所有者チェックなど）
-        /// インタラクト可能ならTrueを返す
+        /// 派生クラスで個別のバリデーション条件を追加する仮想メソッド
+        /// デフォルトではゲーム終了状態とプレイヤースタン状態をチェック
         /// </summary>
+        /// <param name="context">インタラクトのコンテキスト</param>
+        /// <param name="charaType">キャラクタータイプ</param>
+        /// <returns>true: インタラクト可能、false: インタラクト不可</returns>
         protected virtual bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
         {
             // ゲーム終了状態の時はインタラクトを無効化
@@ -183,8 +273,10 @@ namespace InGame.Interact
         }
 
         /// <summary>
-        /// ゲームが終了状態かどうかを判定する
+        /// ゲームが終了状態（EndingState）かどうかを判定
+        /// エラー時は安全側でインタラクトを許可（falseを返す）
         /// </summary>
+        /// <returns>true: ゲーム終了状態、false: それ以外</returns>
         private bool IsGameEnded()
         {
             try
@@ -197,14 +289,17 @@ namespace InGame.Interact
             }
             catch (System.Exception)
             {
-                // エラーが発生した場合は安全側にインタラクトを許可
+                // エラーが発生した場合は安全側でインタラクトを許可
                 return false;
             }
         }
 
         /// <summary>
-        /// プレイヤーがスタン状態かどうかを判定する
+        /// プレイヤーがスタン状態かどうかを判定
+        /// エラー時は安全側でインタラクトを許可（falseを返す）
         /// </summary>
+        /// <param name="context">インタラクトのコンテキスト</param>
+        /// <returns>true: スタン状態、false: それ以外</returns>
         private bool IsPlayerStunned(IInteractableContext context)
         {
             try
@@ -234,16 +329,23 @@ namespace InGame.Interact
             return false;
         }
 
+        /// <summary>
+        /// 派生クラスで個別のインタラクト処理を実装する仮想メソッド
+        /// デフォルトではキャラクタータイプに応じた効果を選択して実行
+        /// </summary>
+        /// <param name="context">インタラクトのコンテキスト</param>
         protected virtual void OnInteract(IInteractableContext context)
         {
             var charaType = context.CharacterType;
-            // All を優先し、特定キャラタイプの effect があれば上書きする
+
+            // CharacterType.All を優先、なければキャラ固有の効果を取得
             var effect = _characterEffects
                              .FirstOrDefault(e => e is { CharacterType: CharacterType.All })
                          ?? _characterEffects.FirstOrDefault(e => e != null && e.CharacterType == charaType);
 
             if (effect != null)
             {
+                // 効果をクローンして開始
                 _activeEffectBase = effect.Clone();
                 _activeEffectBase.OnInteractStart(context, this);
             }
@@ -253,6 +355,10 @@ namespace InGame.Interact
             }
         }
 
+        /// <summary>
+        /// 現在クールダウン中かどうかを判定
+        /// </summary>
+        /// <returns>true: クールダウン中、false: クールダウン終了</returns>
         public bool IsInCooldown()
         {
             if (LastUsedCooldownTime <= 0f) return false;
@@ -261,50 +367,97 @@ namespace InGame.Interact
             return timeSinceLast < LastUsedCooldownTime;
         }
 
+        /// <summary>
+        /// 通常更新処理（Host側でのみ実行）
+        /// アクティブな効果のOnInteractUpdate()を呼び出す
+        /// </summary>
         private void Update()
         {
             if (!HasStateAuthority) return;
             _activeEffectBase?.OnInteractUpdate(Time.deltaTime);
         }
 
+        /// <summary>
+        /// 遅延更新処理（Host側でのみ実行）
+        /// アクティブな効果のOnInteractLateUpdate()を呼び出す
+        /// </summary>
         private void LateUpdate()
         {
             if (!HasStateAuthority) return;
             _activeEffectBase?.OnInteractLateUpdate(Time.deltaTime);
         }
 
+        /// <summary>
+        /// 物理更新処理（Host側でのみ実行）
+        /// アクティブな効果のOnInteractFixedUpdate()を呼び出す
+        /// </summary>
         private void FixedUpdate()
         {
             if (!HasStateAuthority) return;
             _activeEffectBase?.OnInteractFixedUpdate();
         }
 
+        /// <summary>
+        /// ネットワーク同期された固定更新処理
+        /// アクティブな効果のOnInteractFixedNetworkUpdate()を呼び出す
+        /// </summary>
         public override void FixedUpdateNetwork()
         {
             GetInput(out PlayerInput input);
             _activeEffectBase?.OnInteractFixedNetworkUpdate(input);
         }
 
+        /// <summary>
+        /// コリジョン接触中の処理（Host側でのみ実行）
+        /// アクティブな効果のOnInteractCollisionStay()を呼び出す
+        /// </summary>
+        /// <param name="collision">コリジョン情報</param>
         private void OnCollisionStay(Collision collision)
         {
             if (!HasStateAuthority) return;
             _activeEffectBase?.OnInteractCollisionStay(collision);
         }
 
-        // 必要に応じて外部 or クールダウンなどから呼び出す用
+        /// <summary>
+        /// インタラクト終了処理
+        /// 外部またはクールダウンなどから呼び出される
+        /// </summary>
         public void EndInteract()
         {
             _activeEffectBase?.OnInteractEnd();
-            RPC_ChangeDescriptionUI(2);
+            int num;
+            if(_characterType == CharacterType.Tanihira)
+            {
+                num = 4;
+            }
+            else if(_characterType == CharacterType.Sarutobi)
+            {
+                num = 3;
+            }
+            else
+            {
+                num = 2;
+            }
+            RPC_ChangeDescriptionUI(num);
             _activeEffectBase = null;
+            _characterType = CharacterType.None;
         }
-        
+
+        /// <summary>
+        /// InputAuthorityに説明UIの変更を指示するRPC
+        /// </summary>
+        /// <param name="mode">UIモード</param>
         [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
         private void RPC_ChangeDescriptionUI(int mode)
         {
             UIController.I.ChangeDescriptionUI(mode);
         }
-        
+
+        /// <summary>
+        /// 全クライアントにインタラクトログを表示するRPC
+        /// </summary>
+        /// <param name="actor">インタラクト実行者のPlayerRef</param>
+        /// <param name="exhibitType">展示物タイプ</param>
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void Rpc_ShowInteractLog(PlayerRef actor, ExhibitType exhibitType)
         {
@@ -314,18 +467,53 @@ namespace InGame.Interact
                 UIController.I.ShowLog($"{actorName} が {exhibitType.ToDisplayName()} にインタラクトしました");
             }
         }
-    }
 
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            // クールダウンエフェクトの位置と向きを表示
+            var effectTransform = _cooldownEffectTransform != null ? _cooldownEffectTransform : transform;
+            var effectPos = effectTransform.position + _cooldownEffectOffset;
+            var effectRot = Quaternion.Euler(_cooldownEffectRotation);
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(effectPos, 0.3f);
+
+            // 向きを矢印で表示（Forward=青, Up=緑, Right=赤）
+            float arrowLength = 0.8f;
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(effectPos, effectRot * Vector3.forward * arrowLength);
+            Gizmos.color = Color.green;
+            Gizmos.DrawRay(effectPos, effectRot * Vector3.up * arrowLength);
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(effectPos, effectRot * Vector3.right * arrowLength);
+
+            // インタラクトエフェクトの位置を表示
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position + _interactEffectOffset, 0.2f);
+        }
+#endif
+    }
+}
+
+    /// <summary>
+    /// インタラクト時のコンテキスト情報を保持するインターフェース
+    /// </summary>
     public interface IInteractableContext : INetworkStruct
     {
+        /// <summary>インタラクト実行者のPlayerRef（エンコード済み）</summary>
         int Interactor { get; }
+        /// <summary>インタラクト実行者のキャラクタータイプ</summary>
         CharacterType CharacterType { get; set; }
     }
 
-    // シンプルな実装例。必要に合わせて情報は追加してください
+    /// <summary>
+    /// IInteractableContextのシンプルな実装
+    /// 必要に応じて情報を追加可能
+    /// </summary>
     public struct InteractableContext : IInteractableContext
     {
         public int Interactor { get; set; }
         public CharacterType CharacterType { get; set; }
     }
-}

@@ -99,7 +99,6 @@ namespace InGame.Exhibit.InteractEffect
             _lastDelayKnotIndex = -1;
             //_audioBroadcaster.PlaySoundAtPosition(SoundCues.SE.Car_Interact.Name, this.transform.position);
             _audioBroadcaster.PlaySoundAtTransformFollow(SoundCues.SE.Car_Interact.Name, Object);
-            Debug.Log("再生");
         }
 
         public void EffectSpawn()

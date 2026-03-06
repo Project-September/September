@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 806825774370489575}
   - component: {fileID: 905073906492759685}
   - component: {fileID: 3580074162540170996}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: SateliteCannon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,7 +82,9 @@ MonoBehaviour:
   - rid: 3416131569625071707
   _type: 0
   _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
@@ -100,6 +102,7 @@ MonoBehaviour:
       data:
         _characterType: 4
         SateliteCannonInteractRPCInvoker: {fileID: 806825774370489575}
+        _lookPoint: {fileID: 0}
 --- !u!114 &806825774370489575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,6 +207,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: bf9f71c9fc90ffa4a818b68cf1264435, type: 3}
       propertyPath: m_Name
       value: EhMD_sateracanon_0101
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bf9f71c9fc90ffa4a818b68cf1264435, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

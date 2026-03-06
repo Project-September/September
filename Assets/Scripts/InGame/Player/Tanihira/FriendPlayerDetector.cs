@@ -24,6 +24,10 @@ namespace Ingame.Tanihira
         private Collider[] _overlapResults = new Collider[50];
         private bool _isEnd;
 
+        [SerializeField, ReadOnly] private bool _isSerching = true;
+        private Transform _moveIndependentDestination; //ペンギンが自立する時の目的地
+        private BossPenguinFriend _bossPenguinFriend;
+
         private void Start()
         {
             if (HasStateAuthority)
@@ -58,6 +62,17 @@ namespace Ingame.Tanihira
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 索敵の中心を変更する
+        /// </summary>
+        /// <param name="target"></param>
+        public void ChangeDetectionCenter(Transform target, bool isSerching, Transform moveDestination = null)
+        {
+            _detectionCenter = target;
+            _isSerching = isSerching;
+            _moveIndependentDestination = moveDestination;
         }
         
         private void GameStart()
@@ -131,7 +146,15 @@ namespace Ingame.Tanihira
             }
             else
             {
-                _friendStateChanger.SetMoveState();
+                if (_isSerching)
+                {
+                    _friendStateChanger.SetMoveState();
+                }
+                else
+                {
+                    _friendStateChanger.IndependentFrienState(_moveIndependentDestination);
+                }
+                
             }
         }
         

@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.AddressableAssets;
-#endif
+
 
 namespace InGame.Common.AnimationMontage
 {
@@ -167,3 +167,4 @@ namespace InGame.Common.AnimationMontage
         }
     }
 }
+#endif

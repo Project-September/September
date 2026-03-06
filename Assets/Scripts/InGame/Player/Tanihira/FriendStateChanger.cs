@@ -21,6 +21,18 @@ namespace Ingame.Tanihira
                 _formationManager.SortFormation();
             }
         }
+
+        public void IndependentFrienState(Transform destination)
+        {
+            if (_formationManager == null)
+                return;
+
+            foreach (var friend in _formationManager.FriendsList)
+            {
+                friend.SetDestination(destination);
+                friend.ChangeState(FriendState.Move);
+            }
+        }
         
         /// <summary>
         /// 攻撃処理を行う

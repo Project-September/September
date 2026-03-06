@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using sepLog = September.Editor.Logger;
 
 namespace September.Editor.AssetImporter
@@ -79,7 +79,7 @@ namespace September.Editor.AssetImporter
             SubscribeToServiceEvents();
         }
 
-        public async UniTask InitializeAsync()
+        public async Task InitializeAsync()
         {
             try
             {
@@ -106,7 +106,7 @@ namespace September.Editor.AssetImporter
             }
         }
 
-        public async UniTask ImportSelectedAssetAsync()
+        public async Task ImportSelectedAssetAsync()
         {
             if (IsImporting) return;
             
@@ -127,11 +127,9 @@ namespace September.Editor.AssetImporter
                     throw new AssetImportException("選択されたリリースにアセットが含まれていません");
                 }
 
-                var assetId = selectedRelease.Assets[0].ID;
-                
                 var extractPath = await _assetImportService.DownloadAndExtractAssetAsync(
-                    AssetImportConstants.Routes.Asset, 
-                    assetId, 
+                    AssetImportConstants.Routes.Asset,
+                    selectedRelease.Assets,
                     _cancellationTokenSource.Token);
                 
                 _assetImportService.ImportUnityPackages(extractPath, AssetImportSettings.ShowImportWindow);
