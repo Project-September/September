@@ -1,5 +1,7 @@
 using System.Net.NetworkInformation;
+using ExitGames.Client.Photon.StructWrapping;
 using Fusion;
+using InGame.Common;
 using InGame.Health;
 using Ingame.Tanihira;
 using September.Common;
@@ -21,6 +23,7 @@ namespace InGame.Player
         PlayerMovement _playerMovement;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
+        AnimationClipPlayerManager _animationClipPlayerManager;
         PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
         /// <summary>
@@ -34,6 +37,11 @@ namespace InGame.Player
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
         public PlayerControlState CurrentPlayerControlState => _playerControlState;
+
+        /// <summary>
+        /// 気絶時間
+        /// </summary>
+        private float _sTimer;
 
         public void SetWarpTarget(Vector3 targetPosition,Quaternion targetRotation)
         {
@@ -58,6 +66,12 @@ namespace InGame.Player
             
             _respawnPosition = transform.position;
             _playerStatus = GetComponent<PlayerStatus>();
+            
+            //気絶時間の設定
+            var animF = _animationClipPlayerManager.FaintAnim.length / _animationClipPlayerManager.PlaybackSpeed;
+            var animG = _animationClipPlayerManager.GetUpAnim.length / _animationClipPlayerManager.PlaybackSpeed;
+            var finalTime = animF + animG;
+            _sTimer = finalTime;
         }
 
         /// <summary> Player関連コンポーネントの初期化 </summary>
@@ -76,6 +90,11 @@ namespace InGame.Player
             {
                 _playerHealth = health;
                 health.OnDeath += OnDeath;
+            }
+
+            if (TryGetComponent(out AnimationClipPlayerManager anim))
+            {
+                _animationClipPlayerManager = anim;
             }
         }
 
@@ -133,7 +152,7 @@ namespace InGame.Player
                 }
                 
                 //無敵時間終了の判定
-                if (_invincibleTickTimer.Expired(Runner) && _playerHealth.IsInvincible)
+                if (_invincibleTickTimer.Expired(Runner) && _playerHealth.IsInvincible && !IsStun)
                 {
                     InvincibilityEnd();
                 }
@@ -177,11 +196,9 @@ namespace InGame.Player
         void Restart()
         {
             IsStun = false;
-            _playerHealth.IsInvincible = false;
             _playerEffectController.StopStunEffect();
             
             //気絶終了後、無敵時間を設ける
-            _playerHealth.IsInvincible = true;
             _invincibleTickTimer = TickTimer.CreateFromSeconds(Runner, _playerStatus.InvincibilityTime);
         }
         
@@ -198,7 +215,7 @@ namespace InGame.Player
         {
             IsStun = true;
             
-            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime);
+            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _sTimer);
             _playerHealth.IsInvincible = true;
             _playerEffectController.PlayStunEffect();
         }

@@ -21,6 +21,9 @@ namespace InGame.Common
         [SerializeField] private AnimationClip _getUp;   // 追加: 起き上がりアニメーション
         [SerializeField] private PlayerManager _playerManager; // 追加: PlayerManager参照
         [SerializeField] private PlayerHealth _playerHealth;
+        
+        public AnimationClip FaintAnim => _faint;
+        public AnimationClip GetUpAnim => _getUp;
 
         // ▼ 追加: ブレンド設定
         [Header("Loco Blend")]
@@ -39,6 +42,10 @@ namespace InGame.Common
         [SerializeField, Range(0f, 1f)] private float _overrideOutTime = 0.10f;
         [SerializeField] private AnimationCurve _overrideOutCurve = null;
         private bool _hardOverride = false;
+
+        [Header("気絶アニメーション再生速度（_playbackSpeed>1早く、<遅くなる、1で通常速度）")]
+        [SerializeField] private float _playbackSpeed;
+        public float PlaybackSpeed => _playbackSpeed;
         
         private bool _isFadingOutFall = false;       // 着地フェード多重起動防止
         private CancellationTokenSource _overrideCts;
@@ -218,32 +225,35 @@ namespace InGame.Common
             _overrideCts = cts;
             try
             {
+                var awaitTimeF = _faint.length / _playbackSpeed;
+                var awaitTimeG = _getUp .length / _playbackSpeed;
+                var overrideTime =  _overrideInTime / _playbackSpeed;
                 // 気絶へフェードイン（TopLayer=1）
                 if (_faint != null)
                 {
-                    _animationClipPlayer.SetTopPriorityClip(_faint);
+                    _animationClipPlayer.SetTopPriorityClip(_faint, _playbackSpeed);
                 }
                 _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
 
                 await _animationClipPlayer.BlendLayerWeight(
                     LayerInfo.LayerType.TopLayer,
                     1f,
-                    new LayerInfo.Blend { BlendTime = _overrideInTime, BlendCurve = _overrideInCurve }
+                    new LayerInfo.Blend { BlendTime = overrideTime, BlendCurve = _overrideInCurve }
                 );
 
                 // 気絶クリップの長さだけ待機（速度変更を考慮しない場合は length をそのまま使用）
                 if (_faint != null && _faint.length > 0f)
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_faint.length), cancellationToken: cts.Token);
+                    await UniTask.Delay(TimeSpan.FromSeconds(awaitTimeF), cancellationToken: cts.Token);
                 }
 
                 // 起き上がり（任意）
                 if (_getUp != null)
                 {
-                    _animationClipPlayer.SetTopPriorityClip(_getUp);
+                    _animationClipPlayer.SetTopPriorityClip(_getUp, _playbackSpeed);
                     if (_getUp.length > 0f)
                     {
-                        await UniTask.Delay(TimeSpan.FromSeconds(_getUp.length), cancellationToken: cts.Token);
+                        await UniTask.Delay(TimeSpan.FromSeconds(awaitTimeG), cancellationToken: cts.Token);
                     }
                 }
 

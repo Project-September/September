@@ -479,7 +479,7 @@ namespace InGame.Common
             _baseMixer.SetInputWeight(2, wRun);
         }
         
-        public void SetTopPriorityClip(AnimationClip clip)
+        public void SetTopPriorityClip(AnimationClip clip, float time = 1f)
         {
             if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
             {
@@ -512,7 +512,7 @@ namespace InGame.Common
                 _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
             }
 
-            Play(clip, LayerInfo.LayerType.TopLayer, 1f, additive: false);
+            Play(clip, LayerInfo.LayerType.TopLayer, 1f, additive: false, time);
 
             var li = _layerInfo[slot];
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
