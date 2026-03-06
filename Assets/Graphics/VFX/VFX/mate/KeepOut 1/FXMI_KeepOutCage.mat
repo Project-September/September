@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-2279866756043360304
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: FXMI_KeepOutCage
+  m_Shader: {fileID: -6465566751694194690, guid: 55c68a5f3e65f3743a725c0e2cc3dd67, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _ALPHAPREMULTIPLY_ON
+  - _ALPHATEST_ON
+  - _SURFACE_TYPE_TRANSPARENT
+  m_InvalidKeywords: []
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap:
+    RenderType: Transparent
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Ribbon:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_d75e93b4267f4b39bbc89860c9c62380_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 12d70c839f21bc7479be23f857ced555, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_eb906b28d8f342cab8b2e9fe79e1fb54_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: e0b0475056a22bd4bbdea1f82235d4c2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_faf5f97e75cd4adf90392a392f2d33f8_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: dca9eb9e63d3ac9419f6a9415f4b75d9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _edge_tex:
+        m_Texture: {fileID: 2800000, guid: e0b0475056a22bd4bbdea1f82235d4c2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaClip: 1
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendModePreserveSpecular: 1
+    - _CastShadows: 1
+    - _Color_Change: -0.62
+    - _Cull: 0
+    - _Desolve: 0
+    - _DstBlend: 10
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
+    - _RibbonRotato: -0.08
+    - _SrcBlend: 1
+    - _Surface: 1
+    - _WorkflowMode: 1
+    - _ZTest: 2
+    - _ZWrite: 1
+    - _ZWriteControl: 1
+    - _alphaClip: 0.63
+    - _edgewidth: 0.02
+    - _metalic: 1
+    - _smoothness: 0.56
+    m_Colors:
+    - _Basecolor: {r: 1, g: 0.39607847, b: 0, a: 1}
+    - _Emi: {r: 1, g: 1, b: 1, a: 1}
+    - _Emiscroll: {r: 0.25, g: 0.36, b: 0, a: 0}
+    - _FresnelColor: {r: 2.4086525, g: 0.9372753, b: 0.031812266, a: 0}
+    - _RibbonCOlor: {r: 1, g: 0, b: 0, a: 1}
+    - _RibbonTiling: {r: 1, g: 1, b: 0, a: 0}
+    - _StepColor: {r: 0.9169811, g: 0.40658593, b: 0.40658593, a: 0}
+    - _disolve_tile: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _normalscrool: {r: 0.36, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
