@@ -16,18 +16,18 @@ namespace September.NewResult
         protected override async UniTask FadeInPanel()
         {
             _fadePanel.gameObject.SetActive(true);
-            State = TransitionState.Closing;
+            State = TransitionState.Opening;
             await Transition(1f, 0f, _fadeDuration);
             _fadePanel.gameObject.SetActive(false);
-            State = TransitionState.Covered;
+            State = TransitionState.Opened;
         }
         
         protected override async UniTask FadeOutPanel()
         {
-            State = TransitionState.Opening;
+            State = TransitionState.Closing;
             _fadePanel.gameObject.SetActive(true);
             await Transition(0f, 1f, _fadeDuration);
-            State = TransitionState.Opened;
+            State = TransitionState.Covered;
         }
 
         public override void SetCovered()

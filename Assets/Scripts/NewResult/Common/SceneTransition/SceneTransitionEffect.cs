@@ -76,7 +76,7 @@ namespace September.NewResult
         public async UniTask WaitUntilState(TransitionState targetState)
         {
             await UniTask.WaitUntil(targetState,
-                state => _currentView.State == state || !_currentView);
+                state => !_currentView || _currentView.State == state);
         }
     }
 }
