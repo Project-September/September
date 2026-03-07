@@ -18,6 +18,7 @@ namespace September.Common
 
         private async UniTaskVoid Fade()
         {
+            await _transitionEffect.WaitUntilState(TransitionState.Opened);
             await _transitionEffect.TryTransitionOut();
             OnFadeOuted.Invoke();
             await _transitionEffect.TryTransitionIn();
