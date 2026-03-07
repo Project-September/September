@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -12,6 +13,9 @@ namespace September.Title
         [SerializeField] Selectable _selectWhenHide;
         private CanvasGroup _panel;
         private bool _isInitialized;
+        
+        [SerializeField] UnityEvent OnShow;
+        [SerializeField] UnityEvent OnHide;
 
         private void Awake()
         {
@@ -22,10 +26,10 @@ namespace September.Title
 
         public void ShowPanel()
         {
+            OnShow.Invoke();
             _panel.alpha = 1;
             _panel.interactable = true;
             _panel.blocksRaycasts = true;
-
             if (!_isInitialized) return;
             if (_selectWhenShow == null) return;
             EventSystem.current.SetSelectedGameObject(_selectWhenShow.gameObject);
@@ -33,6 +37,7 @@ namespace September.Title
 
         public void HidePanel()
         {
+            OnHide.Invoke();
             _panel.alpha = 0;
             _panel.interactable = false;
             _panel.blocksRaycasts = false;
