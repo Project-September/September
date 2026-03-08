@@ -691,6 +691,12 @@ MonoBehaviour:
   _hideOnStart: 0
   _selectWhenShow: {fileID: 1037866967}
   _selectWhenHide: {fileID: 0}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &220900723
 GameObject:
   m_ObjectHideFlags: 0
@@ -1987,6 +1993,12 @@ MonoBehaviour:
   _hideOnStart: 0
   _selectWhenShow: {fileID: 0}
   _selectWhenHide: {fileID: 0}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &466335694
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3449,6 +3461,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 2115030202}
   _selectWhenHide: {fileID: 815067119}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &750085510
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3952,6 +3970,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 727871002}
   _selectWhenHide: {fileID: 319388157}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &827729390
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8581,6 +8605,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 888308947}
   _selectWhenHide: {fileID: 1245209989}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &1602490850
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9240,6 +9270,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 1068440251}
   _selectWhenHide: {fileID: 1037866967}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1780502004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9352,9 +9388,10 @@ GameObject:
   - component: {fileID: 1897263317}
   - component: {fileID: 1897263319}
   - component: {fileID: 1897263318}
-  - component: {fileID: 1897263320}
   - component: {fileID: 1897263322}
   - component: {fileID: 1897263321}
+  - component: {fileID: 1897263323}
+  - component: {fileID: 1897263324}
   m_Layer: 5
   m_Name: BG
   m_TagString: Untagged
@@ -9422,18 +9459,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897263316}
   m_CullTransparentMesh: 1
---- !u!114 &1897263320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1897263316}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84bf3cb08d6a4dd46aff8cb989699f85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1897263321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9449,6 +9474,36 @@ MonoBehaviour:
   _hideOnStart: 0
   _selectWhenShow: {fileID: 0}
   _selectWhenHide: {fileID: 0}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1897263323}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnHide:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1897263323}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!225 &1897263322
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9461,6 +9516,86 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1897263323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897263316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f783db7a4e004743870c0b6ff397e09f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inputAction: {fileID: -3679345383534867552, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _onPerformed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1897263324}
+        m_TargetAssemblyTypeName: September.Common.Fader, Scripts
+        m_MethodName: StartFade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1897263323}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1897263324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897263316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 089590a4cbdc4a7fa5e26a613c4fd4b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _transitionEffect: {fileID: 11400000, guid: 8133bdd28c7367d4880b87e9934b6225, type: 2}
+  OnFadeOuted:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1972415467}
+        m_TargetAssemblyTypeName: September.Title.TitlePanelController, Scripts
+        m_MethodName: ShowMainMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1972415468}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!1 &1897680809
 GameObject:
   m_ObjectHideFlags: 0
@@ -10055,6 +10190,7 @@ GameObject:
   - component: {fileID: 1972415465}
   - component: {fileID: 1972415466}
   - component: {fileID: 1972415467}
+  - component: {fileID: 1972415468}
   m_Layer: 0
   m_Name: TitleController
   m_TagString: Untagged
@@ -10116,6 +10252,34 @@ MonoBehaviour:
   _startPanel: 7
   <CurrentPanel>k__BackingField: 0
   _idleSeconds: 5
+--- !u!114 &1972415468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972415464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f783db7a4e004743870c0b6ff397e09f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inputAction: {fileID: -1922611926221397677, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _onPerformed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1972415467}
+        m_TargetAssemblyTypeName: September.Title.TitlePanelController, Scripts
+        m_MethodName: BackToMain
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1980940683
 GameObject:
   m_ObjectHideFlags: 0
@@ -11957,6 +12121,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 594520420}
   _selectWhenHide: {fileID: 1098445222}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2121426412
 MonoBehaviour:
   m_ObjectHideFlags: 0

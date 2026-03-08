@@ -907,6 +907,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Any"",
+                    ""type"": ""Button"",
+                    ""id"": ""33cf2ea0-9f10-4190-8e54-58d7bcec57c9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1470,6 +1479,28 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""BackPage"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3057465a-cac1-4c0f-9f30-e278086357f8"",
+                    ""path"": ""<Gamepad>/<Button>"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Any"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""27bbb282-21f2-4ed5-b0a6-d26834c909c0"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Any"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1680,6 +1711,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_UI_Volume = m_UI.FindAction("Volume", throwIfNotFound: true);
         m_UI_PageSlide = m_UI.FindAction("PageSlide", throwIfNotFound: true);
         m_UI_BackPage = m_UI.FindAction("BackPage", throwIfNotFound: true);
+        m_UI_Any = m_UI.FindAction("Any", throwIfNotFound: true);
         // Result
         m_Result = asset.FindActionMap("Result", throwIfNotFound: true);
         m_Result_Finish = m_Result.FindAction("Finish", throwIfNotFound: true);
@@ -2045,6 +2077,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_Volume;
     private readonly InputAction m_UI_PageSlide;
     private readonly InputAction m_UI_BackPage;
+    private readonly InputAction m_UI_Any;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -2113,6 +2146,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @BackPage => m_Wrapper.m_UI_BackPage;
         /// <summary>
+        /// Provides access to the underlying input action "UI/Any".
+        /// </summary>
+        public InputAction @Any => m_Wrapper.m_UI_Any;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_UI; }
@@ -2180,6 +2217,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @BackPage.started += instance.OnBackPage;
             @BackPage.performed += instance.OnBackPage;
             @BackPage.canceled += instance.OnBackPage;
+            @Any.started += instance.OnAny;
+            @Any.performed += instance.OnAny;
+            @Any.canceled += instance.OnAny;
         }
 
         /// <summary>
@@ -2233,6 +2273,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @BackPage.started -= instance.OnBackPage;
             @BackPage.performed -= instance.OnBackPage;
             @BackPage.canceled -= instance.OnBackPage;
+            @Any.started -= instance.OnAny;
+            @Any.performed -= instance.OnAny;
+            @Any.canceled -= instance.OnAny;
         }
 
         /// <summary>
@@ -2759,6 +2802,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnBackPage(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Any" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAny(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Result" which allows adding and removing callbacks.
