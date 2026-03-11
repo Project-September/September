@@ -143,7 +143,6 @@ namespace September.Common
                 task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
             else
                 SetOgreLamp();
-            await UniTask.WaitForSeconds(3f);
             ShowStatusUpUI();
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
