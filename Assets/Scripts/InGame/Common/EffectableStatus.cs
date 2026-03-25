@@ -152,6 +152,7 @@ namespace InGame.Common
             Speed,
             Stamina,
             StaminaRegen,
+            StaminaConsumption,
             AttackDamage
         }
         
