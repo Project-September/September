@@ -5240,6 +5240,7 @@ GameObject:
   - component: {fileID: 8254388696613982807}
   - component: {fileID: 7344648055957507413}
   - component: {fileID: 4031138293428820530}
+  - component: {fileID: 6282825429990540647}
   m_Layer: 6
   m_Name: OKBPrefab
   m_TagString: Player
@@ -5579,8 +5580,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abilities:
   - rid: 2879281568291487894
+  - rid: 8000700287031967830
   _conditions:
   - rid: 2879281568291487895
+  - rid: 8000700287031967829
   references:
     version: 2
     RefIds:
@@ -5612,6 +5615,17 @@ MonoBehaviour:
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
+    - rid: 8000700287031967829
+      type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+      data:
+        _targetAbilityName: AbilityOkabeUlt
+        _button: 7
+    - rid: 8000700287031967830
+      type: {class: AbilityOkabeUlt, ns: InGame.Player.Ability.Effect, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        _buffEffect: {fileID: 11400000, guid: eb825a65a95ae924eb8f98bc05831cf5, type: 2}
 --- !u!114 &8254388696613982807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5750,6 +5764,19 @@ MonoBehaviour:
   _root: {fileID: 940626515308406801}
   _nameText: {fileID: 4104923933499953024}
   _maxDistance: 30
+--- !u!114 &6282825429990540647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bf0feaffd3a44cbbc9c8f3292f0c948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredScore: 1000
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
