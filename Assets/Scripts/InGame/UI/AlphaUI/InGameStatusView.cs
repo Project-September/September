@@ -19,7 +19,7 @@ namespace September.InGame.UI
     {
         [Header("UI Root Prefab")] 
         [SerializeField, Label("InGameUIRoot")] private InGameUIRootRefs _inGameUiRootPrefab;
-        [SerializeField] private ResultUIRootRefs _resultUIRootPrefab;
+        // [SerializeField] private ResultUIRootRefs _resultUIRootPrefab;
 
         [Header("Canvas")] 
         [SerializeField, Label("MainCanvas")] private Canvas _mainCanvas;
@@ -72,7 +72,7 @@ namespace September.InGame.UI
             //  Bind前に_uiRootが生成されないのでChangeTagNoticeを直接Subscribeできない
             ui.ChangeTagNoticeObserver.Subscribe(index=>_changeTagOverlayMessage.ChangeTagNotice(index)).AddTo(_cts.Token);
             ui.OnChangeStaminaValue.Skip(1).Subscribe(ChangeStamina).AddTo(_cts.Token);
-            ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
+            // ui.OnGameEnd.Subscribe(_ => PlayResultAnimation().Forget()).AddTo(_cts.Token);
             ui.IsInteracting
                 .Subscribe(isInteracting => _interactUI?.SetActive(isInteracting.Item1, isInteracting.Item2))
                 .AddTo(_cts.Token);
@@ -147,12 +147,12 @@ namespace September.InGame.UI
                 .OnComplete(() => _scoreText.transform.DOScale(1f, 0.2f));
         }
 
-        private async UniTask PlayResultAnimation()
-        {
-            ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
-            ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
-            await resultAnim.Play(resultUI);
-        }
+        // private async UniTask PlayResultAnimation()
+        // {
+        //     ResultUIRootRefs resultUI = Instantiate(_resultUIRootPrefab, _mainCanvas.transform);
+        //     ResultAnimation resultAnim = resultUI.GetComponent<ResultAnimation>();
+        //     await resultAnim.Play(resultUI);
+        // }
 
         private void ChangeExhibitDescriptionUI(int value)
         {
@@ -162,6 +162,7 @@ namespace September.InGame.UI
                 _descriptionIcon[0].SetActive(false);
                 _descriptionIcon[1].SetActive(true);
                 _descriptionIcon[2].SetActive(false);
+                _descriptionIcon[3].SetActive(false);
             }
             else if(value == 2)
             {
@@ -169,6 +170,7 @@ namespace September.InGame.UI
                 _descriptionIcon[0].SetActive(true);
                 _descriptionIcon[1].SetActive(false);
                 _descriptionIcon[2].SetActive(false);
+                _descriptionIcon[3].SetActive(false);
             }
             else if (value == 3)
             {
@@ -176,6 +178,15 @@ namespace September.InGame.UI
                 _descriptionIcon[0].SetActive(false);
                 _descriptionIcon[1].SetActive(false);
                 _descriptionIcon[2].SetActive(true);
+                _descriptionIcon[3].SetActive(false);
+            }
+            else if(value == 4)
+            {
+                //タニヒラ
+                _descriptionIcon[0].SetActive(false);
+                _descriptionIcon[1].SetActive(false);
+                _descriptionIcon[2].SetActive(false);
+                _descriptionIcon[3].SetActive(true);
             }
         }
 
@@ -291,7 +302,7 @@ namespace September.InGame.UI
                     await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds));
                     await ui.DOFade(0, 0.5f);
-                    Destroy(ui.gameObject);
+                    Destroy(ui?.gameObject);
                     UpdateLayOutGroup();
                     break;
                 }
@@ -303,7 +314,7 @@ namespace September.InGame.UI
                     await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
                     await ui.DOFade(0, 0.5f);
-                    Destroy(ui.gameObject);
+                    Destroy(ui?.gameObject);
                     UpdateLayOutGroup();
                     break;
                 }
@@ -324,7 +335,7 @@ namespace September.InGame.UI
                     await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
                     await ui.DOFade(0, 0.5f);
-                    Destroy(ui.gameObject);
+                    Destroy(ui?.gameObject);
                     UpdateLayOutGroup();
                     break;
                 }

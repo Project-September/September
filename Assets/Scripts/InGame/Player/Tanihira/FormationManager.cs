@@ -27,6 +27,7 @@ namespace Ingame.Tanihira
         private Transform _playerTransform;
         private float _warpDuration = 0.5f;
         private CancellationTokenSource _cts;
+        private FriendOrder _friendOrder;
         public List<FriendBase> CurrentFriendsList => _currentFriendsList;
         public List<FriendBase> FriendsList => _friendsList;
         
@@ -34,6 +35,11 @@ namespace Ingame.Tanihira
         private void Start()
         {
             _cts = new CancellationTokenSource();
+
+            if (HasInputAuthority)
+            {
+                _friendOrder = GetComponent<FriendOrder>();
+            }
         }
 
         /// <summary>
@@ -201,6 +207,9 @@ namespace Ingame.Tanihira
         {
             if(!HasStateAuthority)
                 return;
+            
+            //強制的にプレイヤーに追従するようにする
+            _friendOrder.OrderReturnFriend();
             
             //フレンドのステートの切り替え
             foreach (FriendBase friend in _friendsList)

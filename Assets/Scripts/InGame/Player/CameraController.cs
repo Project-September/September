@@ -1,4 +1,5 @@
 using Cinemachine;
+using Common.UserSettings;
 using DG.Tweening;
 using Unity.Mathematics;
 using UnityEngine;
@@ -56,8 +57,14 @@ namespace InGame.Player
         {
             // 他で回転中なら
             if (_isInRotation) return;
+
+            var settings = UserSettings.Get();
             
-            float sens = GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse ? _sens : _padSens;
+            float sens = 
+                GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse 
+                ? _sens * settings.MouseSensitivity 
+                : _padSens * settings.PadSensitivity;
+            
             float deltaX = mouseInput.y, deltaY = mouseInput.x;
             _cameraPitch -= deltaX * deltaTime * sens;
             _cameraPitch = Mathf.Clamp(_cameraPitch, -90 + _defaultPitch, 90 - _defaultPitch);

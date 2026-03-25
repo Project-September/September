@@ -1,7 +1,7 @@
 using System;
+using System.IO;
 using System.Threading;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
+using System.Threading.Tasks;
 using UnityEngine.Networking;
 using sepLog = September.Editor.Logger;
 
@@ -18,9 +18,12 @@ namespace September.Editor.AssetImporter
             _enableLogger = enableLogger;
         }
 
-        public async UniTask<byte[]> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken)
+        public async Task<string> DownloadAssetAsync(string route, int assetId, CancellationToken cancellationToken)
         {
             var url = $"{AssetImportConstants.ApiUrl}/{route}?id={assetId}";
+
+            var fileName = $"Asset_{assetId}_{DateTime.Now:yyyyMMdd_HHmmss}{AssetImportConstants.FileExtensions.Zip}";
+            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
 
             ReportProgress(new ProgressInfo
             {
@@ -31,6 +34,8 @@ namespace September.Editor.AssetImporter
 
             using (var request = UnityWebRequest.Get(url))
             {
+                request.downloadHandler = new DownloadHandlerFile(tempPath) { removeFileOnAbort = true };
+
                 try
                 {
                     var operation = request.SendWebRequest();
@@ -45,10 +50,9 @@ namespace September.Editor.AssetImporter
                             Detail = $"ダウンロード進捗: {progress * 100:F1}%"
                         });
 
-                        await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await Task.Yield();
                     }
-
-                    await operation.ToUniTask(cancellationToken: cancellationToken);
 
                     if (request.result != UnityWebRequest.Result.Success)
                     {
@@ -57,8 +61,8 @@ namespace September.Editor.AssetImporter
                         throw new AssetDownloadException(error);
                     }
 
-                    sepLog.Logger.LogInfo($"アセットダウンロード完了: ID={assetId}", _enableLogger);
-                    return request.downloadHandler.data;
+                    sepLog.Logger.LogInfo($"アセットダウンロード完了: ID={assetId}, Path={tempPath}", _enableLogger);
+                    return tempPath;
                 }
                 catch (Exception e) when (!(e is AssetDownloadException))
                 {

@@ -49,7 +49,6 @@ namespace September.Title
         [Header("Idle Settings")]
         [SerializeField] private float _idleSeconds = 30f;
 
-        private GameInput _gameInput;
         private float _lastInputTime;
 
         private void Awake()
@@ -70,18 +69,10 @@ namespace September.Title
 
         private void Start()
         {
-            _gameInput = GameInput.I;
-
             HideAllPanels();
             CurrentPanel = _startPanel;
             ShowPanel(_startPanel);
-
-            this.UpdateAsObservable()
-                .Where(_ => _gameInput.UI.Option.triggered || _gameInput.Debug.Title.triggered)
-                .Subscribe(_ => BackToMain())
-                .AddTo(this);
-
-
+            
             ResetIdleTimer();
             RunIdleLoop().Forget();
         }

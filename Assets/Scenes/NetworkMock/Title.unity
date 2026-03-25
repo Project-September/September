@@ -691,6 +691,12 @@ MonoBehaviour:
   _hideOnStart: 0
   _selectWhenShow: {fileID: 1037866967}
   _selectWhenHide: {fileID: 0}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &220900723
 GameObject:
   m_ObjectHideFlags: 0
@@ -1987,6 +1993,12 @@ MonoBehaviour:
   _hideOnStart: 0
   _selectWhenShow: {fileID: 0}
   _selectWhenHide: {fileID: 0}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &466335694
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3449,6 +3461,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 2115030202}
   _selectWhenHide: {fileID: 815067119}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &750085510
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3952,6 +3970,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 727871002}
   _selectWhenHide: {fileID: 319388157}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &827729390
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8279,54 +8303,58 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Co-Director\r\n\u5CA1\u90E8 \u4F51\u54C9\u3000\u3000\u767D\u77F3 \u6674\r\n\r\nMarketing
-    Planner\r\n\u963F\u90E8 \u5EB7\u6A39\r\n\r\nLead Engineer\r\n\u6B66\u667A \u672A\u4F86\u4EBA\r\n\r\nTechnical
-    Artist\r\n\u5BAE\uFA11 \u5149\u7409\r\n\r\nServer Engineer\r\n\u5409\u7530 \u7ADC\u4E00\u90CE\r\n\r\nEngineer\r\n\u8584\u8863
-    \u6BC5\u3000\u3000\u67FF\u6CBC \u67DA\u8475\u3000\u3000\u80A5\u6CBC \u7FD4\u543E\r\n\u5869\u898B
-    \u548C\u771F\u3000\u3000\u9AD9\u6751 \u9023\u82BD\u3000\u3000\u5C71\u672C \u3046\u307F\r\n\r\nLead
-    Game Planner\r\n\u77F3\u4E95 \u514B\u4F73\r\n\r\nPlanner\r\n\u6CC9 \u5B97\u543E\u3000\u3000\u767D\u77F3
-    \u9686\u535A\u3000\u3000\u9996\u85E4 \u745E\u7A42\r\n\r\nLead Artist\r\n\u8C37\u5E73
-    \u967D\r\n\r\nBackground Artist\r\n\u5BAE\u672C \u6DF3\u8E8D\r\n\r\nCharacter
-    Modeler\r\n\u77F3\u6A4B\u3000\u9678\u3000\u3000\u5F8C\u85E4 \u5E0C\u5B9F\u3000\u3000\u5EE3\u702C
-    \u6C40\u5948\u3000\u3000\u6CE2\u591A\u91CE \u672A\u6DBC\r\n\r\nRigger\r\n\u91CE\u6FA4
-    \u8056\u4E5F\r\n\r\nMotion Artist\r\n\u7893\u4E95 \u5CB3\u767B\u3000\u3000\u89D2\u8C37
-    \u7F8E\u73B2\u3000\u3000\u6839\u672C \u611B\u9234\u3000\u3000\u5BAE\u5E73 \u4F91\u5F25\r\n\r\nVFX
-    Artist\r\n\u4F50\u91CE \u5143\u4EBA\u3000\u3000\u5C71\u672C \u8CAB\u592A\r\n\r\nCharacter
-    Designer\r\n\u5BAE\u5D0E \u8449\u6708\r\n\r\nUI Designer\r\n\u671B\u6708 \u67DA\u8449\r\n\r\nConcept
-    Artist\r\n\u5DDD\u7530 \u5263\u5FC3\r\n\r\nLead Sound Artist\r\n\u5CA9\u5D0E
-    \u4E45\u6A39\r\n\r\nSound Artist\r\n\u4E0A\u6751 \u76F4\u3000\u3000\u5DDD\u7530
-    \u745E\u7A00\u3000\u3000\u904A\u4F50 \u5317\u5FD7\r\n\r\nSound Engineer\r\n\u5411\u7530
-    \u5C06\u4E5F\r\n\r\n\r\n\r\nUniRx\r\n\r\nThe MIT License (MIT)\r\n\r\nCopyright
-    (c) 2018 Yoshifumi Kawai\r\n\r\nPermission is hereby granted, free of charge,
-    to any person obtaining a copy of this software and associated documentation
-    files (the \"Software\"), to deal in the Software without restriction, including
-    without limitation the rights to use, copy, modify, merge, publish, distribute,
-    sublicense, and/or sell copies of the Software, and to permit persons to whom
-    the Software is furnished to do so, subject to the following conditions:\r\n\r\nThe
-    above copyright notice and this permission notice shall be included in all copies
-    or substantial portions of the Software.\r\n\r\nTHE SOFTWARE IS PROVIDED \"AS
-    IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-    OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-    IN THE SOFTWARE.\r\n\r\n\r\n\r\nUniTask\r\n\r\nThe MIT License (MIT)\r\n\r\nCopyright
-    (c) 2019 Yoshifumi Kawai / Cysharp, Inc.\r\n\r\nPermission is hereby granted,
-    free of charge, to any person obtaining a copy of this software and associated
-    documentation files (the \"Software\"), to deal in the Software without restriction,
-    including without limitation the rights to use, copy, modify, merge, publish,
-    distribute, sublicense, and/or sell copies of the Software, and to permit persons
-    to whom the Software is furnished to do so, subject to the following conditions:\r\n\r\nThe
-    above copyright notice and this permission notice shall be included in all copies
-    or substantial portions of the Software.\r\n\r\nTHE SOFTWARE IS PROVIDED \"AS
-    IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-    TO THE WARRANTIES OF MERCHANTABILITY,\r\nFITNESS FOR A PARTICULAR PURPOSE AND
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-    FOR ANY CLAIM, DAMAGES OR OTHER\r\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
-    THE USE OR OTHER DEALINGS IN THE3 SOFTWARE.\r\n\r\n\r\n\r\n\u3053\u306E\u30BD\u30D5\u30C8\u30A6\u30A7\u30A2\u306B\u306F\u3001\uFF08\u682A\uFF09\uFF23\uFF32\uFF29\u30FB\u30DF\u30C9\u30EB\u30A6\u30A7\u30A2\u306E\u300CCRIWARE\u300D\u304C\u4F7F\u7528\u3055\u308C\u3066\u3044\u307E\u3059\u3002\r\nPowered
-    by \"CRIWARE\".CRIWARE is a trademark of CRI Middleware Co., Ltd.\r\n\r\nMIXAMO
-    (Adobe)\r\n\r\nBakery - GPU Lightmapper\r\n\r\nPowerd by Photon(Exit Games)\r\n\r\n"
+  m_text: "VOICE CAST\r\nOKABE WRIGHT\u3000ENISHI NAO\r\nHARU THE BUTCHER\u3000KAMIO
+    TAICHI\r\nTANIHIRA AMUNDSEN\u3000USUI YUMENO\r\nSARUTOBI SHOGO\u3000ISHIKURA
+    IWA\r\nHATANO ERIKSON\u3000KAWAGUCHI KANADE\r\nOPERATOR\u3000NAKAGAWA NATSUMI\r\nMOAI\u3000KIM
+    YEJUN\r\n\r\nPROJECT SEPTEMBER\r\nCo-Director\r\nOKABE YUYA\u3000\u3000SHIRAISHI
+    HARU\r\n\r\n\r\nPROGRAMMER UNIT\r\nLead Game Programmer\r\nTAKECHI MIKUTO\r\n\r\nGame
+    Programmer\r\nUSUGI TSUYOSHI\u3000\u3000KAKINUMA YUZUKI\nKOINUMA SHOGO\u3000\u3000SHIOMI
+    KAZUKA\nYAMAMOTO UMI\u3000\u3000TAKAMURA RENGA\r\nIWAKI EISUKE\u3000\u3000YAMAMOTO
+    YUZUHA\r\n\r\nTechnical Artist\r\nMIYAZAKI HIKARU\r\n\r\nTool Programmer\r\nYOSHIDA
+    RYUICHIRO\r\n\r\n\r\nPLANNER UNIT\r\nLead Game Planner\r\nISHII KATSUYOSHI\r\n\r\nPlanner\r\nIZUMI
+    SHUGO\u3000\u3000SHUTO MIZUHO\r\nSHIRAISHI TAKAHIRO\u3000\u3000HOZUMI REINA\r\n\r\n\r\n3D
+    ARTIST UNIT\r\nLead Artist\r\nTANIHIRA AKIRA\r\n\r\nEnvironment Artist\r\nMIYAMOTO
+    JUNYO\u3000\u3000OKUBO TATSUKI\r\n\r\nCharacter Modeler\r\nISHIBASHI RIKU\u3000\u3000ODE
+    RIKUTO\nGOTO NONOMI\u3000\u3000HATANO MISUZU\nHIROSE TEINA\u3000\u3000SUZUKI
+    HOKUTO\r\n\r\nRigger\r\nNOZAWA SEIYA\r\n\r\nAnimator\r\nUSUI GAKUTO\u3000\u3000SUMIYA
+    MIREI\r\nNEMOTO AIRI\u3000\u3000MIYAHIRA YUYA\r\nSUZUKI RIKUTO\u3000\u3000MORI
+    YUSUKE\r\n\r\nVFX Artist\r\nSANO GENTO\u3000\u3000YAMAMOTO KANTA\r\nSHIRAI YUGA\u3000\u3000TAKAMURA
+    RIHO\r\n\r\n\r\n2D ARTIST UNIT\r\nConcept Artist\r\nKAWATA KENSHIN\r\n\r\nCharacter
+    Designer\r\nMIYAZAKI HAZUKI\u3000\u3000MABUCHI AKINARI\r\n\r\n2D/UI Artsist\r\nMOCHIZUKI
+    YUZUHA\u3000\u3000SAWADA NAOKI\r\nSUGIMOTO MUTSUKI\u3000\u3000YOSHIZAWA NAOKI\r\n\r\n\r\nSOUND
+    UNIT\r\nLead Sound Designer\r\nIWASAKI HISAGI\r\n\r\nSound Engineer\r\nMUKAIDA
+    MASAYA\r\n\r\nSound Designer\r\nKAMIMURA NAO\u3000\u3000KAWATA MIZUKI\r\nMORI
+    SHION\u3000\u3000YUSA HAIJI\r\n\r\n\r\nMarketing Planner\r\nABE KOKI\r\n\r\n\r\n\r\nRIGHTS\r\n\r\nUniRx\r\n\r\nThe
+    MIT License (MIT)\r\n\r\nCopyright (c) 2018 Yoshifumi Kawai\r\n\r\nPermission
+    is hereby granted, free of charge, to any person obtaining a copy of this software
+    and associated documentation files (the \"Software\"), to deal in the Software
+    without restriction, including without limitation the rights to use, copy, modify,
+    merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+    to permit persons to whom the Software is furnished to do so, subject to the
+    following conditions:\r\n\r\nThe above copyright notice and this permission notice
+    shall be included in all copies or substantial portions of the Software.\r\n\r\nTHE
+    SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\r\n\r\n\r\nUniTask\r\n\r\nThe
+    MIT License (MIT)\r\n\r\nCopyright (c) 2019 Yoshifumi Kawai / Cysharp, Inc.\r\n\r\nPermission
+    is hereby granted, free of charge, to any person obtaining a copy of this software
+    and associated documentation files (the \"Software\"), to deal in the Software
+    without restriction, including without limitation the rights to use, copy, modify,
+    merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+    to permit persons to whom the Software is furnished to do so, subject to the
+    following conditions:\r\n\r\nThe above copyright notice and this permission notice
+    shall be included in all copies or substantial portions of the Software.\r\n\r\nTHE
+    SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\r\nFITNESS FOR
+    A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\r\nLIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE3 SOFTWARE.\r\n\r\n\u3053\u306E\u30BD\u30D5\u30C8\u30A6\u30A7\u30A2\u306B\u306F\u3001\uFF08\u682A\uFF09\uFF23\uFF32\uFF29\u30FB\u30DF\u30C9\u30EB\u30A6\u30A7\u30A2\u306E\u300CCRIWARE\u300D\u304C\u4F7F\u7528\u3055\u308C\u3066\u3044\u307E\u3059\u3002\r\nPowered
+    by \"CRIWARE\".CRIWARE is a trademark of CRI Middleware Co., Ltd.\r\n\r\nMIXAMO(Adobe)\r\nBakery
+    - GPU Lightmapper\r\nPowerd by Photon(Exit Games)\r\n\r\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
   m_sharedMaterial: {fileID: -4247787893072867334, guid: 4a052c52285c57241b1f76e0e1fe0452, type: 2}
@@ -8577,6 +8605,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 888308947}
   _selectWhenHide: {fileID: 1245209989}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &1602490850
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9236,6 +9270,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 1068440251}
   _selectWhenHide: {fileID: 1037866967}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1780502004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9348,9 +9388,10 @@ GameObject:
   - component: {fileID: 1897263317}
   - component: {fileID: 1897263319}
   - component: {fileID: 1897263318}
-  - component: {fileID: 1897263320}
   - component: {fileID: 1897263322}
   - component: {fileID: 1897263321}
+  - component: {fileID: 1897263323}
+  - component: {fileID: 1897263324}
   m_Layer: 5
   m_Name: BG
   m_TagString: Untagged
@@ -9418,18 +9459,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897263316}
   m_CullTransparentMesh: 1
---- !u!114 &1897263320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1897263316}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84bf3cb08d6a4dd46aff8cb989699f85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1897263321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9445,6 +9474,36 @@ MonoBehaviour:
   _hideOnStart: 0
   _selectWhenShow: {fileID: 0}
   _selectWhenHide: {fileID: 0}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1897263323}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnHide:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1897263323}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!225 &1897263322
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9457,6 +9516,86 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1897263323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897263316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f783db7a4e004743870c0b6ff397e09f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inputAction: {fileID: -3679345383534867552, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _onPerformed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1897263324}
+        m_TargetAssemblyTypeName: September.Common.Fader, Scripts
+        m_MethodName: StartFade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1897263323}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1897263324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1897263316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 089590a4cbdc4a7fa5e26a613c4fd4b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _transitionEffect: {fileID: 11400000, guid: 8133bdd28c7367d4880b87e9934b6225, type: 2}
+  OnFadeOuted:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1972415467}
+        m_TargetAssemblyTypeName: September.Title.TitlePanelController, Scripts
+        m_MethodName: ShowMainMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1972415468}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!1 &1897680809
 GameObject:
   m_ObjectHideFlags: 0
@@ -10051,6 +10190,7 @@ GameObject:
   - component: {fileID: 1972415465}
   - component: {fileID: 1972415466}
   - component: {fileID: 1972415467}
+  - component: {fileID: 1972415468}
   m_Layer: 0
   m_Name: TitleController
   m_TagString: Untagged
@@ -10112,6 +10252,34 @@ MonoBehaviour:
   _startPanel: 7
   <CurrentPanel>k__BackingField: 0
   _idleSeconds: 5
+--- !u!114 &1972415468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972415464}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f783db7a4e004743870c0b6ff397e09f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _inputAction: {fileID: -1922611926221397677, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _onPerformed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1972415467}
+        m_TargetAssemblyTypeName: September.Title.TitlePanelController, Scripts
+        m_MethodName: BackToMain
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1980940683
 GameObject:
   m_ObjectHideFlags: 0
@@ -10281,6 +10449,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1863937645893418062, guid: cc81586ea499216ea8af2fc121acd95d, type: 3}
       propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1863937645893418062, guid: cc81586ea499216ea8af2fc121acd95d, type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2025238836040774474, guid: cc81586ea499216ea8af2fc121acd95d, type: 3}
@@ -11949,6 +12121,12 @@ MonoBehaviour:
   _hideOnStart: 1
   _selectWhenShow: {fileID: 594520420}
   _selectWhenHide: {fileID: 1098445222}
+  OnShow:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHide:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2121426412
 MonoBehaviour:
   m_ObjectHideFlags: 0

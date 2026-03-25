@@ -6,6 +6,7 @@ using InGame.Player;
 using InGame.Player.Ability;
 using UnityEngine;
 using September.Common;
+using September.InGame;
 using September.InGame.UI;
 
 namespace InGame.Interact
@@ -23,6 +24,7 @@ namespace InGame.Interact
         [SerializeField] private float _interactResponseTimeout = 3f;
         [SerializeField] private float _interactAngleBuffer = 10f; // 角度に+10°
         [SerializeField] private float _interactRadiusBuffer = 0.3f; // 距離に+0.3m
+        [SerializeField] private PlayerAudioController _playerAudioController; // インタラクト時のボイス再生用
         //許容できる高さの差
         private float _heightDifference = 0.1f;
         
@@ -43,6 +45,7 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
+            _playerAudioController = GetComponentInChildren<PlayerAudioController>(); //
         }
 
         public override void Spawned()
@@ -76,6 +79,7 @@ namespace InGame.Interact
                     {
                         _hasCompletedInteraction = true;
                         CompleteInteraction();
+                        _playerAudioController?.PlayInteractActionVoice();  // インタラクト時ボイスの再生依頼
                         UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
                     }
                     UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));

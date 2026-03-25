@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4102848815963976517}
   - component: {fileID: 5457354466456622787}
   - component: {fileID: 3115068171291840454}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Angle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 614659007804034789}
   - component: {fileID: 7008883754808005516}
   - component: {fileID: 6362518027200371173}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: IsUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -281,7 +281,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8714944195079449359}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,7 +312,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4664626561920155601}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: GetOffPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 7572378393327729410}
   - component: {fileID: 4200780594601291185}
   - component: {fileID: 5916104638410838153}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Wheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -442,7 +442,7 @@ GameObject:
   - component: {fileID: 7226465452575025352}
   - component: {fileID: 8037508527883768754}
   - component: {fileID: 7651307372411773162}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: EhMD_jet01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -527,7 +527,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9001709393461897941}
-  m_Layer: 6
+  m_Layer: 11
   m_Name: CameraPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -543,7 +543,7 @@ Transform:
   m_GameObject: {fileID: 1379057650989118783}
   serializedVersion: 2
   m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -559,7 +559,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2796730351171042166}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -596,7 +596,7 @@ GameObject:
   - component: {fileID: 1208129064862653996}
   - component: {fileID: 2486792822856041295}
   - component: {fileID: 7903287257162869617}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: EhMD_jetPlo_02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -671,6 +671,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &3423492188439724034
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2844357009395957964}
+  m_Layer: 0
+  m_Name: AirPlanePos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2844357009395957964
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3423492188439724034}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6127325779914019723}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5088452126391890468
 GameObject:
   m_ObjectHideFlags: 0
@@ -683,7 +714,7 @@ GameObject:
   - component: {fileID: 7494316538794269785}
   - component: {fileID: 8473515391512153635}
   - component: {fileID: 1367492198867136899}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: MoveCol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -783,7 +814,7 @@ GameObject:
   - component: {fileID: 7868433830455336253}
   - component: {fileID: 8790789282858948513}
   - component: {fileID: 793880936398018537}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: ForwardSpeed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -917,7 +948,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7252702095044206839}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -948,7 +979,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2124503553425392776}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -979,7 +1010,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8763808552245321171}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1018,7 +1049,7 @@ GameObject:
   - component: {fileID: -5982283155467583323}
   - component: {fileID: -8190595206022697743}
   - component: {fileID: 4308694996682901781}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: PropAirplane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1045,6 +1076,7 @@ Transform:
   - {fileID: 1940838463282121370}
   - {fileID: 2796730351171042166}
   - {fileID: 8796760849923940281}
+  - {fileID: 2844357009395957964}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &1606182845362196092
@@ -1165,12 +1197,13 @@ MonoBehaviour:
   - rid: 5083283082934222954
   _type: 4
   _interactEffectOffset: {x: 0, y: 0, z: 0}
-  _cooldownEffectTransform: {fileID: 0}
-  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
-  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 2844357009395957964}
+  _cooldownEffectOffset: {x: 0, y: -0.5, z: -0.77}
+  _cooldownEffectRotation: {x: 0, y: 90, z: 0}
+  _cooldownEffectScale: {x: 1, y: 1, z: 1}
   _interactEffectType: 9
   _cooldownEffectType: 24
-  _spawnCooldownEffectOnStart: 1
+  _spawnCooldownEffectOnStart: 0
   _audioBroadcaster: {fileID: 4308694996682901781}
   _interactSoundCueName: SE_ZeroFighter_Interact
   _interactSoundTrackingType: 0
@@ -1247,7 +1280,7 @@ MonoBehaviour:
   _camera: {fileID: 3659471650815562422}
   _collideAgainst:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   _cameraRadius: 0.1
   _motionDuration: 1
   _motionEase: 9
@@ -1287,7 +1320,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 58593279513329935}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1322,7 +1355,7 @@ GameObject:
   - component: {fileID: 2622466760559903285}
   - component: {fileID: 3375929515771130985}
   - component: {fileID: 1464172462217974093}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Velo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1460,7 +1493,7 @@ GameObject:
   - component: {fileID: 6880804506632384831}
   - component: {fileID: 907081510139824844}
   - component: {fileID: 3347094730461292348}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: DebugUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1591,7 +1624,7 @@ GameObject:
   - component: {fileID: 8095899424817823145}
   - component: {fileID: 7798274107352638913}
   - component: {fileID: 7986310020915403168}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: CurrentAccel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1725,7 +1758,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1940838463282121370}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1741,7 +1774,7 @@ Transform:
   m_GameObject: {fileID: 8660123353378353734}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.009999911, z: 0.17200002}
+  m_LocalPosition: {x: 0, y: 0.009999911, z: -0.0018}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1756,7 +1789,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8366093709419192700}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1788,13 +1821,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9001709393461897941}
     m_Modifications:
+    - target: {fileID: 4638991148023797111, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.1
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1832,9 +1869,37 @@ PrefabInstance:
       propertyPath: m_Priority
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 5790922885440071402, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6084878976809419936, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6188179611881003629, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 6297285441075323246, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_Name
       value: PlayerVirtualCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 6297285441075323246, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 6468915604407942180, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7900251229537261673, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 8673078701234368821, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

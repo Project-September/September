@@ -11,7 +11,6 @@ using Ingame.Tanihira;
 using September.Common;
 using September.InGame.Effect;
 using September.InGame;
-using WebSocketSharp;
 
 namespace InGame.Exhibit
 {
