@@ -13,7 +13,7 @@ namespace InGame.Player.Ability.Effect
         [SerializeField] private StatusEffect _buffEffect;
         [SerializeField] private EffectType _effectType;
         
-        protected EffectSpawner _effectSpawner;
+        private EffectSpawner _effectSpawner;
         private string _effectID;
 
         protected override void OnStart()
