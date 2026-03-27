@@ -57,7 +57,7 @@ namespace InGame.Player.Ability
             if (elapsed >= _endAttackTick)
             {
                 _playerMovement.IgnoreMoveInput = false;
-                _phase = AbilityPhase.Ending;
+                RequestEndAbility();
                 
                 _startHitTick  = FrameToTick(_startHitCheckFrame);
                 _endHitTick    = FrameToTick(_endHitCheckFrame);
