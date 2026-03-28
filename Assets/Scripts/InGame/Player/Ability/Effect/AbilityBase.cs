@@ -56,8 +56,15 @@ namespace  InGame.Player.Ability
         protected float CooldownEndTime { get; private set; }
         /// <summary>現在のアビリティフェーズ（読み取り専用）</summary>
         public AbilityPhase Phase => _phase;
+        
         /// <summary>アビリティ開始時のティック</summary>
         public int StartTick { get; private set; }
+        /// <summary>アビリティ開始時の時間</summary>
+        public float StartTime { get; private set; }
+        /// <summary>アビリティ開始からの経過ティック</summary>
+        public int ElapsedTick => Runner ? Runner.Tick - StartTick : -1;
+        /// <summary>アビリティ開始からの経過時間</summary>
+        public float ElapsedTime => (Runner ? Runner.SimulationTime : Time.time) - StartTime;
 
         /// <summary>
         /// アビリティを開始する（PlayerAbilityManagerから呼び出される）
@@ -68,6 +75,7 @@ namespace  InGame.Player.Ability
             Parameter = parameter;
             _phase = AbilityPhase.Started;
             StartTick = Runner ? Runner.Tick : -1;
+            StartTime = Runner ? Runner.SimulationTime : Time.time;
         }
 
         /// <summary>
