@@ -18,6 +18,8 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private Transform _muzzleTf;
         [SerializeField] private Vector3 _stanceCameraOffset;
         [SerializeField] private float _changeOffsetDuration;
+        [SerializeField] private int _bulletCount = 1;
+        [SerializeField] private float _angleBetweenBullets = 2.5f;
         [Header("AnimationClip")]
         [SerializeField] private AnimationClip _stance;
         [SerializeField] private AnimationClip _stanceLoop;
@@ -90,7 +92,12 @@ namespace InGame.Player.Sarutobi
             }
             else if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Attack) && CanThrow)
             {
-                Throw().Forget();
+                PlayCharacterThrowAnimation().Forget();
+                for (int i = 0; i < _bulletCount; i++)
+                {
+                    var angle = _angleBetweenBullets * (i - (_bulletCount - 1) / 2f);
+                    Throw(angle);
+                }
             }
 
             if (State == KunaiStateType.Ready || State == KunaiStateType.Stance)
@@ -131,14 +138,28 @@ namespace InGame.Player.Sarutobi
                 EndStance();
             }
         }
+        
+        void Throw(float angle)
+        {
+            var rot = Quaternion.AngleAxis(angle, Vector3.up);
+            var dir = rot * _mainCamera.transform.forward;
+            var hit = Physics.Raycast(_mainCamera.transform.position, dir, out var hitInfo, _maxDistance, _hitLayer);
+            var target = hit
+                ? hitInfo.point
+                : _mainCamera.transform.position + dir * _maxDistance;
+            Throw(target);
+        }
 
-        async UniTask Throw()
+        void Throw(Vector3 targetPos)
         {
             if (HasInputAuthority)
             {
-                KunaiTargetDetection();
+                KunaiTargetDetection(targetPos);
             }
+        }
 
+        async UniTask PlayCharacterThrowAnimation()
+        {
             if (!HasStateAuthority) return;
             State = KunaiStateType.Stance;
             var endType = await _clipPlayer.PlayClipAndWait(_throw, this.GetCancellationTokenOnDestroy());
@@ -188,11 +209,10 @@ namespace InGame.Player.Sarutobi
         }
 
         // Local で投げる位置の判定をとる
-        void KunaiTargetDetection()
+        void KunaiTargetDetection(Vector3 targetPos)
         {
             if (!HasInputAuthority) return;
-            var hit = Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out var hitInfo, _maxDistance, _hitLayer);
-            Rpc_KunaiBulletDetection(hit ? hitInfo.point : _mainCamera.transform.position + _mainCamera.transform.forward * _maxDistance);
+            Rpc_KunaiBulletDetection(targetPos);
         }
         
         /// <summary> input authority から target position を取得し、クナイの判定をとる </summary>
