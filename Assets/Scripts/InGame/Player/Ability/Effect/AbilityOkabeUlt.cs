@@ -7,7 +7,7 @@ using UnityEngine;
 namespace InGame.Player.Ability.Effect
 {
     [Serializable]
-    public class AbilityOkabeUlt : AbilityBase
+    public class AbilityOkabeUlt : AbilityUltBase
     {
         [SerializeField] private float _duration = 5f;
         [SerializeField] private StatusEffect _buffEffect;
@@ -16,7 +16,7 @@ namespace InGame.Player.Ability.Effect
         private EffectSpawner _effectSpawner;
         private string _effectID;
 
-        protected override void OnStart()
+        protected override void OnCutInEnd()
         {
             Debug.Log("[AbilityOkabeUlt] Start");
             var player = Parameter.Owner;

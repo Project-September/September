@@ -5,7 +5,7 @@ using UnityEngine;
 namespace InGame.Player.Ability.Effect
 {
     [Serializable]
-    public class AbilitySarutobiUlt : AbilityBase
+    public class AbilitySarutobiUlt : AbilityUltBase
     {
         [Header("必殺技の発動時間")]
         [SerializeField] private float _duration = 10;
@@ -15,7 +15,7 @@ namespace InGame.Player.Ability.Effect
 
         private ThrowKunai _throwKunai;
 
-        protected override void OnStart()
+        protected override void OnCutInEnd()
         {
             var player = Parameter.Owner;
             

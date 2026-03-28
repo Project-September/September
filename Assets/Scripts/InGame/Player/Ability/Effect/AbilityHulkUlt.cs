@@ -7,7 +7,7 @@ using UnityEngine;
 namespace InGame.Player.Ability.Effect
 {
     [Serializable]
-    public class AbilityHulkUlt : AbilityBase
+    public class AbilityHulkUlt : AbilityUltBase
     {
         [Header("必殺技効果設定")]
         [SerializeField] private float _radius = 20f;
@@ -18,7 +18,7 @@ namespace InGame.Player.Ability.Effect
         
         private EffectSpawner _effectSpawner;
 
-        protected override void OnStart()
+        protected override void OnCutInEnd()
         {
             Debug.Log("[AbilityHulkUlt] Start");
             var player = Parameter.Owner;
