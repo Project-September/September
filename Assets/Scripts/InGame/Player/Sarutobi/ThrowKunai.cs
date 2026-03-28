@@ -138,6 +138,15 @@ namespace InGame.Player.Sarutobi
                 EndStance();
             }
         }
+
+        /// <summary>
+        /// クナイの投げる数を設定する（仮）
+        /// ステータスシステムに統合したい 
+        /// </summary>
+        public void SetBulletCount(int bulletCount)
+        {
+            _bulletCount = bulletCount;
+        }
         
         void Throw(float angle)
         {
