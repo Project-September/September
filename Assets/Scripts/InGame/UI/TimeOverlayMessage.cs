@@ -29,6 +29,9 @@ public class TimeOverlayMessage : MonoBehaviour
             case TimeMessageType.Countdown:
                 _currentTask = CountdownTask().Preserve();
                 break;
+            case TimeMessageType.PreStart:
+                _currentTask = GamePreStartTask().Preserve();
+                break;
             case TimeMessageType.GameStart:
                 _currentTask = GameStartTask().Preserve();
                 break;
@@ -54,6 +57,20 @@ public class TimeOverlayMessage : MonoBehaviour
         CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_Count.Name); // カウントダウン音
         await _text.transform.DOScale(Vector3.one, 0.5f).SetLoops(2,LoopType.Yoyo).SetEase(_ease);
         CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_End.Name); // ゲーム開始音
+        col.a = 0;
+        _text.color = col;
+        //　戦いに備えろのテキストをスキップする場合があるため、分離。
+        // _text.text = _readyTimeMessage;
+        // await _text.transform.DOScale(Vector3.one, 0.5f).SetEase(_ease);
+        // await _text.DOFade(0f, _fadeOutDuration).SetEase(Ease.Linear);
+    }
+
+    private async UniTask GamePreStartTask()
+    {
+        _text.transform.localScale = Vector3.zero;
+        var col = _text.color;
+        col.a = 1;
+        _text.color = col;
         _text.text = _readyTimeMessage;
         await _text.transform.DOScale(Vector3.one, 0.5f).SetEase(_ease);
         await _text.DOFade(0f, _fadeOutDuration).SetEase(Ease.Linear);
@@ -87,4 +104,5 @@ public enum TimeMessageType
     Countdown,
     GameStart,
     TimeRemainingAlert,
+    PreStart,
 }

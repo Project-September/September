@@ -26,7 +26,7 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
-        private int _spawnPositionIndex;
+        [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawnPosition = false;
         private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
@@ -59,16 +59,23 @@ namespace September.Common
                 Initialize().Forget();
             }
         }
-
         private async UniTask Initialize()
         {
             await Runner.LoadScene("Field", LoadSceneMode.Additive);
             var container = CharacterDataContainer.Instance;
+            // 開始時のPlayer位置をランダム化
+            var spawnPositions = _spawnPositions;
+            if(_isRandomSpawnPosition)
+                spawnPositions = spawnPositions.OrderBy(_ => Random.value).ToArray();
+            var index = 0;
             foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
             {
+                // ランダム化の際にPlayerのrotationを制御可能にするために、spawnPositionに合わせる
+                var spawnTransform = spawnPositions[index++];
                 var player = await Context.Runner.SpawnAsync(
                     container.GetCharacterData(pair.Value.CharacterType).Prefab,
-                    GetSpawnPosition(),
+                    spawnTransform.position,
+                    spawnTransform.rotation,
                     inputAuthority: pair.Key);
                 Context.Runner.SetPlayerObject(pair.Key, player);
                 if (!Context.PlayerDataDic.ContainsKey(pair.Key))
@@ -111,7 +118,6 @@ namespace September.Common
         {
             OpeningSequence().Forget();
         }
-
         private async UniTaskVoid OpeningSequence()
         {
             // 全クライアントで入力を無効化
@@ -128,13 +134,22 @@ namespace September.Common
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始
-            UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
+            var countDownTask = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ - 全クライアントで移動入力を有効化
-            if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
             BGMManager.ReleseFlag();
-            UIController.I.StartTimer(Context.Runner);
-            await UniTask.Delay(TimeSpan.FromSeconds(10f));
+            var countDownDuration = StaticServiceLocator.Instance.Get<InGameManager>().TimerData.PreStartTime;
+            if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合はスキップする。
+            {
+                if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
+                // 画面中央のTextを使用したAnimationを使用した場合、Animationの実行がcancelされるため、終了を待機する。
+                countDownTask?.GetAwaiter().OnCompleted(
+                    ()=> UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreStart));
+                UIController.I.StartTimer(Context.Runner);
+                // 準備時間分待つ
+                await UniTask.Delay(TimeSpan.FromSeconds(countDownDuration));
+            }
+
             //  ゲーム開始 - 全クライアントでアクション入力も有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, true, true);
             var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
@@ -143,6 +158,7 @@ namespace September.Common
                 task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
             else
                 SetOgreLamp();
+
             ShowStatusUpUI();
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
@@ -207,12 +223,6 @@ namespace September.Common
 
             // スコアの更新処理
             PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
-        }
-        private Vector3 GetSpawnPosition()
-        {
-            var result = _spawnPositions[_spawnPositionIndex].position;
-            _spawnPositionIndex = (_spawnPositionIndex + 1) % _spawnPositions.Length;
-            return result;
         }
         /// <summary>
         /// 鬼を抽選するメソッド
