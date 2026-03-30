@@ -234,6 +234,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Shooting"",
+                    ""type"": ""Button"",
+                    ""id"": ""2c0c0453-b712-48c8-9428-72f2a6155d18"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -773,6 +782,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Ability3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b6708e9c-917f-4315-ae7f-075d4d840a5a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Shooting"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1695,6 +1715,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player_Warp = m_Player.FindAction("Warp", throwIfNotFound: true);
         m_Player_AirplaneForward = m_Player.FindAction("AirplaneForward", throwIfNotFound: true);
         m_Player_AirPlaneBack = m_Player.FindAction("AirPlaneBack", throwIfNotFound: true);
+        m_Player_Shooting = m_Player.FindAction("Shooting", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1818,6 +1839,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Warp;
     private readonly InputAction m_Player_AirplaneForward;
     private readonly InputAction m_Player_AirPlaneBack;
+    private readonly InputAction m_Player_Shooting;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1894,6 +1916,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @AirPlaneBack => m_Wrapper.m_Player_AirPlaneBack;
         /// <summary>
+        /// Provides access to the underlying input action "Player/Shooting".
+        /// </summary>
+        public InputAction @Shooting => m_Wrapper.m_Player_Shooting;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -1967,6 +1993,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @AirPlaneBack.started += instance.OnAirPlaneBack;
             @AirPlaneBack.performed += instance.OnAirPlaneBack;
             @AirPlaneBack.canceled += instance.OnAirPlaneBack;
+            @Shooting.started += instance.OnShooting;
+            @Shooting.performed += instance.OnShooting;
+            @Shooting.canceled += instance.OnShooting;
         }
 
         /// <summary>
@@ -2026,6 +2055,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @AirPlaneBack.started -= instance.OnAirPlaneBack;
             @AirPlaneBack.performed -= instance.OnAirPlaneBack;
             @AirPlaneBack.canceled -= instance.OnAirPlaneBack;
+            @Shooting.started -= instance.OnShooting;
+            @Shooting.performed -= instance.OnShooting;
+            @Shooting.canceled -= instance.OnShooting;
         }
 
         /// <summary>
@@ -2696,6 +2728,13 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAirPlaneBack(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Shooting" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnShooting(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

@@ -88,7 +88,7 @@ namespace InGame.Player.Ability
             // 全アビリティを更新
             foreach (var ability in _abilities)
             {
-                //入力を保持　山本
+                //入力を保持
                 ability.SetPlayerInput(input);
                 
                 ability.Tick(Time.deltaTime);
