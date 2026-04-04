@@ -26,10 +26,11 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
-        [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawnPosition = false;
+        [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
+        public bool IsRandomSpawn {get=>_isRandomSpawn; set => _isRandomSpawn = value;}
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -86,7 +87,7 @@ namespace September.Common
         {
             var container = CharacterDataContainer.Instance;
             // キャラクターのスポーン位置をランダムに
-            var spawnPositions = _isRandomSpawnPosition ? GetShuffledSpawnPoints() : _spawnPositions;
+            var spawnPositions = _isRandomSpawn ? GetShuffledSpawnPoints() : _spawnPositions;
             var index = 0;
             foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
             {
