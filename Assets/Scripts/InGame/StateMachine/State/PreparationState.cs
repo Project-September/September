@@ -62,15 +62,35 @@ namespace September.Common
         private async UniTask Initialize()
         {
             await Runner.LoadScene("Field", LoadSceneMode.Additive);
+            await SpawnPlayers();
+
+            // プレイヤーのキャラクター選択を一度だけ記録
+            if (!_hasRecordedPlayerSelection)
+            {
+                _hasRecordedPlayerSelection = true;
+                foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
+                {
+                    var data = new GameEventData();
+                    data.DataPack("Player", pair.Key.ToString());
+                    data.DataPack("Chara", pair.Value.CharacterType.ToString());
+                    data.DataPack("Name", pair.Value.DisplayNickName);
+                    GameEventRecorder.SendEventData("UserSelect", data);
+                }
+            }
+
+            Context.Register(StaticServiceLocator.Instance);
+            RPC_OpeningSequence();
+        }
+
+        private async UniTask SpawnPlayers()
+        {
             var container = CharacterDataContainer.Instance;
-            // 開始時のPlayer位置をランダム化
-            var spawnPositions = _spawnPositions;
-            if(_isRandomSpawnPosition)
-                spawnPositions = spawnPositions.OrderBy(_ => Random.value).ToArray();
+            // キャラクターのスポーン位置をランダムに
+            var spawnPositions = _isRandomSpawnPosition ? GetShuffledSpawnPoints() : _spawnPositions;
             var index = 0;
             foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
             {
-                // ランダム化の際にPlayerのrotationを制御可能にするために、spawnPositionに合わせる
+                // ランダム化の際にPlayerのrotationを制御可能にするために、spawnPositionのrotationに合わせる
                 var spawnTransform = spawnPositions[index++];
                 var player = await Context.Runner.SpawnAsync(
                     container.GetCharacterData(pair.Value.CharacterType).Prefab,
@@ -94,23 +114,11 @@ namespace September.Common
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key, spd);
                 _setIcon.ShowIcon(pair.Key);
             }
+        }
 
-            // プレイヤーのキャラクター選択を一度だけ記録
-            if (!_hasRecordedPlayerSelection)
-            {
-                _hasRecordedPlayerSelection = true;
-                foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
-                {
-                    var data = new GameEventData();
-                    data.DataPack("Player", pair.Key.ToString());
-                    data.DataPack("Chara", pair.Value.CharacterType.ToString());
-                    data.DataPack("Name", pair.Value.DisplayNickName);
-                    GameEventRecorder.SendEventData("UserSelect", data);
-                }
-            }
-
-            Context.Register(StaticServiceLocator.Instance);
-            RPC_OpeningSequence();
+        private Transform[] GetShuffledSpawnPoints()
+        {
+            return _spawnPositions.OrderBy(_ => Random.value).ToArray();
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -139,7 +147,7 @@ namespace September.Common
             //  準備フェーズ - 全クライアントで移動入力を有効化
             BGMManager.ReleseFlag();
             var countDownDuration = StaticServiceLocator.Instance.Get<InGameManager>().TimerData.PreStartTime;
-            if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合はスキップする。
+            if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合は下記の処理をスキップする。
             {
                 if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
                 // 画面中央のTextを使用したAnimationを使用した場合、Animationの実行がcancelされるため、終了を待機する。
