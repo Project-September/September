@@ -86,13 +86,16 @@ namespace September.Common
         private async UniTask SpawnPlayers()
         {
             var container = CharacterDataContainer.Instance;
-            // キャラクターのスポーン位置をランダムに
+            // キャラクターのスポーン位置をランダムに。
             var spawnPositions = _isRandomSpawn ? GetShuffledSpawnPoints() : _spawnPositions;
+            // スポーンポイント設定が適応されていない場合はこのコンポーネント位置を暫定で初期値とする。
+            if (spawnPositions == null || spawnPositions.Length == 0)
+                spawnPositions = new[] { transform };
             var index = 0;
             foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
             {
-                // ランダム化の際にPlayerのrotationを制御可能にするために、spawnPositionのrotationに合わせる
-                var spawnTransform = spawnPositions[index++];
+                // ランダム化の際にPlayerのrotationを制御可能にするために、spawnPositionのrotationに合わせる。
+                var spawnTransform = spawnPositions[index % spawnPositions.Length];
                 var player = await Context.Runner.SpawnAsync(
                     container.GetCharacterData(pair.Value.CharacterType).Prefab,
                     spawnTransform.position,
@@ -114,6 +117,8 @@ namespace September.Common
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key, spd);
                 _setIcon.ShowIcon(pair.Key);
+                
+                index++;
             }
         }
 
