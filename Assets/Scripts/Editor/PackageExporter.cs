@@ -59,7 +59,7 @@ public class PackageExporter : EditorWindow
 
                 // 「子フォルダ名 > 孫フォルダ名」の形式で表示
                 EditorGUILayout.LabelField($"{icon}[{status.ParentName}] {status.FolderName}", GUILayout.Width(250));
-                EditorGUILayout.LabelField($"{status.LastModified:MM/dd HH:mm}", GUILayout.Width(100));
+                EditorGUILayout.LabelField($"{status.LastModified:yyyy/MM/dd HH:mm}", GUILayout.Width(130));
 
                 if (GUILayout.Button("開く", GUILayout.Width(40)))
                 {
