@@ -29,8 +29,13 @@ namespace InGame.Player.Ability
         [Header("射撃のステート")] 
         [SerializeField] private ShootingStateType _shootingStateType;
         
+        private AbilityStatusManagement _abilityStatusManagement;
+        
         protected override void OnStart()
         {
+            if(_abilityStatusManagement == null) _abilityStatusManagement = 
+                Parameter.Owner.GetComponent<AbilityStatusManagement>();
+            
             _shootingStateType = ShootingStateType.Stance;
             _aimCameraController.CrosshairToggleChange(true);
             _aimCameraController.AimCamera();
@@ -38,7 +43,7 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
-            if(AbilityStatusManagement.instance.AbilityStatus != HatanoAbilityStatus.RocketLauncher) return;
+            if(_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.RocketLauncher) return;
             
             if (_shootingStateType == ShootingStateType.Stance)
             {

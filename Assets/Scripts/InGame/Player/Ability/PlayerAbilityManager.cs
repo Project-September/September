@@ -62,7 +62,7 @@ namespace InGame.Player.Ability
             // 前フレームと現在のボタン入力を更新
             _previousButtons = _currentButtons;
             _currentButtons = input.Buttons;
-
+            
             // Host側でのみアビリティの開始・更新を実行
             if (!HasStateAuthority) return;
 

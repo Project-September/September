@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Fusion;
 using UnityEngine;
 using September.Common;
@@ -10,11 +11,10 @@ namespace InGame.Player.Hatano
     /// </summary>
     public class AbilityStatusManagement : NetworkBehaviour
     {
-        public static AbilityStatusManagement instance;
-
         [Header("現在の選択中のAbility")]
-        [SerializeField] private HatanoAbilityStatus _abilityStatus;
+        [Networked] private HatanoAbilityStatus _abilityStatus {get; set;}
         public HatanoAbilityStatus AbilityStatus => _abilityStatus;
+        public HatanoAbilityStatus _lastAbilityStatus;
         
         private AbilityStatusUIManager _abilityStatusUIManager;
         private AimCameraController _aimCameraController;
@@ -22,67 +22,64 @@ namespace InGame.Player.Hatano
 
         private void Awake()
         {
-            if (instance == null) instance = this;
-            _abilityStatus = HatanoAbilityStatus.None;
-            
             _abilityStatusUIManager = GetComponent<AbilityStatusUIManager>();
             _aimCameraController = GetComponent<AimCameraController>();
         }
 
+        public override void Spawned()
+        {
+            _abilityStatus = HatanoAbilityStatus.None;
+        }
+
         public override void FixedUpdateNetwork()
         {
+            if (_abilityStatus != _lastAbilityStatus)
+            {
+                _lastAbilityStatus = _abilityStatus;
+                _abilityStatusUIManager.SelectedAbilityUITextChanged(_abilityStatus);
+            }
+            
+            if(!HasInputAuthority) return;
             //入力がなかったら処理を行わない
             if (!GetInput<PlayerInput>(out var input)) return;
             //構えているときはアビリティの変更を行えないようにする
             if(_aimCameraController.IsAim) return;
 
-            //アビリティの入力でアビリティの変更を行う
             if (input.Buttons.IsSet(PlayerButtons.Ability1) && !_isChangeAbilityInput)
             {
                 _isChangeAbilityInput = true;
-                //現在のアビリティに応じて、アビリティを変更する
-                switch (_abilityStatus)
-                {
-                    case HatanoAbilityStatus.None:
-                        var abilityD1 = HatanoAbilityStatus.DoubleBarreledGun;
-                        ChangeAbilityStatus(abilityD1);
-                        _abilityStatusUIManager.SelectedAbilityUITextChanged(abilityD1);
-                        break;
-                    
-                    case HatanoAbilityStatus.DoubleBarreledGun:
-                        var abilityRi = HatanoAbilityStatus.RemoteInteraction;
-                        ChangeAbilityStatus(abilityRi);
-                        _abilityStatusUIManager.SelectedAbilityUITextChanged(abilityRi);
-                        break;
-                    
-                    case HatanoAbilityStatus.RemoteInteraction:
-                        var abilityRl = HatanoAbilityStatus.RocketLauncher;
-                        ChangeAbilityStatus(abilityRl);
-                        _abilityStatusUIManager.SelectedAbilityUITextChanged(abilityRl);
-                        break;
-                    
-                    case HatanoAbilityStatus.RocketLauncher:
-                        var abilityD2 = HatanoAbilityStatus.DoubleBarreledGun;
-                        ChangeAbilityStatus(abilityD2);
-                        _abilityStatusUIManager.SelectedAbilityUITextChanged(abilityD2);
-                        break;
-                }
+                var next = GetNextHatanoAbilityStatus();
+                RPC_ChangeAbilityStatus(next);
             }
 
-            //再度Abilityの変更を行えるようにする
-            if (!input.Buttons.IsSet(PlayerButtons.Ability1) && _isChangeAbilityInput)
-            {
+            if (!input.Buttons.IsSet(PlayerButtons.Ability1) && _isChangeAbilityInput) 
                 _isChangeAbilityInput = false;
-            }
         }
 
         /// <summary>
-        /// 現在の選択中のアビリティを変更する
+        /// 現在のアビリティに応じてアビリティの変更を行う
         /// </summary>
-        /// <param name="abilityStatus">変更するアビリティ</param>
-        private void ChangeAbilityStatus(HatanoAbilityStatus abilityStatus)
+        /// <returns>変更後のアビリティ</returns>
+        private HatanoAbilityStatus GetNextHatanoAbilityStatus()
         {
-            _abilityStatus = abilityStatus;
+            return _abilityStatus switch
+            {
+                HatanoAbilityStatus.None => HatanoAbilityStatus.DoubleBarreledGun,
+                HatanoAbilityStatus.DoubleBarreledGun => HatanoAbilityStatus.RemoteInteraction,
+                HatanoAbilityStatus.RemoteInteraction => HatanoAbilityStatus.RocketLauncher,
+                HatanoAbilityStatus.RocketLauncher => HatanoAbilityStatus.DoubleBarreledGun,
+                _ => HatanoAbilityStatus.None
+            };
+        }
+
+        /// <summary>
+        /// アビリティの変更を行う
+        /// </summary>
+        /// <param name="status">変更後のアビリティ</param>
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+        private void RPC_ChangeAbilityStatus(HatanoAbilityStatus status)
+        {
+            _abilityStatus = status;
         }
     }
 }
