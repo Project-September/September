@@ -43,9 +43,9 @@ namespace  InGame.Player.Ability
         }
 
         /// <summary>クールダウン時間（秒）</summary>
-        [SerializeField] private float _cooldown;
+        [SerializeField] protected float _cooldown;
         /// <summary>現在のアビリティフェーズ</summary>
-        [SerializeField] private AbilityPhase _phase = AbilityPhase.Available;
+        [SerializeField] protected AbilityPhase _phase = AbilityPhase.Available;
         /// <summary>NetworkRunnerのインスタンス（シミュレーション時刻取得用）</summary>
         protected NetworkRunner Runner => NetworkRunner.Instances.FirstOrDefault();
 
