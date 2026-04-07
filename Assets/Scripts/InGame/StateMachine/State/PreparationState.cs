@@ -30,7 +30,7 @@ namespace September.Common
         private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
-        public bool IsRandomSpawn {get=>_isRandomSpawn; set => _isRandomSpawn = value;}
+        public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -60,6 +60,7 @@ namespace September.Common
                 Initialize().Forget();
             }
         }
+        
         private async UniTask Initialize()
         {
             await Runner.LoadScene("Field", LoadSceneMode.Additive);
@@ -88,7 +89,7 @@ namespace September.Common
             var container = CharacterDataContainer.Instance;
             // キャラクターのスポーン位置をランダムに。
             var spawnPositions = _isRandomSpawn ? GetShuffledSpawnPoints() : _spawnPositions;
-            // スポーンポイント設定が適応されていない場合はこのコンポーネント位置を暫定で初期値とする。
+            // スポーンポイント設定が適用されていない場合はこのコンポーネント位置を暫定で初期値とする。
             if (spawnPositions == null || spawnPositions.Length == 0)
                 spawnPositions = new[] { transform };
             var index = 0;
@@ -132,6 +133,7 @@ namespace September.Common
         {
             OpeningSequence().Forget();
         }
+        
         private async UniTaskVoid OpeningSequence()
         {
             // 全クライアントで入力を無効化
@@ -158,7 +160,7 @@ namespace September.Common
                 if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
                 // 画面中央のTextを使用したAnimationを使用した場合、Animationの実行がcancelされるため、終了を待機する。
                 countDownTask?.GetAwaiter().OnCompleted(
-                    ()=> UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreStart));
+                    () => UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart));
                 UIController.I.StartTimer(Context.Runner);
                 // 準備時間分待つ
                 await UniTask.Delay(TimeSpan.FromSeconds(countDownDuration));
@@ -238,6 +240,7 @@ namespace September.Common
             // スコアの更新処理
             PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
         }
+        
         /// <summary>
         /// 鬼を抽選するメソッド
         /// </summary>
@@ -255,6 +258,7 @@ namespace September.Common
             _firstOgrePlayer = ogreKey;
             PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
         }
+        
         /// <summary>
         /// 各Playerの気絶時に呼ばれるメソッド
         /// </summary>
@@ -282,11 +286,13 @@ namespace September.Common
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
         }
+        
         private void HideCursor()
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
+        
         private void SetOgreLamp()
         {
             if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
@@ -361,6 +367,5 @@ namespace September.Common
             GameInput.I.ToggleActionInput(actionInputEnabled);
             GameInput.I.ToggleLookInput(lookInputEnabled);
         }
-
     }
 }
