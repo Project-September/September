@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using InGame.Player.Ult;
 using UnityEngine;
 
 namespace InGame.Player.Ability.Effect
@@ -7,28 +8,33 @@ namespace InGame.Player.Ability.Effect
     [Serializable]
     public abstract class AbilityUltBase : AbilityBase
     {
-        [Header("カットイン設定")]
-        [SerializeField] private float _cutInDuration = 1f; // 仮
-
+        private CutInAnimatorBase _cutInAnimator;
         private PlayerHealth _playerHealth;
         
         protected sealed override void OnStart()
         {
             Debug.Log("[AbilityUlt] OnStart");
             
-            if (!_playerHealth)
-            {
-                _playerHealth = Parameter.Owner.GetComponent<PlayerHealth>();
-            }
+            var player = Parameter.Owner;
+            
+            if (!_playerHealth) _playerHealth = player.GetComponent<PlayerHealth>();
+            if (!_cutInAnimator) _cutInAnimator = player.GetComponent<CutInAnimatorBase>();
             
             PlayCutIn().Forget();
         }
 
-        protected async UniTask PlayCutIn()
+        private async UniTask PlayCutIn()
         {
             if (_playerHealth) _playerHealth.IsInvincible = true;
-            await UniTask.WaitForSeconds(_cutInDuration);
+
+            if (_cutInAnimator)
+            {
+                var token = Parameter.Owner.destroyCancellationToken;
+                await _cutInAnimator.PlayCutInAnimation(token);
+            }
+            
             if (_playerHealth) _playerHealth.IsInvincible = false;
+            
             OnCutInEnd();
         }
         
