@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Fusion;
+using September.Common;
 using UnityEngine;
 
 namespace  InGame.Player.Ability
@@ -57,6 +58,9 @@ namespace  InGame.Player.Ability
         /// <summary>現在のアビリティフェーズ（読み取り専用）</summary>
         public AbilityPhase Phase => _phase;
         
+        //inputを保持するために追加
+        protected PlayerInput _playerInput;
+        
         /// <summary>アビリティ開始時のティック</summary>
         public int StartTick { get; private set; }
         /// <summary>アビリティ開始時の時間</summary>
@@ -93,6 +97,15 @@ namespace  InGame.Player.Ability
         public void RequestEndAbility()
         {
             _phase = AbilityPhase.Ending;
+        }
+        
+        /// <summary>
+        /// プレイヤーの入力を設定する
+        /// </summary>
+        /// <param name="playerInput">入力</param>
+        public void SetPlayerInput(PlayerInput playerInput)
+        {
+            _playerInput = playerInput;
         }
 
         /// <summary>
