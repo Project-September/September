@@ -10,6 +10,10 @@ namespace InGame.Player.Ability.Effect
     {
         private CutInAnimatorBase _cutInAnimator;
         private PlayerHealth _playerHealth;
+
+        private float _cutInEndTime;
+        
+        public float TimeSinceCutInEnd => ElapsedTime - _cutInEndTime;
         
         protected sealed override void OnStart()
         {
@@ -34,7 +38,8 @@ namespace InGame.Player.Ability.Effect
             }
             
             if (_playerHealth) _playerHealth.IsInvincible = false;
-            
+
+            _cutInEndTime = ElapsedTime;
             OnCutInEnd();
         }
         

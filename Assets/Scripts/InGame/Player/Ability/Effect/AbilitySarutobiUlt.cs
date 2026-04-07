@@ -30,7 +30,7 @@ namespace InGame.Player.Ability.Effect
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (ElapsedTime >= _duration)
+            if (TimeSinceCutInEnd > _duration)
             {
                 _throwKunai.SetBulletCount(1);
                 RequestEndAbility();

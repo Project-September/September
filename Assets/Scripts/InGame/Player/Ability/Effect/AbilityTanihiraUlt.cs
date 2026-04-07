@@ -32,7 +32,7 @@ namespace InGame.Player.Ability.Effect
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (Runner.SimulationTime - StartTime > _duration)
+            if (TimeSinceCutInEnd > _duration)
             {
                 RequestEndAbility();
             }

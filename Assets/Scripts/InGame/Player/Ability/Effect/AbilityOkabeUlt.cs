@@ -35,8 +35,7 @@ namespace InGame.Player.Ability.Effect
 
         protected override void OnUpdate(float deltaTime)
         {
-            var elapsedTick = Runner.Tick - StartTick;
-            if (elapsedTick >= _duration / Runner.DeltaTime)
+            if (TimeSinceCutInEnd > _duration)
             {
                 RequestEndAbility();
             }
