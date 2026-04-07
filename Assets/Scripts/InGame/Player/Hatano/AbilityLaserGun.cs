@@ -29,7 +29,7 @@ namespace InGame.Player.Ability
         [Header("判定を取るためのBoxの大きさ")]
         [SerializeField] private Vector3 _judgmentBoxSize;
         
-        private AbilityStatusManagement _abilityStatusManagement;
+        private HatanoAbilityStatusManagement _abilityStatusManagement;
         private bool _isSetAim;
         private ShootingStateType _lastShootingStateType;
         
@@ -39,7 +39,7 @@ namespace InGame.Player.Ability
         protected override void OnStart()
         {
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
-                Parameter.Owner.GetComponent<AbilityStatusManagement>();
+                Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
 
             _shootingStateType = ShootingStateType.Stance;
             _isSetAim = false;
@@ -76,38 +76,6 @@ namespace InGame.Player.Ability
                 _phase = AbilityPhase.Available;
                 _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
             }
-            
-            /*
-            //現在のAbilityが遠距離インタラクションの場合、処理を通す
-            if(_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.RemoteInteraction) return;
-            
-            //構えている状態
-            if (_shootingStateType == ShootingStateType.Stance)
-            {
-                _aimCameraController.PlayerDirectionAIMCamera();
-                
-                //撃つ入力をしている時、Rayを飛ばす
-                if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
-                {
-                    LaserTargetDetection();
-                }
-                else if (!_playerInput.Buttons.IsSet(PlayerButtons.Shooting)) //撃つ入力を離したらインタラクションを中止する
-                {
-                    _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
-                }
-            }
-            
-            //構える入力を離したら、アビリティを終了する
-            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
-            {
-                _phase = AbilityPhase.Available;
-                _aimCameraController.NormalCamera();
-                _aimCameraController.CrosshairToggleChange(false);
-                
-                //一応、インタラクション中にエイムを辞めたときもインタラクションを中止する
-                _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
-            }
-            */
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)

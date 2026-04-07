@@ -30,12 +30,12 @@ namespace InGame.Player.Ability
         [Header("射撃のステート")] 
         [SerializeField] private ShootingStateType _shootingStateType;
         
-        private AbilityStatusManagement _abilityStatusManagement;
+        private HatanoAbilityStatusManagement _abilityStatusManagement;
         
         protected override void OnStart()
         {
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
-                Parameter.Owner.GetComponent<AbilityStatusManagement>();
+                Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             
             _shootingStateType = ShootingStateType.Stance;
             _aimCameraController.CrosshairToggleChange(true);
@@ -48,7 +48,7 @@ namespace InGame.Player.Ability
             
             if (_shootingStateType == ShootingStateType.Stance)
             {
-                _aimCameraController.PlayerDirectionAIMCamera();
+                _aimCameraController.PlayerDirectionCamera();
                 
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {

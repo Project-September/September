@@ -57,6 +57,9 @@ namespace  InGame.Player.Ability
         protected float CooldownEndTime { get; private set; }
         /// <summary>現在のアビリティフェーズ（読み取り専用）</summary>
         public AbilityPhase Phase => _phase;
+        
+        //inputを保持するために追加
+        protected PlayerInput _playerInput;
 
         /// <summary>
         /// アビリティを開始する（PlayerAbilityManagerから呼び出される）
@@ -154,8 +157,6 @@ namespace  InGame.Player.Ability
             }
         }
         
-        //inputを保持するために追加
-        protected PlayerInput _playerInput;
         /// <summary>
         /// プレイヤーの入力を設定する
         /// </summary>

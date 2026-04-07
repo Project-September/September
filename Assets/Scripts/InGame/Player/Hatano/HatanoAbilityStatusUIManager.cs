@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace InGame.Player.Hatano
 {
-    public class AbilityStatusUIManager : NetworkBehaviour
+    public class HatanoAbilityStatusUIManager : NetworkBehaviour
     {
         [Header("選択中のAbilityを表示するUI")]
         [SerializeField] private GameObject _selectedAbilityUIPrefab;

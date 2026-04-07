@@ -83,7 +83,7 @@ public class AimCameraController : NetworkBehaviour
     /// <summary>
     /// カメラの方向にプレイヤーを向かせる
     /// </summary>
-    public void PlayerDirectionAIMCamera()
+    public void PlayerDirectionCamera()
     {
         if (MainCamera == null)
         {

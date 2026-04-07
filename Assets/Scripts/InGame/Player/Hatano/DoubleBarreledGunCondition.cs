@@ -12,7 +12,7 @@ namespace InGame.Player.Ability
         // キャッシュ用
         private PlayerMovement _playerMovement;
         private PlayerManager _playerManager;
-        private AbilityStatusManagement _abilityStatusManagement;
+        private HatanoAbilityStatusManagement _abilityStatusManagement;
 
         public bool IsConditionMatch(in TriggerEventContext context)
         {
@@ -21,7 +21,7 @@ namespace InGame.Player.Ability
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
             
             if (_abilityStatusManagement == null) _abilityStatusManagement = 
-                context.Owner.GetComponent<AbilityStatusManagement>();
+                context.Owner.GetComponent<HatanoAbilityStatusManagement>();
             if(_abilityStatusManagement.AbilityStatus == HatanoAbilityStatus.None) return false;
             
             // 条件を定義

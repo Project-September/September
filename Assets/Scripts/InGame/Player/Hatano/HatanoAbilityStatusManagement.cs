@@ -1,28 +1,26 @@
-using System.Linq.Expressions;
 using Fusion;
 using UnityEngine;
 using September.Common;
-using TMPro;
 
 namespace InGame.Player.Hatano
 {
     /// <summary>
     /// ハタノ・エリクソンのAbility選択状態を管理する
     /// </summary>
-    public class AbilityStatusManagement : NetworkBehaviour
+    public class HatanoAbilityStatusManagement : NetworkBehaviour
     {
         [Header("現在の選択中のAbility")]
         [Networked] private HatanoAbilityStatus _abilityStatus {get; set;}
         public HatanoAbilityStatus AbilityStatus => _abilityStatus;
         public HatanoAbilityStatus _lastAbilityStatus;
         
-        private AbilityStatusUIManager _abilityStatusUIManager;
+        private HatanoAbilityStatusUIManager _abilityStatusUIManager;
         private AimCameraController _aimCameraController;
         private bool _isChangeAbilityInput; //Abilityの変更入力
 
         private void Awake()
         {
-            _abilityStatusUIManager = GetComponent<AbilityStatusUIManager>();
+            _abilityStatusUIManager = GetComponent<HatanoAbilityStatusUIManager>();
             _aimCameraController = GetComponent<AimCameraController>();
         }
 
@@ -49,7 +47,15 @@ namespace InGame.Player.Hatano
             {
                 _isChangeAbilityInput = true;
                 var next = GetNextHatanoAbilityStatus();
-                RPC_ChangeAbilityStatus(next);
+
+                if (HasStateAuthority)
+                {
+                    _abilityStatus = next;
+                }
+                else
+                {
+                    RPC_ChangeAbilityStatus(next);
+                }
             }
 
             if (!input.Buttons.IsSet(PlayerButtons.Ability1) && _isChangeAbilityInput) 

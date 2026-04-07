@@ -29,12 +29,12 @@ namespace InGame.Player.Ability
         [Header("射撃のステート")] 
         [SerializeField] private ShootingStateType _shootingStateType;
         
-        private AbilityStatusManagement _abilityStatusManagement;
+        private HatanoAbilityStatusManagement _abilityStatusManagement;
         
         protected override void OnStart()
         {
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
-                Parameter.Owner.GetComponent<AbilityStatusManagement>();
+                Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             
             _shootingStateType = ShootingStateType.Stance;
             _aimCameraController.CrosshairToggleChange(true);
@@ -47,7 +47,7 @@ namespace InGame.Player.Ability
             
             if (_shootingStateType == ShootingStateType.Stance)
             {
-                _aimCameraController.PlayerDirectionAIMCamera();
+                _aimCameraController.PlayerDirectionCamera();
                 
                 //一度撃ったら、アビリティを終了する
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
@@ -68,17 +68,13 @@ namespace InGame.Player.Ability
             }
         }
 
-        public override void OnUpdateLocal(float deltaTime, GameObject owner)
-        {
-            
-        }
-        
         private void LauncherTargetDetection()
         {
             var origin = _aimCameraController.MainCamera.transform.position;
             var dir = _aimCameraController.MainCamera.transform.forward;
             Debug.DrawRay(origin, dir * _rocketLauncherDistance, Color.red);
             
+            //カメラからのRay
             var hit = Physics.Raycast(origin, dir, out RaycastHit hitInfo, _rocketLauncherDistance);
             //hitがtrueなら当たった場所を渡す　falseなら最大距離を渡す
             LauncherShootingDetection(hit? hitInfo.point :
@@ -95,17 +91,10 @@ namespace InGame.Player.Ability
             var dir = targetPos - origin;
             Debug.DrawRay(origin, dir * _rocketLauncherDistance, Color.blue);
             
-            //hitした場所に向かってRayを飛ばす
+            //hitした場所に向かってRayを飛ばす（プレイヤーからのRay）
             var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _rocketLauncherDistance);
-            if (laserPoint) //ヒットしたところにロケットランチャーを発射する
-            {
-                //ロケランの攻撃範囲内のプレイヤーを取得する
-                RocketLauncherRadius(laseHitInfo.point);
-            }
-            else //ヒットしなかった場合、Rayを飛ばした方向に向かってロケットランチャーを発射
-            {
-                RocketLauncherRadius(laseHitInfo.point);
-            }
+            //ヒットしたところにロケットランチャーを発射
+            RocketLauncherRadius(laseHitInfo.point);
         }
 
         /// <summary>
@@ -127,9 +116,10 @@ namespace InGame.Player.Ability
                 
                 //ダメージ処理
                 bool enableData = PlayerDatabase.Instance.PlayerDataDic.TryGet(playerInput, out var sessionData);
+                var damage = _damage;
+                if(enableData && sessionData.IsOgre) damage = _ogreDamage; //鬼の場合、鬼時のダメージに変更
                 var hitData = new HitData(HitActionType.Damage,
-                    enableData ? sessionData.IsOgre ? _ogreDamage : _damage : _damage, playerInput,
-                    damageable.OwnerPlayerRef, null, damageable);
+                    damage, playerInput, damageable.OwnerPlayerRef, null, damageable);
                 damageable.TakeHit(ref hitData);
             }
         }
