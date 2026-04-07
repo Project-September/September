@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Common.UserSettings
@@ -31,17 +32,25 @@ namespace Common.UserSettings
 
         public static void Save(UserSettings settings)
         {
+            if (IsFileLocked(FilePath)) return;
+
             var json = JsonUtility.ToJson(settings, false);
             File.WriteAllText(FilePath, json);
         }
 
         public static UserSettings Get()
         {
+            if(_instance == null)
+            {
+                return new UserSettings();
+            }
             return Instance;
         }
 
         private static UserSettings Load()
         {
+            if (IsFileLocked(FilePath)) return null;
+
             var userSettings = new UserSettings();
             if (File.Exists(FilePath))
             {
@@ -49,6 +58,22 @@ namespace Common.UserSettings
             }
 
             return userSettings;
+        }
+        private static bool IsFileLocked(string path)
+        {
+            if (!File.Exists(path)) return false;
+
+            try
+            {
+                using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    return false; // 開けた = ロックされてない
+                }
+            }
+            catch (IOException)
+            {
+                return true; // 開けない = 誰かが使ってる
+            }
         }
     }
 }
