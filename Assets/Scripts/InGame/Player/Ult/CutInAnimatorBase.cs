@@ -5,7 +5,7 @@ using Fusion;
 namespace InGame.Player.Ult
 {
     /// <summary>
-    /// カットインの抽象クラス
+    /// カットインの基底クラス
     /// </summary>
     public abstract class CutInAnimatorBase : NetworkBehaviour
     {
