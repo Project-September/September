@@ -2,7 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
-using InGame.Health; // 追加
+using InGame.Health;
 using InGame.Player;
 using UniRx;
 using UniRx.Triggers;
@@ -60,7 +60,8 @@ namespace InGame.Common
                     {
                         _isFainting = false;
                     }
-                });
+                }).AddTo(this);
+            
             _playerHealth.OnHitTaken += (hitData) =>
             {
                 if (!_playerManager.IsStun && hitData.HitActionType == HitActionType.Damage)
