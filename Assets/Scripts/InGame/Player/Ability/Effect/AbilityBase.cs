@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Fusion;
+using September.Common;
 using UnityEngine;
 
 namespace  InGame.Player.Ability
@@ -56,6 +57,9 @@ namespace  InGame.Player.Ability
         protected float CooldownEndTime { get; private set; }
         /// <summary>現在のアビリティフェーズ（読み取り専用）</summary>
         public AbilityPhase Phase => _phase;
+        
+        //inputを保持するために追加
+        protected PlayerInput _playerInput;
 
         /// <summary>
         /// アビリティを開始する（PlayerAbilityManagerから呼び出される）
@@ -151,6 +155,15 @@ namespace  InGame.Player.Ability
             {
                 _phase = AbilityPhase.Available;
             }
+        }
+        
+        /// <summary>
+        /// プレイヤーの入力を設定する
+        /// </summary>
+        /// <param name="playerInput">入力</param>
+        public void SetPlayerInput(PlayerInput playerInput)
+        {
+            _playerInput = playerInput;
         }
     }
 }

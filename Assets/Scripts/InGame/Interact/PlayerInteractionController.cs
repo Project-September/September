@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Player;
+using InGame.Player.Ability;
 using UnityEngine;
 using September.Common;
 using September.InGame;
@@ -37,6 +38,7 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
+        private bool _isRemote; //遠距離インタラクション中か判定
 
         private void Awake()
         {
@@ -85,6 +87,8 @@ namespace InGame.Interact
             }
             else
             {
+                if(_isRemote) return;
+                
                 CancelInteraction();
             }
         }
@@ -112,16 +116,71 @@ namespace InGame.Interact
             _isHoldingInteract = input.Buttons.IsSet(PlayerButtons.Interact);
         }
 
+        /// <summary>
+        /// 遠距離からのインタラクション用
+        /// </summary>
+        /// <param name="timer">インタラクションタイマー</param>
+        /// <param name="time">インタラクション必要時間</param>
+        /// <param name="interactableBase">Rayで当たったインタラクション可能なオブジェクト</param>>
+        /// <param name="abilityPhase">アビリティの状態</param>>
+        /// <param name="aimCameraController">このAbilityを使っているキャラのカメラ</param>>
+        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase, 
+            ref AbilityBase.AbilityPhase abilityPhase, AimCameraController aimCameraController)
+        {
+            var context = new InteractableContext
+            {
+                Interactor = Object.InputAuthority.RawEncoded,
+            };
+            if(!interactableBase.ValidateInteraction(context)) return;
+
+            _isRemote = true;
+            var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
+                PlayerManager.PlayerControlState.ForcedControl;
+            _focusedObj = interactableBase;
+            UIController.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+            
+            timer += Runner.DeltaTime;
+            if (timer >= time) //インタラクション成功時間を超えたらインタラクションを行う
+            {
+                _isRemote = false;
+                timer = 0f;
+                CompleteInteraction();
+                UIController.I.ShowInteractUI(false);
+                
+                //インタラクションに成功したらアビリティを終了
+                abilityPhase = AbilityBase.AbilityPhase.Ending;
+                aimCameraController.NormalCamera();
+                aimCameraController.CrosshairToggleChange(false);
+            }
+            UIController.I.SetInteractProgress(Mathf.Clamp01(timer / time));
+        }
+
+        /// <summary>
+        ///　途中で遠距離インタラクションを中止したときに呼ぶ
+        /// ・インタラクションの入力を辞めたとき
+        /// ・エイムをインタラクションオブジェクトから外した時
+        /// </summary>
+        public void RemoteInteractionCancel(ref float timer)
+        {
+            _isRemote = false;
+            timer = 0;
+            CancelInteraction();
+        }
+
         private void UpdateFocusedInteractable()
         {
             // 現在の focusedObj がまだ有効な範囲内かチェック
-            if (_focusedObj)
+            if (_focusedObj && !_isRemote)
             {
                 if (!IsInInteractRange(_focusedObj.transform.position, InteractRangeCheckMode.Buffered))
                 {
                     _focusedObj = null;
+                    Debug.Log("Nullにする");
                 }
             }
+            
+            //別のインタラクションオブジェクトに上書きされないようにする
+            if(_isRemote) return;
 
             // より近い候補があれば差し替え
             int count = Physics.OverlapSphereNonAlloc(_interactOrigin.position, _interactRadius, _hitBuffer,
