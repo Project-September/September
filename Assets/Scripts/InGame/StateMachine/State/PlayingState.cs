@@ -32,7 +32,8 @@ namespace September.Common
                 UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.TimeRemainingAlert);
             }
             
-            if (TickTimer.Expired(Context.Runner))
+            // 時間が0になったら次のステートに遷移する
+            if (HasStateAuthority && TickTimer.Expired(Context.Runner))
             {
                 TickTimer = TickTimer.None;
                 Context.Rpc_SendEvent((int)StateEventId.Finish);
