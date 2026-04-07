@@ -13476,6 +13476,7 @@ GameObject:
   - component: {fileID: -3421365915295316578}
   - component: {fileID: 3507305747521096909}
   - component: {fileID: 4461238842832938777}
+  - component: {fileID: 649019293918567276}
   m_Layer: 6
   m_Name: Sarutobi
   m_TagString: Player
@@ -13564,6 +13565,7 @@ MonoBehaviour:
   - {fileID: 4940562243900058895}
   - {fileID: -3421365915295316578}
   - {fileID: 3507305747521096909}
+  - {fileID: 649019293918567276}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -13964,6 +13966,8 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        _cutInDuration: 1
+        _player: {fileID: 0}
         _duration: 10
         _addProjectileCount: 2
     - rid: 8000700352795770966
@@ -14187,6 +14191,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredScore: 1000
+--- !u!114 &649019293918567276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc7840d6f50245e781522fe38dd245cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cutInAnimation: {fileID: 7400000, guid: 38623b8d90adb324cb3408d762de0fe2, type: 2}
+  _player: {fileID: 8254388696613982807}
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0

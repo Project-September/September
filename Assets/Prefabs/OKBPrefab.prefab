@@ -5241,6 +5241,7 @@ GameObject:
   - component: {fileID: 7344648055957507413}
   - component: {fileID: 4031138293428820530}
   - component: {fileID: 6282825429990540647}
+  - component: {fileID: -7886593714486123081}
   m_Layer: 6
   m_Name: OKBPrefab
   m_TagString: Player
@@ -5325,6 +5326,7 @@ MonoBehaviour:
   - {fileID: 8254388696613982807}
   - {fileID: 7344648055957507413}
   - {fileID: 4031138293428820530}
+  - {fileID: -7886593714486123081}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -5625,6 +5627,8 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        _cutInDuration: 1
+        _player: {fileID: 0}
         _duration: 10
         _buffEffect: {fileID: 11400000, guid: eb825a65a95ae924eb8f98bc05831cf5, type: 2}
         _effectType: 0
@@ -5779,6 +5783,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredScore: 1000
+--- !u!114 &-7886593714486123081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc7840d6f50245e781522fe38dd245cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cutInAnimation: {fileID: 7400000, guid: 60507cae34df73946a21e067315e1ecc, type: 2}
+  _player: {fileID: 8254388696613982807}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
