@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using System.IO;
@@ -169,3 +170,4 @@ public class PackageExporter : EditorWindow
         return index >= 0 ? fullPath.Substring(index) : null;
     }
 }
+#endif
