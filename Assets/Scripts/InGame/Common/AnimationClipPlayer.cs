@@ -38,6 +38,7 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
 
         public AnimationMixerPlayable BaseMixer => _baseMixer;
+        public Animator Animator => _animator;
 
         public bool IsPlayingTargetClip(AnimationClip clip)
         {
