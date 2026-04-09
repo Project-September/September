@@ -1,7 +1,9 @@
 using System.Threading;
+using Common.Extensions;
 using Cysharp.Threading.Tasks;
 using InGame.Common;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace InGame.Player.Ult
 {
@@ -11,24 +13,18 @@ namespace InGame.Player.Ult
     [RequireComponent(typeof(AnimationClipPlayer))]
     public class UltCutInAnimator : CutInAnimatorBase
     {
-        [SerializeField] private AnimationClip _cutInAnimation;
-        [SerializeField] private AnimationClipPlayer _player;
+        [SerializeField] private PlayableDirector _playableDirector;
 
         public override async UniTask PlayCutInAnimation(CancellationToken token)
         {
-            if (!_cutInAnimation)
+            if (!_playableDirector)
             {
-                Debug.LogWarning("[CutInAnimator] カットインアニメーションが設定されていません", this);
-                return;
-            }
-
-            if (!_player)
-            {
-                Debug.LogWarning("[CutInAnimator] AnimationClipPlayerがアサインされていません", this);
+                Debug.LogWarning("[UltCutInAnimator] PlayableDirectorが設定されていません。必殺技カットインはスキップされます");
                 return;
             }
             
-            await _player.PlayClipAndWait(_cutInAnimation, token);
+            _playableDirector.Play();
+            await _playableDirector.PlayAsync(token);
         }
     }
 }
