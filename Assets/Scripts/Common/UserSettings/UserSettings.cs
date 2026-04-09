@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Common.UserSettings
@@ -83,12 +82,12 @@ namespace Common.UserSettings
             {
                 using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                 {
-                    return false; // ŠJ‚¯‚½ = ƒƒbƒN‚³‚ê‚Ä‚È‚¢
+                    return false; // é–‹ã‘ãŸ = ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ãªã„
                 }
             }
             catch (IOException)
             {
-                return true; // ŠJ‚¯‚È‚¢ = ’N‚©‚ªg‚Á‚Ä‚é
+                return true; // é–‹ã‘ãªã„ = èª°ã‹ãŒä½¿ã£ã¦ã‚‹
             }
         }
     }
