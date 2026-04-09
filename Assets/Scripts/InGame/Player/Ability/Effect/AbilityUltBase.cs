@@ -10,9 +10,10 @@ namespace InGame.Player.Ability.Effect
     {
         private CutInAnimatorBase _cutInAnimator;
         private PlayerHealth _playerHealth;
+        private PlayerManager _playerManager;
 
         private float _cutInEndTime;
-        
+
         public float TimeSinceCutInEnd => ElapsedTime - _cutInEndTime;
         
         protected sealed override void OnStart()
@@ -23,6 +24,7 @@ namespace InGame.Player.Ability.Effect
             
             if (!_playerHealth) _playerHealth = player.GetComponent<PlayerHealth>();
             if (!_cutInAnimator) _cutInAnimator = player.GetComponent<CutInAnimatorBase>();
+            if (!_playerManager) _playerManager = player.GetComponent<PlayerManager>();
             
             PlayCutIn().Forget();
         }
@@ -30,6 +32,7 @@ namespace InGame.Player.Ability.Effect
         private async UniTask PlayCutIn()
         {
             if (_playerHealth) _playerHealth.IsInvincible = true;
+            if (_playerManager) _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
 
             if (_cutInAnimator)
             {
@@ -38,6 +41,7 @@ namespace InGame.Player.Ability.Effect
             }
             
             if (_playerHealth) _playerHealth.IsInvincible = false;
+            if (_playerManager) _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
 
             _cutInEndTime = ElapsedTime;
             OnCutInEnd();
