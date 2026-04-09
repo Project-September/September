@@ -168,6 +168,11 @@ namespace InGame.Common
             return _layerInfo[slot].Weight;
         }
 
+        /// <summary>
+        /// AnimationClipsContainerに登録されているMontageを再生します。
+        /// Montageで設定されたレイヤーやブレンドに応じてアニメーションを制御します。
+        /// </summary>
+        /// <param name="clip">再生するアニメーション</param>
         public void PlayClip(AnimationClip clip)
         {
             if (AnimationClipsContainer.Instance.AnimationMontages == null)
