@@ -74,6 +74,7 @@ namespace Common.UserSettings
             return userSettings;
         }
 
+        
         private static bool IsFileLocked(string path)
         {
             if (!File.Exists(path)) return false;
