@@ -14,6 +14,7 @@ namespace Common.UserSettings
         public float MouseSensitivity = 1f;
         public float PadSensitivity = 1f;
 
+        private static int _maxWaitMs = 5000;
         private static UserSettings Instance
         {
             get
@@ -25,14 +26,27 @@ namespace Common.UserSettings
                 return _instance;
             }
         }
-        
+
         private static UserSettings _instance;
 
         private static readonly string FilePath = Application.persistentDataPath + "/UserSettings.json";
 
-        public static void Save(UserSettings settings)
+        public static async UniTask Save(UserSettings settings)
         {
-            if (IsFileLocked(FilePath)) return;
+            int waited = 0;
+            const int interval = 50;
+
+            while (IsFileLocked(FilePath))
+            {
+                if (waited >= _maxWaitMs)
+                {
+                    Debug.LogWarning("Save skipped: file lock timeout");
+                    return;
+                }
+
+                await UniTask.Delay(interval);
+                waited += interval;
+            }
 
             var json = JsonUtility.ToJson(settings, false);
             File.WriteAllText(FilePath, json);
@@ -40,25 +54,27 @@ namespace Common.UserSettings
 
         public static UserSettings Get()
         {
-            if(_instance == null)
-            {
-                return new UserSettings();
-            }
             return Instance;
         }
 
         private static UserSettings Load()
         {
-            if (IsFileLocked(FilePath)) return null;
-
             var userSettings = new UserSettings();
             if (File.Exists(FilePath))
             {
-                JsonUtility.FromJsonOverwrite(File.ReadAllText(FilePath), userSettings);
+                try
+                {
+                    JsonUtility.FromJsonOverwrite(File.ReadAllText(FilePath), userSettings);
+                }
+                catch (IOException)
+                {
+                    Debug.LogWarning("Load failed (file locked)");
+                }
             }
 
             return userSettings;
         }
+
         private static bool IsFileLocked(string path)
         {
             if (!File.Exists(path)) return false;
