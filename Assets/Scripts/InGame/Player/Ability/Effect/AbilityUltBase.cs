@@ -14,8 +14,24 @@ namespace InGame.Player.Ability.Effect
 
         private float _cutInEndTime;
 
-        public float TimeSinceCutInEnd => ElapsedTime - _cutInEndTime;
-        
+        public float TimeSinceCutInEnd
+        {
+            get
+            {
+                if (_cutInAnimator == null)
+                {
+                    return 0;
+                }
+
+                if (_cutInAnimator.IsCutInAnimationPlaying)
+                {
+                    return 0;
+                }
+                
+                return ElapsedTime - _cutInEndTime;
+            }
+        }
+
         protected sealed override void OnStart()
         {
             Debug.Log("[AbilityUlt] OnStart");
