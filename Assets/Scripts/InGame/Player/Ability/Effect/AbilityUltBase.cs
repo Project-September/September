@@ -53,7 +53,8 @@ namespace InGame.Player.Ability.Effect
             if (_cutInAnimator)
             {
                 var token = Parameter.Owner.destroyCancellationToken;
-                await _cutInAnimator.PlayCutInAnimation(token);
+                _cutInAnimator.RequestPlayCutInAnimation();
+                await UniTask.WaitUntil(_cutInAnimator, c => !c.IsCutInAnimationPlaying, cancellationToken: token);
             }
             
             if (_playerHealth) _playerHealth.IsInvincible = false;

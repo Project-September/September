@@ -1,5 +1,3 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using Fusion;
 
 namespace InGame.Player.Ult
@@ -9,6 +7,7 @@ namespace InGame.Player.Ult
     /// </summary>
     public abstract class CutInAnimatorBase : NetworkBehaviour
     {
-        public abstract UniTask PlayCutInAnimation(CancellationToken token); 
+        public bool IsCutInAnimationPlaying { get; protected set; }
+        public abstract void RequestPlayCutInAnimation(); 
     }
 }
