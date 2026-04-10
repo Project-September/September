@@ -48,7 +48,7 @@ namespace InGame.Player.Ability.Effect
         private async UniTask PlayCutIn()
         {
             if (_playerHealth) _playerHealth.IsInvincible = true;
-            if (_playerManager) _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.InputLocked);
 
             if (_cutInAnimator)
             {
@@ -57,7 +57,7 @@ namespace InGame.Player.Ability.Effect
             }
             
             if (_playerHealth) _playerHealth.IsInvincible = false;
-            if (_playerManager) _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
 
             _cutInEndTime = ElapsedTime;
             OnCutInEnd();
