@@ -204,13 +204,14 @@ namespace September.Common
         {
             var playerDatabase = PlayerDatabase.Instance;
             var characterDataContainer = CharacterDataContainer.Instance;
-            int index = 0;
             foreach (var pair in playerDatabase.PlayerDataDic)
             {
-                var animClipPlayer = Context.Runner.GetPlayerObject(pair.Key).GetComponent<AnimationClipPlayer>();
+                var player = Context.Runner.GetPlayerObject(pair.Key);
+                var animClipPlayer = player.GetComponent<AnimationClipPlayer>();
                 var characterType = pair.Value.CharacterType;
                 var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
-                _startCamera.transform.position = _spawnPositions[index].position + _cameraOffset;
+                _startCamera.transform.position = player.transform.position + player.transform.rotation * _cameraOffset;
+                _startCamera.transform.rotation = player.transform.rotation;
                 await UniTask.WaitForSeconds(1f);
                 float delayTime = 1f;
                 if (emoteClip)
@@ -221,7 +222,6 @@ namespace September.Common
                     delayTime = emoteClip.length;
                 }
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
-                index++;
             }
         }
 
