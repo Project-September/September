@@ -35,7 +35,6 @@ namespace InGame.Player.Ult
             
             RPC_PlayCutInAnimation();
         }
-
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_PlayCutInAnimation()
