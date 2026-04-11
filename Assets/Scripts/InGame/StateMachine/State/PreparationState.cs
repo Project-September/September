@@ -154,6 +154,10 @@ namespace September.Common
             await UniTask.WaitForSeconds(3f);
             //  準備フェーズ - 全クライアントで移動入力を有効化
             BGMManager.ReleseFlag();
+            
+            // タイマー開始
+            UIController.I.StartTimer(Context.Runner);
+            
             var countDownDuration = StaticServiceLocator.Instance.Get<InGameManager>().TimerData.PreStartTime;
             if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合は下記の処理をスキップする。
             {
@@ -161,7 +165,6 @@ namespace September.Common
                 // 画面中央のTextを使用したAnimationを使用した場合、Animationの実行がcancelされるため、終了を待機する。
                 countDownTask?.GetAwaiter().OnCompleted(
                     () => UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart));
-                UIController.I.StartTimer(Context.Runner);
                 // 準備時間分待つ
                 await UniTask.Delay(TimeSpan.FromSeconds(countDownDuration));
             }
