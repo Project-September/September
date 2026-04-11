@@ -150,8 +150,10 @@ namespace September.Common
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始
-            var countDownTask = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
-            await UniTask.WaitForSeconds(3f);
+            if (UIController.I.TimeOverlayMessage != null)
+            {
+                await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.Countdown);
+            }
             //  準備フェーズ - 全クライアントで移動入力を有効化
             BGMManager.ReleseFlag();
             
@@ -162,21 +164,26 @@ namespace September.Common
             if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合は下記の処理をスキップする。
             {
                 if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
-                // 画面中央のTextを使用したAnimationを使用した場合、Animationの実行がcancelされるため、終了を待機する。
-                countDownTask?.GetAwaiter().OnCompleted(
-                    () => UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart));
-                // 準備時間分待つ
+                
+                // 準備フェーズを開始する
+                if (UIController.I.TimeOverlayMessage != null)
+                {
+                    UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.PreparationStart).Forget();
+                }
+                // 準備フェーズが終了するまで待機
                 await UniTask.Delay(TimeSpan.FromSeconds(countDownDuration));
             }
 
             //  ゲーム開始 - 全クライアントでアクション入力も有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, true, true);
-            var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
-            //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
-            if (task != null)
-                task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
-            else
-                SetOgreLamp();
+            //  ゲーム開始表示
+            if (UIController.I.TimeOverlayMessage != null)
+            {
+                await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.GameStart);
+            }
+            
+            //  ゲーム開始表示終了後に役職開示を行う
+            SetOgreLamp();
 
             ShowStatusUpUI();
             _firstOgrePlayer = PlayerRef.None;
