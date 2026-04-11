@@ -8,7 +8,9 @@ namespace InGame.Player.Ult
     {
         [SerializeField] private int _requiredScore = 1000;
 
+        /// <summary> 直近の必殺技発動時のスコア </summary>
         private int _prevScore;
+        
         private int _currentScore;
         
         public int RemainingScore => Mathf.Clamp(_requiredScore - (_currentScore - _prevScore), 0, _requiredScore);
@@ -26,6 +28,7 @@ namespace InGame.Player.Ult
         
         private void Start()
         {
+            // スコアの変動を監視
             PlayerDatabase.Instance.ChangedDataAction += dict =>
             {
                 var runner = NetworkRunner.Instances[0];

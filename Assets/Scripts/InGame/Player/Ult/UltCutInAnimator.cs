@@ -39,6 +39,7 @@ namespace InGame.Player.Ult
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_PlayCutInAnimation()
         {
+            // 発動者かどうかで演出を振り分け
             if (HasInputAuthority)
             {
                 PlayLocal().Forget();
@@ -50,7 +51,7 @@ namespace InGame.Player.Ult
         }
 
         /// <summary>
-        /// 発動者に合わせてカットインの終了を通知する
+        /// 発動者側に合わせてカットインの終了をサーバーに通知する
         /// </summary>
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         private void RPC_StopCutInAnimation()
@@ -59,22 +60,18 @@ namespace InGame.Player.Ult
         }
 
         /// <summary>
-        /// 全員が見る演出
+        /// 発動者以外が見る演出
         /// </summary>
         private async UniTask PlayRemote()
         {
-            Debug.Log($"<color=cyan> Remote </color>");
-            
             await _playableDirector.PlayAsync();
         }
 
         /// <summary>
-        /// 発動者のみの演出
+        /// 発動者が見る演出
         /// </summary>
         private async UniTask PlayLocal()
         {
-            Debug.Log($"<color=cyan> Local </color>");
-            
             _camera.gameObject.SetActive(true);
             
             await _playableDirector.PlayAsync();
