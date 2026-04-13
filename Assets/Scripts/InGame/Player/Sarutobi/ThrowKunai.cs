@@ -18,7 +18,7 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private Transform _muzzleTf;
         [SerializeField] private Vector3 _stanceCameraOffset;
         [SerializeField] private float _changeOffsetDuration;
-        [SerializeField] private int _bulletCount = 1;
+        [SerializeField] private int _defaultBulletCount = 1;
         [SerializeField] private float _angleBetweenBullets = 2.5f;
         [Header("AnimationClip")]
         [SerializeField] private AnimationClip _stance;
@@ -44,6 +44,7 @@ namespace InGame.Player.Sarutobi
         private bool CanThrow => _cooldownTimer <= 0 && State == KunaiStateType.Ready && _grapplingHook &&
                                  _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active;
 
+        [Networked] private int BulletCountNetwork { get; set; }
         [Networked, HideInInspector] public KunaiStateType State { get; private set; } = KunaiStateType.Idol;
 
         public override void Spawned()
@@ -55,6 +56,7 @@ namespace InGame.Player.Sarutobi
                 _clipPlayer = GetComponent<AnimationClipPlayer>();
                 _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _grapplingHook.OnAbilityStart += EndStance;
+                BulletCountNetwork = _defaultBulletCount;
             }
 
             if (HasInputAuthority)
@@ -96,9 +98,9 @@ namespace InGame.Player.Sarutobi
                 
                 if (HasInputAuthority)
                 {
-                    for (int i = 0; i < _bulletCount; i++)
+                    for (int i = 0; i < BulletCountNetwork; i++)
                     {
-                        var angle = _angleBetweenBullets * (i - (_bulletCount - 1) / 2f);
+                        var angle = _angleBetweenBullets * (i - (BulletCountNetwork - 1) / 2f);
                         Throw(angle);
                     }
                 }
@@ -149,7 +151,8 @@ namespace InGame.Player.Sarutobi
         /// </summary>
         public void SetBulletCount(int bulletCount)
         {
-            _bulletCount = bulletCount;
+            if (!HasStateAuthority) return;
+            BulletCountNetwork = bulletCount;
         }
         
         void Throw(float angle)
