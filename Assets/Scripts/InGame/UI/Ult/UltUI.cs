@@ -1,8 +1,6 @@
 using InGame.Player.Ult;
 using September.Common;
 using September.InGame.Common;
-using UniRx;
-using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,13 +13,21 @@ namespace September.InGame.Ult
         private void Start()
         {
             var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+            
+            // プレイヤーがスポーンされた後に処理を行う
             inGameManager.GameStarted += () =>
             {
                 var runner = inGameManager.Runner;
 
-                if (!inGameManager.PlayerDataDic.TryGetValue(runner.LocalPlayer, out var player))
+                if (runner == null)
                 {
-                    Debug.LogError("[UltUI] No local player data found");
+                    Debug.LogError("[UltUI] No runner found");
+                    return;
+                }
+
+                if (!runner.TryGetPlayerObject(runner.LocalPlayer, out var player))
+                {
+                    Debug.LogError("[UltUI] No player found");
                     return;
                 }
 
@@ -31,10 +37,10 @@ namespace September.InGame.Ult
                     return;
                 }
 
-                this.UpdateAsObservable()
-                    .Select(_ => model.Progress)
-                    .DistinctUntilChanged()
-                    .Subscribe(SetGaugeProgress);
+                PlayerDatabase.Instance.ChangedDataAction += _ =>
+                {
+                    SetGaugeProgress(model.Progress);
+                };
             };
         }
 
