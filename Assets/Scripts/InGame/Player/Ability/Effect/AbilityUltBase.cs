@@ -1,5 +1,5 @@
 using System;
-using Cysharp.Threading.Tasks;
+using Fusion;
 using InGame.Player.Ult;
 using UnityEngine;
 
@@ -12,29 +12,29 @@ namespace InGame.Player.Ability.Effect
         private PlayerHealth _playerHealth;
         private PlayerManager _playerManager;
 
-        private float _cutInEndTime;
+        /// <summary>
+        /// カットイン終了まで待機するタイマー
+        /// </summary>
+        private TickTimer _cutInEndTimer;
 
+        private bool _isCutInEnd;
+        
+        /// <summary>
+        /// 直近のカットイン終了からの経過時間
+        /// </summary>
         public float TimeSinceCutInEnd
         {
             get
             {
-                if (_cutInAnimator == null)
-                {
-                    return 0;
-                }
+                if (!_isCutInEnd) return 0;
 
-                if (_cutInAnimator.IsCutInAnimationPlaying)
-                {
-                    return 0;
-                }
-                
-                return ElapsedTime - _cutInEndTime;
+                return (_cutInEndTimer.TargetTick - _cutInEndTimer.RemainingTicks(Runner) ?? 0) * Runner.DeltaTime;
             }
         }
 
         protected sealed override void OnStart()
         {
-            Debug.Log("[AbilityUlt] OnStart");
+            Debug.Log("<color=yellow>[AbilityUlt]</color> Start");
             
             var player = Parameter.Owner;
             
@@ -42,28 +42,66 @@ namespace InGame.Player.Ability.Effect
             if (!_cutInAnimator) _cutInAnimator = player.GetComponent<CutInAnimatorBase>();
             if (!_playerManager) _playerManager = player.GetComponent<PlayerManager>();
             
-            PlayCutIn().Forget();
-        }
+            // アビリティが発動したら条件をリセットする
+            if (player.TryGetComponent<IUltCondition>(out var condition))
+            {
+                condition.OnUltActivated();
+            }
 
-        private async UniTask PlayCutIn()
-        {
+            // 無敵化と入力ロック
             if (_playerHealth) _playerHealth.IsInvincible = true;
             if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.InputLocked);
 
             if (_cutInAnimator)
             {
-                var token = Parameter.Owner.destroyCancellationToken;
                 _cutInAnimator.RequestPlayCutInAnimation();
-                await UniTask.WaitUntil(_cutInAnimator, c => !c.IsCutInAnimationPlaying, cancellationToken: token);
+                _cutInEndTimer = TickTimer.CreateFromSeconds(Runner, (float)_cutInAnimator.Duration);
+            }
+            else
+            {
+                OnCutInEnd();
+            }
+        }
+
+        protected sealed override void OnUpdate(float deltaTime)
+        {
+            Debug.Log($"<color=yellow>[AbilityUlt]</color> Update {Runner.Tick} {_cutInEndTimer.TargetTick} {_cutInEndTimer.RemainingTicks(Runner)} {TimeSinceCutInEnd}");
+            
+            // カットイン終了待ち
+            if (!_cutInEndTimer.Expired(Runner)) return;
+            
+            // カットインが終了したフレームだけ処理する
+            if (!_isCutInEnd)
+            {
+                Debug.Log("<color=yellow>[AbilityUlt]</color> CutIn End");
+                // 無敵解除と入力ロック解除
+                if (_playerHealth) _playerHealth.IsInvincible = false;
+                if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
+
+                _isCutInEnd = true;
+                OnCutInEnd();
+                
+                return;
             }
             
-            if (_playerHealth) _playerHealth.IsInvincible = false;
-            if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
-
-            _cutInEndTime = ElapsedTime;
-            OnCutInEnd();
+            // カットイン終了済みなら必殺技効果の更新処理
+            OnUpdateUlt(deltaTime);
         }
-        
+
+        protected sealed override void OnEndAbility()
+        {
+            Debug.Log($"<color=yellow>[AbilityUlt]</color> End {StartTick} {Runner.Tick} {Runner.Tick - StartTick} {(Runner.Tick - StartTick) * Runner.DeltaTime}");
+            _isCutInEnd = false;
+            OnEndUlt();
+        }
+
+        /// <summary> カットインが終了した瞬間の処理 </summary>
         protected abstract void OnCutInEnd();
+        
+        /// <summary> カットイン終了後の更新処理 </summary>
+        protected virtual void OnUpdateUlt(float deltaTime) { }
+        
+        /// <summary> 必殺技終了時の処理 </summary>
+        protected virtual void OnEndUlt() { }
     }
 }

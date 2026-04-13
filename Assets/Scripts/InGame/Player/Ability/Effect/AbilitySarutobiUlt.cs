@@ -28,7 +28,7 @@ namespace InGame.Player.Ability.Effect
             _throwKunai.SetBulletCount(1 + _addProjectileCount);
         }
 
-        protected override void OnUpdate(float deltaTime)
+        protected override void OnUpdateUlt(float deltaTime)
         {
             if (TimeSinceCutInEnd > _duration)
             {

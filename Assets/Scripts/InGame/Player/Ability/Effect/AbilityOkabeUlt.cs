@@ -33,7 +33,7 @@ namespace InGame.Player.Ability.Effect
             _effectSpawner.RequestPlayLoopEffect(_effectID, _effectType, player.transform.position, Quaternion.identity, player.transform);
         }
 
-        protected override void OnUpdate(float deltaTime)
+        protected override void OnUpdateUlt(float deltaTime)
         {
             if (TimeSinceCutInEnd > _duration)
             {
@@ -41,9 +41,8 @@ namespace InGame.Player.Ability.Effect
             }
         }
 
-        protected override void OnEndAbility()
+        protected override void OnEndUlt()
         {
-            Debug.Log($"[AbilityOkabeUlt] End {StartTick} {Runner.Tick} {Runner.Tick - StartTick} {(Runner.Tick - StartTick) * Runner.DeltaTime}");
             _effectSpawner?.StopEffect(_effectID);
         }
     }

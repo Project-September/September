@@ -32,8 +32,6 @@ namespace InGame.Player.Ability.Condition
                 !condition.IsAvailable()) 
                 return false;
             
-            condition.OnUltActivated();
-            
             return true;
         }
     }

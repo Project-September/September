@@ -30,7 +30,7 @@ namespace InGame.Player.Ability.Effect
             }
         }
 
-        protected override void OnUpdate(float deltaTime)
+        protected override void OnUpdateUlt(float deltaTime)
         {
             if (TimeSinceCutInEnd > _duration)
             {
@@ -38,7 +38,7 @@ namespace InGame.Player.Ability.Effect
             }
         }
 
-        protected override void OnEndAbility()
+        protected override void OnEndUlt()
         {
             foreach (var friend in _spawnedFriends)
             {

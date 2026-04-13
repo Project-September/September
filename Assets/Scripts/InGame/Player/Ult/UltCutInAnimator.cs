@@ -17,6 +17,15 @@ namespace InGame.Player.Ult
         [SerializeField] private PlayableDirector _playableDirector;
         [SerializeField] private CinemachineVirtualCameraBase _camera;
 
+        public override double Duration
+        {
+            get
+            {
+                if (!_playableDirector) return 0;
+                return _playableDirector.duration;
+            }
+        }
+
         public override void RequestPlayCutInAnimation()
         {
             if (!_playableDirector)
@@ -24,8 +33,6 @@ namespace InGame.Player.Ult
                 Debug.LogWarning("[UltCutInAnimator] PlayableDirectorが設定されていません。必殺技カットインはスキップされます");
                 return;
             }
-            
-            IsCutInAnimationPlaying = true;
             
             RPC_PlayCutInAnimation();
         }
@@ -42,15 +49,6 @@ namespace InGame.Player.Ult
             {
                 PlayRemote().Forget();
             }
-        }
-
-        /// <summary>
-        /// 発動者側に合わせてカットインの終了をサーバーに通知する
-        /// </summary>
-        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        private void RPC_StopCutInAnimation()
-        {
-            IsCutInAnimationPlaying = false;
         }
 
         /// <summary>

@@ -8,9 +8,13 @@ namespace InGame.Player.Ult
     public abstract class CutInAnimatorBase : NetworkBehaviour
     {
         /// <summary>
-        /// カットイン再生中かどうか。サーバー側からカットインが終了したか検知するために使用する
+        /// カットインの秒数
         /// </summary>
-        public bool IsCutInAnimationPlaying { get; protected set; }
-        public abstract void RequestPlayCutInAnimation(); 
+        public abstract double Duration { get; }
+        
+        /// <summary>
+        /// カットインを開始する
+        /// </summary>
+        public abstract void RequestPlayCutInAnimation();
     }
 }
