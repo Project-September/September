@@ -43,7 +43,7 @@ namespace InGame.Player.Ability.Effect
             foreach (var friend in _spawnedFriends)
             {
                 _formationManager.DeleteFriend(friend);
-                friend.gameObject.SetActive(false);
+                Runner.Despawn(friend.Object);
             }
             _spawnedFriends.Clear();
         }
