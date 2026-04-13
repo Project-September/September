@@ -13565,6 +13565,7 @@ MonoBehaviour:
   - {fileID: 4940562243900058895}
   - {fileID: -3421365915295316578}
   - {fileID: 3507305747521096909}
+  - {fileID: 4461238842832938777}
   - {fileID: 649019293918567276}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
@@ -13966,8 +13967,6 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
-        _cutInDuration: 1
-        _player: {fileID: 0}
         _duration: 10
         _addProjectileCount: 2
     - rid: 8000700352795770966
@@ -14153,7 +14152,7 @@ MonoBehaviour:
   _muzzleTf: {fileID: 5246278993902121081}
   _stanceCameraOffset: {x: 0.5, y: -0.5, z: -1}
   _changeOffsetDuration: 0.2
-  _bulletCount: 1
+  _defaultBulletCount: 1
   _angleBetweenBullets: 2.5
   _stance: {fileID: 7400000, guid: f0fc32250dd58af46bcf550907312b7d, type: 2}
   _stanceLoop: {fileID: 7400000, guid: 3219ec83e3c65ab4ab202264540d13b6, type: 2}
@@ -14203,8 +14202,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc7840d6f50245e781522fe38dd245cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cutInAnimation: {fileID: 7400000, guid: 38623b8d90adb324cb3408d762de0fe2, type: 2}
-  _player: {fileID: 8254388696613982807}
+  _playableDirector: {fileID: 0}
+  _camera: {fileID: 0}
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0

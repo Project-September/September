@@ -4823,7 +4823,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 16
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[11]'
@@ -4832,17 +4832,21 @@ PrefabInstance:
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[12]'
       value: 
-      objectReference: {fileID: 2293468585310412346}
+      objectReference: {fileID: -8694140379074560207}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[13]'
       value: 
-      objectReference: {fileID: 2663096909821573416}
+      objectReference: {fileID: 2293468585310412346}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[14]'
       value: 
-      objectReference: {fileID: 8908661120334280169}
+      objectReference: {fileID: 2663096909821573416}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[15]'
+      value: 
+      objectReference: {fileID: 8908661120334280169}
+    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[16]'
       value: 
       objectReference: {fileID: 5479209303769175572}
     - target: {fileID: 2525442923973757293, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -5303,8 +5307,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc7840d6f50245e781522fe38dd245cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cutInAnimation: {fileID: 7400000, guid: 448bab7b97604614b8eed12fa10f0ea1, type: 2}
-  _player: {fileID: 6321949946618764873}
+  _playableDirector: {fileID: 0}
+  _camera: {fileID: 0}
 --- !u!4 &2236335591442623996 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8736522266100138394, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
