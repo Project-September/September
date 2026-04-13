@@ -27,6 +27,15 @@ namespace InGame.Player.Ult
         public void OnUltActivated()
         {
             PrevScore = _currentScore;
+            if (HasStateAuthority)
+            {
+                RPC_OnUltActivated();
+            }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_OnUltActivated()
+        {
             OnProgressChanged?.Invoke();
         }
         
