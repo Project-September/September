@@ -166,10 +166,7 @@ namespace September.Common
                 if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
                 
                 // 準備フェーズを開始する
-                if (UIController.I.TimeOverlayMessage != null)
-                {
-                    UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.PreparationStart).Forget();
-                }
+                UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart).Forget();
                 // 準備フェーズが終了するまで待機
                 await UniTask.Delay(TimeSpan.FromSeconds(countDownDuration));
             }
