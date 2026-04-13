@@ -13,24 +13,26 @@ namespace InGame.Player.Ability.Condition
         [SerializeField] private PlayerButtons _button = PlayerButtons.Ability3;
         
         private PlayerManager _playerManager;
+        private IUltCondition _condition;
         
         public string TargetAbilityName => _targetAbilityName;
         
         public bool IsConditionMatch(in TriggerEventContext context)
         {
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
+            _condition ??= context.Owner.GetComponent<IUltCondition>();
+
+            if (_playerManager == null || _condition == null) return false;
+            
+            if (!context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(_button) ||
+                !PlayerDatabase.Instance.PlayerDataDic.TryGet(NetworkRunner.Instances[0].LocalPlayer, out _)) return false;
             
             if (context.AbilityRef.Phase != AbilityBase.AbilityPhase.Available
                 || _playerManager.CurrentPlayerControlState != PlayerManager.PlayerControlState.Normal
                 || _playerManager.IsStun) return false;
             
-            if (!context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(_button) ||
-                !PlayerDatabase.Instance.PlayerDataDic.TryGet(NetworkRunner.Instances[0].LocalPlayer, out _))
-                return false;
 
-            if (!context.Owner.TryGetComponent<IUltCondition>(out var condition) ||
-                !condition.IsAvailable()) 
-                return false;
+            if (!_condition.IsAvailable()) return false;
             
             return true;
         }
