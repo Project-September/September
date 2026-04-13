@@ -15,7 +15,6 @@ namespace InGame.Common
     /// 一時的なモーションはFullBodyやUpperBodyレイヤーに設定して使う。
     /// RootMotion非対応。
     /// </summary>
-    [ExecuteAlways]
     public class AnimationClipPlayer : NetworkBehaviour
     {
         [SerializeField] private List<LayerInfo> _layerInfo;
@@ -63,8 +62,8 @@ namespace InGame.Common
             }
             return false;
         }
-
-        private void Start()
+        
+        public void Start()
         {
             Initialize();
         }
@@ -144,7 +143,7 @@ namespace InGame.Common
             _graph.Play();
         }
 
-        private void Update()
+        public void Update()
         {
             if (!_graph.IsValid())
             {
@@ -161,7 +160,7 @@ namespace InGame.Common
             }
         }
 
-        private void LateUpdate()
+        public void LateUpdate()
         {
             _graph.Evaluate(Time.deltaTime * _graphSpeed);
         }
@@ -558,7 +557,7 @@ namespace InGame.Common
         private void OnDisable() => SafeDestroy();
         private void OnDestroy() => SafeDestroy();
 
-        private void SafeDestroy()
+        public void SafeDestroy()
         {
             if (!_graph.IsValid()) return;
 

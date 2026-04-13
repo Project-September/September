@@ -12,19 +12,28 @@ namespace InGame.Player.Ult
         private bool _isPlayed;
         private AnimationClipPlayer.PlayableInfo _info;
 
+        private AnimationClipPlayer _clipPlayer;
+        
         public AnimationClip Clip => _clip;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            var clipPlayer = playerData as AnimationClipPlayer;
+            if (!_clipPlayer)
+            {
+                _clipPlayer = playerData as AnimationClipPlayer;
+                
+#if UNITY_EDITOR
+                if (!Application.isPlaying) _clipPlayer?.Start();
+#endif
+            }
             
-            if (clipPlayer == null || _clip == null) return;
+            if (_clipPlayer == null || _clip == null) return;
             
             if (!_isPlayed)
             {
-                clipPlayer.Play(_clip);
+                _clipPlayer.Play(_clip);
 
-                if (!clipPlayer.TryGetPlayableInfo(_clip, out _info))
+                if (!_clipPlayer.TryGetPlayableInfo(_clip, out _info))
                 {
                     Debug.LogWarning("AnimationClipPlayerPlayable: AnimationClipPlayable is not found");
                     return;
@@ -36,12 +45,28 @@ namespace InGame.Player.Ult
             var time = playable.GetTime();
             
             _info.SetTime((float)time);
+
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
+                _clipPlayer.Update();
+                _clipPlayer.LateUpdate();
+            }
+#endif
         }
+
+#if UNITY_EDITOR
+        public override void OnGraphStop(Playable playable)
+        {
+            if (!Application.isPlaying && _clipPlayer) _clipPlayer.SafeDestroy();
+        }
+#endif
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
             _info.Disconnect();
             _isPlayed = false;
+            
         }
     }
 }
