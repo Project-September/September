@@ -24,12 +24,6 @@ namespace InGame.Player.Ult
                 Debug.LogWarning("[UltCutInAnimator] PlayableDirectorが設定されていません。必殺技カットインはスキップされます");
                 return;
             }
-
-            if (!_camera)
-            {
-                Debug.LogWarning("[UltCutInAnimator] Cameraが設定されていません。必殺技カットインはスキップされます");
-                return;
-            }
             
             IsCutInAnimationPlaying = true;
             
@@ -72,12 +66,11 @@ namespace InGame.Player.Ult
         /// </summary>
         private async UniTask PlayLocal()
         {
-            _camera.gameObject.SetActive(true);
+            if (_camera) _camera.gameObject.SetActive(true);
             
             await _playableDirector.PlayAsync();
             
-            _camera.gameObject.SetActive(false);
-            RPC_StopCutInAnimation();
+            if (_camera) _camera.gameObject.SetActive(false);
         }
     }
 }
