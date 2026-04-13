@@ -28,7 +28,10 @@ namespace InGame.Player.Ability.Effect
             {
                 if (!_isCutInEnd) return 0;
 
-                return (_cutInEndTimer.TargetTick - _cutInEndTimer.RemainingTicks(Runner) ?? 0) * Runner.DeltaTime;
+                var elapsedTick = Runner.Tick - (_cutInEndTimer.TargetTick ?? 0);
+                if (elapsedTick < 0) return 0;
+                
+                return elapsedTick * Runner.DeltaTime;
             }
         }
 
