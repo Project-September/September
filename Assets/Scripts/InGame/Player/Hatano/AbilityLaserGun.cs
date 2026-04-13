@@ -3,7 +3,6 @@ using Fusion;
 using InGame.Interact;
 using InGame.Player.Hatano;
 using September.Common;
-using UnityEditor.XR;
 using UnityEngine;
 
 namespace InGame.Player.Ability
