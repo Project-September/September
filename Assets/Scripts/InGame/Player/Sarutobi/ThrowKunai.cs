@@ -93,10 +93,14 @@ namespace InGame.Player.Sarutobi
             else if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Attack) && CanThrow)
             {
                 PlayCharacterThrowAnimation().Forget();
-                for (int i = 0; i < _bulletCount; i++)
+                
+                if (HasInputAuthority)
                 {
-                    var angle = _angleBetweenBullets * (i - (_bulletCount - 1) / 2f);
-                    Throw(angle);
+                    for (int i = 0; i < _bulletCount; i++)
+                    {
+                        var angle = _angleBetweenBullets * (i - (_bulletCount - 1) / 2f);
+                        Throw(angle);
+                    }
                 }
             }
 
@@ -150,6 +154,8 @@ namespace InGame.Player.Sarutobi
         
         void Throw(float angle)
         {
+            if (!HasInputAuthority) return;
+            
             var rot = Quaternion.AngleAxis(angle, Vector3.up);
             var dir = rot * _mainCamera.transform.forward;
             var hit = Physics.Raycast(_mainCamera.transform.position, dir, out var hitInfo, _maxDistance, _hitLayer);
