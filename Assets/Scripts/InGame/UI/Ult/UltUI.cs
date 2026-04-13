@@ -36,11 +36,8 @@ namespace September.InGame.Ult
                     Debug.LogError("[UltUI] No UltCondition found");
                     return;
                 }
-
-                PlayerDatabase.Instance.ChangedDataAction += _ =>
-                {
-                    SetGaugeProgress(model.Progress);
-                };
+                
+                model.OnProgressChanged += () => SetGaugeProgress(model.Progress);
             };
         }
 

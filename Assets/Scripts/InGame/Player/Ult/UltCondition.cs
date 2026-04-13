@@ -1,3 +1,4 @@
+using System;
 using Fusion;
 using September.Common;
 using UnityEngine;
@@ -15,6 +16,8 @@ namespace InGame.Player.Ult
         
         public int RemainingScore => Mathf.Clamp(_requiredScore - (_currentScore - PrevScore), 0, _requiredScore);
         public float Progress => Mathf.Clamp01((float)(_currentScore - PrevScore) / _requiredScore);
+        
+        public event Action OnProgressChanged;
 
         public bool IsAvailable()
         {
@@ -24,6 +27,7 @@ namespace InGame.Player.Ult
         public void OnUltActivated()
         {
             PrevScore = _currentScore;
+            OnProgressChanged?.Invoke();
         }
         
         private void Start()
@@ -37,6 +41,7 @@ namespace InGame.Player.Ult
                     return;
                 }
                 _currentScore = playerData.Score;
+                OnProgressChanged?.Invoke();
             };
         }
     }
