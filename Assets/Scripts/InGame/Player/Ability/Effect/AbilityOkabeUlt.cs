@@ -44,7 +44,7 @@ namespace InGame.Player.Ability.Effect
         protected override void OnEndAbility()
         {
             Debug.Log($"[AbilityOkabeUlt] End {StartTick} {Runner.Tick} {Runner.Tick - StartTick} {(Runner.Tick - StartTick) * Runner.DeltaTime}");
-            _effectSpawner.StopEffect(_effectID);
+            _effectSpawner?.StopEffect(_effectID);
         }
     }
 }
