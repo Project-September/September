@@ -35,7 +35,7 @@ namespace InGame.Player.Ult
             // スコアの変動を監視
             PlayerDatabase.Instance.ChangedDataAction += dict =>
             {
-                if (!dict.TryGet(Runner.LocalPlayer, out var playerData))
+                if (!dict.TryGet(Object.InputAuthority, out var playerData))
                 {
                     Debug.LogError("[UltCondition] PlayerData is not found");
                     return;
