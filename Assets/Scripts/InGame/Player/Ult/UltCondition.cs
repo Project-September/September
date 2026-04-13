@@ -10,7 +10,7 @@ namespace InGame.Player.Ult
         [SerializeField] private int _requiredScore = 1000;
 
         /// <summary> 直近の必殺技発動時のスコア </summary>
-        [Networked] private int PrevScore { get; set; }
+        [Networked, OnChangedRender(nameof(OnPrevScoreChangedRender))] private int PrevScore { get; set; }
         
         private int _currentScore;
         
@@ -27,14 +27,12 @@ namespace InGame.Player.Ult
         public void OnUltActivated()
         {
             PrevScore = _currentScore;
-            if (HasStateAuthority)
-            {
-                RPC_OnUltActivated();
-            }
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_OnUltActivated()
+        /// <summary>
+        /// 必殺技発動時にUIを更新する用
+        /// </summary>
+        private void OnPrevScoreChangedRender()
         {
             OnProgressChanged?.Invoke();
         }
