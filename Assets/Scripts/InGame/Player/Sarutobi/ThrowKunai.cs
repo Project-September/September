@@ -132,7 +132,7 @@ namespace InGame.Player.Sarutobi
 
             State = KunaiStateType.Stance;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
-            var endType = await _clipPlayer.PlayClipAndWait(_stance, this.GetCancellationTokenOnDestroy());
+            var endType = await _clipPlayer.PlayClipAndWait(_stance);
 
             if (endType == EndClipType.Complete)
             {
@@ -182,7 +182,7 @@ namespace InGame.Player.Sarutobi
         {
             if (!HasStateAuthority) return;
             State = KunaiStateType.Stance;
-            var endType = await _clipPlayer.PlayClipAndWait(_throw, this.GetCancellationTokenOnDestroy());
+            var endType = await _clipPlayer.PlayClipAndWait(_throw);
 
             if (endType == EndClipType.Complete)
             {
