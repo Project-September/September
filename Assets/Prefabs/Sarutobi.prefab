@@ -13475,6 +13475,8 @@ GameObject:
   - component: {fileID: 4940562243900058895}
   - component: {fileID: -3421365915295316578}
   - component: {fileID: 3507305747521096909}
+  - component: {fileID: 4461238842832938777}
+  - component: {fileID: 649019293918567276}
   m_Layer: 6
   m_Name: Sarutobi
   m_TagString: Player
@@ -13563,6 +13565,8 @@ MonoBehaviour:
   - {fileID: 4940562243900058895}
   - {fileID: -3421365915295316578}
   - {fileID: 3507305747521096909}
+  - {fileID: 4461238842832938777}
+  - {fileID: 649019293918567276}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -13918,8 +13922,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abilities:
   - rid: 1755462043767144544
+  - rid: 8000700352795770965
   _conditions:
   - rid: 1755462127588212827
+  - rid: 8000700352795770966
   references:
     version: 2
     RefIds:
@@ -13956,6 +13962,18 @@ MonoBehaviour:
     - rid: 1755462127588212827
       type: {class: SarutobiAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
       data: 
+    - rid: 8000700352795770965
+      type: {class: AbilitySarutobiUlt, ns: InGame.Player.Ability.Effect, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        _duration: 10
+        _addProjectileCount: 2
+    - rid: 8000700352795770966
+      type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+      data:
+        _targetAbilityName: AbilitySarutobiUlt
+        _button: 7
 --- !u!114 &8254388696613982807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14134,6 +14152,8 @@ MonoBehaviour:
   _muzzleTf: {fileID: 5246278993902121081}
   _stanceCameraOffset: {x: 0.5, y: -0.5, z: -1}
   _changeOffsetDuration: 0.2
+  _defaultBulletCount: 1
+  _angleBetweenBullets: 2.5
   _stance: {fileID: 7400000, guid: f0fc32250dd58af46bcf550907312b7d, type: 2}
   _stanceLoop: {fileID: 7400000, guid: 3219ec83e3c65ab4ab202264540d13b6, type: 2}
   _throw: {fileID: 7400000, guid: 6bb4907bebb67584ab8af42caa53f9b9, type: 2}
@@ -14157,6 +14177,33 @@ MonoBehaviour:
   _root: {fileID: 7393272621407946988}
   _nameText: {fileID: 8469776830625534239}
   _maxDistance: 30
+--- !u!114 &4461238842832938777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bf0feaffd3a44cbbc9c8f3292f0c948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredScore: 1000
+--- !u!114 &649019293918567276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc7840d6f50245e781522fe38dd245cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playableDirector: {fileID: 0}
+  _camera: {fileID: 0}
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0

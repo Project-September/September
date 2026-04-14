@@ -163,7 +163,7 @@ namespace InGame.Player
             // Dash中ならスタミナを消費させる
             if (isDash && moveDirection != Vector2.zero)
             {
-                if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _staminaConsumption * deltaTime);
+                if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _status.StaminaConsumption * deltaTime);
 
                 // スタミナなくなったら
                 if (_status.CurrentStamina <= 0)

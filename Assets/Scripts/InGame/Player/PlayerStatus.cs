@@ -18,11 +18,13 @@ namespace InGame.Player
         [Networked, HideInInspector, OnChangedRender(nameof(OnChangeStamina))] public float CurrentStamina { get; set; }
         private void OnChangeStamina() => _currentStamina.Value = CurrentStamina;
         public float StaminaRegen { get; private set; }
+        public float StaminaConsumption { get; private set; }
         public int AttackDamage { get; set; }
 
         private Stat _speedStat;
         private Stat _staminaStat;
         private Stat _staminaRegenStat;
+        private Stat _staminaConsumptionStat;
         private Stat _attackDamageStat;
         
         #region Events
@@ -46,20 +48,20 @@ namespace InGame.Player
             MaxStamina = _param.Stamina;
             CurrentStamina = _param.Stamina;
             StaminaRegen = _param.StaminaRegen;
+            StaminaConsumption = _param.StaminaConsumption;
             AttackDamage = _param.AttackDamage;
 
-            if (HasStateAuthority)
-            {
-                _speedStat = new Stat(_param.Speed, ActiveEffectSpecs);
-                _staminaStat = new Stat(_param.Stamina, ActiveEffectSpecs);
-                _staminaRegenStat = new Stat(_param.StaminaRegen, ActiveEffectSpecs);
-                _attackDamageStat = new Stat(_param.AttackDamage, ActiveEffectSpecs);
-                
-                _speedStat.OnValueChanged.Subscribe(value => MaxSpeedRate = value).AddTo(this);
-                _staminaStat.OnValueChanged.Subscribe(value => CurrentStamina = value).AddTo(this);
-                _staminaRegenStat.OnValueChanged.Subscribe(value => StaminaRegen = value).AddTo(this);
-                _attackDamageStat.OnValueChanged.Subscribe(value => AttackDamage = (int)value).AddTo(this);
-            }
+            _speedStat = new Stat(_param.Speed, ActiveEffectSpecs);
+            _staminaStat = new Stat(_param.Stamina, ActiveEffectSpecs);
+            _staminaRegenStat = new Stat(_param.StaminaRegen, ActiveEffectSpecs);
+            _staminaConsumptionStat = new Stat(_param.StaminaConsumption, ActiveEffectSpecs);
+            _attackDamageStat = new Stat(_param.AttackDamage, ActiveEffectSpecs);
+            
+            _speedStat.OnValueChanged.Subscribe(value => MaxSpeedRate = value).AddTo(this);
+            _staminaStat.OnValueChanged.Subscribe(value => CurrentStamina = value).AddTo(this);
+            _staminaRegenStat.OnValueChanged.Subscribe(value => StaminaRegen = value).AddTo(this);
+            _staminaConsumptionStat.OnValueChanged.Subscribe(value => StaminaConsumption = value).AddTo(this);
+            _attackDamageStat.OnValueChanged.Subscribe(value => AttackDamage = (int)value).AddTo(this);
         }
 
         protected override void OnPostApplyEffect(ActiveStatusEffect activeEffect)
@@ -77,6 +79,9 @@ namespace InGame.Player
                     case StatType.StaminaRegen:
                         _staminaRegenStat.SetValue(Mathf.Max(0, _staminaRegenStat.Value));
                         break;
+                    case StatType.StaminaConsumption:
+                        _staminaConsumptionStat.SetValue(Mathf.Max(0, _staminaConsumptionStat.Value));
+                        break;
                     case StatType.AttackDamage:
                         _attackDamageStat.SetValue(Mathf.Max(0, _attackDamageStat.Value));
                         break;
@@ -90,6 +95,7 @@ namespace InGame.Player
             if (type == StatType.Speed) return ref _speedStat;
             if (type == StatType.Stamina) return ref _staminaStat;
             if (type == StatType.StaminaRegen) return ref _staminaRegenStat;
+            if (type == StatType.StaminaConsumption) return ref _staminaConsumptionStat;
             if (type == StatType.AttackDamage) return ref _attackDamageStat;
             return ref base.GetStatFromType(type);
         }

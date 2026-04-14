@@ -45,7 +45,7 @@ namespace InGame.Tanihira
         /// <summary>
         /// フレンドを生成
         /// </summary>
-        public void SpawnFriend(FriendType friendType,Transform spawnPosition)
+        public FriendBase SpawnFriend(FriendType friendType,Transform spawnPosition)
         {
             var prefab = _friendDatabase.GetFriendObject(friendType);
             
@@ -78,8 +78,11 @@ namespace InGame.Tanihira
                         friend.SetDestination(pos);
                     }
                 }
+
+                return friend;
             }
+            
+            return null;
         }
     }
-
 }

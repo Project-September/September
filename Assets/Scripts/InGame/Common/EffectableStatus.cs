@@ -33,7 +33,20 @@ namespace InGame.Common
 
         public void AddEffect(StatusEffect effect)
         {
-            AddEffect(new StatusEffectSpec(effect));
+            if (!StatusEffectsContainer.TryGetInstance(out var container)) return;
+            
+            RPC_AddEffect(container.GetStatusEffectIndex(effect));
+        }
+
+        // Tick同期にしたほうがよさそう
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_AddEffect(int statusIndex)
+        {
+            if (!StatusEffectsContainer.TryGetInstance(out var container)) return;
+
+            container.GetStatusEffect(statusIndex);
+            var status = container.GetStatusEffect(statusIndex);
+            AddEffect(new StatusEffectSpec(status));
         }
 
         public void AddEffect(StatusEffectSpec effectSpec)
@@ -53,6 +66,19 @@ namespace InGame.Common
 
         public void RemoveEffect(StatusEffect effect)
         {
+            if (!StatusEffectsContainer.TryGetInstance(out var container)) return;
+            
+            RPC_RemoveEffect(container.GetStatusEffectIndex(effect));
+        }
+        
+        // Tick同期にしたほうがよさそう
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_RemoveEffect(int statusIndex)
+        {
+            if (!StatusEffectsContainer.TryGetInstance(out var container)) return;
+            
+            var effect = container.GetStatusEffect(statusIndex);
+            
             var targetIndex = ActiveEffectSpecs.FindIndex(activeEffect => activeEffect.Spec.DefEffect == effect);
 
             if (targetIndex != -1)
@@ -152,6 +178,7 @@ namespace InGame.Common
             Speed,
             Stamina,
             StaminaRegen,
+            StaminaConsumption,
             AttackDamage
         }
         
