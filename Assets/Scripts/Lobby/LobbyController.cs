@@ -35,6 +35,7 @@ namespace September.Lobby
             _readyButton.onClick.AddListener(() => Rpc_ToggleReady(Runner.LocalPlayer));
             _quitButton.onClick.AddListener(() => NetworkManager.Instance.QuitLobby().Forget());
             PlayerDatabase.Instance.ChangedDataAction += ChangeLobbyPlayerUI;
+            OnChangedIsReady();
         }
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
@@ -83,6 +84,8 @@ namespace September.Lobby
         void AddContents(PlayerRef playerRef)
         {
             if (_lobbyPlayerUIDic.ContainsKey(playerRef)) return;
+
+            //これ分岐させる意味ある？
             if (Runner.LocalPlayer == playerRef)
             {
                 _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
