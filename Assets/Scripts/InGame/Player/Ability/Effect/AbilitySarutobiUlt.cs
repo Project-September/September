@@ -19,11 +19,11 @@ namespace InGame.Player.Ability.Effect
         {
             var player = Parameter.Owner;
             
-            if (!_throwKunai)
-                if (!player.TryGetComponent(out _throwKunai))
-                {
-                    return;
-                }
+            // コンポーネント取得。見つからなかったらreturn
+            if (!_throwKunai && !player.TryGetComponent(out _throwKunai))
+            {
+                return;
+            }
             
             _throwKunai.SetBulletCount(1 + _addProjectileCount);
         }
@@ -32,7 +32,7 @@ namespace InGame.Player.Ability.Effect
         {
             if (TimeSinceCutInEnd > _duration)
             {
-                _throwKunai.SetBulletCount(1);
+                _throwKunai?.SetBulletCount(1);
                 RequestEndAbility();
             }
         }

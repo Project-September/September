@@ -29,7 +29,7 @@ namespace InGame.Player.Ability.Effect
             
             _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             _effectID = Guid.NewGuid().ToString();
-            _effectSpawner.RequestPlayLoopEffect(_effectID, _effectType, player.transform.position, Quaternion.identity, player.transform);
+            _effectSpawner?.RequestPlayLoopEffect(_effectID, _effectType, player.transform.position, Quaternion.identity, player.transform);
         }
 
         protected override void OnUpdateUlt(float deltaTime)

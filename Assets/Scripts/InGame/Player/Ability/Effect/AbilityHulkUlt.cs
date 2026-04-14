@@ -34,7 +34,7 @@ namespace InGame.Player.Ability.Effect
                 item.SetCooldown(_exhibitsCooldownTime);
             }
             
-            _effectSpawner.RequestPlayOneShotEffect(_effectType, player.transform.position, Quaternion.identity);
+            _effectSpawner?.RequestPlayOneShotEffect(_effectType, player.transform.position, Quaternion.identity);
             
             RequestEndAbility();
         }
