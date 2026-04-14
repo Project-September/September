@@ -51,20 +51,17 @@ namespace InGame.Player
             StaminaConsumption = _param.StaminaConsumption;
             AttackDamage = _param.AttackDamage;
 
-            if (HasStateAuthority)
-            {
-                _speedStat = new Stat(_param.Speed, ActiveEffectSpecs);
-                _staminaStat = new Stat(_param.Stamina, ActiveEffectSpecs);
-                _staminaRegenStat = new Stat(_param.StaminaRegen, ActiveEffectSpecs);
-                _staminaConsumptionStat = new Stat(_param.StaminaConsumption, ActiveEffectSpecs);
-                _attackDamageStat = new Stat(_param.AttackDamage, ActiveEffectSpecs);
-                
-                _speedStat.OnValueChanged.Subscribe(value => MaxSpeedRate = value).AddTo(this);
-                _staminaStat.OnValueChanged.Subscribe(value => CurrentStamina = value).AddTo(this);
-                _staminaRegenStat.OnValueChanged.Subscribe(value => StaminaRegen = value).AddTo(this);
-                _staminaConsumptionStat.OnValueChanged.Subscribe(value => StaminaConsumption = value).AddTo(this);
-                _attackDamageStat.OnValueChanged.Subscribe(value => AttackDamage = (int)value).AddTo(this);
-            }
+            _speedStat = new Stat(_param.Speed, ActiveEffectSpecs);
+            _staminaStat = new Stat(_param.Stamina, ActiveEffectSpecs);
+            _staminaRegenStat = new Stat(_param.StaminaRegen, ActiveEffectSpecs);
+            _staminaConsumptionStat = new Stat(_param.StaminaConsumption, ActiveEffectSpecs);
+            _attackDamageStat = new Stat(_param.AttackDamage, ActiveEffectSpecs);
+            
+            _speedStat.OnValueChanged.Subscribe(value => MaxSpeedRate = value).AddTo(this);
+            _staminaStat.OnValueChanged.Subscribe(value => CurrentStamina = value).AddTo(this);
+            _staminaRegenStat.OnValueChanged.Subscribe(value => StaminaRegen = value).AddTo(this);
+            _staminaConsumptionStat.OnValueChanged.Subscribe(value => StaminaConsumption = value).AddTo(this);
+            _attackDamageStat.OnValueChanged.Subscribe(value => AttackDamage = (int)value).AddTo(this);
         }
 
         protected override void OnPostApplyEffect(ActiveStatusEffect activeEffect)
