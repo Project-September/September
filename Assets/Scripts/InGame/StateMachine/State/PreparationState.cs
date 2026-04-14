@@ -150,30 +150,37 @@ namespace September.Common
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始
-            var countDownTask = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
-            await UniTask.WaitForSeconds(3f);
+            if (UIController.I.TimeOverlayMessage != null)
+            {
+                await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.Countdown);
+            }
             //  準備フェーズ - 全クライアントで移動入力を有効化
             BGMManager.ReleseFlag();
+            
+            // タイマー開始
+            UIController.I.StartTimer(Context.Runner);
+            
             var countDownDuration = StaticServiceLocator.Instance.Get<InGameManager>().TimerData.PreStartTime;
             if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合は下記の処理をスキップする。
             {
                 if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
-                // 画面中央のTextを使用したAnimationを使用した場合、Animationの実行がcancelされるため、終了を待機する。
-                countDownTask?.GetAwaiter().OnCompleted(
-                    () => UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart));
-                UIController.I.StartTimer(Context.Runner);
-                // 準備時間分待つ
+                
+                // 準備フェーズを開始する
+                UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart).Forget();
+                // 準備フェーズが終了するまで待機
                 await UniTask.Delay(TimeSpan.FromSeconds(countDownDuration));
             }
 
             //  ゲーム開始 - 全クライアントでアクション入力も有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, true, true);
-            var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
-            //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
-            if (task != null)
-                task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
-            else
-                SetOgreLamp();
+            //  ゲーム開始表示
+            if (UIController.I.TimeOverlayMessage != null)
+            {
+                await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.GameStart);
+            }
+            
+            //  ゲーム開始表示終了後に役職開示を行う
+            SetOgreLamp();
 
             ShowStatusUpUI();
             _firstOgrePlayer = PlayerRef.None;
@@ -204,13 +211,14 @@ namespace September.Common
         {
             var playerDatabase = PlayerDatabase.Instance;
             var characterDataContainer = CharacterDataContainer.Instance;
-            int index = 0;
             foreach (var pair in playerDatabase.PlayerDataDic)
             {
-                var animClipPlayer = Context.Runner.GetPlayerObject(pair.Key).GetComponent<AnimationClipPlayer>();
+                var player = Context.Runner.GetPlayerObject(pair.Key);
+                var animClipPlayer = player.GetComponent<AnimationClipPlayer>();
                 var characterType = pair.Value.CharacterType;
                 var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
-                _startCamera.transform.position = _spawnPositions[index].position + _cameraOffset;
+                _startCamera.transform.position = player.transform.position + player.transform.rotation * _cameraOffset;
+                _startCamera.transform.rotation = player.transform.rotation;
                 await UniTask.WaitForSeconds(1f);
                 float delayTime = 1f;
                 if (emoteClip)
@@ -221,7 +229,6 @@ namespace September.Common
                     delayTime = emoteClip.length;
                 }
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
-                index++;
             }
         }
 

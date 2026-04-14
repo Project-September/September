@@ -23,7 +23,12 @@ public class TimeOverlayMessage : MonoBehaviour
 
     public UniTask CallTask(TimeMessageType type)
     {
-        if (!_currentTask.Status.IsCompleted()) return default;
+        if (!_currentTask.Status.IsCompleted())
+        {
+            Debug.LogWarning($"[TimeOverlayMessage] 前回のタスクが終了していないため、{type}メッセージを処理できません。前回呼び出したタスクを待機してください");
+            return default;
+        }
+        
         switch (type)
         {
             case TimeMessageType.Countdown:
