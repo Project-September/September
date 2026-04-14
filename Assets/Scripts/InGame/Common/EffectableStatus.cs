@@ -45,7 +45,8 @@ namespace InGame.Common
             if (!StatusEffectsContainer.TryGetInstance(out var container)) return;
 
             container.GetStatusEffect(statusIndex);
-            AddEffect(container.GetStatusEffect(statusIndex));
+            var status = container.GetStatusEffect(statusIndex);
+            AddEffect(new StatusEffectSpec(status));
         }
 
         public void AddEffect(StatusEffectSpec effectSpec)
