@@ -498,7 +498,7 @@ namespace InGame.Common
             }
         }
         
-                public async UniTask BlendLayerWeight(
+        public async UniTask BlendLayerWeight(
             LayerInfo.LayerType layer,
             float toWeight,
             LayerInfo.Blend blend,
