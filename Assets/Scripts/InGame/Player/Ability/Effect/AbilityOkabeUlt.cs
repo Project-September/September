@@ -13,6 +13,7 @@ namespace InGame.Player.Ability.Effect
         [SerializeField] private StatusEffect _buffEffect;
         [SerializeField] private EffectType _effectType;
         
+        private PlayerStatus _playerStatus;
         private EffectSpawner _effectSpawner;
         private string _effectID;
 
@@ -21,11 +22,9 @@ namespace InGame.Player.Ability.Effect
             Debug.Log("[AbilityOkabeUlt] Start");
             var player = Parameter.Owner;
 
-            if (player.TryGetComponent<PlayerStatus>(out var playerStatus))
+            if (_playerStatus || player.TryGetComponent(out _playerStatus))
             {
-                var spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
-                spec.Duration = _duration;
-                playerStatus.AddEffect(spec);
+                _playerStatus.AddEffect(_buffEffect);
             }
             
             _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
@@ -43,6 +42,7 @@ namespace InGame.Player.Ability.Effect
 
         protected override void OnEndUlt()
         {
+            _playerStatus?.RemoveEffect(_buffEffect);
             _effectSpawner?.StopEffect(_effectID);
         }
     }
