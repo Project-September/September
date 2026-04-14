@@ -231,6 +231,7 @@ namespace InGame.Common
         /// <param name="layerType">再生するレイヤーマスクの種類（ベースは不可）</param>
         /// <param name="weight">再生するレイヤーの重み</param>
         /// <param name="additive">加算モーションにするか</param>
+        /// <param name="playSpeed">再生速度</param>
         /// <param name="external">外部から再生処理を止めるトークン。デフォルトではゲームオブジェクトのトークンに紐づく</param>
         /// <param name="blendIn">アニメーション再生開始時のブレンド</param>
         /// <param name="outBlend">アニメーション再生終了時のブレンド</param>
