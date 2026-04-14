@@ -195,6 +195,20 @@ namespace InGame.Common
             RPC_PlayAsync(index);
             PlayAsync(index);
         }
+        
+        /// <summary> 再生したClipが終了または中断されるまで待機 </summary>
+        public async UniTask<EndClipType> PlayClipAndWait(AnimationClip clip)
+        {
+            // AnimationClipsContainer から探して再生
+            if (!TryGetMontageIndex(clip, out int index))
+            {
+                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
+                return EndClipType.Failed;
+            }
+            
+            RPC_PlayAsync(index);
+            return await PlayAsync(index);
+        }
 
         [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
         private void RPC_PlayAsync(int clipIndex)
@@ -331,7 +345,11 @@ namespace InGame.Common
         
         public void Play(AnimationClip clip, bool forcePlay = false)
         {
-            if (!TryGetMontageIndex(clip, out int clipIndex)) return;
+            if (!TryGetMontageIndex(clip, out int clipIndex))
+            {
+                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
+                return;
+            }
             
             if (Application.isPlaying) RPC_Play(clipIndex, forcePlay);
             Play(clipIndex, forcePlay);
@@ -382,6 +400,7 @@ namespace InGame.Common
             
             index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
                 x => x.AnimClip.name == clip.name);
+            
             return index >= 0;
         }
         
@@ -713,30 +732,7 @@ namespace InGame.Common
             _layerInfo[slot] = li;
         }
 
-        /// <summary> 再生したClipが終了または中断されるまで待機 </summary>
-        public async UniTask<EndClipType> PlayClipAndWait(AnimationClip clip, CancellationToken ct = default)
-        {
-            if (AnimationClipsContainer.Instance.AnimationMontages == null)
-            {
-                Debug.LogWarning("AnimationClipsContainer Instance is null");
-                return EndClipType.Failed;
-            }
-            
-            // AnimationClipsContainer から探して再生
-            var index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
-                x => x.AnimClip.name == clip.name);
-
-            if (index < 0)
-            {
-                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
-                return EndClipType.Failed;
-            }
-            
-            RPC_PlayAsync(index);
-
-            return await PlayAsync(index);
-        }
-
+        #region StopClip
         public bool StopClip(AnimationClip clip)
         {
             if (AnimationClipsContainer.Instance.AnimationMontages == null)
@@ -794,6 +790,7 @@ namespace InGame.Common
 
             return false;
         }
+        #endregion
         
         public bool TryGetPlayableInfo(AnimationClip clip, out PlayableInfo info)
         {
