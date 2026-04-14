@@ -100,7 +100,9 @@ namespace InGame.Player.Sarutobi
                 {
                     for (int i = 0; i < BulletCountNetwork; i++)
                     {
-                        var angle = _angleBetweenBullets * (i - (BulletCountNetwork - 1) / 2f);
+                        // 扇状にクナイを発射する
+                        // iを中央基準に変換（ 0,1,2,3,4 を -2,-1,0,1,2 に変換）した後、クナイ間の角度をかける
+                        var angle = (i - (BulletCountNetwork - 1) / 2f) * _angleBetweenBullets;
                         Throw(angle);
                     }
                 }
