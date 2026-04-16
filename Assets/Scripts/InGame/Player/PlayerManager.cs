@@ -187,6 +187,12 @@ namespace InGame.Player
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetControlState(PlayerControlState controlState)
+        {
+            SetControlState(controlState);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetColliderActive(NetworkBool active)
         {
             _colliderObj.SetActive(active);

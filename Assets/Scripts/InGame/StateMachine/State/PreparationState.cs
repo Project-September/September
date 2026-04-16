@@ -26,10 +26,11 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
-        private int _spawnPositionIndex;
+        [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
         private static readonly string _cueSheetName = "ALLCue";
+        public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -59,34 +60,11 @@ namespace September.Common
                 Initialize().Forget();
             }
         }
-
+        
         private async UniTask Initialize()
         {
             await Runner.LoadScene("Field", LoadSceneMode.Additive);
-            var container = CharacterDataContainer.Instance;
-            foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
-            {
-                var player = await Context.Runner.SpawnAsync(
-                    container.GetCharacterData(pair.Value.CharacterType).Prefab,
-                    GetSpawnPosition(),
-                    inputAuthority: pair.Key);
-                Context.Runner.SetPlayerObject(pair.Key, player);
-                if (!Context.PlayerDataDic.ContainsKey(pair.Key))
-                {
-                    Context.AddPlayerObject(pair.Key, player);
-                }
-                var playerHealth = player.GetComponent<PlayerHealth>();
-                //PlayerHealthのOnDeathに登録
-                playerHealth.OnDeath += OnPlayerKilled;
-                var spd = pair.Value;
-                foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
-                {
-                    if (pair.Key == playerData.Key) continue;
-                    spd.StunData.Add(playerData.Key, 0);
-                }
-                PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key, spd);
-                _setIcon.ShowIcon(pair.Key);
-            }
+            await SpawnPlayers();
 
             // プレイヤーのキャラクター選択を一度だけ記録
             if (!_hasRecordedPlayerSelection)
@@ -106,12 +84,56 @@ namespace September.Common
             RPC_OpeningSequence();
         }
 
+        private async UniTask SpawnPlayers()
+        {
+            var container = CharacterDataContainer.Instance;
+            // キャラクターのスポーン位置をランダムに。
+            var spawnPositions = _isRandomSpawn ? GetShuffledSpawnPoints() : _spawnPositions;
+            // スポーンポイント設定が適用されていない場合はこのコンポーネント位置を暫定で初期値とする。
+            if (spawnPositions == null || spawnPositions.Length == 0)
+                spawnPositions = new[] { transform };
+            var index = 0;
+            foreach (var pair in PlayerDatabase.Instance.PlayerDataDic)
+            {
+                // ランダム化の際にPlayerのrotationを制御可能にするために、spawnPositionのrotationに合わせる。
+                var spawnTransform = spawnPositions[index % spawnPositions.Length];
+                var player = await Context.Runner.SpawnAsync(
+                    container.GetCharacterData(pair.Value.CharacterType).Prefab,
+                    spawnTransform.position,
+                    spawnTransform.rotation,
+                    inputAuthority: pair.Key);
+                Context.Runner.SetPlayerObject(pair.Key, player);
+                if (!Context.PlayerDataDic.ContainsKey(pair.Key))
+                {
+                    Context.AddPlayerObject(pair.Key, player);
+                }
+                var playerHealth = player.GetComponent<PlayerHealth>();
+                //PlayerHealthのOnDeathに登録
+                playerHealth.OnDeath += OnPlayerKilled;
+                var spd = pair.Value;
+                foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
+                {
+                    if (pair.Key == playerData.Key) continue;
+                    spd.StunData.Add(playerData.Key, 0);
+                }
+                PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key, spd);
+                _setIcon.ShowIcon(pair.Key);
+                
+                index++;
+            }
+        }
+
+        private Transform[] GetShuffledSpawnPoints()
+        {
+            return _spawnPositions.OrderBy(_ => Random.value).ToArray();
+        }
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_OpeningSequence()
         {
             OpeningSequence().Forget();
         }
-
+        
         private async UniTaskVoid OpeningSequence()
         {
             // 全クライアントで入力を無効化
@@ -128,21 +150,38 @@ namespace September.Common
             //  カメラが元の位置に戻るまで待つ
             await UniTask.WaitForSeconds(1.5f);
             //  カウントダウン開始
-            UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.Countdown);
-            await UniTask.WaitForSeconds(3f);
+            if (UIController.I.TimeOverlayMessage != null)
+            {
+                await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.Countdown);
+            }
             //  準備フェーズ - 全クライアントで移動入力を有効化
-            if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
             BGMManager.ReleseFlag();
+            
+            // タイマー開始
             UIController.I.StartTimer(Context.Runner);
-            await UniTask.Delay(TimeSpan.FromSeconds(10f));
+            
+            var countDownDuration = StaticServiceLocator.Instance.Get<InGameManager>().TimerData.PreStartTime;
+            if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合は下記の処理をスキップする。
+            {
+                if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
+                
+                // 準備フェーズを開始する
+                UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart).Forget();
+                // 準備フェーズが終了するまで待機
+                await UniTask.Delay(TimeSpan.FromSeconds(countDownDuration));
+            }
+
             //  ゲーム開始 - 全クライアントでアクション入力も有効化
             if (HasStateAuthority) RPC_ToggleInputs(true, true, true);
-            var task = UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.GameStart);
-            //  ゲーム開始表示が正常に行われたら表示終了後に役職開示を行う
-            if (task != null)
-                task.Value.GetAwaiter().OnCompleted(SetOgreLamp);
-            else
-                SetOgreLamp();
+            //  ゲーム開始表示
+            if (UIController.I.TimeOverlayMessage != null)
+            {
+                await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.GameStart);
+            }
+            
+            //  ゲーム開始表示終了後に役職開示を行う
+            SetOgreLamp();
+
             ShowStatusUpUI();
             _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
@@ -172,13 +211,14 @@ namespace September.Common
         {
             var playerDatabase = PlayerDatabase.Instance;
             var characterDataContainer = CharacterDataContainer.Instance;
-            int index = 0;
             foreach (var pair in playerDatabase.PlayerDataDic)
             {
-                var animClipPlayer = Context.Runner.GetPlayerObject(pair.Key).GetComponent<AnimationClipPlayer>();
+                var player = Context.Runner.GetPlayerObject(pair.Key);
+                var animClipPlayer = player.GetComponent<AnimationClipPlayer>();
                 var characterType = pair.Value.CharacterType;
                 var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
-                _startCamera.transform.position = _spawnPositions[index].position + _cameraOffset;
+                _startCamera.transform.position = player.transform.position + player.transform.rotation * _cameraOffset;
+                _startCamera.transform.rotation = player.transform.rotation;
                 await UniTask.WaitForSeconds(1f);
                 float delayTime = 1f;
                 if (emoteClip)
@@ -189,7 +229,6 @@ namespace September.Common
                     delayTime = emoteClip.length;
                 }
                 await UniTask.WaitForSeconds(delayTime); // 各エモートのAnimation分待つ
-                index++;
             }
         }
 
@@ -208,12 +247,7 @@ namespace September.Common
             // スコアの更新処理
             PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
         }
-        private Vector3 GetSpawnPosition()
-        {
-            var result = _spawnPositions[_spawnPositionIndex].position;
-            _spawnPositionIndex = (_spawnPositionIndex + 1) % _spawnPositions.Length;
-            return result;
-        }
+        
         /// <summary>
         /// 鬼を抽選するメソッド
         /// </summary>
@@ -231,6 +265,7 @@ namespace September.Common
             _firstOgrePlayer = ogreKey;
             PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
         }
+        
         /// <summary>
         /// 各Playerの気絶時に呼ばれるメソッド
         /// </summary>
@@ -258,11 +293,13 @@ namespace September.Common
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
         }
+        
         private void HideCursor()
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
+        
         private void SetOgreLamp()
         {
             if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
@@ -337,6 +374,5 @@ namespace September.Common
             GameInput.I.ToggleActionInput(actionInputEnabled);
             GameInput.I.ToggleLookInput(lookInputEnabled);
         }
-
     }
 }

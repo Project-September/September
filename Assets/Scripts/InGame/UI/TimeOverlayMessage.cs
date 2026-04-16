@@ -23,11 +23,19 @@ public class TimeOverlayMessage : MonoBehaviour
 
     public UniTask CallTask(TimeMessageType type)
     {
-        if (!_currentTask.Status.IsCompleted()) return default;
+        if (!_currentTask.Status.IsCompleted())
+        {
+            Debug.LogWarning($"[TimeOverlayMessage] 前回のタスクが終了していないため、{type}メッセージを処理できません。前回呼び出したタスクを待機してください");
+            return default;
+        }
+        
         switch (type)
         {
             case TimeMessageType.Countdown:
                 _currentTask = CountdownTask().Preserve();
+                break;
+            case TimeMessageType.PreparationStart:
+                _currentTask = GamePreStartTask().Preserve();
                 break;
             case TimeMessageType.GameStart:
                 _currentTask = GameStartTask().Preserve();
@@ -38,6 +46,7 @@ public class TimeOverlayMessage : MonoBehaviour
         }
         return _currentTask;
     }
+    
     private async UniTask CountdownTask()
     {
         _text.transform.localScale = Vector3.zero;
@@ -54,6 +63,16 @@ public class TimeOverlayMessage : MonoBehaviour
         CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_Count.Name); // カウントダウン音
         await _text.transform.DOScale(Vector3.one, 0.5f).SetLoops(2,LoopType.Yoyo).SetEase(_ease);
         CRIAudio.PlaySE("ALLCue", SoundCues.SE.UI_CountDown_End.Name); // ゲーム開始音
+        col.a = 0;
+        _text.color = col;
+    }
+
+    private async UniTask GamePreStartTask()
+    {
+        _text.transform.localScale = Vector3.zero;
+        var col = _text.color;
+        col.a = 1;
+        _text.color = col;
         _text.text = _readyTimeMessage;
         await _text.transform.DOScale(Vector3.one, 0.5f).SetEase(_ease);
         await _text.DOFade(0f, _fadeOutDuration).SetEase(Ease.Linear);
@@ -87,4 +106,5 @@ public enum TimeMessageType
     Countdown,
     GameStart,
     TimeRemainingAlert,
+    PreparationStart,
 }

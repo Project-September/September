@@ -62,6 +62,15 @@ namespace  InGame.Player.Ability
         
         //inputを保持するために追加
         protected PlayerInput _playerInput;
+        
+        /// <summary>アビリティ開始時のティック</summary>
+        public int StartTick { get; private set; }
+        /// <summary>アビリティ開始時の時間</summary>
+        public float StartTime { get; private set; }
+        /// <summary>アビリティ開始からの経過ティック</summary>
+        public int ElapsedTick => Runner ? Runner.Tick - StartTick : -1;
+        /// <summary>アビリティ開始からの経過時間</summary>
+        public float ElapsedTime => (Runner ? Runner.SimulationTime : Time.time) - StartTime;
 
         /// <summary>
         /// アビリティを開始する（PlayerAbilityManagerから呼び出される）
@@ -71,6 +80,8 @@ namespace  InGame.Player.Ability
         {
             Parameter = parameter;
             _phase = AbilityPhase.Started;
+            StartTick = Runner ? Runner.Tick : -1;
+            StartTime = Runner ? Runner.SimulationTime : Time.time;
         }
 
         /// <summary>
@@ -80,6 +91,23 @@ namespace  InGame.Player.Ability
         public void Tick(float deltaTime)
         {
             ProcessPhase(deltaTime);
+        }
+
+        /// <summary>
+        /// アビリティを終了する
+        /// </summary>
+        public void RequestEndAbility()
+        {
+            _phase = AbilityPhase.Ending;
+        }
+        
+        /// <summary>
+        /// プレイヤーの入力を設定する
+        /// </summary>
+        /// <param name="playerInput">入力</param>
+        public void SetPlayerInput(PlayerInput playerInput)
+        {
+            _playerInput = playerInput;
         }
 
         /// <summary>
@@ -103,11 +131,35 @@ namespace  InGame.Player.Ability
                 case AbilityPhase.Ending:
                     // 終了処理を実行してCooldownに遷移
                     OnEndAbility();
+                    ResetCooldown();
+                    _phase = AbilityPhase.Cooldown;
                     break;
                 case AbilityPhase.Cooldown:
                     // クールダウン判定
                     OnCooldown();
                     break;
+            }
+        }
+        
+        /// <summary>
+        /// クールダウン時刻を計算してセットする
+        /// </summary>
+        private void ResetCooldown()
+        {
+            // NetworkRunnerがあればシミュレーション時刻、なければローカル時刻を使用
+            CooldownEndTime = Runner ? Runner.SimulationTime + _cooldown : Time.time + _cooldown;
+        }
+        
+        /// <summary>
+        /// クールダウン中の処理
+        /// クールダウン終了時刻を超えたらAvailableフェーズに遷移
+        /// </summary>
+        private void OnCooldown()
+        {
+            // 現在時刻がクールダウン終了時刻を超えたら使用可能に戻す
+            if (Runner ? Runner.SimulationTime >= CooldownEndTime : Time.time >= CooldownEndTime)
+            {
+                _phase = AbilityPhase.Available;
             }
         }
 
@@ -138,35 +190,7 @@ namespace  InGame.Player.Ability
 
         /// <summary>
         /// アビリティ終了時の処理（派生クラスでオーバーライド可能）
-        /// クールダウン時刻を計算してCooldownフェーズに遷移する
         /// </summary>
-        protected virtual void OnEndAbility()
-        {
-            // NetworkRunnerがあればシミュレーション時刻、なければローカル時刻を使用
-            CooldownEndTime = Runner ? Runner.SimulationTime + _cooldown : Time.time + _cooldown;
-            _phase = AbilityPhase.Cooldown;
-        }
-
-        /// <summary>
-        /// クールダウン中の処理
-        /// クールダウン終了時刻を超えたらAvailableフェーズに遷移
-        /// </summary>
-        protected void OnCooldown()
-        {
-            // 現在時刻がクールダウン終了時刻を超えたら使用可能に戻す
-            if (Runner ? Runner.SimulationTime >= CooldownEndTime : Time.time >= CooldownEndTime)
-            {
-                _phase = AbilityPhase.Available;
-            }
-        }
-        
-        /// <summary>
-        /// プレイヤーの入力を設定する
-        /// </summary>
-        /// <param name="playerInput">入力</param>
-        public void SetPlayerInput(PlayerInput playerInput)
-        {
-            _playerInput = playerInput;
-        }
+        protected virtual void OnEndAbility() { }
     }
 }

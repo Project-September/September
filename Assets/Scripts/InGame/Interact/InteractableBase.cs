@@ -115,17 +115,14 @@ namespace InGame.Interact
             _characterType = context.CharacterType;
 
             // CharacterType.All を優先、なければキャラ固有のクールダウン時間を取得
-            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+            var cooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
                 : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(_characterType, 0f);
 
-            // インタラクト時刻を記録（NetworkRunnerがあればシミュレーション時刻、なければローカル時刻）
-            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-
             // クールダウンのループエフェクトを再生（設定がONで、クールダウン時間が0より大きい場合）
-            if (_spawnCooldownEffectOnStart && LastUsedCooldownTime > 0f)
+            if (_spawnCooldownEffectOnStart && cooldownTime > 0f)
             {
-                PlayCooldownEffect(LastUsedCooldownTime).Forget();
+                SetCooldown(cooldownTime);
             }
 
             // インタラクト完了エフェクトを再生（ワンショット）
@@ -153,16 +150,34 @@ namespace InGame.Interact
             // 全クライアントにインタラクトログを表示
             Rpc_ShowInteractLog(actor, _type);
         }
+        
+        /// <summary>
+        /// クールダウンを開始する。すでにクールダウン中であればクールダウン時間を上書きする
+        /// </summary>
+        public void SetCooldown(float seconds)
+        {
+            if (!HasStateAuthority || seconds <= 0f) return;
+
+            // すでにクールダウン中か評価する。（クールダウンの設定前に評価しないと常に真となるため事前に行う必要あり）
+            var isInCooldown = IsInCooldown();
+            
+            // インタラクト時刻を記録（NetworkRunnerがあればシミュレーション時刻、なければローカル時刻）
+            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
+            LastUsedCooldownTime = seconds;
+            
+            // 二重にエフェクトが表示されないようクールダウン中なら処理しない
+            if (!isInCooldown)
+            {
+                PlayCooldownEffect().Forget();
+            }
+        }
 
         /// <summary>
         /// クールダウンエフェクトを再生する非同期処理
-        /// 指定時間経過後にエフェクトを停止し、回復音を再生
+        /// クールダウン終了後にエフェクトを停止し、回復音を再生
         /// </summary>
-        /// <param name="cooldownTime">クールダウン時間（秒）</param>
-        public async UniTask PlayCooldownEffect(float cooldownTime)
+        private async UniTask PlayCooldownEffect()
         {
-            if (cooldownTime <= 0f) return;
-
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             var uniqueEffectId = $"cooldown_{Object.Id}"; // オブジェクトIDを使って一意なIDを生成
             var effectTransform = _cooldownEffectTransform != null ? _cooldownEffectTransform : transform;
@@ -172,8 +187,8 @@ namespace InGame.Interact
                 effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation),
                 _cooldownEffectScale);
 
-            // クールダウン時間待機
-            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false, cancellationToken: this.GetCancellationTokenOnDestroy());
+            // クールダウン終了待機
+            await UniTask.WaitUntil(this, s => !s.IsInCooldown(), cancellationToken: this.GetCancellationTokenOnDestroy());
 
             // エフェクトを停止
             effectSpawner?.StopEffect(uniqueEffectId);
@@ -233,19 +248,6 @@ namespace InGame.Interact
             }
 
             return true;
-        }
-
-        public void ForceStartCooldown(float seconds)
-        {
-            if (!HasStateAuthority) return;
-
-            LastUsedCooldownTime = seconds;
-            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-
-            if (_spawnCooldownEffectOnStart && seconds > 0f)
-            {
-                PlayCooldownEffect(seconds).Forget();
-            }
         }
 
         /// <summary>

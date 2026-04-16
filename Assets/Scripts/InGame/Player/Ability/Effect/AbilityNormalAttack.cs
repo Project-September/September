@@ -252,7 +252,7 @@ namespace InGame.Player.Ability
             if (elapsed >= _endAttackTick)
             {
                 _playerMovement.IgnoreMoveInput = false;
-                _phase = AbilityPhase.Ending;
+                RequestEndAbility();
             }
         }
 

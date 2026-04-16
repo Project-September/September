@@ -8,6 +8,7 @@ namespace September.Common
         [SerializeField] ImtStateMachine<TContext>.State[] _states;
         
         protected ImtStateMachine<TContext> _stateMachine;
+        
         public override void Spawned()
         {
             _stateMachine = new ImtStateMachine<TContext>((TContext)this, _states);
@@ -15,12 +16,19 @@ namespace September.Common
             Runner.SetIsSimulated(Object, true);
             InitializeStateMachine();
         }
+        
         public override void FixedUpdateNetwork()
         {
             _stateMachine.Update();
         }
+        
         protected abstract void InitializeStateMachine();
-        [Rpc]
+        
+        /// <summary>
+        /// ステート遷移イベントを送信する
+        /// </summary>
+        /// <param name="eventId">遷移イベントID。現在のステートに、この遷移イベントに対応する遷移先が存在すれば遷移する。</param>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_SendEvent(int eventId)
         {
             _stateMachine.SendEvent(eventId);
