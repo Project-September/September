@@ -27,8 +27,7 @@ namespace InGame.Player.Ability
         [SerializeField] private int _damage;
         [Header("鬼の時のダメージ")] 
         [SerializeField] private int _ogreDamage;
-        [Header("射撃のステート")] 
-        [SerializeField] private ShootingStateType _shootingStateType;
+        [Networked] private ShootingStateType _lastShootingStateType { get; set; }
         
         private HatanoAbilityStatusManagement _abilityStatusManagement;
         
@@ -36,10 +35,6 @@ namespace InGame.Player.Ability
         {
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
-            
-            _shootingStateType = ShootingStateType.Stance;
-            _aimCameraController.CrosshairToggleChange(true);
-            _aimCameraController.AimCamera();
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -48,20 +43,16 @@ namespace InGame.Player.Ability
             
             if (_shootingStateType == ShootingStateType.Stance)
             {
-                _aimCameraController.PlayerDirectionCamera();
-                
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
                     GunTargetDetection();
                     _shootingStateType = ShootingStateType.Shooting;
-                    Debug.Log("二丁銃を射撃");
                 }
             }
             
             //射撃後、インターバルを開始する
             if (_shootingStateType == ShootingStateType.Shooting)
             {
-                Debug.Log("インターバル開始");
                 _shootingIntervalTimer += Runner.DeltaTime;
                 if (_shootingIntervalTimer >= _shootingInterval)
                 {
@@ -73,16 +64,24 @@ namespace InGame.Player.Ability
             //構えの入力が終了後
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
+                ApplyCameraState(ShootingStateType.None);
                 _phase = AbilityPhase.Available;
-                _aimCameraController.NormalCamera();
-                _aimCameraController.CrosshairToggleChange(false);
+                _shootingStateType = ShootingStateType.None;
+                _lastShootingStateType = ShootingStateType.None;
+            }
+            
+            //状態変化検知
+            if (_shootingStateType != _lastShootingStateType)
+            {
+                _lastShootingStateType = _shootingStateType;
+                ApplyCameraState(ShootingStateType.Stance);
             }
         }
         
         private void GunTargetDetection()
         {
-            var origin = _aimCameraController.MainCamera.transform.position;
-            var dir = _aimCameraController.MainCamera.transform.forward;
+            var origin = _aimCameraController.AimOrigin;
+            var dir = _aimCameraController.AimDirection;
             Debug.DrawRay(origin, dir * _doubleBarreledGunDistance, Color.red);
             
             var hit = Physics.Raycast(origin, dir, out RaycastHit hitInfo, _doubleBarreledGunDistance);
@@ -140,6 +139,20 @@ namespace InGame.Player.Ability
                 enableData ? sessionData.IsOgre ? _ogreDamage : _damage : _damage, inputAuthority,
                 damageable.OwnerPlayerRef, null, damageable);
             damageable.TakeHit(ref hitData);
+        }
+        
+        private void ApplyCameraState(ShootingStateType type)
+        {
+            if (type == ShootingStateType.Stance)
+            {
+                _aimCameraController.RPC_AimCamera();;
+                _aimCameraController.RPC_CrosshairToggleChange(true);
+            }
+            else
+            {
+                _aimCameraController.RPC_NormalCamera();
+                _aimCameraController.RPC_CrosshairToggleChange(false);
+            }
         }
     }
 }

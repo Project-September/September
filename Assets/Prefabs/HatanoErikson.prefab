@@ -5640,6 +5640,7 @@ MonoBehaviour:
   _interactResponseTimeout: 3
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
+  _playerAudioController: {fileID: 0}
   _isHoldingInteract: 0
 --- !u!114 &7508249662566368237
 MonoBehaviour:
@@ -5698,13 +5699,14 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
+        _shootingStateType: 0
         _playerInteractionController: {fileID: 7710838205980989238}
         _aimCameraController: {fileID: 2677403803585906037}
         _laserDistance: 100
         _laserStartPoint: {fileID: 915611406105039834}
         _interactionTime: 2
-        _shootingStateType: 0
         _judgmentBoxSize: {x: 1, y: 1, z: 1}
+        _lastShootingStateType: 0
     - rid: 1502005709025574999
       type: {class: AbilityLaserSkillCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
@@ -5713,6 +5715,7 @@ MonoBehaviour:
       data:
         _cooldown: 5
         _phase: 0
+        _shootingStateType: 0
         _playerInteractionController: {fileID: 7710838205980989238}
         _aimCameraController: {fileID: 2677403803585906037}
         _rocketLauncherDistance: 100
@@ -5729,6 +5732,7 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
+        _shootingStateType: 0
         _aimCameraController: {fileID: 2677403803585906037}
         _doubleBarreledGunDistance: 100
         _shootingInterval: 2
@@ -5745,6 +5749,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        _shootingStateType: 0
         _attackDamage: 10
         _ogreAttackDamage: 15
         _startHitCheckFrame: 17
@@ -5882,7 +5887,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e154282f1fa7874ab49e1f29c118239, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _abilityStatus: 3
+  _lastAbilityStatus: 3
 --- !u!114 &-3759821598390054299
 MonoBehaviour:
   m_ObjectHideFlags: 0
