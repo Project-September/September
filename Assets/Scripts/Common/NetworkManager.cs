@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using NaughtyAttributes;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +15,9 @@ namespace September.Common
         [SerializeField] NetworkRunner _runnerPrefab;
         [SerializeField] PlayerDatabase _playerDatabasePrefab;
         [SerializeField] LoadingIcon _loadingIcon;
+        [SerializeField] RoomErrorMessage _roomErrorMessage;
+        [SerializeField] TextMeshProUGUI _createErrorText;
+        [SerializeField] TextMeshProUGUI _joinErrorText;
         [SerializeField, Scene] string _titleSceneName;
         [SerializeField, Scene] string _lobbySceneName;
         [SerializeField, Scene] string _gameSceneName;
@@ -32,13 +36,22 @@ namespace September.Common
             {
                 Destroy(gameObject);
             }
+
+            if(_createErrorText != null)
+            {
+                _createErrorText.gameObject.SetActive(false);
+            }
+            if (_joinErrorText != null)
+            {
+                _joinErrorText.gameObject.SetActive(false);
+            }
         }
         public void CreateLobby(string gameName, int playerCount)
         {
             if (!_currentTask.Status.IsCompleted()) return;
             _loadingIcon.StartAnimation();
             _currentTask = CreateLobbyAsync(gameName, playerCount).Preserve();
-            _currentTask.GetAwaiter().OnCompleted(()=>_loadingIcon.StopAnimation());
+            _currentTask.GetAwaiter().OnCompleted(() => _loadingIcon.StopAnimation());
         }
         async UniTask CreateLobbyAsync(string gameName, int playerCount)
         {
@@ -48,9 +61,11 @@ namespace September.Common
                 SessionName = gameName,
                 PlayerCount = playerCount
             });
+
+            ChangeErrorMessage(result, _createErrorText);
+
             if (!result.Ok)
             {
-                Debug.Log(result.ShutdownReason);
                 await InitializeRunner();
                 return;
             }
@@ -62,7 +77,7 @@ namespace September.Common
             if (!_currentTask.Status.IsCompleted()) return;
             _loadingIcon.StartAnimation();
             _currentTask = JoinLobbyAsync(gameName).Preserve();
-            _currentTask.GetAwaiter().OnCompleted(()=>_loadingIcon.StopAnimation());
+            _currentTask.GetAwaiter().OnCompleted(() => _loadingIcon.StopAnimation());
         }
         async UniTask JoinLobbyAsync(string gameName)
         {
@@ -71,9 +86,12 @@ namespace September.Common
                 GameMode = GameMode.Client,
                 SessionName = gameName,
             });
+
+            ChangeErrorMessage(result, _joinErrorText);
+
             if (!result.Ok)
             {
-                Debug.Log(result.ShutdownReason);
+
                 await InitializeRunner();
             }
         }
@@ -93,10 +111,10 @@ namespace September.Common
         {
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
-            
+
             await _networkRunner.LoadScene(_gameSceneName);
         }
-        
+
         public async UniTask Fade(Image fadeImage)
         {
             fadeImage.gameObject.SetActive(true);
@@ -105,19 +123,38 @@ namespace September.Common
             await fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InOutQuad);
         }
 
-        
+
         public async UniTask QuitInGame()
         {
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
-            
+
             if (!SceneManager.GetSceneByName("Field").isLoaded)
             {
                 return;
             }
-            
-            await _networkRunner.UnloadScene("Field"); 
+
+            await _networkRunner.UnloadScene("Field");
             await _networkRunner.LoadScene(_resultSceneName);
+        }
+
+        /// <summary>
+        /// StartGameの結果に応じてエラーメッセージを変更する
+        /// </summary>
+        /// <param name="result">StartGameの結果</param>
+        /// <param name="text">エラーメッセージを表示するText</param>
+        private void ChangeErrorMessage(StartGameResult result,TextMeshProUGUI text)
+        {
+            if (result == null ||  text == null || _roomErrorMessage == null) return;
+
+            if (result.Ok)
+            {
+                text.gameObject.SetActive(false);
+                return;
+            }
+
+            text.gameObject.SetActive(true);
+            text.text = _roomErrorMessage.GetMessage(result.ShutdownReason);
         }
     }
 }
