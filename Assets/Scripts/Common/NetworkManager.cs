@@ -15,15 +15,12 @@ namespace September.Common
         [SerializeField] NetworkRunner _runnerPrefab;
         [SerializeField] PlayerDatabase _playerDatabasePrefab;
         [SerializeField] LoadingIcon _loadingIcon;
-        [SerializeField] RoomErrorMessage _roomErrorMessage;
-        [SerializeField] TextMeshProUGUI _createErrorText;
-        [SerializeField] TextMeshProUGUI _joinErrorText;
         [SerializeField, Scene] string _titleSceneName;
         [SerializeField, Scene] string _lobbySceneName;
         [SerializeField, Scene] string _gameSceneName;
         [SerializeField, Scene] string _resultSceneName;
         NetworkRunner _networkRunner;
-        UniTask _currentTask;
+        UniTask<StartGameResult> _currentTask;
         private void Start()
         {
             if (Instance == null)
@@ -36,24 +33,25 @@ namespace September.Common
             {
                 Destroy(gameObject);
             }
-
-            if(_createErrorText != null)
-            {
-                _createErrorText.gameObject.SetActive(false);
-            }
-            if (_joinErrorText != null)
-            {
-                _joinErrorText.gameObject.SetActive(false);
-            }
         }
-        public void CreateLobby(string gameName, int playerCount)
+        public async UniTask<StartGameResult> CreateLobby(string gameName, int playerCount)
         {
-            if (!_currentTask.Status.IsCompleted()) return;
+            if (!_currentTask.Status.IsCompleted())
+                return default;
+
             _loadingIcon.StartAnimation();
-            _currentTask = CreateLobbyAsync(gameName, playerCount).Preserve();
-            _currentTask.GetAwaiter().OnCompleted(() => _loadingIcon.StopAnimation());
+
+            try
+            {
+                _currentTask = CreateLobbyAsync(gameName, playerCount).Preserve();
+                return await _currentTask;
+            }
+            finally
+            {
+                _loadingIcon.StopAnimation();
+            }
         }
-        async UniTask CreateLobbyAsync(string gameName, int playerCount)
+        async UniTask<StartGameResult> CreateLobbyAsync(string gameName, int playerCount)
         {
             var result = await _networkRunner.StartGame(new StartGameArgs
             {
@@ -62,24 +60,35 @@ namespace September.Common
                 PlayerCount = playerCount
             });
 
-            ChangeErrorMessage(result, _createErrorText);
-
             if (!result.Ok)
             {
                 await InitializeRunner();
-                return;
+                return result;
             }
             await _networkRunner.SpawnAsync(_playerDatabasePrefab);
             await _networkRunner.LoadScene(_lobbySceneName);
+
+            return result;
         }
-        public void JoinLobby(string gameName)
+        public async UniTask<StartGameResult> JoinLobby(string gameName)
         {
-            if (!_currentTask.Status.IsCompleted()) return;
+            if (!_currentTask.Status.IsCompleted())
+                return default;
             _loadingIcon.StartAnimation();
-            _currentTask = JoinLobbyAsync(gameName).Preserve();
-            _currentTask.GetAwaiter().OnCompleted(() => _loadingIcon.StopAnimation());
+
+            try
+            {
+                _currentTask = JoinLobbyAsync(gameName).Preserve();
+                return await _currentTask;
+
+            }
+            finally
+            {
+                _loadingIcon.StopAnimation();
+            }
+
         }
-        async UniTask JoinLobbyAsync(string gameName)
+        async UniTask<StartGameResult> JoinLobbyAsync(string gameName)
         {
             var result = await _networkRunner.StartGame(new StartGameArgs
             {
@@ -87,13 +96,12 @@ namespace September.Common
                 SessionName = gameName,
             });
 
-            ChangeErrorMessage(result, _joinErrorText);
-
             if (!result.Ok)
             {
 
                 await InitializeRunner();
             }
+            return result;
         }
         public async UniTask InitializeRunner()
         {
@@ -136,25 +144,6 @@ namespace September.Common
 
             await _networkRunner.UnloadScene("Field");
             await _networkRunner.LoadScene(_resultSceneName);
-        }
-
-        /// <summary>
-        /// StartGameの結果に応じてエラーメッセージを変更する
-        /// </summary>
-        /// <param name="result">StartGameの結果</param>
-        /// <param name="text">エラーメッセージを表示するText</param>
-        private void ChangeErrorMessage(StartGameResult result,TextMeshProUGUI text)
-        {
-            if (result == null ||  text == null || _roomErrorMessage == null) return;
-
-            if (result.Ok)
-            {
-                text.gameObject.SetActive(false);
-                return;
-            }
-
-            text.gameObject.SetActive(true);
-            text.text = _roomErrorMessage.GetMessage(result.ShutdownReason);
         }
     }
 }
