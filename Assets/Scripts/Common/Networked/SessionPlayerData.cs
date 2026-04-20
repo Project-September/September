@@ -25,7 +25,7 @@ namespace September.Common
         public CharacterType CharacterType;
         public NetworkBool IsOgre;
         public int Score;
-        [Networked, Capacity(3)] public NetworkDictionary<PlayerRef, int> StunData => default;
+        [Networked, Capacity(7)] public NetworkDictionary<PlayerRef, int> StunData => default;
         
         public int DamageReceived;
         public int DamageDealt;
