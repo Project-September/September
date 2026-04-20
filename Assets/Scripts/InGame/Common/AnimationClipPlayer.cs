@@ -42,6 +42,8 @@ namespace InGame.Common
 
         public AnimationMixerPlayable BaseMixer => _baseMixer;
 
+        public bool IsValid => _graph.IsValid();
+
         #region Initialize
         public void Start()
         {

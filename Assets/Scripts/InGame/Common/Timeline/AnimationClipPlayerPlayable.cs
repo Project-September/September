@@ -23,7 +23,10 @@ namespace InGame.Player.Ult
                 _clipPlayer = playerData as AnimationClipPlayer;
                 
 #if UNITY_EDITOR
-                if (!Application.isPlaying) _clipPlayer?.Start();
+                if (_clipPlayer && !_clipPlayer.IsValid)
+                {
+                    _clipPlayer.Start();
+                }
 #endif
             }
             
@@ -59,7 +62,6 @@ namespace InGame.Player.Ult
         {
             _info.Disconnect();
             _isPlayed = false;
-            
         }
     }
 }
