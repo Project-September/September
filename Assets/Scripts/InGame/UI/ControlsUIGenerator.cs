@@ -8,7 +8,7 @@ public class ControlsUIGenerator : MonoBehaviour
     // VerticalLayoutGroup,ContentSizeFitterなどのレイアウトコンポーネントがアタッチされていることを想定
     [SerializeField] private GameObject _descriptionObject;
     [SerializeField] private ControlDescription _descriptionData;
-    [SerializeField] private GameObject _iconPrefub;
+    [SerializeField] private GameObject _iconPrefab;
 
     private void Start()
     {
@@ -22,7 +22,7 @@ public class ControlsUIGenerator : MonoBehaviour
     {   
         foreach (var action in description.Actions)
         {
-            GameObject icon = Instantiate(_iconPrefub, _descriptionObject.transform);
+            GameObject icon = Instantiate(_iconPrefab, _descriptionObject.transform);
             icon.name = $"{action.ActionName}Icon";
             icon.GetComponent<Image>().sprite = action.Icon;
             icon.GetComponentInChildren<TextMeshProUGUI>().text = action.Description;
