@@ -1,8 +1,7 @@
-using InGame.Common;
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace InGame.Player.Ult
+namespace InGame.Common.Timeline
 {
     [System.Serializable]
     public class AnimationClipPlayerPlayable : PlayableBehaviour

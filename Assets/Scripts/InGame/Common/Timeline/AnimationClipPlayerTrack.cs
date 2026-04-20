@@ -1,7 +1,6 @@
-using InGame.Common;
 using UnityEngine.Timeline;
 
-namespace InGame.Player.Ult
+namespace InGame.Common.Timeline
 {
     [TrackBindingType(typeof(AnimationClipPlayer))]
     [TrackClipType(typeof(AnimationClipPlayerAsset))]

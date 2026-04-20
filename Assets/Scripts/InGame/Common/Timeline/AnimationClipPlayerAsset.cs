@@ -1,10 +1,9 @@
 using System;
-using InGame.Common;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace InGame.Player.Ult
+namespace InGame.Common.Timeline
 {
     [Serializable]
     public class AnimationClipPlayerAsset : PlayableAsset, ITimelineClipAsset, IPropertyPreview
