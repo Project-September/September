@@ -19,13 +19,38 @@ public class ControlsUIGenerator : MonoBehaviour
     /// ControlDescriptionの内容をもとに操作説明UIを生成する
     /// </summary>
     public void GenerateDescription(ControlDescription description)
-    {   
+    {
+        ClearChildren();
+       
+        if (_descriptionObject == null)
+        {
+            Debug.LogError("DescriptionObject is not assigned");
+            return;
+        }
+
         foreach (var action in description.Actions)
         {
             GameObject icon = Instantiate(_iconPrefab, _descriptionObject.transform);
             icon.name = $"{action.ActionName}Icon";
             icon.GetComponent<Image>().sprite = action.Icon;
             icon.GetComponentInChildren<TextMeshProUGUI>().text = action.Description;
+        }
+    }
+
+    /// <summary>
+    /// 生成前に子オブジェクトを全て削除する
+    /// </summary>
+    private void ClearChildren()
+    {
+        if (_descriptionObject == null)
+        {
+            Debug.LogError("DescriptionObject is not assigned");
+            return;
+        }
+
+        for (int i = _descriptionObject.transform.childCount - 1; i >= 0; i--)
+        {
+            Destroy(_descriptionObject.transform.GetChild(i).gameObject);
         }
     }
 }
