@@ -22,7 +22,7 @@ namespace InGame.Common.Timeline
                 _clipPlayer = playerData as AnimationClipPlayer;
                 
 #if UNITY_EDITOR
-                if (_clipPlayer && !_clipPlayer.IsValid)
+                if (!Application.isPlaying && _clipPlayer && !_clipPlayer.IsValid)
                 {
                     _clipPlayer.Start();
                 }
