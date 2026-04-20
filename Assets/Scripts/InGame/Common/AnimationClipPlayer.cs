@@ -41,7 +41,8 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
 
         public AnimationMixerPlayable BaseMixer => _baseMixer;
-        public Animator Animator => _animator;
+
+        public bool IsValid => _graph.IsValid();
 
         #region Initialize
         public void Start()
@@ -180,6 +181,47 @@ namespace InGame.Common
             
             RPC_PlayAsync(index);
             return await PlayAsync(index);
+        }
+        
+        /// <summary> TopLayerでアニメーションを再生 </summary>
+        public void PlayOnTopLayer(AnimationClip clip)
+        {
+            if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
+            {
+                Debug.LogWarning("[AnimationClipPlayer] TopLayer が設定されていません。_layerInfo の最後に追加してください。");
+                return;
+            }
+
+            // 解除要求
+            if (clip == null)
+            {
+                _layerMixer.SetInputWeight(slot, 0f);
+
+                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var current) && current.IsValid())
+                {
+                    _layerMixer.DisconnectInput(slot);
+                    current.Destroy();
+                    _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
+                }
+
+                var li0 = _layerInfo[slot];
+                li0.Weight = 0f;
+                _layerInfo[slot] = li0;
+                return;
+            }
+
+            if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var prev) && prev.IsValid())
+            {
+                _layerMixer.DisconnectInput(slot);
+                prev.Destroy();
+                _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
+            }
+
+            Play(clip, LayerInfo.LayerType.TopLayer, 1f, additive: false);
+
+            var li = _layerInfo[slot];
+            li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
+            _layerInfo[slot] = li;
         }
         
         public void Play(AnimationClip clip, bool forcePlay = false)
@@ -673,46 +715,6 @@ namespace InGame.Common
                 await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
                 if (token.IsCancellationRequested) break;
             }
-        }
-        
-        public void SetTopPriorityClip(AnimationClip clip)
-        {
-            if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
-            {
-                Debug.LogWarning("[AnimationClipPlayer] TopLayer が設定されていません。_layerInfo の最後に追加してください。");
-                return;
-            }
-
-            // 解除要求
-            if (clip == null)
-            {
-                _layerMixer.SetInputWeight(slot, 0f);
-
-                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var current) && current.IsValid())
-                {
-                    _layerMixer.DisconnectInput(slot);
-                    current.Destroy();
-                    _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
-                }
-
-                var li0 = _layerInfo[slot];
-                li0.Weight = 0f;
-                _layerInfo[slot] = li0;
-                return;
-            }
-
-            if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var prev) && prev.IsValid())
-            {
-                _layerMixer.DisconnectInput(slot);
-                prev.Destroy();
-                _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
-            }
-
-            Play(clip, LayerInfo.LayerType.TopLayer, 1f, additive: false);
-
-            var li = _layerInfo[slot];
-            li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
-            _layerInfo[slot] = li;
         }
         
         /// <summary>

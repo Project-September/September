@@ -1,8 +1,7 @@
-using InGame.Common;
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace InGame.Player.Ult
+namespace InGame.Common.Timeline
 {
     [System.Serializable]
     public class AnimationClipPlayerPlayable : PlayableBehaviour
@@ -23,7 +22,10 @@ namespace InGame.Player.Ult
                 _clipPlayer = playerData as AnimationClipPlayer;
                 
 #if UNITY_EDITOR
-                if (!Application.isPlaying) _clipPlayer?.Start();
+                if (!Application.isPlaying && _clipPlayer && !_clipPlayer.IsValid)
+                {
+                    _clipPlayer.Start();
+                }
 #endif
             }
             
@@ -55,18 +57,10 @@ namespace InGame.Player.Ult
 #endif
         }
 
-#if UNITY_EDITOR
-        public override void OnGraphStop(Playable playable)
-        {
-            if (!Application.isPlaying && _clipPlayer) _clipPlayer.SafeDestroy();
-        }
-#endif
-
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
             _info.Disconnect();
             _isPlayed = false;
-            
         }
     }
 }

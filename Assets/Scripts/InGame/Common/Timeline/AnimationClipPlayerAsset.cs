@@ -1,10 +1,9 @@
 using System;
-using InGame.Common;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace InGame.Player.Ult
+namespace InGame.Common.Timeline
 {
     [Serializable]
     public class AnimationClipPlayerAsset : PlayableAsset, ITimelineClipAsset, IPropertyPreview
@@ -12,6 +11,8 @@ namespace InGame.Player.Ult
         [SerializeField] private AnimationClipPlayerPlayable _playable;
         
         public ClipCaps clipCaps => ClipCaps.None;
+
+        public override double duration => _playable.Clip == null ? base.duration : _playable.Clip.length;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
