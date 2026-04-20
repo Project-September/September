@@ -20,13 +20,14 @@ public class ControlsUIGenerator : MonoBehaviour
     /// </summary>
     public void GenerateDescription(ControlDescription description)
     {
-        ClearChildren();
        
         if (_descriptionObject == null)
         {
             Debug.LogError("DescriptionObject is not assigned");
             return;
         }
+
+        ClearChildren();
 
         foreach (var action in description.Actions)
         {
@@ -42,12 +43,6 @@ public class ControlsUIGenerator : MonoBehaviour
     /// </summary>
     private void ClearChildren()
     {
-        if (_descriptionObject == null)
-        {
-            Debug.LogError("DescriptionObject is not assigned");
-            return;
-        }
-
         for (int i = _descriptionObject.transform.childCount - 1; i >= 0; i--)
         {
             Destroy(_descriptionObject.transform.GetChild(i).gameObject);
