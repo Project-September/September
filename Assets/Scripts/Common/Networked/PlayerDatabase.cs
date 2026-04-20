@@ -19,7 +19,7 @@ namespace September.Common
         [SerializeField] private int _sarutobiBonusScore = 50;
         [SerializeField] private ExhibitScoreConfig _tanihiraBonusScore;
         
-        [Networked, OnChangedRender(nameof(OnChangedPlayerData)), Capacity(4)]
+        [Networked, OnChangedRender(nameof(OnChangedPlayerData)), Capacity(8)]
         public NetworkDictionary<PlayerRef, SessionPlayerData> PlayerDataDic => default;
         public Action<NetworkDictionary<PlayerRef, SessionPlayerData>> ChangedDataAction;
         public static PlayerDatabase Instance;
