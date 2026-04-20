@@ -55,13 +55,6 @@ namespace InGame.Player.Ult
 #endif
         }
 
-#if UNITY_EDITOR
-        public override void OnGraphStop(Playable playable)
-        {
-            if (!Application.isPlaying && _clipPlayer) _clipPlayer.SafeDestroy();
-        }
-#endif
-
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
             _info.Disconnect();
