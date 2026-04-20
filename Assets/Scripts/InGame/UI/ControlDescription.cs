@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
 /// <summary>
-/// ‘€ìà–¾‚ğŠi”[‚·‚éƒf[ƒ^
+/// æ“ä½œèª¬æ˜ã‚’æ ¼ç´ã™ã‚‹ãƒ‡ãƒ¼ã‚¿
 /// </summary>
 [CreateAssetMenu(fileName = "Description", menuName = "Scriptable Objects/ControlDescriptionUI")]
 public class ControlDescription : ScriptableObject
@@ -12,7 +12,7 @@ public class ControlDescription : ScriptableObject
 }
 
 /// <summary>
-/// ŠeƒAƒNƒVƒ‡ƒ“‚Ìà–¾
+/// å„ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®èª¬æ˜
 /// </summary>
 [System.Serializable]
 public class DescribedAction

@@ -1,11 +1,11 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ControlsUIGenerator : MonoBehaviour
 {
-    // ‘€ìà–¾‚ğ¶¬‚µ‚½Û‚É‚»‚ÌƒIƒuƒWƒFƒNƒg‚Ìe‚É‚È‚éƒIƒuƒWƒFƒNƒg
-    // VerticalLayoutGroup,ContentSizeFitter‚È‚Ç‚ÌƒŒƒCƒAƒEƒgƒRƒ“ƒ|[ƒlƒ“ƒg‚ªƒAƒ^ƒbƒ`‚³‚ê‚Ä‚¢‚é‚±‚Æ‚ğ‘z’è
+    // æ“ä½œèª¬æ˜ã‚’ç”Ÿæˆã—ãŸéš›ã«ãã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è¦ªã«ãªã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    // VerticalLayoutGroup,ContentSizeFitterãªã©ã®ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒã‚¢ã‚¿ãƒƒãƒã•ã‚Œã¦ã„ã‚‹ã“ã¨ã‚’æƒ³å®š
     [SerializeField] private GameObject _descriptionObject;
     [SerializeField] private ControlDescription _descriptionData;
     [SerializeField] private GameObject _iconPrefab;
@@ -16,7 +16,7 @@ public class ControlsUIGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// ControlDescription‚Ì“à—e‚ğ‚à‚Æ‚É‘€ìà–¾UI‚ğ¶¬‚·‚é
+    /// ControlDescriptionã®å†…å®¹ã‚’ã‚‚ã¨ã«æ“ä½œèª¬æ˜UIã‚’ç”Ÿæˆã™ã‚‹
     /// </summary>
     public void GenerateDescription(ControlDescription description)
     {   
