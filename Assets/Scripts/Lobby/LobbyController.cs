@@ -21,7 +21,7 @@ namespace September.Lobby
         [SerializeField] private Image _fadePanel;
         [SerializeField] private Transform _contentTransform;
         readonly Dictionary<PlayerRef, PlayerConditionView> _lobbyPlayerUIDic = new();
-        [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(4), HideInInspector]
+        [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(8), HideInInspector]
         public NetworkDictionary<PlayerRef, NetworkBool> PlayerIsReadyDic => default;
         public override void Spawned()
         {
