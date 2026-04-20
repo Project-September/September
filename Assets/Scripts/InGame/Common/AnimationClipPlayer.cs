@@ -483,6 +483,7 @@ namespace InGame.Common
         {
             LayerInfo.Blend blend;
             float startTime;
+            
             {
                 // イン
                 if (time < blendIn.BlendTime)
@@ -845,11 +846,20 @@ namespace InGame.Common
                 this.slot = slot;
             }
 
-            public void SetTime(float time)
+            public void SetTime(float time, bool updateBlendWeight = true)
             {
                 playable.SetTime(time);
                 playable.SetSpeed(0);
-                player.UpdateLayerBlendWeight(layerType, montage.BlendIn, montage.BlendOut, clip.length, time);
+                
+                if (updateBlendWeight)
+                {
+                    player.UpdateLayerBlendWeight(layerType, montage.BlendIn, montage.BlendOut, clip.length, time);
+                }
+            }
+
+            public void SetBlendTime(float time, float clipLength)
+            {
+                player.UpdateLayerBlendWeight(layerType, montage.BlendIn, montage.BlendOut, clipLength, time);
             }
 
             /// <summary>
