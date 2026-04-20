@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using NaughtyAttributes;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -21,6 +20,7 @@ namespace September.Common
         [SerializeField, Scene] string _resultSceneName;
         NetworkRunner _networkRunner;
         UniTask<StartGameResult> _currentTask;
+
         private void Start()
         {
             if (Instance == null)
@@ -34,6 +34,7 @@ namespace September.Common
                 Destroy(gameObject);
             }
         }
+
         public async UniTask<StartGameResult> CreateLobby(string gameName, int playerCount)
         {
             if (!_currentTask.Status.IsCompleted())
@@ -51,6 +52,7 @@ namespace September.Common
                 _loadingIcon.StopAnimation();
             }
         }
+
         async UniTask<StartGameResult> CreateLobbyAsync(string gameName, int playerCount)
         {
             var result = await _networkRunner.StartGame(new StartGameArgs
@@ -70,6 +72,7 @@ namespace September.Common
 
             return result;
         }
+
         public async UniTask<StartGameResult> JoinLobby(string gameName)
         {
             if (!_currentTask.Status.IsCompleted())
@@ -88,6 +91,7 @@ namespace September.Common
             }
 
         }
+
         async UniTask<StartGameResult> JoinLobbyAsync(string gameName)
         {
             var result = await _networkRunner.StartGame(new StartGameArgs
@@ -103,11 +107,13 @@ namespace September.Common
             }
             return result;
         }
+
         public async UniTask InitializeRunner()
         {
             await _networkRunner.Shutdown();
             _networkRunner = Instantiate(_runnerPrefab);
         }
+
         public async UniTaskVoid QuitLobby()
         {
             await _networkRunner.Shutdown();
@@ -130,7 +136,6 @@ namespace September.Common
 
             await fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InOutQuad);
         }
-
 
         public async UniTask QuitInGame()
         {

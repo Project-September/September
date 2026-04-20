@@ -9,7 +9,6 @@ namespace September.Title
     public class TitleController : MonoBehaviour
     {
         [Header("Create Lobby")]
-
         [SerializeField] TMP_InputField _createLobbyName;
         [SerializeField] Slider _maxPlayers;
         [Header("Join Lobby")]
@@ -18,6 +17,7 @@ namespace September.Title
         [SerializeField] TextMeshProUGUI _createMessageText;
         [SerializeField] TextMeshProUGUI _joinMessageText;
         [SerializeField] RoomErrorMessage _roomErrorMessage;
+
         public void Start()
         {
             _createMessageText?.gameObject.SetActive(false);
@@ -37,6 +37,7 @@ namespace September.Title
             var result = await NetworkManager.Instance.JoinLobby(_joinLobbyName.text);
             ChangeErrorMessage(result, _joinMessageText);
         }
+
         /// <summary>
         /// StartGameの結果に応じてエラーメッセージを変更する
         /// </summary>
@@ -51,7 +52,6 @@ namespace September.Title
                 text.gameObject.SetActive(false);
                 return;
             }
-
             text.gameObject.SetActive(true);
             text.text = _roomErrorMessage.GetMessage(result.ShutdownReason);
         }
