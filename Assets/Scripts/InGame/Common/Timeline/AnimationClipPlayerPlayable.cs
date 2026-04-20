@@ -13,7 +13,7 @@ namespace InGame.Common.Timeline
 
         private AnimationClipPlayer _clipPlayer;
         
-        public AnimationClip Clip => _clip;
+        public AnimationClip Clip { get => _clip; set => _clip = value; }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
