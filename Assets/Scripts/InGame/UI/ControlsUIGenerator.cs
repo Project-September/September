@@ -7,20 +7,21 @@ public class ControlsUIGenerator : MonoBehaviour
     // 操作説明を生成した際にそのオブジェクトの親になるオブジェクト
     // VerticalLayoutGroup,ContentSizeFitterなどのレイアウトコンポーネントがアタッチされていることを想定
     [SerializeField] private GameObject _descriptionObject;
-    [SerializeField] private ControlDescription _descriptionData;
     [SerializeField] private GameObject _iconPrefab;
+
+    [SerializeField] 
+    private SerializableDictionary<ControlDescriptionType, ControlDescription> _descriptionDictionary;
 
     private void Start()
     {
-        GenerateDescription(_descriptionData);
+        // GenerateDescription(_descriptionData);
     }
 
     /// <summary>
     /// ControlDescriptionの内容をもとに操作説明UIを生成する
     /// </summary>
-    public void GenerateDescription(ControlDescription description)
+    public void GenerateDescription(ControlDescriptionType descriptionType)
     {
-       
         if (_descriptionObject == null)
         {
             Debug.LogError("DescriptionObject is not assigned");
@@ -28,6 +29,8 @@ public class ControlsUIGenerator : MonoBehaviour
         }
 
         ClearChildren();
+
+        ControlDescription description = _descriptionDictionary.Dictionary[descriptionType];
 
         foreach (var action in description.Actions)
         {
