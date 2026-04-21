@@ -9,10 +9,10 @@ using System;
 public class PackageExporter : EditorWindow
 {
     private const string TARGET_PATH = "Assets/AssetStoreTools";
-    private const string LAST_TIME_KEY = "FolderDiff_LastExportTime";
+    private const string LAST_TIME_KEY_PREFIX = "FolderDiff_LastExportTime_";
 
     private Vector2 _scrollPosition;
-    private List<FolderStatus> _folderStatuses = new List<FolderStatus>();
+    private List<FolderStatus> _folderStatuses = new();
 
     private class FolderStatus
     {
@@ -21,27 +21,32 @@ public class PackageExporter : EditorWindow
         public string FullPath;
         public bool HasChanged;
         public DateTime LastModified;
+        public DateTime LastExportTime;
     }
 
-    [MenuItem("September/Analyze Grandchild Diff")]
+    [MenuItem("September/Package Exporter")]
     public static void ShowWindow()
     {
-        GetWindow<PackageExporter>("Package Exporter (Grandchild)");
+        GetWindow<PackageExporter>("Package Exporter");
     }
 
     private void OnEnable() => RefreshAnalysis();
 
     void OnGUI()
     {
-        string lastTimeStr = GetLastExportTime() == DateTime.MinValue ? "記録なし" : GetLastExportTime().ToString("yyyy/MM/dd HH:mm:ss");
-        
         using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
         {
-            EditorGUILayout.LabelField($"基準日時: {lastTimeStr}", EditorStyles.boldLabel);
-            if (GUILayout.Button("基準日時を更新", GUILayout.Width(120)))
+            EditorGUILayout.LabelField("各フォルダのエクスポート履歴に基づいて差分を表示しています", EditorStyles.miniLabel);
+            if (GUILayout.Button("すべて更新済みとしてマーク", GUILayout.Width(160)))
             {
-                SaveCurrentTime();
-                RefreshAnalysis();
+                if (EditorUtility.DisplayDialog("確認", "すべてのフォルダの更新日時を現在時刻に変更します。よろしいですか？", "はい", "いいえ"))
+                {
+                    foreach (var status in _folderStatuses)
+                    {
+                        SaveCurrentTime(status.FullPath);
+                    }
+                    RefreshAnalysis();
+                }
             }
         }
 
@@ -51,7 +56,7 @@ public class PackageExporter : EditorWindow
 
         _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
 
-        foreach (var status in _folderStatuses)
+        foreach (var status in _folderStatuses.ToList())
         {
             using (new EditorGUILayout.HorizontalScope(EditorStyles.textArea))
             {
@@ -60,7 +65,10 @@ public class PackageExporter : EditorWindow
 
                 // 「子フォルダ名 > 孫フォルダ名」の形式で表示
                 EditorGUILayout.LabelField($"{icon}[{status.ParentName}] {status.FolderName}", GUILayout.Width(250));
-                EditorGUILayout.LabelField($"{status.LastModified:yyyy/MM/dd HH:mm}", GUILayout.Width(130));
+                
+                string lastExportStr = status.LastExportTime == DateTime.MinValue ? "未" : status.LastExportTime.ToString("yy/MM/dd HH:mm");
+                EditorGUILayout.LabelField($"前: {lastExportStr}", GUILayout.Width(120));
+                EditorGUILayout.LabelField($"新: {status.LastModified:yy/MM/dd HH:mm}", GUILayout.Width(120));
 
                 if (GUILayout.Button("開く", GUILayout.Width(40)))
                 {
@@ -72,6 +80,7 @@ public class PackageExporter : EditorWindow
                 if (GUILayout.Button("Export", GUILayout.Width(50)))
                 {
                     ExportSingleFolder(status);
+                    GUIUtility.ExitGUI();
                 }
                 GUI.contentColor = Color.white;
             }
@@ -89,7 +98,6 @@ public class PackageExporter : EditorWindow
     private void RefreshAnalysis()
     {
         _folderStatuses.Clear();
-        DateTime lastTime = GetLastExportTime();
 
         string rootFullPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", TARGET_PATH));
         if (!Directory.Exists(rootFullPath)) return;
@@ -105,6 +113,9 @@ public class PackageExporter : EditorWindow
 
             foreach (var grandchild in grandchildDirs)
             {
+                string unityPath = ToUnityPath(grandchild);
+                DateTime lastExportTime = GetLastExportTime(unityPath);
+
                 var files = Directory.GetFiles(grandchild, "*.*", SearchOption.AllDirectories);
                 DateTime maxModified = files.Length > 0
                     ? files.Max(f => File.GetLastWriteTime(f))
@@ -114,9 +125,10 @@ public class PackageExporter : EditorWindow
                 {
                     FolderName = Path.GetFileName(grandchild),
                     ParentName = childName,
-                    FullPath = ToUnityPath(grandchild),
-                    HasChanged = maxModified > lastTime,
-                    LastModified = maxModified
+                    FullPath = unityPath,
+                    HasChanged = maxModified > lastExportTime,
+                    LastModified = maxModified,
+                    LastExportTime = lastExportTime
                 });
             }
         }
@@ -132,6 +144,9 @@ public class PackageExporter : EditorWindow
         {
             AssetDatabase.ExportPackage(status.FullPath, exportPath, ExportPackageOptions.Recurse);
             Debug.Log($"Exported: {exportPath}");
+
+            SaveCurrentTime(status.FullPath);
+            RefreshAnalysis();
         }
     }
 
@@ -148,20 +163,27 @@ public class PackageExporter : EditorWindow
             string fileName = Path.Combine(folderPath, $"{target.FolderName}.unitypackage");
             AssetDatabase.ExportPackage(target.FullPath, fileName, ExportPackageOptions.Recurse);
             Debug.Log($"Auto Exported: {fileName}");
+            SaveCurrentTime(target.FullPath);
         }
         
-        SaveCurrentTime();
         RefreshAnalysis();
         EditorUtility.DisplayDialog("完了", $"{targets.Count}個のパッケージを書き出しました", "OK");
     }
 
-    private DateTime GetLastExportTime()
+    private DateTime GetLastExportTime(string path)
     {
-        string ticks = EditorPrefs.GetString(LAST_TIME_KEY, "");
+        string key = GetKey(path);
+        string ticks = EditorPrefs.GetString(key, "");
         return long.TryParse(ticks, out long result) ? DateTime.FromBinary(result) : DateTime.MinValue;
     }
 
-    private void SaveCurrentTime() => EditorPrefs.SetString(LAST_TIME_KEY, DateTime.Now.ToBinary().ToString());
+    private void SaveCurrentTime(string path)
+    {
+        string key = GetKey(path);
+        EditorPrefs.SetString(key, DateTime.Now.ToBinary().ToString());
+    }
+    
+    private string GetKey(string path) => LAST_TIME_KEY_PREFIX + path;
 
     private string ToUnityPath(string fullPath)
     {
