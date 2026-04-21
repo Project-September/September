@@ -30,7 +30,9 @@ namespace September.InGame.UI
         [Header("キルログ")]
         [SerializeField] private GameObject  _killLogItemText;
         [SerializeField] private int _maxLogCount = 5;
-        
+
+        [SerializeField] private ControlsUIGenerator _controlsUIGenerator;
+
         [SerializeField] private CanvasGroup _statusUpUI;
         private VerticalLayoutGroup _statusUpLayout;
 
@@ -43,7 +45,6 @@ namespace September.InGame.UI
         private GameObject _ogreUiInstance;
         private ChangeTagOverlayMessage _changeTagOverlayMessage;
         private TimeOverlayMessage _timeOverlayMessage;
-        private ControlDescription[] _descriptionIcon;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
         private TextMeshProUGUI _scoreText;
@@ -99,7 +100,6 @@ namespace September.InGame.UI
             _ogreUiInstance = _uiRoot.OgreUI;
             _changeTagOverlayMessage = _uiRoot.ChangeTagOverlayMessage;
             _timeOverlayMessage = _uiRoot.TimeOverlayMessage;
-            _descriptionIcon =  _uiRoot.DescriptionIcon;
             _hpBarSlider = _uiRoot.HpBar;
             _scoreText =  _uiRoot.ScoreText;
             _staminaBarSlider = _uiRoot.StaminaBar;
@@ -154,9 +154,9 @@ namespace September.InGame.UI
         //     await resultAnim.Play(resultUI);
         // }
 
-        private void ChangeExhibitDescriptionUI(ControlDescriptionType description)
+        private void ChangeExhibitDescriptionUI(ControlDescriptionType type)
         {
-            
+            _controlsUIGenerator.GenerateDescription(type);
         }
 
         private void ChangeStamina(float value)
