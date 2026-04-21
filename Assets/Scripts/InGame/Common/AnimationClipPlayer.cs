@@ -742,7 +742,11 @@ namespace InGame.Common
             }
             
             index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
-                x => x.AnimClip.name == clip.name);
+                x =>
+                {
+                    if (x.AnimClip == null) return false;
+                    return x.AnimClip.name == clip.name;
+                });
             
             return index >= 0;
         }
