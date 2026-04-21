@@ -29,6 +29,7 @@ namespace September.Title
             if (_createLobbyName.text == "" || NickNameProvider.GetNickName() == "") return;
             var result = await NetworkManager.Instance.CreateLobby(_createLobbyName.text, (int)_maxPlayers.value);
             ChangeErrorMessage(result, _createMessageText);
+            await NetworkManager.Instance.LoadLobbyScene();
         }
 
         public async void JoinLobby()
