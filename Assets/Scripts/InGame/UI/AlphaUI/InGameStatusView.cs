@@ -43,7 +43,7 @@ namespace September.InGame.UI
         private GameObject _ogreUiInstance;
         private ChangeTagOverlayMessage _changeTagOverlayMessage;
         private TimeOverlayMessage _timeOverlayMessage;
-        private GameObject[] _descriptionIcon;
+        private ControlDescription[] _descriptionIcon;
         private InteractUi _interactUI;
         private UniTask _ogreMessageTask;
         private TextMeshProUGUI _scoreText;
@@ -154,40 +154,9 @@ namespace September.InGame.UI
         //     await resultAnim.Play(resultUI);
         // }
 
-        private void ChangeExhibitDescriptionUI(int value)
+        private void ChangeExhibitDescriptionUI(ControlDescriptionType description)
         {
-            if (value == 1)
-            {
-                // 展示物操作方法をアクティブ
-                _descriptionIcon[0].SetActive(false);
-                _descriptionIcon[1].SetActive(true);
-                _descriptionIcon[2].SetActive(false);
-                _descriptionIcon[3].SetActive(false);
-            }
-            else if(value == 2)
-            {
-                // Player操作をアクティブ
-                _descriptionIcon[0].SetActive(true);
-                _descriptionIcon[1].SetActive(false);
-                _descriptionIcon[2].SetActive(false);
-                _descriptionIcon[3].SetActive(false);
-            }
-            else if (value == 3)
-            {
-                // サルトビ
-                _descriptionIcon[0].SetActive(false);
-                _descriptionIcon[1].SetActive(false);
-                _descriptionIcon[2].SetActive(true);
-                _descriptionIcon[3].SetActive(false);
-            }
-            else if(value == 4)
-            {
-                //タニヒラ
-                _descriptionIcon[0].SetActive(false);
-                _descriptionIcon[1].SetActive(false);
-                _descriptionIcon[2].SetActive(false);
-                _descriptionIcon[3].SetActive(true);
-            }
+            
         }
 
         private void ChangeStamina(float value)

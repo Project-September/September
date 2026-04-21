@@ -148,7 +148,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
             Object.AssignInputAuthority(playerRef);
-            RPC_ChangeDescriptionUI(playerRef,1);
+            RPC_ChangeDescriptionUI(playerRef, ControlDescriptionType.Exhibit);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
             RPC_SetIsKinematic(false);
@@ -159,7 +159,7 @@ namespace InGame.Exhibit
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ChangeDescriptionUI(PlayerRef target, int mode)
+        private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
         {
             if (Runner.LocalPlayer == target)
             {
@@ -174,20 +174,20 @@ namespace InGame.Exhibit
         public virtual void GetOff(PlayerRef playerRef)
         {
             PlayerDatabase.Instance.PlayerDataDic.TryGet(playerRef, out var playerData);
-            int num;
+            ControlDescriptionType type;
             if(playerData.CharacterType == CharacterType.Sarutobi)
             {
-                num = 3;
+                type = ControlDescriptionType.Sarutobi;
             }
             else if(playerData.CharacterType == CharacterType.Tanihira)
             {
-                num = 4;
+                type = ControlDescriptionType.Tanihira;
             }
             else
             {
-                num = 2;
+                type = ControlDescriptionType.Player;
             }
-            RPC_ChangeDescriptionUI(playerRef, num);
+            RPC_ChangeDescriptionUI(playerRef, type);
             var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all

@@ -425,20 +425,20 @@ namespace InGame.Interact
         public void EndInteract()
         {
             _activeEffectBase?.OnInteractEnd();
-            int num;
+            ControlDescriptionType type;
             if(_characterType == CharacterType.Tanihira)
             {
-                num = 4;
+                type = ControlDescriptionType.Tanihira;
             }
             else if(_characterType == CharacterType.Sarutobi)
             {
-                num = 3;
+                type = ControlDescriptionType.Sarutobi;
             }
             else
             {
-                num = 2;
+                type = ControlDescriptionType.Player;
             }
-            RPC_ChangeDescriptionUI(num);
+            RPC_ChangeDescriptionUI(type);
             _activeEffectBase = null;
             _characterType = CharacterType.None;
         }
@@ -448,7 +448,7 @@ namespace InGame.Interact
         /// </summary>
         /// <param name="mode">UIモード</param>
         [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
-        private void RPC_ChangeDescriptionUI(int mode)
+        private void RPC_ChangeDescriptionUI(ControlDescriptionType mode)
         {
             UIController.I.ChangeDescriptionUI(mode);
         }

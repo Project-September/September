@@ -42,15 +42,15 @@ namespace September.Common
                 var type = localData.CharacterType;
                 if (type == CharacterType.Tanihira)
                 {
-                    UIController.I.ChangeDescriptionUI(4);
+                    UIController.I.ChangeDescriptionUI(ControlDescriptionType.Tanihira);
                 }
                 else if (type == CharacterType.Sarutobi)
                 {
-                    UIController.I.ChangeDescriptionUI(3);
+                    UIController.I.ChangeDescriptionUI(ControlDescriptionType.Sarutobi);
                 }
                 else
                 {
-                    UIController.I.ChangeDescriptionUI(2);
+                    UIController.I.ChangeDescriptionUI(ControlDescriptionType.Player);
                 }
             }
 
