@@ -8,7 +8,16 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "Description", menuName = "Scriptable Objects/ControlDescriptionUI")]
 public class ControlDescription : ScriptableObject
 {
+    public ControlDescriptionType Type;
     public List<DescribedAction> Actions;
+}
+
+public enum ControlDescriptionType
+{
+    Player,
+    Exhibit,
+    Sarutobi,
+    Tanihira
 }
 
 /// <summary>
