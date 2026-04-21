@@ -13,7 +13,7 @@ namespace InGame.Common.Timeline
 
         private AnimationClipPlayer _clipPlayer;
         
-        public AnimationClip Clip => _clip;
+        public AnimationClip Clip { get => _clip; set => _clip = value; }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
@@ -46,7 +46,8 @@ namespace InGame.Common.Timeline
             
             var time = playable.GetTime();
             
-            _info.SetTime((float)time);
+            _info.SetTime(Mathf.Clamp((float)time, 0f, _clip.length), false);
+            _info.SetBlendTime((float)time, (float)playable.GetDuration());
 
 #if UNITY_EDITOR
             if (!Application.isPlaying)

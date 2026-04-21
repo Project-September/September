@@ -9,7 +9,9 @@ namespace InGame.Common.Timeline
     public class AnimationClipPlayerAsset : PlayableAsset, ITimelineClipAsset, IPropertyPreview
     {
         [SerializeField] private AnimationClipPlayerPlayable _playable;
-        
+
+        public AnimationClipPlayerPlayable Playable => _playable;
+
         public ClipCaps clipCaps => ClipCaps.None;
 
         public override double duration => _playable.Clip == null ? base.duration : _playable.Clip.length;
