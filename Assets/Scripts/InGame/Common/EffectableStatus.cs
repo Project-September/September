@@ -7,7 +7,7 @@ namespace InGame.Common
 {
     public class EffectableStatus : NetworkBehaviour
     {
-        private Stat _dummy;
+        private OldStat _dummy;
         protected readonly List<ActiveStatusEffect> ActiveEffectSpecs = new();
 
         void Update()
@@ -135,7 +135,7 @@ namespace InGame.Common
             
         protected virtual void OnPostApplyEffect(ActiveStatusEffect activeEffect) { }
 
-        protected virtual bool TryGetStatFromType(StatType type, out Stat stat)
+        protected virtual bool TryGetStatFromType(StatType type, out OldStat stat)
         {
             stat = _dummy;
             Debug.LogError("stat is null");

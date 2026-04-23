@@ -21,7 +21,7 @@ namespace InGame.Common
         public float BaseValue;
         public float Value;
     }
-    public class Stat : IReadOnlyStat
+    public class OldStat : IReadOnlyStat
     {
         public ParameterData BaseParameter { get; private set; }
         public StatType Type { get; private set; }
@@ -40,7 +40,7 @@ namespace InGame.Common
         private readonly List<ActiveStatusEffect> _activeEffects;
         public readonly Subject<float> OnValueChanged;
         public readonly Subject<float> OnPostApplyEffect;
-        public Stat(ParameterData parameterData, List<ActiveStatusEffect> activeEffects)
+        public OldStat(ParameterData parameterData, List<ActiveStatusEffect> activeEffects)
         {
             IsValid = true;
             _activeEffects = activeEffects;

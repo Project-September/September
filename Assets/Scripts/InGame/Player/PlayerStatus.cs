@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using Codice.CM.Common.Tree.Partial;
 using Fusion;
 
 using InGame.Common;
@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace InGame.Player
 {
+    [Obsolete("PlayerStatusは非推奨です。PlayerStatusEffectを使用してください。")]
     public class PlayerStatus : EffectableStatus
     {
         [SerializeField] ParameterData[] _parameters;
@@ -19,7 +20,7 @@ namespace InGame.Player
         [Networked, HideInInspector, OnChangedRender(nameof(OnChangeStamina))] public float CurrentStamina { get; set; }
         private void OnChangeStamina() => _currentStamina.Value = CurrentStamina;
 
-        private Dictionary<StatType, Stat> _stats = new();
+        private Dictionary<StatType, OldStat> _stats = new();
 
 
         #region Events
@@ -40,7 +41,7 @@ namespace InGame.Player
         {
             foreach (var parameter in _parameters)
             {
-                _stats.Add(parameter.Type,new Stat(parameter,ActiveEffectSpecs));
+                _stats.Add(parameter.Type,new OldStat(parameter,ActiveEffectSpecs));
             }
 
             //MaxHealth = _param.Health;
@@ -88,7 +89,7 @@ namespace InGame.Player
                 stat.OnPostApplyEffect.OnNext(stat.Value);
             }
         }
-        protected override bool TryGetStatFromType(StatType type, out Stat stat)
+        protected override bool TryGetStatFromType(StatType type, out OldStat stat)
         {
             if(_stats.TryGetValue(type, out stat)) return true;
 
