@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Common;
 using InGame.Health;
 using September.Common;
 using UnityEngine;
@@ -82,7 +83,10 @@ namespace InGame.Player
         {
             if (IsInvincible) return 0;
             int previousHealth = _status.CurrentHealth;
-            _status.CurrentHealth = Mathf.Clamp(_status.CurrentHealth - damage, 0, _status.MaxHealth);
+
+            _status.TryGetReadOnlyStat(StatType.Health, out var healthStat);
+
+            _status.CurrentHealth = Mathf.Clamp(_status.CurrentHealth - damage, 0, (int)healthStat.BaseParameter.MaxValue);
             return previousHealth - _status.CurrentHealth;
         }
 
@@ -90,7 +94,10 @@ namespace InGame.Player
         {
             if (IsInvincible) return 0;
             int previousHealth = _status.CurrentHealth;
-            _status.CurrentHealth = Mathf.Clamp(_status.CurrentHealth + heal, 0, _status.MaxHealth);
+
+            _status.TryGetReadOnlyStat(StatType.Health, out var healthStat);
+
+            _status.CurrentHealth = Mathf.Clamp(_status.CurrentHealth + heal, 0, (int)healthStat.BaseParameter.MaxValue);
             return _status.CurrentHealth - previousHealth;
         }
 
@@ -119,7 +126,8 @@ namespace InGame.Player
         /// <summary> 死んだとき </summary>
         void Death(HitData lastHitData)
         {
-            _status.CurrentHealth = _status.MaxHealth;
+            _status.TryGetReadOnlyStat(StatType.Health, out var healthStat);
+            _status.CurrentHealth = (int)healthStat.BaseParameter.MaxValue;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
+using InGame.Common;
 using UniRx;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ namespace InGame.Player
         private Rigidbody _rb;
         private PlayerStatus _status;
         private Animator _animator;
-        
+
         // base move
         private Vector3 _moveVelocity;
         public Vector3 MoveVelocity => _moveVelocity;
@@ -53,7 +54,7 @@ namespace InGame.Player
         private bool _isDash;
         // vault
         private bool _doingVault;
-        
+
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
@@ -71,7 +72,7 @@ namespace InGame.Player
         public float WalkSpeed => GetCurrentMoveSpeed();
         public float DashMoveSpeed => GetCurrentDashSpeed();
         public bool IsGround => (_isGround || _isGroundTimer > 0) && !_knockBackActive;
-        [Networked, HideInInspector] 
+        [Networked, HideInInspector]
         public NetworkBool IsGroundNet { get; private set; }
         public Vector3 GroundNormal => _groundNormal;
         public bool InfiniteStamina { get; set; } = false;
@@ -86,15 +87,15 @@ namespace InGame.Player
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
         }
-        
+
 
         public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
         {
             CheckGroundManual();
-            
+
             if (IgnoreMoveInput) moveInput = Vector2.zero;
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
-            
+
             // set velocity
             if (isJump && HasStateAuthority) TryVault(moveDirection);
             if (!DoingVault)
@@ -108,30 +109,30 @@ namespace InGame.Player
         public virtual void MoveTick(float deltaTime)
         {
             CheckGroundManual();
-            
+
             if (DoingVault && HasStateAuthority) UpdateVault(deltaTime);
-            
+
             if (_teleportTarget.HasValue)
             {
                 transform.position = _teleportTarget.Value;
                 _moveVelocity = Vector3.zero;
                 _teleportTarget = null;
             }
-            
+
             ApplyVelocity(deltaTime);
             // Character の回転
             RotationByDirection(_rotationDirection, deltaTime);
-            
+
             // スタミナの更新
             UpdateStamina(_isDash, deltaTime);
-                
+
             if (HasStateAuthority)
             {
                 IsGroundNet = IsGround;
             }
-            
+
             // is ground の管理
-            if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime; 
+            if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime;
             _isGround = false;
             _groundNormal = Vector3.up;
             _moveVelocity = Vector3.zero;
@@ -155,15 +156,17 @@ namespace InGame.Player
                 _moveVelocity = Vector3.zero;
                 return;
             }
-            
+
             // Dash処理
             isDash = isDash && CanDash;
             _isDash = isDash;
-            
+
             // Dash中ならスタミナを消費させる
             if (isDash && moveDirection != Vector2.zero)
             {
-                if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _status.StaminaConsumption * deltaTime);
+                _status.TryGetReadOnlyStat(StatType.StaminaConsumption, out var staminaConsumption);
+
+                if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - staminaConsumption.Value * deltaTime);
 
                 // スタミナなくなったら
                 if (_status.CurrentStamina <= 0)
@@ -174,10 +177,10 @@ namespace InGame.Player
                         .Subscribe(_ => _isDashCoolTime = false).AddTo(this);
                 }
             }
-            
+
             CalcMoveVelocity(moveDirection, isDash, deltaTime);
         }
-        
+
         public void AddForce(Vector3 force)
         {
             _moveVelocity += force;
@@ -190,7 +193,7 @@ namespace InGame.Player
                 _isGroundTimer = 0;
             }
         }
-        
+
         /// <summary> 水平方向のMoveVelocityを計算する </summary>
         private void CalcMoveVelocity(Vector2 moveDir, bool isDash, float deltaTime)
         {
@@ -244,7 +247,7 @@ namespace InGame.Player
         void AdsorptionOnGround()
         {
             if (IsGround) return;
-            
+
             Vector3 origin = _moveCapsuleCollider.transform.position + Vector3.up * _moveCapsuleCollider.radius;
             var hit = Physics.SphereCast(origin + Vector3.up * 0.1f, _moveCapsuleCollider.radius, Vector3.down, out var hitInfo, 0.4f, _groundLayer);
 
@@ -256,7 +259,7 @@ namespace InGame.Player
                 _groundNormal = hitInfo.normal;
             }
         }
-        
+
         protected virtual void ApplyVelocity(float deltaTime)
         {
             if (IsGround)
@@ -264,7 +267,7 @@ namespace InGame.Player
                 _rb.linearVelocity = _moveVelocity;
                 NetworkVelocity = _moveVelocity;
             }
-            
+
             // 回転の向きを代入
             if (!_setDirection) _rotationDirection = _moveVelocity;
         }
@@ -280,7 +283,7 @@ namespace InGame.Player
         {
             direction.y = 0;
             _setDirection = false;
-            
+
             if (direction == Vector3.zero) return;
 
             _rb.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), _rotationSpeed * deltaTime);
@@ -289,7 +292,12 @@ namespace InGame.Player
         /// <summary> 条件付きでスタミナを回復させる </summary>
         private void UpdateStamina(bool dashInput, float deltaTime)
         {
-            if (!dashInput || _isDashCoolTime) _status.CurrentStamina = Mathf.Min(_status.MaxStamina, _status.CurrentStamina + _status.StaminaRegen * deltaTime);
+            _status.TryGetReadOnlyStat(StatType.Stamina, out var stamina);
+            _status.TryGetReadOnlyStat(StatType.StaminaRegen, out var staminaRegen);
+            if (!dashInput || _isDashCoolTime)
+            {
+                _status.CurrentStamina = Mathf.Min(stamina.Value, _status.CurrentStamina + staminaRegen.Value * deltaTime);
+            }
         }
 
         private void TryVault(Vector2 moveDirection)
@@ -301,7 +309,7 @@ namespace InGame.Player
             }
 
             _capsuleCastData.Clear();
-            
+
             // ステップ1：キャラクターが歩くことができない壁やオブジェクトを見つけるために前方にCastします。
             float capsuleRadius = _moveCapsuleCollider.radius;
             Vector3 moveDir3 = new Vector3(moveDirection.x, 0, moveDirection.y);
@@ -311,7 +319,7 @@ namespace InGame.Player
             bool hit = Physics.CapsuleCast(point1, point2, capsuleRadius, moveDir3, out var frontHitInfo, reachDistance + 0.01f, _groundLayer);
             // hit point が歩けるかどうか
             bool walkablePoint = Vector3.Angle(Vector3.up, frontHitInfo.normal) <= _groundSlopeThreshold;
-            
+
             _capsuleCastData.Add(new CapsuleCastData()
             {
                 P1 = point1,
@@ -328,13 +336,13 @@ namespace InGame.Player
                 if (_printVaultFailedLog) Debug.Log("Vault Failed : 壁がない、または壁ではない");
                 return;
             }
-            
+
             // ステップ2：乗り越えることのできる高さであるかの判定
             Vector3 origin = frontHitInfo.point + 0.3f * -frontHitInfo.normal;
             origin.y = transform.position.y + _maxLedgeHeight + capsuleRadius;
             hit = Physics.SphereCast(origin, capsuleRadius, Vector3.down, out var heightHitInfo, _maxLedgeHeight - _minLedgeHeight, _groundLayer);
             float ledgeHeight = heightHitInfo.point.y - transform.position.y;
-            
+
             _capsuleCastData.Add(new CapsuleCastData()
             {
                 P1 = origin,
@@ -348,14 +356,14 @@ namespace InGame.Player
 
             bool checkCapsule = hit && Physics.CheckCapsule(heightHitInfo.point + heightHitInfo.normal * capsuleRadius,
                     heightHitInfo.point + Vector3.up * (capsuleRadius + _moveCapsuleCollider.height), capsuleRadius - 0.01f, _groundLayer);
-            
+
             // min height 以下はステップ1ではじかれる
             if (!(hit && ledgeHeight <= _maxLedgeHeight && ledgeHeight >= _minLedgeHeight) || checkCapsule)
             {
                 if (_printVaultFailedLog) Debug.Log($"Vault Failed : 高さ({ledgeHeight})が適切でない、壁の上のCapsuleのスペースがない(Check:{checkCapsule})");
                 return;
             }
-            
+
             // ステップ3：乗り越えられる障害物の奥行とスペースがあるかの判定
             float underPoint = transform.position.y;
             float halfHeight = _moveCapsuleCollider.height * 0.5f;
@@ -365,7 +373,7 @@ namespace InGame.Player
             point2.y = underPoint + capsuleRadius;
             // 二つ目の障害物を見つける Cast
             hit = Physics.CapsuleCast(point1, point2, capsuleRadius, -frontHitInfo.normal, out var secondHitInfo, _maxLedgeDepth + frontHitInfo.distance, _groundLayer);
-            
+
             _capsuleCastData.Add(new CapsuleCastData()
             {
                 P1 = point1,
@@ -383,13 +391,13 @@ namespace InGame.Player
                 if (_printVaultFailedLog) Debug.Log($"Vault Failed : 奥に十分なスペースがない");
                 return;
             }
-            
+
             origin = point2 + halfHeight * Vector3.up;
             Vector3 reverseCastOrigin = origin - frontHitInfo.normal * (_maxLedgeDepth + frontHitInfo.distance);
             // 逆向きにCastして、障害物の奥行を求める
-            hit = Physics.CapsuleCast(reverseCastOrigin + Vector3.up * halfHeight, reverseCastOrigin + Vector3.down * halfHeight, capsuleRadius, 
+            hit = Physics.CapsuleCast(reverseCastOrigin + Vector3.up * halfHeight, reverseCastOrigin + Vector3.down * halfHeight, capsuleRadius,
                 frontHitInfo.normal, out var canVaultHitInfo, _maxLedgeDepth + frontHitInfo.distance, _groundLayer);
-            
+
             _capsuleCastData.Add(new CapsuleCastData
             {
                 P1 = reverseCastOrigin + Vector3.up * halfHeight,
@@ -411,7 +419,7 @@ namespace InGame.Player
             _vaultEndPos = origin -
                 frontHitInfo.normal * (_maxLedgeDepth + frontHitInfo.distance - canVaultHitInfo.distance +
                                        frontHitInfo.distance) + Vector3.down * (halfHeight + capsuleRadius);
-            
+
             // 最終地点にCheckを入れる
             if (Physics.CheckCapsule(_vaultEndPos + Vector3.up * capsuleRadius,
                     _vaultEndPos + Vector3.up * (capsuleRadius + _moveCapsuleCollider.height), capsuleRadius - 0.01f,
@@ -420,7 +428,7 @@ namespace InGame.Player
                 if (_printVaultFailedLog) Debug.Log($"Vault Failed : 最終地点のCheckがtrue");
                 return;
             }
-            
+
             _vaultStartPos = transform.position;
             _vaultTopPos = (frontHitInfo.point + canVaultHitInfo.point) * 0.5f;
             _vaultTopPos.y = heightHitInfo.point.y;
@@ -439,17 +447,17 @@ namespace InGame.Player
         void UpdateVault(float deltaTime)
         {
             Vector3 prevPos = transform.position;
-            
+
             _vaultTimer += deltaTime;
             float t = _vaultTimer / _timeToVault;
             Vector3 resPos = Vector3.Lerp(_vaultStartPos, _vaultEndPos, t);
             float curveValue = _vaultCurve.Evaluate(t >= 0.5f ? 1 - (t - 0.5f) * 2 : t * 2);
             resPos.y = Mathf.Lerp(t >= 0.5f ? _vaultEndPos.y : _vaultStartPos.y, _vaultTopPos.y, curveValue);
-            
+
             transform.position = resPos;
-            
+
             SetRotationDirection(_vaultEndPos - _vaultStartPos);
-            
+
             if (_vaultTimer >= _timeToVault) EndVault((transform.position - prevPos) / deltaTime);
         }
 
@@ -473,9 +481,9 @@ namespace InGame.Player
 
             _rb.linearVelocity = force;
             _knockBackActive = true;
-            
+
             await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: this.GetCancellationTokenOnDestroy());
-            
+
             _knockBackActive = false;
         }
 
@@ -491,11 +499,11 @@ namespace InGame.Player
             onPlaneVec.y = 0;
             return onPlaneVec.magnitude;
         }
-        
+
         private void CheckGroundManual()
         {
             Vector3 origin = transform.position + Vector3.up * 0.1f;
-            
+
             if (Physics.Raycast(origin, Vector3.down, out var hitInfo, 0.2f, _groundLayer))
             {
                 if (Vector3.Angle(Vector3.up, hitInfo.normal) <= _groundSlopeThreshold)
@@ -531,7 +539,7 @@ namespace InGame.Player
                 else if (index == 1) Gizmos.color = Color.cyan;
                 else if (index == 2) Gizmos.color = Color.yellow;
                 else if (index == 3) Gizmos.color = Color.magenta;
-                
+
                 DrawCapsuleGizmo(castData.P1, castData.P2, castData.Radius);
                 DrawCapsuleGizmo(castData.P1 + castData.Distance, castData.P2 + castData.Distance, castData.Radius);
                 Gizmos.DrawLine(castData.P1, castData.P1 + castData.Distance);
@@ -545,7 +553,7 @@ namespace InGame.Player
                     float halfHeight = (castData.P1 - castData.P2).magnitude * 0.5f;
                     DrawCapsuleGizmo(origin + Vector3.up * halfHeight, origin + Vector3.down * halfHeight, castData.Radius);
                 }
-                
+
                 index++;
             }
 
@@ -569,14 +577,14 @@ namespace InGame.Player
                 pos.y = Mathf.Lerp(_vaultStartPos.y, _vaultTopPos.y, curveValue);
                 Gizmos.DrawLine(frontPrevPos, pos);
                 frontPrevPos = pos;
-                    
+
                 pos = Vector3.Lerp(_vaultEndPos, _vaultTopPos, t);
                 pos.y = Mathf.Lerp(_vaultEndPos.y, _vaultTopPos.y, curveValue);
                 Gizmos.DrawLine(backPrevPos, pos);
                 backPrevPos = pos;
             }
         }
-        
+
         void DrawCapsuleGizmo(Vector3 p1, Vector3 p2, float r)
         {
             Gizmos.DrawWireSphere(p1, r);

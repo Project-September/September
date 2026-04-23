@@ -1,5 +1,7 @@
-using System;
+using System.Collections.Generic;
+using Codice.CM.Common.Tree.Partial;
 using Fusion;
+
 using InGame.Common;
 using UniRx;
 using UnityEngine;
@@ -8,25 +10,18 @@ namespace InGame.Player
 {
     public class PlayerStatus : EffectableStatus
     {
-        [SerializeField] PlayerParameter _param;
-        
-        public int MaxHealth { get; private set; }
+        [SerializeField] ParameterData[] _parameters;
+        //OnChanged‚Å•Ï‚í‚Á‚½Stat‚É’Ê’m‚ğ‘—‚é‚Ì‚Æ’l‚ğ•ÏX‚·‚é
+        [Networked, OnChangedRender(nameof(OnStatsChanged))] private NetworkArray<NetworkStat> Stats => default;
+
         [Networked, HideInInspector, OnChangedRender(nameof(OnChangeHealth))] public int CurrentHealth { get; set; }
         private void OnChangeHealth() => _currentHealth.Value = CurrentHealth;
-        public float MaxStamina { get; private set; }
-        public float MaxSpeedRate { get; private set; } = 1;
         [Networked, HideInInspector, OnChangedRender(nameof(OnChangeStamina))] public float CurrentStamina { get; set; }
         private void OnChangeStamina() => _currentStamina.Value = CurrentStamina;
-        public float StaminaRegen { get; private set; }
-        public float StaminaConsumption { get; private set; }
-        public int AttackDamage { get; set; }
 
-        private Stat _speedStat;
-        private Stat _staminaStat;
-        private Stat _staminaRegenStat;
-        private Stat _staminaConsumptionStat;
-        private Stat _attackDamageStat;
-        
+        private Dictionary<StatType, Stat> _stats = new();
+
+
         #region Events
 
         private readonly ReactiveProperty<int> _currentHealth = new(0);
@@ -43,61 +38,62 @@ namespace InGame.Player
 
         void InitStatus()
         {
-            MaxHealth = _param.Health;
-            CurrentHealth = MaxHealth;
-            MaxStamina = _param.Stamina;
-            CurrentStamina = _param.Stamina;
-            StaminaRegen = _param.StaminaRegen;
-            StaminaConsumption = _param.StaminaConsumption;
-            AttackDamage = _param.AttackDamage;
+            foreach (var parameter in _parameters)
+            {
+                _stats.Add(parameter.Type,new Stat(parameter,ActiveEffectSpecs));
+            }
 
-            _speedStat = new Stat(_param.Speed, ActiveEffectSpecs);
-            _staminaStat = new Stat(_param.Stamina, ActiveEffectSpecs);
-            _staminaRegenStat = new Stat(_param.StaminaRegen, ActiveEffectSpecs);
-            _staminaConsumptionStat = new Stat(_param.StaminaConsumption, ActiveEffectSpecs);
-            _attackDamageStat = new Stat(_param.AttackDamage, ActiveEffectSpecs);
-            
-            _speedStat.OnValueChanged.Subscribe(value => MaxSpeedRate = value).AddTo(this);
-            _staminaStat.OnValueChanged.Subscribe(value => CurrentStamina = value).AddTo(this);
-            _staminaRegenStat.OnValueChanged.Subscribe(value => StaminaRegen = value).AddTo(this);
-            _staminaConsumptionStat.OnValueChanged.Subscribe(value => StaminaConsumption = value).AddTo(this);
-            _attackDamageStat.OnValueChanged.Subscribe(value => AttackDamage = (int)value).AddTo(this);
+            //MaxHealth = _param.Health;
+            //CurrentHealth = MaxHealth;
+            //MaxStamina = _param.Stamina;
+            //CurrentStamina = _param.Stamina;
+            //StaminaRegen = _param.StaminaRegen;
+            //StaminaConsumption = _param.StaminaConsumption;
+            //AttackDamage = _param.AttackDamage;
+        }
+
+        //private void OnStatsChanged(ChangedCache<PlayerStatus> changed)
+        private void OnStatsChanged()
+        {
+            //var self = changed.Behaviour;
+
+            //for (int i = 0; i < self.Stats.Length; i++)
+            //{
+            //    var newStat = self.Stats[i];
+            //    var oldStat = changed.LoadOld().Stats[i];
+
+            //    if (!newStat.Equals(oldStat))
+            //    {
+            //        self._stats[(StatType)i].SetFromNetwork(newStat.Value);
+            //    }
+            //}
         }
 
         protected override void OnPostApplyEffect(ActiveStatusEffect activeEffect)
         {
             foreach (var modifier in activeEffect.Spec.Modifiers)
             {
-                switch (modifier.StatType)
-                {
-                    case StatType.Speed:
-                        _speedStat.SetValue(Mathf.Max(0, _speedStat.Value));
-                        break;
-                    case StatType.Stamina:
-                        _staminaStat.SetBaseValue(Mathf.Clamp(_staminaStat.Value, 0, MaxStamina));
-                        break;
-                    case StatType.StaminaRegen:
-                        _staminaRegenStat.SetValue(Mathf.Max(0, _staminaRegenStat.Value));
-                        break;
-                    case StatType.StaminaConsumption:
-                        _staminaConsumptionStat.SetValue(Mathf.Max(0, _staminaConsumptionStat.Value));
-                        break;
-                    case StatType.AttackDamage:
-                        _attackDamageStat.SetValue(Mathf.Max(0, _attackDamageStat.Value));
-                        break;
-                }
+                if (!TryGetStatFromType(modifier.StatType, out var stat)) return;
+
+                stat.SetValue(stat.Value);
+
             }
         }
-
-        public override ref Stat GetStatFromType(StatType type)
+        protected override void OnNextValue(StatType type)
         {
-            //if (type == StatType.Health) return ref _healthStat;
-            if (type == StatType.Speed) return ref _speedStat;
-            if (type == StatType.Stamina) return ref _staminaStat;
-            if (type == StatType.StaminaRegen) return ref _staminaRegenStat;
-            if (type == StatType.StaminaConsumption) return ref _staminaConsumptionStat;
-            if (type == StatType.AttackDamage) return ref _attackDamageStat;
-            return ref base.GetStatFromType(type);
+            if (!TryGetStatFromType(type, out var stat)) return;
+
+            if (stat.IsValid)
+            {
+                stat.OnPostApplyEffect.OnNext(stat.Value);
+            }
+        }
+        protected override bool TryGetStatFromType(StatType type, out Stat stat)
+        {
+            if(_stats.TryGetValue(type, out stat)) return true;
+
+            base.TryGetStatFromType(type,out stat);
+            return false;
         }
     }
 }

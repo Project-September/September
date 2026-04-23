@@ -10,11 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b10e7b9c18af92e4ea7d4b50318f7035, type: 3}
-  m_Name: PlayerBase
+  m_Name: Health
   m_EditorClassIdentifier: 
-  _health: 100
-  _speed: 1
-  _stamina: 100
-  _staminaConsumption: 20
-  _staminaRegen: 100
-  _attackDamage: 10
+  _type: 0
+  _defaultValue: 3
+  _maxValue: 3
+  _minValue: 0

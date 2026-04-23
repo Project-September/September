@@ -5381,7 +5381,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97fa1f5e591252438ae6f1ea8b0742b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _param: {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
+  _parameters:
+  - {fileID: 11400000, guid: d9d37926c24d010459930b75d43ad3a4, type: 2}
+  - {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
+  - {fileID: 11400000, guid: 7156e2b8ff97d8c4d9222330a36cb775, type: 2}
+  - {fileID: 11400000, guid: 2d33c425f498e05428b2674ae4231933, type: 2}
+  - {fileID: 11400000, guid: 4ea13b54b6c95df4093d8b14e31bf4dd, type: 2}
+  - {fileID: 11400000, guid: 6400c1777c6c06544891ad936a717c59, type: 2}
   _CurrentHealth: 0
   _CurrentStamina: 0
 --- !u!114 &4737425158909762900
@@ -5420,6 +5426,7 @@ MonoBehaviour:
   _interactResponseTimeout: 3
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
+  _playerAudioController: {fileID: 0}
   _isHoldingInteract: 0
 --- !u!114 &7508249662566368237
 MonoBehaviour:

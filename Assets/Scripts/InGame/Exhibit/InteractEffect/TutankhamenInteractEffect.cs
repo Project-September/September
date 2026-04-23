@@ -39,7 +39,7 @@ namespace InGame.Exhibit
                 
                 if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
                 {
-                    EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
+                    StatusEffectSpec spec = new StatusEffectSpec(_buffEffect);
                     spec.Duration = EffectDuration;
                     spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
                     playerStatus.AddEffect(spec);
