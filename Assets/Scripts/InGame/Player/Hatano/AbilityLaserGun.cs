@@ -1,102 +1,53 @@
 using System;
-using Fusion;
 using InGame.Interact;
 using InGame.Player.Hatano;
-using September.Common;
+using InGame.Player.Ability.Effect.Shooting;
 using UnityEngine;
 
 namespace InGame.Player.Ability
 {
     [Serializable]
-    public class AbilityLaserGun : AbilityBase
+    public class AbilityLaserGun : ShootingAbilityBase
     {
         [Header("参照")]
         [Header("PlayerInteractionController")]
         [SerializeField] private PlayerInteractionController _playerInteractionController;
-        [Header("AimCameraController")]
-        [SerializeField] private AimCameraController _aimCameraController;
         [Space(30)]
-        [Header("○○距離")]
-        [SerializeField] private float _laserDistance;
-        [Header("○○発射位置")]
-        [SerializeField] private Transform _laserStartPoint;
-        [Header("○○使用時のインタラクション必要時間")] 
+        [Header("使用時のインタラクション必要時間")] 
         [SerializeField] private float _interactionTime;
         private float _interactionTimer;
         [Header("判定を取るためのBoxの大きさ")]
         [SerializeField] private Vector3 _judgmentBoxSize;
-        [Networked] private ShootingStateType _lastShootingStateType { get; set; }
         
         private HatanoAbilityStatusManagement _abilityStatusManagement;
-        
+
         protected override void OnStart()
         {
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
+            _shootingType = ShootingStateType.Stance;
         }
 
         protected override void OnUpdate(float deltaTime)
         {
-            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.RemoteInteraction) return;
-
-            if (_shootingStateType == ShootingStateType.Stance)
-            {
-                if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
-                {
-                    LaserTargetDetection();
-                }
-                else
-                {
-                    _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
-                }
-            }
-
-            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
-            {
-                ApplyCameraState(ShootingStateType.None);
-                _phase = AbilityPhase.Available;
-                _shootingStateType = ShootingStateType.None;
-                _lastShootingStateType = ShootingStateType.None;
-                _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
-            }
+            //現在のAbilityがレーザー銃でない場合、処理をしない
+            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun) return;
             
-            //状態変化検知
-            if (_shootingStateType != _lastShootingStateType)
-            {
-                _lastShootingStateType = _shootingStateType;
-                ApplyCameraState(ShootingStateType.Stance);
-            }
+            ShootingInputJudgment();
+            StateDetection();
         }
 
-        /// <summary>
-        /// Rayを飛ばす
-        /// カメラ基準
-        /// </summary>
-        private void LaserTargetDetection()
+        protected override void OnShooting()
         {
-            var origin = _aimCameraController.AimOrigin;
-            var dir = _aimCameraController.AimDirection;
-            Debug.DrawRay(origin, dir * _laserDistance, Color.red);
-            
-            var hit = Physics.Raycast(origin, dir, out RaycastHit hitInfo, _laserDistance);
-            //hitがtrueなら当たった場所を渡す　falseなら最大距離を渡す
-            LaserShootingDetection(hit? hitInfo.point :
-                origin + dir * _laserDistance);
-        }
-
-        /// <summary>
-        /// インタラクトオブジェクトに当たったか判定する
-        /// 当たっていたら、インタラクションを行う（キーを入力している状態のこと）
-        /// </summary>
-        /// <param name="targetPos">Rayの当たった場所</param>
-        private void LaserShootingDetection(Vector3 targetPos)
-        {
-            var origin = _laserStartPoint.position;
+            var camOri = _aimCameraController.AimOrigin;
+            var camDir = _aimCameraController.AimDirection;
+            var targetPos = ShootingPositionDetection(camOri, camDir);
+            var origin = _muzzlePos[0].position; //銃口
             var dir = targetPos - origin;
-            Debug.DrawRay(origin, dir * _laserDistance, Color.blue);
+            Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
             //hitした場所に向かってRayを飛ばす
-            var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _laserDistance);
+            var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _shootingDistance);
             if (laserPoint)
             {
                 //Rayが当たった場所のColliderを取得して、小さいインタラクションオブジェクトも取得出来るようにする
@@ -129,21 +80,17 @@ namespace InGame.Player.Ability
                 }
             }
         }
-        
-        private void ApplyCameraState(ShootingStateType type)
+
+        protected override void OnNoShooting()
         {
-            if (type == ShootingStateType.Stance)
-            {
-                _aimCameraController.RPC_AimCamera();;
-                _aimCameraController.RPC_CrosshairToggleChange(true);
-            }
-            else
-            {
-                _aimCameraController.RPC_NormalCamera();
-                _aimCameraController.RPC_CrosshairToggleChange(false);
-            }
+            //遠距離インタラクションを終了する
+            _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
         }
-        
-        
+
+        protected override void OnStopTheStance()
+        {
+            //遠距離インタラクションを終了する
+            _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
+        }
     }
 }

@@ -1,7 +1,7 @@
 using System;
-using Fusion;
 using InGame.Health;
 using InGame.Interact;
+using InGame.Player.Ability.Effect.Shooting;
 using InGame.Player.Hatano;
 using September.Common;
 using UnityEngine;
@@ -9,25 +9,14 @@ using UnityEngine;
 namespace InGame.Player.Ability
 {
     [Serializable]
-    public class AbilityRocketLauncher : AbilityBase
+    public class AbilityRocketLauncher : ShootingAbilityBase
     {
-        [Header("参照")]
-        [Header("PlayerInteractionController")]
-        [SerializeField] private PlayerInteractionController _playerInteractionController;
-        [Header("AimCameraController")]
-        [SerializeField] private AimCameraController _aimCameraController;
-        [Space(30)]
-        [Header("ロケットランチャー射程距離")]
-        [SerializeField] private float _rocketLauncherDistance;
-        [Header("ロケットランチャー発射位置")]
-        [SerializeField] private Transform _rocketLauncherStartPos;
         [Header("ロケットランチャーの攻撃範囲")]
         [SerializeField] private float _rocketLauncherRadius;
         [Header("通常時のダメージ")]
         [SerializeField] private int _damage;
         [Header("鬼の時のダメージ")] 
         [SerializeField] private int _ogreDamage;
-        [Networked] private ShootingStateType _lastShootingStateType { get; set; }
         
         private HatanoAbilityStatusManagement _abilityStatusManagement;
         
@@ -35,68 +24,31 @@ namespace InGame.Player.Ability
         {
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
+            _shootingType = ShootingStateType.Stance;
         }
 
         protected override void OnUpdate(float deltaTime)
         {
             if(_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.RocketLauncher) return;
             
-            if (_shootingStateType == ShootingStateType.Stance)
-            {
-                //一度撃ったら、アビリティを終了する
-                if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
-                {
-                    LauncherTargetDetection();
-                    _phase = AbilityPhase.Ending;
-                    _shootingStateType = ShootingStateType.None;
-                    _lastShootingStateType = ShootingStateType.None;
-                    _aimCameraController.RPC_NormalCamera();
-                    _aimCameraController.RPC_CrosshairToggleChange(false);
-                }
-            }
-            
-            //撃つ入力を終了したら、アビリティを終了する
-            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
-            {
-                _phase = AbilityPhase.Available;
-                _shootingStateType = ShootingStateType.None;
-                _lastShootingStateType = ShootingStateType.None;
-                ApplyCameraState(ShootingStateType.None);
-            }
-            
-            //状態変化検知
-            if (_shootingStateType != _lastShootingStateType)
-            {
-                _lastShootingStateType = _shootingStateType;
-                ApplyCameraState(ShootingStateType.Stance);
-            }
-        }
-
-        private void LauncherTargetDetection()
-        {
-            var origin = _aimCameraController.AimOrigin;
-            var dir = _aimCameraController.AimDirection;
-            Debug.DrawRay(origin, dir * _rocketLauncherDistance, Color.red);
-            
-            //カメラからのRay
-            var hit = Physics.Raycast(origin, dir, out RaycastHit hitInfo, _rocketLauncherDistance);
-            //hitがtrueなら当たった場所を渡す　falseなら最大距離を渡す
-            LauncherShootingDetection(hit? hitInfo.point :
-                origin + dir * _rocketLauncherDistance);
+            ShootingInputJudgment();
+            StateDetection();
         }
 
         /// <summary>
         /// ロケットランチャーを発射する
         /// </summary>
-        /// <param name="targetPos">ヒットした場所</param>
-        private void LauncherShootingDetection(Vector3 targetPos)
+        private void LauncherShootingDetection()
         {
-            var origin = _rocketLauncherStartPos.position;
+            var aimOri = _aimCameraController.AimOrigin;
+            var aimDir = _aimCameraController.AimDirection;
+            var targetPos = ShootingPositionDetection(aimOri, aimDir);
+            var origin = _muzzlePos[0].position;
             var dir = targetPos - origin;
-            Debug.DrawRay(origin, dir * _rocketLauncherDistance, Color.blue);
+            Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
-            //hitした場所に向かってRayを飛ばす（プレイヤーからのRay）
-            var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _rocketLauncherDistance);
+            //hitした場所に向かってRayを飛ばす（プレイヤー（マズル位置）からのRay）
+            var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _shootingDistance);
             //ヒットしたところにロケットランチャーを発射
             RocketLauncherRadius(laseHitInfo.point);
         }
@@ -127,19 +79,20 @@ namespace InGame.Player.Ability
                 damageable.TakeHit(ref hitData);
             }
         }
-        
-        private void ApplyCameraState(ShootingStateType type)
+
+        protected override void OnShooting()
         {
-            if (type == ShootingStateType.Stance)
-            {
-                _aimCameraController.RPC_AimCamera();;
-                _aimCameraController.RPC_CrosshairToggleChange(true);
-            }
-            else
-            {
-                _aimCameraController.RPC_NormalCamera();
-                _aimCameraController.RPC_CrosshairToggleChange(false);
-            }
+            LauncherShootingDetection();
+            _phase = AbilityPhase.Ending;
+        }
+
+        protected override void OnEndAbility()
+        {
+            //構え前の状態へ戻す
+            _shootingType = ShootingStateType.None;
+            _lastShootingType = ShootingStateType.None;
+            _aimCameraController.RPC_NormalCamera();
+            _aimCameraController.RPC_CrosshairToggleChange(false);
         }
     }
 }

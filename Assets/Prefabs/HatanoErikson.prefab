@@ -5699,14 +5699,15 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
-        _shootingStateType: 0
-        _playerInteractionController: {fileID: 7710838205980989238}
         _aimCameraController: {fileID: 2677403803585906037}
-        _laserDistance: 100
-        _laserStartPoint: {fileID: 915611406105039834}
+        _shootingType: 0
+        _lastShootingType: 0
+        _shootingDistance: 100
+        _muzzlePos:
+        - {fileID: 915611406105039834}
+        _playerInteractionController: {fileID: 7710838205980989238}
         _interactionTime: 2
-        _judgmentBoxSize: {x: 1, y: 1, z: 1}
-        _lastShootingStateType: 0
+        _judgmentBoxSize: {x: 2, y: 2, z: 2}
     - rid: 1502005709025574999
       type: {class: AbilityLaserSkillCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
@@ -5715,15 +5716,15 @@ MonoBehaviour:
       data:
         _cooldown: 5
         _phase: 0
-        _shootingStateType: 0
-        _playerInteractionController: {fileID: 7710838205980989238}
         _aimCameraController: {fileID: 2677403803585906037}
-        _rocketLauncherDistance: 100
-        _rocketLauncherStartPos: {fileID: 6159245481983791538}
+        _shootingType: 0
+        _lastShootingType: 0
+        _shootingDistance: 100
+        _muzzlePos:
+        - {fileID: 6159245481983791538}
         _rocketLauncherRadius: 10
         _damage: 5
         _ogreDamage: 10
-        _shootingStateType: 0
     - rid: 1502005779782697045
       type: {class: AbilityRocketLauncherSkillCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
@@ -5732,15 +5733,16 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
-        _shootingStateType: 0
         _aimCameraController: {fileID: 2677403803585906037}
-        _doubleBarreledGunDistance: 100
+        _shootingType: 0
+        _lastShootingType: 0
+        _shootingDistance: 100
+        _muzzlePos:
+        - {fileID: 9070121316509825322}
+        - {fileID: 900395334813402302}
         _shootingInterval: 2
-        _doubleBarreledGunLeftMuzzle: {fileID: 9070121316509825322}
-        _doubleBarreledGunRightMuzzle: {fileID: 900395334813402302}
         _damage: 5
         _ogreDamage: 10
-        _shootingStateType: 0
     - rid: 1502005889970208853
       type: {class: DoubleBarreledGunCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
@@ -5749,7 +5751,6 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
-        _shootingStateType: 0
         _attackDamage: 10
         _ogreAttackDamage: 15
         _startHitCheckFrame: 17
@@ -5875,6 +5876,8 @@ MonoBehaviour:
   _normalCamera: {fileID: 1140998407376993141}
   _aimCamera: {fileID: 1599464012499452082}
   _crosshairPrefab: {fileID: 3758444813883266440, guid: 012a53cb75eae6d42a003f1bb6bd8628, type: 3}
+  _AimOrigin: {x: 0, y: 0, z: 0}
+  _AimDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &-3242926656974808753
 MonoBehaviour:
   m_ObjectHideFlags: 0

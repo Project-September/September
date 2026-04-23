@@ -48,8 +48,6 @@ namespace  InGame.Player.Ability
         [SerializeField] protected AbilityPhase _phase = AbilityPhase.Available;
         /// <summary>NetworkRunnerのインスタンス（シミュレーション時刻取得用）</summary>
         protected NetworkRunner Runner => NetworkRunner.Instances.FirstOrDefault();
-        [Header("射撃ステート（射撃キャラのみ）")]
-        [SerializeField] protected ShootingStateType _shootingStateType { get; set; }
 
         /// <summary>
         /// アビリティのパラメータ。Start()で設定されるため、それより前にアクセスしないこと
@@ -122,7 +120,6 @@ namespace  InGame.Player.Ability
                     // 開始処理を実行してActiveに遷移
                     OnStart();
                     _phase = AbilityPhase.Active;
-                    _shootingStateType = ShootingStateType.Stance;
                     break;
                 case AbilityPhase.Active:
                     // 実行中の更新処理
