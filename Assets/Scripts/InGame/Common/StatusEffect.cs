@@ -1,7 +1,7 @@
 using System;
+using September.InGame.Common.Stats;
 using UnityEngine;
 using UnityEditor;
-using StatType = InGame.Common.EffectableStatus.StatType;
 
 namespace InGame.Common
 {
