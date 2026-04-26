@@ -143,7 +143,7 @@ namespace September.InGame.Common.Stats
         }
 
         /// <summary> StatEffectを発動中管理する </summary>
-        protected struct ActiveStatusEffect
+        protected class ActiveStatusEffect
         {
             private readonly List<float> _timers;
             private readonly List<float> _periodTimers;
