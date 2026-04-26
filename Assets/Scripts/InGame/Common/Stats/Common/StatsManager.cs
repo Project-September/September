@@ -43,6 +43,7 @@ namespace September.InGame.Common.Stats
             CurrentStats = GetInitialStats();
             _pipeline = new StatusPipeline(_modifiers);
             _statOnChangedSubjectsTable = _baseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
+            OnStatsUpdated(CurrentStats.Stats.Select(s => s.Key).ToHashSet());
         }
 
         public override void FixedUpdateNetwork()
