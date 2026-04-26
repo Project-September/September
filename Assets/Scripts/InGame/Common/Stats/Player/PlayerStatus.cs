@@ -45,13 +45,13 @@ namespace InGame.Player
             }
         }
 
-        [Networked] public int MaxHealth { get; set; }
-        [Networked] public int CurrentHealth { get; set; }
-        [Networked] public float MaxStamina { get; set; }
-        [Networked] public float CurrentStamina { get; set; }
-        [Networked] public float StaminaRegen { get; set; }
-        [Networked] public float StaminaConsumption { get; set; }
-        [Networked] public float Speed { get; set; }
-        [Networked] public float AttackDamage { get; set; }
+        [Networked] public int MaxHealth { get; private set; }
+        [Networked] public int CurrentHealth { get; private set; }
+        [Networked] public float MaxStamina { get; private set; }
+        [Networked] public float CurrentStamina { get; private set; }
+        [Networked] public float StaminaRegen { get; private set; }
+        [Networked] public float StaminaConsumption { get; private set; }
+        [Networked] public float Speed { get; private set; }
+        [Networked] public float AttackDamage { get; private set; }
     }
 }
