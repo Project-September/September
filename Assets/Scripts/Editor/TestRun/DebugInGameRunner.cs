@@ -1,3 +1,5 @@
+#region
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,8 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+#endregion
+
 namespace September.Editor.DebugInGame
 {
 	[InitializeOnLoad]
@@ -17,9 +21,10 @@ namespace September.Editor.DebugInGame
 		static DebugInGameEntryPoint()
 		{
 			var _lobbyData = DebugInGameDataRepository.TestLobbyData;
-			Debug.Log("TestRunner static constructor called. LobbyData loaded: " + (_lobbyData != null));
 			if (_lobbyData.IsStartedFromExtensionWindow)
+			{
 				EditorApplication.playModeStateChanged += StartGame;
+			}
 		}
 
 		private static void StartGame(PlayModeStateChange mode)
@@ -30,11 +35,7 @@ namespace September.Editor.DebugInGame
 				case PlayModeStateChange.EnteredPlayMode:
 					if (lobbyData == null || lobbyData.IsStartedFromExtensionWindow == false)
 						return;
-
-					var testRun = new DebugInGameRunner
-					{
-						LobbyData = lobbyData
-					};
+					var testRun = new DebugInGameRunner();
 					testRun.RunAsync().Forget();
 					break;
 
@@ -48,23 +49,30 @@ namespace September.Editor.DebugInGame
 
 	public class DebugInGameRunner : INetworkRunnerCallbacks
 	{
-		public DebugInGameLobbyData LobbyData;
+		private readonly float _joinRetrySecond = 15f;
 		private NetworkRunner _networkRunner;
-		private float _joinRetrySecond = 15f;
-		private float _waitTime = 60;
-		private string GameName => LobbyData.LobbyName;
-		private int MaxPlayers => LobbyData.PlayerData.Count;
-		private List<DebugInGameLobbyData.PlayerSetupData> PlayersData => LobbyData.PlayerData;
+		private DebugInGameLobbyData _lobbyData;
+		private string GameName => _lobbyData.LobbyName;
+		private int MaxPlayers => _lobbyData.PlayerData.Count;
+		private List<DebugInGameLobbyData.PlayerSetupData> PlayersData => _lobbyData.PlayerData;
+
+		void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+		{
+			AddPlayer();
+		}
 
 		public async UniTask RunAsync()
 		{
 			var networkManager = NetworkManager.Instance;
+			_lobbyData = DebugInGameDataRepository.TestLobbyData;
+			NickNameProvider.SetNickName(_lobbyData.Nickname);
 
+			// これがメインエディターであればLobbyを作成する。
 			if (SessionState.GetBool("IsMainEditor", false))
 				await networkManager.CreateLobby(GameName, MaxPlayers);
-			else
+			else　// メインエディターでなければLobbyに入れる
 				await JoinLobby();
-			// NetworkRunnerを強引に取得する
+			// NetworkRunnerをFindで取得する
 			_networkRunner = Object.FindFirstObjectByType<NetworkRunner>();
 			_networkRunner.AddCallbacks(this);
 			AddPlayer();
@@ -81,7 +89,10 @@ namespace September.Editor.DebugInGame
 			// 設定されたキャラクターを人数分、順番に割り振る
 			var index = 0;
 			foreach (var player in playerDatabase.PlayerDataDic)
-				playerDatabase.Rpc_SetCharacter(player.Key, PlayersData[index++].CharacterType);
+			{
+				if(index < PlayersData.Count)
+					playerDatabase.Rpc_SetCharacter(player.Key, PlayersData[index++].CharacterType);
+			}
 
 			networkManager.StartGame().Forget();
 		}
@@ -94,57 +105,53 @@ namespace September.Editor.DebugInGame
 				var joinResult = await NetworkManager.Instance.JoinLobby(GameName);
 				if (joinResult.Ok)
 					return;
-				if (!joinResult.Ok)
-					switch (joinResult.ShutdownReason)
-					{
-						case ShutdownReason.ConnectionTimeout:
-						case ShutdownReason.ConnectionRefused:
-						case ShutdownReason.GameNotFound:
-							await UniTask.WaitForSeconds(_joinRetrySecond);
-							continue;
-						default:
-							Debug.LogError($"Failed to join lobby: {joinResult.ShutdownReason}");
-							return;
-					}
+				switch (joinResult.ShutdownReason)
+				{
+					case ShutdownReason.ConnectionTimeout:
+					case ShutdownReason.ConnectionRefused:
+					case ShutdownReason.GameNotFound:
+						await UniTask.WaitForSeconds(_joinRetrySecond);
+						continue;
+					default:
+						Debug.LogError($"Failed to join lobby: {joinResult.ShutdownReason}");
+						return;
+				}
 			}
 		}
 
 		private void AddPlayer()
 		{
-			_networkRunner = Object.FindFirstObjectByType<NetworkRunner>();
+			if (!_networkRunner.IsServer) return;
 			if (_networkRunner == null)
 			{
 				Debug.LogWarning("NetworkRunner is null. Cannot add player.");
 				return;
 			}
 
-			if (!_networkRunner.IsServer) return;
-			Debug.Log("AddPlayer" + $" ActivePlayersCount is {_networkRunner.ActivePlayers.Count()}");
-			for (var i = 0; i < _networkRunner.ActivePlayers.Count(); i++)
-				DebugInGameDataRepository.TestLobbyData.PlayerData[i].IsReady = true;
+			// アクティブプレイヤーの数だけ順番にConnectしたことにする。
+			for (var i = 0; i < _networkRunner.ActivePlayers.Count() &&
+			     i < _lobbyData.PlayerData.Count; i++)
+			{
+				_lobbyData.PlayerData[i].IsConnected = true;
+			}
+
 			DebugInGameDataRepository.EditorUpdate();
 		}
 
-		// エディターから開始ボタンが押されるとゲームを開始する
+		// エディターから開始ボタンが押されるまで待機する。
 		private async UniTask WaitingForPlayers()
 		{
 			if (PlayerDatabase.Instance == null) return;
-			for (var i = 0; i < _waitTime; i++)
+			while (true)
 			{
-				if (SessionState.GetBool("MoveToGameScene", false))
+				if (_lobbyData.RequestMoveToGameScene)
 				{
 					Debug.Log("MoveToGameScene flag is set. Moving to game scene.");
-					SessionState.SetBool("MoveToGameScene", false);
 					break;
 				}
 
 				await UniTask.Delay(1000);
 			}
-		}
-
-		void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-		{
-			AddPlayer();
 		}
 
 		#region INetworkRunnerCallbacks

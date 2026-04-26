@@ -1,16 +1,10 @@
 #region
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Cysharp.Threading.Tasks;
-using Fusion;
-using Fusion.Sockets;
 using September.Common;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 #endregion
 
@@ -18,7 +12,9 @@ namespace September.Editor.DebugInGame
 {
 	public class DebugLobbyWindow : EditorWindow
 	{
-		public static DebugInGameLobbyData _lobbyData = new();
+		private const string TitleScenePath = "Assets/Scenes/NetworkMock/Title.unity";
+		private const int MaxPlayerCount = 4;
+		private DebugInGameLobbyData _lobbyData = new();
 		private Vector2 _scroll;
 
 		private void OnEnable()
@@ -29,10 +25,7 @@ namespace September.Editor.DebugInGame
 
 		private void OnDisable()
 		{
-			if (!EditorApplication.isPlayingOrWillChangePlaymode)
-			{
-				_lobbyData.IsStartedFromExtensionWindow = false;
-			}
+			if (!EditorApplication.isPlayingOrWillChangePlaymode) _lobbyData.IsStartedFromExtensionWindow = false;
 
 			DebugInGameDataRepository.SaveLobbyData();
 			DebugInGameDataRepository.OnViewUpdated -= Repaint;
@@ -40,49 +33,84 @@ namespace September.Editor.DebugInGame
 
 		private void OnGUI()
 		{
+			if (Application.isPlaying && !_lobbyData.IsStartedFromExtensionWindow)
+			{
+				GUI.color = Color.red;
+				EditorGUILayout.LabelField("このウィンドウ以外から再生が開始されました。\nこのウィンドウは無効化されています。",EditorStyles.wordWrappedLabel);
+				GUI.color = Color.white;
+			}
+			
+			GUI.enabled = !Application.isPlaying;
 			_lobbyData.LobbyName = EditorGUILayout.TextField("Lobby Name", _lobbyData.LobbyName);
+			_lobbyData.Nickname = EditorGUILayout.TextField("Nickname", _lobbyData.Nickname);
 			_scroll = EditorGUILayout.BeginScrollView(_scroll);
 
 			for (var i = 0; i < _lobbyData.PlayerData.Count; i++)
 			{
 				EditorGUILayout.BeginHorizontal("box");
-
-				_lobbyData.PlayerData[i].Nickname = EditorGUILayout.TextField(_lobbyData.PlayerData[i].Nickname);
+				EditorGUILayout.LabelField(_lobbyData.Nickname + (i == 0 ? "" : "_" + i));
+				
 				_lobbyData.PlayerData[i].CharacterType =
 					(CharacterType)EditorGUILayout.EnumPopup(_lobbyData.PlayerData[i].CharacterType);
 
-				using (new EditorGUI.DisabledScope(false))
+				if (Application.isPlaying)
 				{
-					if (Application.isPlaying) EditorGUILayout.Toggle(_lobbyData.PlayerData[i].IsReady);
+					GUI.enabled = false;
+					EditorGUILayout.Toggle(_lobbyData.PlayerData[i].IsConnected);
+					GUI.enabled = !Application.isPlaying;
 				}
 
 				if (GUILayout.Button("削除", GUILayout.Width(60))) _lobbyData.PlayerData.RemoveAt(i);
 				EditorGUILayout.EndHorizontal();
 			}
+			GUI.enabled = true;
 
 			EditorGUILayout.EndScrollView();
 
 			GUILayout.Space(10);
-			if (Application.isPlaying)
-				if (GUILayout.Button("MoveToGameScene"))
-				{
-					Debug.Log("MoveToGameScene button clicked. Setting SessionState flag.");
-					SessionState.SetBool("MoveToGameScene", true);
-				}
+			GUI.enabled = Application.isPlaying && _lobbyData.IsStartedFromExtensionWindow && !_lobbyData.RequestMoveToGameScene;
+			GUI.backgroundColor = Color.green;
+			if (GUILayout.Button("ゲーム開始"))
+				_lobbyData.RequestMoveToGameScene = true;
+			GUI.backgroundColor = Color.white;
 
-			if (GUILayout.Button("追加")) _lobbyData.PlayerData.Add(new DebugInGameLobbyData.PlayerSetupData());
+			GUI.enabled = !Application.isPlaying && _lobbyData.PlayerData.Count < MaxPlayerCount;
+			if (GUILayout.Button("追加"))
+			{
+				_lobbyData.PlayerData.Add(new DebugInGameLobbyData.PlayerSetupData());
+			}
+			GUI.enabled = !Application.isPlaying;
 
-			if (GUILayout.Button("Run")) Run();
+			if (GUILayout.Button("デバッグ再生開始"))
+			{
+				Run().Forget();
+			}
+			GUI.enabled = true;
 		}
 
-		[MenuItem("September/Test Run Window")]
+		[MenuItem("September/Debug in game window")]
 		public static void Open()
 		{
-			GetWindow<DebugLobbyWindow>("Test Run");
+			GetWindow<DebugLobbyWindow>("Debug in game");
+		}
+		private bool TryLoadTitleScene()
+		{
+			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+			{
+				EditorSceneManager.OpenScene(TitleScenePath, OpenSceneMode.Single);
+				return true;
+			}
+			return false;
 		}
 
-		private void Run()
+		private async UniTask Run()
 		{
+			if (!TryLoadTitleScene())
+			{
+				Debug.LogWarning("デバッグ再生がキャンセルされました。");
+				return;
+			}
+			await UniTask.WaitForSeconds(1);
 			if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
 			{
 				Debug.LogWarning("すでに実行中です。");

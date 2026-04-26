@@ -20,8 +20,6 @@ namespace September.Editor.DebugInGame
 				if (_lobbyData == null)
 				{
 					_lobbyData = LoadLobbyData() ?? new DebugInGameLobbyData();
-
-					foreach (var player in _lobbyData.PlayerData) player.IsReady = false;
 				}
 
 				return _lobbyData;
@@ -57,20 +55,22 @@ namespace September.Editor.DebugInGame
 			OnViewUpdated?.Invoke();
 		}
 	}
-
+	[Serializable]
 	public class DebugInGameLobbyData
 	{
+		[NonSerialized] public bool RequestMoveToGameScene;
 		// 拡張windowからゲームが開始したかどうか
 		public bool IsStartedFromExtensionWindow;
 		public string LobbyName = "TestLobby";
+		public string Nickname = "TestPlayer";
 		public List<PlayerSetupData> PlayerData = new();
 
 		[Serializable]
 		public class PlayerSetupData
 		{
 			public CharacterType CharacterType = CharacterType.OkabeWright;
-			public string Nickname = "TestPlayer";
-			public bool IsReady;
+			[NonSerialized]
+			public bool IsConnected;
 		}
 	}
 }
