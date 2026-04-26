@@ -44,6 +44,8 @@ namespace September.InGame.Common.Stats
                     {
                         foreach (var modifier in effect.Spec.Modifiers)
                         {
+                            if (modifier.StatType != stat.StatType) continue;
+                            
                             switch (modifier.ModifierOp)
                             {
                                 case ModifierOperation.Add:
