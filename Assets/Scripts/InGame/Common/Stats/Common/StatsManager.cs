@@ -35,8 +35,6 @@ namespace September.InGame.Common.Stats
         /// </summary>
         protected abstract StatsContainer GetInitialStats();
 
-        protected abstract void OnStatsUpdated(HashSet<StatType> updatedStats);
-
         public override void Spawned()
         {
             BaseStats = GetInitialStats();
@@ -44,7 +42,6 @@ namespace September.InGame.Common.Stats
             CurrentStats = GetInitialStats();
             _pipeline = new StatusPipeline(_modifiers);
             _statOnChangedSubjectsTable = BaseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
-            OnStatsUpdated(CurrentStats.Stats.Select(s => s.Key).ToHashSet());
         }
 
         public override void FixedUpdateNetwork()
@@ -69,8 +66,6 @@ namespace September.InGame.Common.Stats
             }
 
             _prevStats = CurrentStats;
-            
-            OnStatsUpdated(_statDirtyFlags);
             
             _statDirtyFlags.Clear();
         }
