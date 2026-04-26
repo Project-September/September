@@ -10,7 +10,6 @@ namespace September.InGame.Common.Stats
 {
     public class StatsManager : NetworkBehaviour
     {
-        [SerializeField] private PlayerParameter _params;
         [SerializeField] private StatsModifierBase[] _modifiers;
         
         private StatsContainer _baseStats;
@@ -19,12 +18,16 @@ namespace September.InGame.Common.Stats
         protected StatsContainer CurrentStats;
         
         private Dictionary<StatType, Subject<float>> _statOnChangedSubjectsTable;
-        private List<StatType> _statDirtyFlags;
+        
+        /// <summary>
+        /// ステータスの種類や値を初期化するために使用する
+        /// </summary>
+        protected abstract StatsContainer GetInitialStats();
 
         public override void Spawned()
         {
-            _baseStats = _params.GetStats();
-            CurrentStats = _params.GetStats();
+            _baseStats = GetInitialStats();
+            CurrentStats = GetInitialStats();
             _pipeline = new StatusPipeline(_modifiers);
             _statOnChangedSubjectsTable = _baseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
             _statDirtyFlags = _baseStats.Stats.Select(s => s.Key).ToList();

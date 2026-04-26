@@ -1,9 +1,17 @@
 using September.InGame.Common.Stats;
+using UnityEngine;
 
 namespace InGame.Player
 {
     public class PlayerStatus : StatsManager
     {
+        [SerializeField] private PlayerParameter _params;
+        
+        protected override StatsContainer GetInitialStats()
+        {
+            return _params.GetStats();
+        }
+
         public int MaxHealth => (int)CurrentStats.GetStat(StatType.Health).MaxValue;
         public int CurrentHealth => (int)CurrentStats.GetStatValue(StatType.Health);
         public float MaxStamina => CurrentStats.GetStat(StatType.Stamina).MaxValue;
