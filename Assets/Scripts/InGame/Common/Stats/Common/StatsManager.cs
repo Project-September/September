@@ -11,11 +11,11 @@ namespace September.InGame.Common.Stats
     public class StatsManager : NetworkBehaviour
     {
         [SerializeField] private PlayerParameter _params;
+        [SerializeField] private StatsModifierBase[] _modifiers;
         
         private StatsContainer _baseStats;
         private StatusPipeline _pipeline;
         
-        private readonly StatusEffectManager _statusEffectManager = new();
 
         protected StatsContainer CurrentStats;
         
@@ -25,7 +25,7 @@ namespace September.InGame.Common.Stats
         private void Awake()
         {
             _baseStats = _params.GetStats();
-            _pipeline = new StatusPipeline(_statusEffectManager);
+            _pipeline = new StatusPipeline(_modifiers);
             _statOnChangedSubjectsTable = _baseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
         }
 
