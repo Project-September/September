@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
-using InGame.Player;
 using UniRx;
 using UnityEngine;
 
@@ -18,11 +17,13 @@ namespace September.InGame.Common.Stats
         private StatsContainer _baseStats;
         private StatusPipeline _pipeline;
 
+        /// <summary> バフなどの要因を加味した最終的なステータス </summary>
         protected StatsContainer CurrentStats;
-        
 
+        /// <summary> 変更を検知する用 </summary>
         private StatsContainer _prevStats;
         
+        /// <summary> ステータスの変更を外に通知する用 </summary>
         private Dictionary<StatType, Subject<float>> _statOnChangedSubjectsTable;
         
         /// <summary>
@@ -43,6 +44,9 @@ namespace September.InGame.Common.Stats
             CalcStats();
         }
 
+        /// <summary>
+        /// ステータスを再計算する
+        /// </summary>
         private void CalcStats()
         {
             CurrentStats = _pipeline.CalcStats(_baseStats);
@@ -58,22 +62,23 @@ namespace September.InGame.Common.Stats
             _prevStats = CurrentStats;
         }
         
-        private bool TryGetSubject(StatType statType, out Subject<float> subject)
-        {
-            return _statOnChangedSubjectsTable.TryGetValue(statType, out subject);
-        }
-
+        /// <summary>
+        /// ステータスの変化を外部に通知する
+        /// </summary>
         private void OnNextStatOnChanged(StatType statType, float value)
         {
-            if (TryGetSubject(statType, out var subject))
+            if (_statOnChangedSubjectsTable.TryGetValue(statType, out var subject))
             {
                 subject.OnNext(value);
             }
         }
 
+        /// <summary>
+        /// 指定のステータスが変化したら通知を受け取る
+        /// </summary>
         public void SubscribeStatOnChanged(StatType statType, Action<float> action)
         {
-            if (TryGetSubject(statType, out var subject))
+            if (_statOnChangedSubjectsTable.TryGetValue(statType, out var subject))
             {
                 subject.Subscribe(action);
             }

@@ -8,6 +8,7 @@ namespace September.InGame.Common.Stats
 {
     /// <summary>
     /// 状態異常を管理するクラス
+    /// プレイヤーステータス以外に影響を与えたい場合もあるので、バフの概念はもっと抽象化したほうが良いけど今のところはいらない
     /// </summary>
     public class StatusEffectManager : StatsModifierBase
     {

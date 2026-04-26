@@ -8,6 +8,10 @@ using UnityEditor;
 
 namespace InGame.Common
 {
+    /// <summary>
+    /// 状態異常をID管理するためのコンテナクラス
+    /// RPCで送受信する時に使う
+    /// </summary>
     [CreateAssetMenu(fileName = "StatusEffectsContainer", menuName = "Scriptable Objects/StatusEffectsContainer")]
     public class StatusEffectsContainer : AssetsContainerBase<StatusEffectsContainer>
     {
