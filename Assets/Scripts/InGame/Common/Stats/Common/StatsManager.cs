@@ -26,10 +26,15 @@ namespace September.InGame.Common.Stats
         /// <summary> ステータスの変更を外に通知する用 </summary>
         private Dictionary<StatType, Subject<float>> _statOnChangedSubjectsTable;
         
+        /// <summary> 変更があったステータスを追跡する用 </summary>
+        private readonly HashSet<StatType> _statDirtyFlags = new();
+        
         /// <summary>
         /// ステータスの種類や値を初期化するために使用する
         /// </summary>
         protected abstract StatsContainer GetInitialStats();
+
+        protected abstract void OnStatsUpdated(HashSet<StatType> updatedStats);
 
         public override void Spawned()
         {
@@ -56,10 +61,15 @@ namespace September.InGame.Common.Stats
                 if (CurrentStats.TryGetStatValue(statType, out float value) && !Mathf.Approximately(prevStat.Value, value))
                 {
                     OnNextStatOnChanged(statType, CurrentStats.Stats[statType].Value);
+                    _statDirtyFlags.Add(statType);
                 }
             }
 
             _prevStats = CurrentStats;
+            
+            OnStatsUpdated(_statDirtyFlags);
+            
+            _statDirtyFlags.Clear();
         }
         
         /// <summary>
