@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace September.InGame.Common.Stats
 {
+    /// <summary>
+    /// 状態異常を管理するクラス
+    /// </summary>
     public class StatusEffectManager : StatsModifierBase
     {
         private readonly List<ActiveStatusEffect> _activeEffectSpecs = new();
