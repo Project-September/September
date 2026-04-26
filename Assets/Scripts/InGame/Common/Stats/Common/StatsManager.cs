@@ -13,8 +13,9 @@ namespace September.InGame.Common.Stats
     public abstract class StatsManager : NetworkBehaviour
     {
         [SerializeField] private StatsModifierBase[] _modifiers;
+
+        [Networked] private ref StatsContainer BaseStats => ref MakeRef<StatsContainer>();
         
-        private StatsContainer _baseStats;
         private StatusPipeline _pipeline;
 
         /// <summary> バフなどの要因を加味した最終的なステータス </summary>
@@ -38,11 +39,11 @@ namespace September.InGame.Common.Stats
 
         public override void Spawned()
         {
-            _baseStats = GetInitialStats();
+            BaseStats = GetInitialStats();
             _prevStats = GetInitialStats();
             CurrentStats = GetInitialStats();
             _pipeline = new StatusPipeline(_modifiers);
-            _statOnChangedSubjectsTable = _baseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
+            _statOnChangedSubjectsTable = BaseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
             OnStatsUpdated(CurrentStats.Stats.Select(s => s.Key).ToHashSet());
         }
 
@@ -56,7 +57,7 @@ namespace September.InGame.Common.Stats
         /// </summary>
         private void CalcStats()
         {
-            CurrentStats = _pipeline.CalcStats(_baseStats);
+            CurrentStats = _pipeline.CalcStats(BaseStats);
             
             foreach (var (statType, prevStat) in _prevStats.Stats)
             {
@@ -98,13 +99,13 @@ namespace September.InGame.Common.Stats
 
         public void SetBaseValue(StatType statType, float value)
         {
-            _baseStats.TrySetStatValue(statType, value);
+            BaseStats.TrySetStatValue(statType, value);
             CalcStats();
         }
 
         public void AddBaseValue(StatType statType, float value)
         {
-            _baseStats.TryAddStatValue(statType, value);
+            BaseStats.TryAddStatValue(statType, value);
             CalcStats();
         }
     }

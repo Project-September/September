@@ -55,7 +55,7 @@ namespace September.InGame.Common.Stats
                                     multiplyValue *= modifier.Magnitude;
                                     break;
                                 case ModifierOperation.Override:
-                                    stat.Value = modifier.Magnitude;
+                                    stat.SetValue(modifier.Magnitude);
                                     return stat;
                                     break;
                             }
@@ -63,8 +63,8 @@ namespace September.InGame.Common.Stats
                     }
                 }
 
-                stat.Value += addValue;
-                stat.Value *= multiplyValue;
+                stat.SetValue(stat.Value + addValue);
+                stat.SetValue(stat.Value * multiplyValue);
                 
                 return stat;
             }

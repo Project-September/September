@@ -1,43 +1,55 @@
 using System.Collections.Generic;
-using System.Linq;
+using Fusion;
 using UnityEngine;
 
 namespace September.InGame.Common.Stats
 {
-    public readonly struct StatsContainer
+    public readonly struct StatsContainer : INetworkStruct
     {
-        private readonly Dictionary<StatType, Stat> _statsTable;
-        
-        public IReadOnlyDictionary<StatType, Stat> Stats => _statsTable;
+        [Networked, Capacity(16)] public NetworkDictionary<StatType, Stat> Stats => default;
 
         public StatsContainer(Stat[] stats)
         {
-            _statsTable = stats.ToDictionary(stat => stat.StatType, stat => stat);
+            foreach (var stat in stats)
+            {
+                Stats.Add(stat.StatType, stat);
+            }
         }
 
         public StatsContainer(IReadOnlyDictionary<StatType, Stat> stats)
         {
-            _statsTable = stats.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            foreach (var kvp in stats)
+            {
+                var stat = kvp.Value;
+                Stats.Add(stat.StatType, stat);
+            }
         }
         
         public Stat GetStat(StatType type)
         {
-            return _statsTable[type];
+            return Stats[type];
         }
 
         public bool TryGetStat(StatType type, out Stat stat)
         {
-            return _statsTable.TryGetValue(type, out stat);
+            if (Stats.ContainsKey(type))
+            {
+                stat = Stats[type];
+                return true;
+            }
+
+            stat = default;
+            return false;
         }
 
         public float GetStatValue(StatType type)
         {
-            return _statsTable[type].Value;
+            return Stats[type].Value;
         }
 
         public bool TryGetStatValue(StatType type, out float value)
         {
-            if (_statsTable.TryGetValue(type, out var stat))
+            if (TryGetStat(type, out var stat))
             {
                 value = stat.Value; 
                 return true;
@@ -53,12 +65,12 @@ namespace September.InGame.Common.Stats
 
         public void AddStatValue(StatType type, float value)
         {
-            SetStatValueInternal(type, _statsTable[type].Value + value);
+            SetStatValueInternal(type, Stats[type].Value + value);
         }
         
         public bool TrySetStatValue(StatType type, float value)
         {
-            if (_statsTable.ContainsKey(type))
+            if (Stats.ContainsKey(type))
             {
                 SetStatValueInternal(type, value);
                 return true;
@@ -69,7 +81,7 @@ namespace September.InGame.Common.Stats
 
         public bool TryAddStatValue(StatType type, float value)
         {
-            if (_statsTable.TryGetValue(type, out var stat))
+            if (TryGetStat(type, out var stat))
             {
                 SetStatValueInternal(type, stat.Value + value);
                 return true;
@@ -80,23 +92,17 @@ namespace September.InGame.Common.Stats
 
         private void SetStatValueInternal(StatType type, float value)
         {
-            var newStat = _statsTable[type];
+            var newStat = Stats[type];
             newStat.SetValue(value);
-            _statsTable[type] = newStat;
+            Stats.Set(type, newStat);
         }
     }
 
-    public struct Stat
+    public struct Stat : INetworkStruct
     {
         public readonly StatType StatType;
 
-        private float _value;
-
-        public float Value
-        {
-            get => _value;
-            set => _value = Mathf.Clamp(value, MinValue, MaxValue);
-        }
+        [Networked] public float Value { get; private set; }
 
         public float MaxValue;
         public float MinValue;
@@ -109,7 +115,7 @@ namespace September.InGame.Common.Stats
         public Stat(StatType statType, float baseValue, float minValue = 0, float maxValue = float.PositiveInfinity)
         {
             StatType = statType;
-            _value = baseValue;
+            Value = baseValue;
             MinValue = minValue;
             MaxValue = maxValue;
         }
