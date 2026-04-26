@@ -8,7 +8,10 @@ using UnityEngine;
 
 namespace September.InGame.Common.Stats
 {
-    public class StatsManager : NetworkBehaviour
+    /// <summary>
+    /// ステータスを管理するクラス
+    /// </summary>
+    public abstract class StatsManager : NetworkBehaviour
     {
         [SerializeField] private StatsModifierBase[] _modifiers;
         
@@ -16,6 +19,9 @@ namespace September.InGame.Common.Stats
         private StatusPipeline _pipeline;
 
         protected StatsContainer CurrentStats;
+        
+
+        private StatsContainer _prevStats;
         
         private Dictionary<StatType, Subject<float>> _statOnChangedSubjectsTable;
         
@@ -30,7 +36,6 @@ namespace September.InGame.Common.Stats
             CurrentStats = GetInitialStats();
             _pipeline = new StatusPipeline(_modifiers);
             _statOnChangedSubjectsTable = _baseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
-            _statDirtyFlags = _baseStats.Stats.Select(s => s.Key).ToList();
         }
 
         public override void FixedUpdateNetwork()
@@ -40,15 +45,17 @@ namespace September.InGame.Common.Stats
 
         private void CalcStats()
         {
-            if (_statDirtyFlags.Count == 0) return;
-            
             CurrentStats = _pipeline.CalcStats(_baseStats);
-            foreach (var statType in _statDirtyFlags)
-            {
-                OnNextStatOnChanged(statType, CurrentStats.Stats[statType].Value);
-            }
             
-            _statDirtyFlags.Clear();
+            foreach (var (statType, prevStat) in _prevStats.Stats)
+            {
+                if (CurrentStats.TryGetStatValue(statType, out float value) && !Mathf.Approximately(prevStat.Value, value))
+                {
+                    OnNextStatOnChanged(statType, CurrentStats.Stats[statType].Value);
+                }
+            }
+
+            _prevStats = CurrentStats;
         }
         
         private bool TryGetSubject(StatType statType, out Subject<float> subject)
@@ -75,14 +82,12 @@ namespace September.InGame.Common.Stats
         public void SetBaseValue(StatType statType, float value)
         {
             _baseStats.TrySetStatValue(statType, value);
-            _statDirtyFlags.Add(statType);
             CalcStats();
         }
 
         public void AddBaseValue(StatType statType, float value)
         {
             _baseStats.TryAddStatValue(statType, value);
-            _statDirtyFlags.Add(statType);
             CalcStats();
         }
     }
