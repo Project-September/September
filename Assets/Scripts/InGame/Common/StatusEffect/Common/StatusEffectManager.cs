@@ -14,10 +14,13 @@ namespace September.InGame.Common.Stats
     {
         private readonly List<ActiveStatusEffect> _activeEffectSpecs = new();
 
-        public override StatsContainer Apply(StatsContainer stats)
+        private void Update()
         {
             UpdateEffects(Time.deltaTime);
-            
+        }
+        
+        public override StatsContainer Apply(StatsContainer stats)
+        {
             var dict = new Dictionary<StatType, Stat>();
             
             foreach (var(statType, stat) in stats.Stats)
