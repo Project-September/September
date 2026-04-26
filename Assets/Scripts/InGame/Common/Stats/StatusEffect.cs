@@ -268,7 +268,7 @@ namespace InGame.Common
 
     public abstract class CustomMagnitudeCalculation
     {
-        public abstract float CalculateMagnitude(EffectableStatus.ModifierSpec spec);
+        public abstract float CalculateMagnitude(StatusEffectManager.ModifierSpec spec);
     }
 
     /// <summary> スタック削除時の設定 </summary>
