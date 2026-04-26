@@ -8,27 +8,27 @@ using UnityEngine;
 
 #endregion
 
-namespace September.Editor.DebugInGame
+namespace September.Editor.InGameDebug
 {
-	public class DebugLobbyWindow : EditorWindow
+	public class InGameDebugWindow : EditorWindow
 	{
 		private const string TitleScenePath = "Assets/Scenes/NetworkMock/Title.unity";
 		private const int MaxPlayerCount = 4;
-		private DebugInGameLobbyData _lobbyData = new();
+		private InGameDebugLobbyData _lobbyData = new();
 		private Vector2 _scroll;
 
 		private void OnEnable()
 		{
-			_lobbyData = DebugInGameDataRepository.TestLobbyData;
-			DebugInGameDataRepository.OnViewUpdated += Repaint;
+			_lobbyData = InGameDebugDataRepository.TestLobbyData;
+			InGameDebugDataRepository.OnViewUpdated += Repaint;
 		}
 
 		private void OnDisable()
 		{
 			if (!EditorApplication.isPlayingOrWillChangePlaymode) _lobbyData.IsStartedFromExtensionWindow = false;
 
-			DebugInGameDataRepository.SaveLobbyData();
-			DebugInGameDataRepository.OnViewUpdated -= Repaint;
+			InGameDebugDataRepository.SaveLobbyData();
+			InGameDebugDataRepository.OnViewUpdated -= Repaint;
 		}
 
 		private void OnGUI()
@@ -77,7 +77,7 @@ namespace September.Editor.DebugInGame
 			GUI.enabled = !Application.isPlaying && _lobbyData.PlayerData.Count < MaxPlayerCount;
 			if (GUILayout.Button("追加"))
 			{
-				_lobbyData.PlayerData.Add(new DebugInGameLobbyData.PlayerSetupData());
+				_lobbyData.PlayerData.Add(new InGameDebugLobbyData.PlayerSetupData());
 			}
 			GUI.enabled = !Application.isPlaying;
 
@@ -88,10 +88,10 @@ namespace September.Editor.DebugInGame
 			GUI.enabled = true;
 		}
 
-		[MenuItem("September/Debug in game window")]
+		[MenuItem("September/In Game Debug")]
 		public static void Open()
 		{
-			GetWindow<DebugLobbyWindow>("Debug in game");
+			GetWindow<InGameDebugWindow>("In Game Debug");
 		}
 		private bool TryLoadTitleScene()
 		{
@@ -120,7 +120,7 @@ namespace September.Editor.DebugInGame
 			SessionState.SetBool("IsMainEditor", true);
 			// ゲーム開始時の設定データをJsonに書き出す(DomainReload対策)
 			_lobbyData.IsStartedFromExtensionWindow = true;
-			DebugInGameDataRepository.SaveLobbyData();
+			InGameDebugDataRepository.SaveLobbyData();
 			// この後はDomainReloadが入るため、データのリセットが入る
 			EditorApplication.isPlaying = true;
 		}

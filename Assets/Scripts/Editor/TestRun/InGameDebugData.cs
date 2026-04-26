@@ -4,22 +4,22 @@ using System.IO;
 using September.Common;
 using UnityEngine;
 
-namespace September.Editor.DebugInGame
+namespace September.Editor.InGameDebug
 {
-	public static class DebugInGameDataRepository
+	public static class InGameDebugDataRepository
 	{
-		private static DebugInGameLobbyData _lobbyData;
+		private static InGameDebugLobbyData _lobbyData;
 
 		public static string SavePath => $"{Application.dataPath}/Settings/Editor/TestRunLobbyData.json";
 
 		// ゲーム開始前のロビー設定データを保持するプロパティ
-		public static DebugInGameLobbyData TestLobbyData
+		public static InGameDebugLobbyData TestLobbyData
 		{
 			get
 			{
 				if (_lobbyData == null)
 				{
-					_lobbyData = LoadLobbyData() ?? new DebugInGameLobbyData();
+					_lobbyData = LoadLobbyData() ?? new InGameDebugLobbyData();
 				}
 
 				return _lobbyData;
@@ -28,7 +28,7 @@ namespace September.Editor.DebugInGame
 
 		public static event Action OnViewUpdated;
 
-		public static DebugInGameLobbyData LoadLobbyData()
+		public static InGameDebugLobbyData LoadLobbyData()
 		{
 			if (!File.Exists(SavePath))
 			{
@@ -37,7 +37,7 @@ namespace September.Editor.DebugInGame
 			}
 
 			var jsonData = File.ReadAllText(SavePath);
-			return JsonUtility.FromJson<DebugInGameLobbyData>(jsonData);
+			return JsonUtility.FromJson<InGameDebugLobbyData>(jsonData);
 		}
 
 		public static void SaveLobbyData()
@@ -56,7 +56,7 @@ namespace September.Editor.DebugInGame
 		}
 	}
 	[Serializable]
-	public class DebugInGameLobbyData
+	public class InGameDebugLobbyData
 	{
 		[NonSerialized] public bool RequestMoveToGameScene;
 		// 拡張windowからゲームが開始したかどうか

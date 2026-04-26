@@ -13,14 +13,14 @@ using Object = UnityEngine.Object;
 
 #endregion
 
-namespace September.Editor.DebugInGame
+namespace September.Editor.InGameDebug
 {
 	[InitializeOnLoad]
-	public static class DebugInGameEntryPoint
+	public static class InGameDebugEntryPoint
 	{
-		static DebugInGameEntryPoint()
+		static InGameDebugEntryPoint()
 		{
-			var _lobbyData = DebugInGameDataRepository.TestLobbyData;
+			var _lobbyData = InGameDebugDataRepository.TestLobbyData;
 			if (_lobbyData.IsStartedFromExtensionWindow)
 			{
 				EditorApplication.playModeStateChanged += StartGame;
@@ -29,32 +29,32 @@ namespace September.Editor.DebugInGame
 
 		private static void StartGame(PlayModeStateChange mode)
 		{
-			var lobbyData = DebugInGameDataRepository.TestLobbyData;
+			var lobbyData = InGameDebugDataRepository.TestLobbyData;
 			switch (mode)
 			{
 				case PlayModeStateChange.EnteredPlayMode:
 					if (lobbyData == null || lobbyData.IsStartedFromExtensionWindow == false)
 						return;
-					var testRun = new DebugInGameRunner();
+					var testRun = new InGameDebugRunner();
 					testRun.RunAsync().Forget();
 					break;
 
 				case PlayModeStateChange.ExitingPlayMode:
 					lobbyData.IsStartedFromExtensionWindow = false;
-					DebugInGameDataRepository.SaveLobbyData();
+					InGameDebugDataRepository.SaveLobbyData();
 					break;
 			}
 		}
 	}
 
-	public class DebugInGameRunner : INetworkRunnerCallbacks
+	public class InGameDebugRunner : INetworkRunnerCallbacks
 	{
 		private readonly float _joinRetrySecond = 15f;
 		private NetworkRunner _networkRunner;
-		private DebugInGameLobbyData _lobbyData;
+		private InGameDebugLobbyData _lobbyData;
 		private string GameName => _lobbyData.LobbyName;
 		private int MaxPlayers => _lobbyData.PlayerData.Count;
-		private List<DebugInGameLobbyData.PlayerSetupData> PlayersData => _lobbyData.PlayerData;
+		private List<InGameDebugLobbyData.PlayerSetupData> PlayersData => _lobbyData.PlayerData;
 
 		void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
 		{
@@ -64,7 +64,7 @@ namespace September.Editor.DebugInGame
 		public async UniTask RunAsync()
 		{
 			var networkManager = NetworkManager.Instance;
-			_lobbyData = DebugInGameDataRepository.TestLobbyData;
+			_lobbyData = InGameDebugDataRepository.TestLobbyData;
 			NickNameProvider.SetNickName(_lobbyData.Nickname);
 
 			// これがメインエディターであればLobbyを作成する。
@@ -135,7 +135,7 @@ namespace September.Editor.DebugInGame
 				_lobbyData.PlayerData[i].IsConnected = true;
 			}
 
-			DebugInGameDataRepository.EditorUpdate();
+			InGameDebugDataRepository.EditorUpdate();
 		}
 
 		// エディターから開始ボタンが押されるまで待機する。
