@@ -15,23 +15,37 @@ namespace September.InGame.Common.Stats
         
         private StatsContainer _baseStats;
         private StatusPipeline _pipeline;
-        
 
         protected StatsContainer CurrentStats;
         
-        private Dictionary<StatType, Stat> _statsTable;
         private Dictionary<StatType, Subject<float>> _statOnChangedSubjectsTable;
+        private List<StatType> _statDirtyFlags;
 
-        private void Awake()
+        public override void Spawned()
         {
             _baseStats = _params.GetStats();
+            CurrentStats = _params.GetStats();
             _pipeline = new StatusPipeline(_modifiers);
             _statOnChangedSubjectsTable = _baseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
+            _statDirtyFlags = _baseStats.Stats.Select(s => s.Key).ToList();
         }
 
-        private void FixedUpdate()
+        public override void FixedUpdateNetwork()
         {
+            CalcStats();
+        }
+
+        private void CalcStats()
+        {
+            if (_statDirtyFlags.Count == 0) return;
+            
             CurrentStats = _pipeline.CalcStats(_baseStats);
+            foreach (var statType in _statDirtyFlags)
+            {
+                OnNextStatOnChanged(statType, CurrentStats.Stats[statType].Value);
+            }
+            
+            _statDirtyFlags.Clear();
         }
         
         private bool TryGetSubject(StatType statType, out Subject<float> subject)
@@ -58,13 +72,15 @@ namespace September.InGame.Common.Stats
         public void SetBaseValue(StatType statType, float value)
         {
             _baseStats.TrySetStatValue(statType, value);
-            OnNextStatOnChanged(statType, value);
+            _statDirtyFlags.Add(statType);
+            CalcStats();
         }
 
         public void AddBaseValue(StatType statType, float value)
         {
             _baseStats.TryAddStatValue(statType, value);
-            OnNextStatOnChanged(statType, value);
+            _statDirtyFlags.Add(statType);
+            CalcStats();
         }
     }
 }
