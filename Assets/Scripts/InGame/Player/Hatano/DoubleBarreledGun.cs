@@ -84,7 +84,7 @@ namespace InGame.Player.Ability
         /// ヒットしたコライダーからIDamageableを取得
         /// </summary>
         /// <param name="hitLeft">左マズルのヒットした場所</param>
-        /// <param name="hitRight">右マズルのヒットした場所</param>>
+        /// <param name="hitRight">右マズルのヒットした場所</param>
         private void GetGunHitPointIDamageable(RaycastHit hitLeft, RaycastHit hitRight)
         {
             //自身に当たった場合、処理を行わない

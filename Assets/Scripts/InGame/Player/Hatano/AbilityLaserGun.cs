@@ -47,12 +47,12 @@ namespace InGame.Player.Ability
             Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
             //hitした場所に向かってRayを飛ばす
-            var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _shootingDistance);
+            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance);
             if (laserPoint)
             {
                 //Rayが当たった場所のColliderを取得して、小さいインタラクションオブジェクトも取得出来るようにする
                 Collider[] boxColliders = Physics.OverlapBox(
-                    laseHitInfo.point,
+                    laserHitInfo.point,
                     _judgmentBoxSize,
                     Quaternion.identity);
                 

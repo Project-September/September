@@ -1,7 +1,6 @@
 using System;
 using September.Common;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace InGame.Player.Ability.Effect.Shooting
 {
@@ -12,7 +11,6 @@ namespace InGame.Player.Ability.Effect.Shooting
         [SerializeField] protected AimCameraController _aimCameraController;
         
         //現在と最後の射撃ステートを比較して状態の管理を行う
-        [FormerlySerializedAs("_shootingStateType")]
         [Header("射撃ステート（現在）")]
         [SerializeField] protected ShootingStateType _shootingType;
         [Header("射撃ステート（最後）")]
@@ -57,13 +55,13 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// <summary>
         /// 射撃した位置を取得する（カメラからのRay）
         /// </summary>
-        /// <param name="origin">カメラの位置</param>>
-        /// <param name="direction">カメラのforward</param>>
-        /// <returns>hit:true　Raycastで当たった場所　hit:false　最大距離</returns>>
+        /// <param name="origin">カメラの位置</param>
+        /// <param name="direction">カメラのforward</param>
+        /// <returns>hit:true　Raycastで当たった場所　hit:false　最大距離</returns>
         protected Vector3 ShootingPositionDetection(Vector3 origin, Vector3 direction)
         {
             var hit = Physics.Raycast(origin, direction, out RaycastHit hitInfo, _shootingDistance);
-            return hit? hitInfo.point : origin + direction * _shootingDistance;
+            return hit ? hitInfo.point : origin + direction * _shootingDistance;
         }
         
         /// <summary>
@@ -84,7 +82,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// Stance：Aimカメラに変更
         /// None：Normalカメラに変更
         /// </summary>
-        /// <param name="type">射撃ステート</param>>
+        /// <param name="type">射撃ステート</param>
         protected void ApplyCameraState(ShootingStateType type)
         {
             if (type == ShootingStateType.Stance)

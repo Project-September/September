@@ -1,6 +1,5 @@
 using System;
 using InGame.Health;
-using InGame.Interact;
 using InGame.Player.Ability.Effect.Shooting;
 using InGame.Player.Hatano;
 using September.Common;
@@ -48,9 +47,9 @@ namespace InGame.Player.Ability
             Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
             //hitした場所に向かってRayを飛ばす（プレイヤー（マズル位置）からのRay）
-            var laserPoint = Physics.Raycast(origin, dir, out var laseHitInfo, _shootingDistance);
+            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance);
             //ヒットしたところにロケットランチャーを発射
-            RocketLauncherRadius(laseHitInfo.point);
+            RocketLauncherRadius(laserHitInfo.point);
         }
 
         /// <summary>
