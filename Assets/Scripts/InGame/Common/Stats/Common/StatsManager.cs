@@ -47,6 +47,20 @@ namespace September.InGame.Common.Stats
         public override void FixedUpdateNetwork()
         {
             CalcStats();
+            NotifyChangedStats();
+        }
+
+        /// <summary>
+        /// 変更のあったステータスを外部に通知する
+        /// </summary>
+        private void NotifyChangedStats()
+        {
+            foreach (var dirtyStatType in _statDirtyFlags)
+            {
+                OnNextStatOnChanged(dirtyStatType, CurrentStats.Stats[dirtyStatType].Value);
+            }
+            
+            _statDirtyFlags.Clear();
         }
 
         /// <summary>
@@ -56,18 +70,16 @@ namespace September.InGame.Common.Stats
         {
             CurrentStats = _pipeline.CalcStats(BaseStats);
             
+            // 変更があったステータスを検出
             foreach (var (statType, prevStat) in _prevStats.Stats)
             {
                 if (CurrentStats.TryGetStatValue(statType, out float value) && !Mathf.Approximately(prevStat.Value, value))
                 {
-                    OnNextStatOnChanged(statType, CurrentStats.Stats[statType].Value);
                     _statDirtyFlags.Add(statType);
                 }
             }
 
             _prevStats = CurrentStats;
-            
-            _statDirtyFlags.Clear();
         }
         
         /// <summary>
