@@ -33,7 +33,7 @@ namespace InGame.Player
                 // Health監視
                 status.SubscribeStatOnChanged(StatType.Health, x => UIController.I.ChangeSliderValue((int)x));
                 // Stamina 監視
-                status.SubscribeStatOnChanged(StatType.Stamina, x => UIController.I.ChangeStaminaValue((int)x));
+                status.SubscribeStatOnChanged(StatType.Stamina, x => UIController.I.ChangeStaminaValue(x));
             }
         }
     }
