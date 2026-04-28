@@ -7,19 +7,6 @@ namespace InGame.Bot
     public class NodeMapData : ScriptableObject
     {
         [SerializeField] private List<NodeDataSerializable> _serializableNodeDatas = new();
-        private List<NodeData> _nodeDatas;
-        public List<NodeData> NodeDatas
-        {
-            get
-            {
-                if (_nodeDatas == null || _nodeDatas.Count == 0)
-                {
-                    _nodeDatas = ChengeNodeData(_serializableNodeDatas);
-                }
-
-                return _nodeDatas;
-            }
-        }
 
         public void SetNodeData(List<NodeData> data)
         {
@@ -31,14 +18,14 @@ namespace InGame.Bot
             }
         }
 
-        private List<NodeData> ChengeNodeData(List<NodeDataSerializable> serializablesData)
+        public List<NodeData> GetChengeNodeData()
         {
             List<NodeData> result = new();
 
             Dictionary<int, NodeData> indexDic = new();
             Dictionary<NodeData, NodeDataSerializable> serializableDic = new();
 
-            foreach (var data in serializablesData)
+            foreach (var data in _serializableNodeDatas)
             {
                 NodeData nodeData = new(data.Position, data.Index);
                 indexDic.Add(data.Index, nodeData);

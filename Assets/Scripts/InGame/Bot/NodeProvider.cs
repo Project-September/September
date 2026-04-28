@@ -9,7 +9,19 @@ namespace InGame.Bot
         [SerializeField] private NodeMapData _nodeMapData;
         [SerializeField] private bool _isDrowGizmo;
         public static NodeProvider Instance;
-        public List<NodeData> Nodes => _nodeMapData.NodeDatas;
+        private List<NodeData> _nodes;
+        public List<NodeData> Nodes
+        {
+            get
+            {
+                if (_nodes == null || _nodes.Count == 0)
+                {
+                    _nodes = _nodeMapData.GetChengeNodeData();
+                }
+
+                return _nodes;
+            }
+        }
         private void Awake()
         {
             if (Instance == null)
