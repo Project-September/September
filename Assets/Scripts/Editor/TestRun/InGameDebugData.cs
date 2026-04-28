@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using September.Common;
+using UnityEditor;
 using UnityEngine;
 
 namespace September.Editor.InGameDebug
@@ -11,7 +12,7 @@ namespace September.Editor.InGameDebug
 	{
 		private static InGameDebugLobbyData _lobbyData;
 
-		public static string SavePath => $"{Application.dataPath}/Settings/Editor/TestRunLobbyData.json";
+		public static string SavePath => $"{Application.dataPath}/Settings/Editor/Local/TestRunLobbyData.json";
 
 		// ゲーム開始前のロビー設定データを保持するプロパティ
 		public static InGameDebugLobbyData TestLobbyData
@@ -47,10 +48,14 @@ namespace September.Editor.InGameDebug
 				return;
 			var jsonData = JsonUtility.ToJson(_lobbyData);
 			var dir = Path.GetDirectoryName(SavePath);
-			if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+			if (!string.IsNullOrEmpty(dir))
+			{
+				Directory.CreateDirectory(dir);
+			}
 			File.WriteAllText(SavePath, jsonData);
+			AssetDatabase.Refresh();
 		}
-
+		
 		public static void EditorUpdate()
 		{
 			OnViewUpdated?.Invoke();
