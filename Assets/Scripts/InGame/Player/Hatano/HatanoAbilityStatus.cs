@@ -11,7 +11,7 @@ namespace InGame.Player.Hatano
         [InspectorName("２丁銃")]
         DoubleBarreledGun,
         [InspectorName("遠距離インタラクションAbility")]
-        RemoteInteraction,
+        LaserGun,
         [InspectorName("ロケットランチャー")]
         RocketLauncher,
         [InspectorName("何も選択していない状態")]
@@ -33,7 +33,7 @@ namespace InGame.Player.Hatano
             abilityStatusNames = new Dictionary<HatanoAbilityStatus, string>()
             {
                 {HatanoAbilityStatus.DoubleBarreledGun, "2丁銃" },
-                {HatanoAbilityStatus.RemoteInteraction, "遠距離インタラクション"},
+                {HatanoAbilityStatus.LaserGun, "遠距離インタラクション"},
                 {HatanoAbilityStatus.RocketLauncher, "ロケットランチャー"},
                 {HatanoAbilityStatus.None, "装備なし"}
             };

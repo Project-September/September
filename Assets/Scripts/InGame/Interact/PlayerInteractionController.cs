@@ -38,7 +38,11 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
-        private bool _isRemote; //遠距離インタラクション中か判定
+       
+        [Networked] private bool IsRemoting { get; set; } //遠距離インタラクション中かの判定
+        [Networked] private InteractableBase RemoteFocusedObject { get; set; } //遠インタラクションの対象オブジェクト
+        [Networked] private float RemoteInteractTime { get; set; } //遠インタラクション時間
+        [Networked] private float RemoteInteractTimer { get; set; } //遠インタラクションのタイマー
 
         private void Awake()
         {
@@ -87,8 +91,26 @@ namespace InGame.Interact
             }
             else
             {
-                if(_isRemote) return;
-                
+                if (IsRemoting) //遠距離インタラクション中
+                {
+                    //インタラクションオブジェクトが存在する場合、インタラクションUIを表示する
+                    if (RemoteFocusedObject)
+                    {
+                        var context = new InteractableContext
+                        {
+                            Interactor = Object.InputAuthority.RawEncoded,
+                        };
+                        if (UIController.I)
+                        {
+                            var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
+                                PlayerManager.PlayerControlState.ForcedControl;
+                            UIController.I.ShowInteractUI(!isRiding && RemoteFocusedObject.ValidateInteraction(context),
+                                RemoteFocusedObject?.gameObject);
+                        }
+                        UIController.I.SetInteractProgress(Mathf.Clamp01(RemoteInteractTimer / RemoteInteractTime));
+                    }
+                    return;
+                }
                 CancelInteraction();
             }
         }
@@ -132,25 +154,30 @@ namespace InGame.Interact
                 Interactor = Object.InputAuthority.RawEncoded,
             };
             if(!interactableBase.ValidateInteraction(context)) return;
-
-            _isRemote = true;
+            
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
             _focusedObj = interactableBase;
             UIController.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
+
+            IsRemoting = true;
+            RemoteFocusedObject = interactableBase;
             
             timer += Runner.DeltaTime;
+            RemoteInteractTime = time;
+            RemoteInteractTimer = timer;
             if (timer >= time) //インタラクション成功時間を超えたらインタラクションを行う
             {
-                _isRemote = false;
+                IsRemoting = false;
                 timer = 0f;
+                RemoteInteractTimer = 0f;
                 CompleteInteraction();
                 UIController.I.ShowInteractUI(false);
                 
                 //インタラクションに成功したらアビリティを終了
                 abilityPhase = AbilityBase.AbilityPhase.Ending;
-                aimCameraController.NormalCamera();
-                aimCameraController.CrosshairToggleChange(false);
+                aimCameraController.RPC_NormalCamera();
+                aimCameraController.RPC_CrosshairToggleChange(false);
             }
             UIController.I.SetInteractProgress(Mathf.Clamp01(timer / time));
         }
@@ -162,15 +189,16 @@ namespace InGame.Interact
         /// </summary>
         public void RemoteInteractionCancel(ref float timer)
         {
-            _isRemote = false;
+            IsRemoting = false;
             timer = 0;
+            RemoteInteractTimer = 0f;
             CancelInteraction();
         }
 
         private void UpdateFocusedInteractable()
         {
             // 現在の focusedObj がまだ有効な範囲内かチェック
-            if (_focusedObj && !_isRemote)
+            if (_focusedObj && !IsRemoting)
             {
                 if (!IsInInteractRange(_focusedObj.transform.position, InteractRangeCheckMode.Buffered))
                 {
@@ -180,7 +208,7 @@ namespace InGame.Interact
             }
             
             //別のインタラクションオブジェクトに上書きされないようにする
-            if(_isRemote) return;
+            if(IsRemoting) return;
 
             // より近い候補があれば差し替え
             int count = Physics.OverlapSphereNonAlloc(_interactOrigin.position, _interactRadius, _hitBuffer,
