@@ -27,7 +27,7 @@ namespace InGame.Interact
         [SerializeField] private PlayerAudioController _playerAudioController; // インタラクト時のボイス再生用
         //許容できる高さの差
         private float _heightDifference = 0.1f;
-        
+
         private bool _isWaitingForResponse = false;
         private float _interactWaitTimer = 0f;
         private readonly Collider[] _hitBuffer = new Collider[32];
@@ -38,7 +38,7 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
-        private bool _isRemote; //遠距離インタラクション中か判定
+        private bool _isRemote; //遠距離インタラクション中か判定s
 
         private void Awake()
         {
@@ -56,7 +56,7 @@ namespace InGame.Interact
             }
             else
             {
-                 _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType ;
+                _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType;
             }
         }
 
@@ -66,37 +66,12 @@ namespace InGame.Interact
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
-            
-            if (_isHoldingInteract)
-            {
-                if (!_isExecutingInteraction)
-                    TryStartInteraction();
-
-                if (_isExecutingInteraction)
-                {
-                    _currentInteractTime += Runner.DeltaTime;
-                    if (_currentInteractTime >= _requiredInteractTime)
-                    {
-                        _hasCompletedInteraction = true;
-                        CompleteInteraction();
-                        _playerAudioController?.PlayInteractActionVoice();  // インタラクト時ボイスの再生依頼
-                        UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
-                    }
-                    UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
-                }
-            }
-            else
-            {
-                if(_isRemote) return;
-                
-                CancelInteraction();
-            }
         }
 
         public override void FixedUpdateNetwork()
         {
             _isHoldingInteract = false; // 毎フレームリセット
-            
+
             if (!HasInputAuthority) return;
             if (!GetInput(out PlayerInput input)) return;
 
@@ -114,6 +89,32 @@ namespace InGame.Interact
             }
 
             _isHoldingInteract = input.Buttons.IsSet(PlayerButtons.Interact);
+
+            if (_isHoldingInteract)
+            {
+                if (!_isExecutingInteraction)
+                    TryStartInteraction();
+
+                if (_isExecutingInteraction)
+                {
+                    _currentInteractTime += Runner.DeltaTime;
+                    if (_currentInteractTime >= _requiredInteractTime)
+                    {
+                        _hasCompletedInteraction = true;
+
+                        CompleteInteraction();
+                        _playerAudioController?.PlayInteractActionVoice();  // インタラクト時ボイスの再生依頼
+                        UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                    }
+                    UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                }
+            }
+            else
+            {
+                if (_isRemote) return;
+
+                CancelInteraction();
+            }
         }
 
         /// <summary>
@@ -124,21 +125,21 @@ namespace InGame.Interact
         /// <param name="interactableBase">Rayで当たったインタラクション可能なオブジェクト</param>>
         /// <param name="abilityPhase">アビリティの状態</param>>
         /// <param name="aimCameraController">このAbilityを使っているキャラのカメラ</param>>
-        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase, 
+        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase,
             ref AbilityBase.AbilityPhase abilityPhase, AimCameraController aimCameraController)
         {
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
             };
-            if(!interactableBase.ValidateInteraction(context)) return;
+            if (!interactableBase.ValidateInteraction(context)) return;
 
             _isRemote = true;
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
             _focusedObj = interactableBase;
             UIController.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj?.gameObject);
-            
+
             timer += Runner.DeltaTime;
             if (timer >= time) //インタラクション成功時間を超えたらインタラクションを行う
             {
@@ -146,7 +147,7 @@ namespace InGame.Interact
                 timer = 0f;
                 CompleteInteraction();
                 UIController.I.ShowInteractUI(false);
-                
+
                 //インタラクションに成功したらアビリティを終了
                 abilityPhase = AbilityBase.AbilityPhase.Ending;
                 aimCameraController.NormalCamera();
@@ -178,14 +179,14 @@ namespace InGame.Interact
                     Debug.Log("Nullにする");
                 }
             }
-            
+
             //別のインタラクションオブジェクトに上書きされないようにする
-            if(_isRemote) return;
+            if (_isRemote) return;
 
             // より近い候補があれば差し替え
             int count = Physics.OverlapSphereNonAlloc(_interactOrigin.position, _interactRadius, _hitBuffer,
                 _interactMask);
-            float closestDistanceSqr = _focusedObj? (_focusedObj.transform.position - _interactOrigin.position).sqrMagnitude
+            float closestDistanceSqr = _focusedObj ? (_focusedObj.transform.position - _interactOrigin.position).sqrMagnitude
                 : float.MaxValue;
 
             for (int i = 0; i < count; i++)
@@ -251,7 +252,7 @@ namespace InGame.Interact
         private void TryStartInteraction()
         {
             if (!_focusedObj) return;
-            
+
             _requiredInteractTime = GetRequireInteractTime();
             var context = new InteractableContext
             {
@@ -261,7 +262,7 @@ namespace InGame.Interact
             {
                 return;
             }
-            
+
             _currentInteractTime = 0f;
             _isExecutingInteraction = true;
             _hasCompletedInteraction = false;
@@ -322,7 +323,7 @@ namespace InGame.Interact
                 _interactWaitTimer = 0f;
 
                 Debug.Log($"[Client] RPC_RequestInteract 送信: {context.Interactor} -> {_focusedObj.name} NetObj is null? {!netObj}");
-                RPC_RequestInteract(context.Interactor, (int)context.CharacterType,netObj);
+                RPC_RequestInteract(context.Interactor, (int)context.CharacterType, netObj);
             }
         }
 
@@ -340,15 +341,15 @@ namespace InGame.Interact
             if (target && target.TryGetComponent(out InteractableBase interactable))
             {
                 var context = new InteractableContext
-                 {
-                     Interactor = interactor,
-                     CharacterType = (CharacterType)characterType
-                 };
+                {
+                    Interactor = interactor,
+                    CharacterType = (CharacterType)characterType
+                };
 
                 interactable.Interact(context);
             }
         }
-        
+
         private static bool GetSessionPlayerData(int interactor, out SessionPlayerData data)
         {
             if (!PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(interactor), out data))
