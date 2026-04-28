@@ -11,6 +11,14 @@ public class ControlDescription : ScriptableObject
     public List<DescribedAction> Actions;
 }
 
+public enum ControlDescriptionType
+{
+    Player,
+    Exhibit,
+    Sarutobi,
+    Tanihira
+}
+
 /// <summary>
 /// 各アクションの説明
 /// </summary>

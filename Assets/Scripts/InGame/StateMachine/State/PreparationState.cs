@@ -39,19 +39,9 @@ namespace September.Common
 
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData localData))
             {
-                var type = localData.CharacterType;
-                if (type == CharacterType.Tanihira)
-                {
-                    UIController.I.ChangeDescriptionUI(4);
-                }
-                else if (type == CharacterType.Sarutobi)
-                {
-                    UIController.I.ChangeDescriptionUI(3);
-                }
-                else
-                {
-                    UIController.I.ChangeDescriptionUI(2);
-                }
+                ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(localData.CharacterType);
+
+                UIController.I.ChangeDescriptionUI(type);
             }
 
             if (Context.Runner.IsServer)
@@ -60,7 +50,7 @@ namespace September.Common
                 Initialize().Forget();
             }
         }
-        
+
         private async UniTask Initialize()
         {
             await Runner.LoadScene("Field", LoadSceneMode.Additive);
@@ -118,7 +108,7 @@ namespace September.Common
                 }
                 PlayerDatabase.Instance.PlayerDataDic.Set(pair.Key, spd);
                 _setIcon.ShowIcon(pair.Key);
-                
+
                 index++;
             }
         }
@@ -133,7 +123,7 @@ namespace September.Common
         {
             OpeningSequence().Forget();
         }
-        
+
         private async UniTaskVoid OpeningSequence()
         {
             // 全クライアントで入力を無効化
@@ -156,15 +146,15 @@ namespace September.Common
             }
             //  準備フェーズ - 全クライアントで移動入力を有効化
             BGMManager.ReleseFlag();
-            
+
             // タイマー開始
             UIController.I.StartTimer(Context.Runner);
-            
+
             var countDownDuration = StaticServiceLocator.Instance.Get<InGameManager>().TimerData.PreStartTime;
             if (countDownDuration > 0)// 準備フェーズの時間が0秒以下の場合は下記の処理をスキップする。
             {
                 if (HasStateAuthority) RPC_ToggleInputs(true, false, true);
-                
+
                 // 準備フェーズを開始する
                 UIController.I.TimeOverlayMessage?.Invoke(TimeMessageType.PreparationStart).Forget();
                 // 準備フェーズが終了するまで待機
@@ -178,7 +168,7 @@ namespace September.Common
             {
                 await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.GameStart);
             }
-            
+
             //  ゲーム開始表示終了後に役職開示を行う
             SetOgreLamp();
 
@@ -247,7 +237,7 @@ namespace September.Common
             // スコアの更新処理
             PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
         }
-        
+
         /// <summary>
         /// 鬼を抽選するメソッド
         /// </summary>
@@ -265,7 +255,7 @@ namespace September.Common
             _firstOgrePlayer = ogreKey;
             PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
         }
-        
+
         /// <summary>
         /// 各Playerの気絶時に呼ばれるメソッド
         /// </summary>
@@ -293,13 +283,13 @@ namespace September.Common
             UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
             Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
         }
-        
+
         private void HideCursor()
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
-        
+
         private void SetOgreLamp()
         {
             if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
