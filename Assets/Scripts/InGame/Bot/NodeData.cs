@@ -31,7 +31,7 @@ namespace InGame.Bot
             ResetState();
         }
 
-        public void AddConnect(NodeData data, float distance)
+        public void AddConnect(NodeData data)
         {
             if (ConnectNode.Contains(data))
             {

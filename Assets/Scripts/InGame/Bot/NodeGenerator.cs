@@ -75,6 +75,16 @@ namespace InGame.Bot
             return list.ToArray();
         }
 
+        public void Awake()
+        {
+            Destroy(this);
+
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
         [Button("ÉmÅ[Éhê∂ê¨")]
         public void Generate()
         {
@@ -87,6 +97,7 @@ namespace InGame.Bot
         {
             if (_isGenerating) return;
             _isGenerating = true;
+
 
             try
             {
@@ -161,10 +172,6 @@ namespace InGame.Bot
 
                     Nodes[idx.x, idx.y, idx.z] ??= new List<NodeData>(2);
                     Nodes[idx.x, idx.y, idx.z].Add(node);
-
-#if UNITY_EDITOR
-                    _mapData?.AddNodeData(node);
-#endif
                 }
 
                 float maxDistSq = _connectDistance * _connectDistance;
@@ -232,8 +239,8 @@ namespace InGame.Bot
 
                                     float dist = Mathf.Sqrt(distSq);
 
-                                    node.AddConnect(other, dist);
-                                    other.AddConnect(node, dist);
+                                    node.AddConnect(other);
+                                    other.AddConnect(node);
                                 }
                             }
                         }
@@ -244,6 +251,16 @@ namespace InGame.Bot
                 }
 
 #if UNITY_EDITOR
+                foreach (var nodeList in Nodes)
+                {
+                    if (nodeList == null) continue;
+
+                    foreach (var node in nodeList)
+                    {
+                        _mapData?.AddNodeData(node);
+                    }
+                }
+
                 if (_mapData != null)
                 {
                     EditorUtility.SetDirty(_mapData);
