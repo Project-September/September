@@ -25,11 +25,15 @@ MonoBehaviour:
     Action: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     Icon: {fileID: 21300000, guid: f508db900ae488a4d96bf0b4bb262906, type: 3}
     Description: "\u624B\u3059\u308A\u3092\u4E57\u308A\u8D8A\u3048\u308B"
-  - ActionName: Dash
-    Action: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-    Icon: {fileID: 21300000, guid: 90047a75cb6e9834f87a7dac70773dc8, type: 3}
-    Description: "\u30C0\u30C3\u30B7\u30E5"
   - ActionName: Grapple
     Action: {fileID: 8462350752065892112, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     Icon: {fileID: 21300000, guid: 464fe22ba774bda40b25d77bc58ca6a2, type: 3}
     Description: "\u30B0\u30E9\u30C3\u30D7\u30EB"
+  - ActionName: Dash
+    Action: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    Icon: {fileID: 21300000, guid: 90047a75cb6e9834f87a7dac70773dc8, type: 3}
+    Description: "\u30C0\u30C3\u30B7\u30E5"
+  - ActionName: Stance
+    Action: {fileID: 8462350752065892112, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    Icon: {fileID: 21300000, guid: dcb878322e69ee24ebe5c6e390582f51, type: 3}
+    Description: "\u30AF\u30CA\u30A4\u3092\u69CB\u3048\u308B"
