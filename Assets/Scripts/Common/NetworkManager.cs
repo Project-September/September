@@ -21,7 +21,7 @@ namespace September.Common
         NetworkRunner _networkRunner;
         UniTask<StartGameResult> _currentTask;
 
-        private void Start()
+        private void Awake()
         {
             if (Instance == null)
             {
@@ -53,6 +53,11 @@ namespace September.Common
             }
         }
 
+        public async UniTask LoadLobbyScene()
+        {
+            await _networkRunner.LoadScene(_lobbySceneName);
+        }
+
         async UniTask<StartGameResult> CreateLobbyAsync(string gameName, int playerCount)
         {
             var result = await _networkRunner.StartGame(new StartGameArgs
@@ -68,7 +73,6 @@ namespace September.Common
                 return result;
             }
             await _networkRunner.SpawnAsync(_playerDatabasePrefab);
-            await _networkRunner.LoadScene(_lobbySceneName);
 
             return result;
         }
