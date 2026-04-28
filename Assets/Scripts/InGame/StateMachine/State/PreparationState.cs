@@ -26,7 +26,6 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
-        [SerializeField] private SerializableDictionary<CharacterType, ControlDescriptionType> _controlDescriptionDictionary;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
@@ -40,19 +39,9 @@ namespace September.Common
 
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData localData))
             {
-                var descriptionType = ControlDescriptionType.Player; // デフォルト
+                ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(localData.CharacterType);
 
-                if (_controlDescriptionDictionary?.Dictionary != null &&
-                    _controlDescriptionDictionary.Dictionary.TryGetValue(localData.CharacterType, out var type))
-                {
-                    descriptionType = type;
-                }
-                else
-                {
-                    Debug.LogWarning($"CharacterType is not registered in Dictionary");
-                }
-
-                UIController.I.ChangeDescriptionUI(descriptionType);
+                UIController.I.ChangeDescriptionUI(type);
             }
 
             if (Context.Runner.IsServer)
