@@ -154,16 +154,5 @@ namespace September.Common
             await _networkRunner.UnloadScene("Field");
             await _networkRunner.LoadScene(_resultSceneName);
         }
-        
-        public PlayerRef GetLocalPlayerRef()
-        {
-            if (_networkRunner == null || _networkRunner.LocalPlayer == null)
-            {
-                Debug.LogWarning("NetworkRunner or LocalPlayer is not available.");
-                return default; // Return an invalid index
-            }
-
-            return _networkRunner.LocalPlayer;
-        }
     }
 }

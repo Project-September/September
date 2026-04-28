@@ -1,12 +1,9 @@
-#region
-
+#if UNITY_EDITOR
 using Cysharp.Threading.Tasks;
 using September.Common;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-
-#endregion
 
 namespace September.Editor.InGameDebug
 {
@@ -31,15 +28,21 @@ namespace September.Editor.InGameDebug
 			InGameDebugDataRepository.OnViewUpdated -= Repaint;
 		}
 
+		[MenuItem("September/In Game Debug")]
+		public static void Open()
+		{
+			GetWindow<InGameDebugWindow>("In Game Debug");
+		}
+
 		private void OnGUI()
 		{
 			if (Application.isPlaying && !_lobbyData.IsStartedFromExtensionWindow)
 			{
 				GUI.color = Color.red;
-				EditorGUILayout.LabelField("このウィンドウ以外から再生が開始されました。\nこのウィンドウは無効化されています。",EditorStyles.wordWrappedLabel);
+				EditorGUILayout.LabelField("このウィンドウ以外から再生が開始されました。\nこのウィンドウは無効化されています。", EditorStyles.wordWrappedLabel);
 				GUI.color = Color.white;
 			}
-			
+
 			GUI.enabled = !Application.isPlaying;
 			_lobbyData.LobbyName = EditorGUILayout.TextField("Lobby Name", _lobbyData.LobbyName);
 			_lobbyData.Nickname = EditorGUILayout.TextField("Nickname", _lobbyData.Nickname);
@@ -49,7 +52,7 @@ namespace September.Editor.InGameDebug
 			{
 				EditorGUILayout.BeginHorizontal("box");
 				EditorGUILayout.LabelField(_lobbyData.Nickname + (i == 0 ? "" : "_" + i));
-				
+
 				_lobbyData.PlayerData[i].CharacterType =
 					(CharacterType)EditorGUILayout.EnumPopup(_lobbyData.PlayerData[i].CharacterType);
 
@@ -63,12 +66,14 @@ namespace September.Editor.InGameDebug
 				if (GUILayout.Button("削除", GUILayout.Width(60))) _lobbyData.PlayerData.RemoveAt(i);
 				EditorGUILayout.EndHorizontal();
 			}
+
 			GUI.enabled = true;
 
 			EditorGUILayout.EndScrollView();
 
 			GUILayout.Space(10);
-			GUI.enabled = Application.isPlaying && _lobbyData.IsStartedFromExtensionWindow && !_lobbyData.RequestMoveToGameScene;
+			GUI.enabled = Application.isPlaying && _lobbyData.IsStartedFromExtensionWindow &&
+			              !_lobbyData.RequestMoveToGameScene;
 			GUI.backgroundColor = Color.green;
 			if (GUILayout.Button("ゲーム開始"))
 				_lobbyData.RequestMoveToGameScene = true;
@@ -81,18 +86,10 @@ namespace September.Editor.InGameDebug
 			}
 			GUI.enabled = !Application.isPlaying;
 
-			if (GUILayout.Button("デバッグ再生開始"))
-			{
-				Run().Forget();
-			}
+			if (GUILayout.Button("デバッグ再生開始")) Run().Forget();
 			GUI.enabled = true;
 		}
 
-		[MenuItem("September/In Game Debug")]
-		public static void Open()
-		{
-			GetWindow<InGameDebugWindow>("In Game Debug");
-		}
 		private bool TryLoadTitleScene()
 		{
 			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -100,6 +97,7 @@ namespace September.Editor.InGameDebug
 				EditorSceneManager.OpenScene(TitleScenePath, OpenSceneMode.Single);
 				return true;
 			}
+
 			return false;
 		}
 
@@ -110,6 +108,7 @@ namespace September.Editor.InGameDebug
 				Debug.LogWarning("デバッグ再生がキャンセルされました。");
 				return;
 			}
+
 			await UniTask.WaitForSeconds(1);
 			if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
 			{
@@ -117,7 +116,7 @@ namespace September.Editor.InGameDebug
 				return;
 			}
 
-			SessionState.SetBool("IsMainEditor", true);
+			SessionState.SetBool("InGameDebug.IsMainEditor", true);
 			// ゲーム開始時の設定データをJsonに書き出す(DomainReload対策)
 			_lobbyData.IsStartedFromExtensionWindow = true;
 			InGameDebugDataRepository.SaveLobbyData();
@@ -126,3 +125,4 @@ namespace September.Editor.InGameDebug
 		}
 	}
 }
+#endif

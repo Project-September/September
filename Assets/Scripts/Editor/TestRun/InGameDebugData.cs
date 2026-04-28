@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,22 +56,24 @@ namespace September.Editor.InGameDebug
 			OnViewUpdated?.Invoke();
 		}
 	}
+
 	[Serializable]
 	public class InGameDebugLobbyData
 	{
-		[NonSerialized] public bool RequestMoveToGameScene;
 		// 拡張windowからゲームが開始したかどうか
 		public bool IsStartedFromExtensionWindow;
 		public string LobbyName = "TestLobby";
 		public string Nickname = "TestPlayer";
 		public List<PlayerSetupData> PlayerData = new();
+		[NonSerialized] public bool RequestMoveToGameScene;
 
 		[Serializable]
 		public class PlayerSetupData
 		{
 			public CharacterType CharacterType = CharacterType.OkabeWright;
-			[NonSerialized]
-			public bool IsConnected;
+
+			[NonSerialized] public bool IsConnected;
 		}
 	}
 }
+#endif

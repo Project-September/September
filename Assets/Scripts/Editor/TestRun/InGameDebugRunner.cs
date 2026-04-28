@@ -1,5 +1,4 @@
-#region
-
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,6 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-#endregion
 
 namespace September.Editor.InGameDebug
 {
@@ -20,8 +18,8 @@ namespace September.Editor.InGameDebug
 	{
 		static InGameDebugEntryPoint()
 		{
-			var _lobbyData = InGameDebugDataRepository.TestLobbyData;
-			if (_lobbyData.IsStartedFromExtensionWindow)
+			var lobbyData = InGameDebugDataRepository.TestLobbyData;
+			if (lobbyData.IsStartedFromExtensionWindow)
 			{
 				EditorApplication.playModeStateChanged += StartGame;
 			}
@@ -50,16 +48,11 @@ namespace September.Editor.InGameDebug
 	public class InGameDebugRunner : INetworkRunnerCallbacks
 	{
 		private readonly float _joinRetrySecond = 15f;
-		private NetworkRunner _networkRunner;
 		private InGameDebugLobbyData _lobbyData;
+		private NetworkRunner _networkRunner;
 		private string GameName => _lobbyData.LobbyName;
 		private int MaxPlayers => _lobbyData.PlayerData.Count;
 		private List<InGameDebugLobbyData.PlayerSetupData> PlayersData => _lobbyData.PlayerData;
-
-		void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-		{
-			AddPlayer();
-		}
 
 		public async UniTask RunAsync()
 		{
@@ -68,31 +61,32 @@ namespace September.Editor.InGameDebug
 			NickNameProvider.SetNickName(_lobbyData.Nickname);
 
 			// これがメインエディターであればLobbyを作成する。
-			if (SessionState.GetBool("IsMainEditor", false))
+			if (SessionState.GetBool("InGameDebug.IsMainEditor", false))
 				await networkManager.CreateLobby(GameName, MaxPlayers);
 			else　// メインエディターでなければLobbyに入れる
 				await JoinLobby();
+
 			// NetworkRunnerをFindで取得する
 			_networkRunner = Object.FindFirstObjectByType<NetworkRunner>();
 			_networkRunner.AddCallbacks(this);
-			AddPlayer();
+			UpdatePlayerConnectionState();
 
 			await UniTask.WaitUntil(() => PlayerDatabase.Instance != null);
 			var playerDatabase = PlayerDatabase.Instance;
-			var localPlayerRef = networkManager.GetLocalPlayerRef();
+			var localPlayerRef = _networkRunner.LocalPlayer;
 			playerDatabase.AddPlayerData(localPlayerRef);
 
 			if (!_networkRunner.IsServer) return;
-			// 指定人数に達するか、設定された時間が終了するまで待つ
-			await WaitingForPlayers();
+
+			// 指定人数に達するか、Editor上でボタンが押されるまで待機
+			await UniTask.WaitUntil(() => _lobbyData.RequestMoveToGameScene);
+			await UniTask.Delay(1000);
 
 			// 設定されたキャラクターを人数分、順番に割り振る
 			var index = 0;
 			foreach (var player in playerDatabase.PlayerDataDic)
-			{
-				if(index < PlayersData.Count)
+				if (index < PlayersData.Count)
 					playerDatabase.Rpc_SetCharacter(player.Key, PlayersData[index++].CharacterType);
-			}
 
 			networkManager.StartGame().Forget();
 		}
@@ -119,39 +113,37 @@ namespace September.Editor.InGameDebug
 			}
 		}
 
-		private void AddPlayer()
+		private void UpdatePlayerConnectionState()
 		{
-			if (!_networkRunner.IsServer) return;
 			if (_networkRunner == null)
 			{
 				Debug.LogWarning("NetworkRunner is null. Cannot add player.");
 				return;
 			}
 
+			if (!_networkRunner.IsServer) return;
+
+			var ActivePlayerCount = _networkRunner.ActivePlayers.Count();
+			var count = Mathf.Min(ActivePlayerCount, _lobbyData.PlayerData.Count);
+
 			// アクティブプレイヤーの数だけ順番にConnectしたことにする。
-			for (var i = 0; i < _networkRunner.ActivePlayers.Count() &&
-			     i < _lobbyData.PlayerData.Count; i++)
+			for (var i = 0; i < count; i++)
 			{
 				_lobbyData.PlayerData[i].IsConnected = true;
+			}
+
+			// プレイヤーが指定数集まっていればゲームを開始する。
+			if (_lobbyData.PlayerData.Count <= ActivePlayerCount)
+			{
+				_lobbyData.RequestMoveToGameScene = true;
 			}
 
 			InGameDebugDataRepository.EditorUpdate();
 		}
 
-		// エディターから開始ボタンが押されるまで待機する。
-		private async UniTask WaitingForPlayers()
+		void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
 		{
-			if (PlayerDatabase.Instance == null) return;
-			while (true)
-			{
-				if (_lobbyData.RequestMoveToGameScene)
-				{
-					Debug.Log("MoveToGameScene flag is set. Moving to game scene.");
-					break;
-				}
-
-				await UniTask.Delay(1000);
-			}
+			UpdatePlayerConnectionState();
 		}
 
 		#region INetworkRunnerCallbacks
@@ -236,3 +228,4 @@ namespace September.Editor.InGameDebug
 		#endregion
 	}
 }
+#endif
