@@ -1324,6 +1324,26 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5350015315830211674, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: '_descriptionDictionary.values.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: f0b1b946560908145ad5f374aefff9f3, type: 2}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: '_descriptionDictionary.values.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 2a86a825d76a0564fa6d7ec36f43b68c, type: 2}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: '_descriptionDictionary.values.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 92ecbc2e303fcc64db3750c7e3dccb41, type: 2}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: '_descriptionDictionary.values.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 44c5119a34ba73349b21a1714d58da2a, type: 2}
     - target: {fileID: 7158450074864065001, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -2092,8 +2112,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815706846}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.20967059, y: 0.45176768, z: -0.110126205, w: 0.86012584}
-  m_LocalPosition: {x: -25.447107, y: -5.6484556, z: 2.5842335}
+  m_LocalRotation: {x: 0.16909811, y: 0.7703555, z: -0.22818965, w: 0.5708658}
+  m_LocalPosition: {x: -22.510273, y: 0.78999996, z: 24.146217}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
