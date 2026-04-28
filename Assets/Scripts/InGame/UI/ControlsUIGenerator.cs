@@ -12,11 +12,6 @@ public class ControlsUIGenerator : MonoBehaviour
     [SerializeField] 
     private SerializableDictionary<ControlDescriptionType, ControlDescription> _descriptionDictionary;
 
-    private void Start()
-    {
-        // GenerateDescription(_descriptionData);
-    }
-
     /// <summary>
     /// ControlDescriptionの内容をもとに操作説明UIを生成する
     /// </summary>
