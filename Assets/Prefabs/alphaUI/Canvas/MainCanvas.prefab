@@ -358,10 +358,10 @@ MonoBehaviour:
   _descriptionDictionary:
     keys: 00000000010000000200000003000000
     values:
-    - {fileID: 11400000, guid: 51181377b98687c47a36c7651bf2254c, type: 2}
-    - {fileID: 11400000, guid: 51181377b98687c47a36c7651bf2254c, type: 2}
-    - {fileID: 11400000, guid: 51181377b98687c47a36c7651bf2254c, type: 2}
-    - {fileID: 11400000, guid: 51181377b98687c47a36c7651bf2254c, type: 2}
+    - {fileID: 11400000, guid: f0b1b946560908145ad5f374aefff9f3, type: 2}
+    - {fileID: 11400000, guid: 2a86a825d76a0564fa6d7ec36f43b68c, type: 2}
+    - {fileID: 11400000, guid: 92ecbc2e303fcc64db3750c7e3dccb41, type: 2}
+    - {fileID: 11400000, guid: 44c5119a34ba73349b21a1714d58da2a, type: 2}
 --- !u!1001 &2241977469473301577
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -376,11 +376,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_Pivot.x
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_Pivot.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_AnchorMax.x
@@ -400,7 +400,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -436,11 +436,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -207
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 83
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 6134474665295814675, guid: 12fcc8e722228dc4f9ead33389a1105d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
