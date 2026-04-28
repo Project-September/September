@@ -76,19 +76,13 @@ public class AimCameraController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_AimCamera()
     {
-        if(!HasInputAuthority) return;
         IsAim = true;
-        _normalCamera.gameObject.SetActive(false);
-        _aimCamera.gameObject.SetActive(true);
-        
-        //プレイヤーの向きをカメラの方向に合わせる
-        if (MainCamera == null)
+        if (HasInputAuthority)
         {
-            MainCamera = Camera.main;
-            Debug.LogWarning("MainCameraがnull");
-            return;
+            _normalCamera.gameObject.SetActive(false);
+            _aimCamera.gameObject.SetActive(true);
         }
-        var camForward = MainCamera.transform.forward;
+        var camForward = AimDirection;
         camForward.y = 0;
         gameObject.transform.forward = camForward;
     }

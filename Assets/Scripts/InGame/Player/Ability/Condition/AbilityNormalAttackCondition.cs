@@ -26,7 +26,8 @@ namespace  InGame.Player.Ability
                    _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal &&
                    context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available &&
                    context.AbilityRef.CanStartAbilityOverride() &&
-                   context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(PlayerButtons.Attack);
+                   context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(PlayerButtons.Attack) &&
+                   !context.CurrentButtons.IsSet(PlayerButtons.Ability2);
         }
         
         private bool IsGameEnded()
