@@ -38,7 +38,7 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
-        private bool _isRemote; //遠距離インタラクション中か判定s
+        private bool _isRemote; //遠距離インタラクション中か判定
 
         private void Awake()
         {
