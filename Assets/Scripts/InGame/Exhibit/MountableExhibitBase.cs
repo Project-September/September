@@ -174,19 +174,7 @@ namespace InGame.Exhibit
         public virtual void GetOff(PlayerRef playerRef)
         {
             PlayerDatabase.Instance.PlayerDataDic.TryGet(playerRef, out var playerData);
-            ControlDescriptionType type;
-            if(playerData.CharacterType == CharacterType.Sarutobi)
-            {
-                type = ControlDescriptionType.Sarutobi;
-            }
-            else if(playerData.CharacterType == CharacterType.Tanihira)
-            {
-                type = ControlDescriptionType.Tanihira;
-            }
-            else
-            {
-                type = ControlDescriptionType.Player;
-            }
+            ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
             RPC_ChangeDescriptionUI(playerRef, type);
             var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)

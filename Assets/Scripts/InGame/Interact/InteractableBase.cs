@@ -425,19 +425,7 @@ namespace InGame.Interact
         public void EndInteract()
         {
             _activeEffectBase?.OnInteractEnd();
-            ControlDescriptionType type;
-            if(_characterType == CharacterType.Tanihira)
-            {
-                type = ControlDescriptionType.Tanihira;
-            }
-            else if(_characterType == CharacterType.Sarutobi)
-            {
-                type = ControlDescriptionType.Sarutobi;
-            }
-            else
-            {
-                type = ControlDescriptionType.Player;
-            }
+            ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(_characterType);
             RPC_ChangeDescriptionUI(type);
             _activeEffectBase = null;
             _characterType = CharacterType.None;
