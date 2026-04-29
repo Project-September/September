@@ -37,8 +37,6 @@ namespace InGame.Bot
                     endNodeDis = endDis;
                 }
             }
-            Debug.Log("Start" + startNode.Position);
-            Debug.Log("endNode" + endNode.Position);
             if (startNode == null || endNode == null || nodeDatas == null)
             {
                 Debug.LogError("åoòHíTçıé∏îs");
@@ -74,11 +72,6 @@ namespace InGame.Bot
                 crrentNode = GetSmallCost(openNodes);
                 Debug.DrawLine(crrentNode.Position, crrentNode.Position + Vector3.up * 2, Color.red, 0.1f);
                 List<NodeData> connectNodes = new();
-
-                if (crrentNode.ConnectNode.Count == 0)
-                {
-                    Debug.Log("ConnectNull");
-                }
 
                 foreach (var connectNode in crrentNode.ConnectNode)
                 {

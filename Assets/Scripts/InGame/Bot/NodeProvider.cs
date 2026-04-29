@@ -33,8 +33,13 @@ namespace InGame.Bot
         {
             if (Application.isPlaying && _isDrowGizmo)
             {
-                NodeGenerator.DrowGizmos(Nodes);
+                NodeGenerator.DrawGizmos(Nodes);
             }
+        }
+
+        public NodeData GetRandomNode()
+        {
+            return Nodes[Random.Range(0, Nodes.Count)];
         }
     }
 }

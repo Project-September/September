@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using NaughtyAttributes;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace InGame.Bot
 {
@@ -40,6 +42,7 @@ namespace InGame.Bot
 
         private List<Vector3> _nodePositions = new();
         public List<NodeData>[,,] Nodes;
+        private UnityEngine.AI.NavMeshPath _path = new();
 
         private Vector3 _offset;
         private float _invCell;
@@ -234,6 +237,7 @@ namespace InGame.Bot
                                     if ((node.ConnectNode?.Count ?? 0) >= _maxConnectCount) break;
                                     if (other == null) continue;
                                     if (node.ConnectNode != null && node.ConnectNode.Contains(other)) continue;
+                                    if (!HasValidPath(node.Position, other.Position)) continue;
 
                                     if (HasObstacle(node.Position, other.Position)) continue;
 
@@ -267,6 +271,7 @@ namespace InGame.Bot
                     AssetDatabase.SaveAssets();
                 }
 #endif
+
 
                 Debug.Log("=== Generate Complete ===");
             }
@@ -385,11 +390,11 @@ namespace InGame.Bot
 
         private bool IsOnNavMesh(Vector3 pos)
         {
-            return UnityEngine.AI.NavMesh.SamplePosition(
+            return NavMesh.SamplePosition(
                 pos,
                 out _,
                 _navMeshTolerance,
-                UnityEngine.AI.NavMesh.AllAreas
+                NavMesh.AllAreas
             );
         }
 
@@ -418,71 +423,64 @@ namespace InGame.Bot
             return new Vector3Int(ix, iy, iz);
         }
 
+        private bool HasValidPath(Vector3 from, Vector3 to)
+        {
+            _path ??= new NavMeshPath();
+
+            if (NavMesh.CalculatePath(from, to, NavMesh.AllAreas, _path))
+            {
+                return _path.status == NavMeshPathStatus.PathComplete;
+            }
+            return false;
+        }
         private void OnDrawGizmos()
         {
             if (!_isDrawGizumoIcon || Nodes == null) return;
 
-            Gizmos.color = Color.green;
+            var result = Nodes
+           .Cast<List<NodeData>>()
+           .Where(l => l != null)
+           .SelectMany(l => l)
+           .ToList();
 
-            foreach (var cell in Nodes)
-            {
-                if (cell == null) continue;
-
-                foreach (var node in cell)
-                {
-                    Gizmos.DrawSphere(node.Position + Vector3.up * 0.3f, 0.2f);
-
-                    if (node.ConnectNode == null) continue;
-
-                    foreach (var connect in node.ConnectNode)
-                    {
-                        if (connect == null) continue;
-
-                        Gizmos.DrawLine(
-                            node.Position + Vector3.up * 0.3f,
-                            connect.Position + Vector3.up * 0.3f
-                        );
-                    }
-                }
-            }
+            DrawGizmos(result);
         }
 
         public static void DrawGizmos(List<NodeData> nodes)
         {
-            if (nodes == null) return;
+            var offset = Vector3.up * 0.3f;
+            var cam = Camera.current;
 
-            Gizmos.color = Color.green;
+            if (cam == null) return;
+            var camPos = cam.transform.position;
 
-            var drawn = new HashSet<(int, int)>();
-
-            foreach (var node in nodes)
+            for (int i = 0; i < nodes.Count; i++)
             {
-                Gizmos.DrawSphere(node.Position + Vector3.up * 0.3f, 0.2f);
+                var node = nodes[i];
+                if (node == null) continue;
 
-                if (node.ConnectNode == null) continue;
+                // カメラから遠いノードはスキップ
+                if ((node.Position - camPos).sqrMagnitude > 400f) continue;
 
-                int aId = node.GetHashCode();
+                var pos = node.Position + offset;
 
-                foreach (var connect in node.ConnectNode)
+                var connects = node.ConnectNode;
+                if (connects == null) continue;
+
+                for (int j = 0; j < connects.Count; j++)
                 {
+                    var connect = connects[j];
                     if (connect == null) continue;
 
-                    int bId = connect.GetHashCode();
-                    var key = aId < bId ? (aId, bId) : (bId, aId);
-
-                    if (!drawn.Add(key)) continue;
+                    // 重複描画防止（超重要）
+                    if (node.GetHashCode() > connect.GetHashCode()) continue;
 
                     Gizmos.DrawLine(
-                        node.Position + Vector3.up * 0.3f,
-                        connect.Position + Vector3.up * 0.3f
+                        pos,
+                        connect.Position + offset
                     );
                 }
             }
-        }
-
-        public static void DrowGizmos(List<NodeData> nodes)
-        {
-            DrawGizmos(nodes);
         }
     }
 }
