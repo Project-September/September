@@ -364,7 +364,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
-            RPC_ChangeDescriptionUI(ownerPlayerRef,1);
+            RPC_ChangeDescriptionUI(ownerPlayerRef, ControlDescriptionType.Exhibit);
             RPC_SetIsKinematic(false);
             // 乗った時刻を記録
             GetOnTime = Runner.SimulationTime;
@@ -376,7 +376,7 @@ namespace InGame.Exhibit
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ChangeDescriptionUI(PlayerRef target, int mode)
+        private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
         {
             if (Runner.LocalPlayer == target)
             {
@@ -389,7 +389,7 @@ namespace InGame.Exhibit
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
             
             PlayerDatabase.Instance.PlayerDataDic.TryGet(OwnerPlayerRef, out var playerData);
-            RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? 3 : 2);
+            RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? ControlDescriptionType.Sarutobi : ControlDescriptionType.Player);
             var chara = PlayerDatabase.Instance.PlayerDataDic[OwnerPlayerRef].CharacterType;
             var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
