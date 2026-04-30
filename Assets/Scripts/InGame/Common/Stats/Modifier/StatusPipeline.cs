@@ -1,7 +1,7 @@
 namespace September.InGame.Common.Stats
 {
     /// <summary>
-    /// StatsModifierを登録し、ステータスに適用するクラス
+    /// <see cref="StatsEffectorBase"/>を登録し、ステータスに適用するクラス
     /// </summary>
     public class StatusPipeline
     {
