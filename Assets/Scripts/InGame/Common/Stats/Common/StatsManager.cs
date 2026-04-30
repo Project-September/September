@@ -68,7 +68,7 @@ namespace September.InGame.Common.Stats
         /// </summary>
         private void CalcStats()
         {
-            _pipeline.CalcStats(BaseStats, ref CurrentStats);
+            CurrentStats = _pipeline.CalcStats(BaseStats);
             
             // 変更があったステータスを検出
             foreach (var (statType, prevStat) in _prevStats.Stats)

@@ -13,8 +13,7 @@ namespace September.InGame.Common.Stats
         /// 全てのエフェクトを適用する
         /// </summary>
         /// <param name="baseStats">適用前の初期値となる値</param>
-        /// <param name="result">結果を書き込むコンテナ</param>
-        public void CalcStats(in StatsContainer baseStats, ref StatsContainer result)
+        public StatsContainer CalcStats(in StatsContainer baseStats)
         {
             var stats = baseStats;
             
@@ -25,7 +24,7 @@ namespace September.InGame.Common.Stats
             }
             
             // 結果をステータスコンテナに書き込む
-            result = stats;
+            return stats;
         }
     }
 }
