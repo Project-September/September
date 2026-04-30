@@ -8,17 +8,17 @@ namespace September.InGame.Common.Stats
     /// </summary>
     public abstract class StatsModifierBase : NetworkBehaviour
     {
-        public abstract void Apply(EffectableStats stats);
+        public abstract void Apply(CalcStats stats);
     }
 
     /// <summary>
-    /// 計算用ステータス
+    /// ステータス計算用のオブジェクト。Spanを使用して高速に計算を行う
     /// </summary>
-    public ref struct EffectableStats
+    public ref struct CalcStats
     {
         public Span<Stat> Stats;
 
-        public EffectableStats(Span<Stat> stats) => Stats = stats;
+        public CalcStats(Span<Stat> stats) => Stats = stats;
 
         public void WriteStats(ref StatsContainer container)
         {

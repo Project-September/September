@@ -29,7 +29,7 @@ namespace September.InGame.Common.Stats
             }
             
             // 計算用の高速なステータス
-            var calcStats = new EffectableStats(statsSpan);
+            var calcStats = new CalcStats(statsSpan);
             
             // 全てのステータス効果を適用
             foreach (var mod in _statsModifiers)

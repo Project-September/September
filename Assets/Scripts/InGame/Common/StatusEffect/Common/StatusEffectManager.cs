@@ -19,7 +19,7 @@ namespace September.InGame.Common.Stats
             UpdateEffects(Time.deltaTime);
         }
         
-        public override void Apply(EffectableStats stats)
+        public override void Apply(CalcStats stats)
         {
             for (int i = 0; i < stats.Stats.Length; i++)
             {
