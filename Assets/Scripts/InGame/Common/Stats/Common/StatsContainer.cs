@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
@@ -98,9 +99,11 @@ namespace September.InGame.Common.Stats
         }
     }
 
+    [Serializable]
     public struct Stat : INetworkStruct
     {
-        public readonly StatType StatType;
+        [SerializeField] private StatType _statType;
+        public StatType StatType => _statType;
 
         [Networked] public float Value { get; private set; }
 
@@ -114,7 +117,7 @@ namespace September.InGame.Common.Stats
 
         public Stat(StatType statType, float baseValue, float minValue = 0, float maxValue = float.PositiveInfinity)
         {
-            StatType = statType;
+            _statType = statType;
             Value = baseValue;
             MinValue = minValue;
             MaxValue = maxValue;
