@@ -1,3 +1,4 @@
+using System;
 using September.InGame.Common.Stats;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace InGame.Player
 
         public StatsContainer GetStats()
         {
-            var stats = new Stat[]
+            Span<Stat> stats = stackalloc Stat[]
             {
                 new(StatType.Health, Health, maxValue: Health),
                 new(StatType.Speed, Speed),

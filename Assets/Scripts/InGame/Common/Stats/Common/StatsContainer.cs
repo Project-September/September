@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
@@ -9,19 +8,10 @@ namespace September.InGame.Common.Stats
     {
         [Networked, Capacity(16)] public NetworkDictionary<StatType, Stat> Stats => default;
 
-        public StatsContainer(Stat[] stats)
+        public StatsContainer(ReadOnlySpan<Stat> stats)
         {
             foreach (var stat in stats)
             {
-                Stats.Add(stat.StatType, stat);
-            }
-        }
-
-        public StatsContainer(IReadOnlyDictionary<StatType, Stat> stats)
-        {
-            foreach (var kvp in stats)
-            {
-                var stat = kvp.Value;
                 Stats.Add(stat.StatType, stat);
             }
         }
