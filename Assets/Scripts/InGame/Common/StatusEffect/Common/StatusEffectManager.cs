@@ -19,17 +19,16 @@ namespace September.InGame.Common.Stats
             UpdateEffects(Time.deltaTime);
         }
         
-        public override StatsContainer Apply(StatsContainer stats)
+        public override void Apply(EffectableStats stats)
         {
-            var dict = new Dictionary<StatType, Stat>();
-            
-            foreach (var(statType, stat) in stats.Stats)
+            for (int i = 0; i < stats.Stats.Count; i++)
             {
+                var(statType, stat) = stats.Stats.ElementAt(i);
                 var newStat = ApplyStat(stat);
-                dict.Add(statType, newStat);
+                stats.Stats[statType] = newStat;
             }
-            
-            return new StatsContainer(dict);
+
+            return;
             
             Stat ApplyStat(Stat stat)
             {
