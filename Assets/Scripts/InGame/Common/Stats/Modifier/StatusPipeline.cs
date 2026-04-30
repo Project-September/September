@@ -16,7 +16,7 @@ namespace September.InGame.Common.Stats
         /// </summary>
         /// <param name="baseStats">適用前の初期値となる値</param>
         /// <param name="result">結果を書き込むコンテナ</param>
-        public void CalcStats(StatsContainer baseStats, ref StatsContainer result)
+        public void CalcStats(in StatsContainer baseStats, ref StatsContainer result)
         {
             // 計算時に使用するコレクションを作成（元の配列に影響を与えないように）
             Span<Stat> statsSpan = stackalloc Stat[baseStats.Stats.Count];
