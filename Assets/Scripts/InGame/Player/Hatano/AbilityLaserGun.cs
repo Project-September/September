@@ -23,6 +23,7 @@ namespace InGame.Player.Ability
 
         protected override void OnStart()
         {
+            base.OnStart();
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = ShootingStateType.Stance;

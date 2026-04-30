@@ -21,6 +21,7 @@ namespace InGame.Player.Ability
         
         protected override void OnStart()
         {
+            base.OnStart();
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = ShootingStateType.Stance;
@@ -87,6 +88,7 @@ namespace InGame.Player.Ability
 
         protected override void OnEndAbility()
         {
+            base.OnEndAbility();
             //構え前の状態へ戻す
             _shootingType = ShootingStateType.None;
             _lastShootingType = ShootingStateType.None;
