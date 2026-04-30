@@ -1,6 +1,6 @@
 namespace September.InGame.Common.Stats
 {
-    /// <summary> Effect 用共通 </summary>
+    /// <summary> ステータスの種類の定義 </summary>
     public enum StatType
     {
         Health,

@@ -8,17 +8,18 @@ using UnityEngine;
 namespace September.InGame.Common.Stats
 {
     /// <summary>
-    /// ステータスを管理するクラス
+    /// ステータスを管理するコンポーネント
     /// </summary>
     public abstract class StatsManager : NetworkBehaviour
     {
-        [SerializeField] private StatsModifierBase[] _modifiers;
+        [SerializeField] private StatsEffectorBase[] _modifiers;
 
+        /// <summary> エフェクト適用前のステータス </summary>
         [Networked] private ref StatsContainer BaseStats => ref MakeRef<StatsContainer>();
         
         private StatusPipeline _pipeline;
 
-        /// <summary> バフなどの要因を加味した最終的なステータス </summary>
+        /// <summary> エフェクト適用後のステータス </summary>
         protected StatsContainer CurrentStats;
 
         /// <summary> 変更を検知する用 </summary>

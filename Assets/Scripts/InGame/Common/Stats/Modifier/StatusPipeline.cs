@@ -1,16 +1,19 @@
 namespace September.InGame.Common.Stats
 {
+    /// <summary>
+    /// StatsModifierを登録し、ステータスに適用するクラス
+    /// </summary>
     public class StatusPipeline
     {
-        private readonly StatsModifierBase[] _statsModifiers;
+        private readonly StatsEffectorBase[] _statsModifiers;
         
-        public StatusPipeline(params StatsModifierBase[] statsModifiers)
+        public StatusPipeline(params StatsEffectorBase[] statsModifiers)
         {
             _statsModifiers = statsModifiers;
         }
 
         /// <summary>
-        /// 全てのエフェクトを適用する
+        /// 登録されたモディファイアを適用した結果を返します
         /// </summary>
         /// <param name="baseStats">適用前の初期値となる値</param>
         public StatsContainer CalcStats(in StatsContainer baseStats)

@@ -3,9 +3,9 @@ using Fusion;
 namespace September.InGame.Common.Stats
 {
     /// <summary>
-    /// ステータスを変化させるクラス
+    /// バフシステムなどの、ステータスを変化させるシステムの基底クラス
     /// </summary>
-    public abstract class StatsModifierBase : NetworkBehaviour
+    public abstract class StatsEffectorBase : NetworkBehaviour
     {
         public abstract StatsContainer Apply(StatsContainer stats);
     }

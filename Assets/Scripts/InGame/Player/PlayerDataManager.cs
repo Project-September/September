@@ -1,7 +1,6 @@
 using September.InGame.Common.Stats;
 using UnityEngine;
 using September.InGame.UI;
-using UniRx;
 
 namespace InGame.Player
 {

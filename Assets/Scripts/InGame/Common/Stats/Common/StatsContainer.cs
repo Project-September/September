@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace September.InGame.Common.Stats
 {
+    /// <summary>
+    /// 複数のステータスを格納する型
+    /// </summary>
     public readonly struct StatsContainer : INetworkStruct
     {
         [Networked, Capacity(16)] public NetworkDictionary<StatType, Stat> Stats => default;
