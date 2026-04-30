@@ -13,20 +13,19 @@ namespace September.InGame.Common.Stats
         }
 
         /// <summary>
-        /// 登録されたモディファイアを適用した結果を返します
+        /// 登録されたエフェクターを適用した結果を返します
         /// </summary>
         /// <param name="baseStats">適用前の初期値となる値</param>
         public StatsContainer CalcStats(in StatsContainer baseStats)
         {
             var stats = baseStats;
             
-            // 全てのステータス効果を適用
+            // 全てのエフェクターを適用
             foreach (var mod in _statsModifiers)
             {
                 stats = mod.Apply(stats);
             }
             
-            // 結果をステータスコンテナに書き込む
             return stats;
         }
     }
