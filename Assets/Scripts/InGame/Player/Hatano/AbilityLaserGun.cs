@@ -18,11 +18,16 @@ namespace InGame.Player.Ability
         private float _interactionTimer;
         [Header("判定を取るためのBoxの大きさ")]
         [SerializeField] private Vector3 _judgmentBoxSize;
-        
+
+        /// <summary>
+        /// 現在、インタラクション中のオブジェクトを保持
+        /// </summary>
+        private InteractableBase _currentInteractableBase;
         private HatanoAbilityStatusManagement _abilityStatusManagement;
 
         protected override void OnStart()
         {
+            base.OnStart();
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = ShootingStateType.Stance;
@@ -67,28 +72,43 @@ namespace InGame.Player.Ability
                     //一番最初にインタラクションオブジェクトを見つけ次第、ループを抜ける
                     if(interactableBase != null) break;
                 }
-
+                
                 //インタラクションオブジェクトを取得出来た場合、インタラクションを行う
                 if (interactableBase != null)
                 {
+                    //現在のインタラクションオブジェクトが前回と違う場合、タイマーを初期化
+                    if (_currentInteractableBase != interactableBase)
+                    {
+                        _interactionTimer = 0;
+                        _currentInteractableBase = interactableBase;
+                    }
+                    
                     _playerInteractionController.RemoteInteraction(
                         ref _interactionTimer, _interactionTime, interactableBase, ref _phase, _aimCameraController);
                 }
                 else //インタラクションを中止する
                 {
+                    _currentInteractableBase = null;
                     _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
                 }
+            }
+            else //hitした場所がなかった場合もタイマーを初期化する
+            {
+                _currentInteractableBase = null;
+                _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
             }
         }
 
         protected override void OnNoShooting()
         {
+            _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
         }
 
         protected override void OnStopTheStance()
         {
+            _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
         }

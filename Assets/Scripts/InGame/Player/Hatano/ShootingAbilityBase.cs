@@ -21,12 +21,21 @@ namespace InGame.Player.Ability.Effect.Shooting
         [SerializeField] protected float _shootingDistance;
         [Header("マズル（数に応じて追加）")]
         [SerializeField] protected Transform[] _muzzlePos;
+        
+        private PlayerManager _playerManager;
+
+        protected override void OnStart()
+        {
+            if(_playerManager == null)
+                _playerManager = Parameter.Owner.GetComponent<PlayerManager>();
+        }
 
         /// <summary>
         /// 射撃などの入力を判定する
         /// </summary>
         protected void ShootingInputJudgment()
         {
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             //射撃ステートが構えの場合、射撃入力を受け付ける
             if (_shootingType == ShootingStateType.Stance)
             {
@@ -44,6 +53,7 @@ namespace InGame.Player.Ability.Effect.Shooting
             //構え入力が終了➤構える前の状態に戻す
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
+                _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
                 ApplyCameraState(ShootingStateType.None);
                 _phase = AbilityPhase.Available;
                 _shootingType = ShootingStateType.None;
@@ -96,7 +106,12 @@ namespace InGame.Player.Ability.Effect.Shooting
                 _aimCameraController.RPC_CrosshairToggleChange(false);
             }
         }
-        
+
+        protected override void OnEndAbility()
+        {
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+        }
+
         /// <summary>
         /// 射撃入力をしたときに行う処理を書く
         /// </summary>
