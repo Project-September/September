@@ -18,7 +18,7 @@ namespace September.InGame.Common.Stats
         /// <param name="result">結果を書き込むコンテナ</param>
         public void CalcStats(StatsContainer baseStats, ref StatsContainer result)
         {
-            // EffectableStatsに渡すためのSpan
+            // 計算時に使用するコレクションを作成（元の配列に影響を与えないように）
             Span<Stat> statsSpan = stackalloc Stat[baseStats.Stats.Count];
 
             // 値のみ書き写す（コピーした値をSpanに格納する）
