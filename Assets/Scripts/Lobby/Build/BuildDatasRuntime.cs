@@ -9,7 +9,7 @@ namespace September.Lobby
         int _currentIndex;
         bool _selected;
 
-        public BuildDataBase CurrentBuildData => _builds[_currentIndex] ?? throw new System.NullReferenceException();
+        public BuildDataBase CurrentBuildData => _builds[_currentIndex] ?? throw new System.InvalidOperationException();
 
         public BuildDatasRuntime(BuildDatas data)
         {

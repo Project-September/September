@@ -11,9 +11,8 @@ namespace September.Lobby
         {
             _runtime = new(data);
             _view = view;
-            if (_runtime == null) throw new System.NullReferenceException(nameof(_runtime));
-            if (_view == null) throw new System.NullReferenceException(nameof(_view));
-            _view.VisulaizeBuildInfo(_runtime.CurrentBuildData);
+            if (_view == null) throw new System.ArgumentNullException(nameof(_view));
+            _view.VisualizeBuildInfo(_runtime.CurrentBuildData);
         }
 
         /// <summary>
@@ -23,7 +22,7 @@ namespace September.Lobby
         public void MoveIndex(BuildIndexMoveType move)
         {
             _runtime.MoveIndex(move);
-            _view.VisulaizeBuildInfo(_runtime.CurrentBuildData);
+            _view.VisualizeBuildInfo(_runtime.CurrentBuildData);
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace September.Lobby
 
         /// <summary>表示する情報を切り替えるメソッド</summary>
         /// <param name="build">表示する情報</param>
-        void VisulaizeBuildInfo(BuildDataBase build);
+        void VisualizeBuildInfo(BuildDataBase build);
 
         /// <summary>ビルドルートを決定するメソッド</summary>
         /// <param name="selected">初めて決定したかどうか</param>
