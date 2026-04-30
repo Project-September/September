@@ -1,5 +1,3 @@
-using System;
-
 namespace September.InGame.Common.Stats
 {
     public class StatusPipeline
@@ -18,27 +16,16 @@ namespace September.InGame.Common.Stats
         /// <param name="result">結果を書き込むコンテナ</param>
         public void CalcStats(in StatsContainer baseStats, ref StatsContainer result)
         {
-            // 計算時に使用するコレクションを作成（元の配列に影響を与えないように）
-            Span<Stat> statsSpan = stackalloc Stat[baseStats.Stats.Count];
-
-            // 値のみ書き写す（コピーした値をSpanに格納する）
-            int i = 0;
-            foreach (var (_, stat) in baseStats.Stats)
-            {
-                statsSpan[i++] = stat;
-            }
-            
-            // 計算用の高速なステータス
-            var calcStats = new CalcStats(statsSpan);
+            var stats = baseStats;
             
             // 全てのステータス効果を適用
             foreach (var mod in _statsModifiers)
             {
-                mod.Apply(calcStats);
+                stats = mod.Apply(stats);
             }
             
             // 結果をステータスコンテナに書き込む
-            calcStats.WriteStats(ref result);
+            result = stats;
         }
     }
 }
