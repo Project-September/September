@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using Fusion;
 
 namespace September.InGame.Common.Stats
@@ -14,25 +14,17 @@ namespace September.InGame.Common.Stats
     /// <summary>
     /// 計算用ステータス
     /// </summary>
-    public class EffectableStats
+    public ref struct EffectableStats
     {
-        public readonly Dictionary<StatType, Stat> Stats = new();
+        public Span<Stat> Stats;
 
-        public void SetStats(IEnumerable<KeyValuePair<StatType, Stat>> stats)
-        {
-            Stats.Clear();
-            foreach (var kvp in stats)
-            {
-                var stat = kvp.Value;
-                Stats.Add(stat.StatType, stat);
-            }
-        }
+        public EffectableStats(Span<Stat> stats) => Stats = stats;
 
-        public void GetStats(ref StatsContainer container)
+        public void WriteStats(ref StatsContainer container)
         {
-            foreach (var (statType, stat) in Stats)
+            foreach (var stat in Stats)
             {
-                container.TrySetStatValue(statType, stat.Value);
+                container.TrySetStatValue(stat.StatType, stat.Value);
             }
         }
     }

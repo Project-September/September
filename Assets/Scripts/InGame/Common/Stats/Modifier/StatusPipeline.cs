@@ -1,36 +1,44 @@
+using System;
+
 namespace September.InGame.Common.Stats
 {
     public class StatusPipeline
     {
         private readonly StatsModifierBase[] _statsModifiers;
         
-        /// <summary>
-        /// 計算用ステータス
-        /// </summary>
-        private readonly EffectableStats _stats;
-
         public StatusPipeline(params StatsModifierBase[] statsModifiers)
         {
             _statsModifiers = statsModifiers;
         }
 
-        public void ResetStats(StatsContainer stats)
-        {
-            _stats.SetStats(stats.Stats);
-        }
-
         /// <summary>
         /// 全てのエフェクトを適用する
         /// </summary>
-        /// <param name="result">結果となるステータスコンテナ</param>
-        public void CalcStats(ref StatsContainer result)
+        /// <param name="baseStats">適用前の初期値となる値</param>
+        /// <param name="result">結果を書き込むコンテナ</param>
+        public void CalcStats(StatsContainer baseStats, ref StatsContainer result)
         {
-            foreach (var mod in _statsModifiers)
+            // EffectableStatsに渡すためのSpan
+            Span<Stat> statsSpan = stackalloc Stat[baseStats.Stats.Count];
+
+            // 値のみ書き写す（コピーした値をSpanに格納する）
+            int i = 0;
+            foreach (var (_, stat) in baseStats.Stats)
             {
-                mod.Apply(_stats);
+                statsSpan[i++] = stat;
             }
             
-            _stats.GetStats(ref result);
+            // 計算用の高速なステータス
+            var calcStats = new EffectableStats(statsSpan);
+            
+            // 全てのステータス効果を適用
+            foreach (var mod in _statsModifiers)
+            {
+                mod.Apply(calcStats);
+            }
+            
+            // 結果をステータスコンテナに書き込む
+            calcStats.WriteStats(ref result);
         }
     }
 }

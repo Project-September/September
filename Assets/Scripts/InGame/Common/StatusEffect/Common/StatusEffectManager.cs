@@ -21,11 +21,11 @@ namespace September.InGame.Common.Stats
         
         public override void Apply(EffectableStats stats)
         {
-            for (int i = 0; i < stats.Stats.Count; i++)
+            for (int i = 0; i < stats.Stats.Length; i++)
             {
-                var(statType, stat) = stats.Stats.ElementAt(i);
+                var stat = stats.Stats[i];
                 var newStat = ApplyStat(stat);
-                stats.Stats[statType] = newStat;
+                stats.Stats[i] = newStat;
             }
 
             return;
