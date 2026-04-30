@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace InGame.Player
 {
+    /// <summary>
+    /// プレイヤーステータスを管理するコンポーネント
+    /// </summary>
     public class PlayerStatus : StatsManager
     {
         [SerializeField] private PlayerParameter _params;
