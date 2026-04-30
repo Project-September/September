@@ -33,11 +33,6 @@ namespace September.InGame.Common.Stats
             return false;
         }
 
-        public float GetStatValue(StatType type)
-        {
-            return Stats[type].Value;
-        }
-
         public bool TryGetStatValue(StatType type, out float value)
         {
             if (TryGetStat(type, out var stat))
@@ -47,16 +42,6 @@ namespace September.InGame.Common.Stats
             }
             value = 0;
             return false;
-        }
-        
-        public void SetStatValue(StatType type, float value)
-        {
-            SetStatValueInternal(type, value);
-        }
-
-        public void AddStatValue(StatType type, float value)
-        {
-            SetStatValueInternal(type, Stats[type].Value + value);
         }
         
         public bool TrySetStatValue(StatType type, float value)
