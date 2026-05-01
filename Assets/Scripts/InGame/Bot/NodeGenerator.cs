@@ -8,6 +8,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 using UnityEngine.AI;
+using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 namespace InGame.Bot
 {
@@ -170,6 +171,7 @@ namespace InGame.Bot
 
                 for (int i = 0; i < _nodePositions.Count; i++)
                 {
+                    if (!HasValidPath(_nodePositions[i], _origin.position)) continue;
                     var node = new NodeData(_nodePositions[i], i);
                     var idx = WorldToIndex(_nodePositions[i]);
 

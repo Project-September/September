@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using InGame.Bot;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -39,6 +37,11 @@ namespace InGame.Bot
             {
                 Debug.Log("ŠO•”ƒLƒƒƒ“ƒZƒ‹");
             }
+
+            if(_nodes == null || _nodes.Count == 0)
+            {
+                GetRandomMoveRoute(position);
+            } 
             _isFind = false;
         }
 
