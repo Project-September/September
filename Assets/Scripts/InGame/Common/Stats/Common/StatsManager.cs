@@ -36,7 +36,7 @@ namespace September.InGame.Common.Stats
         /// </summary>
         protected abstract StatsContainer GetInitialStats();
 
-        public override void Spawned()
+        public sealed override void Spawned()
         {
             BaseStats = GetInitialStats();
             _prevStats = GetInitialStats();
@@ -45,7 +45,7 @@ namespace September.InGame.Common.Stats
             _statOnChangedSubjectsTable = BaseStats.Stats.ToDictionary(s => s.Key, _ => new Subject<float>());
         }
 
-        public override void FixedUpdateNetwork()
+        public sealed override void FixedUpdateNetwork()
         {
             CalcStats();
             NotifyChangedStats();
