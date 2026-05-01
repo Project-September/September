@@ -4,6 +4,7 @@ using System.Linq;
 using Fusion;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace September.InGame.Common.Stats
 {
@@ -69,6 +70,8 @@ namespace September.InGame.Common.Stats
         /// </summary>
         private void CalcStats()
         {
+            Profiler.BeginSample("StatsManager.CalcStats");
+            
             _pipeline.CalcStats(BaseStats, ref CurrentStats);
             
             // 変更があったステータスを検出
@@ -81,6 +84,8 @@ namespace September.InGame.Common.Stats
             }
 
             _prevStats = CurrentStats;
+            
+            Profiler.EndSample();
         }
         
         /// <summary>

@@ -3,6 +3,7 @@ using System.Linq;
 using Fusion;
 using InGame.Common;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace September.InGame.Common.Stats
 {
@@ -20,11 +21,15 @@ namespace September.InGame.Common.Stats
         
         public override void Apply(ref StatsContainer stats)
         {
+            Profiler.BeginSample("StatusEffectManager.Apply");
+            
             foreach (var (type, stat) in stats.Stats)
             {
                 var newStat = ApplyStat(stat);
                 stats.Stats.Set(type, newStat);
             }
+            
+            Profiler.EndSample();
 
             return;
             

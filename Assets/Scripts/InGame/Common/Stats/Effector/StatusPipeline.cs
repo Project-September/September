@@ -1,3 +1,5 @@
+using UnityEngine.Profiling;
+
 namespace September.InGame.Common.Stats
 {
     /// <summary>
@@ -19,6 +21,8 @@ namespace September.InGame.Common.Stats
         /// <param name="resultStats">適用後の結果が書き込まれるコンテナ</param>
         public void CalcStats(in StatsContainer baseStats, ref StatsContainer resultStats)
         {
+            Profiler.BeginSample("StatusPipeline.CalcStats");
+            
             resultStats = baseStats;
             
             // 全てのエフェクターを適用
@@ -26,6 +30,8 @@ namespace September.InGame.Common.Stats
             {
                 mod.Apply(ref resultStats);
             }
+            
+            Profiler.EndSample();
         }
     }
 }
