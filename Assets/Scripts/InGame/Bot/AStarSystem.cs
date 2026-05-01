@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using Fusion;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -13,7 +12,7 @@ namespace InGame.Bot
         {
             if (_isFind) return new();
             _isFind = true;
-            var nodeDatas = NodeProvider.Instance.Nodes;
+            List<NodeData> nodeDatas = new(NodeProvider.Instance.Nodes);
 
             NodeData startNode = null;
             float startNodeDis = float.MaxValue;
@@ -112,7 +111,6 @@ namespace InGame.Bot
                     Debug.Log("ñ≥å¿ÉãÅ[Év");
                     break;
                 }
-                await UniTask.Yield();
             }
             if (crrentNode != goal)
             {
@@ -143,8 +141,8 @@ namespace InGame.Bot
             }
 
             result.Reverse();
+            await UniTask.DelayFrame(1);
             return result;
-
         }
         private static NodeData GetSmallCost(List<NodeData> nodeDatas)
         {

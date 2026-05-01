@@ -14,6 +14,7 @@ namespace InGame.Bot
         public override bool GetPlayerInput(out PlayerInput input)
         {
             input = _stateMachine.GetInput();
+            input.Buttons.Set(PlayerButtons.Dash, true);
             return true;
         }
     }
