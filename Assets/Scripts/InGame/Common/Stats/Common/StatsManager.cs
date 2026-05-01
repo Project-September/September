@@ -108,7 +108,7 @@ namespace September.InGame.Common.Stats
         public void SetBaseValue(StatType statType, float value)
         {
             BaseStats.TrySetStatValue(statType, value);
-            CalcStats();
+            CalcStats(); // 変更を即時反映
         }
 
         public void AddBaseValue(StatType statType, float value)
