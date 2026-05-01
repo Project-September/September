@@ -13635,6 +13635,7 @@ GameObject:
   - component: {fileID: 8355274600117350697}
   - component: {fileID: 5358505061852357365}
   - component: {fileID: -3905644752378878134}
+  - component: {fileID: 9041128788755863220}
   - component: {fileID: 4737425158909762900}
   - component: {fileID: 7710838205980989238}
   - component: {fileID: 7508249662566368237}
@@ -13728,6 +13729,7 @@ MonoBehaviour:
   - {fileID: 3242880713039265549}
   - {fileID: 5358505061852357365}
   - {fileID: -3905644752378878134}
+  - {fileID: 9041128788755863220}
   - {fileID: 7710838205980989238}
   - {fileID: 7508249662566368237}
   - {fileID: 2779401866583128900}
@@ -13911,9 +13913,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97fa1f5e591252438ae6f1ea8b0742b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _param: {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
-  _CurrentHealth: 0
-  _CurrentStamina: 0
+  _params: {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
+  _modifiers:
+  - {fileID: 9041128788755863220}
+--- !u!114 &9041128788755863220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc9f589dd0734820b271751f025e398c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4737425158909762900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14325,6 +14339,7 @@ MonoBehaviour:
   _changeOffsetDuration: 0.2
   _defaultBulletCount: 1
   _angleBetweenBullets: 2.5
+  _homingRange: {x: 150, y: 150}
   _stance: {fileID: 7400000, guid: f0fc32250dd58af46bcf550907312b7d, type: 2}
   _stanceLoop: {fileID: 7400000, guid: 3219ec83e3c65ab4ab202264540d13b6, type: 2}
   _throw: {fileID: 7400000, guid: 6bb4907bebb67584ab8af42caa53f9b9, type: 2}
@@ -14332,6 +14347,7 @@ MonoBehaviour:
   _kunaiSpeed: 100
   _bulletMark: {fileID: 7762581465889203969, guid: 052631cb43762b9479c2428dc1d6ca4d, type: 3}
   _crosshairPrefab: {fileID: 2541600367538618662, guid: a369727939273664ea0cfb03757f02c7, type: 3}
+  _otherPlayers: []
   _State: 0
 --- !u!114 &3507305747521096909
 MonoBehaviour:

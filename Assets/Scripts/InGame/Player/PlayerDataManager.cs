@@ -1,6 +1,6 @@
+using September.InGame.Common.Stats;
 using UnityEngine;
 using September.InGame.UI;
-using UniRx;
 
 namespace InGame.Player
 {
@@ -30,9 +30,9 @@ namespace InGame.Player
             if (UIController.I)
             {
                 // Health監視
-                status.ReactiveCurrentHealth.DistinctUntilChanged().Subscribe(UIController.I.ChangeSliderValue).AddTo(this);
+                status.SubscribeStatOnChanged(StatType.Health, x => UIController.I.ChangeSliderValue((int)x));
                 // Stamina 監視
-                status.ReactiveCurrentStamina.DistinctUntilChanged().Subscribe(UIController.I.ChangeStaminaValue).AddTo(this);
+                status.SubscribeStatOnChanged(StatType.Stamina, x => UIController.I.ChangeStaminaValue(x));
             }
         }
     }
