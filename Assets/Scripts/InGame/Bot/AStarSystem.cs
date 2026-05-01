@@ -117,6 +117,7 @@ namespace InGame.Bot
             if (crrentNode != goal)
             {
                 Debug.LogError("åoòHíTçıé∏îs");
+                return new();
             }
 
             NodeData prev = null;

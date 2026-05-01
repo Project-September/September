@@ -42,7 +42,7 @@ namespace InGame.Bot
 
         private List<Vector3> _nodePositions = new();
         public List<NodeData>[,,] Nodes;
-        private UnityEngine.AI.NavMeshPath _path = new();
+        private NavMeshPath _path = new();
 
         private Vector3 _offset;
         private float _invCell;

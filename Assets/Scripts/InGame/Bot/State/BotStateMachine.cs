@@ -1,7 +1,7 @@
 using September.Common;
 using UnityEngine;
 
-namespace September
+namespace InGame.Bot
 {
     public class BotStateMachine : MonoBehaviour
     {

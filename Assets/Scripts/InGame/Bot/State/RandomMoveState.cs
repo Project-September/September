@@ -1,12 +1,17 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using InGame.Bot;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace September
+namespace InGame.Bot
 {
     public class RandomMoveState : IBotState
     {
+        private CancellationTokenSource _findRootToken = new();
+        private bool _isFind = false;
         private List<NodeData> _nodes;
         private int _index;
         public void  OnEnter(BotStateMachine stateMachine)
@@ -15,18 +20,45 @@ namespace September
         }
         private async void GetRandomMoveRoute(Vector3 position)
         {
+            _isFind = true;
             _index = 0;
             var goal = NodeProvider.Instance.GetRandomNode();
-            _nodes = await AStarSystem.FindRoute(position, goal.Position);
+            _findRootToken = new();
+            try
+            {
+                _nodes = await AStarSystem.FindRoute(position, goal.Position)
+                    .Timeout(TimeSpan.FromSeconds(5))
+                    .AttachExternalCancellation(_findRootToken.Token);
+            }
+            catch (TimeoutException)
+            {
+                Debug.Log("経路探索タイムアウト");
+                GetRandomMoveRoute(position);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("外部キャンセル");
+            }
+            _isFind = false;
         }
 
         public void OnExit(BotStateMachine stateMachine)
         {
+            _findRootToken.Cancel();
+            _findRootToken?.Dispose();
 
+            _findRootToken = new();
         }
 
         public void OnUpdate(BotStateMachine stateMachine)
         {
+            if(_isFind || _nodes == null || _nodes.Count == 0)
+            {
+                stateMachine._direction = Vector2.zero;
+                return;
+            }
+            _index = Mathf.Clamp(_index, 0, _nodes.Count - 1);
+            Debug.Log($"{_index}/{_nodes.Count}");
             if (Vector3.Distance(stateMachine.transform.position,_nodes[_index].Position) <= stateMachine._stopDistance)
             {
                 _index++;

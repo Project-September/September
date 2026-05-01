@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September
+namespace InGame.Bot
 {
     public interface IBotState
     {
