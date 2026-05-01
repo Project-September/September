@@ -18,7 +18,7 @@ namespace September.InGame.Common.Stats
             UpdateEffects(Time.deltaTime);
         }
         
-        public override StatsContainer Apply(StatsContainer stats)
+        public override void Apply(ref StatsContainer stats)
         {
             foreach (var (type, stat) in stats.Stats)
             {
@@ -26,7 +26,7 @@ namespace September.InGame.Common.Stats
                 stats.Stats.Set(type, newStat);
             }
 
-            return stats;
+            return;
             
             Stat ApplyStat(Stat stat)
             {

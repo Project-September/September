@@ -7,6 +7,6 @@ namespace September.InGame.Common.Stats
     /// </summary>
     public abstract class StatsEffectorBase : NetworkBehaviour
     {
-        public abstract StatsContainer Apply(StatsContainer stats);
+        public abstract void Apply(ref StatsContainer stats);
     }
 }
