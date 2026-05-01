@@ -1,6 +1,7 @@
 using System;
 using InGame.Common;
 using September.Common;
+using September.InGame.Common.Stats;
 using September.InGame.Effect;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace InGame.Player.Ability.Effect
         [SerializeField] private StatusEffect _buffEffect;
         [SerializeField] private EffectType _effectType;
         
-        private PlayerStatus _playerStatus;
+        private StatusEffectManager _statusEffectManager;
         private EffectSpawner _effectSpawner;
         private string _effectID;
 
@@ -22,9 +23,9 @@ namespace InGame.Player.Ability.Effect
             Debug.Log("[AbilityOkabeUlt] Start");
             var player = Parameter.Owner;
 
-            if (_playerStatus || player.TryGetComponent(out _playerStatus))
+            if (_statusEffectManager || player.TryGetComponent(out _statusEffectManager))
             {
-                _playerStatus.AddEffect(_buffEffect);
+                _statusEffectManager.AddEffect(_buffEffect);
             }
             
             _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
@@ -42,7 +43,7 @@ namespace InGame.Player.Ability.Effect
 
         protected override void OnEndUlt()
         {
-            _playerStatus?.RemoveEffect(_buffEffect);
+            _statusEffectManager?.RemoveEffect(_buffEffect);
             _effectSpawner?.StopEffect(_effectID);
         }
     }
