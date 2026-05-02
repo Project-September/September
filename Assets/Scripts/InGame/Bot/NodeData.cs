@@ -11,6 +11,7 @@ namespace InGame.Bot
         public int NodeIndex { get; private set; }
         public List<NodeData> ConnectNode { get; private set; }
         public NodeData Parent { get; private set; }
+        public NodeData VaultConnect { get; private set; }
         public float Cost => GetCost();
 
         private float GetCost()
@@ -82,6 +83,10 @@ namespace InGame.Bot
         public void SetParent(NodeData parent)
         {
             Parent = parent;
+        }
+        public void SetVaultConnect(NodeData nodeData)
+        {
+            VaultConnect = nodeData;
         }
     }
 

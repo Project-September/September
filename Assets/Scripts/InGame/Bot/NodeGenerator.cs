@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using InGame.Player;
 using NaughtyAttributes;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
 using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 namespace InGame.Bot
@@ -40,6 +42,16 @@ namespace InGame.Bot
 
         [Header("NavMesh")]
         [SerializeField] private float _navMeshTolerance = 2f;
+        [Header("Vault")]
+        [SerializeField] private CapsuleCollider _botCapsuleCollider;
+        [SerializeField, Tooltip("最大高さ")] private float _maxLedgeHeight;
+        [SerializeField, Tooltip("最小高さ")] private float _minLedgeHeight;
+        [SerializeField, Tooltip("最大奥行")] private float _maxLedgeDepth;
+        [SerializeField] private float _reachDistance;
+        [SerializeField] private float _timeToVault;
+        [SerializeField] private AnimationCurve _vaultCurve;
+        [SerializeField, Tooltip("地面と認識する最大角度")] private float _groundSlopeThreshold = 45f;
+        [SerializeField] private LayerMask _groundLayer = ~0;
 
         private List<Vector3> _nodePositions = new();
         public List<NodeData>[,,] Nodes;
@@ -116,6 +128,7 @@ namespace InGame.Bot
 
                 Debug.Log("=== Generate Start ===");
 
+                //細分化
                 foreach (Transform child in transform)
                 {
                     var root = GetGroundPoint(child.position);
@@ -131,6 +144,7 @@ namespace InGame.Bot
                     return;
                 }
 
+                //地面に移動
                 for (int i = 0; i < _nodePositions.Count; i++)
                 {
                     _nodePositions[i] = GetGroundPoint(_nodePositions[i]);
@@ -139,6 +153,7 @@ namespace InGame.Bot
                         await UniTask.Yield();
                 }
 
+                //近接ノード削除
                 _nodePositions = RemoveCloseNodes(_nodePositions);
 
                 if (_nodePositions.Count == 0)
@@ -147,6 +162,8 @@ namespace InGame.Bot
                     return;
                 }
 
+
+                //タイル化
                 Vector3 min = Vector3.one * float.MaxValue;
                 Vector3 max = Vector3.one * float.MinValue;
 
@@ -164,20 +181,44 @@ namespace InGame.Bot
                     Mathf.Max(1, Mathf.CeilToInt(size.z / _connectDistance) + 1)
                 );
 
+                //NodeData化
                 Nodes = new List<NodeData>[gridSize.x, gridSize.y, gridSize.z];
 
                 _invCell = 1f / _connectDistance;
                 _offset = -min;
 
-                for (int i = 0; i < _nodePositions.Count; i++)
+                int index = 0;
+                for (index = 0; index < _nodePositions.Count; index++)
                 {
-                    if (!HasValidPath(_nodePositions[i], _origin.position)) continue;
-                    var node = new NodeData(_nodePositions[i], i);
-                    var idx = WorldToIndex(_nodePositions[i]);
-
-                    Nodes[idx.x, idx.y, idx.z] ??= new List<NodeData>(2);
-                    Nodes[idx.x, idx.y, idx.z].Add(node);
+                    CreateNodeData(_nodePositions[index],index);
                 }
+
+                //飛び越え計算
+
+                Dictionary<NodeData, Vector3> tryVaultResult = new();
+
+                foreach (var cell in Nodes)
+                {
+                    if(cell == null) continue;
+                    foreach(var node in cell)
+                    {
+                        foreach(var direction in directions)
+                        {
+                          if(!VaultCheck(node.Position,direction,out Vector3 endPos)) continue;
+
+                          tryVaultResult.Add(node, endPos);
+                        }
+                    }
+                }
+                foreach(var data in tryVaultResult)
+                {
+                    index++;
+                    var nodeData = CreateNodeData(data.Value, index);
+                    if (nodeData == null) continue;
+                    data.Key.SetVaultConnect(nodeData);
+                }
+
+                //接続を作る
 
                 float maxDistSq = _connectDistance * _connectDistance;
 
@@ -283,6 +324,18 @@ namespace InGame.Bot
             }
         }
 
+        private NodeData CreateNodeData(Vector3 position,int index)
+        {
+            if (!HasValidPath(position, _origin.position)) return null;
+            var node = new NodeData(position,index);
+            var idx = WorldToIndex(position);
+
+            Nodes[idx.x, idx.y, idx.z] ??= new List<NodeData>(2);
+            Nodes[idx.x, idx.y, idx.z].Add(node);
+
+            return node;
+        }
+
         private void ValidateSettings()
         {
             if (_subdivisionDistance <= 0f)
@@ -345,7 +398,30 @@ namespace InGame.Bot
                 depth++;
             }
         }
+        private bool VaultCheck(Vector3 position ,Vector3 direction,out Vector3 endPos)
+        {
+            bool isVault = VaultChecker.TryVault(new VaultParameter
+            {
+                Position = position,
+                moveDirection = direction,
 
+                capsuleRadius = _botCapsuleCollider.radius,
+                capsuleHeight = _botCapsuleCollider.height,
+
+                reachDistance = _reachDistance,
+
+                maxLedgeHeight = _maxLedgeHeight,
+                minLedgeHeight = _minLedgeHeight,
+                maxLedgeDepth = _maxLedgeDepth,
+
+                groundSlopeThreshold = _groundSlopeThreshold,
+                groundLayer = _groundLayer
+            }, out var result);
+
+            endPos = result.vaultEnd;
+
+            return isVault;
+        }
         private List<Vector3> RemoveCloseNodes(List<Vector3> nodes)
         {
             if (nodes == null || nodes.Count == 0) return new List<Vector3>();
@@ -450,6 +526,8 @@ namespace InGame.Bot
 
         public static void DrawGizmos(List<NodeData> nodes)
         {
+           
+
             var offset = Vector3.up * 0.3f;
             var cam = Camera.current;
 
@@ -476,11 +554,18 @@ namespace InGame.Bot
 
                     // 重複描画防止（超重要）
                     if (node.GetHashCode() > connect.GetHashCode()) continue;
-
+                    Gizmos.color = Color.white;
                     Gizmos.DrawLine(
                         pos,
                         connect.Position + offset
                     );
+                    if (node.VaultConnect == null) continue;
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(
+                        pos,
+                        node.VaultConnect.Position
+                    );
+
                 }
             }
         }
