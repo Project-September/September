@@ -12,6 +12,7 @@ namespace InGame.Bot
         public List<NodeData> ConnectNode { get; private set; }
         public NodeData Parent { get; private set; }
         public NodeData VaultConnect { get; private set; }
+        public bool IsValut;
         public float Cost => GetCost();
 
         private float GetCost()
@@ -54,6 +55,7 @@ namespace InGame.Bot
             State = NodeState.None;
             StartDistance = 0;
             _goalDistance = 0;
+            IsValut = false;
         }
 
         public float GetAllCost()

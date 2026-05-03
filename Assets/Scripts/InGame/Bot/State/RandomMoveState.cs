@@ -64,6 +64,7 @@ namespace InGame.Bot
             Debug.Log($"{_index}/{_nodes.Count}");
             if (Vector3.Distance(stateMachine.transform.position,_nodes[_index].Position) <= stateMachine._stopDistance)
             {
+                stateMachine._vault = _nodes[_index].IsValut;
                 _index++;
 
                 if(_index >= _nodes.Count)

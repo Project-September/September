@@ -46,7 +46,7 @@ namespace InGame.Bot
             _isFind = false;
             return result;
         }
-        private static async UniTask<List<NodeData>> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal)
+        private static async UniTask<List<NodeData>> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal,bool isVault = true)
         {
             List<NodeData> result = new();
             List<NodeData> openNodes = new();
@@ -95,6 +95,13 @@ namespace InGame.Bot
                             SetNodeDistance(connectNode, parentDistance);
                         }
                     }
+                }
+                if(isVault && crrentNode.VaultConnect != null)
+                {
+                    float distance = Vector3.Distance(crrentNode.VaultConnect.Position, crrentNode.Position);
+                    crrentNode.IsValut = true;
+                    crrentNode.VaultConnect.SetParent(crrentNode);
+                    SetNodeDistance(crrentNode.VaultConnect, distance);
                 }
                 crrentNode.Clause();
                 openNodes.Remove(crrentNode);

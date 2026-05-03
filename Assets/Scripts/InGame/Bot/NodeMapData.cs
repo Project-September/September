@@ -44,6 +44,16 @@ namespace InGame.Bot
                     nodeDataPair.Key.AddConnect(nodeData);
                 }
                 result.Add(nodeDataPair.Key);
+
+                if(nodeDataPair.Value.VauletNode != -1)
+                {
+                    if (!indexDic.TryGetValue(nodeDataPair.Value.VauletNode, out NodeData nodeData))
+                    {
+                        Debug.LogError("NodeData‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ");
+                    }
+
+                    nodeDataPair.Key.SetVaultConnect(nodeData);
+                }
             }
 
             return result;
@@ -65,7 +75,8 @@ namespace InGame.Bot
             }
 
             Debug.Log("indexCount" + connectIndex.Count);
-            _serializableNodeDatas.Add(new NodeDataSerializable(node.Position, node.NodeIndex, connectIndex.ToArray()));
+            int vaultNode = node.VaultConnect?.NodeIndex ?? -1;
+            _serializableNodeDatas.Add(new NodeDataSerializable(node.Position, node.NodeIndex, connectIndex.ToArray(), vaultNode));
         }
     }
 
@@ -75,12 +86,13 @@ namespace InGame.Bot
         public Vector3 Position;
         public int Index;
         public int[] ConnectNode;
-
-        public NodeDataSerializable(Vector3 pos, int index, int[] connect)
+        public int VauletNode;
+        public NodeDataSerializable(Vector3 pos, int index, int[] connect, int vauletNode = -1)
         {
             Position = pos;
             Index = index;
             ConnectNode = connect;
+            VauletNode = vauletNode;
         }
     }
 }
