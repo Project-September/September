@@ -58,6 +58,14 @@ namespace September.Editor.InGameDebug
 		{
 			var networkManager = NetworkManager.Instance;
 			_lobbyData = InGameDebugDataRepository.TestLobbyData;
+
+			if (_lobbyData.PlayerData == null || _lobbyData.PlayerData.Count == 0)
+			{
+				Debug.LogError("プレイヤーのデータがありません。\n" +
+				               "少なくとも1人以上のキャラクターを作成してください。");
+				return;
+			}
+			
 			NickNameProvider.SetNickName(_lobbyData.Nickname);
 
 			// これがメインエディターであればLobbyを作成する。
