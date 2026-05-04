@@ -17,7 +17,7 @@ namespace September.InGame.Common.Stats
         {
             if (stats.Length > MaxCapacity)
             {
-                Debug.LogWarning($"[StatsContainer] {stats.Length}個のステータスを持つコンテナを作成しようとしましたが、最大ステータス数（{MaxCapacity}個）を超過しているため正常に動作しない可能性があります。");
+                Debug.LogWarning($"[StatsContainer] {stats.Length}個のステータスを持つコンテナを作成しようとしましたが、最大ステータス数（{MaxCapacity}個）を超過しているため正常に動作しない可能性があります。{nameof(MaxCapacity)}を増やすことを検討してください");
             }
             
             foreach (var stat in stats)
