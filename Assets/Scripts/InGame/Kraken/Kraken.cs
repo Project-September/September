@@ -1,4 +1,3 @@
-using System;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -62,7 +61,7 @@ namespace September.InGame.Kraken
                 _cameraController.CameraReset();
             }
             
-            _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(),Runner.DeltaTime);
+            _cameraController.RotateCamera(new Vector2(GameInput.I.Player.Look.ReadValue<Vector2>().x, 0) ,Runner.DeltaTime);
         }
         
         /// <summary>
