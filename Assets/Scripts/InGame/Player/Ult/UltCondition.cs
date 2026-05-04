@@ -40,6 +40,7 @@ namespace InGame.Player.Ult
         private void Start()
         {
             // スコアの変動を監視
+            if (PlayerDatabase.Instance == null) return;
             PlayerDatabase.Instance.ChangedDataAction += dict =>
             {
                 if (!dict.TryGet(Object.InputAuthority, out var playerData))

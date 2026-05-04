@@ -46,7 +46,7 @@ namespace InGame.Common
         private float _locoWeight;
         private CancellationTokenSource _jumpOverTokenSrc;
 
-        private void Start()
+        public override void Spawned()
         {
             _playerManager.ObserveEveryValueChanged(x => x.IsStun)
                 .Subscribe(isStun =>
