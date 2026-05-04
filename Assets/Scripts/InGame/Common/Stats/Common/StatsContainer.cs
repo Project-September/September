@@ -9,7 +9,7 @@ namespace September.InGame.Common.Stats
     /// </summary>
     public readonly struct StatsContainer : INetworkStruct
     {
-        public const int MaxCapacity = 6;
+        public const int MaxCapacity = 8;
         
         [Networked, Capacity(MaxCapacity)] public NetworkDictionary<StatType, Stat> Stats => default;
 
@@ -17,7 +17,7 @@ namespace September.InGame.Common.Stats
         {
             if (stats.Length > MaxCapacity)
             {
-                Debug.LogWarning($"[StatsContainer] {stats.Length}個のステータスを持つコンテナを作成しようとしましたが、最大ステータス数（{MaxCapacity}個）を超過しているため正常に動作しない可能性があります。");
+                Debug.LogWarning($"[StatsContainer] {stats.Length}個のステータスを持つコンテナを作成しようとしましたが、最大ステータス数（{MaxCapacity}個）を超過しているため正常に動作しない可能性があります。{nameof(MaxCapacity)}を増やすことを検討してください");
             }
             
             foreach (var stat in stats)
