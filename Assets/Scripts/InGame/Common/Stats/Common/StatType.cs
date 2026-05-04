@@ -9,6 +9,7 @@ namespace September.InGame.Common.Stats
         StaminaRegen,
         StaminaConsumption,
         AttackDamage,
-        InteractDurationMultiply
+        InteractDurationMultiply,
+        StunDurationMultiply,
     }
 }

@@ -25,5 +25,6 @@ namespace InGame.Player
         public float Speed => CurrentStats.GetStat(StatType.Speed).Value;
         public float AttackDamage => CurrentStats.GetStat(StatType.AttackDamage).Value;
         public float InteractDurationMultiply => CurrentStats.GetStat(StatType.InteractDurationMultiply).Value;
+        public float StunDurationMultiply => CurrentStats.GetStat(StatType.StunDurationMultiply).Value;
     }
 }

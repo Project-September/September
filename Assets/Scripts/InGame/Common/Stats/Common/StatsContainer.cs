@@ -9,7 +9,7 @@ namespace September.InGame.Common.Stats
     /// </summary>
     public readonly struct StatsContainer : INetworkStruct
     {
-        public const int MaxCapacity = 7;
+        public const int MaxCapacity = 8;
         
         [Networked, Capacity(MaxCapacity)] public NetworkDictionary<StatType, Stat> Stats => default;
 
