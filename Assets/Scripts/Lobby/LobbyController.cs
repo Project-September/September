@@ -21,7 +21,7 @@ namespace September.Lobby
         [SerializeField] private Image _fadePanel;
         [SerializeField] private Transform _contentTransform;
         readonly Dictionary<PlayerRef, PlayerConditionView> _lobbyPlayerUIDic = new();
-        [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(4), HideInInspector]
+        [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(8), HideInInspector]
         public NetworkDictionary<PlayerRef, NetworkBool> PlayerIsReadyDic => default;
         public override void Spawned()
         {
@@ -35,6 +35,7 @@ namespace September.Lobby
             _readyButton.onClick.AddListener(() => Rpc_ToggleReady(Runner.LocalPlayer));
             _quitButton.onClick.AddListener(() => NetworkManager.Instance.QuitLobby().Forget());
             PlayerDatabase.Instance.ChangedDataAction += ChangeLobbyPlayerUI;
+            OnChangedIsReady();
         }
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
@@ -79,18 +80,13 @@ namespace September.Lobby
             await UniTask.WaitForSeconds(delay);
             NetworkManager.Instance.StartGame().Forget();
         }
-        
+
         void AddContents(PlayerRef playerRef)
         {
             if (_lobbyPlayerUIDic.ContainsKey(playerRef)) return;
-            if (Runner.LocalPlayer == playerRef)
-            {
-                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
-            }
-            else
-            {
-                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
-            }
+
+            _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
+
         }
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -102,7 +98,7 @@ namespace September.Lobby
             if (Runner.LocalPlayer == player) return;
             AddContents(player);
         }
-        
+
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
             Destroy(_lobbyPlayerUIDic[player].gameObject);
@@ -113,10 +109,10 @@ namespace September.Lobby
                 PlayerIsReadyDic.Remove(player);
             }
         }
-        
+
         void ChangeLobbyPlayerUI(NetworkDictionary<PlayerRef, SessionPlayerData> dictionary)
         {
-            if(dictionary.ContainsKey(Runner.LocalPlayer)) _playerNameText.text = dictionary[Runner.LocalPlayer].DisplayNickName;
+            if (dictionary.ContainsKey(Runner.LocalPlayer)) _playerNameText.text = dictionary[Runner.LocalPlayer].DisplayNickName;
             foreach (var kv in dictionary)
             {
                 if (!_lobbyPlayerUIDic.TryGetValue(kv.Key, out var value)) return;
@@ -132,7 +128,7 @@ namespace September.Lobby
         public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
         {
         }
-        
+
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
         }

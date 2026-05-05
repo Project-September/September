@@ -30,11 +30,8 @@ namespace InGame.Exhibit.InteractEffect
 
         public void OnHitHammerAttack(PlayerRef actor)
         {
-            var cooldownTime = _cooldownTime;
-            _interactable.LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-            _interactable.LastUsedCooldownTime = cooldownTime;
             //何かしらの対応する演出を入れる
-            _interactable.PlayCooldownEffect(cooldownTime).Forget();
+            _interactable.SetCooldown(_cooldownTime);
             _audio.RPC_PlaySoundFromCode(CueName,SoundTrackingType.Spot,default,actor);
         }
     }

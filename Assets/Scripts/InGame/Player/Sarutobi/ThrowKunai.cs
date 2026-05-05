@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
@@ -18,6 +19,10 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private Transform _muzzleTf;
         [SerializeField] private Vector3 _stanceCameraOffset;
         [SerializeField] private float _changeOffsetDuration;
+        [SerializeField] private int _defaultBulletCount = 1;
+        [SerializeField] private float _angleBetweenBullets = 2.5f;
+        [Header("クナイホーミング範囲")]
+        [SerializeField] private Vector2 _homingRange;
         [Header("AnimationClip")]
         [SerializeField] private AnimationClip _stance;
         [SerializeField] private AnimationClip _stanceLoop;
@@ -28,6 +33,8 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private ParticleSystem _bulletMark;
         [Header("UI")]
         [SerializeField] private GameObject _crosshairPrefab;
+        [Header("他プレイヤー")] 
+        [SerializeField] private List<GameObject> _otherPlayers;
 
         private Camera _mainCamera;
         private PlayerManager _playerManager;
@@ -42,6 +49,7 @@ namespace InGame.Player.Sarutobi
         private bool CanThrow => _cooldownTimer <= 0 && State == KunaiStateType.Ready && _grapplingHook &&
                                  _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active;
 
+        [Networked] private int BulletCountNetwork { get; set; }
         [Networked, HideInInspector] public KunaiStateType State { get; private set; } = KunaiStateType.Idol;
 
         public override void Spawned()
@@ -53,6 +61,7 @@ namespace InGame.Player.Sarutobi
                 _clipPlayer = GetComponent<AnimationClipPlayer>();
                 _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _grapplingHook.OnAbilityStart += EndStance;
+                BulletCountNetwork = _defaultBulletCount;
             }
 
             if (HasInputAuthority)
@@ -64,6 +73,18 @@ namespace InGame.Player.Sarutobi
                 if (!_grapplingHook) _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _crosshair = Instantiate(_crosshairPrefab);
                 _crosshair.SetActive(false);
+                
+                //全プレイヤーを取得
+                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+                if (players.Length > 0)
+                {
+                    //自身以外のプレイヤーを保持（クナイホーミングのため）
+                    foreach (var p in players)
+                    {
+                        if(p == gameObject) continue;
+                        _otherPlayers.Add(p);
+                    }
+                }
             }
         }
 
@@ -90,7 +111,19 @@ namespace InGame.Player.Sarutobi
             }
             else if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Attack) && CanThrow)
             {
-                Throw().Forget();
+                PlayCharacterThrowAnimation().Forget();
+                
+                if (HasInputAuthority)
+                {
+                    var targetPlayer = AcquireAttackTarget();
+                    for (int i = 0; i < BulletCountNetwork; i++)
+                    {
+                        // 扇状にクナイを発射する
+                        // iを中央基準に変換（ 0,1,2,3,4 を -2,-1,0,1,2 に変換）した後、クナイ間の角度をかける
+                        var angle = (i - (BulletCountNetwork - 1) / 2f) * _angleBetweenBullets;
+                        Throw(angle, targetPlayer);
+                    }
+                }
             }
 
             if (State == KunaiStateType.Ready || State == KunaiStateType.Stance)
@@ -117,7 +150,7 @@ namespace InGame.Player.Sarutobi
 
             State = KunaiStateType.Stance;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
-            var endType = await _clipPlayer.PlayClipAndWait(_stance, this.GetCancellationTokenOnDestroy());
+            var endType = await _clipPlayer.PlayClipAndWait(_stance);
 
             if (endType == EndClipType.Complete)
             {
@@ -132,16 +165,90 @@ namespace InGame.Player.Sarutobi
             }
         }
 
-        async UniTask Throw()
+        /// <summary>
+        /// クナイの投げる数を設定する（仮）
+        /// ステータスシステムに統合したい 
+        /// </summary>
+        public void SetBulletCount(int bulletCount)
+        {
+            if (!HasStateAuthority) return;
+            BulletCountNetwork = bulletCount;
+        }
+        
+        void Throw(float angle, GameObject nearPlayer = null)
+        {
+            if (!HasInputAuthority) return;
+            
+            Vector3 dir;
+            // 画面内で一番近いプレイヤーがいる場合、そのプレイヤーの方向を使用する
+            if (nearPlayer != null)
+            {
+                dir = (nearPlayer.transform.position - _mainCamera.transform.position).normalized;
+            }
+            else // カメラの前方方向にangle分回転させた方向を計算
+            {
+                var rot = Quaternion.AngleAxis(angle, Vector3.up);
+                dir = rot * _mainCamera.transform.forward;
+            }
+
+            var hit = Physics.Raycast(_mainCamera.transform.position, dir, out var hitInfo, _maxDistance, _hitLayer);
+            var target = hit
+                ? hitInfo.point
+                : _mainCamera.transform.position + dir * _maxDistance;
+            Throw(target);
+        }
+        
+        /// <summary>
+        /// 画面中央に一番近いプレイヤーを取得する
+        /// </summary>
+        /// <returns>画面中心に最も近いプレイヤー</returns>
+        private GameObject AcquireAttackTarget()
+        {
+            if (_otherPlayers.Count == 0) return null;
+            
+            GameObject nearPlayer = null; // 最も近いプレイヤーを保持
+            float mathf = Mathf.Infinity; //距離比較用
+            Vector2 center = new Vector2(Screen.width / 2f, Screen.height / 2f); //画面中央
+            
+            // 画面中央から一番近いプレイヤーを判定
+            foreach (var p in _otherPlayers)
+            {
+                // ワールド座標をカメラのスクリーン座標へと変換
+                var screenPoint = _mainCamera.WorldToScreenPoint(p.transform.position);
+                // カメラに映っていて、範囲内にいるかを判定する
+                bool isScreen = screenPoint.x >= 0 && screenPoint.x <= Screen.width &&
+                              screenPoint.y >= 0 && screenPoint.y <= Screen.height && screenPoint.z > 0;
+                // 画面中央からプレイヤーの距離がホーミング範囲内かを判定する
+                bool isRange = Mathf.Abs(screenPoint.x - center.x) <= _homingRange.x &&
+                               Mathf.Abs(screenPoint.y - center.y) <= _homingRange.y;
+                bool isView = isScreen && isRange;
+                if(!isView) continue;
+
+                // 画面中央からプレイヤーの距離を計算
+                float distance = Vector2.Distance(new Vector2(screenPoint.x, screenPoint.y), center);
+                if (distance < mathf) // 最も近いプレイヤーを更新していく
+                {
+                    nearPlayer = p;
+                    mathf = distance;
+                }
+            }
+
+            return nearPlayer;
+        }
+
+        void Throw(Vector3 targetPos)
         {
             if (HasInputAuthority)
             {
-                KunaiTargetDetection();
+                KunaiTargetDetection(targetPos);
             }
+        }
 
+        async UniTask PlayCharacterThrowAnimation()
+        {
             if (!HasStateAuthority) return;
             State = KunaiStateType.Stance;
-            var endType = await _clipPlayer.PlayClipAndWait(_throw, this.GetCancellationTokenOnDestroy());
+            var endType = await _clipPlayer.PlayClipAndWait(_throw);
 
             if (endType == EndClipType.Complete)
             {
@@ -188,11 +295,10 @@ namespace InGame.Player.Sarutobi
         }
 
         // Local で投げる位置の判定をとる
-        void KunaiTargetDetection()
+        void KunaiTargetDetection(Vector3 targetPos)
         {
             if (!HasInputAuthority) return;
-            var hit = Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out var hitInfo, _maxDistance, _hitLayer);
-            Rpc_KunaiBulletDetection(hit ? hitInfo.point : _mainCamera.transform.position + _mainCamera.transform.forward * _maxDistance);
+            Rpc_KunaiBulletDetection(targetPos);
         }
         
         /// <summary> input authority から target position を取得し、クナイの判定をとる </summary>

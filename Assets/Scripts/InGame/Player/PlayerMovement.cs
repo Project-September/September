@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
+using September.InGame.Common.Stats;
 using UniRx;
 using UnityEngine;
 
@@ -163,7 +164,7 @@ namespace InGame.Player
             // Dash中ならスタミナを消費させる
             if (isDash && moveDirection != Vector2.zero)
             {
-                if (!InfiniteStamina) _status.CurrentStamina = Mathf.Max(0, _status.CurrentStamina - _staminaConsumption * deltaTime);
+                if (!InfiniteStamina) _status.AddBaseValue(StatType.Stamina, -_status.StaminaConsumption * deltaTime);
 
                 // スタミナなくなったら
                 if (_status.CurrentStamina <= 0)
@@ -289,7 +290,7 @@ namespace InGame.Player
         /// <summary> 条件付きでスタミナを回復させる </summary>
         private void UpdateStamina(bool dashInput, float deltaTime)
         {
-            if (!dashInput || _isDashCoolTime) _status.CurrentStamina = Mathf.Min(_status.MaxStamina, _status.CurrentStamina + _status.StaminaRegen * deltaTime);
+            if (!dashInput || _isDashCoolTime) _status.AddBaseValue(StatType.Stamina, _status.StaminaRegen * deltaTime);
         }
 
         private void TryVault(Vector2 moveDirection)

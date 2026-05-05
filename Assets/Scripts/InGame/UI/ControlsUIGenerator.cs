@@ -22,10 +22,20 @@ public class ControlsUIGenerator : MonoBehaviour
             Debug.LogError("DescriptionObject is not assigned");
             return;
         }
+        
+        if (!_descriptionDictionary.Dictionary.TryGetValue(descriptionType, out var description))
+        {
+            Debug.LogWarning($"{descriptionType}がキーとなる操作説明UIが見つかりませんでした", this);
+            return;
+        }
 
+        if (description == null)
+        {
+            Debug.LogWarning($"{descriptionType}に対応する操作説明UIが見つかりませんでした", this);
+            return;
+        }
+        
         ClearChildren();
-
-        ControlDescription description = _descriptionDictionary.Dictionary[descriptionType];
 
         foreach (var action in description.Actions)
         {
