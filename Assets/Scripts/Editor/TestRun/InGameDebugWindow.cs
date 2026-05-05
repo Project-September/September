@@ -86,6 +86,7 @@ namespace September.Editor.InGameDebug
 			}
 			GUI.enabled = !Application.isPlaying;
 
+			GUI.enabled = _lobbyData.PlayerData.Count > 0;
 			if (GUILayout.Button("デバッグ再生開始")) Run().Forget();
 			GUI.enabled = true;
 		}
