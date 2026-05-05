@@ -9,8 +9,6 @@ using UnityEditor;
 #endif
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.EventSystems;
-using static Codice.Client.Common.EventTracking.TrackFeatureUseEvent.Features.DesktopGUI.Filters;
 
 namespace InGame.Bot
 {

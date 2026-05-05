@@ -1,13 +1,26 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Fusion;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace InGame.Bot
 {
     public static class AStarSystem
     {
         public static bool _isFind = false;
+        private static NavMeshPath _path;
+        public static NavMeshPath Path
+        {
+            get
+            {
+                if( _path == null)
+                {
+                    _path = new NavMeshPath();
+                }
+                return _path;
+            }
+        }
+
         public static async UniTask<List<NodeData>> FindRoute(Vector3 start, Vector3 end)
         {
             if (_isFind) return new();
@@ -25,12 +38,12 @@ namespace InGame.Bot
                 float startDis = Vector3.Distance(nodeData.Position, start);
                 float endDis = Vector3.Distance(nodeData.Position, end);
 
-                if (startNodeDis > startDis)
+                if ( startNodeDis > startDis && ConnectivityCheck(start,nodeData.Position))
                 {
                     startNode = nodeData;
                     startNodeDis = startDis;
                 }
-                if (endNodeDis > endDis)
+                if (endNodeDis > endDis && ConnectivityCheck(end, nodeData.Position))
                 {
                     endNode = nodeData;
                     endNodeDis = endDis;
@@ -46,7 +59,7 @@ namespace InGame.Bot
             _isFind = false;
             return result;
         }
-        private static async UniTask<List<NodeData>> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal,bool isVault = true)
+        private static async UniTask<List<NodeData>> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal, bool isVault = true)
         {
             List<NodeData> result = new();
             List<NodeData> openNodes = new();
@@ -96,7 +109,7 @@ namespace InGame.Bot
                         }
                     }
                 }
-                if(isVault && crrentNode.VaultConnect != null)
+                if (isVault && crrentNode.VaultConnect != null)
                 {
                     float distance = Vector3.Distance(crrentNode.VaultConnect.Position, crrentNode.Position);
                     crrentNode.IsValut = true;
@@ -165,6 +178,46 @@ namespace InGame.Bot
                 }
             }
             return best;
+        }
+
+        private static bool HasObstacle(Vector3 from, Vector3 to)
+        {
+            from += Vector3.up * 0.5f;
+            to += Vector3.up * 0.5f;
+
+            Vector3 dir = to - from;
+            float distance = dir.magnitude;
+
+            if (distance <= 0.0001f) return false;
+            return Physics.Raycast(
+                from,
+                dir / distance,
+            distance
+            );
+        }
+
+        public static bool ConnectivityCheck(Vector3 from,Vector3 to)
+        {
+            if (!NavMesh.CalculatePath(from, to, NavMesh.AllAreas, Path))
+                return false;
+
+            if (Path.status != NavMeshPathStatus.PathComplete)
+                return false;
+
+            // 曲がる必要がある経路は除外（壁越え防止）
+            if (Path.corners.Length > 2)
+                return false;
+
+            // NavMesh上の直線チェック
+            if (NavMesh.Raycast(from, to, out var hit, NavMesh.AllAreas))
+                return false;
+
+            // 高低差制限
+            float heightDiff = Mathf.Abs(from.y - to.y);
+            if (heightDiff > 1.5f)
+                return false;
+
+            return true;
         }
     }
 }

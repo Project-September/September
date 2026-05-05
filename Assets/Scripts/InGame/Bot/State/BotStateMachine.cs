@@ -22,7 +22,7 @@ namespace InGame.Bot
         }
         // Update is called once per frame
         void Update()
-        {
+        {   
             _currentState?.OnUpdate(this);
 
             if(_rigidbody.linearVelocity.magnitude < _stopAmount)
@@ -31,7 +31,7 @@ namespace InGame.Bot
                 if(_stopTimer < 0 )
                 {
                     Debug.Log("ƒtƒŠ[ƒY");
-                    _currentState?.OnEnter(this);
+                    //_currentState?.OnEnter(this);
                 }
             }
             else
@@ -49,8 +49,19 @@ namespace InGame.Bot
         {
             PlayerInput input = new();
             input.MoveDirection = _direction.normalized;
-            input.Buttons.Set(PlayerButtons.Jump, true);
+            input.Buttons.Set(PlayerButtons.Jump, _vault);
+            input.Buttons.Set(PlayerButtons.Dash, false);
             return input;
+        }
+
+        public void OnDrawGizmos()
+        {
+            if (_randomState == null) return;
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(_randomState._nodes[_randomState._nodes.Count - 1].Position, 1f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(_randomState._nodes[_randomState._index].Position,1f);
         }
     }
 }

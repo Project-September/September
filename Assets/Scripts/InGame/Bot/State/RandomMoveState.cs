@@ -10,8 +10,8 @@ namespace InGame.Bot
     {
         private CancellationTokenSource _findRootToken = new();
         private bool _isFind = false;
-        private List<NodeData> _nodes;
-        private int _index;
+        public List<NodeData> _nodes;
+        public int _index;
         public void  OnEnter(BotStateMachine stateMachine)
         {
             GetRandomMoveRoute(stateMachine.transform.position);
@@ -38,10 +38,10 @@ namespace InGame.Bot
                 Debug.Log("ŠO•”ƒLƒƒƒ“ƒZƒ‹");
             }
 
-            if(_nodes == null || _nodes.Count == 0)
+            if (_nodes == null || _nodes.Count == 0)
             {
                 GetRandomMoveRoute(position);
-            } 
+            }
             _isFind = false;
         }
 
@@ -55,19 +55,19 @@ namespace InGame.Bot
 
         public void OnUpdate(BotStateMachine stateMachine)
         {
-            if(_isFind || _nodes == null || _nodes.Count == 0)
+            if (_isFind || _nodes == null || _nodes.Count == 0)
             {
                 stateMachine._direction = Vector2.zero;
                 return;
             }
             _index = Mathf.Clamp(_index, 0, _nodes.Count - 1);
             Debug.Log($"{_index}/{_nodes.Count}");
-            if (Vector3.Distance(stateMachine.transform.position,_nodes[_index].Position) <= stateMachine._stopDistance)
+            if (Vector3.Distance(stateMachine.transform.position, _nodes[_index].Position) <= stateMachine._stopDistance)
             {
                 stateMachine._vault = _nodes[_index].IsValut;
                 _index++;
 
-                if(_index >= _nodes.Count)
+                if (_index >= _nodes.Count)
                 {
                     GetRandomMoveRoute(stateMachine.transform.position);
                 }
