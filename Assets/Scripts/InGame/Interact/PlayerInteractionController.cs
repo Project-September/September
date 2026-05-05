@@ -78,7 +78,7 @@ namespace InGame.Interact
 
                 if (_isExecutingInteraction)
                 {
-                    _currentInteractTime += Runner.DeltaTime;
+                    _currentInteractTime += Time.deltaTime;
                     if (_currentInteractTime >= _requiredInteractTime)
                     {
                         _hasCompletedInteraction = true;
