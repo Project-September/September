@@ -21,6 +21,9 @@ namespace InGame.Player
         [Header("CameraMotion")]
         [SerializeField] private float _motionDuration;
         [SerializeField] private Ease _motionEase;
+        [Header("CameraMovementDirection")]
+        [SerializeField] private bool _enablePitchRotate = true;
+        [SerializeField] private bool _enableYawRotate = true;
         
         // camera rotation
         Quaternion _defaultRotation;
@@ -64,12 +67,20 @@ namespace InGame.Player
                 GameInput.I.UseDeviceType == GameInput.DeviceType.KeyboardMouse 
                 ? _sens * settings.MouseSensitivity 
                 : _padSens * settings.PadSensitivity;
-            
-            float deltaX = mouseInput.y, deltaY = mouseInput.x;
-            _cameraPitch -= deltaX * deltaTime * sens;
-            _cameraPitch = Mathf.Clamp(_cameraPitch, -90 + _defaultPitch, 90 - _defaultPitch);
-            _cameraYaw += deltaY * sens * deltaTime;
-            _cameraYaw = ToAngle(_cameraYaw);
+
+            if (_enablePitchRotate)
+            {
+                float deltaX = mouseInput.y;
+                _cameraPitch -= deltaX * deltaTime * sens;
+                _cameraPitch = Mathf.Clamp(_cameraPitch, -90 + _defaultPitch, 90 - _defaultPitch);
+            }
+
+            if (_enableYawRotate)
+            {
+                float deltaY = mouseInput.x;
+                _cameraYaw += deltaY * sens * deltaTime;
+                _cameraYaw = ToAngle(_cameraYaw);
+            }
             
             _cameraPivot.rotation = Quaternion.Euler(_cameraPitch, _cameraYaw, 0);
         }
