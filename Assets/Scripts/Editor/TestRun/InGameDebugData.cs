@@ -69,8 +69,9 @@ namespace September.Editor.InGameDebug
 		public bool IsStartedFromExtensionWindow;
 		public string LobbyName = "TestLobby";
 		public string Nickname = "TestPlayer";
-		public List<PlayerSetupData> PlayerData = new();
+		[SerializeField] private List<PlayerSetupData> _playerSetupData = new();
 		[NonSerialized] public bool RequestMoveToGameScene;
+		public List<PlayerSetupData> PlayerData => _playerSetupData;
 
 		[Serializable]
 		public class PlayerSetupData
