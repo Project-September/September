@@ -1,13 +1,11 @@
 ﻿using System;
-using CRISound;
 using Fusion;
 using Ingame.Tanihira;
 using InGame.Common;
 using InGame.Interact;
-using InGame.Player;
 using September.Common;
+using September.InGame.Common.Stats;
 using September.InGame.Effect;
-using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -37,12 +35,12 @@ namespace InGame.Exhibit
             if (target.Runner.TryGetPlayerObject(playerRef, out var playerNetworkObject))
             {
                 
-                if (playerNetworkObject.TryGetComponent(out PlayerStatus playerStatus))
+                if (playerNetworkObject.TryGetComponent(out StatusEffectManager statusEffectManager))
                 {
-                    EffectableStatus.StatusEffectSpec spec = new EffectableStatus.StatusEffectSpec(_buffEffect);
+                    StatusEffectManager.StatusEffectSpec spec = new(_buffEffect);
                     spec.Duration = EffectDuration;
                     spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
-                    playerStatus.AddEffect(spec);
+                    statusEffectManager.AddEffect(spec);
                 }
                 
                 if (playerNetworkObject.TryGetComponent(out FormationManager formationManager))

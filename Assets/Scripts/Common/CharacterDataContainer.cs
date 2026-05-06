@@ -35,6 +35,8 @@ namespace September.Common
             public string BGM;
         }
         [SerializeField, ArrayLength(DataCount)] CharacterData[] _characterData;
+        // キャラクターと操作説明を紐づけるための辞書
+        [SerializeField] SerializableDictionary<CharacterType, ControlDescriptionType> _controlDictionary;
 
         public static async UniTaskVoid LoadAssetAsync(string path)
         {
@@ -43,7 +45,23 @@ namespace September.Common
 
         public CharacterData GetCharacterData(CharacterType characterType)
         {
-            return _characterData.FirstOrDefault(data=>data.Type == characterType);
+            return _characterData.FirstOrDefault(data => data.Type == characterType);
+        }
+
+        /// <summary>
+        /// CharacterTypeに対応するControlDescriptionTypeを返す
+        /// </summary>
+        public ControlDescriptionType GetControlDescriptionType(CharacterType characterType)
+        {
+            if (_controlDictionary.Dictionary.TryGetValue(characterType, out var controlDescriptionType))
+            {
+                return controlDescriptionType;
+            }
+            else
+            {
+                Debug.LogError($"{characterType}に対応する操作説明が紐づけされていません");
+                return ControlDescriptionType.Player; // デフォルト値を返す
+            }
         }
 
         public CharacterData GetCharacterData(int index)

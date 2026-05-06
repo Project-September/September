@@ -1,5 +1,5 @@
+using September.InGame.Common.Stats;
 using TMPro;
-using UniRx;
 using UnityEngine;
 
 namespace InGame.Player
@@ -27,8 +27,8 @@ namespace InGame.Player
                 return;
             }
 
-            _playerStatus.ReactiveCurrentHealth.Subscribe(health => _healthText.text = health.ToString());
-            _playerStatus.ReactiveCurrentStamina.Subscribe(stamina => _staminaText.text = stamina.ToString("F1"));
+            _playerStatus.SubscribeStatOnChanged(StatType.Health, health => _healthText.text = health.ToString());
+            _playerStatus.SubscribeStatOnChanged(StatType.Stamina, stamina => _staminaText.text = stamina.ToString("F1"));
         }
 
         private void FixedUpdate()
