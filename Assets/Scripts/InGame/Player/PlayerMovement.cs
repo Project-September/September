@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using Mono.Cecil.Cil;
 using September.Common;
 using September.InGame.Common.Stats;
 using UniRx;
@@ -36,6 +37,7 @@ namespace InGame.Player
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
+        [SerializeField] private VaultGizmoDebugger _vaultGizmoDebugger;
 
         private Rigidbody _rb;
         private PlayerStatus _status;
@@ -426,10 +428,10 @@ namespace InGame.Player
             //_vaultTopPos = (frontHitInfo.point + canVaultHitInfo.point) * 0.5f;
             //_vaultTopPos.y = heightHitInfo.point.y;
 
-            bool isVault = VaultChecker.TryVault(new VaultParameter
+            var p = new VaultParameter
             {
                 Position = transform.position,
-                moveDirection = moveDirection,
+                moveDirection = new Vector3(moveDirection.x,0,moveDirection.y),
 
                 capsuleRadius = _moveCapsuleCollider.radius,
                 capsuleHeight = _moveCapsuleCollider.height,
@@ -442,7 +444,10 @@ namespace InGame.Player
 
                 groundSlopeThreshold = _groundSlopeThreshold,
                 groundLayer = _groundLayer
-            }, out var result);
+            };
+            bool isVault = VaultChecker.TryVault(p, out var result,out var reason);
+            _vaultGizmoDebugger.parameter = p;
+            Debug.Log(reason);
 
             if (!isVault) return;
             _vaultStartPos = result.vaultStart;

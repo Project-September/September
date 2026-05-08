@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace InGame.Bot
 {
-    [System.Serializable]
     public class NodeData
     {
         public Vector3 Position { get; private set; }

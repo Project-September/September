@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -12,7 +13,8 @@ namespace InGame.Bot
         private bool _isFind = false;
         public List<NodeData> _nodes;
         public int _index;
-        public void  OnEnter(BotStateMachine stateMachine)
+        public NodeData _nextNode;
+        public void OnEnter(BotStateMachine stateMachine)
         {
             GetRandomMoveRoute(stateMachine.transform.position);
         }
@@ -21,7 +23,7 @@ namespace InGame.Bot
             _isFind = true;
             _index = 0;
             var goal = NodeProvider.Instance.GetRandomNode();
-            _findRootToken = new();
+            CancelFindRoute();
             try
             {
                 _nodes = await AStarSystem.FindRoute(position, goal.Position)
@@ -43,9 +45,16 @@ namespace InGame.Bot
                 GetRandomMoveRoute(position);
             }
             _isFind = false;
+
+            _nextNode = _nodes[0];
         }
 
         public void OnExit(BotStateMachine stateMachine)
+        {
+            CancelFindRoute();
+        }
+
+        private void CancelFindRoute()
         {
             _findRootToken.Cancel();
             _findRootToken?.Dispose();
@@ -55,26 +64,35 @@ namespace InGame.Bot
 
         public void OnUpdate(BotStateMachine stateMachine)
         {
-            if (_isFind || _nodes == null || _nodes.Count == 0)
+            if (_isFind || _nextNode == null)
             {
                 stateMachine._direction = Vector2.zero;
                 return;
             }
-            _index = Mathf.Clamp(_index, 0, _nodes.Count - 1);
-            Debug.Log($"{_index}/{_nodes.Count}");
-            if (Vector3.Distance(stateMachine.transform.position, _nodes[_index].Position) <= stateMachine._stopDistance)
-            {
-                stateMachine._vault = _nodes[_index].IsValut;
-                _index++;
+            float distance = 0;
+            distance = Vector3.Distance(stateMachine.transform.position, _nextNode.Position);
 
-                if (_index >= _nodes.Count)
-                {
-                    GetRandomMoveRoute(stateMachine.transform.position);
-                }
-            }
+            //êiÇﬂÇﬁï˚å¸ÇãÅÇﬂÇÈ
             Vector2 position = new Vector2(stateMachine.transform.position.x, stateMachine.transform.position.z);
             Vector2 goal = new Vector2(_nodes[_index].Position.x, _nodes[_index].Position.z);
             stateMachine._direction = goal - position;
+
+            if (distance <= stateMachine._stopDistance)
+            {
+                _index++;
+                //ÉSÅ[Éã
+                if (_index >= _nodes.Count)
+                {
+                    GetRandomMoveRoute(stateMachine.transform.position);
+                    _nextNode = null;
+                }
+                else
+                {
+                    stateMachine._vault = _nextNode.IsValut;
+                    _nextNode = _nodes[_index];
+                }
+            }
         }
     }
 }
+

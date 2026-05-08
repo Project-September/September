@@ -414,7 +414,8 @@ namespace InGame.Bot
 
                 groundSlopeThreshold = _groundSlopeThreshold,
                 groundLayer = _groundLayer
-            }, out var result);
+            }, out var result,out var reason);
+            Debug.Log(reason);
 
             endPos = result.vaultEnd;
 

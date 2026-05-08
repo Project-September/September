@@ -150,43 +150,25 @@ namespace InGame.Bot
                 {
                     Debug.LogWarning("NodeData 生成後にノードが0件になりました。");
                     return;
-                }
+                }   
+
+                // グリッド化
+                BuildNodeGrid(nodeList);
 
                 // 飛び越え接続を作る
                 var vaultTargets = new Dictionary<NodeData, NodeData>();
 
-                var sourceNodes = nodeList.ToArray();
-                for (int i = 0; i < sourceNodes.Length; i++)
+                foreach (var vaultNode in GetComponentsInChildren<VaultNode>())
                 {
-                    var node = sourceNodes[i];
-                    if (node == null) continue;
-
-                    foreach (var direction in directions)
-                    {
-                        if (!VaultCheck(node.Position, direction, out var endPos)) continue;
-
-                        if (!CreateNodeData(endPos, ref index, nodeCache, nodeList, out var targetNode))
-                            continue;
-
-                        if (!vaultTargets.ContainsKey(node))
-                        {
-                            vaultTargets.Add(node, targetNode);
-                        }
-
-                        break;
-                    }
-
-                    if ((i & 31) == 0)
-                        await UniTask.Yield();
+                    vaultTargets.Add(GetNearestNode(vaultNode.GetStartPos()), GetNearestNode(vaultNode.GetEndPos()));
                 }
 
                 foreach (var pair in vaultTargets)
                 {
+                    Debug.Log(pair.Key.NodeIndex);
+                    Debug.Log(pair.Value.NodeIndex);
                     pair.Key.SetVaultConnect(pair.Value);
                 }
-
-                // グリッド化
-                BuildNodeGrid(nodeList);
 
                 // 接続を作る
                 await BuildConnectionsAsync();
@@ -526,30 +508,6 @@ namespace InGame.Bot
 
         private bool _removeInvalid(float value) => value <= 0f;
 
-        private bool VaultCheck(Vector3 position, Vector3 direction, out Vector3 endPos)
-        {
-            bool isVault = VaultChecker.TryVault(new VaultParameter
-            {
-                Position = position,
-                moveDirection = direction,
-
-                capsuleRadius = _botCapsuleCollider.radius,
-                capsuleHeight = _botCapsuleCollider.height,
-
-                reachDistance = _reachDistance,
-
-                maxLedgeHeight = _maxLedgeHeight,
-                minLedgeHeight = _minLedgeHeight,
-                maxLedgeDepth = _maxLedgeDepth,
-
-                groundSlopeThreshold = _groundSlopeThreshold,
-                groundLayer = _groundLayer
-            }, out var result);
-
-            endPos = result.vaultEnd;
-            return isVault;
-        }
-
         private bool HasObstacle(Vector3 from, Vector3 to)
         {
             from += Vector3.up * _rayUpAmount;
@@ -566,16 +524,6 @@ namespace InGame.Bot
                 distance,
                 _obstacleMask,
                 QueryTriggerInteraction.Ignore
-            );
-        }
-
-        private bool IsOnNavMesh(Vector3 pos)
-        {
-            return NavMesh.SamplePosition(
-                pos,
-                out _,
-                _navMeshTolerance,
-                NavMesh.AllAreas
             );
         }
 
@@ -660,6 +608,28 @@ namespace InGame.Bot
                     }
                 }
             }
+        }
+
+        private NodeData GetNearestNode(Vector3 pos)
+        {
+            float minDistance = float.MaxValue;
+            NodeData nodeData = null;
+            foreach (var cell in Nodes)
+            {
+                if(cell == null) continue;
+                foreach (var node in cell)
+                {
+                    float distance = Vector3.Distance(pos, node.Position);
+
+                    if (distance < minDistance)
+                    {
+                        nodeData = node;
+                        minDistance = distance;
+                    }
+                }
+            }
+
+            return nodeData;
         }
     }
 }
