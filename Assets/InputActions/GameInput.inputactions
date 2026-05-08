@@ -383,7 +383,7 @@
                 {
                     "name": "",
                     "id": "7bf3469a-1cca-4ad0-b1d6-3527196d7055",
-                    "path": "<XInputController>/rightShoulder",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
@@ -442,6 +442,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67d0f15b-1561-4651-9831-7fdf5717dda9",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
                     "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
