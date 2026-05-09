@@ -31,6 +31,7 @@ namespace InGame.Bot
             float startNodeDis = float.MaxValue;
             NodeData endNode = null;
             float endNodeDis = float.MaxValue;
+            //最短のノードを検索する
             foreach (NodeData nodeData in nodeDatas)
             {
                 nodeData.ResetState();
@@ -55,15 +56,27 @@ namespace InGame.Bot
                 _isFind = false;
                 return new List<NodeData>();
             }
+            //実際のA*アルゴリズム
             var result = await AStar(nodeDatas, startNode, endNode);
             _isFind = false;
             return result;
         }
+
+        /// <summary>
+        /// 経路探索をする
+        /// </summary>
+        /// <param name="nodeDatas">nodeData</param>
+        /// <param name="start">開始ノード</param>
+        /// <param name="goal">ゴールノード</param>
+        /// <param name="isVault">飛び越えをするか</param>
+        /// <returns>経路順のNodeData</returns>
         private static async UniTask<List<NodeData>> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal, bool isVault = true)
         {
             List<NodeData> result = new();
             List<NodeData> openNodes = new();
             Debug.DrawLine(start.Position, goal.Position, Color.yellow, 0.1f);
+
+            //オープン処理
             void SetNodeDistance(NodeData target, float parentDis)
             {
                 float g = (target.Parent != null ? target.Parent.StartDistance : 0f) + parentDis;
@@ -79,12 +92,14 @@ namespace InGame.Bot
 
             NodeData crrentNode = start;
             int count = nodeDatas.Count;
+            //探索本体
             while (openNodes.Count > 0)
             {
                 crrentNode = GetSmallCost(openNodes);
                 Debug.DrawLine(crrentNode.Position, crrentNode.Position + Vector3.up * 2, Color.red, 0.1f);
                 List<NodeData> connectNodes = new();
 
+                //接続ノードをOpenにする
                 foreach (var connectNode in crrentNode.ConnectNode)
                 {
                     Debug.DrawLine(crrentNode.Position, connectNode.Position, Color.gray, 0.1f);
@@ -109,6 +124,7 @@ namespace InGame.Bot
                         }
                     }
                 }
+                //飛び越え接続の処理
                 if (isVault && crrentNode.VaultConnect != null)
                 {
                     if (crrentNode.VaultConnect.State != NodeState.Closed)
@@ -119,11 +135,14 @@ namespace InGame.Bot
                         SetNodeDistance(crrentNode.VaultConnect, distance);
                     }
                 }
+                //探索したノードをClauseにする
                 crrentNode.Clause();
                 openNodes.Remove(crrentNode);
 
+                //次に探索するノード
                 crrentNode = GetSmallCost(openNodes);
 
+                //ゴールしたら探索を終える
                 if (crrentNode == goal)
                 {
                     break;
@@ -145,6 +164,8 @@ namespace InGame.Bot
             NodeData prev = null;
 
             count = 100;
+
+            //Parentを元に復元をする
             while (crrentNode != null)
             {
                 result.Add(crrentNode);
@@ -168,6 +189,11 @@ namespace InGame.Bot
             await UniTask.DelayFrame(1);
             return result;
         }
+        /// <summary>
+        /// 最小コストのノードを取得する
+        /// </summary>
+        /// <param name="nodeDatas">検索するノードリスト</param>
+        /// <returns>最小コストのノード</returns>
         private static NodeData GetSmallCost(List<NodeData> nodeDatas)
         {
             NodeData best = nodeDatas[0];
@@ -184,22 +210,9 @@ namespace InGame.Bot
             return best;
         }
 
-        private static bool HasObstacle(Vector3 from, Vector3 to)
-        {
-            from += Vector3.up * 0.5f;
-            to += Vector3.up * 0.5f;
-
-            Vector3 dir = to - from;
-            float distance = dir.magnitude;
-
-            if (distance <= 0.0001f) return false;
-            return Physics.Raycast(
-                from,
-                dir / distance,
-            distance
-            );
-        }
-
+        /// <summary>
+        /// 直線的に接続ができるかを確認する
+        /// </summary>
         public static bool ConnectivityCheck(Vector3 from, Vector3 to)
         {
             if (!NavMesh.CalculatePath(from, to, NavMesh.AllAreas, Path))
@@ -217,9 +230,9 @@ namespace InGame.Bot
                 return false;
 
             // 高低差制限
-            //float heightDiff = Mathf.Abs(from.y - to.y);
-            //if (heightDiff > 1.5f)
-            //    return false;
+            float heightDiff = Mathf.Abs(from.y - to.y);
+            if (heightDiff > 1.5f)
+                return false;
 
             return true;
         }

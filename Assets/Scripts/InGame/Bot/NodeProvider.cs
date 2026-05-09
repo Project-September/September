@@ -1,9 +1,11 @@
-using InGame.Bot;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace InGame.Bot
 {
+    /// <summary>
+    /// NodeData‚ð‚Ç‚±‚Å‚àŽg‚¦‚é‚æ‚¤‚É‚·‚éƒNƒ‰ƒX
+    /// </summary>
     public class NodeProvider : MonoBehaviour
     {
         [SerializeField] private NodeMapData _nodeMapData;

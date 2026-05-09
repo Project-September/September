@@ -27,19 +27,20 @@ namespace InGame.Bot
         {   
             _currentState?.OnUpdate(this);
 
-            if(_rigidbody.linearVelocity.magnitude < _stopAmount)
-            {
-                _stopTimer -= Time.deltaTime;
-                if(_stopTimer < 0 )
-                {
-                    Debug.Log("フリーズ");
-                    //_currentState?.OnEnter(this);
-                }
-            }
-            else
-            {
-                _stopTimer = _stopTime;
-            }
+            //フリーズ処理
+            //if(_rigidbody.linearVelocity.magnitude < _stopAmount)
+            //{
+            //    _stopTimer -= Time.deltaTime;
+            //    if(_stopTimer < 0 )
+            //    {
+            //        Debug.Log("フリーズ");
+            //        _currentState?.OnEnter(this);
+            //    }
+            //}
+            //else
+            //{
+            //    _stopTimer = _stopTime;
+            //}
         }
         public void ChangeState(IBotState state)
         {

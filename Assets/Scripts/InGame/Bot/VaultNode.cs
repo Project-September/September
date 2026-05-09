@@ -10,6 +10,9 @@ namespace InGame.Bot
         private Vector3 _currentPos;
         private Vector3? _goalPos;
 
+        /// <summary>
+        /// ”ò‚Ñ‰z‚¦‚½æ‚ÌêŠ‚ğæ“¾‚·‚é
+        /// </summary>
         public void RayGround()
         {
             Vector3 origin = transform.position + transform.forward * _distance;

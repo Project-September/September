@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace InGame.Bot
 {
+    /// <summary>
+    /// テスト用ステート
+    /// </summary>
     public class RandomMoveState : IBotState
     {
         private CancellationTokenSource _findRootToken = new();

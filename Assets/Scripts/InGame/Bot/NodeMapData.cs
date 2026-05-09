@@ -18,6 +18,10 @@ namespace InGame.Bot
             }
         }
 
+        /// <summary>
+        /// NodeDataSerializableをNodeDataに変換する
+        /// </summary>
+        /// <returns></returns>
         public List<NodeData> GetChengeNodeData()
         {
             List<NodeData> result = new();
@@ -25,6 +29,7 @@ namespace InGame.Bot
             Dictionary<int, NodeData> indexDic = new();
             Dictionary<NodeData, NodeDataSerializable> serializableDic = new();
 
+            //indexとNodeData , NodeDataと保存用NodeDataのペアを作る
             foreach (var data in _serializableNodeDatas)
             {
                 NodeData nodeData = new(data.Position, data.Index);
@@ -32,6 +37,7 @@ namespace InGame.Bot
                 serializableDic.Add(nodeData, data);
             }
 
+            //indexDicをもとにConnectとVauletの接続を行う
             foreach (var nodeDataPair in serializableDic)
             {
                 foreach (var connectIndex in nodeDataPair.Value.ConnectNode)
@@ -64,6 +70,10 @@ namespace InGame.Bot
             _serializableNodeDatas.Clear();
         }
 
+        /// <summary>
+        /// ノードデータを保存用クラスに変換して保存する
+        /// </summary>
+        /// <param name="node">ノードリスト</param>
         public void AddNodeData(NodeData node)
         {
             List<int> connectIndex = new();

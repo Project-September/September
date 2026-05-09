@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 namespace InGame.Bot
@@ -38,6 +37,10 @@ namespace InGame.Bot
             ResetState();
         }
 
+        /// <summary>
+        /// 接続ノードを登録する
+        /// </summary>
+        /// <param name="data">接続するノード</param>
         public void AddConnect(NodeData data)
         {
             if (ConnectNode.Contains(data))
@@ -57,6 +60,10 @@ namespace InGame.Bot
             IsValut = false;
         }
 
+        /// <summary>
+        /// コストを計算する
+        /// </summary>
+        /// <returns></returns>
         public float GetAllCost()
         {
             if (State == NodeState.None)
@@ -68,6 +75,11 @@ namespace InGame.Bot
             return StartDistance + _goalDistance;
         }
 
+        /// <summary>
+        /// ノードをOpenにする
+        /// </summary>
+        /// <param name="startDis">開始地点からのみちのり</param>
+        /// <param name="goalDis">終了地点からの直線距離</param>
         public void OpenNode(float startDis, float goalDis)
         {
             StartDistance = startDis;
@@ -85,6 +97,7 @@ namespace InGame.Bot
         {
             Parent = parent;
         }
+
         public void SetVaultConnect(NodeData nodeData)
         {
             VaultConnect = nodeData;

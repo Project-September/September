@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using InGame.Player;
 using NaughtyAttributes;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11,6 +10,10 @@ using UnityEngine.AI;
 
 namespace InGame.Bot
 {
+    /// <summary>
+    /// MapDataに書き込みをするクラス
+    /// ゲーム実行中は動かさない
+    /// </summary>
     public class NodeGaneratorPlus : MonoBehaviour
     {
         [SerializeField] private NodeMapData _mapData;

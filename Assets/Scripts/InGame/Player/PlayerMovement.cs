@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
-using Mono.Cecil.Cil;
 using September.Common;
 using September.InGame.Common.Stats;
 using UniRx;
@@ -303,135 +302,10 @@ namespace InGame.Player
                 return;
             }
 
-            //_capsuleCastData.Clear();
-
-            //// ステップ1：キャラクターが歩くことができない壁やオブジェクトを見つけるために前方にCastします。
-            //float capsuleRadius = _moveCapsuleCollider.radius;
-            //Vector3 moveDir3 = new Vector3(moveDirection.x, 0, moveDirection.y);
-            //Vector3 point1 = transform.position + Vector3.up * (_maxLedgeHeight - capsuleRadius) - moveDir3 * 0.01f;
-            //Vector3 point2 = transform.position + Vector3.up * (_minLedgeHeight + capsuleRadius) - moveDir3 * 0.01f;
-            //float reachDistance = _reachDistance * GetSpeedOnPlane();
-            //bool hit = Physics.CapsuleCast(point1, point2, capsuleRadius, moveDir3, out var frontHitInfo, reachDistance + 0.01f, _groundLayer);
-            //// hit point が歩けるかどうか
-            //bool walkablePoint = Vector3.Angle(Vector3.up, frontHitInfo.normal) <= _groundSlopeThreshold;
-
-            //_capsuleCastData.Add(new CapsuleCastData()
-            //{
-            //    P1 = point1,
-            //    P2 = point2,
-            //    Direction = moveDir3,
-            //    Distance = moveDir3 * reachDistance,
-            //    Radius = capsuleRadius,
-            //    IsHit = hit,
-            //    HitInfo = frontHitInfo
-            //});
-
-            //if (!(hit && !walkablePoint))
-            //{
-            //    if (_printVaultFailedLog) Debug.Log("Vault Failed : 壁がない、または壁ではない");
-            //    return;
-            //}
-
-            //// ステップ2：乗り越えることのできる高さであるかの判定
-            //Vector3 origin = frontHitInfo.point + 0.3f * -frontHitInfo.normal;
-            //origin.y = transform.position.y + _maxLedgeHeight + capsuleRadius;
-            //hit = Physics.SphereCast(origin, capsuleRadius, Vector3.down, out var heightHitInfo, _maxLedgeHeight - _minLedgeHeight, _groundLayer);
-            //float ledgeHeight = heightHitInfo.point.y - transform.position.y;
-
-            //_capsuleCastData.Add(new CapsuleCastData()
-            //{
-            //    P1 = origin,
-            //    P2 = origin,
-            //    Direction = Vector3.down,
-            //    Distance = Vector3.down * _maxLedgeHeight,
-            //    Radius = capsuleRadius,
-            //    IsHit = hit,
-            //    HitInfo = heightHitInfo
-            //});
-
-            //bool checkCapsule = hit && Physics.CheckCapsule(heightHitInfo.point + heightHitInfo.normal * capsuleRadius,
-            //        heightHitInfo.point + Vector3.up * (capsuleRadius + _moveCapsuleCollider.height), capsuleRadius - 0.01f, _groundLayer);
-
-            //// min height 以下はステップ1ではじかれる
-            //if (!(hit && ledgeHeight <= _maxLedgeHeight && ledgeHeight >= _minLedgeHeight) || checkCapsule)
-            //{
-            //    if (_printVaultFailedLog) Debug.Log($"Vault Failed : 高さ({ledgeHeight})が適切でない、壁の上のCapsuleのスペースがない(Check:{checkCapsule})");
-            //    return;
-            //}
-
-            //// ステップ3：乗り越えられる障害物の奥行とスペースがあるかの判定
-            //float underPoint = transform.position.y;
-            //float halfHeight = _moveCapsuleCollider.height * 0.5f;
-            //point1 = frontHitInfo.point;
-            //point1.y = underPoint + capsuleRadius + _moveCapsuleCollider.height;
-            //point2 = frontHitInfo.point;
-            //point2.y = underPoint + capsuleRadius;
-            //// 二つ目の障害物を見つける Cast
-            //hit = Physics.CapsuleCast(point1, point2, capsuleRadius, -frontHitInfo.normal, out var secondHitInfo, _maxLedgeDepth + frontHitInfo.distance, _groundLayer);
-
-            //_capsuleCastData.Add(new CapsuleCastData()
-            //{
-            //    P1 = point1,
-            //    P2 = point2,
-            //    Direction = -frontHitInfo.normal,
-            //    Distance = -frontHitInfo.normal * (_maxLedgeDepth + frontHitInfo.distance),
-            //    Radius = capsuleRadius,
-            //    IsHit = hit,
-            //    HitInfo = secondHitInfo
-            //});
-
-            //// 奥に十分なスペースがないと乗り越えられない 終了判定おかしい 最終地点を判定してから長さと比較しないと
-            //if (hit)
-            //{
-            //    if (_printVaultFailedLog) Debug.Log($"Vault Failed : 奥に十分なスペースがない");
-            //    return;
-            //}
-
-            //origin = point2 + halfHeight * Vector3.up;
-            //Vector3 reverseCastOrigin = origin - frontHitInfo.normal * (_maxLedgeDepth + frontHitInfo.distance);
-            //// 逆向きにCastして、障害物の奥行を求める
-            //hit = Physics.CapsuleCast(reverseCastOrigin + Vector3.up * halfHeight, reverseCastOrigin + Vector3.down * halfHeight, capsuleRadius, 
-            //    frontHitInfo.normal, out var canVaultHitInfo, _maxLedgeDepth + frontHitInfo.distance, _groundLayer);
-
-            //_capsuleCastData.Add(new CapsuleCastData
-            //{
-            //    P1 = reverseCastOrigin + Vector3.up * halfHeight,
-            //    P2 = reverseCastOrigin + Vector3.down * halfHeight,
-            //    Direction = frontHitInfo.normal,
-            //    Distance = frontHitInfo.normal * (frontHitInfo.distance),
-            //    Radius = capsuleRadius,
-            //    IsHit = hit,
-            //    HitInfo = canVaultHitInfo
-            //});
-
-            //// 奥行がありすぎたら終了
-            //if (hit && canVaultHitInfo.distance < frontHitInfo.distance)
-            //{
-            //    if (_printVaultFailedLog) Debug.Log($"Vault Failed : 壁の奥行がありすぎる({_maxLedgeDepth + frontHitInfo.distance - canVaultHitInfo.distance})");
-            //    return;
-            //}
-
-            //_vaultEndPos = origin -
-            //    frontHitInfo.normal * (_maxLedgeDepth + frontHitInfo.distance - canVaultHitInfo.distance +
-            //                           frontHitInfo.distance) + Vector3.down * (halfHeight + capsuleRadius);
-
-            //// 最終地点にCheckを入れる
-            //if (Physics.CheckCapsule(_vaultEndPos + Vector3.up * capsuleRadius,
-            //        _vaultEndPos + Vector3.up * (capsuleRadius + _moveCapsuleCollider.height), capsuleRadius - 0.01f,
-            //        _groundLayer))
-            //{
-            //    if (_printVaultFailedLog) Debug.Log($"Vault Failed : 最終地点のCheckがtrue");
-            //    return;
-            //}
-
-            //_vaultStartPos = transform.position;
-            //_vaultTopPos = (frontHitInfo.point + canVaultHitInfo.point) * 0.5f;
-            //_vaultTopPos.y = heightHitInfo.point.y;
-
             var p = new VaultParameter
             {
                 Position = transform.position,
-                moveDirection = new Vector3(moveDirection.x,0,moveDirection.y),
+                moveDirection = new Vector3(moveDirection.x, 0, moveDirection.y),
 
                 capsuleRadius = _moveCapsuleCollider.radius,
                 capsuleHeight = _moveCapsuleCollider.height,
@@ -445,9 +319,14 @@ namespace InGame.Player
                 groundSlopeThreshold = _groundSlopeThreshold,
                 groundLayer = _groundLayer
             };
-            bool isVault = VaultChecker.TryVault(p, out var result,out var reason);
-            _vaultGizmoDebugger.parameter = p;
+
+            bool isVault = VaultChecker.TryVault(p, out var result, out var reason);
             Debug.Log(reason);
+
+            if (_vaultGizmoDebugger != null)
+            {
+                _vaultGizmoDebugger.parameter = p;
+            }
 
             if (!isVault) return;
             _vaultStartPos = result.vaultStart;
