@@ -1,3 +1,4 @@
+using InGame.Player;
 using September.Common;
 using UnityEngine;
 
@@ -5,6 +6,7 @@ namespace InGame.Bot
 {
     public class BotStateMachine : MonoBehaviour
     {
+        [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private float _stopAmount;
         [SerializeField] private float _stopTime;
         [SerializeField] private Rigidbody _rigidbody;
@@ -48,7 +50,7 @@ namespace InGame.Bot
         public PlayerInput GetInput()
         {
             PlayerInput input = new();
-            input.MoveDirection = _direction.normalized;
+            input.MoveDirection = _playerMovement.IsGroundNet ? _direction.normalized : Vector2.zero;
             input.Buttons.Set(PlayerButtons.Jump, _vault);
             input.Buttons.Set(PlayerButtons.Dash, false);
             return input;
