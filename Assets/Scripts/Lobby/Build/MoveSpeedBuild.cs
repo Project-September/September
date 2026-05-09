@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September.Lobby
+namespace September.Common
 {
     [CreateAssetMenu(fileName = "MoveSpeedBuild", menuName = "Build/MoveSpeedBuild")]
     public class MoveSpeedBuild : BuildParamBase<float>

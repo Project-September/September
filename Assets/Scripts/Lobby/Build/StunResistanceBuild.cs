@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September.Lobby
+namespace September.Common
 {
     [CreateAssetMenu(fileName = "StunResistanceBuild", menuName = "Build/StunResistanceBuild")]
     public class StunResistanceBuild : BuildParamBase<float>

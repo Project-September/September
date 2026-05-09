@@ -1,3 +1,5 @@
+using September.Common;
+
 namespace September.Lobby
 {
     /// <summary>ビルド選択の表示用インターフェース</summary>

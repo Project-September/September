@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September.Lobby
+namespace September.Common
 {
     [CreateAssetMenu(fileName = "AttackPowerBuild", menuName = "Build/AttackPowerBuild")]
     public class AttackPowerBuild : BuildParamBase<int>

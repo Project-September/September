@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace September.Lobby
+namespace September.Common
 {
     public abstract class BuildParamBase<T> : BuildDataBase where T : IComparable
     {

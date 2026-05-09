@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September.Lobby
+namespace September.Common
 {
     public abstract class BuildDataBase : ScriptableObject
     {
