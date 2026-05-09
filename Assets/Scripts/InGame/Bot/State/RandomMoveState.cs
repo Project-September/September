@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -46,7 +45,10 @@ namespace InGame.Bot
             }
             _isFind = false;
 
-            _nextNode = _nodes[0];
+            if (_nodes != null && _nodes.Count > 0)
+            {
+                _nextNode = _nodes[0];
+            }
         }
 
         public void OnExit(BotStateMachine stateMachine)

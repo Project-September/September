@@ -13,7 +13,7 @@ namespace InGame.Bot
         {
             get
             {
-                if( _path == null)
+                if (_path == null)
                 {
                     _path = new NavMeshPath();
                 }
@@ -38,7 +38,7 @@ namespace InGame.Bot
                 float startDis = Vector3.Distance(nodeData.Position, start);
                 float endDis = Vector3.Distance(nodeData.Position, end);
 
-                if ( startNodeDis > startDis && ConnectivityCheck(start,nodeData.Position))
+                if (startNodeDis > startDis && ConnectivityCheck(start, nodeData.Position))
                 {
                     startNode = nodeData;
                     startNodeDis = startDis;
@@ -78,7 +78,7 @@ namespace InGame.Bot
             SetNodeDistance(start, 0);
 
             NodeData crrentNode = start;
-            int count = 1000;
+            int count = nodeDatas.Count;
             while (openNodes.Count > 0)
             {
                 crrentNode = GetSmallCost(openNodes);
@@ -111,17 +111,21 @@ namespace InGame.Bot
                 }
                 if (isVault && crrentNode.VaultConnect != null)
                 {
-                    float distance = Vector3.Distance(crrentNode.VaultConnect.Position, crrentNode.Position);
-                    crrentNode.IsValut = true;
-                    crrentNode.VaultConnect.SetParent(crrentNode);
-                    SetNodeDistance(crrentNode.VaultConnect, distance);
+                    if (crrentNode.VaultConnect.State != NodeState.Closed)
+                    {
+                        float distance = Vector3.Distance(crrentNode.VaultConnect.Position, crrentNode.Position);
+                        crrentNode.IsValut = true;
+                        crrentNode.VaultConnect.SetParent(crrentNode);
+                        SetNodeDistance(crrentNode.VaultConnect, distance);
+                    }
                 }
                 crrentNode.Clause();
                 openNodes.Remove(crrentNode);
 
-                if (openNodes.Contains(goal))
+                crrentNode = GetSmallCost(openNodes);
+
+                if (crrentNode == goal)
                 {
-                    crrentNode = goal;
                     break;
                 }
 
@@ -134,7 +138,7 @@ namespace InGame.Bot
             }
             if (crrentNode != goal)
             {
-                Debug.LogError("Œo˜H’Tõ¸”s");
+                Debug.LogError($"Œo˜H’Tõ¸”s \n start{start.Position}  goal{goal.Position}");
                 return new();
             }
 
@@ -196,7 +200,7 @@ namespace InGame.Bot
             );
         }
 
-        public static bool ConnectivityCheck(Vector3 from,Vector3 to)
+        public static bool ConnectivityCheck(Vector3 from, Vector3 to)
         {
             if (!NavMesh.CalculatePath(from, to, NavMesh.AllAreas, Path))
                 return false;
@@ -213,9 +217,9 @@ namespace InGame.Bot
                 return false;
 
             // ‚’á·§ŒÀ
-            float heightDiff = Mathf.Abs(from.y - to.y);
-            if (heightDiff > 1.5f)
-                return false;
+            //float heightDiff = Mathf.Abs(from.y - to.y);
+            //if (heightDiff > 1.5f)
+            //    return false;
 
             return true;
         }
