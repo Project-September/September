@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
-using InGame.Player;
 using September.Common;
 using September.InGame.Common;
 using UnityEngine;
@@ -17,6 +16,8 @@ namespace Ingame.Tanihira
         [SerializeField] private FriendStateChanger _friendStateChanger;
         [SerializeField] private FormationManager _formationManager;
         [SerializeField] private bool _isWaiting;
+        [Header("TanihiraCursor")]
+        [SerializeField] private TanihiraCursor _tanihiraCursor;
         
         private Transform _currentTarget;
         private InGameManager _inGameManager;
@@ -105,7 +106,7 @@ namespace Ingame.Tanihira
                 .Distinct()
                 .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude)
                 .ToList();
-
+            
             foreach (Transform player in uniqueRoots)
             {
                 //自身は除く
@@ -142,6 +143,13 @@ namespace Ingame.Tanihira
             //ペンギンに攻撃指示を飛ばす
             if (_currentTarget)
             {
+                // 指示を行っていない場合、攻撃処理を行わない
+                if (!_tanihiraCursor.IsInstruction)
+                {
+                    Debug.LogWarning("指示を行っていないので、攻撃処理は行わない");
+                    _friendStateChanger.SetMoveState();
+                    return;
+                }
                 _friendStateChanger.SetChaseState(_currentTarget);
             }
             else

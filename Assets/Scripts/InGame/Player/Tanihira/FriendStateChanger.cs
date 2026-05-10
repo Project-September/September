@@ -45,8 +45,23 @@ namespace Ingame.Tanihira
 
             foreach (var friend in _formationManager.FriendsList)
             {
-                friend.SetDestination(target);
-                friend.ChangeState(FriendState.Chase);
+                // 各ペンギンが規定の攻撃量を上回っていないかを判定
+                // 上回っていた場合、そのペンギンは攻撃を辞め、処理をスキップ
+                if (friend.CurrentAA >= friend.RegulationAA)
+                {
+                    // プレイヤーのところへ戻るようにする
+                    friend.SetDestination(_friendOwner.transform);
+                    friend.ChangeState(FriendState.Move);
+                    // 隊列の整理をする
+                    _formationManager.SortFormation();
+                    continue;
+                }
+
+                if (friend.IsAttackPossible)
+                {
+                    friend.SetDestination(target);
+                    friend.ChangeState(FriendState.Chase);
+                }
             }
         }
     }

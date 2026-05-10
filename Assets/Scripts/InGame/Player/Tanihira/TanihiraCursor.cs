@@ -1,4 +1,3 @@
-using System;
 using Fusion;
 using InGame.Common;
 using InGame.Player;
@@ -38,7 +37,14 @@ namespace Ingame.Tanihira
         private FriendOrder _friendOrder;
         private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] private TanihiraCursorState _state { get; set; }
-        
+
+        /// <summary>
+        /// 指示を行ったか
+        /// true：行った
+        /// false：行っていない
+        /// </summary>
+        public bool IsInstruction;
+
 
         public override void Spawned()
         {
@@ -79,10 +85,12 @@ namespace Ingame.Tanihira
             //離した時
             if (input.Buttons.WasReleased(PreviousButtons, PlayerButtons.Ability2))
             {
+                IsInstruction = false;
                 EndCursor();
             }
             else if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability3) && _state == TanihiraCursorState.Active)
             {
+                IsInstruction = true;
                 MoveTargetCursor();
             }
             
@@ -129,6 +137,7 @@ namespace Ingame.Tanihira
         {
             _moveTargetInstance.transform.position = targetPos;
             _friendOrder.ExecuteOrderMoveFriend();
+            _friendOrder.AllResetAttackAmount();
         }
 
         private void EndCursor()
