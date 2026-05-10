@@ -1,5 +1,4 @@
 using Fusion;
-using InGame.Player;
 using UnityEngine;
 
 namespace September.InGame.Kraken
@@ -19,11 +18,9 @@ namespace September.InGame.Kraken
             }
         }
 
-        public Kraken CreateKraken(PlayerRef owner, Vector3 position, Quaternion rotation, Vector3 finishPosition, Quaternion finishRotation)
+        public Kraken CreateKraken(Vector3 position, Quaternion rotation)
         {
-            var kraken = _networkRunner.Spawn(_krakenPrefab, position, rotation, owner);
-            
-            kraken.GetOn(owner);
+            var kraken = _networkRunner.Spawn(_krakenPrefab, position, rotation);
             
             return kraken;
         }
