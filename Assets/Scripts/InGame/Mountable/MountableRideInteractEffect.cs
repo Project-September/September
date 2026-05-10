@@ -11,7 +11,8 @@ namespace September.InGame.Mountable
         [SerializeField, RequireInterface(typeof(IMountable))] private MonoBehaviour _targetMountable;
         
         private IMountable _mountable;
-        
+        private InteractableBase _interactable;
+
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             if (_mountable == null)
@@ -26,7 +27,13 @@ namespace September.InGame.Mountable
             
             var player = PlayerRef.FromEncoded(context.Interactor);
             _mountable.GetOn(player);
-            target.ForceSetInteractable = false;
+            _interactable = target;
+            _interactable.ForceSetInteractable = false;
+        }
+
+        public override void OnInteractEnd()
+        {
+            _interactable.ForceSetInteractable = true;
         }
 
         public override CharacterInteractEffectBase Clone()
