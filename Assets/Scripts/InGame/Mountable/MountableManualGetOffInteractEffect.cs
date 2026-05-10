@@ -16,8 +16,9 @@ namespace September.InGame.Mountable
         [SerializeField, RequireInterface(typeof(IMountable))] private MonoBehaviour _targetMountable;
         
         private IMountable _mountable;
-        private InputWrapper _interact;
+        private InputWrapper _interactKey;
         private PlayerRef _currentOwner;
+        private InteractableBase _interactable;
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
@@ -32,17 +33,20 @@ namespace September.InGame.Mountable
             }
             
             _currentOwner = PlayerRef.FromEncoded(context.Interactor);
+            _interactable = target;
+            _interactKey.SetInput(true);
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
             if (_mountable == null) return;
             
-            _interact.SetInput(playerInput.Buttons.IsSet(PlayerButtons.Interact));
+            _interactKey.SetInput(playerInput.Buttons.IsSet(PlayerButtons.Interact));
 
-            if (_interact.IsJustPressed)
+            if (_interactKey.IsJustPressed)
             {
                 _mountable.GetOff(_currentOwner);
+                _interactable.EndInteract();
             }
         }
 
