@@ -171,6 +171,17 @@ namespace InGame.Interact
                 PlayCooldownEffect().Forget();
             }
         }
+        
+        /// <summary>
+        /// クールダウンを開始する 
+        /// </summary>
+        private void StartCooldown()
+        {
+            var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all
+                : CooldownTimeDictionary.Dictionary.GetValueOrDefault(_characterType, 0f);
+            SetCooldown(time);
+        }
 
         /// <summary>
         /// クールダウンエフェクトを再生する非同期処理
@@ -426,6 +437,7 @@ namespace InGame.Interact
         /// </summary>
         public void EndInteract()
         {
+            StartCooldown();
             _activeEffectBase?.OnInteractEnd();
             ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(_characterType);
             RPC_ChangeDescriptionUI(type);
