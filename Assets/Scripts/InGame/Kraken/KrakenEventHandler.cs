@@ -3,30 +3,26 @@ using UnityEngine;
 
 namespace September.InGame.Kraken
 {
+    /// <summary>
+    /// クラーケンの出現イベント
+    /// </summary>
     public class KrakenEventHandler : NetworkBehaviour
     {
         [SerializeField] private KrakenFactory _krakenFactory;
         [SerializeField] private Transform _krakenSpawnPoint;
-        
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_PlayerChangeKraken(PlayerRef target)
-        {
-            var playerObject = Runner.GetPlayerObject(target);
 
-            if (playerObject == null)
+        public bool StartEvent(out Kraken kraken)
+        {
+            if (!HasStateAuthority)
             {
-                Debug.LogError("PlayerObject is null");
-                return;
+                Debug.LogError("[KrakenEventHandler] StateAuthority以外から呼び出されました");
+                kraken = null;
+                return false;
             }
             
-            var kraken = _krakenFactory.CreateKraken(target, _krakenSpawnPoint.position, _krakenSpawnPoint.rotation,
-                playerObject.transform.position, playerObject.transform.rotation);
-        }
+            kraken = _krakenFactory.CreateKraken(_krakenSpawnPoint.position, _krakenSpawnPoint.rotation);
 
-        [ContextMenu("Test")]
-        public void Test()
-        {
-            RPC_PlayerChangeKraken(Runner.LocalPlayer);
+            return true;
         }
     }
 }
