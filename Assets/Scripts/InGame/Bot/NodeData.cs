@@ -45,7 +45,7 @@ namespace InGame.Bot
         {
             if (ConnectNode.Contains(data))
             {
-                Debug.Log("重複");
+                Debug.Log("接続ノードが重複しています");
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace InGame.Bot
         {
             if (State == NodeState.None)
             {
-                Debug.LogError("");
+                Debug.LogError("コストが入力されていません");
                 return 0;
             }
 
@@ -88,7 +88,7 @@ namespace InGame.Bot
             State = NodeState.Open;
         }
 
-        public void Clause()
+        public void Close()
         {
             State = NodeState.Closed;
         }

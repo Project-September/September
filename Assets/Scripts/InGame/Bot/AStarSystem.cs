@@ -7,7 +7,7 @@ namespace InGame.Bot
 {
     public static class AStarSystem
     {
-        public static bool _isFind = false;
+        private static bool _isFinding = false;
         private static NavMeshPath _path;
         public static NavMeshPath Path
         {
@@ -23,9 +23,9 @@ namespace InGame.Bot
 
         public static async UniTask<List<NodeData>> FindRoute(Vector3 start, Vector3 end)
         {
-            if (_isFind) return new();
-            _isFind = true;
-            List<NodeData> nodeDatas = new(NodeProvider.Instance.Nodes);
+            if (_isFinding) return new();
+            _isFinding = true;
+            List<NodeData> nodeDatas = NodeProvider.Instance.Nodes;
 
             NodeData startNode = null;
             float startNodeDis = float.MaxValue;
@@ -36,8 +36,8 @@ namespace InGame.Bot
             {
                 nodeData.ResetState();
 
-                float startDis = Vector3.Distance(nodeData.Position, start);
-                float endDis = Vector3.Distance(nodeData.Position, end);
+                float startDis = (nodeData.Position - start).sqrMagnitude;
+                float endDis = (nodeData.Position - end).sqrMagnitude;
 
                 if (startNodeDis > startDis && ConnectivityCheck(start, nodeData.Position))
                 {
@@ -53,12 +53,12 @@ namespace InGame.Bot
             if (startNode == null || endNode == null || nodeDatas == null)
             {
                 Debug.LogError("Œo˜H’Tõ¸”s");
-                _isFind = false;
+                _isFinding = false;
                 return new List<NodeData>();
             }
             //ÀÛ‚ÌA*ƒAƒ‹ƒSƒŠƒYƒ€
             var result = await AStar(nodeDatas, startNode, endNode);
-            _isFind = false;
+            _isFinding = false;
             return result;
         }
 
@@ -136,7 +136,7 @@ namespace InGame.Bot
                     }
                 }
                 //’Tõ‚µ‚½ƒm[ƒh‚ğClause‚É‚·‚é
-                crrentNode.Clause();
+                crrentNode.Close();
                 openNodes.Remove(crrentNode);
 
                 //Ÿ‚É’Tõ‚·‚éƒm[ƒh

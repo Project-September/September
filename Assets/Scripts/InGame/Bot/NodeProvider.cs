@@ -9,7 +9,7 @@ namespace InGame.Bot
     public class NodeProvider : MonoBehaviour
     {
         [SerializeField] private NodeMapData _nodeMapData;
-        [SerializeField] private bool _isDrowGizmo;
+        [SerializeField] private bool _isDrawGizmo;
         public static NodeProvider Instance;
         private List<NodeData> _nodes;
         public List<NodeData> Nodes
@@ -18,7 +18,7 @@ namespace InGame.Bot
             {
                 if (_nodes == null || _nodes.Count == 0)
                 {
-                    _nodes = _nodeMapData.GetChengeNodeData();
+                    _nodes = _nodeMapData.GetChangeNodeData();
                 }
 
                 return _nodes;
@@ -33,9 +33,9 @@ namespace InGame.Bot
         }
         private void OnDrawGizmos()
         {
-            if (Application.isPlaying && _isDrowGizmo)
+            if (Application.isPlaying && _isDrawGizmo)
             {
-                NodeGenerator.DrawGizmos(Nodes);
+                NodeGanerator.DrawGizmos(Nodes);
             }
         }
 

@@ -12,18 +12,18 @@ namespace InGame.Bot
     public class RandomMoveState : IBotState
     {
         private CancellationTokenSource _findRootToken = new();
-        private bool _isFind = false;
-        public List<NodeData> _nodes;
-        public int _index;
-        public NodeData _nextNode;
+        private bool _isFinding = false;
+        private List<NodeData> _nodes;
+        private int _currentIndex;
+        private NodeData _nextNode;
         public void OnEnter(BotStateMachine stateMachine)
         {
             GetRandomMoveRoute(stateMachine.transform.position);
         }
         private async void GetRandomMoveRoute(Vector3 position)
         {
-            _isFind = true;
-            _index = 0;
+            _isFinding = true;
+            _currentIndex = 0;
             var goal = NodeProvider.Instance.GetRandomNode();
             CancelFindRoute();
             try
@@ -46,7 +46,7 @@ namespace InGame.Bot
             {
                 GetRandomMoveRoute(position);
             }
-            _isFind = false;
+            _isFinding = false;
 
             if (_nodes != null && _nodes.Count > 0)
             {
@@ -69,32 +69,34 @@ namespace InGame.Bot
 
         public void OnUpdate(BotStateMachine stateMachine)
         {
-            if (_isFind || _nextNode == null)
+            //探索中は入力を入れない
+            if (_isFinding || _nextNode == null)
             {
-                stateMachine._direction = Vector2.zero;
+                stateMachine.InputDirection = Vector2.zero;
                 return;
             }
             float distance = 0;
             distance = Vector3.Distance(stateMachine.transform.position, _nextNode.Position);
 
-            //進めむ方向を求める
+            //進む方向を求める
             Vector2 position = new Vector2(stateMachine.transform.position.x, stateMachine.transform.position.z);
-            Vector2 goal = new Vector2(_nodes[_index].Position.x, _nodes[_index].Position.z);
-            stateMachine._direction = goal - position;
+            Vector2 goal = new Vector2(_nodes[_currentIndex].Position.x, _nodes[_currentIndex].Position.z);
+            stateMachine.InputDirection = goal - position;
 
-            if (distance <= stateMachine._stopDistance)
+            //NextNodeに近づいたら次のノードにする
+            if (distance <= stateMachine.StopDistance)
             {
-                _index++;
+                _currentIndex++;
                 //ゴール
-                if (_index >= _nodes.Count)
+                if (_currentIndex >= _nodes.Count)
                 {
                     GetRandomMoveRoute(stateMachine.transform.position);
                     _nextNode = null;
                 }
                 else
                 {
-                    stateMachine._vault = _nextNode.IsValut;
-                    _nextNode = _nodes[_index];
+                    stateMachine.InputIsVault = _nextNode.IsValut;
+                    _nextNode = _nodes[_currentIndex];
                 }
             }
         }

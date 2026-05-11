@@ -22,7 +22,7 @@ namespace InGame.Bot
         /// NodeDataSerializable‚ğNodeData‚É•ÏŠ·‚·‚é
         /// </summary>
         /// <returns></returns>
-        public List<NodeData> GetChengeNodeData()
+        public List<NodeData> GetChangeNodeData()
         {
             List<NodeData> result = new();
 
@@ -37,7 +37,7 @@ namespace InGame.Bot
                 serializableDic.Add(nodeData, data);
             }
 
-            //indexDic‚ğ‚à‚Æ‚ÉConnect‚ÆVaulet‚ÌÚ‘±‚ğs‚¤
+            //indexDic‚ğ‚à‚Æ‚ÉConnect‚ÆVault‚ÌÚ‘±‚ğs‚¤
             foreach (var nodeDataPair in serializableDic)
             {
                 foreach (var connectIndex in nodeDataPair.Value.ConnectNode)
@@ -51,9 +51,9 @@ namespace InGame.Bot
                 }
                 result.Add(nodeDataPair.Key);
 
-                if(nodeDataPair.Value.VauletNode != -1)
+                if(nodeDataPair.Value.VaultNode != -1)
                 {
-                    if (!indexDic.TryGetValue(nodeDataPair.Value.VauletNode, out NodeData nodeData))
+                    if (!indexDic.TryGetValue(nodeDataPair.Value.VaultNode, out NodeData nodeData))
                     {
                         Debug.LogError("NodeData‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ");
                     }
@@ -96,13 +96,13 @@ namespace InGame.Bot
         public Vector3 Position;
         public int Index;
         public int[] ConnectNode;
-        public int VauletNode;
-        public NodeDataSerializable(Vector3 pos, int index, int[] connect, int vauletNode = -1)
+        public int VaultNode;
+        public NodeDataSerializable(Vector3 pos, int index, int[] connect, int vaultNode = -1)
         {
             Position = pos;
             Index = index;
             ConnectNode = connect;
-            VauletNode = vauletNode;
+            VaultNode = vaultNode;
         }
     }
 }

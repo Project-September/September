@@ -128,10 +128,7 @@ namespace InGame.Player
             // HEAD SPACE
             //==================================================
 
-            Vector3 headCheckP1 =
-       heightHitInfo.point
-       + heightHitInfo.normal
-       * (parameter.capsuleRadius - 0.02f);
+            Vector3 headCheckP1 = heightHitInfo.point + heightHitInfo.normal * (parameter.capsuleRadius - 0.02f);
 
             Vector3 headCheckP2 =
                 heightHitInfo.point

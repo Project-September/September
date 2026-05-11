@@ -14,34 +14,35 @@ namespace InGame.Bot
     /// MapDataに書き込みをするクラス
     /// ゲーム実行中は動かさない
     /// </summary>
-    public class NodeGaneratorPlus : MonoBehaviour
+    public class NodeGanerator : MonoBehaviour
     {
-        [SerializeField] private NodeMapData _mapData;
-        [SerializeField] private Transform _origin;
-        [SerializeField] private bool _isDrawGizumoIcon;
+        [SerializeField,Tooltip("生成したノードを書き込む")] private NodeMapData _mapData;
+
+        [SerializeField, Tooltip("経路到達判定の基準地点")] private Transform _origin;
+        [SerializeField, Tooltip("描画するか")] private bool _isDrawGizumoIcon;
 
         [Header("Poisson Disk")]
-        [SerializeField] private BoxCollider _generationArea;
-        [SerializeField] private Vector3 _fallbackAreaSize = new(50f, 10f, 50f);
+        [SerializeField, Tooltip("ノード生成範囲")] private BoxCollider _generationArea;
+        [SerializeField, Tooltip("生成範囲未設定時の代替サイズ")] private Vector3 _fallbackAreaSize = new(50f, 10f, 50f);
         [SerializeField, Tooltip("ノード間の目安距離")] private float _poissonRadius = 5f;
         [SerializeField, Tooltip("候補生成回数")] private int _poissonCandidateCount = 30;
         [SerializeField, Tooltip("最大ノード数。0なら無制限")] private int _maxNodeCount = 0;
 
         [Header("Connect")]
-        [SerializeField] private float _connectDistance = 10f;
-        [SerializeField] private int _maxConnectCount = 4;
+        [SerializeField, Tooltip("接続可能距離")] private float _connectDistance = 10f;
+        [SerializeField, Tooltip("1ノードあたりの最大接続数")] private int _maxConnectCount = 4;
 
         [Header("Raycast")]
-        [SerializeField] private float _rayDistance = 10f;
-        [SerializeField] private float _rayUpAmount = 1f;
-        [SerializeField] private float _groundRayUp = 2f;
-        [SerializeField] private LayerMask _obstacleMask = ~0;
+        [SerializeField, Tooltip("Raycast 距離")] private float _rayDistance = 10f;
+        [SerializeField, Tooltip("開始地点の上方向補正")] private float _rayUpAmount = 1f;
+        [SerializeField, Tooltip("地面判定時の上方向補正")] private float _groundRayUp = 2f;
+        [SerializeField, Tooltip("障害物判定用レイヤー")] private LayerMask _obstacleMask = ~0;
 
         [Header("Precision")]
-        [SerializeField] private float _positionQuantize = 1000f;
+        [SerializeField, Tooltip("座標量子化精度")] private float _positionQuantize = 1000f;
 
         [Header("NavMesh")]
-        [SerializeField] private float _navMeshTolerance = 2f;
+        [SerializeField, Tooltip("サンプリング許容距離")] private float _navMeshTolerance = 2f;
 
         [Header("Vault")]
         [SerializeField] private CapsuleCollider _botCapsuleCollider;
@@ -89,7 +90,9 @@ namespace InGame.Bot
 
             return list.ToArray();
         }
-
+        /// <summary>
+        /// 開始時に自分自身と飛び越えノードを削除する
+        /// </summary>
         public void Awake()
         {
             Destroy(this);
@@ -197,6 +200,9 @@ namespace InGame.Bot
             }
         }
 
+        /// <summary>
+        /// ノード生成範囲を取得
+        /// </summary>
         private Bounds GetGenerationBounds()
         {
             if (_generationArea != null)
@@ -208,6 +214,9 @@ namespace InGame.Bot
             return new Bounds(center, _fallbackAreaSize);
         }
 
+        /// <summary>
+        /// Poisson Disk Sampling によりノード候補を生成
+        /// </summary>
         private List<Vector3> GeneratePoissonSamples(Bounds bounds)
         {
             var samples = new List<Vector3>();
@@ -262,6 +271,9 @@ namespace InGame.Bot
             return samples;
         }
 
+        /// <summary>
+        /// 候補位置を生成
+        /// </summary>
         private Vector3 GenerateCandidate(Vector3 origin, float radius)
         {
             float angle = UnityEngine.Random.value * Mathf.PI * 2f;
@@ -271,6 +283,9 @@ namespace InGame.Bot
             return origin + offset;
         }
 
+        /// <summary>
+        /// ランダムな NavMesh 上の地点を取得
+        /// </summary>
         private bool TryGetRandomNavMeshPoint(Bounds bounds, out Vector3 result)
         {
             const int maxTry = 128;
@@ -299,6 +314,9 @@ namespace InGame.Bot
             return false;
         }
 
+        /// <summary>
+        /// 指定座標を NavMesh 上へ補正
+        /// </summary>
         private bool TryProjectToNavMesh(Vector3 position, out Vector3 result)
         {
             if (NavMesh.SamplePosition(position, out var hit, _navMeshTolerance, NavMesh.AllAreas))
@@ -311,6 +329,9 @@ namespace InGame.Bot
             return false;
         }
 
+        /// <summary>
+        /// 周囲ノードとの最低距離を満たしているか
+        /// </summary>
         private bool IsFarEnough(Vector3 candidate, List<Vector3> samples, float minDistance)
         {
             float minDistanceSq = minDistance * minDistance;
@@ -324,6 +345,9 @@ namespace InGame.Bot
             return true;
         }
 
+        /// <summary>
+        /// NodeData 作成
+        /// </summary>
         private bool CreateNodeData(
             Vector3 position,
             ref int index,
@@ -347,6 +371,9 @@ namespace InGame.Bot
             return true;
         }
 
+        /// <summary>
+        /// NodeData 作成簡易版
+        /// </summary>
         private NodeData CreateNodeData(
             Vector3 position,
             ref int index,
@@ -359,6 +386,9 @@ namespace InGame.Bot
             return node;
         }
 
+        /// <summary>
+        /// 座標量子化
+        /// </summary>
         private Vector3Int Quantize(Vector3 position)
         {
             return new Vector3Int(
@@ -368,6 +398,9 @@ namespace InGame.Bot
             );
         }
 
+        /// <summary>
+        /// ノードを空間グリッドへ格納
+        /// </summary>
         private void BuildNodeGrid(List<NodeData> nodes)
         {
             if (nodes == null || nodes.Count == 0)
@@ -409,6 +442,9 @@ namespace InGame.Bot
             }
         }
 
+        /// <summary>
+        /// ノード接続生成
+        /// </summary>
         private async UniTask BuildConnectionsAsync()
         {
             if (Nodes == null) return;
@@ -491,6 +527,9 @@ namespace InGame.Bot
             }
         }
 
+        /// <summary>
+        /// パラメータ検証
+        /// </summary>
         private void ValidateSettings()
         {
             if (_poissonRadius <= 0f)
@@ -509,8 +548,14 @@ namespace InGame.Bot
                 throw new ArgumentOutOfRangeException(nameof(_navMeshTolerance), "NavMesh Tolerance は 0 より大きくしてください。");
         }
 
+        /// <summary>
+        /// 無効値判定
+        /// </summary>
         private bool _removeInvalid(float value) => value <= 0f;
 
+        /// <summary>
+        /// 障害物有無判定
+        /// </summary>
         private bool HasObstacle(Vector3 from, Vector3 to)
         {
             from += Vector3.up * _rayUpAmount;
@@ -530,6 +575,9 @@ namespace InGame.Bot
             );
         }
 
+        /// <summary>
+        /// NavMesh 上で経路到達可能か
+        /// </summary>
         private bool HasValidPath(Vector3 from, Vector3 to)
         {
             _path ??= new NavMeshPath();
@@ -542,6 +590,9 @@ namespace InGame.Bot
             return false;
         }
 
+        /// <summary>
+        /// ワールド座標をグリッドインデックスへ変換
+        /// </summary>
         private Vector3Int WorldToIndex(Vector3 pos)
         {
             int ix = Mathf.FloorToInt((pos.x + _offset.x) * _invCell);
@@ -613,6 +664,9 @@ namespace InGame.Bot
             }
         }
 
+        /// <summary>
+        /// 指定座標に最も近いノード取得
+        /// </summary>
         private NodeData GetNearestNode(Vector3 pos)
         {
             float minDistance = float.MaxValue;
@@ -633,6 +687,53 @@ namespace InGame.Bot
             }
 
             return nodeData;
+        }
+
+        /// <summary>
+        /// ノード一覧 Gizmos 描画
+        /// </summary>
+        public static void DrawGizmos(List<NodeData> nodes)
+        {
+            var offset = Vector3.up * 0.3f;
+            var cam = Camera.current;
+
+            if (cam == null) return;
+            var camPos = cam.transform.position;
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                if (node == null) continue;
+
+                // カメラから遠いノードはスキップ
+                if ((node.Position - camPos).sqrMagnitude > 400f) continue;
+
+                var pos = node.Position + offset;
+
+                var connects = node.ConnectNode;
+                if (connects == null) continue;
+
+                for (int j = 0; j < connects.Count; j++)
+                {
+                    var connect = connects[j];
+                    if (connect == null) continue;
+
+                    // 重複描画防止（超重要）
+                    if (node.GetHashCode() > connect.GetHashCode()) continue;
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawLine(
+                        pos,
+                        connect.Position + offset
+                    );
+                    if (node.VaultConnect == null) continue;
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(
+                        pos,
+                        node.VaultConnect.Position
+                    );
+
+                }
+            }
         }
     }
 }
