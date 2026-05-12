@@ -135,7 +135,7 @@ namespace InGame.Bot
                         SetNodeDistance(crrentNode.VaultConnect, distance);
                     }
                 }
-                //’Tõ‚µ‚½ƒm[ƒh‚ğClause‚É‚·‚é
+                //’Tõ‚µ‚½ƒm[ƒh‚ğClose‚É‚·‚é
                 crrentNode.Close();
                 openNodes.Remove(crrentNode);
 

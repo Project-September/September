@@ -533,19 +533,19 @@ namespace InGame.Bot
         private void ValidateSettings()
         {
             if (_poissonRadius <= 0f)
-                throw new ArgumentOutOfRangeException(nameof(_poissonRadius), "Poisson Radius は 0 より大きくしてください。");
+                throw new InvalidOperationException( "Poisson Radius は 0 より大きくしてください。");
 
             if (_poissonCandidateCount <= 0)
-                throw new ArgumentOutOfRangeException(nameof(_poissonCandidateCount), "Poisson Candidate Count は 0 より大きくしてください。");
+                throw new InvalidOperationException("Poisson Candidate Count は 0 より大きくしてください。");
 
             if (_removeInvalid(_connectDistance))
-                throw new ArgumentOutOfRangeException(nameof(_connectDistance), "Connect Distance は 0 より大きくしてください。");
+                throw new InvalidOperationException("Connect Distance は 0 より大きくしてください。");
 
             if (_positionQuantize <= 0f)
-                throw new ArgumentOutOfRangeException(nameof(_positionQuantize), "Position Quantize は 0 より大きくしてください。");
+                throw new InvalidOperationException("Position Quantize は 0 より大きくしてください。");
 
             if (_navMeshTolerance <= 0f)
-                throw new ArgumentOutOfRangeException(nameof(_navMeshTolerance), "NavMesh Tolerance は 0 より大きくしてください。");
+                throw new InvalidOperationException("NavMesh Tolerance は 0 より大きくしてください。");
         }
 
         /// <summary>
