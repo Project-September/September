@@ -40,8 +40,6 @@ namespace September.Lobby
 
             PlayerDatabase.Instance.OnBotJoin.Subscribe(x => OnBotJoined(x)).AddTo(this);
 
-
-
             //仮でホストがBotをJoin
             if (HasStateAuthority)
             {

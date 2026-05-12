@@ -1,3 +1,4 @@
+using System;
 using InGame.Player;
 using September.Common;
 using UnityEngine;
@@ -13,8 +14,12 @@ namespace InGame.Bot
         }
         public override bool GetPlayerInput(out PlayerInput input)
         {
-            input = _stateMachine.GetInput();
-            input.Buttons.Set(PlayerButtons.Dash, true);
+            input = new();
+            input.MoveDirection = _stateMachine.GetMoveDirection();
+            foreach (PlayerButtons state in Enum.GetValues(typeof(PlayerButtons)))
+            {
+                input.Buttons.Set(state, _stateMachine.GetButton(state));
+            }
             return true;
         }
     }

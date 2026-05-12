@@ -45,8 +45,6 @@ namespace September.Common
             {
                 Runner.Despawn(Object);
             }
-
-
         }
         
         public void Server_AddExhibit(PlayerRef actor, ExhibitType type)
