@@ -71,7 +71,7 @@ namespace InGame.Player
             }
         }
 
-        private void LateUpdate()
+        protected virtual void LateUpdate()
         {
             // if (_animationClipPlayer)
             // {
@@ -126,7 +126,7 @@ namespace InGame.Player
             }
             
             // プレイヤーの入力の管理
-            if (GetInput<PlayerInput>(out var input))
+            if (GetPlayerInput(out var input))
             {
                 if (!IsStun && _playerControlState == PlayerControlState.Normal)
                 {
@@ -226,6 +226,11 @@ namespace InGame.Player
 
         /// <summary> スタンの経過時間を取得する </summary>
         public float GetRemainingStunTime => _stunTickTimer.RemainingTime(Runner) ?? 0;
+
+        public virtual bool GetPlayerInput(out PlayerInput input)
+        {
+            return GetInput(out input);
+        }
         
         public enum PlayerControlState
         {

@@ -4,28 +4,28 @@ using September.InGame.UI;
 
 namespace InGame.Player
 {
-    public class PlayerDataManager : MonoBehaviour
-    {
-        private PlayerManager _playerManager;
-        private PlayerStatus _playerStatus;
+	public class PlayerDataManager : MonoBehaviour
+	{
+		private PlayerManager _playerManager;
+		private PlayerStatus _playerStatus;
 
-        private void Start()
-        {
-            Initialize();
-            RegisterPlayer(_playerStatus);
-        }
+		private void Start()
+		{
+			Initialize();
+			RegisterPlayer(_playerStatus);
+		}
 
-        private void Initialize()
-        {
-            _playerManager = GetComponent<PlayerManager>();
-            _playerStatus = GetComponent<PlayerStatus>();
-        }
+		private void Initialize()
+		{
+			_playerManager = GetComponent<PlayerManager>();
+			_playerStatus = GetComponent<PlayerStatus>();
+		}
 
-        // GameLauncherでDataを登録する必要がある
-        private void RegisterPlayer(PlayerStatus status)
-        {
-            if (!_playerManager.IsLocalPlayer)
-                return;
+		// GameLauncherでDataを登録する必要がある
+		private void RegisterPlayer(PlayerStatus status)
+		{
+			if (!_playerManager.IsLocalPlayer)
+				return;
 
             if (UIController.I)
             {

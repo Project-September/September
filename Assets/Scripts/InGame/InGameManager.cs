@@ -11,24 +11,15 @@ namespace September.InGame.Common
 {
     public class InGameManager : NetworkStateMachineOwner<InGameManager>, IRegisterableService
     {
-        [SerializeField] private string _inGameBGMCueName = "Default_BGM";
         [Header("Timer Settings"), SerializeField, Label("TimerData")]
-        
         private GameTimerData _timerData;
         
-        [Header("他Playerを気絶させたときに得られるスコア"), SerializeField] 
-        private int _stunScore;
-
         private readonly Dictionary<PlayerRef, NetworkObject> _playerDataDic = new();
 
         private NetworkRunner _networkRunner;
         public IReadOnlyDictionary<PlayerRef, NetworkObject> PlayerDataDic => _playerDataDic;
         public GameTimerData TimerData => _timerData;
         public CancellationTokenSource Cts { get; private set; }
-
-        public int StunScore => _stunScore;
-        public string InGameBGMCueName => _inGameBGMCueName;
-        public string CurrentBGM { get; set; }
 
         public System.Action GameStarted { get; set; }
 
@@ -54,7 +45,7 @@ namespace September.InGame.Common
             Cts = new CancellationTokenSource();
             _networkRunner = FindFirstObjectByType<NetworkRunner>();
             if (_networkRunner == null) Debug.LogError("NetworkRunnerがありません");
-            base.Spawned();
+            if (_states.Length > 0) base.Spawned();
         }
 
         protected override void InitializeStateMachine()
