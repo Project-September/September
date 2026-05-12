@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Fusion;
 using Result;
+using UniRx;
 using UnityEngine;
 
 namespace September.Common
@@ -18,13 +19,19 @@ namespace September.Common
         [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
         [SerializeField] private int _sarutobiBonusScore = 50;
         [SerializeField] private ExhibitScoreConfig _tanihiraBonusScore;
-        
+
+        [Networked, Capacity(20)]
+        public NetworkDictionary<PlayerRef, NetworkObject> PlayerObjectDic => default;
         [Networked, OnChangedRender(nameof(OnChangedPlayerData)), Capacity(8)]
         public NetworkDictionary<PlayerRef, SessionPlayerData> PlayerDataDic => default;
         public Action<NetworkDictionary<PlayerRef, SessionPlayerData>> ChangedDataAction;
         public static PlayerDatabase Instance;
+
+        private Subject<PlayerRef> _onBotJoin = new();
+        public IObservable<PlayerRef> OnBotJoin => _onBotJoin;
         
         private readonly Dictionary<PlayerRef, ScoreTracker> _serverTrackers = new();
+        public static readonly int BotStartIndex = 100;
         
         public override void Spawned()
         {
@@ -38,6 +45,8 @@ namespace September.Common
             {
                 Runner.Despawn(Object);
             }
+
+
         }
         
         public void Server_AddExhibit(PlayerRef actor, ExhibitType type)
@@ -225,10 +234,21 @@ namespace September.Common
         
         public void AddPlayerData(PlayerRef playerRef)
         {
-            if (playerRef != Runner.LocalPlayer) return;
+            if (playerRef != Runner.LocalPlayer && playerRef.AsIndex < BotStartIndex) return;
             var localNickName = NickNameProvider.GetNickName();
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
             Rpc_SetPlayerData(playerRef, new SessionPlayerData(localNickName, nickNameOrder));
+        }
+        public void AddBotData(int botIndex)
+        {
+            if (botIndex < BotStartIndex) return;
+            var localNickName ="Bot";
+            var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
+            Rpc_SetBotData(PlayerRef.FromIndex(botIndex), new SessionPlayerData(localNickName, nickNameOrder));
+        }
+        public void AddPlayerObject(PlayerRef playerRef,NetworkObject playerObject)
+        {
+            PlayerObjectDic.Set(playerRef, playerObject);
         }
         
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
@@ -236,7 +256,13 @@ namespace September.Common
         {
             PlayerDataDic.Set(playerRef, data);
         }
-        
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        private void Rpc_SetBotData(PlayerRef playerRef, SessionPlayerData data)
+        {
+            PlayerDataDic.Set(playerRef, data);
+            _onBotJoin.OnNext(playerRef);
+        }
+
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
         public void Rpc_SetCharacter(PlayerRef playerRef, CharacterType characterType)
         {

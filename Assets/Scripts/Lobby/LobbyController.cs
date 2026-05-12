@@ -6,6 +6,7 @@ using Fusion;
 using Fusion.Sockets;
 using September.Common;
 using TMPro;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,6 +37,16 @@ namespace September.Lobby
             _quitButton.onClick.AddListener(() => NetworkManager.Instance.QuitLobby().Forget());
             PlayerDatabase.Instance.ChangedDataAction += ChangeLobbyPlayerUI;
             OnChangedIsReady();
+
+            PlayerDatabase.Instance.OnBotJoin.Subscribe(x => OnBotJoined(x)).AddTo(this);
+
+
+
+            //仮でホストがBotをJoin
+            if (HasStateAuthority)
+            {
+                PlayerDatabase.Instance.AddBotData(PlayerDatabase.BotStartIndex);
+            }
         }
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
@@ -97,6 +108,17 @@ namespace September.Lobby
             }
             if (Runner.LocalPlayer == player) return;
             AddContents(player);
+        }
+        public void OnBotJoined(PlayerRef bot)
+        {
+            Debug.Log(bot.AsIndex);
+            if (bot.AsIndex < PlayerDatabase.BotStartIndex) return;
+
+            if (HasStateAuthority)
+            {
+                PlayerIsReadyDic.Add(bot, true);
+            }
+            AddContents(bot);
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
