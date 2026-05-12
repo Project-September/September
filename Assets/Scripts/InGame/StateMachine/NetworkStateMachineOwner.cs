@@ -5,7 +5,7 @@ namespace September.Common
 {
     public abstract class NetworkStateMachineOwner<TContext> : NetworkBehaviour where TContext : NetworkStateMachineOwner<TContext>
     {
-        [SerializeField] ImtStateMachine<TContext>.State[] _states;
+        [SerializeField] protected ImtStateMachine<TContext>.State[] _states;
         
         protected ImtStateMachine<TContext> _stateMachine;
         
@@ -19,7 +19,7 @@ namespace September.Common
         
         public override void FixedUpdateNetwork()
         {
-            _stateMachine.Update();
+            _stateMachine?.Update();
         }
         
         protected abstract void InitializeStateMachine();
