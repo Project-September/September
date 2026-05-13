@@ -17,6 +17,7 @@ namespace September.Lobby
         [SerializeField] private PlayerConditionView _playerConditionViewPrefab;
         [SerializeField] private Button _readyButton;
         [SerializeField] private Button _quitButton;
+        [SerializeField] private Button _addBotButton;
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private TextMeshProUGUI _roomNameText;
         [SerializeField] private Image _fadePanel;
@@ -35,16 +36,11 @@ namespace September.Lobby
             }
             _readyButton.onClick.AddListener(() => Rpc_ToggleReady(Runner.LocalPlayer));
             _quitButton.onClick.AddListener(() => NetworkManager.Instance.QuitLobby().Forget());
+            _addBotButton.onClick.AddListener(() => PlayerDatabase.Instance.AddBotData());
             PlayerDatabase.Instance.ChangedDataAction += ChangeLobbyPlayerUI;
             OnChangedIsReady();
 
             PlayerDatabase.Instance.OnBotJoin.Subscribe(x => OnBotJoined(x)).AddTo(this);
-
-            //仮でホストがBotをJoin
-            if (HasStateAuthority)
-            {
-                PlayerDatabase.Instance.AddBotData(PlayerDatabase.BotStartIndex);
-            }
         }
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
@@ -138,6 +134,13 @@ namespace September.Lobby
                 if (!_lobbyPlayerUIDic.TryGetValue(kv.Key, out var value)) return;
                 value.PlayerNameText.text = kv.Value.DisplayNickName;
                 value.CharacterIconImage.sprite = CharacterDataContainer.Instance.GetCharacterData(kv.Value.CharacterType).CharacterIcon;
+
+                bool isChangeButtonActive = HasStateAuthority && kv.Key.AsIndex >= PlayerDatabase.BotStartIndex;
+                value.CharacterChangeButton.gameObject.SetActive(isChangeButtonActive);
+                if (isChangeButtonActive)
+                {
+                    value.CharacterChangeButton.onClick.AddListener(() => { });//TODO処理を追加
+                }
             }
         }
 

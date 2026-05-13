@@ -237,8 +237,9 @@ namespace September.Common
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
             Rpc_SetPlayerData(playerRef, new SessionPlayerData(localNickName, nickNameOrder));
         }
-        public void AddBotData(int botIndex)
+        public void AddBotData()
         {
+            int botIndex = GetBotCount() + BotStartIndex;
             if (botIndex < BotStartIndex) return;
             var localNickName ="Bot";
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
@@ -267,6 +268,20 @@ namespace September.Common
             if (!PlayerDataDic.TryGet(playerRef, out var playerData)) return;
             playerData.CharacterType = characterType;
             PlayerDataDic.Set(playerRef, playerData);
+        }
+
+        public int GetBotCount()
+        {
+            int count = 0;
+            foreach (var kv in PlayerDataDic)
+            {
+                if(kv.Key.AsIndex >= BotStartIndex)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private void OnChangedPlayerData()

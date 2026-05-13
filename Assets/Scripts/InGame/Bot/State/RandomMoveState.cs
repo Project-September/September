@@ -34,6 +34,7 @@ namespace InGame.Bot
             }
             catch (TimeoutException)
             {
+                await UniTask.Yield();
                 Debug.Log("経路探索タイムアウト");
                 GetRandomMoveRoute(position);
             }
@@ -44,6 +45,7 @@ namespace InGame.Bot
 
             if (_nodes == null || _nodes.Count == 0)
             {
+                await UniTask.Yield();
                 GetRandomMoveRoute(position);
             }
             _isFinding = false;

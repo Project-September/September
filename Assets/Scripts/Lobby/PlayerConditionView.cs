@@ -10,8 +10,11 @@ namespace September.Lobby
         [SerializeField, DisplayName("プレイヤー名表示用")] TextMeshProUGUI _playerNameText;
         [SerializeField, DisplayName("キャラアイコン表示用")] Image _characterIconImage;
         [SerializeField, DisplayName("準備完了アイコン")] Image _isReadyImage;
+        [SerializeField, DisplayName("Bot用キャラ変更ボタン")] Button _characterChangeButton;
+        
         public TextMeshProUGUI PlayerNameText => _playerNameText;
         public Image CharacterIconImage => _characterIconImage;
         public Image IsReadyImage => _isReadyImage;
+        public Button CharacterChangeButton => _characterChangeButton;
     }
 }
