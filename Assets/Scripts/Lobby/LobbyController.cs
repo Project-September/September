@@ -41,6 +41,7 @@ namespace September.Lobby
             OnChangedIsReady();
 
             PlayerDatabase.Instance.OnBotJoin.Subscribe(x => OnBotJoined(x)).AddTo(this);
+            PlayerDatabase.Instance.OnBotLeft.Subscribe(x => OnBotLeft(x)).AddTo(this);
         }
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
@@ -126,20 +127,30 @@ namespace September.Lobby
             }
         }
 
+        public void OnBotLeft(PlayerRef bot)
+        {
+            OnPlayerLeft(null, bot);
+        }
+
         void ChangeLobbyPlayerUI(NetworkDictionary<PlayerRef, SessionPlayerData> dictionary)
         {
             if (dictionary.ContainsKey(Runner.LocalPlayer)) _playerNameText.text = dictionary[Runner.LocalPlayer].DisplayNickName;
             foreach (var kv in dictionary)
             {
-                if (!_lobbyPlayerUIDic.TryGetValue(kv.Key, out var value)) return;
+                PlayerRef playerRef = kv.Key;
+                if (!_lobbyPlayerUIDic.TryGetValue(playerRef, out var value)) return;
                 value.PlayerNameText.text = kv.Value.DisplayNickName;
                 value.CharacterIconImage.sprite = CharacterDataContainer.Instance.GetCharacterData(kv.Value.CharacterType).CharacterIcon;
 
-                bool isChangeButtonActive = HasStateAuthority && kv.Key.AsIndex >= PlayerDatabase.BotStartIndex;
-                value.CharacterChangeButton.gameObject.SetActive(isChangeButtonActive);
-                if (isChangeButtonActive)
+                bool isBot = playerRef.AsIndex >= PlayerDatabase.BotStartIndex;
+                bool HasBotAuthority = isBot && HasStateAuthority;
+                value.CharacterChangeButton.gameObject.SetActive(HasBotAuthority);
+                value.BotRemoveButton.gameObject.SetActive(HasBotAuthority);
+
+                if (HasBotAuthority)
                 {
                     value.CharacterChangeButton.onClick.AddListener(() => { });//TODO処理を追加
+                    value.BotRemoveButton.onClick.AddListener(() => PlayerDatabase.Instance.RemoveBotData(playerRef));
                 }
             }
         }

@@ -29,7 +29,9 @@ namespace September.Common
 
         private Subject<PlayerRef> _onBotJoin = new();
         public IObservable<PlayerRef> OnBotJoin => _onBotJoin;
-        
+        private Subject<PlayerRef> _onBotLeft = new();
+        public IObservable<PlayerRef> OnBotLeft => _onBotLeft;
+
         private readonly Dictionary<PlayerRef, ScoreTracker> _serverTrackers = new();
         public static readonly int BotStartIndex = 100;
         
@@ -245,6 +247,11 @@ namespace September.Common
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
             Rpc_SetBotData(PlayerRef.FromIndex(botIndex), new SessionPlayerData(localNickName, nickNameOrder));
         }
+        public void RemoveBotData(PlayerRef playerRef)
+        {
+            if (!HasStateAuthority) return;
+            Rpc_RemoveBotData(playerRef);
+        }
         public void AddPlayerObject(PlayerRef playerRef,NetworkObject playerObject)
         {
             PlayerObjectDic.Set(playerRef, playerObject);
@@ -268,6 +275,14 @@ namespace September.Common
             if (!PlayerDataDic.TryGet(playerRef, out var playerData)) return;
             playerData.CharacterType = characterType;
             PlayerDataDic.Set(playerRef, playerData);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        public void Rpc_RemoveBotData(PlayerRef playerRef)
+        {
+            if (!PlayerDataDic.TryGet(playerRef, out _)) return;
+            PlayerDataDic.Remove(playerRef);
+            _onBotLeft.OnNext(playerRef);
         }
 
         public int GetBotCount()
