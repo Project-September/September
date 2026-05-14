@@ -12,6 +12,7 @@ namespace September.Lobby
         {
             var characterNames = CharacterDataContainer.Instance.GetNames();
             CreateCharacterIcons(characterNames);
+            ClosePanel();
         }
             
         public void ShowPanel(PlayerRef player,Vector3 buttonPos)

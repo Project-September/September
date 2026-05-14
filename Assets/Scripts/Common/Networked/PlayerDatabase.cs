@@ -239,6 +239,7 @@ namespace September.Common
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
             Rpc_SetPlayerData(playerRef, new SessionPlayerData(localNickName, nickNameOrder));
         }
+
         public void AddBotData()
         {
             int botIndex = GetBotCount() + BotStartIndex;
@@ -247,11 +248,13 @@ namespace September.Common
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
             Rpc_SetBotData(PlayerRef.FromIndex(botIndex), new SessionPlayerData(localNickName, nickNameOrder));
         }
+
         public void RemoveBotData(PlayerRef playerRef)
         {
             if (!HasStateAuthority) return;
             Rpc_RemoveBotData(playerRef);
         }
+
         public void AddPlayerObject(PlayerRef playerRef,NetworkObject playerObject)
         {
             PlayerObjectDic.Set(playerRef, playerObject);
@@ -262,6 +265,7 @@ namespace September.Common
         {
             PlayerDataDic.Set(playerRef, data);
         }
+
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
         private void Rpc_SetBotData(PlayerRef playerRef, SessionPlayerData data)
         {

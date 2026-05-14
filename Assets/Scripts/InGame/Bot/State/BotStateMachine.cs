@@ -53,6 +53,7 @@ namespace InGame.Bot
                 default: return false;
             }
         }
+
         public Vector3 GetMoveDirection()
         {
             if (!GameInput.I.IsMoveInput) return Vector3.zero;
