@@ -15,6 +15,7 @@ namespace September.Lobby
     public class LobbyController : NetworkBehaviour, INetworkRunnerCallbacks
     {
         [SerializeField] private PlayerConditionView _playerConditionViewPrefab;
+        [SerializeField] private BotCharacterSelect _botCharacterSelect;
         [SerializeField] private Button _readyButton;
         [SerializeField] private Button _quitButton;
         [SerializeField] private Button _addBotButton;
@@ -149,7 +150,8 @@ namespace September.Lobby
 
                 if (HasBotAuthority)
                 {
-                    value.CharacterChangeButton.onClick.AddListener(() => { });//TODO処理を追加
+                    RectTransform rect = value.CharacterChangeButton.GetComponent<RectTransform>();
+                    value.CharacterChangeButton.onClick.AddListener(() => { _botCharacterSelect.ShowPanel(playerRef, value.BotRemoveButton.transform.position); });//TODO処理を追加
                     value.BotRemoveButton.onClick.AddListener(() => PlayerDatabase.Instance.RemoveBotData(playerRef));
                 }
             }
