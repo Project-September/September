@@ -58,4 +58,14 @@ public static class HitboxDebugUtility
         // duration=0 で1フレームだけ表示
         DebugDrawUtility.DrawOrientedWireBox(center, halfExtents, rot, color, 0f);
     }
+
+    /// <summary>
+    /// コライダー形状を描画する。デバッグモード中のみ描画される
+    /// </summary>
+    [Conditional("UNITY_EDITOR")]
+    public static void DrawCollider(Collider collider, Color color, float duration = 0f)
+    {
+        if (!IsDebugModeEnabled) return;
+        DebugDrawUtility.DrawCollider(collider, color, duration);
+    }
 }
