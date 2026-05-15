@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public static class DebugDrawUtility
 {
+    [Conditional("UNITY_EDITOR")]
     public static void DrawWireSphere(Vector3 center, float radius, Color color, float duration = 0f)
     {
         int segments = 16;
@@ -38,11 +41,15 @@ public static class DebugDrawUtility
         }
     }
     
+    [Conditional("UNITY_EDITOR")]
     public static void DrawWireCapsule(Vector3 p0, Vector3 p1, float radius, Color color, float duration = 0f)
     {
         // 中心位置を使って、球体を描画
         DrawWireSphere(p0, radius, color, duration);
         DrawWireSphere(p1, radius, color, duration);
+
+        var capsuleDirection = (p0 - p1).normalized;
+        var rot = Quaternion.FromToRotation(Vector3.up, capsuleDirection);
 
         // 4方向をつなぐ
         Vector3[] directions = {
@@ -51,9 +58,49 @@ public static class DebugDrawUtility
 
         foreach (var dir in directions)
         {
-            var offset = dir * radius;
+            var offset = rot * dir * radius;
             Debug.DrawLine(p0 + offset, p1 + offset, color, duration);
         }
     }
 
+    [Conditional("UNITY_EDITOR")]
+    public static void DrawOrientedWireBox(Vector3 center, Vector3 halfExtents, Quaternion rot, Color col, float duration)
+    {
+        var c = GetBoxCorners(center, halfExtents, rot);
+        // 底面
+        DrawEdge(c[0], c[1], col, duration);
+        DrawEdge(c[1], c[3], col, duration);
+        DrawEdge(c[3], c[2], col, duration);
+        DrawEdge(c[2], c[0], col, duration);
+        // 上面
+        DrawEdge(c[4], c[5], col, duration);
+        DrawEdge(c[5], c[7], col, duration);
+        DrawEdge(c[7], c[6], col, duration);
+        DrawEdge(c[6], c[4], col, duration);
+        // 縦
+        DrawEdge(c[0], c[4], col, duration);
+        DrawEdge(c[1], c[5], col, duration);
+        DrawEdge(c[2], c[6], col, duration);
+        DrawEdge(c[3], c[7], col, duration);
+        return;
+
+        static void DrawEdge(Vector3 a, Vector3 b, Color col, float duration)
+        {
+            Debug.DrawLine(a, b, col, duration, false);
+        }
+
+        static Vector3[] GetBoxCorners(Vector3 center, Vector3 halfExtents, Quaternion rot)
+        {
+            Vector3 x = rot * new Vector3(halfExtents.x, 0, 0);
+            Vector3 y = rot * new Vector3(0, halfExtents.y, 0);
+            Vector3 z = rot * new Vector3(0, 0, halfExtents.z);
+
+            var c = new Vector3[8];
+            c[0] = center - x - y - z; c[1] = center + x - y - z;
+            c[2] = center - x - y + z; c[3] = center + x - y + z;
+            c[4] = center - x + y - z; c[5] = center + x + y - z;
+            c[6] = center - x + y + z; c[7] = center + x + y + z;
+            return c;
+        }
+    }
 }
