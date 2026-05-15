@@ -15,7 +15,9 @@ namespace September.InGame.Kraken
 
         private int _startExecuteTick = -9999;
         private bool _isActive;
-        private Matrix4x4 _startMatrix;
+        
+        private Vector3 _startPosition;
+        private Quaternion _startRotation;
         
         private readonly Collider[] _hitColliders = new Collider[32];
         private readonly List<Collider> _alreadyHitColliders = new();
@@ -27,8 +29,11 @@ namespace September.InGame.Kraken
             if (!HasStateAuthority) return;
             if (!_isActive) return;
             
+            Debug.Log("Tick");
+            
             if (_hitboxTicks.IsStartPredictionTick(Runner.Tick, _startExecuteTick))
             {
+                Debug.Log("Start Prediction Tick");
                 _isActive = true;
                 StartPrediction(_hitboxTicks.PredictionDurationTick);
                 return;
@@ -36,19 +41,24 @@ namespace September.InGame.Kraken
 
             if (_hitboxTicks.IsInHitboxExecuteTick(Runner.Tick, _startExecuteTick))
             {
+                Debug.Log("Cast Hitbox Tick");
                 _isActive = true;
                 CastHitbox();
                 return;
             }
 
-            _isActive = false;
-            _alreadyHitColliders.Clear();
+            if (_hitboxTicks.IsEnded(Runner.Tick, _startExecuteTick))
+            {
+                _isActive = false;
+                _alreadyHitColliders.Clear();
+            }
         }
 
         public void StartCast()
         {
             _startExecuteTick = Runner.Tick;
-            _startMatrix = transform.localToWorldMatrix;
+            _startPosition = transform.position;
+            _startRotation = transform.rotation;
             _isActive = true;
         }
 
@@ -56,7 +66,7 @@ namespace September.InGame.Kraken
         {
             foreach (var bind in _binds)
             {
-                bind.StartPrediction(_startMatrix, durationTick, Runner);
+                bind.StartPrediction(_startPosition, _startRotation, durationTick, Runner);
             }
         }
 
@@ -64,7 +74,7 @@ namespace September.InGame.Kraken
         {
             foreach (var bind in _binds)
             {
-                bind.CastHitbox(_startMatrix, _hitColliders, hitCollider =>
+                bind.CastHitbox(_startPosition, _startRotation, _hitColliders, hitCollider =>
                 {
                     if (_alreadyHitColliders.Contains(hitCollider)) return;
                     OnHit?.Invoke(hitCollider);
@@ -79,13 +89,11 @@ namespace September.InGame.Kraken
             if (!enabled) return;
             if (_binds == null) return;
 
-            var matrix = transform.localToWorldMatrix;
-            
             Gizmos.color = new Color(1f, 0.92f, 0.02f, 0.31f);
             
             foreach (var bind in _binds)
             {
-                bind?.DrawGizmos(matrix);
+                bind?.DrawGizmos(transform.position, transform.rotation);
             }
         }
     }
