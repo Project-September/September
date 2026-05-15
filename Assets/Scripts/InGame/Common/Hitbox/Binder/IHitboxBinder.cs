@@ -9,12 +9,12 @@ namespace September.InGame.Common.Hitbox.Binder
     public interface IHitboxBinder
     {
         public bool Validate();
-        public void StartPrediction(Matrix4x4 baseMatrix, int durationTick, NetworkRunner runner);
-        public void CastHitbox(Matrix4x4 baseMatrix, Collider[] results, Action<Collider> onHit);
-        public void DrawGizmos(Matrix4x4 baseMatrix);
+        public void StartPrediction(Vector3 basePosition, Quaternion baseRotation, int durationTick, NetworkRunner runner);
+        public void CastHitbox(Vector3 basePosition, Quaternion baseRotation, Collider[] results, Action<Collider> onHit);
+        public void DrawGizmos(Vector3 basePosition, Quaternion baseRotation);
     }
     
-    public interface IHitboxBinder<TShapeStruct, THitboxShape, out TPrediction> : IHitboxBinder
+    public interface IHitboxBinder<TShapeStruct, out THitboxShape, out TPrediction> : IHitboxBinder
         where THitboxShape : IHitboxShape<TShapeStruct>
         where TPrediction : IHitboxPrediction<TShapeStruct>
     {
@@ -34,29 +34,29 @@ namespace September.InGame.Common.Hitbox.Binder
             return true;
         }
 
-        void IHitboxBinder.StartPrediction(Matrix4x4 baseMatrix, int durationTick, NetworkRunner runner)
+        void IHitboxBinder.StartPrediction(Vector3 basePosition, Quaternion baseRotation, int durationTick, NetworkRunner runner)
         {
             foreach (var shape in Shapes)
             {
-                Prediction.StartPrediction(shape, baseMatrix, durationTick, runner);
+                Prediction.StartPrediction(shape, basePosition, baseRotation, durationTick, runner);
             }
         }
 
-        void IHitboxBinder.CastHitbox(Matrix4x4 baseMatrix, Collider[] results, Action<Collider> onHit)
+        void IHitboxBinder.CastHitbox(Vector3 basePosition, Quaternion baseRotation, Collider[] results, Action<Collider> onHit)
         {
             foreach (var shape in Shapes)
             {
-                shape.CastHitbox(baseMatrix, results, onHit);
+                shape.CastHitbox(basePosition, baseRotation, results, onHit);
             }
         }
 
-        void IHitboxBinder.DrawGizmos(Matrix4x4 baseMatrix)
+        void IHitboxBinder.DrawGizmos(Vector3 basePosition, Quaternion baseRotation)
         {
-            if (Prediction is not IHitboxPredictionGizmo gizmo) return;
+            if (Prediction is not IHitboxPredictionGizmo<TShapeStruct> gizmo) return;
             
             foreach (var shape in Shapes)
             {
-                gizmo.DrawGizmos(baseMatrix, shape.Hitbox);
+                gizmo.DrawGizmos(shape.Hitbox, basePosition, baseRotation);
             }
         }
     }

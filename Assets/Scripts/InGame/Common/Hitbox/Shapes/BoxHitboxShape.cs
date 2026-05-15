@@ -11,11 +11,10 @@ namespace September.InGame.Common.Hitbox.Shapes
         
         public BoxHitbox Hitbox => _hitboxShape;
 
-        public void CastHitbox(Matrix4x4 baseMatrix, Collider[] results, Action<Collider> onHit)
+        public void CastHitbox(Vector3 basePosition, Quaternion baseRotation, Collider[] results, Action<Collider> onHit)
         {
-            var hitboxMatrix = baseMatrix * _hitboxShape.GetMatrix();
-            var castPosition = hitboxMatrix.GetPosition();
-            var castRotation = hitboxMatrix.rotation;
+            var castPosition = _hitboxShape.GetWorldCenter(basePosition, baseRotation);
+            var castRotation = _hitboxShape.GetWorldRotation(baseRotation);
             
             int hitCount = Physics.OverlapBoxNonAlloc(castPosition, _hitboxShape.HalfExtents, results, castRotation);
 

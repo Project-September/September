@@ -4,18 +4,18 @@ namespace September.InGame.Common.Hitbox.Prediction
 {
     public interface IHitboxPredictionGizmo
     {
-        public void DrawGizmos(Matrix4x4 matrix, object shape);
+        public void DrawGizmos(Vector3 basePosition, Quaternion baseRotation, object shape);
     }
     
     public interface IHitboxPredictionGizmo<in TShape> : IHitboxPredictionGizmo
     {
-        public void DrawGizmos(Matrix4x4 matrix, TShape shape);
+        public void DrawGizmos(TShape shape, Vector3 basePosition, Quaternion baseRotation);
 
-        void IHitboxPredictionGizmo.DrawGizmos(Matrix4x4 matrix, object shape)
+        void IHitboxPredictionGizmo.DrawGizmos(Vector3 basePosition, Quaternion baseRotation, object shape)
         {
             if (shape is TShape typedShape)
             {
-                DrawGizmos(matrix, typedShape);
+                DrawGizmos(typedShape, basePosition, baseRotation);
             }
         }
     }
