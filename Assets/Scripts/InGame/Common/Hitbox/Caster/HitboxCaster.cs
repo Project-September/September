@@ -56,6 +56,8 @@ namespace September.InGame.Common.Hitbox.Caster
 
         public void StartCast()
         {
+            if (_isActive) return;
+            
             _startExecuteTick = Runner.Tick;
             _startPosition = transform.position;
             _startRotation = transform.rotation;
