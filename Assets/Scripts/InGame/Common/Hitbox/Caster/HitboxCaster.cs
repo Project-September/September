@@ -17,8 +17,8 @@ namespace September.InGame.Common.Hitbox.Caster
         private bool _isActive;
         private Matrix4x4 _startMatrix;
         
-        private Collider[] _hitColliders = new Collider[32];
-        private List<Collider> _alreadyHitColliders = new();
+        private readonly Collider[] _hitColliders = new Collider[32];
+        private readonly List<Collider> _alreadyHitColliders = new();
         
         public event Action<Collider> OnHit;
 
