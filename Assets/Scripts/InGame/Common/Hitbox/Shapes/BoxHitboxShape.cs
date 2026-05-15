@@ -16,6 +16,8 @@ namespace September.InGame.Kraken
             var castPosition = _hitboxShape.GetWorldCenter(basePosition, baseRotation);
             var castRotation = _hitboxShape.GetWorldRotation(baseRotation);
             
+            HitboxDebugUtility.DrawBoxOneFrame(castPosition, _hitboxShape.HalfExtents, castRotation, Color.red);
+            
             int hitCount = Physics.OverlapBoxNonAlloc(castPosition, _hitboxShape.HalfExtents, results, castRotation);
 
             for (int i = 0; i < hitCount; i++)
