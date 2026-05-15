@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -40,7 +41,7 @@ public static class DebugDrawUtility
             Debug.DrawLine(p1, p2, color, duration);
         }
     }
-    
+
     [Conditional("UNITY_EDITOR")]
     public static void DrawWireCapsule(Vector3 p0, Vector3 p1, float radius, Color color, float duration = 0f)
     {
@@ -52,7 +53,8 @@ public static class DebugDrawUtility
         var rot = Quaternion.FromToRotation(Vector3.up, capsuleDirection);
 
         // 4方向をつなぐ
-        Vector3[] directions = {
+        Vector3[] directions =
+        {
             Vector3.right, Vector3.back, Vector3.forward, Vector3.left
         };
 
@@ -101,6 +103,68 @@ public static class DebugDrawUtility
             c[4] = center - x + y - z; c[5] = center + x + y - z;
             c[6] = center - x + y + z; c[7] = center + x + y + z;
             return c;
+        }
+    }
+
+    /// <summary>
+    /// コライダー形状に合わせて描画を行う
+    /// </summary>
+    [Conditional("UNITY_EDITOR")]
+    public static void DrawCollider(Collider collider, Color color, float duration = 0f)
+    {
+        var transform = collider.transform;
+
+        switch (collider)
+        {
+            case BoxCollider box:
+            {
+                var halfSize = box.size / 2f;
+                var lossyScale = transform.lossyScale;
+                var size = new Vector3(halfSize.x * lossyScale.x, halfSize.y * lossyScale.y, halfSize.z * lossyScale.z);
+                DrawOrientedWireBox(transform.TransformPoint(box.center), size, transform.rotation, color, duration);
+                break;
+            }
+            case SphereCollider sphere:
+            {
+                var size = Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
+                DrawWireSphere(transform.TransformPoint(sphere.center), size * sphere.radius, color, duration);
+                break;
+            }
+            case CapsuleCollider capsule:
+            {
+                var direction = transform.rotation * capsule.direction switch
+                {
+                    0 => Vector3.right,
+                    1 => Vector3.up,
+                    2 => Vector3.forward,
+                    _ => throw new InvalidEnumArgumentException("Invalid direction")
+                };
+
+                var heightScale = capsule.direction switch
+                {
+                    0 => transform.lossyScale.x,
+                    1 => transform.lossyScale.y,
+                    2 => transform.lossyScale.z,
+                };
+
+                var radiusScale = capsule.direction switch
+                {
+                    0 => Mathf.Max(transform.lossyScale.y, transform.lossyScale.z),
+                    1 => Mathf.Max(transform.lossyScale.x, transform.lossyScale.z),
+                    2 => Mathf.Max(transform.lossyScale.x, transform.lossyScale.y),
+                };
+
+                var radius = capsule.radius * radiusScale;
+                var height = Mathf.Max(capsule.height * heightScale - radius * 2, 0);
+                var offset = height * 0.5f * direction;
+
+                var center = transform.TransformPoint(capsule.center);
+                var p0 = center + offset;
+                var p1 = center - offset;
+
+                DrawWireCapsule(p0, p1, radius, color, duration);
+                break;
+            }
         }
     }
 }
