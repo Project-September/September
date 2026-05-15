@@ -122,13 +122,13 @@ public static class DebugDrawUtility
                 var lossyScale = transform.lossyScale;
                 var size = new Vector3(halfSize.x * lossyScale.x, halfSize.y * lossyScale.y, halfSize.z * lossyScale.z);
                 DrawOrientedWireBox(transform.TransformPoint(box.center), size, transform.rotation, color, duration);
-                break;
+                return;
             }
             case SphereCollider sphere:
             {
                 var size = Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
                 DrawWireSphere(transform.TransformPoint(sphere.center), size * sphere.radius, color, duration);
-                break;
+                return;
             }
             case CapsuleCollider capsule:
             {
@@ -163,8 +163,10 @@ public static class DebugDrawUtility
                 var p1 = center - offset;
 
                 DrawWireCapsule(p0, p1, radius, color, duration);
-                break;
+                return;
             }
         }
+
+        Debug.LogWarning("このコライダー形状はサポートされていません");
     }
 }
