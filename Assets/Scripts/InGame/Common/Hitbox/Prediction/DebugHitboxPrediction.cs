@@ -11,7 +11,7 @@ namespace September.InGame.Common.Hitbox.Prediction
         {
             var center = shape.GetWorldCenter(basePosition, baseRotation);
             var rotation = shape.GetWorldRotation(baseRotation);
-            DebugDrawUtility.DrawOrientedWireBox(center, shape.HalfExtents, rotation, Color.red, durationTick * runner.DeltaTime);
+            DebugDrawUtility.DrawOrientedWireBox(center, shape.HalfExtents, rotation, Color.yellow, durationTick * runner.DeltaTime);
         }
 
         public void DrawGizmos(BoxHitbox shape, Vector3 basePosition, Quaternion baseRotation)
