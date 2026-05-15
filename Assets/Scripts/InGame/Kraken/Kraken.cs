@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
 using InGame.Player;
@@ -20,16 +19,8 @@ namespace September.InGame.Kraken
         
         /// <summary> 攻撃処理コンポーネント </summary>
         [Header("攻撃設定")]
-        [SerializeField] private HitChecker _hitChecker;
-        [SerializeField] private float _hitStartTime;
-        [SerializeField] private float _hitEndTime;
+        [SerializeField] private HitboxCaster _hitboxCaster;
         [SerializeField] private int _damage;
-
-        [Header("攻撃予測")]
-        [SerializeField] private GameObject _predictVFX;
-        [SerializeField] private float _predictDuration;
-        [SerializeField] private Vector3 _predictSize;
-        [SerializeField] private Vector3 _predictOffset;
 
         [Header("アニメーション設定")] 
         [SerializeField] private Transform _leg;
@@ -42,18 +33,18 @@ namespace September.InGame.Kraken
 
         private void Start()
         {
-            _hitChecker.OnHit += x =>
+            _hitboxCaster.OnHit += x =>
             {
                 if (x.TryGetComponent<IDamageable>(out var damageable))
                 {
-                    var hitData = new HitData()
+                    var hitData = new HitData
                     {
                         HitActionType = HitActionType.Damage,
                         Amount = _damage,
                         ExecutorRef = Object.InputAuthority,
                         TargetRef = damageable.OwnerPlayerRef,
                     };
-                    
+
                     damageable.TakeHit(ref hitData);
                 }
             };
@@ -92,7 +83,7 @@ namespace September.InGame.Kraken
                     if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f)), out var hit))
                     {
                         var targetPos = hit.point;
-                        Attack(targetPos).Forget();
+                        Attack(targetPos);
                     }
                 }
             }
@@ -161,26 +152,10 @@ namespace September.InGame.Kraken
             // 入力を受け取らないようにする
             Object.RemoveInputAuthority();
         }
-        
-        /// <summary>
-        /// 攻撃予測の表示
-        /// </summary>
-        private void ShowAttackPrediction()
-        {
-            var center = transform.rotation * _predictOffset + transform.position;
-            _leg.forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
-            _leg.position = center;
-            _leg.localScale = _predictSize;
-            // DebugDrawUtility.DrawWireBox(center, _predictSize, _leg.rotation, Color.red, _predictDuration);
-        }
 
-        private async UniTask Attack(Vector3 targetPos)
+        private void Attack(Vector3 targetPos)
         {
-            ShowAttackPrediction();
-            await UniTask.WaitForSeconds(_hitStartTime);
-            _hitChecker.StartHitCheck();
-            await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
-            _hitChecker.EndHitCheck();
+            _hitboxCaster.StartCast();
         }
     }
 }
