@@ -11,38 +11,38 @@ using UnityEngine.AI;
 namespace InGame.Bot
 {
     /// <summary>
-    /// MapData‚É‘‚«‚İ‚ğ‚·‚éƒNƒ‰ƒX
-    /// ƒQ[ƒ€Às’†‚Í“®‚©‚³‚È‚¢
+    /// MapDataã«æ›¸ãè¾¼ã¿ã‚’ã™ã‚‹ã‚¯ãƒ©ã‚¹
+    /// ã‚²ãƒ¼ãƒ å®Ÿè¡Œä¸­ã¯å‹•ã‹ã•ãªã„
     /// </summary>
     public class NodeGanerator : MonoBehaviour
     {
-        [SerializeField,Tooltip("¶¬‚µ‚½ƒm[ƒh‚ğ‘‚«‚Ş")] private NodeMapData _mapData;
+        [SerializeField,Tooltip("ç”Ÿæˆã—ãŸãƒãƒ¼ãƒ‰ã‚’æ›¸ãè¾¼ã‚€")] private NodeMapData _mapData;
 
-        [SerializeField, Tooltip("Œo˜H“’B”»’è‚ÌŠî€’n“_")] private Transform _origin;
-        [SerializeField, Tooltip("•`‰æ‚·‚é‚©")] private bool _isDrawGizumoIcon;
+        [SerializeField, Tooltip("çµŒè·¯åˆ°é”åˆ¤å®šã®åŸºæº–åœ°ç‚¹")] private Transform _origin;
+        [SerializeField, Tooltip("æç”»ã™ã‚‹ã‹")] private bool _isDrawGizumoIcon;
 
         [Header("Poisson Disk")]
-        [SerializeField, Tooltip("ƒm[ƒh¶¬”ÍˆÍ")] private BoxCollider _generationArea;
-        [SerializeField, Tooltip("¶¬”ÍˆÍ–¢İ’è‚Ì‘ã‘ÖƒTƒCƒY")] private Vector3 _fallbackAreaSize = new(50f, 10f, 50f);
-        [SerializeField, Tooltip("ƒm[ƒhŠÔ‚Ì–ÚˆÀ‹——£")] private float _poissonRadius = 5f;
-        [SerializeField, Tooltip("Œó•â¶¬‰ñ”")] private int _poissonCandidateCount = 30;
-        [SerializeField, Tooltip("Å‘åƒm[ƒh”B0‚È‚ç–³§ŒÀ")] private int _maxNodeCount = 0;
+        [SerializeField, Tooltip("ãƒãƒ¼ãƒ‰ç”Ÿæˆç¯„å›²")] private BoxCollider _generationArea;
+        [SerializeField, Tooltip("ç”Ÿæˆç¯„å›²æœªè¨­å®šæ™‚ã®ä»£æ›¿ã‚µã‚¤ã‚º")] private Vector3 _fallbackAreaSize = new(50f, 10f, 50f);
+        [SerializeField, Tooltip("ãƒãƒ¼ãƒ‰é–“ã®ç›®å®‰è·é›¢")] private float _poissonRadius = 5f;
+        [SerializeField, Tooltip("å€™è£œç”Ÿæˆå›æ•°")] private int _poissonCandidateCount = 30;
+        [SerializeField, Tooltip("æœ€å¤§ãƒãƒ¼ãƒ‰æ•°ã€‚0ãªã‚‰ç„¡åˆ¶é™")] private int _maxNodeCount = 0;
 
         [Header("Connect")]
-        [SerializeField, Tooltip("Ú‘±‰Â”\‹——£")] private float _connectDistance = 10f;
-        [SerializeField, Tooltip("1ƒm[ƒh‚ ‚½‚è‚ÌÅ‘åÚ‘±”")] private int _maxConnectCount = 4;
+        [SerializeField, Tooltip("æ¥ç¶šå¯èƒ½è·é›¢")] private float _connectDistance = 10f;
+        [SerializeField, Tooltip("1ãƒãƒ¼ãƒ‰ã‚ãŸã‚Šã®æœ€å¤§æ¥ç¶šæ•°")] private int _maxConnectCount = 4;
 
         [Header("Raycast")]
-        [SerializeField, Tooltip("Raycast ‹——£")] private float _rayDistance = 10f;
-        [SerializeField, Tooltip("ŠJn’n“_‚Ìã•ûŒü•â³")] private float _rayUpAmount = 1f;
-        [SerializeField, Tooltip("’n–Ê”»’è‚Ìã•ûŒü•â³")] private float _groundRayUp = 2f;
-        [SerializeField, Tooltip("áŠQ•¨”»’è—pƒŒƒCƒ„[")] private LayerMask _obstacleMask = ~0;
+        [SerializeField, Tooltip("Raycast è·é›¢")] private float _rayDistance = 10f;
+        [SerializeField, Tooltip("é–‹å§‹åœ°ç‚¹ã®ä¸Šæ–¹å‘è£œæ­£")] private float _rayUpAmount = 1f;
+        [SerializeField, Tooltip("åœ°é¢åˆ¤å®šæ™‚ã®ä¸Šæ–¹å‘è£œæ­£")] private float _groundRayUp = 2f;
+        [SerializeField, Tooltip("éšœå®³ç‰©åˆ¤å®šç”¨ãƒ¬ã‚¤ãƒ¤ãƒ¼")] private LayerMask _obstacleMask = ~0;
 
         [Header("Precision")]
-        [SerializeField, Tooltip("À•W—Êq‰»¸“x")] private float _positionQuantize = 1000f;
+        [SerializeField, Tooltip("åº§æ¨™é‡å­åŒ–ç²¾åº¦")] private float _positionQuantize = 1000f;
 
         [Header("NavMesh")]
-        [SerializeField, Tooltip("ƒTƒ“ƒvƒŠƒ“ƒO‹–—e‹——£")] private float _navMeshTolerance = 2f;
+        [SerializeField, Tooltip("ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°è¨±å®¹è·é›¢")] private float _navMeshTolerance = 2f;
 
         [Header("Vault")]
         [SerializeField] private CapsuleCollider _botCapsuleCollider;
@@ -91,7 +91,7 @@ namespace InGame.Bot
             return list.ToArray();
         }
         /// <summary>
-        /// ŠJn‚É©•ª©g‚Æ”ò‚Ñ‰z‚¦ƒm[ƒh‚ğíœ‚·‚é
+        /// é–‹å§‹æ™‚ã«è‡ªåˆ†è‡ªèº«ã¨é£›ã³è¶Šãˆãƒãƒ¼ãƒ‰ã‚’å‰Šé™¤ã™ã‚‹
         /// </summary>
         public void Awake()
         {
@@ -103,7 +103,7 @@ namespace InGame.Bot
             }
         }
 
-        [Button("ƒm[ƒh¶¬")]
+        [Button("ãƒãƒ¼ãƒ‰ç”Ÿæˆ")]
         public void Generate()
         {
 #if UNITY_EDITOR
@@ -121,10 +121,10 @@ namespace InGame.Bot
                 ValidateSettings();
 
                 if (_origin == null)
-                    throw new InvalidOperationException("Origin ‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+                    throw new InvalidOperationException("Origin ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
 
                 if (_botCapsuleCollider == null)
-                    throw new InvalidOperationException("Bot Capsule Collider ‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB");
+                    throw new InvalidOperationException("Bot Capsule Collider ãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚");
 
                 Nodes = null;
 
@@ -139,7 +139,7 @@ namespace InGame.Bot
 
                 if (sampledPositions.Count == 0)
                 {
-                    Debug.LogWarning("¶¬‘ÎÛƒm[ƒh‚ª‚ ‚è‚Ü‚¹‚ñB");
+                    Debug.LogWarning("ç”Ÿæˆå¯¾è±¡ãƒãƒ¼ãƒ‰ãŒã‚ã‚Šã¾ã›ã‚“ã€‚");
                     return;
                 }
 
@@ -154,14 +154,14 @@ namespace InGame.Bot
 
                 if (nodeList.Count == 0)
                 {
-                    Debug.LogWarning("NodeData ¶¬Œã‚Éƒm[ƒh‚ª0Œ‚É‚È‚è‚Ü‚µ‚½B");
+                    Debug.LogWarning("NodeData ç”Ÿæˆå¾Œã«ãƒãƒ¼ãƒ‰ãŒ0ä»¶ã«ãªã‚Šã¾ã—ãŸã€‚");
                     return;
                 }   
 
-                // ƒOƒŠƒbƒh‰»
+                // ã‚°ãƒªãƒƒãƒ‰åŒ–
                 BuildNodeGrid(nodeList);
 
-                // ”ò‚Ñ‰z‚¦Ú‘±‚ğì‚é
+                // é£›ã³è¶Šãˆæ¥ç¶šã‚’ä½œã‚‹
                 var vaultTargets = new Dictionary<NodeData, NodeData>();
 
                 foreach (var vaultNode in GetComponentsInChildren<VaultNode>())
@@ -176,7 +176,7 @@ namespace InGame.Bot
                     pair.Key.SetVaultConnect(pair.Value);
                 }
 
-                // Ú‘±‚ğì‚é
+                // æ¥ç¶šã‚’ä½œã‚‹
                 await BuildConnectionsAsync();
 
 #if UNITY_EDITOR
@@ -201,7 +201,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// ƒm[ƒh¶¬”ÍˆÍ‚ğæ“¾
+        /// ãƒãƒ¼ãƒ‰ç”Ÿæˆç¯„å›²ã‚’å–å¾—
         /// </summary>
         private Bounds GetGenerationBounds()
         {
@@ -215,7 +215,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// Poisson Disk Sampling ‚É‚æ‚èƒm[ƒhŒó•â‚ğ¶¬
+        /// Poisson Disk Sampling ã«ã‚ˆã‚Šãƒãƒ¼ãƒ‰å€™è£œã‚’ç”Ÿæˆ
         /// </summary>
         private List<Vector3> GeneratePoissonSamples(Bounds bounds)
         {
@@ -224,7 +224,7 @@ namespace InGame.Bot
 
             if (!TryGetRandomNavMeshPoint(bounds, out var firstPoint))
             {
-                Debug.LogWarning("NavMesh ã‚É‰Šú“_‚ğŒ©‚Â‚¯‚ç‚ê‚Ü‚¹‚ñ‚Å‚µ‚½B");
+                Debug.LogWarning("NavMesh ä¸Šã«åˆæœŸç‚¹ã‚’è¦‹ã¤ã‘ã‚‰ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚");
                 return samples;
             }
 
@@ -272,7 +272,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// Œó•âˆÊ’u‚ğ¶¬
+        /// å€™è£œä½ç½®ã‚’ç”Ÿæˆ
         /// </summary>
         private Vector3 GenerateCandidate(Vector3 origin, float radius)
         {
@@ -284,7 +284,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// ƒ‰ƒ“ƒ_ƒ€‚È NavMesh ã‚Ì’n“_‚ğæ“¾
+        /// ãƒ©ãƒ³ãƒ€ãƒ ãª NavMesh ä¸Šã®åœ°ç‚¹ã‚’å–å¾—
         /// </summary>
         private bool TryGetRandomNavMeshPoint(Bounds bounds, out Vector3 result)
         {
@@ -315,7 +315,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// w’èÀ•W‚ğ NavMesh ã‚Ö•â³
+        /// æŒ‡å®šåº§æ¨™ã‚’ NavMesh ä¸Šã¸è£œæ­£
         /// </summary>
         private bool TryProjectToNavMesh(Vector3 position, out Vector3 result)
         {
@@ -330,7 +330,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// üˆÍƒm[ƒh‚Æ‚ÌÅ’á‹——£‚ğ–‚½‚µ‚Ä‚¢‚é‚©
+        /// å‘¨å›²ãƒãƒ¼ãƒ‰ã¨ã®æœ€ä½è·é›¢ã‚’æº€ãŸã—ã¦ã„ã‚‹ã‹
         /// </summary>
         private bool IsFarEnough(Vector3 candidate, List<Vector3> samples, float minDistance)
         {
@@ -346,7 +346,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// NodeData ì¬
+        /// NodeData ä½œæˆ
         /// </summary>
         private bool CreateNodeData(
             Vector3 position,
@@ -372,7 +372,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// NodeData ì¬ŠÈˆÕ”Å
+        /// NodeData ä½œæˆç°¡æ˜“ç‰ˆ
         /// </summary>
         private NodeData CreateNodeData(
             Vector3 position,
@@ -387,7 +387,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// À•W—Êq‰»
+        /// åº§æ¨™é‡å­åŒ–
         /// </summary>
         private Vector3Int Quantize(Vector3 position)
         {
@@ -399,7 +399,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// ƒm[ƒh‚ğ‹óŠÔƒOƒŠƒbƒh‚ÖŠi”[
+        /// ãƒãƒ¼ãƒ‰ã‚’ç©ºé–“ã‚°ãƒªãƒƒãƒ‰ã¸æ ¼ç´
         /// </summary>
         private void BuildNodeGrid(List<NodeData> nodes)
         {
@@ -443,7 +443,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// ƒm[ƒhÚ‘±¶¬
+        /// ãƒãƒ¼ãƒ‰æ¥ç¶šç”Ÿæˆ
         /// </summary>
         private async UniTask BuildConnectionsAsync()
         {
@@ -528,33 +528,33 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// ƒpƒ‰ƒ[ƒ^ŒŸØ
+        /// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿æ¤œè¨¼
         /// </summary>
         private void ValidateSettings()
         {
             if (_poissonRadius <= 0f)
-                throw new InvalidOperationException( "Poisson Radius ‚Í 0 ‚æ‚è‘å‚«‚­‚µ‚Ä‚­‚¾‚³‚¢B");
+                throw new InvalidOperationException( "Poisson Radius ã¯ 0 ã‚ˆã‚Šå¤§ããã—ã¦ãã ã•ã„ã€‚");
 
             if (_poissonCandidateCount <= 0)
-                throw new InvalidOperationException("Poisson Candidate Count ‚Í 0 ‚æ‚è‘å‚«‚­‚µ‚Ä‚­‚¾‚³‚¢B");
+                throw new InvalidOperationException("Poisson Candidate Count ã¯ 0 ã‚ˆã‚Šå¤§ããã—ã¦ãã ã•ã„ã€‚");
 
             if (_removeInvalid(_connectDistance))
-                throw new InvalidOperationException("Connect Distance ‚Í 0 ‚æ‚è‘å‚«‚­‚µ‚Ä‚­‚¾‚³‚¢B");
+                throw new InvalidOperationException("Connect Distance ã¯ 0 ã‚ˆã‚Šå¤§ããã—ã¦ãã ã•ã„ã€‚");
 
             if (_positionQuantize <= 0f)
-                throw new InvalidOperationException("Position Quantize ‚Í 0 ‚æ‚è‘å‚«‚­‚µ‚Ä‚­‚¾‚³‚¢B");
+                throw new InvalidOperationException("Position Quantize ã¯ 0 ã‚ˆã‚Šå¤§ããã—ã¦ãã ã•ã„ã€‚");
 
             if (_navMeshTolerance <= 0f)
-                throw new InvalidOperationException("NavMesh Tolerance ‚Í 0 ‚æ‚è‘å‚«‚­‚µ‚Ä‚­‚¾‚³‚¢B");
+                throw new InvalidOperationException("NavMesh Tolerance ã¯ 0 ã‚ˆã‚Šå¤§ããã—ã¦ãã ã•ã„ã€‚");
         }
 
         /// <summary>
-        /// –³Œø’l”»’è
+        /// ç„¡åŠ¹å€¤åˆ¤å®š
         /// </summary>
         private bool _removeInvalid(float value) => value <= 0f;
 
         /// <summary>
-        /// áŠQ•¨—L–³”»’è
+        /// éšœå®³ç‰©æœ‰ç„¡åˆ¤å®š
         /// </summary>
         private bool HasObstacle(Vector3 from, Vector3 to)
         {
@@ -576,7 +576,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// NavMesh ã‚ÅŒo˜H“’B‰Â”\‚©
+        /// NavMesh ä¸Šã§çµŒè·¯åˆ°é”å¯èƒ½ã‹
         /// </summary>
         private bool HasValidPath(Vector3 from, Vector3 to)
         {
@@ -591,7 +591,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// ƒ[ƒ‹ƒhÀ•W‚ğƒOƒŠƒbƒhƒCƒ“ƒfƒbƒNƒX‚Ö•ÏŠ·
+        /// ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‚’ã‚°ãƒªãƒƒãƒ‰ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸å¤‰æ›
         /// </summary>
         private Vector3Int WorldToIndex(Vector3 pos)
         {
@@ -665,7 +665,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// w’èÀ•W‚ÉÅ‚à‹ß‚¢ƒm[ƒhæ“¾
+        /// æŒ‡å®šåº§æ¨™ã«æœ€ã‚‚è¿‘ã„ãƒãƒ¼ãƒ‰å–å¾—
         /// </summary>
         private NodeData GetNearestNode(Vector3 pos)
         {
@@ -690,7 +690,7 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// ƒm[ƒhˆê—— Gizmos •`‰æ
+        /// ãƒãƒ¼ãƒ‰ä¸€è¦§ Gizmos æç”»
         /// </summary>
         public static void DrawGizmos(List<NodeData> nodes)
         {
@@ -705,7 +705,7 @@ namespace InGame.Bot
                 var node = nodes[i];
                 if (node == null) continue;
 
-                // ƒJƒƒ‰‚©‚ç‰“‚¢ƒm[ƒh‚ÍƒXƒLƒbƒv
+                // ã‚«ãƒ¡ãƒ©ã‹ã‚‰é ã„ãƒãƒ¼ãƒ‰ã¯ã‚¹ã‚­ãƒƒãƒ—
                 if ((node.Position - camPos).sqrMagnitude > 400f) continue;
 
                 var pos = node.Position + offset;
@@ -718,7 +718,7 @@ namespace InGame.Bot
                     var connect = connects[j];
                     if (connect == null) continue;
 
-                    // d•¡•`‰æ–h~i’´d—vj
+                    // é‡è¤‡æç”»é˜²æ­¢ï¼ˆè¶…é‡è¦ï¼‰
                     if (node.GetHashCode() > connect.GetHashCode()) continue;
                     Gizmos.color = Color.white;
                     Gizmos.DrawLine(
