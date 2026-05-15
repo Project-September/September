@@ -33,9 +33,9 @@ namespace September.InGame.Kraken
 
         private void Start()
         {
-            _hitboxCaster.OnHit += x =>
+            _hitboxCaster.OnHit += hitCollider =>
             {
-                if (x.TryGetComponent<IDamageable>(out var damageable))
+                if (hitCollider.TryGetComponent<IDamageable>(out var damageable))
                 {
                     var hitData = new HitData
                     {

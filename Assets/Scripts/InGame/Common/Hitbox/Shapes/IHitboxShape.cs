@@ -6,7 +6,8 @@ namespace September.InGame.Kraken
     public interface IHitboxShape
     {
         public object Hitbox { get; }
-        public void CastHitbox(Vector3 basePosition, Quaternion baseRotation, Collider[] results, Action<Collider> onHit);
+        public void CastHitbox(Vector3 basePosition, Quaternion baseRotation, Collider[] results, LayerMask layerMask,
+            Action<Collider> onHit);
     }
     
     public interface IHitboxShape<out TShape> : IHitboxShape
