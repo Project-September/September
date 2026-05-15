@@ -29,11 +29,8 @@ namespace September.InGame.Kraken
             if (!HasStateAuthority) return;
             if (!_isActive) return;
             
-            Debug.Log("Tick");
-            
             if (_hitboxTicks.IsStartPredictionTick(Runner.Tick, _startExecuteTick))
             {
-                Debug.Log("Start Prediction Tick");
                 _isActive = true;
                 StartPrediction(_hitboxTicks.PredictionDurationTick);
                 return;
@@ -41,7 +38,6 @@ namespace September.InGame.Kraken
 
             if (_hitboxTicks.IsInHitboxExecuteTick(Runner.Tick, _startExecuteTick))
             {
-                Debug.Log("Cast Hitbox Tick");
                 _isActive = true;
                 CastHitbox();
                 return;
