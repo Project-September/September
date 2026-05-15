@@ -27,6 +27,7 @@ namespace September.InGame.Common.Hitbox.Shapes
 
             for (int i = 0; i < hitCount; i++)
             {
+                HitboxDebugUtility.DrawCollider(results[i], Color.magenta);
                 onHit?.Invoke(results[i]);
             }
         }
