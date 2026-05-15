@@ -14450,12 +14450,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerMovement: {fileID: 3242880713039265549}
-  _stopAmount: 0.2
+  _stopAmount: 1
   _stopTime: 3
   _rigidbody: {fileID: 6099435784402053345}
   <StopDistance>k__BackingField: 1
-  InputDirection: {x: 0, y: 0, z: 0}
-  InputIsVault: 0
+  Navigation:
+    StopDistance: 0
+    CanVault: 0
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0

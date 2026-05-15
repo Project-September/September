@@ -1,3 +1,5 @@
+
+
 using InGame.Player;
 using September.Common;
 using UnityEngine;
@@ -14,17 +16,23 @@ namespace InGame.Bot
         private IBotState _currentState;
         private RandomMoveState _randomState = new();
 
-        public Vector3 InputDirection;
-        public bool InputIsVault;
+        private Vector3 InputDirection;
+        private bool InputIsVault;
+        public NavigationController Navigation = new();
 
         void Start()
         {
             ChangeState(_randomState);
+            Navigation.StopDistance = _stopAmount;
+            Navigation.CanVault = true;
         }
 
         void Update()
         {
             _currentState?.OnUpdate(this);
+
+            InputIsVault = Navigation.IsVaultInput;
+            InputDirection = Navigation.InputDirection;
         }
 
         public void ChangeState(IBotState state)
@@ -59,5 +67,10 @@ namespace InGame.Bot
             if (!GameInput.I.IsMoveInput) return Vector3.zero;
             return _playerMovement.IsGroundNet ? InputDirection.normalized : Vector2.zero;
         }
+        public void OnDrawGizmos()
+        {
+            Navigation.ShowGizumo();
+        }
     }
 }
+

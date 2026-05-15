@@ -5653,12 +5653,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerMovement: {fileID: 5419612909587862379}
-  _stopAmount: 0.2
+  _stopAmount: 1
   _stopTime: 3
   _rigidbody: {fileID: 3644220712944108679}
   <StopDistance>k__BackingField: 1
-  InputDirection: {x: 0, y: 0, z: 0}
-  InputIsVault: 0
+  Navigation:
+    StopDistance: 0
+    CanVault: 0
 --- !u!4 &2236335591442623996 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8736522266100138394, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
