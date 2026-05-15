@@ -37,7 +37,7 @@ namespace September.InGame.Common.Hitbox.Binder
         {
             foreach (var shape in Shapes)
             {
-                Prediction.StartPrediction(shape, basePosition, baseRotation, durationTick, runner);
+                Prediction.StartPrediction(shape.Hitbox, basePosition, baseRotation, durationTick, runner);
             }
         }
 
