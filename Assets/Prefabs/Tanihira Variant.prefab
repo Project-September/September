@@ -6393,6 +6393,7 @@ MonoBehaviour:
   _friendStateChanger: {fileID: 2957292007609013862}
   _formationManager: {fileID: 913702230075351532}
   _isWaiting: 0
+  _tanihiraCursor: {fileID: 2833980278294200028}
   _tyrannoInteractables: []
   _isSerching: 1
 --- !u!114 &2957292007609013862
@@ -6432,6 +6433,7 @@ MonoBehaviour:
   _changeOffsetDuration: 0.2
   _cursorOffsetY: 0.5
   _moveTargetPrefab: {fileID: 6185508062456583009, guid: 87568c7b0a84a9346bbd984a335f9170, type: 3}
+  IsInstruction: 0
 --- !u!114 &6708881702509990833
 MonoBehaviour:
   m_ObjectHideFlags: 0

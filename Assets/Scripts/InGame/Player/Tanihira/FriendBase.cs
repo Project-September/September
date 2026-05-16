@@ -61,7 +61,7 @@ namespace Ingame.Tanihira
         /// <summary>
         /// 現在の攻撃量
         /// </summary>
-        public int _currentAttackAmount;
+        private int _currentAttackAmount;
 
         private static int _spawnCount;
         public bool IsAttack;
@@ -88,14 +88,6 @@ namespace Ingame.Tanihira
         /// false：不可能
         /// </summary>
         public bool IsAttackPossible => _isAttackPossible;
-        /// <summary>
-        /// 規定の攻撃量
-        /// </summary>
-        public int RegulationAA => _regulationAttackAmount;
-        /// <summary>
-        /// 現在の攻撃量
-        /// </summary>
-        public int CurrentAA => _currentAttackAmount;
         
         public override void Spawned()
         {
@@ -263,7 +255,10 @@ namespace Ingame.Tanihira
             _currentAttackAmount += _currentStatus.AttackPower;
             if (_currentAttackAmount >= _regulationAttackAmount)
             {
+                // 規定量を超えたら攻撃を辞め、プレイヤーの元に帰還する
                 _isAttackPossible = false;
+                SetDestination(OwnerPlayer.transform);
+                ChangeState(FriendState.Move);
             }
         }
         
