@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,7 +9,6 @@ namespace InGame.Bot
     {
         private static bool _isFinding = false;
         private static NavMeshPath _path;
-        private static int index = 0;
         public static NavMeshPath Path
         {
             get
@@ -26,8 +24,6 @@ namespace InGame.Bot
         public static async UniTask<List<NodeData>> FindRoute(Vector3 start, Vector3 end)
         {
             if (_isFinding) return new();
-            index++;
-            Stopwatch sw = Stopwatch.StartNew();
             _isFinding = true;
             List<NodeData> nodeDatas = NodeProvider.Instance.Nodes;
 
@@ -35,7 +31,6 @@ namespace InGame.Bot
             float startNodeDis = float.MaxValue;
             NodeData endNode = null;
             float endNodeDis = float.MaxValue;
-            Debug.Log("Start" + sw.Elapsed.TotalMilliseconds + "ms number" + index);
             //ç≈íZÇÃÉmÅ[ÉhÇåüçıÇ∑ÇÈ
             foreach (NodeData nodeData in nodeDatas)
             {
@@ -55,7 +50,6 @@ namespace InGame.Bot
                     endNodeDis = endDis;
                 }
             }
-            Debug.Log("near" + sw.Elapsed.TotalMilliseconds + "ms number" + index);
             if (startNode == null || endNode == null || nodeDatas == null)
             {
                 Debug.LogError("åoòHíTçıé∏îs");
@@ -81,8 +75,6 @@ namespace InGame.Bot
             List<NodeData> result = new();
             NodeHeap openNodes = new();
             Debug.DrawLine(start.Position, goal.Position, Color.yellow, 0.1f);
-            Stopwatch sw = Stopwatch.StartNew();
-            Debug.Log("astart" + sw.Elapsed.TotalMilliseconds + "ms number" + index);
             //ÉIÅ[ÉvÉìèàóù
             void SetNodeDistance(NodeData target, float parentDis)
             {
@@ -98,7 +90,6 @@ namespace InGame.Bot
 
             NodeData crrentNode = start;
             int count = nodeDatas.Count;
-            Debug.Log("ñ{ëÃ" + sw.Elapsed.TotalMilliseconds + "ms number" + index);
             //íTçıñ{ëÃ
             while (openNodes.Count > 0)
             {
@@ -172,7 +163,6 @@ namespace InGame.Bot
             NodeData prev = null;
 
             count = 100;
-            Debug.Log("ïúå≥" + sw.Elapsed.TotalMilliseconds + "ms number" + index);
 
             //ParentÇå≥Ç…ïúå≥ÇÇ∑ÇÈ
             while (crrentNode != null)
@@ -193,7 +183,6 @@ namespace InGame.Bot
                     break;
                 }
             }
-            Debug.Log("astartEnd" + sw.ElapsedMilliseconds + "ms number" + index);
 
             result.Reverse();
             await UniTask.DelayFrame(1);
