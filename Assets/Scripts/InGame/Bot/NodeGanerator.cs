@@ -511,7 +511,7 @@ namespace InGame.Bot
                                 if ((other.ConnectNode?.Count ?? 0) >= _maxConnectCount) continue;
                                 if (node.ConnectNode != null && node.ConnectNode.Contains(other)) continue;
 
-                                if (!AStarSystem.ConnectivityCheck(node.Position, other.Position)) continue;
+                                if (!AStarSystem.ConnectivityCheck(node.Position, other.Position,true)) continue;
 
                                 if (HasObstacle(node.Position, other.Position)) continue;
 

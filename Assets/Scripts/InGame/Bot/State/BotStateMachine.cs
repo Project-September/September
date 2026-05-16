@@ -16,6 +16,7 @@ namespace InGame.Bot
         private IBotState _currentState;
         private RandomMoveState _randomState = new();
 
+        private float _stopTimer;
         private Vector3 InputDirection;
         private bool InputIsVault;
         public NavigationController Navigation = new();
@@ -23,16 +24,32 @@ namespace InGame.Bot
         void Start()
         {
             ChangeState(_randomState);
-            Navigation.StopDistance = _stopAmount;
+            Navigation.StopDistance = StopDistance;
             Navigation.CanVault = true;
         }
 
         void Update()
         {
+            if (_rigidbody.linearVelocity.magnitude < _stopAmount && GameInput.I.IsMoveInput && _playerMovement.IsGroundNet)
+            {
+                _stopTimer -= Time.deltaTime;
+                if (_stopTimer < 0)
+                {
+                    _stopTimer = _stopTime;
+                    _currentState?.OnEnter(this);
+                }
+            }
+            else
+            {
+                _stopTimer = _stopTime;
+            }
+
+
             _currentState?.OnUpdate(this);
 
             InputIsVault = Navigation.IsVaultInput;
             InputDirection = Navigation.InputDirection;
+
         }
 
         public void ChangeState(IBotState state)
