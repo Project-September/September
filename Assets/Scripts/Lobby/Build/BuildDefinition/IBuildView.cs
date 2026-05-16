@@ -1,25 +1,24 @@
-using September.Common;
-
 namespace September.Lobby
 {
     /// <summary>ビルド選択の表示用インターフェース</summary>
     public interface IBuildView
     {
         /// <summary>ビルドルート選択入力用メソッド</summary>
-        void OnNextIndex();
+        void NextIndex();
 
         /// <summary>ビルドルート選択入力用メソッド</summary>
-        void OnBackIndex();
+        void BackIndex();
 
         /// <summary>ビルドルートを決定するメソッド</summary>
-        void OnSelectBuild();
+        void SelectBuild();
 
         /// <summary>表示する情報を切り替えるメソッド</summary>
-        /// <param name="build">表示する情報</param>
-        void VisualizeBuildInfo(BuildDataBase build);
+        /// <param name="index">選択中のインデックス</param>
+        void VisualizeBuildInfo(int index);
 
         /// <summary>ビルドルートを決定するメソッド</summary>
-        /// <param name="selected">初めて決定したかどうか</param>
-        void VisualizeSelection(bool selected);
+        /// <param name="selected">すでに決定しているかどうか</param>
+        /// <param name="index">決定したビルドルートのインデックス</param>
+        void VisualizeSelection(bool selected, int index);
     }
 }
