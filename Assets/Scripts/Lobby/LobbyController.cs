@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
@@ -26,18 +25,25 @@ namespace September.Lobby
         readonly Dictionary<PlayerRef, PlayerConditionView> _lobbyPlayerUIDic = new();
         [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(8), HideInInspector]
         public NetworkDictionary<PlayerRef, NetworkBool> PlayerIsReadyDic => default;
-        public override void Spawned()
+        public override async void Spawned()
         {
             _roomNameText.text = Runner.SessionInfo.Name;
             Runner.AddCallbacks(this);
-            PlayerDatabase.Instance.AddPlayerData(Runner.LocalPlayer);
-            foreach (var pr in Runner.ActivePlayers.Reverse())
+            foreach (var kv in PlayerDatabase.Instance.PlayerDataDic)
             {
-                AddContents(pr);
+                AddContents(kv.Key);
             }
+            AddContents(Runner.LocalPlayer);
+            PlayerDatabase.Instance.AddPlayerData(Runner.LocalPlayer);
             _readyButton.onClick.AddListener(() => Rpc_ToggleReady(Runner.LocalPlayer));
             _quitButton.onClick.AddListener(() => NetworkManager.Instance.QuitLobby().Forget());
-            _addBotButton.onClick.AddListener(() => PlayerDatabase.Instance.AddBotData());
+
+            if (HasStateAuthority)
+            {
+                _addBotButton.onClick.AddListener(() => PlayerDatabase.Instance.AddBotData());
+            }
+            _addBotButton.gameObject.SetActive(HasStateAuthority);
+
             PlayerDatabase.Instance.ChangedDataAction += ChangeLobbyPlayerUI;
             OnChangedIsReady();
 
@@ -72,6 +78,7 @@ namespace September.Lobby
         {
             PlayerIsReadyDic.Set(playerRef, !PlayerIsReadyDic.Get(playerRef));
         }
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_Fade()
         {
@@ -119,7 +126,10 @@ namespace September.Lobby
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            Destroy(_lobbyPlayerUIDic[player].gameObject);
+            if (_lobbyPlayerUIDic.ContainsKey(player))
+            {
+                Destroy(_lobbyPlayerUIDic[player].gameObject);
+            }
             _lobbyPlayerUIDic.Remove(player);
             if (HasStateAuthority)
             {

@@ -13,7 +13,7 @@ namespace September.Common
     {
         [Header("Not Networked")]
         [SerializeField] private ExhibitScoreConfig _config;
-        
+
         [Header("Ability Bonus Config")]
         [SerializeField] private ExhibitScoreConfig _okabeRideConfig;
         [SerializeField] private ExhibitScoreConfig _haruDestroyConfig;
@@ -34,7 +34,7 @@ namespace September.Common
 
         private readonly Dictionary<PlayerRef, ScoreTracker> _serverTrackers = new();
         public static readonly int BotStartIndex = 100;
-        
+
         public override void Spawned()
         {
             if (Instance == null)
@@ -48,7 +48,7 @@ namespace September.Common
                 Runner.Despawn(Object);
             }
         }
-        
+
         public void Server_AddExhibit(PlayerRef actor, ExhibitType type)
         {
             if (!Object.HasStateAuthority)
@@ -60,7 +60,7 @@ namespace September.Common
             tracker.AddInteract(type);
             UpdatePlayerScore(actor, tracker);
         }
-        
+
         public void Server_AddGrapplingHook(PlayerRef actor)
         {
             if (!Object.HasStateAuthority)
@@ -72,7 +72,7 @@ namespace September.Common
             tracker.AddGrapplingHook();
             UpdatePlayerScore(actor, tracker);
         }
-        
+
         // スコアを再計算
         public void Server_RecalculateScore(PlayerRef actor)
         {
@@ -81,21 +81,21 @@ namespace September.Common
 
             if (!_serverTrackers.TryGetValue(actor, out var tracker))
                 _serverTrackers[actor] = tracker = new ScoreTracker(_config);
-            
+
             UpdatePlayerScore(actor, tracker);
         }
-        
+
         // ハルクのDestroy処理をここで加算
         public void Server_AddDestroyExhibit(PlayerRef actor, ExhibitType type)
         {
-            if(!Object.HasStateAuthority)
+            if (!Object.HasStateAuthority)
                 return;
 
             if (!_serverTrackers.TryGetValue(actor, out ScoreTracker tracker))
             {
                 _serverTrackers[actor] = tracker = new ScoreTracker(_config);
             }
-            
+
             tracker.AddDestroyed(type);
             UpdatePlayerScore(actor, tracker);
         }
@@ -137,39 +137,39 @@ namespace September.Common
         {
             return PlayerDataDic.TryGet(actor, out data) && Object.HasStateAuthority;
         }
-        
+
         private void UpdatePlayerScore(PlayerRef actor, ScoreTracker tracker)
         {
-            if (!PlayerDataDic.TryGet(actor, out SessionPlayerData d)) 
+            if (!PlayerDataDic.TryGet(actor, out SessionPlayerData d))
                 return;
-            
+
             int baseScore = tracker.CalcTotal(d);
             int bonus = AbilityBonusContainer.CalcBonus(d.CharacterType, tracker);
-                
+
             d.Score = baseScore + bonus;
             d.TotalInteractCount = tracker.GetTotalInteractCount();
             PlayerDataDic.Set(actor, d);
         }
-        
+
         // ホストからクライアントに送信
         public void Server_PushResultToClients()
         {
-            if(!Object.HasStateAuthority)
+            if (!Object.HasStateAuthority)
                 return;
 
             foreach (var kv in PlayerDataDic)
             {
                 PlayerRef player = kv.Key;
-                SessionPlayerData data =  kv.Value;
+                SessionPlayerData data = kv.Value;
                 _serverTrackers.TryGetValue(player, out ScoreTracker tracker);
 
                 if (tracker == null)
                 {
                     Debug.LogWarning($"[ResultPush] No tracker for {player}.");
-                    Rpc_SendPersonalResult( player,"", data.Score);
+                    Rpc_SendPersonalResult(player, "", data.Score);
                     continue;
                 }
-                
+
                 int calc = tracker.CalcTotal(data) + AbilityBonusContainer.CalcBonus(data.CharacterType, tracker);
 
                 if (calc != data.Score)
@@ -179,7 +179,7 @@ namespace September.Common
                     data.Score = calc;
                     PlayerDataDic.Set(player, data);
                 }
-                
+
                 string payload = EncodeDetailV2(tracker);
                 Rpc_SendPersonalResult(player, payload, calc);
             }
@@ -194,7 +194,7 @@ namespace September.Common
             {
                 if (!first)
                     sb.Append(',');
-                
+
                 sb.Append(kv.Key).Append('=').Append(kv.Value);
                 first = false;
             }
@@ -217,13 +217,13 @@ namespace September.Common
             sb.Append("|F:").Append(tracker.FriendExhibitCount);
             return sb.ToString();
         }
-        
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void Rpc_SendPersonalResult(PlayerRef target, string encodedPayload, int pageTotal)
         {
-            if (Runner.LocalPlayer != target) 
+            if (Runner.LocalPlayer != target)
                 return;
-            
+
             if (!ResultDataInbox.I)
             {
                 GameObject go = new("[ResultDataInbox]");
@@ -231,7 +231,7 @@ namespace September.Common
             }
             ResultDataInbox.I.LoadFromEncoded(encodedPayload, pageTotal);
         }
-        
+
         public void AddPlayerData(PlayerRef playerRef)
         {
             if (playerRef != Runner.LocalPlayer && playerRef.AsIndex < BotStartIndex) return;
@@ -242,9 +242,9 @@ namespace September.Common
 
         public void AddBotData()
         {
-            int botIndex = GetBotCount() + BotStartIndex;
+            int botIndex = GetBotIndex();
             if (botIndex < BotStartIndex) return;
-            var localNickName ="Bot";
+            var localNickName = "Bot";
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
             Rpc_SetBotData(PlayerRef.FromIndex(botIndex), new SessionPlayerData(localNickName, nickNameOrder));
         }
@@ -255,22 +255,23 @@ namespace September.Common
             Rpc_RemoveBotData(playerRef);
         }
 
-        public void AddPlayerObject(PlayerRef playerRef,NetworkObject playerObject)
+        public void AddPlayerObject(PlayerRef playerRef, NetworkObject playerObject)
         {
             PlayerObjectDic.Set(playerRef, playerObject);
         }
-        
+
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
         private void Rpc_SetPlayerData(PlayerRef playerRef, SessionPlayerData data)
         {
             PlayerDataDic.Set(playerRef, data);
         }
 
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
         private void Rpc_SetBotData(PlayerRef playerRef, SessionPlayerData data)
         {
             PlayerDataDic.Set(playerRef, data);
             _onBotJoin.OnNext(playerRef);
+            Debug.Log(playerRef.AsIndex + "Bot");
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
@@ -281,26 +282,40 @@ namespace September.Common
             PlayerDataDic.Set(playerRef, playerData);
         }
 
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
         public void Rpc_RemoveBotData(PlayerRef playerRef)
         {
-            if (!PlayerDataDic.TryGet(playerRef, out _)) return;
-            PlayerDataDic.Remove(playerRef);
+            if (HasStateAuthority)
+            {
+                if (!PlayerDataDic.TryGet(playerRef, out _)) return;
+                PlayerDataDic.Remove(playerRef);
+            }
             _onBotLeft.OnNext(playerRef);
         }
 
-        public int GetBotCount()
+        /// <summary>
+        /// BotのIndex100以上で使われていないIndexを返す
+        /// </summary>
+        /// <returns></returns>
+        private int GetBotIndex()
         {
-            int count = 0;
+            List<int> nodeIndex = new();
             foreach (var kv in PlayerDataDic)
             {
-                if(kv.Key.AsIndex >= BotStartIndex)
+                if (kv.Key.AsIndex >= BotStartIndex)
                 {
-                    count++;
+                    nodeIndex.Add(kv.Key.AsIndex - BotStartIndex);
                 }
             }
 
-            return count;
+            nodeIndex.Sort();
+            int count = 0;
+            while (count < nodeIndex.Count && nodeIndex[count] == count)
+            {
+                count++;
+            }
+
+            return count + BotStartIndex;
         }
 
         private void OnChangedPlayerData()
@@ -310,7 +325,7 @@ namespace September.Common
 
         private void OnDestroy()
         {
-            if(Object && Object.HasStateAuthority)
+            if (Object && Object.HasStateAuthority)
                 _serverTrackers.Clear();
         }
     }
