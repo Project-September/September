@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using CRISound;
 using Fusion;
 using InGame.Health;
 using September.Common;
@@ -44,8 +42,10 @@ namespace Ingame.Tanihira
         [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
         [Networked] private NetworkBool HasMask { get; set; }
         [Networked] private NetworkBool HasRunEffect { get; set; }
-        [Header("攻撃可能フラグ")]
-        [SerializeField] private bool _isAttackPossible = true;
+        [Header("攻撃指示")]
+        [SerializeField] private bool _isAttackOrdered;
+        [Header("攻撃可能")]
+        [SerializeField] private bool _isCanAttack = true;
         [Header("規定の攻撃量（超えたら指示があるまで攻撃はしない）")] 
         [SerializeField] private int _regulationAttackAmount;
         
@@ -87,8 +87,9 @@ namespace Ingame.Tanihira
         /// true：可能
         /// false：不可能
         /// </summary>
-        public bool IsAttackPossible => _isAttackPossible;
-        
+        public bool IsAttackPossible => _isCanAttack && _isAttackOrdered;
+        public bool IsAttackOrdered => _isAttackOrdered;
+
         public override void Spawned()
         {
             _currentStatus = _friendStatus.Clone();
@@ -256,7 +257,8 @@ namespace Ingame.Tanihira
             if (_currentAttackAmount >= _regulationAttackAmount)
             {
                 // 規定量を超えたら攻撃を辞め、プレイヤーの元に帰還する
-                _isAttackPossible = false;
+                _isCanAttack = false;
+                _isAttackOrdered = false;
                 SetDestination(OwnerPlayer.transform);
                 ChangeState(FriendState.Move);
             }
@@ -374,7 +376,17 @@ namespace Ingame.Tanihira
         public void ResetAttackAmount()
         {
             _currentAttackAmount = 0;
-            _isAttackPossible = true;
+            _isCanAttack = true;
+            SetAttackOrdered(false);
+        }
+
+        /// <summary>
+        /// 攻撃指示状態を設定
+        /// </summary>
+        /// <param name="isOrdered">攻撃指示を行う場合はtrue</param>
+        public void SetAttackOrdered(bool isOrdered)
+        {
+            _isAttackOrdered = isOrdered;
         }
     }
 }

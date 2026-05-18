@@ -26,7 +26,7 @@ namespace Ingame.Tanihira
             
             if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability1))
             {
-                _cursor.IsInstruction = false;
+                _formationManager.SetAllAttackOrdered(false);
                 OrderReturnFriend();
             }
             

@@ -143,10 +143,19 @@ namespace Ingame.Tanihira
             //ペンギンに攻撃指示を飛ばす
             if (_currentTarget)
             {
-                // 指示を行っていない場合、攻撃処理を行わない
-                if (!_tanihiraCursor.IsInstruction)
+                bool flag = false;
+                // 攻撃指示を受けているかを判定する
+                foreach (var friend in _formationManager.CurrentFriendsList)
                 {
-                    Debug.LogWarning("指示を行っていないので、攻撃処理は行わない");
+                    if (friend.IsAttackOrdered)
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if (!flag)
+                {
                     _friendStateChanger.SetMoveState();
                     return;
                 }
