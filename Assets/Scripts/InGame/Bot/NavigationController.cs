@@ -22,7 +22,7 @@ namespace InGame.Bot
         private NodeData _nextNode;
 
         private CancellationTokenSource _findRootToken = new();
-        public async UniTask GetDestinationInput(Vector3 goalPosition, Vector3 playerPosition)
+        public async void GetDestinationInput(Vector3 goalPosition, Vector3 playerPosition)
         {
             if (_currentGoalPosition != goalPosition)
             {

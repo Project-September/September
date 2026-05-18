@@ -1,13 +1,15 @@
-
-
+using System;
+using System.Collections.Generic;
 using InGame.Player;
 using September.Common;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace InGame.Bot
 {
     public class BotStateMachine : MonoBehaviour
     {
+        [SerializeField] private BotStateData _botStateData;
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private float _stopAmount;
         [SerializeField] private float _stopTime;
@@ -15,6 +17,7 @@ namespace InGame.Bot
         [field: SerializeField] public float StopDistance { get; private set; }
         private IBotState _currentState;
         private RandomMoveState _randomState = new();
+        private Dictionary<StateType, IBotState> _stateDic = new();
 
         private float _stopTimer;
         private Vector3 InputDirection;
@@ -23,9 +26,10 @@ namespace InGame.Bot
 
         void Start()
         {
-            ChangeState(_randomState);
             Navigation.StopDistance = StopDistance;
             Navigation.CanVault = true;
+
+            ChangeState();
         }
 
         void Update()
@@ -36,7 +40,7 @@ namespace InGame.Bot
                 if (_stopTimer < 0)
                 {
                     _stopTimer = _stopTime;
-                    _currentState?.OnEnter(this);
+                    ChangeState();
                 }
             }
             else
@@ -52,13 +56,6 @@ namespace InGame.Bot
 
         }
 
-        public void ChangeState(IBotState state)
-        {
-            _currentState?.OnExit(this);
-            _currentState = state;
-            _currentState.OnEnter(this);
-        }
-
         public PlayerInput GetInput()
         {
             PlayerInput input = new();
@@ -66,6 +63,7 @@ namespace InGame.Bot
             input.Buttons.Set(PlayerButtons.Dash, false);
             return input;
         }
+
         public bool GetButton(PlayerButtons button)
         {
             if (!GameInput.I.IsActionInput) return false;
@@ -84,9 +82,63 @@ namespace InGame.Bot
             if (!GameInput.I.IsMoveInput) return Vector3.zero;
             return _playerMovement.IsGroundNet ? InputDirection.normalized : Vector2.zero;
         }
+
         public void OnDrawGizmos()
         {
             Navigation.ShowGizumo();
+        }
+
+        public void ChangeState()
+        {
+            _currentState.OnExit(this);
+
+            Type stateScriptType = null;
+            StateType stateType = GetNextState();
+            switch (stateType)
+            {
+                case StateType.RandomMove:
+                    stateScriptType = typeof(RandomMoveState);
+                    break;
+                case StateType.Interact:
+                    stateScriptType = typeof(InteractState);
+                    break;
+                case StateType.Attack:
+                    stateScriptType = typeof(AttackState);
+                    break;
+                default:
+                    return;
+            }
+
+            if (!typeof(IBotState).IsAssignableFrom(stateScriptType))
+            {
+                Debug.LogError($"{stateScriptType.Name} は IBotState を実装していません");
+                return;
+            }
+
+            if (!_stateDic.TryGetValue(stateType, out var state))
+            {
+                state = (IBotState)Activator.CreateInstance(stateScriptType);
+                _stateDic.Add(stateType, state);
+            }
+
+            _currentState = state;
+            _currentState.OnEnter(this);
+        }
+        private StateType GetNextState()
+        {
+            int random = Random.Range(0, _botStateData.SumProbability);
+
+            int sum = 0;
+            foreach (var state in _botStateData.states)
+            {
+                sum += state._probability;
+                if (random < sum)
+                {
+                    return state._stateType;
+                }
+            }
+
+            return _botStateData.states[_botStateData.states.Length - 1]._stateType;
         }
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace InGame.Bot
 {
-    [CreateAssetMenu(fileName = "NodeMapData", menuName = "ScriptableObject/NodeMapData")]
+    [CreateAssetMenu(fileName = "NodeMapData", menuName = "ScriptableObjects/Bot/NodeMapData")]
     public class NodeMapData : ScriptableObject
     {
         [SerializeField] private List<NodeDataSerializable> _serializableNodeDatas = new();
