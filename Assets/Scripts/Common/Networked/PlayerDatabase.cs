@@ -243,9 +243,9 @@ namespace September.Common
         public void AddBotData()
         {
             int botIndex = GetBotIndex();
-            if (botIndex < BotStartIndex) return;
+
             var localNickName = "Bot";
-            var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
+            var nickNameOrder = botIndex - BotStartIndex;
             Rpc_SetBotData(PlayerRef.FromIndex(botIndex), new SessionPlayerData(localNickName, nickNameOrder));
         }
 
@@ -315,7 +315,14 @@ namespace September.Common
                 count++;
             }
 
-            return count + BotStartIndex;
+            int result = count + BotStartIndex;
+            if (result < BotStartIndex)
+            {
+                Debug.LogError("Botに使えないIndexです");
+                return 999;
+            }
+
+            return result;
         }
 
         private void OnChangedPlayerData()

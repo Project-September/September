@@ -16,7 +16,6 @@ namespace InGame.Bot
         [SerializeField] private Rigidbody _rigidbody;
         [field: SerializeField] public float StopDistance { get; private set; }
         private IBotState _currentState;
-        private RandomMoveState _randomState = new();
         private Dictionary<StateType, IBotState> _stateDic = new();
 
         private float _stopTimer;
@@ -85,17 +84,19 @@ namespace InGame.Bot
 
         public void OnDrawGizmos()
         {
-            Navigation.ShowGizumo();
+            Navigation.ShowGizmo();
         }
 
         public void ChangeState()
         {
-            _currentState.OnExit(this);
+            _currentState?.OnExit(this);
 
             Type stateScriptType = null;
             StateType stateType = GetNextState();
             switch (stateType)
             {
+                case StateType.None:
+                    return;
                 case StateType.RandomMove:
                     stateScriptType = typeof(RandomMoveState);
                     break;
@@ -122,10 +123,12 @@ namespace InGame.Bot
             }
 
             _currentState = state;
-            _currentState.OnEnter(this);
+            _currentState?.OnEnter(this);
         }
         private StateType GetNextState()
         {
+            if (_botStateData == null) return StateType.None;
+            
             int random = Random.Range(0, _botStateData.SumProbability);
 
             int sum = 0;

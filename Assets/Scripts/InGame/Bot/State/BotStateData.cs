@@ -40,6 +40,6 @@ namespace InGame.Bot
     }
     public enum StateType
     {
-        RandomMove,Interact,Attack,
+       None,RandomMove,Interact,Attack,
     }
 }

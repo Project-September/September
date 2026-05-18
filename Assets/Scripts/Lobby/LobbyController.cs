@@ -161,7 +161,7 @@ namespace September.Lobby
                 if (HasBotAuthority)
                 {
                     RectTransform rect = value.CharacterChangeButton.GetComponent<RectTransform>();
-                    value.CharacterChangeButton.onClick.AddListener(() => { _botCharacterSelect.ShowPanel(playerRef, value.BotRemoveButton.transform.position); });//TODO処理を追加
+                    value.CharacterChangeButton.onClick.AddListener(() => { _botCharacterSelect.ShowPanel(playerRef, value.BotRemoveButton.transform.position); });
                     value.BotRemoveButton.onClick.AddListener(() => PlayerDatabase.Instance.RemoveBotData(playerRef));
                 }
             }

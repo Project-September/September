@@ -16,9 +16,9 @@ namespace InGame.Bot
         {
             input = new();
             input.MoveDirection = _stateMachine.GetMoveDirection();
-            foreach (PlayerButtons state in Enum.GetValues(typeof(PlayerButtons)))
+            foreach (PlayerButtons button in Enum.GetValues(typeof(PlayerButtons)))
             {
-                input.Buttons.Set(state, _stateMachine.GetButton(state));
+                input.Buttons.Set(button, _stateMachine.GetButton(button));
             }
             return true;
         }

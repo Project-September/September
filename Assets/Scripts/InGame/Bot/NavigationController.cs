@@ -119,7 +119,7 @@ namespace InGame.Bot
 
             _findRootToken = new();
         }
-        public void ShowGizumo()
+        public void ShowGizmo()
         {
             if (_navigationData.Count == 0 || _nextNode == null) return;
 
@@ -127,8 +127,6 @@ namespace InGame.Bot
             Gizmos.DrawSphere(_nextNode.Position, 0.5f);
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(_navigationData[_navigationData.Count - 1].Position, 0.5f);
-            //Gizmos.color = Color.green;
-            //Gizmos.DrawSphere(_currentGoalPosition,0.5f);
         }
     }
 }
