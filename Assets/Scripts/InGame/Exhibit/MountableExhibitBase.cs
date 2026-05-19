@@ -175,12 +175,21 @@ namespace InGame.Exhibit
         {
             PlayerDatabase.Instance.PlayerDataDic.TryGet(playerRef, out var playerData);
             ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
+            
+            // UIの切り替え
             RPC_ChangeDescriptionUI(playerRef, type);
+            
+            // インタラクト物を基の位置に移動
+            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+            
+            // クールダウン処理
             var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
                 : _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
             _interactable.SetCooldown(time);
+            
+            // プレイヤーの状態復帰
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetUseGrav(true);
             _ownerPlayerManager.RPC_SetColliderActive(true);
@@ -196,7 +205,6 @@ namespace InGame.Exhibit
                 formationManager.WarpFriendNearPlayer(obj.transform.position,obj.transform.rotation);
             }
             Executor = null;
-            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
             CameraController.CameraReset();
         }
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
