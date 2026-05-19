@@ -16,7 +16,9 @@ public enum ControlDescriptionType
     Player,
     Exhibit,
     Sarutobi,
-    Tanihira
+    Tanihira,
+    SarutobiAiming,
+    TanihiraAiming,
 }
 
 /// <summary>
