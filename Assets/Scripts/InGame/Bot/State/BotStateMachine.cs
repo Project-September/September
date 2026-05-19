@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Fusion;
 using InGame.Player;
 using September.Common;
 using UnityEngine;
@@ -9,6 +10,8 @@ namespace InGame.Bot
 {
     public class BotStateMachine : MonoBehaviour
     {
+        [SerializeField] private NetworkObject _netObject;
+        public NetworkObject NetObject => _netObject;
         [SerializeField] private BotStateData _botStateData;
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private float _stopAmount;
@@ -19,8 +22,9 @@ namespace InGame.Bot
         private Dictionary<StateType, IBotState> _stateDic = new();
 
         private float _stopTimer;
-        private Vector3 InputDirection;
-        private bool InputIsVault;
+        private Vector3 _inputDirection;
+        private bool _inputIsVault;
+        public bool InputIsAttack;//一旦Public　あとでちゃんと書く
         public NavigationController Navigation = new();
 
         void Start()
@@ -50,15 +54,15 @@ namespace InGame.Bot
 
             _currentState?.OnUpdate(this);
 
-            InputIsVault = Navigation.IsVaultInput;
-            InputDirection = Navigation.InputDirection;
+            _inputIsVault = Navigation.IsVaultInput;
+            _inputDirection = Navigation.InputDirection;
 
         }
 
         public PlayerInput GetInput()
         {
             PlayerInput input = new();
-            input.Buttons.Set(PlayerButtons.Jump, InputIsVault);
+            input.Buttons.Set(PlayerButtons.Jump, _inputIsVault);
             input.Buttons.Set(PlayerButtons.Dash, false);
             return input;
         }
@@ -69,9 +73,11 @@ namespace InGame.Bot
             switch (button)
             {
                 case PlayerButtons.Jump:
-                    return InputIsVault;
+                    return _inputIsVault;
                 case PlayerButtons.Dash:
                     return true;
+                case PlayerButtons.Attack:
+                    return InputIsAttack;
                 default: return false;
             }
         }
@@ -79,7 +85,7 @@ namespace InGame.Bot
         public Vector3 GetMoveDirection()
         {
             if (!GameInput.I.IsMoveInput) return Vector3.zero;
-            return _playerMovement.IsGroundNet ? InputDirection.normalized : Vector2.zero;
+            return _playerMovement.IsGroundNet ? _inputDirection.normalized : Vector2.zero;
         }
 
         public void OnDrawGizmos()
@@ -125,14 +131,15 @@ namespace InGame.Bot
             _currentState = state;
             _currentState?.OnEnter(this);
         }
+
         private StateType GetNextState()
         {
             if (_botStateData == null) return StateType.None;
-            
+
             int random = Random.Range(0, _botStateData.SumProbability);
 
             int sum = 0;
-            foreach (var state in _botStateData.states)
+            foreach (var state in _botStateData._states)
             {
                 sum += state._probability;
                 if (random < sum)
@@ -141,7 +148,7 @@ namespace InGame.Bot
                 }
             }
 
-            return _botStateData.states[_botStateData.states.Length - 1]._stateType;
+            return _botStateData._states[_botStateData._states.Length - 1]._stateType;
         }
     }
 }

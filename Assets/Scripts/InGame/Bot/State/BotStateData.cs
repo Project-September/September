@@ -5,7 +5,7 @@ namespace InGame.Bot
     [CreateAssetMenu(fileName = "BotStateData", menuName = "ScriptableObjects/Bot/BotStateData")]
     public class BotStateData : ScriptableObject
     {
-        public StateData[] states;
+        public StateData[] _states;
         [System.Serializable]
         public class StateData
         {
@@ -18,7 +18,7 @@ namespace InGame.Bot
         {
             get
             {
-                if( !_sumProbability.HasValue )
+                if (!_sumProbability.HasValue)
                 {
                     _sumProbability = GetSumProbability();
                 }
@@ -31,7 +31,7 @@ namespace InGame.Bot
         {
             int sum = 0;
 
-            foreach(var state in states)
+            foreach (var state in _states)
             {
                 sum += state._probability;
             }
@@ -40,6 +40,6 @@ namespace InGame.Bot
     }
     public enum StateType
     {
-       None,RandomMove,Interact,Attack,
+        None, RandomMove, Interact, Attack,
     }
 }

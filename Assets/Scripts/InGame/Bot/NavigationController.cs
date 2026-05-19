@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -22,12 +21,12 @@ namespace InGame.Bot
         private NodeData _nextNode;
 
         private CancellationTokenSource _findRootToken = new();
-        public async void GetDestinationInput(Vector3 goalPosition, Vector3 playerPosition)
+        public void GetDestinationInput(Vector3 playerPosition, Vector3 goalPosition)
         {
             if (_currentGoalPosition != goalPosition)
             {
                 IsComplete = false;
-                if (await GetNavigationRoute(playerPosition))
+                if (GetNavigationRoute(playerPosition, goalPosition))
                 {
                     _currentGoalPosition = goalPosition;
                 }
@@ -76,21 +75,18 @@ namespace InGame.Bot
             return;
         }
 
-        private async UniTask<bool> GetNavigationRoute(Vector3 position)
+        private bool GetNavigationRoute(Vector3 startPos, Vector3 goalPos)
         {
             _isFinding = true;
             _currentIndex = 0;
-            var goal = NodeProvider.Instance.GetRandomNode();
             CancelFindRoute();
+            List<NodeData> result = new();
             try
             {
-                _navigationData = await AStarSystem.FindRoute(position, goal.Position)
-                    .Timeout(TimeSpan.FromSeconds(10))
-                    .AttachExternalCancellation(_findRootToken.Token);
+                result = AStarSystem.FindRoute(startPos, goalPos);
             }
             catch (TimeoutException)
             {
-                await UniTask.Yield();
                 Debug.Log("経路探索タイムアウト");
                 return false;
             }
@@ -99,11 +95,13 @@ namespace InGame.Bot
                 Debug.Log("外部キャンセル");
             }
 
-            if (_navigationData == null || _navigationData.Count == 0)
+            if (result == null || result.Count == 0)
             {
                 Debug.Log("経路探索エラー");
                 return false;
             }
+
+            _navigationData = result;
 
             if (_navigationData != null && _navigationData.Count > 0)
             {
@@ -112,6 +110,7 @@ namespace InGame.Bot
             _isFinding = false;
             return true;
         }
+
         private void CancelFindRoute()
         {
             _findRootToken.Cancel();
@@ -119,6 +118,7 @@ namespace InGame.Bot
 
             _findRootToken = new();
         }
+
         public void ShowGizmo()
         {
             if (_navigationData.Count == 0 || _nextNode == null) return;

@@ -51,7 +51,7 @@ namespace InGame.Bot
                 }
                 result.Add(nodeDataPair.Key);
 
-                if(nodeDataPair.Value.VaultNode != -1)
+                if (nodeDataPair.Value.VaultNode != -1)
                 {
                     if (!indexDic.TryGetValue(nodeDataPair.Value.VaultNode, out NodeData nodeData))
                     {

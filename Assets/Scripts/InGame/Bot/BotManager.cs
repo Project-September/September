@@ -12,6 +12,7 @@ namespace InGame.Bot
         {
 
         }
+
         public override bool GetPlayerInput(out PlayerInput input)
         {
             input = new();

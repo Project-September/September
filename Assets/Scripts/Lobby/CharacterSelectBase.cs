@@ -35,7 +35,7 @@ namespace September.Lobby
                 selectCharacterIcon.Button.onClick.AddListener(() =>
                 {
                     if (!SelectCharacter(characterNames[temp], temp)) return;
-                    OnCharacterIconClick(characterNames[temp],temp);
+                    OnCharacterIconClick(characterNames[temp], temp);
                     foreach (var icon in _selectCharacterIcons)
                     {
                         if (icon == selectCharacterIcon)
@@ -46,6 +46,7 @@ namespace September.Lobby
                 });
             }
         }
+
         /// <summary>
         /// キャラクターを選択(クリック)した時の動作
         /// </summary>
@@ -58,15 +59,19 @@ namespace September.Lobby
             CRIAudio.PlaySE("ALLCue", data.SelectedVoice); // キャラ選択ボイス再生
             return true;
         }
+
         /// <summary>
         /// キャラクターを決定した時の動作
         /// </summary>
         protected void SubmitCharacter()
         {
             var data = CharacterDataContainer.Instance.GetCharacterData(_currentCharacterIndex);
+            Debug.Log(PlayerDatabase.Instance);
             PlayerDatabase.Instance.Rpc_SetCharacter(_localPlayerRef, data.Type);
         }
+
         protected abstract void SelectCharacterIconSetting(SelectCharacterIcon characterIcon, int index);
+
         protected abstract void OnCharacterIconClick(string characterName, int index);
     }
 }

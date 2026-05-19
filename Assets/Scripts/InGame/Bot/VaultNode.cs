@@ -35,7 +35,7 @@ namespace InGame.Bot
 
         public Vector3 GetEndPos()
         {
-            if(_goalPos == null)
+            if (_goalPos == null)
             {
                 RayGround();
             }

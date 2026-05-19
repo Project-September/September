@@ -5652,6 +5652,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c0d12b4f3fb25849aa84bf95ea2f80b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _netObject: {fileID: 4901742853775545291}
   _botStateData: {fileID: 11400000, guid: cdc5352b5542557488434c15c6f25748, type: 2}
   _playerMovement: {fileID: 5419612909587862379}
   _stopAmount: 0.2
@@ -5724,6 +5725,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c7244242fca19c4caa942020db8defa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4901742853775545291 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 7365447978694257766}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310722873612347470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &5170642531100738289 stripped

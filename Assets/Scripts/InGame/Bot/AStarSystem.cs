@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using Debug = UnityEngine.Debug;
+
 namespace InGame.Bot
 {
     public static class AStarSystem
@@ -21,7 +21,7 @@ namespace InGame.Bot
             }
         }
 
-        public static async UniTask<List<NodeData>> FindRoute(Vector3 start, Vector3 end)
+        public static List<NodeData> FindRoute(Vector3 start, Vector3 end)
         {
             if (_isFinding) return new();
             _isFinding = true;
@@ -57,7 +57,7 @@ namespace InGame.Bot
                 return new List<NodeData>();
             }
             //実際のA*アルゴリズム
-            var result = await AStar(nodeDatas, startNode, endNode);
+            var result = AStar(nodeDatas, startNode, endNode);
             _isFinding = false;
             return result;
         }
@@ -70,7 +70,7 @@ namespace InGame.Bot
         /// <param name="goal">ゴールノード</param>
         /// <param name="isVault">飛び越えをするか</param>
         /// <returns>経路順のNodeData</returns>
-        private static async UniTask<List<NodeData>> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal, bool isVault = true)
+        private static List<NodeData> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal, bool isVault = true)
         {
             List<NodeData> result = new();
             NodeHeap openNodes = new();
@@ -185,9 +185,9 @@ namespace InGame.Bot
             }
 
             result.Reverse();
-            await UniTask.DelayFrame(1);
             return result;
         }
+
         /// <summary>
         /// 最小コストのノードを取得する
         /// </summary>

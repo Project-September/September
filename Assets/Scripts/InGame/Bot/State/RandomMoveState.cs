@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -23,7 +20,7 @@ namespace InGame.Bot
 
         public void OnUpdate(BotStateMachine stateMachine)
         {
-            stateMachine.Navigation.GetDestinationInput(_currentPos, stateMachine.transform.position);
+            stateMachine.Navigation.GetDestinationInput(stateMachine.transform.position, _currentPos);
             if (stateMachine.Navigation.IsComplete)
             {
                 Debug.Log("NextNode");

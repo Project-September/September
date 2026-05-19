@@ -16,7 +16,7 @@ namespace InGame.Bot
     /// </summary>
     public class NodeGanerator : MonoBehaviour
     {
-        [SerializeField,Tooltip("生成したノードを書き込む")] private NodeMapData _mapData;
+        [SerializeField, Tooltip("生成したノードを書き込む")] private NodeMapData _mapData;
 
         [SerializeField, Tooltip("経路到達判定の基準地点")] private Transform _origin;
         [SerializeField, Tooltip("描画するか")] private bool _isDrawGizumoIcon;
@@ -55,7 +55,7 @@ namespace InGame.Bot
         [SerializeField] private float _groundSlopeThreshold = 45f;
         [SerializeField] private LayerMask _groundLayer = ~0;
 
-        private NavMeshPath _path = new();
+        private NavMeshPath _path;
         private Vector3 _offset;
         private float _invCell;
         private bool _isGenerating;
@@ -156,7 +156,7 @@ namespace InGame.Bot
                 {
                     Debug.LogWarning("NodeData 生成後にノードが0件になりました。");
                     return;
-                }   
+                }
 
                 // グリッド化
                 BuildNodeGrid(nodeList);
@@ -511,7 +511,7 @@ namespace InGame.Bot
                                 if ((other.ConnectNode?.Count ?? 0) >= _maxConnectCount) continue;
                                 if (node.ConnectNode != null && node.ConnectNode.Contains(other)) continue;
 
-                                if (!AStarSystem.ConnectivityCheck(node.Position, other.Position,true)) continue;
+                                if (!AStarSystem.ConnectivityCheck(node.Position, other.Position, true)) continue;
 
                                 if (HasObstacle(node.Position, other.Position)) continue;
 
@@ -533,7 +533,7 @@ namespace InGame.Bot
         private void ValidateSettings()
         {
             if (_poissonRadius <= 0f)
-                throw new InvalidOperationException( "Poisson Radius は 0 より大きくしてください。");
+                throw new InvalidOperationException("Poisson Radius は 0 より大きくしてください。");
 
             if (_poissonCandidateCount <= 0)
                 throw new InvalidOperationException("Poisson Candidate Count は 0 より大きくしてください。");
@@ -673,7 +673,7 @@ namespace InGame.Bot
             NodeData nodeData = null;
             foreach (var cell in Nodes)
             {
-                if(cell == null) continue;
+                if (cell == null) continue;
                 foreach (var node in cell)
                 {
                     float distance = Vector3.Distance(pos, node.Position);

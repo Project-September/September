@@ -12,10 +12,11 @@ namespace September.Lobby
         {
             var characterNames = CharacterDataContainer.Instance.GetNames();
             CreateCharacterIcons(characterNames);
-            ClosePanel();
+
+            _mainPanel.gameObject.SetActive(false);
         }
-            
-        public void ShowPanel(PlayerRef player,Vector3 buttonPos)
+
+        public void ShowPanel(PlayerRef player, Vector3 buttonPos)
         {
             _mainPanel.gameObject.SetActive(true);
             _localPlayerRef = player;
@@ -25,8 +26,9 @@ namespace September.Lobby
         public void ClosePanel()
         {
             SubmitCharacter();
-            _mainPanel.gameObject.SetActive (false);
+            _mainPanel.gameObject.SetActive(false);
         }
+
         protected override void OnCharacterIconClick(string characterName, int index)
         {
             var data = CharacterDataContainer.Instance.GetCharacterData(index);
