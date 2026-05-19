@@ -139,16 +139,15 @@ namespace InGame.Bot
             int random = Random.Range(0, _botStateData.SumProbability);
 
             int sum = 0;
-            foreach (var state in _botStateData._states)
+            foreach (var state in _botStateData.States)
             {
-                sum += state._probability;
+                sum += state.Probability;
                 if (random < sum)
                 {
-                    return state._stateType;
+                    return state.Type;
                 }
             }
-
-            return _botStateData._states[_botStateData._states.Length - 1]._stateType;
+            return _botStateData.States[_botStateData.States.Length - 1].Type;
         }
     }
 }

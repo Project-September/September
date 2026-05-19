@@ -5,12 +5,22 @@ namespace InGame.Bot
     [CreateAssetMenu(fileName = "BotStateData", menuName = "ScriptableObjects/Bot/BotStateData")]
     public class BotStateData : ScriptableObject
     {
-        public StateData[] _states;
+        [SerializeField] private StateData[] _states;
+        public IReadOnlyState[] States => _states;
+        public interface IReadOnlyState
+        {
+            public StateType Type { get; }
+            public int Probability { get; }
+        }
         [System.Serializable]
-        public class StateData
+        public class StateData : IReadOnlyState
         {
             public StateType _stateType;
             public int _probability;
+
+            public StateType Type => _stateType;
+
+            public int Probability => _probability;
         }
 
         private int? _sumProbability;
