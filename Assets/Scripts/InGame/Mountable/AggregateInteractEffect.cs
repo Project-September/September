@@ -1,3 +1,4 @@
+using System.Linq;
 using InGame.Interact;
 using September.Common;
 using UnityEngine;
@@ -69,7 +70,10 @@ namespace September.InGame.Mountable
 
         public override CharacterInteractEffectBase Clone()
         {
-            return MemberwiseClone() as CharacterInteractEffectBase;
+            return new AggregateInteractEffect
+            {
+                _interactEffects = _interactEffects.Select(x => x.Clone()).ToArray()
+            };
         }
     }
 }
