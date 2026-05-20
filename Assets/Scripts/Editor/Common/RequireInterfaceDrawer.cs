@@ -16,8 +16,34 @@ namespace September.Editor.Common
             var attr = (RequireInterfaceAttribute)attribute;
 
             EditorGUI.BeginProperty(position, label, property);
-            
+
             label.tooltip = $"Requires component implementing {attr.InterfaceType.Name}";
+
+            // ドラッグ中の表示制御
+            if (position.Contains(Event.current.mousePosition))
+            {
+                if (Event.current.type == EventType.DragUpdated)
+                {
+                    bool isValid = false;
+                    foreach (Object obj in DragAndDrop.objectReferences)
+                    {
+                        if (FindValidComponent(obj, attr.InterfaceType) != null)
+                        {
+                            isValid = true;
+                            break;
+                        }
+                    }
+
+                    if (!isValid)
+                    {
+                        // マウスポインタを変更してアサイン不可能であることを明示する
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
+
+                        // DragUpdated/Perform のイベントを消費して内部処理を阻止
+                        Event.current.Use();
+                    }
+                }
+            }
 
             Object current = property.objectReferenceValue;
 
@@ -25,7 +51,7 @@ namespace September.Editor.Common
                 position,
                 label,
                 current,
-                typeof(UnityEngine.Object),
+                typeof(Object),
                 true
             );
 
@@ -53,7 +79,7 @@ namespace September.Editor.Common
                 infoRect.xMin += EditorGUIUtility.labelWidth + 4;
                 infoRect.xMax -= 20;
 
-                GUIStyle style = new GUIStyle(EditorStyles.miniLabel);
+                var style = new GUIStyle(EditorStyles.miniLabel);
                 style.alignment = TextAnchor.MiddleRight;
                 style.normal.textColor = Color.gray;
 
@@ -83,7 +109,7 @@ namespace September.Editor.Common
             {
                 var components = go.GetComponents<Component>();
 
-                foreach (var c in components)
+                foreach (Component c in components)
                 {
                     if (c == null)
                         continue;
