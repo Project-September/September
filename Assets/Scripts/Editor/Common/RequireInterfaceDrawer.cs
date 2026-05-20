@@ -11,6 +11,15 @@ namespace September.Editor.Common
     [CustomPropertyDrawer(typeof(RequireInterfaceAttribute))]
     public class RequireInterfaceDrawer : PropertyDrawer
     {
+        private readonly GUIStyle _style = new(EditorStyles.miniLabel)
+        {
+            alignment = TextAnchor.MiddleRight,
+            normal =
+            {
+                textColor = Color.gray
+            }
+        };
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             var attr = (RequireInterfaceAttribute)attribute;
@@ -79,14 +88,10 @@ namespace September.Editor.Common
                 infoRect.xMin += EditorGUIUtility.labelWidth + 4;
                 infoRect.xMax -= 20;
 
-                var style = new GUIStyle(EditorStyles.miniLabel);
-                style.alignment = TextAnchor.MiddleRight;
-                style.normal.textColor = Color.gray;
-
                 GUI.Label(
                     infoRect,
                     attr.InterfaceType.Name,
-                    style
+                    _style
                 );
             }
 
