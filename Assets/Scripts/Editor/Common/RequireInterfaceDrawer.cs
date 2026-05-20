@@ -79,6 +79,10 @@ namespace September.Editor.Common
                 {
                     property.objectReferenceValue = validComponent;
                 }
+                else
+                {
+                    Debug.LogWarning($"{picked.name} does not implement {attr.InterfaceType.Name}.");
+                }
             }
 
             // 未アサインならInterface名表示
