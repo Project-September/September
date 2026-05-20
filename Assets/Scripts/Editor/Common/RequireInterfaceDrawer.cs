@@ -24,6 +24,12 @@ namespace September.Editor.Common
         {
             var attr = (RequireInterfaceAttribute)attribute;
 
+            if (attr.InterfaceType == null)
+            {
+                GUI.Label(position, "Invalid Type(null)", EditorStyles.label);
+                return;
+            }
+
             EditorGUI.BeginProperty(position, label, property);
 
             label.tooltip = $"Requires component implementing {attr.InterfaceType.Name}";
