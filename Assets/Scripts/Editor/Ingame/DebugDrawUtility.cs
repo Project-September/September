@@ -167,6 +167,6 @@ public static class DebugDrawUtility
             }
         }
 
-        Debug.LogWarning("このコライダー形状はサポートされていません");
+        Debug.LogWarning($"[DebugDrawUtility] サポートされていないコライダー形状: {collider.GetType().Name}");
     }
 }
