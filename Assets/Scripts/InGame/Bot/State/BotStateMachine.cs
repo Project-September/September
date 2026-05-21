@@ -147,7 +147,7 @@ namespace InGame.Bot
                     return state.Type;
                 }
             }
-            return _botStateData.States[_botStateData.States.Length - 1].Type;
+            return _botStateData.States[^1].Type;
         }
     }
 }

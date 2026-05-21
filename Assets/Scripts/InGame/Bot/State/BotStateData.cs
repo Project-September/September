@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -6,7 +7,7 @@ namespace InGame.Bot
     public class BotStateData : ScriptableObject
     {
         [SerializeField] private StateData[] _states;
-        public IReadOnlyState[] States => _states;
+        public IReadOnlyList<IReadOnlyState> States => _states;
         public interface IReadOnlyState
         {
             public StateType Type { get; }
@@ -15,12 +16,12 @@ namespace InGame.Bot
         [System.Serializable]
         public class StateData : IReadOnlyState
         {
-            public StateType _stateType;
-            public int _probability;
+            public StateType Type;
+            public int Probability;
 
-            public StateType Type => _stateType;
+            StateType IReadOnlyState.Type => Type;
 
-            public int Probability => _probability;
+            int IReadOnlyState.Probability => Probability;
         }
 
         private int? _sumProbability;
@@ -43,7 +44,7 @@ namespace InGame.Bot
 
             foreach (var state in _states)
             {
-                sum += state._probability;
+                sum += state.Probability;
             }
             return sum;
         }
