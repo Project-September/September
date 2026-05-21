@@ -11,11 +11,16 @@ namespace September.InGame.Mountable
     public class CompositeInteractEffect : CharacterInteractEffectBase
     {
         [SerializeReference, SubclassSelector] private CharacterInteractEffectBase[] _interactEffects;
-        
+
+        private IInteractableContext _context;
+
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
+            _context = context;
+
             foreach (var effect in _interactEffects)
             {
+                if (!effect.IsExecutable(_context.CharacterType)) continue;
                 effect.OnInteractStart(context, target);
             }
         }
@@ -24,6 +29,7 @@ namespace September.InGame.Mountable
         {
             foreach (var effect in _interactEffects)
             {
+                if (!effect.IsExecutable(_context.CharacterType)) continue;
                 effect.OnInteractUpdate(deltaTime);
             }
         }
@@ -32,6 +38,7 @@ namespace September.InGame.Mountable
         {
             foreach (var effect in _interactEffects)
             {
+                if (!effect.IsExecutable(_context.CharacterType)) continue;
                 effect.OnInteractLateUpdate(deltaTime);
             }
         }
@@ -40,6 +47,7 @@ namespace September.InGame.Mountable
         {
             foreach (var effect in _interactEffects)
             {
+                if (!effect.IsExecutable(_context.CharacterType)) continue;
                 effect.OnInteractFixedUpdate();
             }
         }
@@ -48,6 +56,7 @@ namespace September.InGame.Mountable
         {
             foreach (var effect in _interactEffects)
             {
+                if (!effect.IsExecutable(_context.CharacterType)) continue;
                 effect.OnInteractFixedNetworkUpdate(playerInput);
             }
         }
@@ -56,6 +65,7 @@ namespace September.InGame.Mountable
         {
             foreach (var effect in _interactEffects)
             {
+                if (!effect.IsExecutable(_context.CharacterType)) continue;
                 effect.OnInteractCollisionStay(collision);
             }
         }
@@ -64,6 +74,7 @@ namespace September.InGame.Mountable
         {
             foreach (var effect in _interactEffects)
             {
+                if (!effect.IsExecutable(_context.CharacterType)) continue;
                 effect.OnInteractEnd();
             }
         }
