@@ -8,7 +8,7 @@ namespace September.InGame.Mountable
     /// <summary>
     /// 複数のInteractEffectを同時実行する
     /// </summary>
-    public class AggregateInteractEffect : CharacterInteractEffectBase
+    public class CompositeInteractEffect : CharacterInteractEffectBase
     {
         [SerializeReference, SubclassSelector] private CharacterInteractEffectBase[] _interactEffects;
         
@@ -70,7 +70,7 @@ namespace September.InGame.Mountable
 
         public override CharacterInteractEffectBase Clone()
         {
-            return new AggregateInteractEffect
+            return new CompositeInteractEffect
             {
                 _interactEffects = _interactEffects.Select(x => x.Clone()).ToArray()
             };
