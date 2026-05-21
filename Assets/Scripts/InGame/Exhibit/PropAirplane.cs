@@ -391,10 +391,6 @@ namespace InGame.Exhibit
             PlayerDatabase.Instance.PlayerDataDic.TryGet(OwnerPlayerRef, out var playerData);
             RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? ControlDescriptionType.Sarutobi : ControlDescriptionType.Player);
             var chara = PlayerDatabase.Instance.PlayerDataDic[OwnerPlayerRef].CharacterType;
-            var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
-                ? all
-                : CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
-            SetCooldown(time);
 
             // Authority
             OwnerPlayerRef = PlayerRef.None;
@@ -409,11 +405,20 @@ namespace InGame.Exhibit
 
             // 飛行機を初期位置・回転に戻す（ティラノと同じ仕組み）
             transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+
+            // クールダウン開始
+            var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all
+                : CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
+            SetCooldown(time);
+
+            // パラメータリセット
             CurrentAccel = 0;
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
             RPC_SetIsKinematic(true);
             _interactTimer = 0f;
+
             //隊列がある場合の処理
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {

@@ -93,7 +93,9 @@ namespace InGame.Interact
         /// <summary>現在アクティブなインタラクト効果</summary>
         private CharacterInteractEffectBase _activeEffectBase;
 
-        private CharacterType _characterType; 
+        private CharacterType _characterType;
+        
+        [SerializeField] private bool _debug;
 
         /// <summary>
         /// インタラクトのメイン処理（Host側でのみ実行）
@@ -156,7 +158,11 @@ namespace InGame.Interact
         /// </summary>
         public void SetCooldown(float seconds)
         {
-            if (!HasStateAuthority || seconds <= 0f) return;
+            if (!HasStateAuthority || seconds <= 0f)
+            {
+                Debug.LogWarning($"[InteractableBase] クールダウンの開始に失敗しました\n詳細：{HasStateAuthority} {seconds}");
+                return;
+            }
 
             // すでにクールダウン中か評価する。（クールダウンの設定前に評価しないと常に真となるため事前に行う必要あり）
             var isInCooldown = IsInCooldown();
@@ -222,28 +228,28 @@ namespace InGame.Interact
             // クールダウン中はインタラクト不可
             if (IsInCooldown())
             {
-                //Debug.LogError("[InteractableBase] クールダウン中のためインタラクトできません");
+                if (_debug) Debug.Log("[InteractableBase] クールダウン中のためインタラクトできません");
                 return false;
             }
 
             // オブジェクトが無効な場合はインタラクト不可
             if (!Object.isActiveAndEnabled)
             {
-                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが無効です");
+                if (_debug) Debug.Log($"[{name}] インタラクト可能なオブジェクトが無効です");
                 return false;
             }
 
             // 強制無効化フラグがfalseの場合はインタラクト不可
             if (!ForceSetInteractable)
             {
-                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
+                if (_debug) Debug.Log($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
                 return false;
             }
 
             // 派生クラスの個別条件をチェック
             if (!OnValidateInteraction(context, type))
             {
-                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
+                if (_debug) Debug.Log($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
                 return false;
             }
 
