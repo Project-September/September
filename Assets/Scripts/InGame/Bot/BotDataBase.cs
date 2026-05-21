@@ -1,4 +1,4 @@
-using Fusion;
+using InGame.Player;
 using September.Common;
 using UnityEngine;
 
@@ -8,6 +8,7 @@ namespace September
     {
         public static BotDataBase Instance;
         private GameObject[] _interactObjects;
+        private PlayerManager[] _playerManagers;
 
         public void Awake()
         {
@@ -22,26 +23,40 @@ namespace September
             //インタラクトオブジェクトを入れる
         }
 
-        public NetworkObject GetNearbyPlayer(NetworkObject myObject)
+        public PlayerManager GetNearbyPlayer(GameObject myObject)
         {
-            float minDistance = float.MaxValue;
-            NetworkObject player = null;
-            foreach (var kv in PlayerDatabase.Instance.PlayerObjectDic)
+            if(_playerManagers == null)
             {
-                var target = kv.Value;
+                SetPlayerManager();
+            }
 
-                if (target == null || target == myObject)
+            float minDistance = float.MaxValue;
+            PlayerManager player = null;
+            foreach (var p in _playerManagers)
+            {
+                if (p == null || p.gameObject == myObject || p.IsStun)
                     continue;
 
-                float dis = (myObject.transform.position - target.transform.position).sqrMagnitude;
+                float dis = (myObject.transform.position - p.transform.position).sqrMagnitude;
                 if (minDistance > dis)
                 {
                     minDistance = dis;
-                    player = target;
+                    player = p;
                 }
             }
 
             return player;
+        }
+
+        private void SetPlayerManager()
+        {
+            _playerManagers = new PlayerManager[PlayerDatabase.Instance.PlayerObjectDic.Count];
+            int index = 0;
+            foreach (var kv in PlayerDatabase.Instance.PlayerObjectDic)
+            {
+                _playerManagers[index] = kv.Value.GetComponent<PlayerManager>();
+                index++;
+            }
         }
     }
 }

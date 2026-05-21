@@ -13650,6 +13650,7 @@ GameObject:
   - component: {fileID: 3668101618786491776}
   - component: {fileID: -6185430689018103594}
   - component: {fileID: 5628340922608597896}
+  - component: {fileID: 791899454190680927}
   m_Layer: 6
   m_Name: BotSarutobi
   m_TagString: Player
@@ -13741,6 +13742,7 @@ MonoBehaviour:
   - {fileID: 4461238842832938777}
   - {fileID: 649019293918567276}
   - {fileID: -6185430689018103594}
+  - {fileID: 791899454190680927}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -14089,6 +14091,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c7244242fca19c4caa942020db8defa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputManager: {fileID: 791899454190680927}
   _abilities:
   - rid: 1755462043767144544
   - rid: 8000700352795770965
@@ -14430,13 +14433,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0676332cf1296f43aa0526cc71bfb72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputManager: {fileID: 791899454190680927}
   _colliderObj: {fileID: 8360875997416129576}
   _meshObj: {fileID: 8360875997416129576}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
   _IsStun:
     _value: 0
-  _stateMachine: {fileID: 5628340922608597896}
 --- !u!114 &5628340922608597896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14456,9 +14459,23 @@ MonoBehaviour:
   _stopTime: 5
   _rigidbody: {fileID: 6099435784402053345}
   <StopDistance>k__BackingField: 1
+  InputIsAttack: 0
   Navigation:
     StopDistance: 0
     CanVault: 0
+--- !u!114 &791899454190680927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa38665e3317a7f42a64c7ba382b28a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateMachine: {fileID: 5628340922608597896}
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0

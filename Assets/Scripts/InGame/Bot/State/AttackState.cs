@@ -1,4 +1,5 @@
 using Fusion;
+using InGame.Player;
 using September;
 using UnityEngine;
 
@@ -7,13 +8,13 @@ namespace InGame.Bot
     public class AttackState : IBotState
     {
         //パラメータ系はいつか外でいじれるようにしたい
-        private NetworkObject _target;
+        private PlayerManager _target;
         private Vector3 _targetPos;
         private float _findRouteInterval = 0.5f;
         private float _timer;
         public void OnEnter(BotStateMachine stateMachine)
         {
-            _target = BotDataBase.Instance.GetNearbyPlayer(stateMachine.NetObject);
+            _target = BotDataBase.Instance.GetNearbyPlayer(stateMachine.gameObject);
         }
 
         public void OnExit(BotStateMachine stateMachine)
@@ -26,6 +27,13 @@ namespace InGame.Bot
             if (_target == null)
             {
                 stateMachine.ChangeState();
+                return;
+            }
+
+            if (_target.IsStun)
+            {
+                _target = null;
+                OnEnter(stateMachine);
                 return;
             }
 
