@@ -20,6 +20,7 @@ namespace September.InGame.Common.Hitbox.Binder
     {
         protected THitboxShape[] Shapes { get; }
         protected TPrediction Prediction { get; }
+        protected LayerMask BaseLayerMask { get; }
         
         bool IHitboxBinder.Validate()
         {
@@ -46,7 +47,7 @@ namespace September.InGame.Common.Hitbox.Binder
         {
             foreach (var shape in Shapes)
             {
-                shape.CastHitbox(basePosition, baseRotation, results, onHit);
+                shape.CastHitbox(basePosition, baseRotation, results, BaseLayerMask, onHit);
             }
         }
 
