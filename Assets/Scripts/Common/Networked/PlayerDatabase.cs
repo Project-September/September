@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Fusion;
 using Result;
+using UniRx;
 using UnityEngine;
 
 namespace September.Common
@@ -19,12 +20,20 @@ namespace September.Common
         [SerializeField] private int _sarutobiBonusScore = 50;
         [SerializeField] private ExhibitScoreConfig _tanihiraBonusScore;
 
+        [Networked, Capacity(20)]
+        public NetworkDictionary<PlayerRef, NetworkObject> PlayerObjectDic => default;
         [Networked, OnChangedRender(nameof(OnChangedPlayerData)), Capacity(8)]
         public NetworkDictionary<PlayerRef, SessionPlayerData> PlayerDataDic => default;
         public Action<NetworkDictionary<PlayerRef, SessionPlayerData>> ChangedDataAction;
         public static PlayerDatabase Instance;
 
+        private Subject<PlayerRef> _onBotJoin = new();
+        public IObservable<PlayerRef> OnBotJoin => _onBotJoin;
+        private Subject<PlayerRef> _onBotLeft = new();
+        public IObservable<PlayerRef> OnBotLeft => _onBotLeft;
+
         private readonly Dictionary<PlayerRef, ScoreTracker> _serverTrackers = new();
+        public static readonly int BotStartIndex = 100;
 
         public override void Spawned()
         {
@@ -225,16 +234,44 @@ namespace September.Common
 
         public void AddPlayerData(PlayerRef playerRef)
         {
-            if (playerRef != Runner.LocalPlayer) return;
+            if (playerRef != Runner.LocalPlayer && playerRef.AsIndex < BotStartIndex) return;
             var localNickName = NickNameProvider.GetNickName();
             var nickNameOrder = PlayerDataDic.Count(kv => kv.Value.PureNickName == localNickName);
             Rpc_SetPlayerData(playerRef, new SessionPlayerData(localNickName, nickNameOrder));
+        }
+
+        public void AddBotData()
+        {
+            int botIndex = GetBotIndex();
+
+            var localNickName = "Bot";
+            var nickNameOrder = botIndex - BotStartIndex;
+            Rpc_SetBotData(PlayerRef.FromIndex(botIndex), new SessionPlayerData(localNickName, nickNameOrder));
+        }
+
+        public void RemoveBotData(PlayerRef playerRef)
+        {
+            if (!HasStateAuthority) return;
+            Rpc_RemoveBotData(playerRef);
+        }
+
+        public void AddPlayerObject(PlayerRef playerRef, NetworkObject playerObject)
+        {
+            PlayerObjectDic.Set(playerRef, playerObject);
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
         private void Rpc_SetPlayerData(PlayerRef playerRef, SessionPlayerData data)
         {
             PlayerDataDic.Set(playerRef, data);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
+        private void Rpc_SetBotData(PlayerRef playerRef, SessionPlayerData data)
+        {
+            PlayerDataDic.Set(playerRef, data);
+            _onBotJoin.OnNext(playerRef);
+            Debug.Log(playerRef.AsIndex + "Bot");
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
@@ -245,17 +282,47 @@ namespace September.Common
             PlayerDataDic.Set(playerRef, playerData);
         }
 
-        /// <summary>
-        /// 決定したビルドルートを保存するメソッド
-        /// </summary>
-        /// <param name="playerRef">プレイヤーの情報</param>
-        /// <param name="buildType">決定したビルドルート</param>
-        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-        public void Rpc_SetBuild(PlayerRef playerRef, BuildType buildType)
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
+        public void Rpc_RemoveBotData(PlayerRef playerRef)
         {
-            if (!PlayerDataDic.TryGet(playerRef, out var playerData)) return;
-            playerData.BuildType = buildType;
-            PlayerDataDic.Set(playerRef, playerData);
+            if (HasStateAuthority)
+            {
+                if (!PlayerDataDic.TryGet(playerRef, out _)) return;
+                PlayerDataDic.Remove(playerRef);
+            }
+            _onBotLeft.OnNext(playerRef);
+        }
+
+        /// <summary>
+        /// BotのIndex100以上で使われていないIndexを返す
+        /// </summary>
+        /// <returns></returns>
+        private int GetBotIndex()
+        {
+            List<int> nodeIndex = new();
+            foreach (var kv in PlayerDataDic)
+            {
+                if (kv.Key.AsIndex >= BotStartIndex)
+                {
+                    nodeIndex.Add(kv.Key.AsIndex - BotStartIndex);
+                }
+            }
+
+            nodeIndex.Sort();
+            int count = 0;
+            while (count < nodeIndex.Count && nodeIndex[count] == count)
+            {
+                count++;
+            }
+
+            int result = count + BotStartIndex;
+            if (result < BotStartIndex)
+            {
+                Debug.LogError("Botに使えないIndexです");
+                return 999;
+            }
+
+            return result;
         }
 
         private void OnChangedPlayerData()

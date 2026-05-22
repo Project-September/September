@@ -5411,6 +5411,7 @@ GameObject:
   - component: {fileID: 6282825429990540647}
   - component: {fileID: -7886593714486123081}
   - component: {fileID: 8299193541871035024}
+  - component: {fileID: 4943096902174970823}
   m_Layer: 6
   m_Name: OKBPrefab
   m_TagString: Player
@@ -5499,6 +5500,7 @@ MonoBehaviour:
   - {fileID: 4031138293428820530}
   - {fileID: 6282825429990540647}
   - {fileID: -7886593714486123081}
+  - {fileID: 4943096902174970823}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -5556,6 +5558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82df9dd14a0794b429f808e8d246e3c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputManager: {fileID: 4943096902174970823}
   _colliderObj: {fileID: 2287520664147054077}
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 8
@@ -5617,6 +5620,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _printVaultFailedLog: 0
   _visibleGizmos: 0
+  _vaultGizmoDebugger: {fileID: 0}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
@@ -5672,9 +5676,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97fa1f5e591252438ae6f1ea8b0742b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _params: {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
   _modifiers:
   - {fileID: 7276315659277605485}
+  _params: {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
 --- !u!114 &7276315659277605485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5764,6 +5768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c7244242fca19c4caa942020db8defa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputManager: {fileID: 4943096902174970823}
   _abilities:
   - rid: 2879281568291487894
   - rid: 8000700287031967830
@@ -5998,6 +6003,18 @@ PlayableDirector:
     value: {fileID: 8254388696613982807}
   m_ExposedReferences:
     m_References: []
+--- !u!114 &4943096902174970823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d209bb15182b7642b72658a821ece7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

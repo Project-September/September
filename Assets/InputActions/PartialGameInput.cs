@@ -12,6 +12,10 @@ public partial class GameInput
     public DeviceType UseDeviceType { get; private set; } = DeviceType.Unknown;
     public event Action<DeviceType> OnDeviceTypeChanged;
 
+    public bool IsMoveInput { get; private set; }
+    public bool IsActionInput {  get; private set; }
+    public bool IsLookInput {  get; private set; }
+
     static GameInput Init()
     {
         // インスタンスの生成、イベントの購読
@@ -102,6 +106,7 @@ public partial class GameInput
             Player.Dash.Disable();
             Player.Aim.Disable();
         }
+        IsMoveInput = value;
     }
     public void ToggleActionInput(bool value)
     {
@@ -119,6 +124,7 @@ public partial class GameInput
             Player.Ability2.Disable();
             Player.Interact.Disable();
         }
+        IsActionInput = value;
     }
 
     public void ToggleLookInput(bool value)
@@ -131,6 +137,7 @@ public partial class GameInput
         {
             Player.Look.Disable();
         }
+        IsLookInput = value;
     }
 
     public enum DeviceType

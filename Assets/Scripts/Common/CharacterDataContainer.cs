@@ -22,6 +22,7 @@ namespace September.Common
             [TextArea(2, 5)] public string AbilityName;
             [TextArea(3, 5)] public string AbilityExplain;
             public NetworkPrefabRef Prefab;
+            public NetworkPrefabRef BotPrefab;
             public VideoClip ExplainVideo;
             public Sprite CharacterIcon;
             public AnimationClip EmoteAnimation;

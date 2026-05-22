@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using Fusion;
-using September.Common;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -12,6 +10,7 @@ namespace InGame.Player.Ability
     /// </summary>
     public class PlayerAbilityManager : NetworkBehaviour
     {
+        [SerializeField] private PlayerInputManager _playerInputManager;
         /// <summary>管理するアビリティのリスト（InspectorでSubclassSelectorで選択）</summary>
         [SerializeReference, SubclassSelector] private List<AbilityBase> _abilities = new();
         /// <summary>アビリティ実行条件のリスト（InspectorでSubclassSelectorで選択）</summary>
@@ -57,12 +56,13 @@ namespace InGame.Player.Ability
         public override void FixedUpdateNetwork()
         {
             // プレイヤー入力を取得（取得できない場合は処理をスキップ）
-            if (!GetInput<PlayerInput>(out var input)) return;
+            if (_playerInputManager == null) return;
+            if (!_playerInputManager.GetPlayerInput(out var input)) return;
 
             // 前フレームと現在のボタン入力を更新
             _previousButtons = _currentButtons;
             _currentButtons = input.Buttons;
-            
+
             // Host側でのみアビリティの開始・更新を実行
             if (!HasStateAuthority) return;
 
@@ -90,7 +90,7 @@ namespace InGame.Player.Ability
             {
                 //入力を保持
                 ability.SetPlayerInput(input);
-                
+
                 ability.Tick(Time.deltaTime);
             }
         }
