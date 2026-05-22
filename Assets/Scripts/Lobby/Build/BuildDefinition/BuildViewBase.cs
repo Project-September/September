@@ -6,30 +6,23 @@ namespace September.Lobby
 {
     public abstract class BuildViewBase : MonoBehaviour
     {
-        [SerializeField] protected BuildDatas _build;
-
         // 発火用
         event Action<BuildIndexMoveType> _onMoveIndex;
         event Action _onSelectBuild;
         // 購読・解除用
         // 普段の「+=」「-=」をメソッドにして役割分担
-        public ActionDisposable OnMoveIndex(Action<BuildIndexMoveType> act)
+        public Action OnMoveIndex(Action<BuildIndexMoveType> act)
         {
             _onMoveIndex += act;
-            return new(() => _onMoveIndex -= act);
+            return () => _onMoveIndex -= act;
         }
-        public ActionDisposable OnSelectBuild(Action act)
+        public Action OnSelectBuild(Action act)
         {
             _onSelectBuild += act;
-            return new(() => _onSelectBuild -= act);
+            return () => _onSelectBuild -= act;
         }
 
-        private void Awake()
-        {
-            Init();
-        }
-
-        protected abstract void Init();
+        public abstract void Init(BuildDataBase[] builds);
 
         #region 入力
         [ContextMenu("Next")]
@@ -51,23 +44,15 @@ namespace September.Lobby
         }
         #endregion
 
-        public virtual void VisualizeBuildInfo(int index)
-        {
-#if UNITY_EDITOR
-            var build = _build.Builds[index];
-            if (build == null) return;
-            Debug.Log($"選択中 : {build.BuildName}\n説明 : {build.BuildInfo}");
-#endif
-        }
+        /// <summary>ビルドルートの選択中かどうかの表示を切り替えるメソッド</summary>
+        /// <param name="index">選択中のビルドルートのインデックス</param>
+        /// <param name="build">選択中のビルドルートの詳細</param>
+        public abstract void VisualizeBuildInfo(int index, BuildDataBase build);
 
-        public virtual void VisualizeSelection(bool selected, int index)
-        {
-#if UNITY_EDITOR
-            var build = _build.Builds[index];
-            if (build == null) return;
-            Debug.Log(!selected ? "ビルドルート決定" : "ビルドルートは決定されています"
-            + $"\n決定ビルド : {build.BuildName}");
-#endif
-        }
+        /// <summary>決定したビルドルートの表示を切り替えるメソッド</summary>
+        /// <param name="selected">すでに決定されているかどうか</param>
+        /// <param name="index">決定したビルドルートのインデックス</param>
+        /// <param name="build">決定したビルドルートの詳細</param>
+        public abstract void VisualizeSelection(bool selected, int index, BuildDataBase build);
     }
 }

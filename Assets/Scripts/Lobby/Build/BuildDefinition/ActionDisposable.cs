@@ -1,20 +1,24 @@
 using System;
+using System.Collections.Generic;
 
 namespace September.Common
 {
     /// <summary>登録解除を管理するクラス</summary>
     public sealed class ActionDisposable : IDisposable
     {
-        Action _dispose;
+        readonly List<Action> _disposes = new();
 
-        public ActionDisposable(Action dispose)
+        public void AddActionDisposing(Action act)
         {
-            _dispose = dispose;
+            _disposes.Add(act);
         }
 
         public void Dispose()
         {
-            _dispose?.Invoke();
+            foreach (Action dispose in _disposes)
+            {
+                dispose();
+            }
         }
     }
 }

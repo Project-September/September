@@ -1,6 +1,5 @@
 using September.Common;
 using System;
-using System.Collections.Generic;
 
 namespace September.Lobby
 {
@@ -8,37 +7,34 @@ namespace September.Lobby
     {
         BuildDatasRuntime _runtime;
         BuildViewBase _view;
-        /// <summary>登録解除管理クラスをまとめて購読解除するためのコレクション</summary>
-        readonly List<ActionDisposable> _disposes = new();
+        readonly ActionDisposable _dispose;
 
         public BuildPresenter(BuildDatas data, BuildViewBase view)
         {
+            if (view == null) throw new ArgumentNullException(nameof(view));
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            // 諸々の初期化をPresenterに集約
             _runtime = new(data);
             _view = view;
-            if (_view == null) throw new ArgumentNullException(nameof(_view));
+            _view.Init(data.Builds);
+            _dispose = new();
             Init();
         }
 
         void Init()
         {
-            ActionDisposable dispose = null;
-            //Viewに登録
-            dispose = _view.OnMoveIndex(_runtime.MoveIndex);
-            _disposes.Add(dispose);
-            dispose = _view.OnSelectBuild(_runtime.SelectBuild);
-            _disposes.Add(dispose);
-
-            //Runtimeに登録
-            dispose = _runtime.OnMoveIndex(_view.VisualizeBuildInfo);
-            _disposes.Add(dispose);
-            dispose = _runtime.OnSelectBuild(_view.VisualizeSelection);
-            _disposes.Add(dispose);
+            // Viewに登録
+            _dispose.AddActionDisposing(_view.OnMoveIndex(_runtime.MoveIndex));
+            _dispose.AddActionDisposing(_view.OnSelectBuild(_runtime.SelectBuild));
+            // Runtimeに登録
+            _dispose.AddActionDisposing(_runtime.OnMoveIndex(_view.VisualizeBuildInfo));
+            _dispose.AddActionDisposing(_runtime.OnSelectBuild(_view.VisualizeSelection));
         }
 
         public void Dispose()
         {
-            foreach (var deregistration in _disposes)
-                deregistration?.Dispose();
+            // ActionDisposableクラスのDisposeによって一括解除
+            _dispose?.Dispose();
         }
     }
 }

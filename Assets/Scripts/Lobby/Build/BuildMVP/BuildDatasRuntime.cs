@@ -5,30 +5,29 @@ namespace September.Lobby
 {
     public class BuildDatasRuntime
     {
-        int _buildArrLength;
+        readonly BuildDataBase[] _builds;
         int _currentIndex;
-        int _selectedIndex;
         bool _selected;
 
         // 発火用
-        event Action<int> _onMoveIndex;
-        event Action<bool, int> _onSelectBuild;
+        event Action<int, BuildDataBase> _onMoveIndex;
+        event Action<bool, int, BuildDataBase> _onSelectBuild;
         // 購読・解除用
         // 普段の「+=」「-=」をメソッドにして役割分担
-        public ActionDisposable OnMoveIndex(Action<int> act)
+        public Action OnMoveIndex(Action<int, BuildDataBase> act)
         {
             _onMoveIndex += act;
-            return new(() => _onMoveIndex -= act);
+            return () => _onMoveIndex -= act;
         }
-        public ActionDisposable OnSelectBuild(Action<bool, int> act)
+        public Action OnSelectBuild(Action<bool, int, BuildDataBase> act)
         {
             _onSelectBuild += act;
-            return new(() => _onSelectBuild -= act);
+            return () => _onSelectBuild -= act;
         }
 
         public BuildDatasRuntime(BuildDatas data)
         {
-            _buildArrLength = data.Builds.Count;
+            _builds = data.Builds;
         }
 
         /// <summary>
@@ -39,9 +38,9 @@ namespace September.Lobby
         public void MoveIndex(BuildIndexMoveType move)
         {
             _currentIndex += (int)move;
-            if (_currentIndex < 0) _currentIndex = _buildArrLength - 1;
-            if (_currentIndex > _buildArrLength - 1) _currentIndex = 0;
-            _onMoveIndex?.Invoke(_currentIndex);
+            if (_currentIndex < 0) _currentIndex = _builds.Length - 1;
+            if (_currentIndex > _builds.Length - 1) _currentIndex = 0;
+            _onMoveIndex?.Invoke(_currentIndex, _builds[_currentIndex]);
         }
 
         /// <summary>
@@ -51,13 +50,9 @@ namespace September.Lobby
         public void SelectBuild()
         {
             var selected = _selected;
-            if (!selected)
-            {
-                // 初めて選択した時の処理
-                _selected = true;
-                _selectedIndex = _currentIndex;
-            }
-            _onSelectBuild?.Invoke(selected, _selectedIndex);
+            if (!selected) _selected = true; // 初めて選択した時の処理
+
+            _onSelectBuild?.Invoke(selected, _currentIndex, _builds[_currentIndex]);
         }
     }
 }

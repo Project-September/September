@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace September.Common
@@ -8,6 +7,6 @@ namespace September.Common
     {
         [SerializeField] BuildDataBase[] _builds;
 
-        public IReadOnlyList<BuildDataBase> Builds => _builds;
+        public BuildDataBase[] Builds => _builds;
     }
 }
