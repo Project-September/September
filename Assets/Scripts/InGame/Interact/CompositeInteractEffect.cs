@@ -3,7 +3,7 @@ using InGame.Interact;
 using September.Common;
 using UnityEngine;
 
-namespace September.InGame.Mountable
+namespace September.InGame.Interact
 {
     /// <summary>
     /// 複数のInteractEffectを同時実行する
