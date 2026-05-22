@@ -68,21 +68,5 @@ namespace September.Lobby
         {
             _presenter?.Dispose();
         }
-
-        /// <summary>
-        /// 操作主が見つかったかどうかを
-        /// </summary>
-        /// <returns></returns>
-        bool FindPlayer()
-        {
-            if (_networkRunner == null || PlayerDatabase.Instance == null)
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning("操作主が見つかりませんでした");
-#endif
-                return false;
-            }
-            return true;
-        }
     }
 }
