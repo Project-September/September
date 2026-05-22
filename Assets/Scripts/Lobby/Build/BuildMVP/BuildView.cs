@@ -12,6 +12,23 @@ namespace September.Lobby
         [SerializeField] Text _buildInfo;
         [SerializeField] Button _button;
         BuildPresenter _presenter;
+        NetworkRunner _networkRunner;
+
+        public override void SelectBuild()
+        {
+            //自分自身の確保
+            if (!_networkRunner) _networkRunner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
+            if (_networkRunner == null || PlayerDatabase.Instance == null)
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("サーバー接続に失敗しました");
+#endif
+                return;
+            }
+
+            //操作主が見つかったら決定処理
+            base.SelectBuild();
+        }
 
         public override void VisualizeBuildInfo(int index)
         {
@@ -27,11 +44,14 @@ namespace September.Lobby
         {
             if (!selected)
             {
+                //仮の決定描画
                 var colors = _button.colors;
                 colors.normalColor = Color.red;
                 colors.selectedColor = Color.red;
+                colors.highlightedColor = Color.red;
                 _button.colors = colors;
-                var player = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene()).LocalPlayer;
+                //NetworkRunnerとPlayerDatabaseはnullじゃない前提
+                var player = _networkRunner.LocalPlayer;
                 PlayerDatabase.Instance.Rpc_SetBuild(player, _build.Builds[index].BuildType);
             }
             base.VisualizeSelection(selected, index);
@@ -47,6 +67,22 @@ namespace September.Lobby
         private void OnDisable()
         {
             _presenter?.Dispose();
+        }
+
+        /// <summary>
+        /// 操作主が見つかったかどうかを
+        /// </summary>
+        /// <returns></returns>
+        bool FindPlayer()
+        {
+            if (_networkRunner == null || PlayerDatabase.Instance == null)
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("操作主が見つかりませんでした");
+#endif
+                return false;
+            }
+            return true;
         }
     }
 }

@@ -15,12 +15,12 @@ namespace September.Lobby
         event Action<bool, int> _onSelectBuild;
         // 購読・解除用
         // 普段の「+=」「-=」をメソッドにして役割分担
-        public ActionDeregistration OnMoveIndex(Action<int> act)
+        public ActionDisposable OnMoveIndex(Action<int> act)
         {
             _onMoveIndex += act;
             return new(() => _onMoveIndex -= act);
         }
-        public ActionDeregistration OnSelectBuild(Action<bool, int> act)
+        public ActionDisposable OnSelectBuild(Action<bool, int> act)
         {
             _onSelectBuild += act;
             return new(() => _onSelectBuild -= act);
@@ -57,7 +57,7 @@ namespace September.Lobby
                 _selected = true;
                 _selectedIndex = _currentIndex;
             }
-            _onSelectBuild(selected, _selectedIndex);
+            _onSelectBuild?.Invoke(selected, _selectedIndex);
         }
     }
 }

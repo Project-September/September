@@ -9,7 +9,7 @@ namespace September.Lobby
         BuildDatasRuntime _runtime;
         BuildViewBase _view;
         /// <summary>登録解除管理クラスをまとめて購読解除するためのコレクション</summary>
-        readonly List<ActionDeregistration> _deregistrations = new();
+        readonly List<ActionDisposable> _disposes = new();
 
         public BuildPresenter(BuildDatas data, BuildViewBase view)
         {
@@ -21,25 +21,23 @@ namespace September.Lobby
 
         void Init()
         {
-            ActionDeregistration deregistration = null;
+            ActionDisposable dispose = null;
             //Viewに登録
-            deregistration = _view.OnNextIndex(_runtime.MoveIndex);
-            _deregistrations.Add(deregistration);
-            deregistration = _view.OnBackIndex(_runtime.MoveIndex);
-            _deregistrations.Add(deregistration);
-            deregistration = _view.OnSelectBuild(_runtime.SelectBuild);
-            _deregistrations.Add(deregistration);
+            dispose = _view.OnMoveIndex(_runtime.MoveIndex);
+            _disposes.Add(dispose);
+            dispose = _view.OnSelectBuild(_runtime.SelectBuild);
+            _disposes.Add(dispose);
 
             //Runtimeに登録
-            deregistration = _runtime.OnMoveIndex(_view.VisualizeBuildInfo);
-            _deregistrations.Add(deregistration);
-            deregistration = _runtime.OnSelectBuild(_view.VisualizeSelection);
-            _deregistrations.Add(deregistration);
+            dispose = _runtime.OnMoveIndex(_view.VisualizeBuildInfo);
+            _disposes.Add(dispose);
+            dispose = _runtime.OnSelectBuild(_view.VisualizeSelection);
+            _disposes.Add(dispose);
         }
 
         public void Dispose()
         {
-            foreach (var deregistration in _deregistrations)
+            foreach (var deregistration in _disposes)
                 deregistration?.Dispose();
         }
     }
