@@ -118,7 +118,6 @@ namespace InGame.Player
 
         public override void FixedUpdateNetwork()
         {
-            Debug.Log($"Stan:{this.gameObject.name} => {IsStun}");
             if (HasStateAuthority)
             {
                 if (_stunTickTimer.Expired(Runner) && IsStun)
