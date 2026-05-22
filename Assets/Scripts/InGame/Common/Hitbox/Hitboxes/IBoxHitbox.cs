@@ -1,14 +1,14 @@
 using September.InGame.Common.Hitbox.Shapes;
 
-namespace September.InGame.Common.Hitbox.Prediction
+namespace September.InGame.Common.Hitbox.Hitboxes
 {
     /// <summary>
-    /// ボックス形状の予測表示を提供します。
+    /// ボックス形状のヒットボックス。
     /// </summary>
     /// <remarks>
     /// SubclassSelectorで使用可能にするための非ジェネリックインターフェースです。
     /// </remarks>
-    public interface IBoxPrediction : IHitboxPrediction<Box>
+    public interface IBoxHitbox : IHitbox<Box>
     {
         
     }

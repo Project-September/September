@@ -1,10 +1,13 @@
 using System;
 using UnityEngine;
 
-namespace September.InGame.Common.Hitbox.ShapeStructs
+namespace September.InGame.Common.Hitbox.Shapes
 {
+    /// <summary>
+    /// 直方体を表すデータ
+    /// </summary>
     [Serializable]
-    public struct BoxHitbox
+    public struct Box
     {
         [SerializeField] private Vector3 _center;
         [SerializeField] private Vector3 _halfExtents;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Fusion;
 using September.InGame.Common.Hitbox.Binder;
-using September.InGame.Common.Hitbox.ShapeStructs;
+using September.InGame.Common.Hitbox.Shapes;
 using UnityEngine;
 
 namespace September.InGame.Common.Hitbox.Caster

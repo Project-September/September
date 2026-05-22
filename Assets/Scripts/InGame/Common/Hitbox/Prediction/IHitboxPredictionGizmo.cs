@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace September.InGame.Common.Hitbox.Prediction
 {
+    /// <summary>
+    /// ギズモによる形状表示
+    /// </summary>
     public interface IHitboxPredictionGizmo
     {
         public void DrawGizmos(Vector3 basePosition, Quaternion baseRotation, object shape);

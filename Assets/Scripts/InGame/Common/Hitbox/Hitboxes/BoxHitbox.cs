@@ -1,24 +1,24 @@
 using System;
-using September.InGame.Common.Hitbox.ShapeStructs;
+using September.InGame.Common.Hitbox.Shapes;
 using UnityEngine;
 
-namespace September.InGame.Common.Hitbox.Shapes
+namespace September.InGame.Common.Hitbox.Hitboxes
 {
     [Serializable]
-    public class BoxHitboxShape : IBoxHitbox
+    public class BoxHitbox : IBoxHitbox
     {
-        [SerializeField] private BoxHitbox _hitboxShape;
+        [SerializeField] private Box _shape;
         
-        public BoxHitbox Hitbox => _hitboxShape;
+        public Box Shape => _shape;
 
         public void CastHitbox(Vector3 basePosition, Quaternion baseRotation, Collider[] results, LayerMask layerMask, Action<Collider> onHit)
         {
-            var castPosition = _hitboxShape.GetWorldCenter(basePosition, baseRotation);
-            var castRotation = _hitboxShape.GetWorldRotation(baseRotation);
+            var castPosition = _shape.GetWorldCenter(basePosition, baseRotation);
+            var castRotation = _shape.GetWorldRotation(baseRotation);
             
-            HitboxDebugUtility.DrawBoxOneFrame(castPosition, _hitboxShape.HalfExtents, castRotation, Color.red);
+            HitboxDebugUtility.DrawBoxOneFrame(castPosition, _shape.HalfExtents, castRotation, Color.red);
             
-            int hitCount = Physics.OverlapBoxNonAlloc(castPosition, _hitboxShape.HalfExtents, results, castRotation, layerMask);
+            int hitCount = Physics.OverlapBoxNonAlloc(castPosition, _shape.HalfExtents, results, castRotation, layerMask);
 
             if (hitCount >= results.Length)
             {
