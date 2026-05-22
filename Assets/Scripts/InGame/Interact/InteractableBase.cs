@@ -347,9 +347,7 @@ namespace InGame.Interact
             var charaType = context.CharacterType;
 
             // CharacterType.All を優先、なければキャラ固有の効果を取得
-            var effect = _characterEffects
-                             .FirstOrDefault(e => e is { CharacterType: CharacterType.All })
-                         ?? _characterEffects.FirstOrDefault(e => e != null && e.CharacterType == charaType);
+            var effect = _characterEffects.FirstOrDefault(e => e != null && e.IsExecutable(charaType));
 
             if (effect != null)
             {
