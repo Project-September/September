@@ -9,7 +9,7 @@ namespace September.InGame.Common.Hitbox.Caster
 {
     public class HitboxCaster : NetworkBehaviour, IHitboxCaster 
     {
-        [SerializeField] private HitboxBinder[] _binds;
+        [SerializeReference, SubclassSelector] private IHitboxBinder[] _binds;
         
         [SerializeField] private HitboxTicks _hitboxTicks;
 
