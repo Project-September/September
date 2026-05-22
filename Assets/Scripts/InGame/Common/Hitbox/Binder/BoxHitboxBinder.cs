@@ -1,3 +1,4 @@
+using System;
 using September.InGame.Common.Hitbox.Hitboxes;
 using September.InGame.Common.Hitbox.Prediction;
 using September.InGame.Common.Hitbox.Shapes;
@@ -5,6 +6,7 @@ using UnityEngine;
 
 namespace September.InGame.Common.Hitbox.Binder
 {
+    [Serializable]
     public class BoxHitboxBinder : IHitboxBinder<Box, BoxHitbox, IBoxPrediction>
     {
         [SerializeField] private BoxHitbox[] _shapes;
