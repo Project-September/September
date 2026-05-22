@@ -2637,6 +2637,7 @@ GameObject:
   m_Component:
   - component: {fileID: 618147048}
   - component: {fileID: 618147049}
+  - component: {fileID: 618147050}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -2661,7 +2662,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.0000076293945}
-  m_SizeDelta: {x: 0, y: 300}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &618147049
 MonoBehaviour:
@@ -2689,6 +2690,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &618147050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 618147047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 1
 --- !u!1 &635468608
 GameObject:
   m_ObjectHideFlags: 0
@@ -4360,7 +4375,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 598347562}
   m_Direction: 0
   m_Value: 1
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5201,8 +5216,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1017903993}
   m_HandleRect: {fileID: 1017903992}
   m_Direction: 2
-  m_Value: 1.0000015
-  m_Size: 0.86632407
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7885,7 +7900,7 @@ MonoBehaviour:
   _selectButtonPrefab: {fileID: 6310213737131034369, guid: ca90123e8623f01429575137158a1eb5, type: 3}
   _content: {fileID: 1787673245}
   _mainPanel: {fileID: 492376614}
-  _panelOffset: {x: -300, y: -300, z: 0}
+  _panelOffset: {x: -300, y: -120, z: 0}
 --- !u!1 &2070279139
 GameObject:
   m_ObjectHideFlags: 0
