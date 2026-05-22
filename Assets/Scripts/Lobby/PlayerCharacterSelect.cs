@@ -4,20 +4,16 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Video;
 
 namespace September.Lobby
 {
-    public class SelectCharacterPanel : MonoBehaviour
+    public class PlayerCharacterSelect : CharacterSelectBase
     {
-        [SerializeField] private SelectCharacterIcon _selectButtonPrefab;
         [SerializeField] private Button _submitButton;
         [SerializeField] private CharacterInfoPanel _frontCharacterInfoPanel;
         [SerializeField] private CharacterInfoPanel _backCharacterInfoPanel;
-        [SerializeField] private Transform _content;
         //[SerializeField] private CharacterDisplay _characterDisplay;
         [SerializeField] private TextureCharacterDisplay _characterDisplay;
         [SerializeField] private ToggleTweenAnimation _toggleTweenAnimation;
@@ -28,10 +24,6 @@ namespace September.Lobby
         
         private CharacterInfoPanel _currentFrontPanel;
         private CharacterInfoPanel _currentBackPanel;
-        private bool _changeCharacterInfo;
-        private string _currentCharacterName;
-        private int _currentCharacterIndex;
-        private PlayerRef _localPlayerRef;
         private readonly List<SelectCharacterIcon> _selectCharacterIcons = new();
         private void Start()
         {
@@ -62,45 +54,16 @@ namespace September.Lobby
             });
         }
 
-        private void CreateCharacterIcons(string[] characterNames)
+        protected override void OnCharacterIconClick(string characterName, int index)
         {
-            for (int i = 0; i < characterNames.Length; i++)
-            {
-                var selectCharacterIcon = Instantiate(_selectButtonPrefab, _content);
-                var data = CharacterDataContainer.Instance.GetCharacterData(i);
-                selectCharacterIcon.CharacterImage.sprite = data.CharacterIcon;
-                _selectCharacterIcons.Add(selectCharacterIcon);
-                var temp = i;
-                if (i == 0)
-                {
-                    selectCharacterIcon.SelectCharacter();
-                    var nav = _submitButton.navigation;
-                    nav.selectOnLeft = selectCharacterIcon.Button;
-                    _submitButton.navigation = nav;
-                    _toggleTweenAnimation.SelectWhenOpen = selectCharacterIcon.Button;
-                    //EventSystem.current.SetSelectedGameObject(selectCharacterIcon.gameObject);
-                }
-                selectCharacterIcon.Button.onClick.AddListener(()=>
-                {
-                    if (!SelectCharacter(characterNames[temp], temp)) return;
-                    SetSelectedCharacterImage(temp);
-                    foreach (var icon in _selectCharacterIcons)
-                    {
-                        if (icon == selectCharacterIcon)
-                            icon.SelectCharacter();
-                        else
-                            icon.DeselectCharacter();
-                    }
-                });
-            }
-        }
-        
-        private void SetSelectedCharacterImage(int index)
-        {
+            var data = CharacterDataContainer.Instance.GetCharacterData(index);
+
+            _characterDisplay.SetCharacter(_currentCharacterIndex);
+            //  表示を切り替え
+            ChangeCharacterInfo(characterName, data.AbilityName, data.AbilityExplain).Forget();
             if (index < 0 || index >= _selectedCharacterSprites.Length) return;
             _selectedCharacterImage.sprite = _selectedCharacterSprites[index];
         }
-
         private void SetCharacterIconsNavigation()
         {
             if (_selectCharacterIcons.Count == 1)
@@ -143,28 +106,14 @@ namespace September.Lobby
             (_currentFrontPanel, _currentBackPanel) = (_currentBackPanel, _currentFrontPanel);
             _changeCharacterInfo = false;
         }
-        /// <summary>
-        /// キャラクターを選択(クリック)した時の動作
-        /// </summary>
-        private bool SelectCharacter(string characterName, int index)
+
+        protected override void SelectCharacterIconSetting(SelectCharacterIcon characterIcon, int index)
         {
-            if (_changeCharacterInfo || _currentCharacterName == characterName) return false;
-            var data = CharacterDataContainer.Instance.GetCharacterData(index);
-            //  表示を切り替え
-            ChangeCharacterInfo(characterName, data.AbilityName, data.AbilityExplain).Forget();
-            //  選択しているキャラクターのインデックスを控える
-            _currentCharacterIndex = index;
-            _characterDisplay.SetCharacter(_currentCharacterIndex);
-            CRIAudio.PlaySE("ALLCue", data.SelectedVoice); // キャラ選択ボイス再生
-            return true;
-        }
-        /// <summary>
-        /// キャラクターを決定した時の動作
-        /// </summary>
-        private void SubmitCharacter()
-        {
-            var data = CharacterDataContainer.Instance.GetCharacterData(_currentCharacterIndex);
-            PlayerDatabase.Instance.Rpc_SetCharacter(_localPlayerRef, data.Type);
+            if (index != 0) return;
+            var nav = _submitButton.navigation;
+            nav.selectOnLeft = characterIcon.Button;
+            _submitButton.navigation = nav;
+            _toggleTweenAnimation.SelectWhenOpen = characterIcon.Button;
         }
     }
 }

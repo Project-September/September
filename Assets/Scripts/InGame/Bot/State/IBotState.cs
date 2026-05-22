@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace InGame.Bot
 {
     public interface IBotState

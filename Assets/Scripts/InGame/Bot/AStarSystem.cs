@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
+using Debug = UnityEngine.Debug;
 
 namespace InGame.Bot
 {
@@ -21,7 +21,7 @@ namespace InGame.Bot
             }
         }
 
-        public static async UniTask<List<NodeData>> FindRoute(Vector3 start, Vector3 end)
+        public static List<NodeData> FindRoute(Vector3 start, Vector3 end)
         {
             if (_isFinding) return new();
             _isFinding = true;
@@ -39,12 +39,12 @@ namespace InGame.Bot
                 float startDis = (nodeData.Position - start).sqrMagnitude;
                 float endDis = (nodeData.Position - end).sqrMagnitude;
 
-                if (startNodeDis > startDis && ConnectivityCheck(start, nodeData.Position))
+                if (startNodeDis > startDis && ConnectivityCheck(start, nodeData.Position, false))
                 {
                     startNode = nodeData;
                     startNodeDis = startDis;
                 }
-                if (endNodeDis > endDis && ConnectivityCheck(end, nodeData.Position))
+                if (endNodeDis > endDis && ConnectivityCheck(end, nodeData.Position, false))
                 {
                     endNode = nodeData;
                     endNodeDis = endDis;
@@ -57,7 +57,7 @@ namespace InGame.Bot
                 return new List<NodeData>();
             }
             //実際のA*アルゴリズム
-            var result = await AStar(nodeDatas, startNode, endNode);
+            var result = AStar(nodeDatas, startNode, endNode);
             _isFinding = false;
             return result;
         }
@@ -70,12 +70,11 @@ namespace InGame.Bot
         /// <param name="goal">ゴールノード</param>
         /// <param name="isVault">飛び越えをするか</param>
         /// <returns>経路順のNodeData</returns>
-        private static async UniTask<List<NodeData>> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal, bool isVault = true)
+        private static List<NodeData> AStar(List<NodeData> nodeDatas, NodeData start, NodeData goal, bool isVault = true)
         {
             List<NodeData> result = new();
-            List<NodeData> openNodes = new();
+            NodeHeap openNodes = new();
             Debug.DrawLine(start.Position, goal.Position, Color.yellow, 0.1f);
-
             //オープン処理
             void SetNodeDistance(NodeData target, float parentDis)
             {
@@ -83,8 +82,7 @@ namespace InGame.Bot
                 float h = Vector3.Distance(target.Position, goal.Position);
                 target.OpenNode(g, h);
 
-                if (!openNodes.Contains(target))
-                    openNodes.Add(target);
+                openNodes.Enqueue(target);
             }
 
             start.SetParent(null);
@@ -95,7 +93,17 @@ namespace InGame.Bot
             //探索本体
             while (openNodes.Count > 0)
             {
-                crrentNode = GetSmallCost(openNodes);
+                crrentNode = openNodes.Dequeue();
+
+                if (crrentNode.State == NodeState.Closed)
+                    continue;
+
+                //ゴールしたら探索を終える
+                if (crrentNode == goal)
+                {
+                    break;
+                }
+
                 Debug.DrawLine(crrentNode.Position, crrentNode.Position + Vector3.up * 2, Color.red, 0.1f);
                 List<NodeData> connectNodes = new();
 
@@ -137,16 +145,7 @@ namespace InGame.Bot
                 }
                 //探索したノードをCloseにする
                 crrentNode.Close();
-                openNodes.Remove(crrentNode);
 
-                //次に探索するノード
-                crrentNode = GetSmallCost(openNodes);
-
-                //ゴールしたら探索を終える
-                if (crrentNode == goal)
-                {
-                    break;
-                }
 
                 count--;
                 if (count == 0)
@@ -186,9 +185,9 @@ namespace InGame.Bot
             }
 
             result.Reverse();
-            await UniTask.DelayFrame(1);
             return result;
         }
+
         /// <summary>
         /// 最小コストのノードを取得する
         /// </summary>
@@ -213,8 +212,21 @@ namespace InGame.Bot
         /// <summary>
         /// 直線的に接続ができるかを確認する
         /// </summary>
-        public static bool ConnectivityCheck(Vector3 from, Vector3 to)
+        public static bool ConnectivityCheck(Vector3 from, Vector3 to, bool isNavMeshCheck)
         {
+            // 高低差制限
+            float heightDiff = Mathf.Abs(from.y - to.y);
+            if (heightDiff > 1.5f)
+                return false;
+
+            if (!isNavMeshCheck)
+                return true;
+
+            // NavMesh上の直線チェック
+            if (NavMesh.Raycast(from, to, out var hit, NavMesh.AllAreas))
+                return false;
+
+            // 経路探索
             if (!NavMesh.CalculatePath(from, to, NavMesh.AllAreas, Path))
                 return false;
 
@@ -225,16 +237,73 @@ namespace InGame.Bot
             if (Path.corners.Length > 2)
                 return false;
 
-            // NavMesh上の直線チェック
-            if (NavMesh.Raycast(from, to, out var hit, NavMesh.AllAreas))
-                return false;
-
-            // 高低差制限
-            float heightDiff = Mathf.Abs(from.y - to.y);
-            if (heightDiff > 1.5f)
-                return false;
-
             return true;
+        }
+    }
+    public class NodeHeap
+    {
+        private readonly List<NodeData> _heap = new();
+
+        public int Count => _heap.Count;
+
+        public void Enqueue(NodeData node)
+        {
+            _heap.Add(node);
+
+            int index = _heap.Count - 1;
+
+            while (index > 0)
+            {
+                int parent = (index - 1) / 2;
+
+                if (_heap[parent].Cost <= _heap[index].Cost)
+                    break;
+
+                (_heap[parent], _heap[index]) =
+                    (_heap[index], _heap[parent]);
+
+                index = parent;
+            }
+        }
+
+        public NodeData Dequeue()
+        {
+            NodeData result = _heap[0];
+
+            int lastIndex = _heap.Count - 1;
+
+            _heap[0] = _heap[lastIndex];
+
+            _heap.RemoveAt(lastIndex);
+
+            int index = 0;
+
+            while (true)
+            {
+                int left = index * 2 + 1;
+                int right = index * 2 + 2;
+
+                if (left >= _heap.Count)
+                    break;
+
+                int smallest = left;
+
+                if (right < _heap.Count &&
+                    _heap[right].Cost < _heap[left].Cost)
+                {
+                    smallest = right;
+                }
+
+                if (_heap[index].Cost <= _heap[smallest].Cost)
+                    break;
+
+                (_heap[index], _heap[smallest]) =
+                    (_heap[smallest], _heap[index]);
+
+                index = smallest;
+            }
+
+            return result;
         }
     }
 }

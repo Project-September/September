@@ -157,7 +157,6 @@ namespace InGame.Player
                 _moveVelocity = Vector3.zero;
                 return;
             }
-
             // Dash処理
             isDash = isDash && CanDash;
             _isDash = isDash;
