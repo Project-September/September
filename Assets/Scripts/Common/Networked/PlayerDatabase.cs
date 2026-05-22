@@ -325,6 +325,22 @@ namespace September.Common
             return result;
         }
 
+        /*
+        以下をマージ直前に解放する
+        /// <summary>
+        /// 決定したビルドルートを保存するメソッド
+        /// </summary>
+        /// <param name="playerRef">プレイヤーの情報</param>
+        /// <param name="buildType">決定したビルドルート</param>
+        [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        public void Rpc_SetBuild(PlayerRef playerRef, BuildType buildType)
+        {
+            if (!PlayerDataDic.TryGet(playerRef, out var playerData)) return;
+            playerData.BuildType = buildType;
+            PlayerDataDic.Set(playerRef, playerData);
+        }
+        */
+
         private void OnChangedPlayerData()
         {
             ChangedDataAction?.Invoke(PlayerDataDic);
