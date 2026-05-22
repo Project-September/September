@@ -88,7 +88,7 @@ namespace September.Lobby
                 _button.colors = colors;
                 // NetworkRunnerとPlayerDatabaseはnullじゃない前提
                 var player = _networkRunner.LocalPlayer;
-                //PlayerDatabase.Instance.Rpc_SetBuild(player, build.BuildType);
+                PlayerDatabase.Instance.Rpc_SetBuild(player, build.BuildType);
             }
         }
 

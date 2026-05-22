@@ -325,8 +325,6 @@ namespace September.Common
             return result;
         }
 
-        /*
-        以下をマージ直前に解放する
         /// <summary>
         /// 決定したビルドルートを保存するメソッド
         /// </summary>
@@ -339,7 +337,6 @@ namespace September.Common
             playerData.BuildType = buildType;
             PlayerDataDic.Set(playerRef, playerData);
         }
-        */
 
         private void OnChangedPlayerData()
         {
