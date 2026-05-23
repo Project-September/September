@@ -32,9 +32,8 @@ namespace InGame.Exhibit
             _isDestroyScheduled = false;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
 
-            if (target.Runner.TryGetPlayerObject(playerRef, out var playerNetworkObject))
+            if (PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef,out var playerNetworkObject))
             {
-                
                 if (playerNetworkObject.TryGetComponent(out StatusEffectManager statusEffectManager))
                 {
                     StatusEffectManager.StatusEffectSpec spec = new(_buffEffect);

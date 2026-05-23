@@ -29,7 +29,7 @@ namespace InGame.Exhibit
             {
                 var hits = Physics.OverlapSphere(_currentParent.transform.position + _muramasaOffset, _attackRadius);
                 //タニヒラ用にformationManagerを取得
-                Runner.TryGetPlayerObject(_currentOwner, out NetworkObject player);
+                PlayerDatabase.Instance.PlayerObjectDic.TryGet(_currentOwner, out var player);
                 FormationManager formationManager = player.GetComponent<FormationManager>(); 
                 
                 foreach (var hit in hits)
@@ -64,7 +64,7 @@ namespace InGame.Exhibit
         {
             if (_currentOwnerID != -1) return;
             var playerRef = PlayerRef.FromEncoded(interactor);
-            if (!Runner.TryGetPlayerObject(playerRef, out var playerObj)) return;
+            if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef,out var playerObj)) return;
             EffectSpawner.RequestPlayLoopEffect(
                 MURAMASA_EFFECT_ID + interactor,
                 EffectType.Muramasa,
