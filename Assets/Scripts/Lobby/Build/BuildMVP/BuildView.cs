@@ -1,6 +1,5 @@
 using Fusion;
 using September.Common;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,8 +8,7 @@ namespace September.Lobby
 {
     public class BuildView : BuildViewBase
     {
-        [SerializeField] TextMeshProUGUI[] _buildNames;
-        [SerializeField] TextMeshProUGUI[] _buildInfos;
+        [SerializeField] BuildSelectObject[] _buildObjects;
         [SerializeField] Button _button;
         [SerializeField] BuildFactory _build;
         BuildPresenter _presenter; // MVPに反した参照ではない
@@ -26,19 +24,17 @@ namespace September.Lobby
         public override void Init(BuildDataBase[] builds)
         {
             // 仮UI処理
-            if (_buildNames != null && _buildInfos != null && builds != null)
+            if (_buildObjects != null && builds != null)
             {
                 // UIへの範囲外アクセスを防止したfor文
-                for (int i = 0; i < Mathf.Min(_buildNames.Length, _buildInfos.Length, builds.Length); i++)
+                for (int i = 0; i < Mathf.Min(_buildObjects.Length, builds.Length); i++)
                 {
-                    _buildNames[i].text = builds[i].BuildName;
-                    _buildInfos[i].text = builds[i].BuildInfo;
-                    if (i != 0)
-                    {
-                        // 最初のUI以外を見えなくする
-                        _buildNames[i].color = Color.clear;
-                        _buildInfos[i].color = Color.clear;
-                    }
+                    _buildObjects[i].Init(builds[i].BuildName, builds[i].BuildInfo);
+                    // 最初のUI以外を見えなくする
+                    if (i == 0)
+                        _buildObjects[i].Select();
+                    else
+                        _buildObjects[i].Unselect();
                 }
             }
         }
@@ -65,12 +61,10 @@ namespace September.Lobby
             // アイコンだけ表示していて選択中のビルドルートに関しては詳細を表示する場合とかに使えるのでは
 
             // 直前に表示していたものを見えなくする
-            _buildNames[_preSelectIndex].color = Color.clear;
-            _buildInfos[_preSelectIndex].color = Color.clear;
+            _buildObjects[_preSelectIndex].Unselect();
 
             // 選択要素を見えるようにする
-            _buildNames[index].color = Color.white;
-            _buildInfos[index].color = Color.white;
+            _buildObjects[index].Select();
 
             // 直前のインデックスを保存
             _preSelectIndex = index;
