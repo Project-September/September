@@ -245,6 +245,17 @@ namespace InGame.Interact
                 }
             }
 
+            //Playerが処理する
+            if (!_isBot)
+            {
+                UpdateInteractUI();
+            }
+
+            //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
+        }
+
+        private void UpdateInteractUI()
+        {
             if (_focusedObj)
             {
                 var context = new InteractableContext
@@ -263,7 +274,6 @@ namespace InGame.Interact
                 if (UIController.I)
                     UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
             }
-            //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
 
         /// <summary>
