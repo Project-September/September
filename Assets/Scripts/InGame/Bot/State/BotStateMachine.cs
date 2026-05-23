@@ -25,6 +25,7 @@ namespace InGame.Bot
         private Vector3 _inputDirection;
         private bool _inputIsVault;
         public bool InputIsAttack;//一旦Public　あとでちゃんと書く
+        public bool InputIsInteract;
         public NavigationController Navigation = new();
 
         void Start()
@@ -78,6 +79,8 @@ namespace InGame.Bot
                     return true;
                 case PlayerButtons.Attack:
                     return InputIsAttack;
+                case PlayerButtons.Interact:
+                    return InputIsInteract;
                 default: return false;
             }
         }

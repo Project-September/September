@@ -23,8 +23,7 @@ namespace InGame.Bot
             stateMachine.Navigation.GetDestinationInput(stateMachine.transform.position, _currentPos);
             if (stateMachine.Navigation.IsComplete)
             {
-                Debug.Log("NextNode");
-                OnEnter(stateMachine);
+                stateMachine.ChangeState();
             }
         }
     }

@@ -8,12 +8,14 @@ using UnityEngine;
 using September.Common;
 using September.InGame;
 using September.InGame.UI;
+using InGame.Bot;
 
 namespace InGame.Interact
 {
     [DisallowMultipleComponent]
     public class PlayerInteractionController : NetworkBehaviour
     {
+        [SerializeField] private PlayerInputManager _inputManager;
         [SerializeField] private float _interactRadius = 2.5f;
         [SerializeField] private LayerMask _interactMask;
         [SerializeField, Range(0f, 180f)] private float _interactAngle = 90f; // 前方180度
@@ -38,7 +40,8 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
-       
+        private bool _isBot;
+
         [Networked] private bool IsRemoting { get; set; } //遠距離インタラクション中かの判定
         [Networked] private InteractableBase RemoteFocusedObject { get; set; } //遠インタラクションの対象オブジェクト
         [Networked] private float RemoteInteractTime { get; set; } //遠インタラクション時間
@@ -49,7 +52,12 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
-            _playerAudioController = GetComponentInChildren<PlayerAudioController>(); //
+            _playerAudioController = GetComponentInChildren<PlayerAudioController>();
+           
+            if(_inputManager == null)
+                _inputManager = GetComponent<PlayerInputManager>();
+
+            _isBot = _inputManager?.GetType() == typeof(BotInputManager);
         }
 
         public override void Spawned()
@@ -66,13 +74,14 @@ namespace InGame.Interact
 
         private void Update()
         {
-            if (!HasInputAuthority) return;
+            if (!HasInputAuthority && !_isBot) return;
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
             
             if (_isHoldingInteract)
             {
+                Debug.LogWarning($"{this.gameObject.name} hold");
                 if (!_isExecutingInteraction)
                     TryStartInteraction();
 
@@ -119,8 +128,8 @@ namespace InGame.Interact
         {
             _isHoldingInteract = false; // 毎フレームリセット
             
-            if (!HasInputAuthority) return;
-            if (!GetInput(out PlayerInput input)) return;
+            if (!HasInputAuthority && !_isBot) return;
+            if (!_inputManager.GetPlayerInput(out PlayerInput input)) return;
 
             // Fusionのシミュレーション内でのみ行う処理
             if (_isWaitingForResponse)
@@ -136,6 +145,7 @@ namespace InGame.Interact
             }
 
             _isHoldingInteract = input.Buttons.IsSet(PlayerButtons.Interact);
+            Debug.LogWarning($"{this.gameObject.name} input：{_isHoldingInteract}");
         }
 
         /// <summary>
@@ -293,6 +303,7 @@ namespace InGame.Interact
             _currentInteractTime = 0f;
             _isExecutingInteraction = true;
             _hasCompletedInteraction = false;
+            Debug.LogWarning($"{this.gameObject.name} start");
         }
 
         private float GetRequireInteractTime()
