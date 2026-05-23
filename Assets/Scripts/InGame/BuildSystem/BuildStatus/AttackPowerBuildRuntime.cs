@@ -1,27 +1,23 @@
 using September.Common;
+using UnityEngine;
 
 namespace September.InGame.Common.Stats
 {
-    public class AttackPowerBuildRuntime : IBuild<int>
+    public class AttackPowerBuildRuntime : BuildRuntimeBase<int, int>
     {
-        int _conditionValue;
-        int _maxConditionValue;
-        int _currentCondition;
-        int _advantageousValue;
-
-        public int CurrentBuild => _advantageousValue * (_currentCondition / _conditionValue);
+        public override int CurrentBuild => _advantageousValue * Mathf.Min((_currentCondition / _conditionValue), _maxBuildCount); // 最大ビルド回数を超えないように調整
 
         public AttackPowerBuildRuntime(AttackPowerBuild build)
         {
             _conditionValue = build.ConditionValue;
-            _maxConditionValue = build.MaxConditionValue;
             _currentCondition = build.DefaultConditionValue;
+            _maxBuildCount = build.MaxBuildCount;
             _advantageousValue = build.AdvantageousValue;
         }
 
-        public void UpdateBuild(int value)
+        public override void UpdateBuild(int value)
         {
-            if (_currentCondition >= _maxConditionValue) return;
+            if (_currentCondition / _conditionValue >= _maxBuildCount) return;
             _currentCondition += value;
         }
     }

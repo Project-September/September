@@ -1,10 +1,9 @@
 using Fusion;
 using September.Common;
-using September.InGame.Common.Stats;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace September.InGame.Common
+namespace September.InGame.Common.Stats
 {
     /// <summary>
     /// ビルドルートの機能を生成するクラス

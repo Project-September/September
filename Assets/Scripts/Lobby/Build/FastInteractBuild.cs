@@ -1,4 +1,5 @@
 using UnityEngine;
+using September.InGame.Common.Stats;
 
 namespace September.Common
 {
@@ -7,7 +8,7 @@ namespace September.Common
     {
         public override IBuild CreateBuildInstance()
         {
-            throw new System.NotImplementedException();
+            return new FastInteractBuildRuntime(this);
         }
     }
 }

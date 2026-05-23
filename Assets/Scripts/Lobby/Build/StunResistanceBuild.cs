@@ -1,3 +1,4 @@
+using September.InGame.Common.Stats;
 using UnityEngine;
 
 namespace September.Common
@@ -7,7 +8,7 @@ namespace September.Common
     {
         public override IBuild CreateBuildInstance()
         {
-            throw new System.NotImplementedException();
+            return new StunResistanceBuildRuntime(this);
         }
     }
 }
