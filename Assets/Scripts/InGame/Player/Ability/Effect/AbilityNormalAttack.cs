@@ -8,6 +8,7 @@ using InGame.Health;
 using InGame.Player;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.Common.Stats;
 using September.InGame.Effect;
 using UnityEngine;
 

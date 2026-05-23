@@ -80,7 +80,6 @@ namespace September.InGame.Common.Stats
                 if (CurrentStats.TryGetStatValue(statType, out float value) && !Mathf.Approximately(prevStat.Value, value))
                 {
                     _statDirtyFlags.Add(statType);
-                    if (statType == StatType.AttackDamage) Debug.Log(CurrentStats.GetStat(statType).Value);
                 }
             }
 
