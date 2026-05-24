@@ -3,6 +3,7 @@ using Fusion;
 using InGame.Common;
 using InGame.Player;
 using September.Common;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace Ingame.Tanihira
@@ -104,6 +105,13 @@ namespace Ingame.Tanihira
             
             _state = TanihiraCursorState.Active;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            RPC_ChangeDescriptionUI(ControlDescriptionType.TanihiraAiming);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+        private void RPC_ChangeDescriptionUI(ControlDescriptionType mode)
+        {
+            UIController.I.ChangeDescriptionUI(mode);
         }
 
         private void MoveCursor()
@@ -142,6 +150,7 @@ namespace Ingame.Tanihira
             if (!HasStateAuthority) return;
             _state = TanihiraCursorState.Idol;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            RPC_ChangeDescriptionUI(ControlDescriptionType.Tanihira);
         }
 
         private Vector3 MoveCursorPos()
