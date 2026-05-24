@@ -97,6 +97,14 @@ namespace InGame.Player.Ability
 
             _startHitTick = FrameToTick(_startHitCheckFrame);
             _playerMovement.IgnoreMoveInput = true;
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
+            // 後でパスを登録
+#endif
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)
@@ -164,8 +172,8 @@ namespace InGame.Player.Ability
 
                 if (playerDatabase.PlayerDataDic.TryGet(Parameter.Owner.InputAuthority, out SessionPlayerData playerData))
                 {
-                    // 鬼じゃないときの通常攻撃についてビルド適用
-                    return playerData.IsOgre ? _ogreAttackDamage : _playerStatus ? (int)_playerStatus.AttackDamage : _attackDamage;
+                    // ビルドの上昇分を加算して計算
+                    return playerData.IsOgre ? _ogreAttackDamage : _attackDamage + (_playerStatus ? (int)_playerStatus.AttackDamage : 0);
                 }
             }
             catch (System.Exception)

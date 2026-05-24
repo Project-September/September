@@ -38,5 +38,15 @@ namespace September.InGame.Common.Stats
             if (!_buildDict.TryGetValue(buildType, out var build)) return;
             build.UpdateBuild(value);
         }
+
+        /// <summary>
+        /// ビルドシステムが有効かどうかを返すメソッド
+        /// </summary>
+        /// <param name="buildType">有効かどうかを調べるビルドルート</param>
+        /// <returns>有効かどうか</returns>
+        public bool TryGetBuildEnable(BuildType buildType)
+        {
+            return _buildDict.TryGetValue(buildType, out var build) && build.IsEnable;
+        }
     }
 }

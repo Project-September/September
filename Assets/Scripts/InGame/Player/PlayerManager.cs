@@ -2,6 +2,7 @@ using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
 using September.Common;
+using September.InGame.Common.Stats;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 
@@ -17,6 +18,9 @@ namespace InGame.Player
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
         [SerializeField] private Vector3 _respawnPosition;
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
 
         PlayerMovement _playerMovement;
         CameraController _cameraController;
@@ -70,6 +74,14 @@ namespace InGame.Player
                 _playerHealth = health;
                 health.OnDeath += OnDeath;
             }
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
+            // 後でパスを登録
+#endif
         }
 
         protected virtual void LateUpdate()
@@ -166,13 +178,15 @@ namespace InGame.Player
             IsStun = false;
             _playerHealth.IsInvincible = false;
             _playerEffectController.StopStunEffect();
+            _buildGenerator?.UpdateBuild(BuildType.StunResistance, 1); // 気絶から治ったときの回数を記録するため１を引数に渡す
         }
 
         void OnDeath(HitData lastHitData)
         {
             IsStun = true;
 
-            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime);
+            // ビルドの減衰分を乗算
+            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             _playerHealth.IsInvincible = true;
             _playerEffectController.PlayStunEffect();
         }

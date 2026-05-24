@@ -6,7 +6,9 @@ namespace September.InGame.Common.Stats
     public abstract class BuildSystem : StatsEffectorBase
     {
         [SerializeField] protected BuildDataBase _buildData;
-        protected bool _enable = false;
+        protected bool _isEnable = false;
+
+        public bool IsEnable => _isEnable;
 
         public BuildType BuildType => _buildData.BuildType;
 
@@ -19,7 +21,7 @@ namespace September.InGame.Common.Stats
         /// </summary>
         public void TryEnableBuild(BuildType build)
         {
-            _enable = build == BuildType;
+            _isEnable = build == BuildType;
         }
 
         /// <summary>ビルドの状態を更新するメソッド</summary>

@@ -5,7 +5,7 @@ namespace September.InGame.Common.Stats
 {
     public class MoveSpeedBuildRuntime : BuildRuntimeBase<float, float>
     {
-        public override float CurrentBuild => _advantageousValue * Mathf.Min((_currentCondition / _conditionValue), _maxBuildCount); // 最大ビルド回数を超えないように調整
+        public override float CurrentBuild => _advantageousValue * (int)Mathf.Min((_currentCondition / _conditionValue), _maxBuildCount); // 最大ビルド回数を超えないように調整
 
         public MoveSpeedBuildRuntime(MoveSpeedBuild build)
         {

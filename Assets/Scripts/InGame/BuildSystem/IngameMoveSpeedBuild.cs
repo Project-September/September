@@ -1,4 +1,5 @@
 using September.Common;
+using UnityEngine;
 
 namespace September.InGame.Common.Stats
 {
@@ -11,7 +12,7 @@ namespace September.InGame.Common.Stats
 
         public override void UpdateBuild(float value)
         {
-            if (_enable)
+            if (_isEnable)
                 _runtime.UpdateBuild(value);
         }
     }
