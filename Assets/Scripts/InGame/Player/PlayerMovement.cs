@@ -94,9 +94,9 @@ namespace InGame.Player
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
             // ========== ビルドシステム ==========
-            _moveBuildEnabled = _playerStatus & _buildGenerator & _buildGenerator.TryGetBuildEnable(BuildType.MoveSpeed);
+            _moveBuildEnabled = _playerStatus & _buildGenerator;
 #if UNITY_EDITOR
-            if (_buildGenerator & _playerStatus)
+            if (_moveBuildEnabled)
                 Debug.Log("ビルドシステムが正常に動きます");
             else
                 Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
@@ -193,7 +193,7 @@ namespace InGame.Player
             }
 
             // ========== ビルドシステム ==========
-            if (_moveBuildEnabled)
+            if (_moveBuildEnabled & _buildGenerator.TryGetBuildEnable(BuildType.MoveSpeed))
             {
                 var moveDistance = Vector3.Distance(transform.position, _prePos);
                 _buildGenerator?.UpdateBuild(BuildType.MoveSpeed, moveDistance);
