@@ -81,7 +81,6 @@ namespace InGame.Interact
             
             if (_isHoldingInteract)
             {
-                Debug.LogWarning($"{this.gameObject.name} hold");
                 if (!_isExecutingInteraction)
                     TryStartInteraction();
 
@@ -145,7 +144,6 @@ namespace InGame.Interact
             }
 
             _isHoldingInteract = input.Buttons.IsSet(PlayerButtons.Interact);
-            Debug.LogWarning($"{this.gameObject.name} input：{_isHoldingInteract}");
         }
 
         /// <summary>

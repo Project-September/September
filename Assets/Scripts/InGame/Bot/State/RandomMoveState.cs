@@ -1,3 +1,4 @@
+using September.Common;
 using UnityEngine;
 
 namespace InGame.Bot
@@ -25,6 +26,22 @@ namespace InGame.Bot
             {
                 stateMachine.ChangeState();
             }
+        }
+
+        public bool? GetInputButton(BotStateMachine stateMachine, PlayerButtons button)
+        {
+            switch (button)
+            {
+                case PlayerButtons.Jump:
+                    return stateMachine.Navigation.IsVaultInput;
+            }
+
+            return null;
+        }
+
+        public Vector2 GetInputDirection(BotStateMachine stateMachine)
+        {
+            return stateMachine.Navigation.InputDirection;
         }
     }
 }

@@ -18,14 +18,11 @@ namespace InGame.Bot
         [SerializeField] private float _stopTime;
         [SerializeField] private Rigidbody _rigidbody;
         [field: SerializeField] public float StopDistance { get; private set; }
+        [field: SerializeField] public float InteractDistance { get; private set; } = 2.5f;
         private IBotState _currentState;
         private Dictionary<StateType, IBotState> _stateDic = new();
 
         private float _stopTimer;
-        private Vector3 _inputDirection;
-        private bool _inputIsVault;
-        public bool InputIsAttack;//一旦Public　あとでちゃんと書く
-        public bool InputIsInteract;
         public NavigationController Navigation = new();
 
         void Start()
@@ -54,18 +51,6 @@ namespace InGame.Bot
 
 
             _currentState?.OnUpdate(this);
-
-            _inputIsVault = Navigation.IsVaultInput;
-            _inputDirection = Navigation.InputDirection;
-
-        }
-
-        public PlayerInput GetInput()
-        {
-            PlayerInput input = new();
-            input.Buttons.Set(PlayerButtons.Jump, _inputIsVault);
-            input.Buttons.Set(PlayerButtons.Dash, false);
-            return input;
         }
 
         public bool GetButton(PlayerButtons button)
@@ -74,13 +59,11 @@ namespace InGame.Bot
             switch (button)
             {
                 case PlayerButtons.Jump:
-                    return _inputIsVault;
+                case PlayerButtons.Interact:
+                case PlayerButtons.Attack:
+                    return _currentState?.GetInputButton(this, button) ?? false;
                 case PlayerButtons.Dash:
                     return true;
-                case PlayerButtons.Attack:
-                    return InputIsAttack;
-                case PlayerButtons.Interact:
-                    return InputIsInteract;
                 default: return false;
             }
         }
@@ -88,7 +71,8 @@ namespace InGame.Bot
         public Vector3 GetMoveDirection()
         {
             if (!GameInput.I.IsMoveInput) return Vector3.zero;
-            return _playerMovement.IsGroundNet ? _inputDirection.normalized : Vector2.zero;
+            Vector2 inputDirection = _currentState?.GetInputDirection(this) ?? Vector2.zero;
+            return _playerMovement.IsGroundNet ? inputDirection.normalized : Vector2.zero;
         }
 
         public void OnDrawGizmos()

@@ -227,7 +227,7 @@ namespace InGame.Bot
                 Debug.LogWarning("NavMesh 上に初期点を見つけられませんでした。");
                 return samples;
             }
-
+            firstPoint = GetGroundPosition(firstPoint, 10);
             samples.Add(firstPoint);
             activeList.Add(firstPoint);
 
@@ -271,6 +271,17 @@ namespace InGame.Bot
             return samples;
         }
 
+        private Vector3 GetGroundPosition(Vector3 position, float distance)
+        {
+            Ray ray = new(position, Vector3.down);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, distance))
+            {
+                return hit.point;
+            }
+
+            return position;
+        }
         /// <summary>
         /// 候補位置を生成
         /// </summary>
