@@ -5,6 +5,7 @@ using Fusion;
 using InGame.Common;
 using InGame.Health;
 using September.Common;
+using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Player.Sarutobi
@@ -33,7 +34,7 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private ParticleSystem _bulletMark;
         [Header("UI")]
         [SerializeField] private GameObject _crosshairPrefab;
-        [Header("他プレイヤー")] 
+        [Header("他プレイヤー")]
         [SerializeField] private List<GameObject> _otherPlayers;
 
         private Camera _mainCamera;
@@ -73,7 +74,7 @@ namespace InGame.Player.Sarutobi
                 if (!_grapplingHook) _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _crosshair = Instantiate(_crosshairPrefab);
                 _crosshair.SetActive(false);
-                
+
                 //全プレイヤーを取得
                 GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
                 if (players.Length > 0)
@@ -99,7 +100,7 @@ namespace InGame.Player.Sarutobi
         public override void FixedUpdateNetwork()
         {
             if (!GetInput<PlayerInput>(out var input)) return;
-            
+
             if (State == KunaiStateType.Idol && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability2)
                                              && _grapplingHook && _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active)
             {
@@ -112,7 +113,7 @@ namespace InGame.Player.Sarutobi
             else if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Attack) && CanThrow)
             {
                 PlayCharacterThrowAnimation().Forget();
-                
+
                 if (HasInputAuthority)
                 {
                     var targetPlayer = AcquireAttackTarget();
@@ -130,7 +131,7 @@ namespace InGame.Player.Sarutobi
             {
                 _movement.SetRotationDirection(HasInputAuthority ? _mainCamera.transform.forward : input.DesiredLookDirection);
             }
-            
+
             SetCooldownTimer();
         }
 
@@ -148,6 +149,7 @@ namespace InGame.Player.Sarutobi
             }
             if (!HasStateAuthority) return;
 
+            RPC_ChangeDescriptionUI(ControlDescriptionType.SarutobiAiming);
             State = KunaiStateType.Stance;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             var endType = await _clipPlayer.PlayClipAndWait(_stance);
@@ -165,6 +167,12 @@ namespace InGame.Player.Sarutobi
             }
         }
 
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+        private void RPC_ChangeDescriptionUI(ControlDescriptionType mode)
+        {
+            UIController.I.ChangeDescriptionUI(mode);
+        }
+
         /// <summary>
         /// クナイの投げる数を設定する（仮）
         /// ステータスシステムに統合したい 
@@ -174,11 +182,11 @@ namespace InGame.Player.Sarutobi
             if (!HasStateAuthority) return;
             BulletCountNetwork = bulletCount;
         }
-        
+
         void Throw(float angle, GameObject nearPlayer = null)
         {
             if (!HasInputAuthority) return;
-            
+
             Vector3 dir;
             // 画面内で一番近いプレイヤーがいる場合、そのプレイヤーの方向を使用する
             if (nearPlayer != null)
@@ -197,7 +205,7 @@ namespace InGame.Player.Sarutobi
                 : _mainCamera.transform.position + dir * _maxDistance;
             Throw(target);
         }
-        
+
         /// <summary>
         /// 画面中央に一番近いプレイヤーを取得する
         /// </summary>
@@ -205,11 +213,11 @@ namespace InGame.Player.Sarutobi
         private GameObject AcquireAttackTarget()
         {
             if (_otherPlayers.Count == 0) return null;
-            
+
             GameObject nearPlayer = null; // 最も近いプレイヤーを保持
             float mathf = Mathf.Infinity; //距離比較用
             Vector2 center = new Vector2(Screen.width / 2f, Screen.height / 2f); //画面中央
-            
+
             // 画面中央から一番近いプレイヤーを判定
             foreach (var p in _otherPlayers)
             {
@@ -273,10 +281,12 @@ namespace InGame.Player.Sarutobi
             {
                 Rpc_EndStance();
             }
-
+            if(HasStateAuthority)
+            {
+                RPC_ChangeDescriptionUI(ControlDescriptionType.Sarutobi);
+            }
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             State = KunaiStateType.Idol;
-
             // より確実にすべての関連アニメーションクリップを停止
             if (_clipPlayer)
             {
@@ -300,7 +310,7 @@ namespace InGame.Player.Sarutobi
             if (!HasInputAuthority) return;
             Rpc_KunaiBulletDetection(targetPos);
         }
-        
+
         /// <summary> input authority から target position を取得し、クナイの判定をとる </summary>
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         void Rpc_KunaiBulletDetection(Vector3 targetPos)
@@ -321,7 +331,7 @@ namespace InGame.Player.Sarutobi
                     damageable.TakeHit(ref hitData);
                 }
             }
-            
+
             // 各クライアントでParticleの再生
             RPC_PlayKunaiThrowParticle(muzzleHit ? muzzleHitInfo.point : targetPos,
                 muzzleHit ? muzzleHitInfo.distance : Vector3.Distance(_muzzleTf.transform.position, targetPos),
