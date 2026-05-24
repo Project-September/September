@@ -10,6 +10,7 @@ namespace September
 {
     public class BotDataBase : MonoBehaviour
     {
+        [SerializeField] private float _randomDistanceAmount = 50f;
         public static BotDataBase Instance;
         private HashSet<InteractableBase> _exhibitObjects;
         private HashSet<InteractableBase> _rideObjects;
@@ -67,6 +68,8 @@ namespace September
                     continue;
 
                 float dis = (myObject.transform.position - p.transform.position).sqrMagnitude;
+                float randomAmount = Random.Range(0f, _randomDistanceAmount);
+                dis += randomAmount * randomAmount;
                 if (minDistance > dis)
                 {
                     minDistance = dis;
