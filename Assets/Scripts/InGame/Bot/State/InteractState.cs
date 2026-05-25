@@ -8,6 +8,7 @@ namespace InGame.Bot
     public class InteractState : IBotState
     {
         private InteractableBase _targetInteractable;
+        private Vector3 _targetPosition;
 
         public void OnEnter(BotStateMachine stateMachine)
         {
@@ -21,13 +22,14 @@ namespace InGame.Bot
 
         public void OnUpdate(BotStateMachine stateMachine)
         {
-            if(_targetInteractable == null)
+            if (_targetInteractable == null)
             {
                 OnEnter(stateMachine);
                 return;
             }
 
-            stateMachine.Navigation.GetDestinationInput(stateMachine.transform.position, _targetInteractable.transform.position);
+            Vector3 targetPosition = _targetInteractable.GetInteractPosition();
+            stateMachine.Navigation.GetDestinationInput(stateMachine.transform.position, targetPosition);
 
             if (_targetInteractable.IsInCooldown())
             {
@@ -50,17 +52,6 @@ namespace InGame.Bot
 
         public Vector2 GetInputDirection(BotStateMachine stateMachine)
         {
-            if (stateMachine.Navigation.IsComplete)
-            {
-             
-                var targetSqr = (_targetInteractable.transform.position - stateMachine.transform.position).sqrMagnitude;
-                if (targetSqr > stateMachine.InteractDistance * stateMachine.InteractDistance)
-                {
-                    Vector3 targetPos = _targetInteractable.transform.position;
-                    targetPos.y = stateMachine.transform.position.y;
-                    return targetPos - stateMachine.transform.position;
-                }
-            }
             return stateMachine.Navigation.InputDirection;
         }
     }

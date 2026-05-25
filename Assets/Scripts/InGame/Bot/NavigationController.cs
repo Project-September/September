@@ -9,6 +9,7 @@ namespace InGame.Bot
     public class NavigationController
     {
         public float StopDistance;
+        public float GoalDistance;
         public bool CanVault;
         public bool IsComplete { get; private set; } = false;
         public bool IsVaultInput { get; private set; } = false;
@@ -45,10 +46,10 @@ namespace InGame.Bot
             float distance = 0;
             distance = (playerPosition - _nextNode.Position).sqrMagnitude;
 
-
-
+            float stopDis = _currentIndex < _navigationData.Count - 1 ? StopDistance : GoalDistance;
+            
             //NextNodeに近づいたら次のノードにする
-            if (distance <= StopDistance * StopDistance)
+            if (distance <= stopDis * stopDis)
             {
                 _currentIndex++;
                 //ゴール

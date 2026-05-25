@@ -17,7 +17,8 @@ namespace InGame.Bot
         [SerializeField] private float _stopAmount;
         [SerializeField] private float _stopTime;
         [SerializeField] private Rigidbody _rigidbody;
-        [field: SerializeField] public float StopDistance { get; private set; }
+        [field: SerializeField] public float StopDistance { get; private set; } = 1f;
+        [field: SerializeField] public float GoalDistance { get; private set; } = 0.5f;
         [field: SerializeField] public float InteractDistance { get; private set; } = 2.5f;
         private IBotState _currentState;
         private Dictionary<StateType, IBotState> _stateDic = new();
@@ -28,6 +29,7 @@ namespace InGame.Bot
         void Start()
         {
             Navigation.StopDistance = StopDistance;
+            Navigation.GoalDistance = GoalDistance;
             Navigation.CanVault = true;
 
             ChangeState();

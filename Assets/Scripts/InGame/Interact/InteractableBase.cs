@@ -464,6 +464,13 @@ namespace InGame.Interact
             }
         }
 
+        public Vector3 GetInteractPosition()
+        {
+            Vector3 result = this.transform.position;
+            result.y += _cooldownEffectOffset.y;
+            return result;
+        }
+
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
