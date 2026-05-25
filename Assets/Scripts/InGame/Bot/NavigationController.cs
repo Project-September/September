@@ -8,6 +8,7 @@ namespace InGame.Bot
     [System.Serializable]
     public class NavigationController
     {
+        public Vector3? NextNodePos => _nextNode?.Position ?? null;
         public float StopDistance;
         public float GoalDistance;
         public bool CanVault;

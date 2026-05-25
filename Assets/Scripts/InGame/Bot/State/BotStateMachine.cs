@@ -14,6 +14,7 @@ namespace InGame.Bot
         public NetworkObject NetObject => _netObject;
         [SerializeField] private BotStateData _botStateData;
         [SerializeField] private PlayerMovement _playerMovement;
+        [SerializeField] private float _uncontrollableDis;
         [SerializeField] private float _stopAmount;
         [SerializeField] private float _stopTime;
         [SerializeField] private Rigidbody _rigidbody;
@@ -37,6 +38,7 @@ namespace InGame.Bot
 
         void Update()
         {
+            //一定時間止まったら別のステートに変える
             if (_rigidbody.linearVelocity.magnitude < _stopAmount && GameInput.I.IsMoveInput && _playerMovement.IsGroundNet)
             {
                 _stopTimer -= Time.deltaTime;
@@ -51,6 +53,15 @@ namespace InGame.Bot
                 _stopTimer = _stopTime;
             }
 
+            //次のノードとPositionが離れすぎたら別のステートにする
+            if (Navigation.NextNodePos.HasValue)
+            {
+                float dis = (Navigation.NextNodePos.Value - this.transform.position).sqrMagnitude;
+                if(dis > _uncontrollableDis * _uncontrollableDis)
+                {
+                    ChangeState();
+                }
+            }
 
             _currentState?.OnUpdate(this);
         }

@@ -53,7 +53,7 @@ namespace InGame.Exhibit
                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             _interactableBase =  target;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
-            if(target.Runner.TryGetPlayerObject(playerRef, out NetworkObject playerNetworkObject))
+            if(PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef,out var playerNetworkObject))
             {
                 HandleWarpAsync(playerNetworkObject).Forget();
                 // 同時インタラクト不可
