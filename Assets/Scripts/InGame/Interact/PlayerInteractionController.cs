@@ -92,9 +92,15 @@ namespace InGame.Interact
                         _hasCompletedInteraction = true;
                         CompleteInteraction();
                         _playerAudioController?.PlayInteractActionVoice();  // インタラクト時ボイスの再生依頼
-                        UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        if (!_isBot)
+                        {
+                            UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        }
                     }
-                    UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    if (!_isBot)
+                    {
+                        UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    }
                 }
             }
             else
