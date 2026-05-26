@@ -5,6 +5,7 @@ using InGame.Interact;
 using InGame.Player;
 using Ingame.Tanihira;
 using UnityEngine;
+using September.Common;
 
 namespace InGame.Exhibit
 {
@@ -17,7 +18,7 @@ namespace InGame.Exhibit
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
             
             // Runnerからplayerを取得する
-            if (target.Runner.TryGetPlayerObject(playerRef, out var playerNetworkObject))
+            if(PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef,out var playerNetworkObject))
             {
                 StartOpticalCamouflage(playerNetworkObject);
                 StopOpticalCamouflage(playerNetworkObject).Forget();
