@@ -32,8 +32,9 @@ namespace InGame.Exhibit
         public void Rpc_RequestInteraction(PlayerRef requestingPlayer)
         {
             // ここで他のプレイヤーに通知
-            foreach (var player in Runner.ActivePlayers)
+            foreach (var kv in PlayerDatabase.Instance.PlayerObjectDic)
             {
+                var player = kv.Key;
                 if (player != requestingPlayer)
                 { 
                     ShowEffect(player).Forget();
@@ -43,7 +44,7 @@ namespace InGame.Exhibit
 
         private async UniTask ShowEffect(PlayerRef player)
         {
-            if (!Runner.TryGetPlayerObject(player, out var playerObject))
+            if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(player,out var playerObject))
                 return;
 
             // 同時インタラクト不可
