@@ -53,7 +53,7 @@ namespace InGame.Bot
 
             return player;
         }
-        public InteractableBase GetNearByInteract(GameObject myObject)
+        public InteractableBase GetNearbyInteractable(GameObject myObject)
         {
             if (_exhibitObjects == null || _exhibitObjects.Count == 0)
             {

@@ -10,7 +10,7 @@ namespace InGame.Bot
 
         public void OnEnter(BotStateMachine stateMachine)
         {
-            _targetInteractable = BotDataBase.Instance.GetNearByInteract(stateMachine.gameObject);
+            _targetInteractable = BotDataBase.Instance.GetNearbyInteractable(stateMachine.gameObject);
         }
 
         public void OnExit(BotStateMachine stateMachine)

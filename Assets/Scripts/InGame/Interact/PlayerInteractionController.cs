@@ -253,8 +253,6 @@ namespace InGame.Interact
             {
                 UpdateInteractUI();
             }
-
-            //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
 
         private void UpdateInteractUI()
