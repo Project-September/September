@@ -14,7 +14,8 @@ namespace InGame.Bot
         public NetworkObject NetObject => _netObject;
         [SerializeField] private BotStateData _botStateData;
         [SerializeField] private PlayerMovement _playerMovement;
-        [SerializeField] private float _uncontrollableDis;
+        /// <summary>NodeとBotが離れすぎて次のステートにする距離 </summary>
+        [SerializeField] private float _stateChangeDistance;
         [SerializeField] private float _stopAmount;
         [SerializeField] private float _stopTime;
         [SerializeField] private Rigidbody _rigidbody;
@@ -59,7 +60,7 @@ namespace InGame.Bot
             if (Navigation.NextNodePos.HasValue)
             {
                 float dis = (Navigation.NextNodePos.Value - this.transform.position).sqrMagnitude;
-                if (dis > _uncontrollableDis * _uncontrollableDis)
+                if (dis > _stateChangeDistance * _stateChangeDistance)
                 {
                     ChangeState();
                 }
