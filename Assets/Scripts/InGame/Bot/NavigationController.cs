@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace InGame.Bot
 {
-    [System.Serializable]
+    [Serializable]
     public class NavigationController
     {
         public Vector3? NextNodePos => _nextNode?.Position ?? null;
@@ -48,7 +48,7 @@ namespace InGame.Bot
             distance = (playerPosition - _nextNode.Position).sqrMagnitude;
 
             float stopDis = _currentIndex < _navigationData.Count - 1 ? StopDistance : GoalDistance;
-            
+
             //NextNodeに近づいたら次のノードにする
             if (distance <= stopDis * stopDis)
             {

@@ -16,7 +16,7 @@ namespace InGame.Bot
     /// </summary>
     public class NodeGanerator : MonoBehaviour
     {
-        [SerializeField,Tooltip("生成したノードを書き込む")] private NodeMapData _mapData;
+        [SerializeField, Tooltip("生成したノードを書き込む")] private NodeMapData _mapData;
 
         [SerializeField, Tooltip("経路到達判定の基準地点")] private Transform _origin;
         [SerializeField, Tooltip("描画するか")] private bool _isDrawGizumoIcon;
@@ -544,7 +544,7 @@ namespace InGame.Bot
         private void ValidateSettings()
         {
             if (_poissonRadius <= 0f)
-                throw new InvalidOperationException( "Poisson Radius は 0 より大きくしてください。");
+                throw new InvalidOperationException("Poisson Radius は 0 より大きくしてください。");
 
             if (_poissonCandidateCount <= 0)
                 throw new InvalidOperationException("Poisson Candidate Count は 0 より大きくしてください。");

@@ -8,7 +8,7 @@ namespace InGame.Exhibit
     public class LondonTelephoneInteractEffect : CharacterInteractEffectBase
     {
         public LondonTelephoneInteractRPCInvoker LondonTelephoneInteractRPC;
-        
+
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             LondonTelephoneInteractRPC.Rpc_RequestInteraction(PlayerRef.FromEncoded(context.Interactor));

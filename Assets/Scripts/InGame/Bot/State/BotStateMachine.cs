@@ -18,20 +18,22 @@ namespace InGame.Bot
         [SerializeField] private float _stopAmount;
         [SerializeField] private float _stopTime;
         [SerializeField] private Rigidbody _rigidbody;
+
         [field: SerializeField] public float StopDistance { get; private set; } = 1f;
         [field: SerializeField] public float GoalDistance { get; private set; } = 0.5f;
         [field: SerializeField] public float InteractDistance { get; private set; } = 2.5f;
+        public NavigationController Navigation { get; private set; } = new();
+
         private IBotState _currentState;
         private Dictionary<StateType, IBotState> _stateDic = new();
-
         private float _stopTimer;
-        public NavigationController Navigation = new();
 
         void Start()
         {
             Navigation.StopDistance = StopDistance;
             Navigation.GoalDistance = GoalDistance;
             Navigation.CanVault = true;
+            _stopTimer = _stopTime;
 
             ChangeState();
         }
@@ -57,7 +59,7 @@ namespace InGame.Bot
             if (Navigation.NextNodePos.HasValue)
             {
                 float dis = (Navigation.NextNodePos.Value - this.transform.position).sqrMagnitude;
-                if(dis > _uncontrollableDis * _uncontrollableDis)
+                if (dis > _uncontrollableDis * _uncontrollableDis)
                 {
                     ChangeState();
                 }
@@ -69,6 +71,7 @@ namespace InGame.Bot
         public bool GetButton(PlayerButtons button)
         {
             if (!GameInput.I.IsActionInput) return false;
+
             switch (button)
             {
                 case PlayerButtons.Jump:
@@ -101,8 +104,6 @@ namespace InGame.Bot
             StateType stateType = GetNextState();
             switch (stateType)
             {
-                case StateType.None:
-                    return;
                 case StateType.RandomMove:
                     stateScriptType = typeof(RandomMoveState);
                     break;
@@ -112,7 +113,9 @@ namespace InGame.Bot
                 case StateType.Attack:
                     stateScriptType = typeof(AttackState);
                     break;
+                case StateType.None:
                 default:
+                    _currentState = null;
                     return;
             }
 
@@ -151,4 +154,3 @@ namespace InGame.Bot
         }
     }
 }
-

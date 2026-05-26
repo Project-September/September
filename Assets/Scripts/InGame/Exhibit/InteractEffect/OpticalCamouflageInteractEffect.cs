@@ -1,11 +1,11 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using Ingame.Tanihira;
 using InGame.Interact;
 using InGame.Player;
-using Ingame.Tanihira;
-using UnityEngine;
 using September.Common;
+using UnityEngine;
 
 namespace InGame.Exhibit
 {
@@ -16,13 +16,13 @@ namespace InGame.Exhibit
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
-            
-            // Runnerからplayerを取得する
-            if(PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef,out var playerNetworkObject))
+
+            // PlayerDatabaseからplayerを取得する
+            if (PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef, out var playerNetworkObject))
             {
                 StartOpticalCamouflage(playerNetworkObject);
                 StopOpticalCamouflage(playerNetworkObject).Forget();
-                
+
                 //FormationManagerを持っている場合には条件分岐
                 if (playerNetworkObject.TryGetComponent<FormationManager>(out var formationManager))
                 {

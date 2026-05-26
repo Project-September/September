@@ -1,19 +1,16 @@
-﻿using System;
-using Fusion;
-using September.Common;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CRISound;
 using Cysharp.Threading.Tasks;
+using Fusion;
+using InGame.Player;
 using Result;
-using September.InGame.Effect;
+using September.Common;
 using September.InGame;
 using September.InGame.Common;
-using InGame.Player;
-using CRISound;
+using September.InGame.Effect;
 using September.InGame.UI;
-using WebSocketSharp;
-using System.Threading;
+using UnityEngine;
 
 namespace InGame.Interact
 {
@@ -94,7 +91,7 @@ namespace InGame.Interact
         private CharacterInteractEffectBase _activeEffectBase;
 
         private CharacterType _characterType;
-        
+
         [SerializeField] private bool _debug;
 
         /// <summary>
@@ -152,7 +149,7 @@ namespace InGame.Interact
             // 全クライアントにインタラクトログを表示
             Rpc_ShowInteractLog(actor, _type);
         }
-        
+
         /// <summary>
         /// クールダウンを開始する。すでにクールダウン中であればクールダウン時間を上書きする
         /// </summary>
@@ -166,11 +163,11 @@ namespace InGame.Interact
 
             // すでにクールダウン中か評価する。（クールダウンの設定前に評価しないと常に真となるため事前に行う必要あり）
             var isInCooldown = IsInCooldown();
-            
+
             // インタラクト時刻を記録（NetworkRunnerがあればシミュレーション時刻、なければローカル時刻）
             LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
             LastUsedCooldownTime = seconds;
-            
+
             // 二重にエフェクトが表示されないようクールダウン中なら処理しない
             if (!isInCooldown)
             {
@@ -464,13 +461,15 @@ namespace InGame.Interact
             }
         }
 
+        /// <summary>
+        /// オフセットを考慮した位置を取得
+        /// </summary>
         public Vector3 GetInteractPosition()
         {
             Vector3 result = this.transform.position;
             result.y += _cooldownEffectOffset.y;
             return result;
         }
-
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
@@ -500,23 +499,23 @@ namespace InGame.Interact
     }
 }
 
-    /// <summary>
-    /// インタラクト時のコンテキスト情報を保持するインターフェース
-    /// </summary>
-    public interface IInteractableContext : INetworkStruct
-    {
-        /// <summary>インタラクト実行者のPlayerRef（エンコード済み）</summary>
-        int Interactor { get; }
-        /// <summary>インタラクト実行者のキャラクタータイプ</summary>
-        CharacterType CharacterType { get; set; }
-    }
+/// <summary>
+/// インタラクト時のコンテキスト情報を保持するインターフェース
+/// </summary>
+public interface IInteractableContext : INetworkStruct
+{
+    /// <summary>インタラクト実行者のPlayerRef（エンコード済み）</summary>
+    int Interactor { get; }
+    /// <summary>インタラクト実行者のキャラクタータイプ</summary>
+    CharacterType CharacterType { get; set; }
+}
 
-    /// <summary>
-    /// IInteractableContextのシンプルな実装
-    /// 必要に応じて情報を追加可能
-    /// </summary>
-    public struct InteractableContext : IInteractableContext
-    {
-        public int Interactor { get; set; }
-        public CharacterType CharacterType { get; set; }
-    }
+/// <summary>
+/// IInteractableContextのシンプルな実装
+/// 必要に応じて情報を追加可能
+/// </summary>
+public struct InteractableContext : IInteractableContext
+{
+    public int Interactor { get; set; }
+    public CharacterType CharacterType { get; set; }
+}

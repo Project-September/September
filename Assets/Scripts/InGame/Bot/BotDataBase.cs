@@ -6,7 +6,7 @@ using Result;
 using September.Common;
 using UnityEngine;
 
-namespace September
+namespace InGame.Bot
 {
     public class BotDataBase : MonoBehaviour
     {
@@ -53,9 +53,9 @@ namespace September
 
             return player;
         }
-        public InteractableBase GetNearByInteract (GameObject myObject)
+        public InteractableBase GetNearByInteract(GameObject myObject)
         {
-            if(_exhibitObjects == null || _exhibitObjects.Count == 0)
+            if (_exhibitObjects == null || _exhibitObjects.Count == 0)
             {
                 SetInteractData();
             }
@@ -104,7 +104,6 @@ namespace September
                     case ExhibitType.Ptr:
                     case ExhibitType.TRex:
                     case ExhibitType.AirPlane:
-                    case ExhibitType.SateliteCanon:
                         _rideObjects.Add(interactObj);
                         break;
                     case ExhibitType.Art:
@@ -115,6 +114,7 @@ namespace September
                     case ExhibitType.Moai:
                     case ExhibitType.Instrument:
                     case ExhibitType.Muramasa:
+                    case ExhibitType.SateliteCanon:
                         _exhibitObjects.Add(interactObj);
                         break;
                     case ExhibitType.None:

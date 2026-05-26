@@ -1,5 +1,4 @@
 using InGame.Interact;
-using September;
 using September.Common;
 using UnityEngine;
 
@@ -8,7 +7,6 @@ namespace InGame.Bot
     public class InteractState : IBotState
     {
         private InteractableBase _targetInteractable;
-        private Vector3 _targetPosition;
 
         public void OnEnter(BotStateMachine stateMachine)
         {
@@ -31,6 +29,7 @@ namespace InGame.Bot
             Vector3 targetPosition = _targetInteractable.GetInteractPosition();
             stateMachine.Navigation.GetDestinationInput(stateMachine.transform.position, targetPosition);
 
+            //ターゲットがクールダウンになったら終了
             if (_targetInteractable.IsInCooldown())
             {
                 stateMachine.ChangeState();
