@@ -1,6 +1,6 @@
 using Fusion;
-using InGame.Health;
 using Ingame.Tanihira;
+using InGame.Health;
 using September.Common;
 using September.InGame.Effect;
 using UnityEngine;
@@ -21,7 +21,7 @@ namespace InGame.Exhibit
         private PlayerRef _currentOwner;
         private int _currentOwnerID = -1;
         private const string MURAMASA_EFFECT_ID = "muramasa";
-        
+
         public override void FixedUpdateNetwork()
         {
             if (_currentOwnerID == -1) return;
@@ -29,19 +29,19 @@ namespace InGame.Exhibit
             {
                 var hits = Physics.OverlapSphere(_currentParent.transform.position + _muramasaOffset, _attackRadius);
                 //タニヒラ用にformationManagerを取得
-                Runner.TryGetPlayerObject(_currentOwner, out NetworkObject player);
-                FormationManager formationManager = player.GetComponent<FormationManager>(); 
-                
+                PlayerDatabase.Instance.PlayerObjectDic.TryGet(_currentOwner, out var player);
+                FormationManager formationManager = player.GetComponent<FormationManager>();
+
                 foreach (var hit in hits)
                 {
                     //隊列がいる場合ははじく
                     if (formationManager)
                     {
                         var friendBase = hit.GetComponent<FriendBase>();
-                        if(friendBase != null && formationManager.FriendsList.Contains(friendBase))
+                        if (friendBase != null && formationManager.FriendsList.Contains(friendBase))
                             continue;
                     }
-                    
+
                     var root = hit.transform.root;
                     if (root.TryGetComponent<IDamageable>(out var damageable) &&
                         damageable.OwnerPlayerRef != _currentOwner)
@@ -64,7 +64,7 @@ namespace InGame.Exhibit
         {
             if (_currentOwnerID != -1) return;
             var playerRef = PlayerRef.FromEncoded(interactor);
-            if (!Runner.TryGetPlayerObject(playerRef, out var playerObj)) return;
+            if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef, out var playerObj)) return;
             EffectSpawner.RequestPlayLoopEffect(
                 MURAMASA_EFFECT_ID + interactor,
                 EffectType.Muramasa,
@@ -77,7 +77,7 @@ namespace InGame.Exhibit
             _currentOwnerID = interactor;
             DurationTimer = TickTimer.CreateFromSeconds(Runner, _muramasaDuration);
         }
-        
+
         private void StopAttack()
         {
             EffectSpawner.StopEffect(MURAMASA_EFFECT_ID + _currentOwnerID);
@@ -85,7 +85,7 @@ namespace InGame.Exhibit
             _currentOwner = PlayerRef.None;
             _currentParent = null;
         }
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (_currentParent == null)
@@ -97,6 +97,6 @@ namespace InGame.Exhibit
                 Gizmos.DrawWireSphere(_currentParent.position + _muramasaOffset, _attackRadius);
             }
         }
-        #endif
+#endif
     }
 }

@@ -14,29 +14,34 @@ namespace InGame.Bot
         public NetworkObject NetObject => _netObject;
         [SerializeField] private BotStateData _botStateData;
         [SerializeField] private PlayerMovement _playerMovement;
+        /// <summary>NodeとBotが離れすぎて次のステートにする距離 </summary>
+        [SerializeField] private float _stateChangeDistance;
         [SerializeField] private float _stopAmount;
         [SerializeField] private float _stopTime;
         [SerializeField] private Rigidbody _rigidbody;
-        [field: SerializeField] public float StopDistance { get; private set; }
+
+        [field: SerializeField] public float StopDistance { get; private set; } = 1f;
+        [field: SerializeField] public float GoalDistance { get; private set; } = 0.5f;
+        [field: SerializeField] public float InteractDistance { get; private set; } = 2.5f;
+        public NavigationController Navigation { get; private set; } = new();
+
         private IBotState _currentState;
         private Dictionary<StateType, IBotState> _stateDic = new();
-
         private float _stopTimer;
-        private Vector3 _inputDirection;
-        private bool _inputIsVault;
-        public bool InputIsAttack;//一旦Public　あとでちゃんと書く
-        public NavigationController Navigation = new();
 
         void Start()
         {
             Navigation.StopDistance = StopDistance;
+            Navigation.GoalDistance = GoalDistance;
             Navigation.CanVault = true;
+            _stopTimer = _stopTime;
 
             ChangeState();
         }
 
         void Update()
         {
+            //一定時間止まったら別のステートに変える
             if (_rigidbody.linearVelocity.magnitude < _stopAmount && GameInput.I.IsMoveInput && _playerMovement.IsGroundNet)
             {
                 _stopTimer -= Time.deltaTime;
@@ -51,33 +56,31 @@ namespace InGame.Bot
                 _stopTimer = _stopTime;
             }
 
+            //次のノードとPositionが離れすぎたら別のステートにする
+            if (Navigation.NextNodePos.HasValue)
+            {
+                float dis = (Navigation.NextNodePos.Value - this.transform.position).sqrMagnitude;
+                if (dis > _stateChangeDistance * _stateChangeDistance)
+                {
+                    ChangeState();
+                }
+            }
 
             _currentState?.OnUpdate(this);
-
-            _inputIsVault = Navigation.IsVaultInput;
-            _inputDirection = Navigation.InputDirection;
-
-        }
-
-        public PlayerInput GetInput()
-        {
-            PlayerInput input = new();
-            input.Buttons.Set(PlayerButtons.Jump, _inputIsVault);
-            input.Buttons.Set(PlayerButtons.Dash, false);
-            return input;
         }
 
         public bool GetButton(PlayerButtons button)
         {
             if (!GameInput.I.IsActionInput) return false;
+
             switch (button)
             {
                 case PlayerButtons.Jump:
-                    return _inputIsVault;
+                case PlayerButtons.Interact:
+                case PlayerButtons.Attack:
+                    return _currentState?.GetInputButton(this, button) ?? false;
                 case PlayerButtons.Dash:
                     return true;
-                case PlayerButtons.Attack:
-                    return InputIsAttack;
                 default: return false;
             }
         }
@@ -85,7 +88,8 @@ namespace InGame.Bot
         public Vector3 GetMoveDirection()
         {
             if (!GameInput.I.IsMoveInput) return Vector3.zero;
-            return _playerMovement.IsGroundNet ? _inputDirection.normalized : Vector2.zero;
+            Vector2 inputDirection = _currentState?.GetInputDirection(this) ?? Vector2.zero;
+            return _playerMovement.IsGroundNet ? inputDirection.normalized : Vector2.zero;
         }
 
         public void OnDrawGizmos()
@@ -101,8 +105,6 @@ namespace InGame.Bot
             StateType stateType = GetNextState();
             switch (stateType)
             {
-                case StateType.None:
-                    return;
                 case StateType.RandomMove:
                     stateScriptType = typeof(RandomMoveState);
                     break;
@@ -112,7 +114,9 @@ namespace InGame.Bot
                 case StateType.Attack:
                     stateScriptType = typeof(AttackState);
                     break;
+                case StateType.None:
                 default:
+                    _currentState = null;
                     return;
             }
 
@@ -151,4 +155,3 @@ namespace InGame.Bot
         }
     }
 }
-

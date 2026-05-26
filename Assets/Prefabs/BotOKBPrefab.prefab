@@ -5682,6 +5682,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30522911d6f01d94e88b4f6d3fe4de7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inputManager: {fileID: 5078540296886538316}
   _interactRadius: 2.5
   _interactMask:
     serializedVersion: 2
@@ -6004,14 +6005,13 @@ MonoBehaviour:
   _netObject: {fileID: 2463801933549895597}
   _botStateData: {fileID: 11400000, guid: 66618cb459c02f740848c1ac5fea6582, type: 2}
   _playerMovement: {fileID: 3242880713039265549}
+  _uncontrollableDis: 10
   _stopAmount: 0.2
   _stopTime: 5
   _rigidbody: {fileID: 6099435784402053345}
   <StopDistance>k__BackingField: 1
-  InputIsAttack: 0
-  Navigation:
-    StopDistance: 0
-    CanVault: 0
+  <GoalDistance>k__BackingField: 0.5
+  <InteractDistance>k__BackingField: 2.5
 --- !u!114 &5078540296886538316
 MonoBehaviour:
   m_ObjectHideFlags: 0
