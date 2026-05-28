@@ -31,6 +31,10 @@ public class PackageExporter : EditorWindow
         public string RelativePath;
         public string FullPath;
         public DateTime LastModified;
+        public bool HasUpdatedMeta;
+        
+        public const string MetaDisplayText = " [+META]";
+        public string DisplayText => RelativePath + (HasUpdatedMeta ? MetaDisplayText : "");
     }
 
     [MenuItem("September/Package Exporter")]
@@ -100,8 +104,8 @@ public class PackageExporter : EditorWindow
 
         EditorGUILayout.LabelField($"更新があったファイル一覧 ({_changedFiles.Count}件)", EditorStyles.boldLabel);
         
-        // パス表示に必要な幅を計算
-        float maxPathWidth = _changedFiles.Count > 0 ? _changedFiles.Max(f => EditorStyles.label.CalcSize(new GUIContent(f.RelativePath)).x) : 0;
+        // パス表示に必要な幅を計算（表示されるファイルのみで計算）
+        float maxPathWidth = _changedFiles.Count > 0 ? _changedFiles.Max(f => EditorStyles.label.CalcSize(new GUIContent(f.DisplayText)).x) : 0;
         
         _fileScrollPosition.y = EditorGUILayout.BeginScrollView(new Vector2(0, _fileScrollPosition.y), GUILayout.ExpandHeight(true)).y;
         
@@ -122,13 +126,13 @@ public class PackageExporter : EditorWindow
                     GUI.contentColor = isMetaFile ? Color.gray : Color.yellow;
                 }
 
-                // ファイルパス
+                // ファイルパス表示
                 Rect pathAreaRect = EditorGUILayout.GetControlRect(GUILayout.ExpandWidth(true));
                 if (Event.current.type == EventType.Repaint)
                 {
                     GUI.BeginGroup(pathAreaRect);
                     Rect labelRect = new Rect(-_fileScrollPosition.x, 0, maxPathWidth + 20, pathAreaRect.height);
-                    GUI.Label(labelRect, $"{file.RelativePath}");
+                    GUI.Label(labelRect, file.DisplayText);
                     GUI.EndGroup();
                 }
 
@@ -180,6 +184,8 @@ public class PackageExporter : EditorWindow
         string rootFullPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", TARGET_PATH));
         if (!Directory.Exists(rootFullPath)) return;
 
+        List<FileStatus> allTempChanged = new();
+
         // 1. 子フォルダを取得
         string[] childDirs = Directory.GetDirectories(rootFullPath);
 
@@ -204,10 +210,10 @@ public class PackageExporter : EditorWindow
                     DateTime modTime = File.GetLastWriteTime(file);
                     if (modTime > maxModified) maxModified = modTime;
 
-                    // 前回のエクスポートから更新のあったファイルを見つけてキャッシュする
+                    // 前回のエクスポートから更新のあったファイルを見つけて一時リストに保存
                     if (modTime > lastExportTime)
                     {
-                        _changedFiles.Add(new FileStatus
+                        allTempChanged.Add(new FileStatus
                         {
                             RelativePath = Path.GetRelativePath(child, file).Replace("\\", "/"),
                             FullPath = ToUnityPath(file),
@@ -227,6 +233,23 @@ public class PackageExporter : EditorWindow
                 });
             }
         }
+
+        // メタファイルの重複フィルタリングと「+META」フラグの設定
+        var changedPaths = new HashSet<string>(allTempChanged.Select(f => f.FullPath));
+        foreach (var file in allTempChanged)
+        {
+            if (file.FullPath != null && file.FullPath.EndsWith(".meta"))
+            {
+                string assetPath = file.FullPath.Substring(0, file.FullPath.Length - 5);
+                // 対応するアセットも更新されている場合は、メタファイル自体は表示しない
+                if (changedPaths.Contains(assetPath)) continue;
+            }
+
+            // 表示するファイルに対して、対応するメタファイルも更新されているかチェック
+            file.HasUpdatedMeta = changedPaths.Contains(file.FullPath + ".meta");
+            _changedFiles.Add(file);
+        }
+
         _folderStatuses = _folderStatuses.OrderByDescending(s => s.HasChanged).ThenBy(s => s.FolderName).ToList();
         _changedFiles = _changedFiles.OrderByDescending(f => f.LastModified).ToList();
     }
