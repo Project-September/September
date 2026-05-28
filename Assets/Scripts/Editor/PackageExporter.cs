@@ -28,9 +28,7 @@ public class PackageExporter : EditorWindow
 
     private class FileStatus
     {
-        public string FileName;
         public string RelativePath;
-        public string FolderName;
         public string FullPath;
         public DateTime LastModified;
     }
@@ -101,29 +99,70 @@ public class PackageExporter : EditorWindow
         EditorGUILayout.Space();
 
         EditorGUILayout.LabelField($"更新があったファイル一覧 ({_changedFiles.Count}件)", EditorStyles.boldLabel);
-        _fileScrollPosition = EditorGUILayout.BeginScrollView(_fileScrollPosition, GUILayout.ExpandHeight(true));
+        
+        // パス表示に必要な幅を計算
+        float maxPathWidth = _changedFiles.Count > 0 ? _changedFiles.Max(f => EditorStyles.label.CalcSize(new GUIContent(f.RelativePath)).x) : 0;
+        
+        _fileScrollPosition.y = EditorGUILayout.BeginScrollView(new Vector2(0, _fileScrollPosition.y), GUILayout.ExpandHeight(true)).y;
+        
         foreach (var file in _changedFiles)
         {
+            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(file.FullPath);
+            var sourceAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(file.FullPath.Replace(".meta", ""));
+            bool isAsset = asset != null;
+            bool isMetaFile = sourceAsset != null;
+            bool isValidFile = isMetaFile || isAsset;
+
             using (new EditorGUILayout.HorizontalScope(EditorStyles.textArea))
             {
-                EditorGUILayout.LabelField(file.LastModified.ToString("MM/dd HH:mm"), GUILayout.Width(80));
-                EditorGUILayout.LabelField($"[{file.FolderName}]", GUILayout.Width(100));
-                EditorGUILayout.LabelField(file.RelativePath);
-                if (GUILayout.Button("開く", GUILayout.Width(40)))
+                // 更新日時
+                EditorGUILayout.LabelField(file.LastModified.ToString("yy/MM/dd HH:mm"), GUILayout.Width(100));
+                if (!isAsset)
                 {
-                    var obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(file.FullPath);
-                    if (obj)
+                    GUI.contentColor = isMetaFile ? Color.gray : Color.yellow;
+                }
+
+                // ファイルパス
+                Rect pathAreaRect = EditorGUILayout.GetControlRect(GUILayout.ExpandWidth(true));
+                if (Event.current.type == EventType.Repaint)
+                {
+                    GUI.BeginGroup(pathAreaRect);
+                    Rect labelRect = new Rect(-_fileScrollPosition.x, 0, maxPathWidth + 20, pathAreaRect.height);
+                    GUI.Label(labelRect, $"{file.RelativePath}");
+                    GUI.EndGroup();
+                }
+
+                // ファイルを開く。または削除済み表示
+                if (!isValidFile)
+                {
+                    GUI.contentColor = Color.yellow;
+                    EditorGUILayout.LabelField("削除済み", GUILayout.Width(60));
+                    GUI.contentColor = Color.white;
+                }
+                else
+                {
+                    GUI.contentColor = Color.white;
+                    var rect = EditorGUILayout.GetControlRect(GUILayout.Width(40));
+                    if (GUI.Button(rect, "開く"))
                     {
-                        EditorGUIUtility.PingObject(obj);
-                    }
-                    else
-                    {
-                        EditorUtility.RevealInFinder(file.FullPath);
+                        EditorGUIUtility.PingObject(isAsset ? asset : sourceAsset);
                     }
                 }
             }
         }
         EditorGUILayout.EndScrollView();
+
+        // 下部に水平スクロールバーを表示（パス表示エリアのスクロールを制御）
+        // おおよその表示可能幅を計算
+        float visiblePathWidth = position.width - 180;
+        if (maxPathWidth > visiblePathWidth)
+        {
+            _fileScrollPosition.x = GUILayout.HorizontalScrollbar(_fileScrollPosition.x, visiblePathWidth, 0, maxPathWidth);
+        }
+        else
+        {
+            _fileScrollPosition.x = 0;
+        }
 
         EditorGUILayout.Space();
 
@@ -170,9 +209,7 @@ public class PackageExporter : EditorWindow
                     {
                         _changedFiles.Add(new FileStatus
                         {
-                            FileName = Path.GetFileName(file),
-                            RelativePath = Path.GetRelativePath(grandchild, file).Replace("\\", "/"),
-                            FolderName = Path.GetFileName(grandchild),
+                            RelativePath = Path.GetRelativePath(child, file).Replace("\\", "/"),
                             FullPath = ToUnityPath(file),
                             LastModified = modTime
                         });
