@@ -93,6 +93,11 @@ public class PackageExporter : EditorWindow
         {
             ExportAllChangedFolders();
         }
+        
+        if (GUILayout.Button("すべての孫フォルダを書き出す", GUILayout.Height(40)))
+        {
+            ExportAllFolders();
+        }
     }
 
     private void RefreshAnalysis()
@@ -153,6 +158,16 @@ public class PackageExporter : EditorWindow
     private void ExportAllChangedFolders()
     {
         var targets = _folderStatuses.Where(s => s.HasChanged).ToList();
+        ExportFolders(targets);
+    }
+
+    private void ExportAllFolders()
+    {
+        ExportFolders(_folderStatuses);
+    }
+
+    private void ExportFolders(List<FolderStatus> targets)
+    {
         if (targets.Count == 0) return;
 
         string folderPath = EditorUtility.OpenFolderPanel("保存先フォルダを選択", "", "");
