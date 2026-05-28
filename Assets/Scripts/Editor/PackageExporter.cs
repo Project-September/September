@@ -48,18 +48,18 @@ public class PackageExporter : EditorWindow
         using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
         {
             EditorGUILayout.LabelField("各フォルダのエクスポート履歴に基づいて差分を表示しています", EditorStyles.miniLabel);
-            if (GUILayout.Button("すべて更新済みとしてマーク", GUILayout.Width(160)))
+
+            var rect = EditorGUILayout.GetControlRect(GUILayout.Width(120));
+            if (EditorGUI.DropdownButton(rect, new GUIContent("その他の操作"), FocusType.Passive))
             {
-                if (EditorUtility.DisplayDialog("確認", "すべてのフォルダの更新日時を現在時刻に変更します。よろしいですか？", "はい", "いいえ"))
-                {
-                    foreach (var status in _folderStatuses)
-                    {
-                        SaveCurrentTime(status.FullPath);
-                    }
-                    RefreshAnalysis();
-                }
+                GenericMenu menu = new GenericMenu();
+                menu.AddItem(new GUIContent("すべて更新済みとしてマーク"), false, MarkAllAsUpdated);
+                menu.AddItem(new GUIContent("すべての孫フォルダを書き出す"), false, ExportAllFolders);
+                menu.DropDown(rect);
             }
         }
+
+        EditorGUILayout.Space();
 
         if (GUILayout.Button("差分を再スキャン", GUILayout.Height(30))) RefreshAnalysis();
 
@@ -130,11 +130,6 @@ public class PackageExporter : EditorWindow
         if (GUILayout.Button("更新があった孫フォルダをすべて書き出す", GUILayout.Height(40)))
         {
             ExportAllChangedFolders();
-        }
-        
-        if (GUILayout.Button("すべての孫フォルダを書き出す", GUILayout.Height(40)))
-        {
-            ExportAllFolders();
         }
     }
 
@@ -210,6 +205,18 @@ public class PackageExporter : EditorWindow
             Debug.Log($"Exported: {exportPath}");
 
             SaveCurrentTime(status.FullPath);
+            RefreshAnalysis();
+        }
+    }
+
+    private void MarkAllAsUpdated()
+    {
+        if (EditorUtility.DisplayDialog("確認", "すべてのフォルダの更新日時を現在時刻に変更します。よろしいですか？", "はい", "いいえ"))
+        {
+            foreach (var status in _folderStatuses)
+            {
+                SaveCurrentTime(status.FullPath);
+            }
             RefreshAnalysis();
         }
     }
