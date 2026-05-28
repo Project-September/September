@@ -12,7 +12,9 @@ public class PackageExporter : EditorWindow
     private const string LAST_TIME_KEY_PREFIX = "FolderDiff_LastExportTime_";
 
     private Vector2 _scrollPosition;
+    private Vector2 _fileScrollPosition;
     private List<FolderStatus> _folderStatuses = new();
+    private List<FileStatus> _changedFiles = new();
 
     private class FolderStatus
     {
@@ -22,6 +24,15 @@ public class PackageExporter : EditorWindow
         public bool HasChanged;
         public DateTime LastModified;
         public DateTime LastExportTime;
+    }
+
+    private class FileStatus
+    {
+        public string FileName;
+        public string RelativePath;
+        public string FolderName;
+        public string FullPath;
+        public DateTime LastModified;
     }
 
     [MenuItem("September/Package Exporter")]
@@ -54,8 +65,8 @@ public class PackageExporter : EditorWindow
 
         EditorGUILayout.Space();
 
-        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
-
+        EditorGUILayout.LabelField("パッケージ状態", EditorStyles.boldLabel);
+        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(200));
         foreach (var status in _folderStatuses.ToList())
         {
             using (new EditorGUILayout.HorizontalScope(EditorStyles.textArea))
@@ -89,6 +100,33 @@ public class PackageExporter : EditorWindow
 
         EditorGUILayout.Space();
 
+        EditorGUILayout.LabelField($"更新があったファイル一覧 ({_changedFiles.Count}件)", EditorStyles.boldLabel);
+        _fileScrollPosition = EditorGUILayout.BeginScrollView(_fileScrollPosition, GUILayout.ExpandHeight(true));
+        foreach (var file in _changedFiles)
+        {
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.textArea))
+            {
+                EditorGUILayout.LabelField(file.LastModified.ToString("MM/dd HH:mm"), GUILayout.Width(80));
+                EditorGUILayout.LabelField($"[{file.FolderName}]", GUILayout.Width(100));
+                EditorGUILayout.LabelField(file.RelativePath);
+                if (GUILayout.Button("開く", GUILayout.Width(40)))
+                {
+                    var obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(file.FullPath);
+                    if (obj)
+                    {
+                        EditorGUIUtility.PingObject(obj);
+                    }
+                    else
+                    {
+                        EditorUtility.RevealInFinder(file.FullPath);
+                    }
+                }
+            }
+        }
+        EditorGUILayout.EndScrollView();
+
+        EditorGUILayout.Space();
+
         if (GUILayout.Button("更新があった孫フォルダをすべて書き出す", GUILayout.Height(40)))
         {
             ExportAllChangedFolders();
@@ -103,6 +141,7 @@ public class PackageExporter : EditorWindow
     private void RefreshAnalysis()
     {
         _folderStatuses.Clear();
+        _changedFiles.Clear();
 
         string rootFullPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", TARGET_PATH));
         if (!Directory.Exists(rootFullPath)) return;
@@ -122,9 +161,28 @@ public class PackageExporter : EditorWindow
                 DateTime lastExportTime = GetLastExportTime(unityPath);
 
                 var files = Directory.GetFiles(grandchild, "*.*", SearchOption.AllDirectories);
-                DateTime maxModified = files.Length > 0
-                    ? files.Max(f => File.GetLastWriteTime(f))
-                    : Directory.GetLastWriteTime(grandchild);
+
+                DateTime maxModified = files.Length == 0 ? Directory.GetLastWriteTime(grandchild) : DateTime.MinValue;
+
+                foreach (var file in files)
+                {
+                    // 全てのファイルの中から直近の更新日時を見つける
+                    DateTime modTime = File.GetLastWriteTime(file);
+                    if (modTime > maxModified) maxModified = modTime;
+
+                    // 前回のエクスポートから更新のあったファイルを見つけてキャッシュする
+                    if (modTime > lastExportTime)
+                    {
+                        _changedFiles.Add(new FileStatus
+                        {
+                            FileName = Path.GetFileName(file),
+                            RelativePath = Path.GetRelativePath(grandchild, file).Replace("\\", "/"),
+                            FolderName = Path.GetFileName(grandchild),
+                            FullPath = ToUnityPath(file),
+                            LastModified = modTime
+                        });
+                    }
+                }
 
                 _folderStatuses.Add(new FolderStatus
                 {
@@ -138,6 +196,7 @@ public class PackageExporter : EditorWindow
             }
         }
         _folderStatuses = _folderStatuses.OrderByDescending(s => s.HasChanged).ThenBy(s => s.FolderName).ToList();
+        _changedFiles = _changedFiles.OrderByDescending(f => f.LastModified).ToList();
     }
 
     private void ExportSingleFolder(FolderStatus status)
