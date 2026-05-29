@@ -1,8 +1,4 @@
-﻿using System;
-using Common.UserSettings;
-using CriWare;
-using NaughtyAttributes;
-using UniRx;
+﻿using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -16,7 +12,7 @@ namespace InGame.UI
 
         private GameInput _gameInput;
         private bool _isShow;
-        
+
         private void Start()
         {
             Initialize();
@@ -28,7 +24,7 @@ namespace InGame.UI
             _gameInput = GameInput.I;
         }
 
-        
+
         private void Update()
         {
             // オプションUIの表示切り替え
@@ -42,7 +38,7 @@ namespace InGame.UI
                     _optionUIPanel.transform.SetAsLastSibling();
                     EventSystem.current.SetSelectedGameObject(_selectWhenOpen.gameObject);
                 }
-                
+
                 Cursor.visible = _isShow;
                 Cursor.lockState = _isShow ? CursorLockMode.None : CursorLockMode.Locked;
             }

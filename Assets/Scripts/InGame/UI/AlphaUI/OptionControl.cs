@@ -10,6 +10,8 @@ namespace InGame.UI
 {
     public class OptionControl : MonoBehaviour
     {
+        [SerializeField, Label("表示時に選択するUI")] private Selectable _selectWhenOpen;
+        [Space(16)]
         [SerializeField, Label("BGMVolume")] private Slider _bgmVolumeSlider;
         [SerializeField, Label("SEVolume")] private Slider _seVolumeSlider;
         [SerializeField, Label("VoiceVolume")] private Slider _voiceVolumeSlider;
