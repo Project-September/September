@@ -51,8 +51,6 @@ namespace September.Lobby
 
         /// <summary>決定したビルドルートの表示を切り替えるメソッド</summary>
         /// <param name="selected">すでに決定されているかどうか</param>
-        /// <param name="index">決定したビルドルートのインデックス</param>
-        /// <param name="build">決定したビルドルートの詳細</param>
-        public abstract void VisualizeSelection(bool selected, int index, BuildDataBase build);
+        public abstract void VisualizeSelection(bool selected);
     }
 }

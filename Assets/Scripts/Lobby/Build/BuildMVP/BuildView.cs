@@ -1,7 +1,5 @@
-using Fusion;
 using September.Common;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace September.Lobby
@@ -12,7 +10,6 @@ namespace September.Lobby
         [SerializeField] Button _button;
         [SerializeField] BuildFactory _build;
         BuildPresenter _presenter; // MVPに反した参照ではない
-        NetworkRunner _networkRunner;
         int _preSelectIndex;
 
         private void Awake()
@@ -41,15 +38,7 @@ namespace September.Lobby
 
         public override void SelectBuild()
         {
-            // 自分自身の確保
-            if (!_networkRunner) _networkRunner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
-            if (_networkRunner == null || PlayerDatabase.Instance == null)
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning("サーバー接続に失敗しました");
-#endif
-                return;
-            }
+            
 
             // 操作主が見つかったら決定処理
             base.SelectBuild();
@@ -70,7 +59,7 @@ namespace September.Lobby
             _preSelectIndex = index;
         }
 
-        public override void VisualizeSelection(bool selected, int index, BuildDataBase build)
+        public override void VisualizeSelection(bool selected)
         {
             if (!selected)
             {
@@ -80,9 +69,6 @@ namespace September.Lobby
                 colors.selectedColor = Color.red;
                 colors.highlightedColor = Color.red;
                 _button.colors = colors;
-                // NetworkRunnerとPlayerDatabaseはnullじゃない前提
-                var player = _networkRunner.LocalPlayer;
-                PlayerDatabase.Instance.Rpc_SetBuild(player, build.BuildType);
             }
         }
 

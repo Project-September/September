@@ -16,13 +16,13 @@ namespace September.Lobby
             // 諸々の初期化をPresenterに集約
             _runtime = new(data);
             _view = view;
-            _view.Init(data.Builds);
             _dispose = new();
-            Init();
+            Init(data);
         }
 
-        void Init()
+        void Init(BuildDatas data)
         {
+            _view.Init(data.Builds);
             // Viewに登録
             _dispose.AddActionDisposing(_view.OnMoveIndex(_runtime.MoveIndex));
             _dispose.AddActionDisposing(_view.OnSelectBuild(_runtime.SelectBuild));

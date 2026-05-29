@@ -1,5 +1,7 @@
+using Fusion;
 using September.Common;
 using System;
+using UnityEngine.SceneManagement;
 
 namespace September.Lobby
 {
@@ -11,7 +13,7 @@ namespace September.Lobby
 
         // 発火用
         event Action<int, BuildDataBase> _onMoveIndex;
-        event Action<bool, int, BuildDataBase> _onSelectBuild;
+        event Action<bool> _onSelectBuild;
         // 購読・解除用
         // 普段の「+=」「-=」をメソッドにして役割分担
         public Action OnMoveIndex(Action<int, BuildDataBase> act)
@@ -19,7 +21,7 @@ namespace September.Lobby
             _onMoveIndex += act;
             return () => _onMoveIndex -= act;
         }
-        public Action OnSelectBuild(Action<bool, int, BuildDataBase> act)
+        public Action OnSelectBuild(Action<bool> act)
         {
             _onSelectBuild += act;
             return () => _onSelectBuild -= act;
@@ -51,9 +53,23 @@ namespace September.Lobby
         public void SelectBuild()
         {
             var selected = _selected;
-            if (!selected) _selected = true; // 初めて選択した時の処理
-
-            _onSelectBuild?.Invoke(selected, _currentIndex, _builds[_currentIndex]);
+            if (!selected)
+            {
+                // 自分自身の確保
+                NetworkRunner networkRunner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
+                if (networkRunner == null || PlayerDatabase.Instance == null)
+                {
+#if UNITY_EDITOR
+                    UnityEngine.Debug.LogWarning("サーバー接続に失敗しました");
+#endif
+                    return;
+                }
+                // NetworkRunnerとPlayerDatabaseはnullじゃない前提
+                var player = networkRunner.LocalPlayer;
+                PlayerDatabase.Instance.Rpc_SetBuild(player, _builds[_currentIndex].BuildType);
+                _selected = true; // 初めて選択した時の処理
+            }
+            _onSelectBuild?.Invoke(selected);
         }
     }
 }
