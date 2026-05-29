@@ -37,6 +37,7 @@ namespace September.Lobby
         /// <returns>選択後の要素番号</returns>
         public void MoveIndex(BuildIndexMoveType move)
         {
+            if (_builds.Length == 0) return;
             _currentIndex += (int)move;
             if (_currentIndex < 0) _currentIndex = _builds.Length - 1;
             if (_currentIndex > _builds.Length - 1) _currentIndex = 0;

@@ -10,6 +10,7 @@ namespace September.Common
 
         public void AddActionDisposing(Action act)
         {
+            if (_disposes.Contains(act)) return;
             _disposes.Add(act);
         }
 

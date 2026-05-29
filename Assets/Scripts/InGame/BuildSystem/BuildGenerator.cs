@@ -23,7 +23,7 @@ namespace September.InGame.Common.Stats
             {
                 if (build == null) continue;
                 build.Init();
-                _buildDict.Add(build.BuildType, build);
+                _buildDict[build.BuildType] = build;
                 build.TryEnableBuild(buildType);
             }
         }

@@ -13,7 +13,7 @@ namespace September.Lobby
         /// </summary>
         /// <param name="view">Buildの表示</param>
         /// <returns>Presenterを返す</returns>
-        public BuildPresenter CreateBuild(BuildView view)
+        public BuildPresenter CreateBuild(BuildViewBase view)
         {
             if (view == null || _buildDatas == null) return null;
             return new BuildPresenter(_buildDatas, view);
