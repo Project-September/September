@@ -1,53 +1,64 @@
 using InGame.Player;
-using September;
+using September.Common;
 using UnityEngine;
 
 namespace InGame.Bot
 {
     public class AttackState : IBotState
     {
-        //パラメータ系はいつか外でいじれるようにしたい
         private PlayerManager _target;
         private Vector3 _targetPos;
         private float _findRouteInterval = 0.5f;
-        private float _timer;
+        private float _findIntervalTimer;
+
         public void OnEnter(BotStateMachine stateMachine)
         {
             _target = BotDataBase.Instance.GetNearbyPlayer(stateMachine.gameObject);
+            _findIntervalTimer = 0f;
         }
 
         public void OnExit(BotStateMachine stateMachine)
         {
-            stateMachine.InputIsAttack = false;
+
         }
 
         public void OnUpdate(BotStateMachine stateMachine)
         {
-            if (_target == null)
+            //プレイヤーが気絶したら終了
+            if (_target == null || _target.IsStun)
             {
                 stateMachine.ChangeState();
                 return;
             }
 
-            if (_target.IsStun)
-            {
-                _target = null;
-                OnEnter(stateMachine);
-                return;
-            }
+            //毎フレームルート検索すると重いので一定間隔で行う
+            _findIntervalTimer -= Time.deltaTime;
 
-            _timer -= Time.deltaTime;
-
-            if (_timer < 0)
+            if (_findIntervalTimer < 0)
             {
-                Debug.Log(_target.gameObject.name);
                 _targetPos = _target.transform.position;
-                _timer = _findRouteInterval;
+                _findIntervalTimer = _findRouteInterval;
             }
-
-            stateMachine.InputIsAttack = stateMachine.Navigation.IsComplete;
 
             stateMachine.Navigation.GetDestinationInput(stateMachine.transform.position, _targetPos);
+        }
+
+        public bool? GetInputButton(BotStateMachine stateMachine, PlayerButtons button)
+        {
+            switch (button)
+            {
+                case PlayerButtons.Attack:
+                    return stateMachine.Navigation.IsComplete;
+                case PlayerButtons.Jump:
+                    return stateMachine.Navigation.IsVaultInput;
+            }
+
+            return null;
+        }
+
+        public Vector2 GetInputDirection(BotStateMachine stateMachine)
+        {
+            return stateMachine.Navigation.InputDirection;
         }
     }
 }

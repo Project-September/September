@@ -1,13 +1,13 @@
-using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 using Fusion;
+using InGame.Bot;
 using InGame.Player;
 using InGame.Player.Ability;
 using September.Common;
 using September.InGame;
 using September.InGame.Common.Stats;
 using September.InGame.UI;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace InGame.Interact
@@ -15,6 +15,7 @@ namespace InGame.Interact
     [DisallowMultipleComponent]
     public class PlayerInteractionController : NetworkBehaviour
     {
+        [SerializeField] private PlayerInputManager _inputManager;
         [SerializeField] private float _interactRadius = 2.5f;
         [SerializeField] private LayerMask _interactMask;
         [SerializeField, Range(0f, 180f)] private float _interactAngle = 90f; // 前方180度
@@ -42,6 +43,7 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
+        private bool _isBot;
 
         [Networked] private bool IsRemoting { get; set; } //遠距離インタラクション中かの判定
         [Networked] private InteractableBase RemoteFocusedObject { get; set; } //遠インタラクションの対象オブジェクト
@@ -53,14 +55,12 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
-            _playerAudioController = GetComponentInChildren<PlayerAudioController>(); //
-#if UNITY_EDITOR
-            if (_buildGenerator & _playerStatus)
-                Debug.Log("ビルドシステムが正常に動きます");
-            else
-                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
-            // 後でパスを登録
-#endif
+            _playerAudioController = GetComponentInChildren<PlayerAudioController>();
+
+            if (_inputManager == null)
+                _inputManager = GetComponent<PlayerInputManager>();
+
+            _isBot = _inputManager?.GetType() == typeof(BotInputManager);
         }
 
         public override void Spawned()
@@ -77,7 +77,7 @@ namespace InGame.Interact
 
         private void Update()
         {
-            if (!HasInputAuthority) return;
+            if (!HasInputAuthority && !_isBot) return;
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
@@ -95,9 +95,15 @@ namespace InGame.Interact
                         _hasCompletedInteraction = true;
                         CompleteInteraction();
                         _playerAudioController?.PlayInteractActionVoice();  // インタラクト時ボイスの再生依頼
-                        UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        if (!_isBot)
+                        {
+                            UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        }
                     }
-                    UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    if (!_isBot)
+                    {
+                        UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    }
                 }
             }
             else
@@ -130,8 +136,8 @@ namespace InGame.Interact
         {
             _isHoldingInteract = false; // 毎フレームリセット
 
-            if (!HasInputAuthority) return;
-            if (!GetInput(out PlayerInput input)) return;
+            if (!HasInputAuthority && !_isBot) return;
+            if (!_inputManager.GetPlayerInput(out PlayerInput input)) return;
 
             // Fusionのシミュレーション内でのみ行う処理
             if (_isWaitingForResponse)
@@ -246,6 +252,15 @@ namespace InGame.Interact
                 }
             }
 
+            //Playerが処理する
+            if (!_isBot)
+            {
+                UpdateInteractUI();
+            }
+        }
+
+        private void UpdateInteractUI()
+        {
             if (_focusedObj)
             {
                 var context = new InteractableContext
@@ -264,7 +279,6 @@ namespace InGame.Interact
                 if (UIController.I)
                     UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
             }
-            //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
 
         /// <summary>
@@ -291,7 +305,7 @@ namespace InGame.Interact
         {
             if (!_focusedObj) return;
 
-            _requiredInteractTime = GetRequireInteractTime() * (_playerStatus ? _playerStatus.InteractDurationMultiply : 1);
+            _requiredInteractTime = GetRequireInteractTime();
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
