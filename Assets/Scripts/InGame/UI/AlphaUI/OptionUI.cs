@@ -30,18 +30,29 @@ namespace InGame.UI
             // オプションUIの表示切り替え
             if (_gameInput.UI.Option.triggered)
             {
-                _isShow = !_isShow;
-                _optionUIPanel.SetActive(_isShow);
-
-                if (_isShow)
-                {
-                    _optionUIPanel.transform.SetAsLastSibling();
-                    EventSystem.current.SetSelectedGameObject(_selectWhenOpen.gameObject);
-                }
-
-                Cursor.visible = _isShow;
-                Cursor.lockState = _isShow ? CursorLockMode.None : CursorLockMode.Locked;
+                Show(!_isShow);
             }
+        }
+
+        public void Show(bool isShow)
+        {
+            _isShow = isShow;
+            if (_optionUIPanel)
+                _optionUIPanel.SetActive(_isShow);
+            
+            if (_gameInput != null)
+                _gameInput.IsInputBlockedByUI = _isShow;
+
+            if (_isShow)
+            {
+                if (_optionUIPanel)
+                    _optionUIPanel.transform.SetAsLastSibling();
+                if (_selectWhenOpen)
+                    EventSystem.current.SetSelectedGameObject(_selectWhenOpen.gameObject);
+            }
+
+            Cursor.visible = _isShow;
+            Cursor.lockState = _isShow ? CursorLockMode.None : CursorLockMode.Locked;
         }
     }
 }
