@@ -107,7 +107,7 @@ namespace September.InGame.UI
             _statusUpUI = _uiRoot.StatusUpGroup;
             _statusUpLayout = _uiRoot.StatusUpUIRoot;
             _optionUI.SetActive(true);
-            _LogPanel.SetActive(true);
+            // _LogPanel.SetActive(true);
             _ogreUiInstance.SetActive(false);
             _hpBarSlider.gameObject.SetActive(true);
             _staminaBarSlider.gameObject.SetActive(true);
