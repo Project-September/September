@@ -1,4 +1,5 @@
 ﻿using NaughtyAttributes;
+using September.Common;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -30,17 +31,39 @@ namespace InGame.UI
             // オプションUIの表示切り替え
             if (_gameInput.UI.Option.triggered)
             {
-                _isShow = !_isShow;
+                Show(!_isShow);
+            }
+
+            // 現状この機能を使うのがInGameSceneのみかつ、OptionUIが存在するのもInGameSceneのみなので動作上問題ない
+            // 他の場所でも使うようにするなら別の所で処理するようにする
+            // ↑特定のシーン上でしか動作させなくていいことに変わりはないと思うので、そこをどう制御するかは必要な時に考える
+            CursorStateManager.UpdateCursorState();
+        }
+
+        public void Show(bool isShow)
+        {
+            _isShow = isShow;
+            if (_optionUIPanel)
                 _optionUIPanel.SetActive(_isShow);
+            
+            if (_gameInput != null)
+                _gameInput.IsInputBlockedByUI = _isShow;
 
-                if (_isShow)
-                {
+            if (_isShow)
+            {
+                if (_optionUIPanel)
                     _optionUIPanel.transform.SetAsLastSibling();
+                if (_selectWhenOpen)
                     EventSystem.current.SetSelectedGameObject(_selectWhenOpen.gameObject);
-                }
+            }
 
-                Cursor.visible = _isShow;
-                Cursor.lockState = _isShow ? CursorLockMode.None : CursorLockMode.Locked;
+            if (isShow)
+            {
+                CursorStateManager.ShowCursor();
+            }
+            else
+            {
+                CursorStateManager.HideCursor();
             }
         }
     }
