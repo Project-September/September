@@ -709,6 +709,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _optionUIPanel: {fileID: 392392761332060554}
+  _selectWhenOpen: {fileID: 5197853394726989907}
 --- !u!114 &481471510209803823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -721,7 +722,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 114f161d85771ec4d809ed9bc104de3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _selectWhenOpen: {fileID: 5197853394726989907}
   _bgmVolumeSlider: {fileID: 5197853394726989907}
   _seVolumeSlider: {fileID: 1967768956780487853}
   _voiceVolumeSlider: {fileID: 2918986712525253299}
