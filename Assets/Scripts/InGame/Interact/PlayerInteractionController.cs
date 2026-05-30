@@ -379,7 +379,10 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIController.I?.SetInteractProgress(0f);
+            if (!_isBot)
+            {
+                UIController.I?.SetInteractProgress(0f);
+            }
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
