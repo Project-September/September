@@ -57,6 +57,15 @@ namespace InGame.Interact
             _playerManager = GetComponent<PlayerManager>();
             _playerAudioController = GetComponentInChildren<PlayerAudioController>();
 
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
+            // 後でパスを登録
+#endif
+
+
             if (_inputManager == null)
                 _inputManager = GetComponent<PlayerInputManager>();
 
@@ -305,7 +314,8 @@ namespace InGame.Interact
         {
             if (!_focusedObj) return;
 
-            _requiredInteractTime = GetRequireInteractTime();
+            _requiredInteractTime = GetRequireInteractTime() * (_playerStatus ? _playerStatus.InteractDurationMultiply : 1);
+
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
