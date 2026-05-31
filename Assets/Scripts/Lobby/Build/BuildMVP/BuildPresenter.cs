@@ -25,6 +25,7 @@ namespace September.Lobby
             _view.Init(data.Builds);
             // Viewに登録
             _dispose.AddActionDisposing(_view.OnMoveIndex(_runtime.MoveIndex));
+            _dispose.AddActionDisposing(_view.OnMoveIndexForButton(_runtime.MoveIndex));
             _dispose.AddActionDisposing(_view.OnSelectBuild(_runtime.SelectBuild));
             // Runtimeに登録
             _dispose.AddActionDisposing(_runtime.OnMoveIndex(_view.VisualizeBuildInfo));

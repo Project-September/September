@@ -9,11 +9,12 @@ namespace September.Lobby
     {
         readonly BuildDataBase[] _builds;
         int _currentIndex;
-        bool _selected;
+        int _selectedIndex;
+        NetworkRunner _networkRunner;
 
         // 発火用
         event Action<int, BuildDataBase> _onMoveIndex;
-        event Action<bool> _onSelectBuild;
+        event Action<int> _onSelectBuild;
         // 購読・解除用
         // 普段の「+=」「-=」をメソッドにして役割分担
         public Action OnMoveIndex(Action<int, BuildDataBase> act)
@@ -21,7 +22,7 @@ namespace September.Lobby
             _onMoveIndex += act;
             return () => _onMoveIndex -= act;
         }
-        public Action OnSelectBuild(Action<bool> act)
+        public Action OnSelectBuild(Action<int> act)
         {
             _onSelectBuild += act;
             return () => _onSelectBuild -= act;
@@ -30,13 +31,14 @@ namespace September.Lobby
         public BuildDatasRuntime(BuildDatas data)
         {
             _builds = data.Builds;
+            _selectedIndex = -1;
+            _networkRunner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
         }
 
         /// <summary>
         /// 選択を切り替えるメソッド
         /// </summary>
         /// <param name="move">選択を切り替える方向</param>
-        /// <returns>選択後の要素番号</returns>
         public void MoveIndex(BuildIndexMoveType move)
         {
             if (_builds.Length == 0) return;
@@ -47,29 +49,36 @@ namespace September.Lobby
         }
 
         /// <summary>
+        /// ダイレクトに要素を選択して切り替えるメソッド
+        /// </summary>
+        /// <param name="index">切り替えるインデックス</param>
+        public void MoveIndex(int index)
+        {
+            if (_builds.Length == 0) return;
+            if (index < 0 || _builds.Length - 1 < index) return;
+            _currentIndex = index;
+            _onMoveIndex?.Invoke(_currentIndex, _builds[_currentIndex]);
+        }
+
+        /// <summary>
         /// ビルドルートを決定するメソッド
         /// </summary>
-        /// <returns>すでに決定しているかどうか</returns>
         public void SelectBuild()
         {
-            var selected = _selected;
-            if (!selected)
+            if (_networkRunner == null || PlayerDatabase.Instance == null)
             {
-                // 自分自身の確保
-                NetworkRunner networkRunner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
-                if (networkRunner == null || PlayerDatabase.Instance == null)
-                {
 #if UNITY_EDITOR
-                    UnityEngine.Debug.LogWarning("サーバー接続に失敗しました");
+                UnityEngine.Debug.LogWarning("サーバー接続に失敗しました");
 #endif
-                    return;
-                }
-                // NetworkRunnerとPlayerDatabaseはnullじゃない前提
-                var player = networkRunner.LocalPlayer;
-                PlayerDatabase.Instance.Rpc_SetBuild(player, _builds[_currentIndex].BuildType);
-                _selected = true; // 初めて選択した時の処理
+                return;
             }
-            _onSelectBuild?.Invoke(selected);
+            // NetworkRunnerとPlayerDatabaseはnullじゃない前提
+            var player = _networkRunner.LocalPlayer;
+            PlayerDatabase.Instance.Rpc_SetBuild(player, _builds[_currentIndex].BuildType);
+            _onSelectBuild?.Invoke(_selectedIndex);
+
+            // 直前に決定したインデックスを保存
+            _selectedIndex = _currentIndex;
         }
     }
 }

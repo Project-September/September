@@ -8,6 +8,7 @@ namespace September.Lobby
     {
         // 発火用
         event Action<BuildIndexMoveType> _onMoveIndex;
+        event Action<int> _onMoveIndexForButton;
         event Action _onSelectBuild;
         // 購読・解除用
         // 普段の「+=」「-=」をメソッドにして役割分担
@@ -15,6 +16,11 @@ namespace September.Lobby
         {
             _onMoveIndex += act;
             return () => _onMoveIndex -= act;
+        }
+        public Action OnMoveIndexForButton(Action<int> act)
+        {
+            _onMoveIndexForButton += act;
+            return () => _onMoveIndexForButton -= act;
         }
         public Action OnSelectBuild(Action act)
         {
@@ -42,6 +48,11 @@ namespace September.Lobby
         {
             _onSelectBuild?.Invoke();
         }
+
+        protected void MoveIndexForButton(int index)
+        {
+            _onMoveIndexForButton?.Invoke(index);
+        }
         #endregion
 
         /// <summary>ビルドルートの選択中かどうかの表示を切り替えるメソッド</summary>
@@ -50,7 +61,7 @@ namespace September.Lobby
         public abstract void VisualizeBuildInfo(int index, BuildDataBase build);
 
         /// <summary>決定したビルドルートの表示を切り替えるメソッド</summary>
-        /// <param name="selected">すでに決定されているかどうか</param>
-        public abstract void VisualizeSelection(bool selected);
+        /// <param name="index">直前に選択していたインデックス</param>
+        public abstract void VisualizeSelection(int index);
     }
 }
