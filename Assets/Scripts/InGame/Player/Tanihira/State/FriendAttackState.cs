@@ -18,6 +18,7 @@ namespace Ingame.Tanihira
                 friend.Agent.isStopped = true;
                 _friendObject = friend.Agent.gameObject.transform;
                 LookTarget(friend.Agent.destination);
+                friend.Agent.SetDestination(friend.Agent.destination);
             }
             friend.MecanimAnimator?.SetTrigger("Attack"); // アニメーターにAttackトリガーがある前提
         }

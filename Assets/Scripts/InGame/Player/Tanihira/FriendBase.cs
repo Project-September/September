@@ -43,9 +43,9 @@ namespace Ingame.Tanihira
         [Networked] private NetworkBool HasMask { get; set; }
         [Networked] private NetworkBool HasRunEffect { get; set; }
         [Header("攻撃指示")]
-        [SerializeField] private bool _isAttackOrdered;
+        [Networked] public NetworkBool IsAttackOrdered { get;  private set; }
         [Header("攻撃可能")]
-        [SerializeField] private bool _isCanAttack = true;
+        [Networked] public NetworkBool IsCanAttack { get; private set; }
         [Header("規定の攻撃量（超えたら指示があるまで攻撃はしない）")] 
         [SerializeField] private int _regulationAttackAmount;
         
@@ -87,8 +87,7 @@ namespace Ingame.Tanihira
         /// true：可能
         /// false：不可能
         /// </summary>
-        public bool IsAttackPossible => _isCanAttack && _isAttackOrdered;
-        public bool IsAttackOrdered => _isAttackOrdered;
+        public bool IsAttackPossible => IsCanAttack && IsAttackOrdered;
 
         public override void Spawned()
         {
@@ -251,16 +250,29 @@ namespace Ingame.Tanihira
             damageable.TakeHit(ref hitData);
             //エフェクトを出す
             PlayEffect();
-
+            
             // 現在の攻撃量に攻撃力分増加させる
             _currentAttackAmount += _currentStatus.AttackPower;
             if (_currentAttackAmount >= _regulationAttackAmount)
             {
                 // 規定量を超えたら攻撃を辞め、プレイヤーの元に帰還する
-                _isCanAttack = false;
-                _isAttackOrdered = false;
+                IsCanAttack = false;
+                IsAttackOrdered = false;
                 SetDestination(OwnerPlayer.transform);
                 ChangeState(FriendState.Move);
+                if (OwnerPlayer.TryGetComponent<FriendPlayerDetector>(out var detector))
+                {
+                    // 全ペンギンの攻撃を止めにする
+                    detector.ChangeDetectionCenter(OwnerPlayer.transform, true);
+                    if (OwnerPlayer.TryGetComponent<FormationManager>(out var formationManager))
+                    {
+                        foreach (var fr in formationManager.CurrentFriendsList)
+                        {
+                            fr.IsCanAttack = false;
+                            fr.IsAttackOrdered = false;
+                        }
+                    }
+                }
             }
         }
         
@@ -376,7 +388,7 @@ namespace Ingame.Tanihira
         public void ResetAttackAmount()
         {
             _currentAttackAmount = 0;
-            _isCanAttack = true;
+            IsCanAttack = true;
             SetAttackOrdered(false);
         }
 
@@ -386,7 +398,7 @@ namespace Ingame.Tanihira
         /// <param name="isOrdered">攻撃指示を行う場合はtrue</param>
         public void SetAttackOrdered(bool isOrdered)
         {
-            _isAttackOrdered = isOrdered;
+            IsAttackOrdered = isOrdered;
         }
     }
 }

@@ -6383,7 +6383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _detectionCenter: {fileID: 3862667250155884466}
-  _detectionRadius: 15
+  _detectionRadius: 5
   _detectionMask:
     serializedVersion: 2
     m_Bits: 64
@@ -6392,8 +6392,8 @@ MonoBehaviour:
     m_Bits: 191
   _friendStateChanger: {fileID: 2957292007609013862}
   _formationManager: {fileID: 913702230075351532}
+  _friendOrder: {fileID: 6708881702509990833}
   _isWaiting: 0
-  _tanihiraCursor: {fileID: 2833980278294200028}
   _tyrannoInteractables: []
   _isSerching: 1
 --- !u!114 &2957292007609013862
@@ -6433,7 +6433,6 @@ MonoBehaviour:
   _changeOffsetDuration: 0.2
   _cursorOffsetY: 0.5
   _moveTargetPrefab: {fileID: 6185508062456583009, guid: 87568c7b0a84a9346bbd984a335f9170, type: 3}
-  IsInstruction: 0
 --- !u!114 &6708881702509990833
 MonoBehaviour:
   m_ObjectHideFlags: 0

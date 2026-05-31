@@ -15,9 +15,8 @@ namespace Ingame.Tanihira
         [SerializeField] private LayerMask _obstacleMask;
         [SerializeField] private FriendStateChanger _friendStateChanger;
         [SerializeField] private FormationManager _formationManager;
+        [SerializeField] private FriendOrder _friendOrder;
         [SerializeField] private bool _isWaiting;
-        [Header("TanihiraCursor")]
-        [SerializeField] private TanihiraCursor _tanihiraCursor;
         
         private Transform _currentTarget;
         private InGameManager _inGameManager;
@@ -153,7 +152,7 @@ namespace Ingame.Tanihira
                         break;
                     }
                 }
-
+                
                 if (!flag)
                 {
                     _friendStateChanger.SetMoveState();
