@@ -6612,14 +6612,13 @@ MonoBehaviour:
   _netObject: {fileID: 7968417084068229509}
   _botStateData: {fileID: 11400000, guid: 66618cb459c02f740848c1ac5fea6582, type: 2}
   _playerMovement: {fileID: 7036215823815979301}
+  _stateChangeDistance: 50
   _stopAmount: 0.2
   _stopTime: 5
   _rigidbody: {fileID: 1729702588652463817}
   <StopDistance>k__BackingField: 1
-  InputIsAttack: 0
-  Navigation:
-    StopDistance: 0
-    CanVault: 0
+  <GoalDistance>k__BackingField: 0.5
+  <InteractDistance>k__BackingField: 2.5
 --- !u!114 &6590944565443799526
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CRISound;
+﻿using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
@@ -24,7 +23,6 @@ namespace September.Lobby
         
         private CharacterInfoPanel _currentFrontPanel;
         private CharacterInfoPanel _currentBackPanel;
-        private readonly List<SelectCharacterIcon> _selectCharacterIcons = new();
         private void Start()
         {
             _localPlayerRef = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene()).LocalPlayer;
