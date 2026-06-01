@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using CRISound;
 using Fusion;
 using InGame.Health;
 using September.Common;
@@ -44,6 +42,12 @@ namespace Ingame.Tanihira
         [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
         [Networked] private NetworkBool HasMask { get; set; }
         [Networked] private NetworkBool HasRunEffect { get; set; }
+        [Header("攻撃指示")]
+        [Networked] public NetworkBool IsAttackOrdered { get;  private set; }
+        [Header("攻撃可能")]
+        [Networked] public NetworkBool IsCanAttack { get; private set; }
+        [Header("規定の攻撃量（超えたら指示があるまで攻撃はしない）")] 
+        [SerializeField] private int _regulationAttackAmount;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -54,6 +58,10 @@ namespace Ingame.Tanihira
         protected FriendStatus _currentStatus;
         protected EffectSpawner _effectSpawner;
         protected bool _isEnd;
+        /// <summary>
+        /// 現在の攻撃量
+        /// </summary>
+        private int _currentAttackAmount;
 
         private static int _spawnCount;
         public bool IsAttack;
@@ -73,7 +81,14 @@ namespace Ingame.Tanihira
         public NetworkObject OwnerPlayer => _ownerPlayer;
         public GameObject Tutankhamen => _tutankhamen;
         public bool IsWarp;
-        
+
+        /// <summary>
+        /// 攻撃可能な状態か
+        /// true：可能
+        /// false：不可能
+        /// </summary>
+        public bool IsAttackPossible => IsCanAttack && IsAttackOrdered;
+
         public override void Spawned()
         {
             _currentStatus = _friendStatus.Clone();
@@ -235,6 +250,30 @@ namespace Ingame.Tanihira
             damageable.TakeHit(ref hitData);
             //エフェクトを出す
             PlayEffect();
+            
+            // 現在の攻撃量に攻撃力分増加させる
+            _currentAttackAmount += _currentStatus.AttackPower;
+            if (_currentAttackAmount >= _regulationAttackAmount)
+            {
+                // 規定量を超えたら攻撃を辞め、プレイヤーの元に帰還する
+                IsCanAttack = false;
+                IsAttackOrdered = false;
+                SetDestination(OwnerPlayer.transform);
+                ChangeState(FriendState.Move);
+                if (OwnerPlayer.TryGetComponent<FriendPlayerDetector>(out var detector))
+                {
+                    // 全ペンギンの攻撃を止めにする
+                    detector.ChangeDetectionCenter(OwnerPlayer.transform, true);
+                    if (OwnerPlayer.TryGetComponent<FormationManager>(out var formationManager))
+                    {
+                        foreach (var fr in formationManager.CurrentFriendsList)
+                        {
+                            fr.IsCanAttack = false;
+                            fr.IsAttackOrdered = false;
+                        }
+                    }
+                }
+            }
         }
         
         private void PlayEffect()
@@ -341,6 +380,25 @@ namespace Ingame.Tanihira
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// 現在の攻撃量、フラグをリセットする
+        /// </summary>
+        public void ResetAttackAmount()
+        {
+            _currentAttackAmount = 0;
+            IsCanAttack = true;
+            SetAttackOrdered(false);
+        }
+
+        /// <summary>
+        /// 攻撃指示状態を設定
+        /// </summary>
+        /// <param name="isOrdered">攻撃指示を行う場合はtrue</param>
+        public void SetAttackOrdered(bool isOrdered)
+        {
+            IsAttackOrdered = isOrdered;
         }
     }
 }

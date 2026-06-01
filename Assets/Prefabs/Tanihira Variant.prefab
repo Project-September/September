@@ -6428,7 +6428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _detectionCenter: {fileID: 3862667250155884466}
-  _detectionRadius: 15
+  _detectionRadius: 5
   _detectionMask:
     serializedVersion: 2
     m_Bits: 64
@@ -6437,6 +6437,7 @@ MonoBehaviour:
     m_Bits: 191
   _friendStateChanger: {fileID: 2957292007609013862}
   _formationManager: {fileID: 913702230075351532}
+  _friendOrder: {fileID: 6708881702509990833}
   _isWaiting: 0
   _tyrannoInteractables: []
   _isSerching: 1

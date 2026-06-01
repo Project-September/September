@@ -1,4 +1,3 @@
-using System;
 using Fusion;
 using InGame.Common;
 using InGame.Player;
@@ -37,9 +36,9 @@ namespace Ingame.Tanihira
         private PlayerMovement _movement;
         private CameraController _cameraController;
         private FriendOrder _friendOrder;
+        private FormationManager _formationManager;
         private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] private TanihiraCursorState _state { get; set; }
-        
 
         public override void Spawned()
         {
@@ -48,6 +47,7 @@ namespace Ingame.Tanihira
                 _playerManager = GetComponent<PlayerManager>();
                 _movement = GetComponent<PlayerMovement>();
                 _friendOrder = GetComponent<FriendOrder>();
+                _formationManager = GetComponent<FormationManager>();
                 _moveTargetInstance = Runner.Spawn(_moveTargetPrefab, Vector3.zero, Quaternion.identity);
             }
             
@@ -57,6 +57,7 @@ namespace Ingame.Tanihira
                 _playerManager = GetComponent<PlayerManager>();
                 _movement = GetComponent<PlayerMovement>();
                 _cameraController = GetComponent<CameraController>();
+                _formationManager = GetComponent<FormationManager>();
                 
                 _playerTransform = this.transform;
                 //前方最大範囲にカーソルを出現
@@ -137,6 +138,8 @@ namespace Ingame.Tanihira
         {
             _moveTargetInstance.transform.position = targetPos;
             _friendOrder.ExecuteOrderMoveFriend();
+            _friendOrder.AllResetAttackAmount();
+            _formationManager.SetAllAttackOrdered(true);
         }
 
         private void EndCursor()
