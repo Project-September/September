@@ -83,60 +83,68 @@ namespace Ingame.Tanihira
         //プレイヤーを索敵する処理
         private void DetectePlayer()
         {
-            if (IsTargetValid(_currentTarget) || _formationManager.CurrentFriendsList.FirstOrDefault().CurrentState == FriendState.None)
+            if (_formationManager.CurrentFriendsList.FirstOrDefault() is { CurrentState: FriendState.None })
                 return;
-            
-            //範囲内のプレイヤーを検出
-            int hitPlayerCount = Physics.OverlapSphereNonAlloc(_detectionCenter.position, _detectionRadius, _overlapResults, _detectionMask);
-            var players = _overlapResults.Take(hitPlayerCount)
-                .Select(col => col.transform.root) // ルート Transform を抽出
-                .Where(root => root != transform.root) // 自分自身は除外
-                .Distinct();                                            // 重複排除
-            
-            //ティラノをチェック
-            var tyrannos = _tyrannoInteractables
-                .Where(t => t != null && t.IsInteracting 
-                                      && (t.transform.position - _detectionCenter.position).sqrMagnitude <= _detectionRadius * _detectionRadius)
-                .Select(t => t.transform);
-            
-            //近い順にソート
-            var uniqueRoots = players
-                .Concat(tyrannos)
-                .Distinct()
-                .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude)
-                .ToList();
-            
-            foreach (Transform player in uniqueRoots)
+
+            // ターゲットが無効だったら再索敵
+            if (!IsTargetValid(_currentTarget))
             {
-                //自身は除く
-                if (player.gameObject == gameObject)
-                    continue;
+                _currentTarget = null;
                 
-                // Rayの始点を少し上に
-                Vector3 start = _detectionCenter.position + Vector3.up * 0.5f;
-
-                // ターゲットの中心も少し上に
-                Vector3 targetCenter = player.position + Vector3.up * 0.5f;
-
-                Vector3 direction = (targetCenter - start).normalized;
-                float distance = Vector3.Distance(start, targetCenter);
+                //範囲内のプレイヤーを検出
+                int hitPlayerCount = Physics.OverlapSphereNonAlloc(_detectionCenter.position, _detectionRadius, _overlapResults, _detectionMask);
+                var players = _overlapResults.Take(hitPlayerCount)
+                    .Select(col => col.transform.root) // ルート Transform を抽出
+                    .Where(root => root != transform.root) // 自分自身は除外
+                    .Distinct();                                            // 重複排除
                 
-                //間に障害物があった場合には無視
-                if (Physics.Raycast(start, direction, out RaycastHit hit, distance, _obstacleMask))
+                //ティラノをチェック
+                var tyrannos = _tyrannoInteractables
+                    .Where(t => t != null && t.IsInteracting 
+                                          && (t.transform.position - _detectionCenter.position).sqrMagnitude <= _detectionRadius * _detectionRadius)
+                    .Select(t => t.transform);
+                
+                //近い順にソート
+                var uniqueRoots = players
+                    .Concat(tyrannos)
+                    .Distinct()
+                    .OrderBy(root => (root.position - _detectionCenter.position).sqrMagnitude)
+                    .ToList();
+                
+                foreach (Transform player in uniqueRoots)
                 {
-                    //ティラノに当たった場合は無視をする
-                    if (hit.collider.GetComponent<TyrannoInteractable>() != null)
-                    {
-                        //何もしない
-                    }
-                    else
-                    {
+                    //自身は除く
+                    if (player.gameObject == gameObject)
                         continue;
+                    
+                    // Rayの始点を少し上に
+                    Vector3 start = _detectionCenter.position + Vector3.up * 0.5f;
+
+                    // ターゲットの中心も少し上に
+                    Vector3 targetCenter = player.position + Vector3.up * 0.5f;
+
+                    Vector3 direction = (targetCenter - start).normalized;
+                    float distance = Vector3.Distance(start, targetCenter);
+                    
+                    //間に障害物があった場合には無視
+                    if (Physics.Raycast(start, direction, out RaycastHit hit, distance, _obstacleMask))
+                    {
+                        //ティラノに当たった場合は無視をする
+                        if (hit.collider.GetComponent<TyrannoInteractable>() != null)
+                        {
+                            //何もしない
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
+                    
+                    //近い物をターゲットにして攻撃させる
+                    _currentTarget = player.gameObject.transform;
+                    //近い順にソート済みなので最初に当たったものが最も近い
+                    break;
                 }
-                
-                //近い物をターゲットにして攻撃させる
-                _currentTarget = player.gameObject.transform;
             }
             
             //ペンギンに攻撃指示を飛ばす
