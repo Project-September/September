@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace September.Lobby
 {
-    public class BuildDatasRuntime
+    public class BuildRuntime
     {
         readonly BuildDataBase[] _builds;
         int _currentIndex;
@@ -28,7 +28,7 @@ namespace September.Lobby
             return () => _onSelectBuild -= act;
         }
 
-        public BuildDatasRuntime(BuildDatas data)
+        public BuildRuntime(BuildDatas data)
         {
             _builds = data.Builds;
             _selectedIndex = -1;
