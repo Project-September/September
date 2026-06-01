@@ -5,7 +5,7 @@ namespace September.Lobby
 {
     public class BuildPresenter : IDisposable
     {
-        BuildDatasRuntime _runtime;
+        BuildRuntime _runtime;
         BuildViewBase _view;
         readonly ActionDisposable _dispose;
 

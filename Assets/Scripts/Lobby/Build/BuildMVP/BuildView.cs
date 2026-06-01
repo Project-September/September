@@ -12,15 +12,7 @@ namespace September.Lobby
         [SerializeField] Button _decisionButton;
         [SerializeField] TextMeshProUGUI _buildName;
         [SerializeField] TextMeshProUGUI _buildInfo;
-        [SerializeField] BuildFactory _build;
-        BuildPresenter _presenter; // MVPに反した参照ではない
         int _currentSelectIndex;
-
-        private void Awake()
-        {
-            // 仮でインスタンス生成
-            _presenter = _build.CreateBuild(this);
-        }
 
         public override void Init(BuildDataBase[] builds)
         {
@@ -89,11 +81,6 @@ namespace September.Lobby
             // 直前に選択していたものの描画処理
             if (index < 0) return;
             _buildObjects[index]?.Cancel();
-        }
-
-        private void OnDisable()
-        {
-            _presenter?.Dispose();
         }
     }
 }

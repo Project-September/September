@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace September.Lobby
@@ -8,8 +9,7 @@ namespace September.Lobby
     {
         [Header("アイコンなどの画像表示")]
         [SerializeField] Button _icon;
-        [SerializeField] Image _selectedIcon;
-        [SerializeField] Image _arrow;
+        [SerializeField, Tooltip("チェックアイコンなど")] Image _selectedIcon;
 
         public void Init()
         {
@@ -30,7 +30,7 @@ namespace September.Lobby
         /// </summary>
         public void Select()
         {
-            if (_arrow) _arrow.color = Color.white;
+            EventSystem.current.SetSelectedGameObject(_icon.gameObject);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace September.Lobby
         /// </summary>
         public void Unselect()
         {
-            if (_arrow) _arrow.color = Color.clear;
+            EventSystem.current.SetSelectedGameObject(null);
         }
 
         /// <summary>
