@@ -15,8 +15,8 @@ namespace September.Common
         private Tween _tween;
         protected void Awake()
         {
-            if(_arrowImage) _arrowImage.enabled = false;
-            if(_selectFrameImage) _selectFrameImage.enabled = false;
+            if (_arrowImage) _arrowImage.enabled = false;
+            if (_selectFrameImage) _selectFrameImage.enabled = false;
             if (_targetSelectable)
             {
                 _targetSelectable.OnSelectAsObservable().Subscribe(OnSelect).AddTo(this);
@@ -40,7 +40,7 @@ namespace September.Common
 
         private void OnDeselect(BaseEventData eventData)
         {
-            if(_selectFrameImage)
+            if (_selectFrameImage)
             {
                 _selectFrameImage.enabled = false;
             }
