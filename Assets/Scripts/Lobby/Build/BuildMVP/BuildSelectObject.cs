@@ -38,7 +38,7 @@ namespace September.Lobby
         /// </summary>
         public void Unselect()
         {
-            EventSystem.current.SetSelectedGameObject(null);
+
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace September.Lobby
                     var obj = _buildObjects[i];
                     if (obj == null) continue;
                     obj.Init();
-                    // ボタンにインデックスを直接選択できるように
+                    // ボタンでインデックスを直接選択できるように
                     var index = i;
                     obj.RegisterAction(() => MoveIndexForButton(index));
                     // 最初のUI以外を見えなくする
@@ -64,6 +64,10 @@ namespace September.Lobby
 
             // 直前のインデックスを保存
             _currentSelectIndex = index;
+
+#if UNITY_EDITOR
+            Debug.Log($"選択中 => {build.BuildName}");
+#endif
         }
 
         public override void VisualizeSelection(int index)
