@@ -193,7 +193,7 @@ namespace InGame.Player
             }
 
             // ========== ビルドシステム ==========
-            if (_moveBuildEnabled & _buildGenerator.TryGetBuildEnable(BuildType.MoveSpeed))
+            if (_moveBuildEnabled && _buildGenerator.TryGetBuildEnable(BuildType.MoveSpeed))
             {
                 var moveDistance = Vector3.Distance(transform.position, _prePos);
                 _buildGenerator?.UpdateBuild(BuildType.MoveSpeed, moveDistance);
