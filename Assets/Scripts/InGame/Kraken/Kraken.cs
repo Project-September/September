@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace September.InGame.Kraken
 {
-    public class Kraken : NetworkBehaviour, IMountable
+    public class Kraken : NetworkBehaviour, IMountable, IDamageable
     {
         /// <summary> クラーケン中のカメラ優先度 </summary>
         private const int CameraPriority = 15;
@@ -120,6 +120,8 @@ namespace September.InGame.Kraken
 
             // このプレイヤーから入力を受け取るように設定する
             Object.AssignInputAuthority(owner);
+
+            OwnerPlayerRef = owner;
         }
 
         /// <summary>
@@ -152,6 +154,8 @@ namespace September.InGame.Kraken
             
             // 入力を受け取らないようにする
             Object.RemoveInputAuthority();
+
+            OwnerPlayerRef = default;
         }
 
         private async UniTask Attack(Vector3 targetPos)
@@ -161,6 +165,17 @@ namespace September.InGame.Kraken
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
             _hitChecker.EndHitCheck();
+        }
+
+        public bool IsAlive { get; private set; } = true;
+        public PlayerRef OwnerPlayerRef { get; private set; }
+
+        public void TakeHit(ref HitData hitData)
+        {
+            if (HasStateAuthority && hitData.HitActionType == HitActionType.Damage)
+            {
+                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, hitData.Amount);
+            }
         }
     }
 }
