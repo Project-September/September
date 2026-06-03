@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
@@ -59,6 +60,9 @@ namespace InGame.Player
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
+        [Networked] public Vector3 InputDirection { get; private set; }
+        private bool _isHookFollow;
+        private Transform _hookTarget;
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
@@ -95,6 +99,15 @@ namespace InGame.Player
             CheckGroundManual();
 
             if (IgnoreMoveInput) moveInput = Vector2.zero;
+
+            if (_isHookFollow)
+            {
+                var hookDirection = _hookTarget.transform.position - this.transform.position;
+                hookDirection.y = 0;
+                //_rb.linearVelocity = hookDirection;
+                this.transform.position += hookDirection;
+            }
+
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             // set velocity
@@ -397,6 +410,17 @@ namespace InGame.Player
             Vector3 onPlaneVec = normalRot * _rb.linearVelocity;
             onPlaneVec.y = 0;
             return onPlaneVec.magnitude;
+        }
+
+        public void OnStartHook(Transform targetHook)
+        {
+            _hookTarget = targetHook;
+            _isHookFollow = true;
+        }
+
+        public void OnEndHook()
+        {
+            _isHookFollow = false;
         }
 
         private void CheckGroundManual()

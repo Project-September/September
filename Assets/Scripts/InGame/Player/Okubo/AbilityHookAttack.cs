@@ -16,22 +16,18 @@ namespace InGame.Player.Okubo
         [SerializeField] private float _stretchedWaitTime = 0.3f;
         [SerializeField] private float _coolDownTime = 1.0f;
         [SerializeField] private float _wireThickness;
+        [SerializeField] private float _hitRadius;
+        [SerializeField] private Transform _wireCyl;
+        [SerializeField] private Transform _hookObject;
 
-
-        private Transform _wireCyl;
         private HookAttackState _currentState;
         private float _currentHookLength;
         private float _waitTimer;
-        private List<GameObject> _players;
+        private HashSet<PlayerRef> _players = new();
+        private PlayerMovement _targetPlayerMovement;
 
         public override void Spawned()
         {
-            var wireObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            wireObj.name = "HookWireCylinder";
-            _wireCyl = wireObj.transform;
-            _wireCyl.localScale = Vector3.one * _wireThickness;
-            wireObj.GetComponent<Renderer>().sharedMaterial = _wireMaterial;
-            if (wireObj.TryGetComponent(out Collider col)) Destroy(col);
             _wireCyl.gameObject.SetActive(false);
         }
 
@@ -60,8 +56,6 @@ namespace InGame.Player.Okubo
                     OnWait();
                     break;
             }
-
-            Debug.Log("Hook Length" + _currentHookLength);
         }
         private void ChangeState(HookAttackState state)
         {
@@ -69,14 +63,20 @@ namespace InGame.Player.Okubo
 
             switch (state)
             {
+                //フック攻撃初期化
                 case HookAttackState.Stretching:
                     _wireCyl.gameObject.SetActive(true);
+                    _players.Clear();
                     break;
                 case HookAttackState.Stretched:
                     _waitTimer = _stretchedWaitTime;
                     break;
 
                 case HookAttackState.CoolDown:
+                    foreach(var player in _players)
+                    {
+                        RPC_HookEnd(player);
+                    }
                     _wireCyl.gameObject.SetActive(false);
                     _waitTimer = _coolDownTime;
                     break;
@@ -95,6 +95,7 @@ namespace InGame.Player.Okubo
             }
 
             UpdateHookLength(_currentHookLength, this.transform.forward);
+            GetHitPlayer(_currentHookLength, this.transform.forward);
         }
 
         private void OnPulling()
@@ -143,6 +144,48 @@ namespace InGame.Player.Okubo
 
             // 向きを合わせる
             _wireCyl.up = direction;
+        }
+
+        private void GetHitPlayer(float length, Vector3 direction)
+        {
+            Vector3 position = _hookOrigin.transform.position + direction * length;
+            var hitObjects = Physics.OverlapSphere(position, _hitRadius);
+
+            foreach (var obj in hitObjects)
+            {
+                GameObject hitObject = obj.transform.root.gameObject;
+                if (hitObject == this.gameObject || !hitObject.CompareTag("Player")) continue;
+                foreach (var pair in PlayerDatabase.Instance.PlayerObjectDic)
+                {
+                    if (pair.Value.gameObject == hitObject)
+                    {
+                        if(_players.Contains(pair.Key)) continue;
+                        _players.Add(pair.Key);
+                        RPC_HookStart(pair.Key);
+                        break; ;
+                    }
+                }
+            }
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_HookStart(PlayerRef playerRef)
+        {
+            if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef, out var playerObject)) return;
+
+            if (!playerObject.gameObject.TryGetComponent(out PlayerMovement _targetPlayerMovement)) return;
+
+            _targetPlayerMovement.OnStartHook(_hookObject);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_HookEnd(PlayerRef playerRef)
+        {
+            if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef, out var playerObject)) return;
+
+            if (!playerObject.TryGetComponent(out PlayerMovement _targetPlayerMovement)) return;
+
+            _targetPlayerMovement.OnEndHook();
         }
         public enum HookAttackState
         {
