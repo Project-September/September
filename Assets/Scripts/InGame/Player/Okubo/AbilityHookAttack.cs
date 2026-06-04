@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Fusion;
+using InGame.Health;
 using September.Common;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace InGame.Player.Okubo
 {
     public class AbilityHookAttack : NetworkBehaviour
     {
+        [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private PlayerInputManager _playerInputManager;
         [SerializeField] private Material _wireMaterial;
         [SerializeField] private Transform _hookOrigin;
@@ -19,16 +21,26 @@ namespace InGame.Player.Okubo
         [SerializeField] private float _hitRadius;
         [SerializeField] private Transform _wireCyl;
         [SerializeField] private Transform _hookObject;
+        [SerializeField] private int _damageAmount;
 
         private HookAttackState _currentState;
         private float _currentHookLength;
         private float _waitTimer;
         private HashSet<PlayerRef> _players = new();
         private PlayerMovement _targetPlayerMovement;
+        private PlayerRef _ownerRef;
 
         public override void Spawned()
         {
             _wireCyl.gameObject.SetActive(false);
+            foreach(var player in PlayerDatabase.Instance.PlayerObjectDic)
+            {
+                if(player.Value.gameObject == this.transform.root.gameObject)
+                {
+                    _ownerRef = player.Key;
+                    break;
+                }
+            }
         }
 
         public override void FixedUpdateNetwork()
@@ -63,13 +75,23 @@ namespace InGame.Player.Okubo
 
             switch (state)
             {
+                case HookAttackState.Idol:
+                    _playerMovement.IgnoreMoveInput = false;
+                    break;
                 //フック攻撃初期化
                 case HookAttackState.Stretching:
                     _wireCyl.gameObject.SetActive(true);
                     _players.Clear();
+                    _playerMovement.IgnoreMoveInput = true;
                     break;
                 case HookAttackState.Stretched:
                     _waitTimer = _stretchedWaitTime;
+                    break;
+                case HookAttackState.Pulling:
+                    foreach(var target in _players)
+                    {
+                        RPC_HookStart(target);
+                    }
                     break;
 
                 case HookAttackState.CoolDown:
@@ -161,7 +183,11 @@ namespace InGame.Player.Okubo
                     {
                         if(_players.Contains(pair.Key)) continue;
                         _players.Add(pair.Key);
-                        RPC_HookStart(pair.Key);
+                        if(pair.Value.TryGetComponent(out IDamageable damageable))
+                        {
+                            var hitData = new HitData(HitActionType.Damage, _damageAmount, _ownerRef, damageable.OwnerPlayerRef);
+                            damageable.TakeHit(ref hitData);
+                        }
                         break; ;
                     }
                 }

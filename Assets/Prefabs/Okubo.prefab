@@ -6135,6 +6135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea90a082de027fd4db8a71d74ef0591c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerMovement: {fileID: 3242880713039265549}
   _playerInputManager: {fileID: 4943096902174970823}
   _wireMaterial: {fileID: 2100000, guid: 3e33a38e2349f447d9fb9ae62269009c, type: 2}
   _hookOrigin: {fileID: 2462965415467351492}
@@ -6147,6 +6148,7 @@ MonoBehaviour:
   _hitRadius: 1
   _wireCyl: {fileID: 3088326584113224399}
   _hookObject: {fileID: 6224232624936183249}
+  _damageAmount: 1
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
