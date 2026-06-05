@@ -152,7 +152,7 @@ MonoBehaviour:
   _simulationStepTime: 0.1
   _simulationEndTime: 5
   _gravity: {x: 0, y: 9.8, z: 0}
-  _ballSpeed: 5
+  _ballSpeed: 20.07
   _aimHitViewObject: {fileID: 0}
   _lineRenderer: {fileID: 7931722243513256251}
   _maxAmmo: 3
@@ -211,7 +211,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 3224717e3d9e63d43abb6255306e0600, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

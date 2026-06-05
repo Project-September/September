@@ -31,16 +31,13 @@ namespace InGame.Exhibit
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
-            Debug.Log("FixedUpdateNetwork");
             base.OnInteractFixedNetworkUpdate(playerInput);
-            
             //_cannonInteractable.OnInteractFixedNetworkUpdate(playerInput);
         }
 
         public override void OnInteractEnd()
         {
             base.OnInteractEnd();
-            _cannonInteractable.OnInteractEnd();
         }
 
         public override CharacterInteractEffectBase Clone()
