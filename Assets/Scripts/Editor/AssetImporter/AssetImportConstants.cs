@@ -2,7 +2,7 @@ namespace September.Editor.AssetImporter
 {
     public static class AssetImportConstants
     {
-        public const string ApiUrl = "https://asset-importer-538394701382.asia-northeast1.run.app";
+        public const string ApiUrl = "https://asset-importer-1081960619038.asia-northeast1.run.app";
         public const string WindowTitle = "Asset Import Tool";
         public const string MenuPath = "September/Import";
         
