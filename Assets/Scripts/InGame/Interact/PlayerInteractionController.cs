@@ -6,6 +6,7 @@ using InGame.Player;
 using InGame.Player.Ability;
 using September.Common;
 using September.InGame;
+using September.InGame.Common.Stats;
 using September.InGame.UI;
 using UnityEngine;
 
@@ -26,6 +27,9 @@ namespace InGame.Interact
         [SerializeField] private float _interactAngleBuffer = 10f; // 角度に+10°
         [SerializeField] private float _interactRadiusBuffer = 0.3f; // 距離に+0.3m
         [SerializeField] private PlayerAudioController _playerAudioController; // インタラクト時のボイス再生用
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
         //許容できる高さの差
         private float _heightDifference = 0.1f;
 
@@ -52,6 +56,15 @@ namespace InGame.Interact
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
             _playerAudioController = GetComponentInChildren<PlayerAudioController>();
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
+            // 後でパスを登録
+#endif
+
 
             if (_inputManager == null)
                 _inputManager = GetComponent<PlayerInputManager>();
@@ -301,7 +314,8 @@ namespace InGame.Interact
         {
             if (!_focusedObj) return;
 
-            _requiredInteractTime = GetRequireInteractTime();
+            _requiredInteractTime = GetRequireInteractTime() * (_playerStatus ? _playerStatus.InteractDurationMultiply : 1);
+
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
@@ -336,6 +350,8 @@ namespace InGame.Interact
         private void CompleteInteraction()
         {
             _isExecutingInteraction = false;
+
+            _buildGenerator?.UpdateBuild(BuildType.FastInteract, 1); // インタラクト成功回数を記録するため１を引数に渡す
 
             if (GetSessionPlayerData(Object.InputAuthority.RawEncoded, out var data))
             {
