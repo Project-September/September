@@ -4,6 +4,7 @@ using InGame.Health;
 using InGame.Player;
 using September.Common;
 using September.Common.Input;
+using September.InGame.Effect;
 using September.InGame.Mountable;
 using UnityEngine;
 
@@ -30,6 +31,9 @@ namespace September.InGame.Kraken
 
         [Header("インタラクト設定")]
         [SerializeField] private Collider _interactArea;
+
+        [Header("ダメージ設定")]
+        [SerializeField] private int _dealScore = 10;
 
         private InputWrapper _attack;
 
@@ -184,7 +188,7 @@ namespace September.InGame.Kraken
         {
             if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
             {
-                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, hitData.Amount);
+                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, _dealScore);
             }
         }
     }
