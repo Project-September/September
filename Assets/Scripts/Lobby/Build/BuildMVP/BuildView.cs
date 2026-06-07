@@ -28,7 +28,7 @@ namespace September.Lobby
                     // ボタンでインデックスを直接選択できるように
                     var index = i;
                     obj.RegisterAction(() => MoveIndexForButton(index));
-                    // 最初のUI以外を見えなくする
+                    // 最初のUIは選択時の処理を、それ以外には未選択時の処理を施す
                     if (i == 0)
                         obj.Select();
                     else
@@ -45,14 +45,10 @@ namespace September.Lobby
 
         public override void VisualizeBuildInfo(int index, BuildDataBase build)
         {
-            // 受け取ったBuildDataBaseは
-            // アイコンだけ表示していて
-            // 選択中のビルドルートに関しては詳細を表示する場合とかに使えるのでは
-
-            // 直前に表示していたものを見えなくする
+            // 直前に選択していた要素に対して未選択時の処理
             _buildObjects[_currentSelectIndex].Unselect();
 
-            // 選択要素を見えるようにする
+            // 新たな要素に対して選択時の処理
             _buildObjects[index].Select();
 
             // 選択中のビルドルート詳細を表示

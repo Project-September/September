@@ -97,12 +97,13 @@ namespace September.Common
                     spawnTransform.rotation,
                     inputAuthority: pair.Key);
 
-                // 追加
+                #region ビルドシステム
                 var buildGenerator = player.GetComponentInChildren<BuildGenerator>();
                 if (buildGenerator != null) buildGenerator.GenerateBuild(pair.Value.BuildType);
 #if UNITY_EDITOR
                 Debug.Log("ビルドシステムの構築に" + (buildGenerator != null ? $"成功しました\n選択ビルド : {pair.Value.BuildType}" : "失敗しました"));
 #endif
+                #endregion
 
                 PlayerDatabase.Instance.AddPlayerObject(pair.Key, player);
 
