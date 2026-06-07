@@ -254,6 +254,7 @@ Transform:
   m_Children:
   - {fileID: 2242802863752948832}
   - {fileID: 7628517979021394399}
+  - {fileID: 599912238346558556}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3295714321225697807
@@ -276,6 +277,8 @@ MonoBehaviour:
   - {fileID: 3135717980165409898}
   - {fileID: 4601619918044447809}
   - {fileID: 8998011957403086214}
+  - {fileID: 8129436580185981927}
+  - {fileID: 4783785741626355923}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3135717980165409898
 MonoBehaviour:
@@ -294,8 +297,8 @@ MonoBehaviour:
   _hitStartTime: 0
   _hitEndTime: 0
   _damage: 0
-  _leg: {fileID: 0}
   _animator: {fileID: 0}
+  _interactArea: {fileID: 2820056890666656220}
 --- !u!114 &872495872056710133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -976,6 +979,132 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &3881798663903504922
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 599912238346558556}
+  - component: {fileID: 8129436580185981927}
+  - component: {fileID: 4783785741626355923}
+  - component: {fileID: 2820056890666656220}
+  m_Layer: 0
+  m_Name: InteractArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &599912238346558556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3881798663903504922}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 13.040001, z: 41.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1498564787072541733}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8129436580185981927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3881798663903504922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+--- !u!114 &4783785741626355923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3881798663903504922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 076425aa117f6da4e8296801168596ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredInteractTimeDictionary:
+    keys: 05000000
+    values:
+    - 2
+  _cooldownTimeDictionary:
+    keys: 05000000
+    values:
+    - 5
+  _characterEffects:
+  - rid: 5799214060048744533
+  _type: 0
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
+  _cooldownEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
+  _cooldownEffectScale: {x: 1, y: 1, z: 1}
+  _interactEffectType: 9
+  _cooldownEffectType: 11
+  _spawnCooldownEffectOnStart: 0
+  _audioBroadcaster: {fileID: 0}
+  _interactSoundCueName: 
+  _interactSoundTrackingType: 0
+  _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
+  _ForceSetInteractable: 1
+  _debug: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 5799214060048744533
+      type: {class: CompositeInteractEffect, ns: September.InGame.Interact, asm: Scripts}
+      data:
+        _characterType: 5
+        _interactEffects:
+        - rid: 5799214060048744534
+        - rid: 5799214060048744536
+    - rid: 5799214060048744534
+      type: {class: MountableRideInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
+      data:
+        _characterType: 5
+        _targetMountable: {fileID: 3135717980165409898}
+    - rid: 5799214060048744536
+      type: {class: MountableManualGetOffInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
+      data:
+        _characterType: 5
+        _targetMountable: {fileID: 3135717980165409898}
+--- !u!65 &2820056890666656220
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3881798663903504922}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 12.699217, y: 3.559165, z: 1.1130514}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4271908795944086070
 GameObject:

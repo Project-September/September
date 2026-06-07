@@ -28,6 +28,9 @@ namespace September.InGame.Kraken
         [Header("アニメーション設定")] 
         [SerializeField] private Animator _animator;
 
+        [Header("インタラクト設定")]
+        [SerializeField] private Collider _interactArea;
+
         private InputWrapper _attack;
 
         private Vector3 _initialPosition;
@@ -120,7 +123,16 @@ namespace September.InGame.Kraken
             // このプレイヤーから入力を受け取るように設定する
             Object.AssignInputAuthority(owner);
 
+            // インタラクト用の判定を消す
+            RPC_SetInteractAreaActive(false);
+
             OwnerPlayerRef = owner;
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_SetInteractAreaActive(bool active)
+        {
+            _interactArea.enabled = active;
         }
 
         /// <summary>
@@ -170,7 +182,7 @@ namespace September.InGame.Kraken
 
         public void TakeHit(ref HitData hitData)
         {
-            if (HasStateAuthority && hitData.HitActionType == HitActionType.Damage)
+            if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
             {
                 PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, hitData.Amount);
             }
