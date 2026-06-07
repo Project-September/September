@@ -28,6 +28,7 @@ namespace September.Common
     {
         public NetworkButtons Buttons;
         public Vector2 MoveDirection;
+        public Vector2 LookDirection;
         public float CameraYaw;
         public Vector3 DesiredLookDirection;
     }
@@ -78,6 +79,7 @@ namespace September.Common
                 if (playerActions.Move.enabled)
                 {
                     playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+                    playerInput.LookDirection = playerActions.Look.ReadValue<Vector2>();
                     playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
@@ -85,6 +87,7 @@ namespace September.Common
                 else
                 {
                     playerInput.MoveDirection = Vector2.zero;
+                    playerInput.LookDirection = Vector2.zero;
                     playerInput.Buttons.Set(PlayerButtons.Jump, false);
                     playerInput.Buttons.Set(PlayerButtons.Dash, false);
                     playerInput.Buttons.Set(PlayerButtons.Aim, false);
