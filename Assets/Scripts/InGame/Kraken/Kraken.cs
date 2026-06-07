@@ -26,7 +26,6 @@ namespace September.InGame.Kraken
         [SerializeField] private int _damage;
 
         [Header("アニメーション設定")] 
-        [SerializeField] private Transform _leg;
         [SerializeField] private Animator _animator;
 
         private InputWrapper _attack;
@@ -160,7 +159,6 @@ namespace September.InGame.Kraken
 
         private async UniTask Attack(Vector3 targetPos)
         {
-            _leg.position = targetPos;
             await UniTask.WaitForSeconds(_hitStartTime);
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
