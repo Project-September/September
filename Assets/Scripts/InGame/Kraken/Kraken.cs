@@ -4,7 +4,6 @@ using InGame.Health;
 using InGame.Player;
 using September.Common;
 using September.Common.Input;
-using September.InGame.Effect;
 using September.InGame.Mountable;
 using UnityEngine;
 
@@ -14,11 +13,11 @@ namespace September.InGame.Kraken
     {
         /// <summary> クラーケン中のカメラ優先度 </summary>
         private const int CameraPriority = 15;
-        
+
         /// <summary> クラーケン時カメラのコントローラー </summary>
         [Header("カメラ")]
         [SerializeField] private CameraController _cameraController;
-        
+
         /// <summary> 攻撃処理コンポーネント </summary>
         [Header("攻撃設定")]
         [SerializeField] private HitChecker _hitChecker;
@@ -26,7 +25,7 @@ namespace September.InGame.Kraken
         [SerializeField] private float _hitEndTime;
         [SerializeField] private int _damage;
 
-        [Header("アニメーション設定")] 
+        [Header("アニメーション設定")]
         [SerializeField] private Animator _animator;
 
         [Header("インタラクト設定")]
@@ -46,14 +45,14 @@ namespace September.InGame.Kraken
             {
                 if (x.TryGetComponent<IDamageable>(out var damageable))
                 {
-                    var hitData = new HitData()
+                    var hitData = new HitData
                     {
                         HitActionType = HitActionType.Damage,
                         Amount = _damage,
                         ExecutorRef = Object.InputAuthority,
-                        TargetRef = damageable.OwnerPlayerRef,
+                        TargetRef = damageable.OwnerPlayerRef
                     };
-                    
+
                     damageable.TakeHit(ref hitData);
                 }
             };
@@ -67,39 +66,31 @@ namespace September.InGame.Kraken
         /// </summary>
         private void LateUpdate()
         {
-            if(!HasInputAuthority) return;
-            
+            if (!HasInputAuthority) return;
+
             if (GameInput.I.Player.Aim.triggered)
             {
                 _cameraController.CameraReset();
             }
-            
-            _cameraController.RotateCamera(new Vector2(GameInput.I.Player.Look.ReadValue<Vector2>().x, 0) ,Runner.DeltaTime);
-        }
-        
-        public override void FixedUpdateNetwork()
-        {
-            if (GetInput<PlayerInput>(out var input))
-            {
-                _attack.SetInput(input.Buttons.IsSet(PlayerButtons.Attack));
-                
-                transform.Rotate(0, 10 * input.MoveDirection.x * Runner.DeltaTime, 0);
 
-                if (_attack.IsJustPressed)
-                {
-                    if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f)), out var hit))
-                    {
-                        var targetPos = hit.point;
-                        Attack(targetPos).Forget();
-                    }
-                }
+            _cameraController.RotateCamera(new Vector2(GameInput.I.Player.Look.ReadValue<Vector2>().x, 0), Runner.DeltaTime);
+        }
+
+        public bool IsAlive { get; } = true;
+        public PlayerRef OwnerPlayerRef { get; private set; }
+
+        public void TakeHit(ref HitData hitData)
+        {
+            if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
+            {
+                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, _dealScore);
             }
         }
-        
+
         /// <summary>
         /// 指定のプレイヤーをクラーケンにする
         /// </summary>
-        /// <param name="owner"></param>
+        /// <param name="owner"> </param>
         public void GetOn(PlayerRef owner)
         {
             // カメラを有効化する
@@ -109,7 +100,7 @@ namespace September.InGame.Kraken
                 _cameraController.CameraReset();
                 _cameraController.SetCameraPriority(CameraPriority);
             }
-            
+
             // 元のプレイヤーオブジェクトを取得
             var playerObject = Runner.GetPlayerObject(owner);
             if (playerObject == null)
@@ -117,7 +108,7 @@ namespace September.InGame.Kraken
                 Debug.LogWarning($"{owner}のプレイヤーオブジェクトが見つかりませんでした");
                 return;
             }
-            
+
             // 元のプレイヤーオブジェクトを非表示にする
             if (playerObject.TryGetComponent<PlayerManager>(out var playerManager))
             {
@@ -133,12 +124,6 @@ namespace September.InGame.Kraken
             OwnerPlayerRef = owner;
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetInteractAreaActive(bool active)
-        {
-            _interactArea.enabled = active;
-        }
-
         /// <summary>
         /// 指定プレイヤーのクラーケン状態を解除する
         /// </summary>
@@ -150,7 +135,7 @@ namespace September.InGame.Kraken
                 _cameraController.CameraReset();
                 _cameraController.SetCameraPriority(0);
             }
-            
+
             // 元のプレイヤーオブジェクトを取得
             var playerObject = Runner.GetPlayerObject(owner);
             if (playerObject == null)
@@ -158,19 +143,44 @@ namespace September.InGame.Kraken
                 Debug.LogWarning($"{owner}のプレイヤーオブジェクトが見つかりませんでした");
                 return;
             }
-            
+
             // 元のプレイヤーオブジェクトを表示する
             var playerManager = playerObject.GetComponent<PlayerManager>();
             if (playerManager != null) playerManager.RPC_SetInvisible(false);
-            
+
             // 初期トランスフォームに戻す
             transform.position = _initialPosition;
             transform.rotation = _initialRotation;
-            
+
             // 入力を受け取らないようにする
             Object.RemoveInputAuthority();
 
             OwnerPlayerRef = default;
+        }
+
+        public override void FixedUpdateNetwork()
+        {
+            if (GetInput<PlayerInput>(out var input))
+            {
+                _attack.SetInput(input.Buttons.IsSet(PlayerButtons.Attack));
+
+                transform.Rotate(0, 10 * input.MoveDirection.x * Runner.DeltaTime, 0);
+
+                if (_attack.IsJustPressed)
+                {
+                    if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f)), out var hit))
+                    {
+                        var targetPos = hit.point;
+                        Attack(targetPos).Forget();
+                    }
+                }
+            }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_SetInteractAreaActive(bool active)
+        {
+            _interactArea.enabled = active;
         }
 
         private async UniTask Attack(Vector3 targetPos)
@@ -179,17 +189,6 @@ namespace September.InGame.Kraken
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
             _hitChecker.EndHitCheck();
-        }
-
-        public bool IsAlive { get; private set; } = true;
-        public PlayerRef OwnerPlayerRef { get; private set; }
-
-        public void TakeHit(ref HitData hitData)
-        {
-            if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
-            {
-                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, _dealScore);
-            }
         }
     }
 }
