@@ -1069,20 +1069,21 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 518934493411147866
+      type: {class: MountableTimeLimitInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
+      data:
+        _characterType: 5
+        _targetMountable: {fileID: 3135717980165409898}
+        _duration: 15
     - rid: 5799214060048744533
       type: {class: CompositeInteractEffect, ns: September.InGame.Interact, asm: Scripts}
       data:
         _characterType: 5
         _interactEffects:
         - rid: 5799214060048744534
-        - rid: 5799214060048744536
+        - rid: 518934493411147866
     - rid: 5799214060048744534
       type: {class: MountableRideInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
-      data:
-        _characterType: 5
-        _targetMountable: {fileID: 3135717980165409898}
-    - rid: 5799214060048744536
-      type: {class: MountableManualGetOffInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
       data:
         _characterType: 5
         _targetMountable: {fileID: 3135717980165409898}
