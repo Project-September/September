@@ -34,6 +34,8 @@ namespace InGame.Player
         [SerializeField] private float _reachDistance;
         [SerializeField] private float _timeToVault;
         [SerializeField] private AnimationCurve _vaultCurve;
+        [Header("Hook")]
+        [SerializeField] private float _hookPower = 10f;
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
@@ -105,7 +107,8 @@ namespace InGame.Player
                 var hookDirection = _hookTarget.transform.position - this.transform.position;
                 hookDirection.y = 0;
                 //_rb.linearVelocity = hookDirection;
-                this.transform.position += hookDirection;
+                //this.transform.position += hookDirection;
+                _moveVelocity = hookDirection * _hookPower;
             }
 
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
@@ -412,15 +415,22 @@ namespace InGame.Player
             return onPlaneVec.magnitude;
         }
 
-        public void OnStartHook(Transform targetHook)
+        public void OnStartHook()
         {
-            _hookTarget = targetHook;
+            IgnoreMoveInput = true;
+        }
+
+        public void OnHookFollow(Transform targetHook)
+        {
             _isHookFollow = true;
+            _hookTarget = targetHook;
         }
 
         public void OnEndHook()
         {
+            IgnoreMoveInput = false;
             _isHookFollow = false;
+            _hookTarget = null;
         }
 
         private void CheckGroundManual()
