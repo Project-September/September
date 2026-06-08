@@ -34,6 +34,7 @@ namespace InGame.UI
                 Show(!_isShow);
             }
 
+            // オプション画面等を開いていて、かつマウスを使用している場合はカーソルを表示する
             // 現状この機能を使うのがInGameSceneのみかつ、OptionUIが存在するのもInGameSceneのみなので動作上問題ない
             // 他の場所でも使うようにするなら別の所で処理するようにする
             // ↑特定のシーン上でしか動作させなくていいことに変わりはないと思うので、そこをどう制御するかは必要な時に考える
@@ -57,7 +58,7 @@ namespace InGame.UI
                     EventSystem.current.SetSelectedGameObject(_selectWhenOpen.gameObject);
             }
 
-            if (isShow)
+            if (_isShow)
             {
                 CursorStateManager.ShowCursor();
             }
@@ -65,6 +66,14 @@ namespace InGame.UI
             {
                 CursorStateManager.HideCursor();
             }
+        }
+
+        private void OnDestroy()
+        {
+            if (!_isShow) return;
+
+            CursorStateManager.HideCursor();
+            if (_gameInput != null) _gameInput.IsInputBlockedByUI = false;
         }
     }
 }
