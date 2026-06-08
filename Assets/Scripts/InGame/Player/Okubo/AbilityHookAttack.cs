@@ -33,14 +33,14 @@ namespace InGame.Player.Okubo
         public override void Spawned()
         {
             _wireCyl.gameObject.SetActive(false);
-            _ownerRef = _ownerRef = Object.InputAuthority;
+            _ownerRef = Object.InputAuthority;
         }
 
         public override void FixedUpdateNetwork()
         {
-            _playerInputManager.GetPlayerInput(out var input);
+            if (!HasStateAuthority) return;
 
-            if (!HasInputAuthority) return;
+            _playerInputManager.GetPlayerInput(out var input);
 
             switch (_currentState)
             {
@@ -219,6 +219,7 @@ namespace InGame.Player.Okubo
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_HookStart(PlayerRef playerRef)
         {
+            Debug.Log($"start {Object.InputAuthority} => {playerRef}");
             _wireCyl.gameObject.SetActive(true);
             var targetData = TryGetTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
@@ -230,15 +231,17 @@ namespace InGame.Player.Okubo
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_HookFollow(PlayerRef playerRef)
         {
+            Debug.Log($"follow {Object.InputAuthority} => {playerRef}");
             var targetData = TryGetTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
 
             targetData.PlayerMovement.OnHookFollow(_hookObject);
         }
 
-        [Rpc(RpcSources.All, RpcTargets.All)]   
+        [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_HookEnd(PlayerRef playerRef)
         {
+            Debug.Log($"end {Object.InputAuthority} => {playerRef}");
             _wireCyl.gameObject.SetActive(false);
             var targetData = TryGetTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
