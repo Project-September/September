@@ -39,6 +39,9 @@ namespace September.InGame.Kraken
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
 
+        private Vector3 _originalPlayerPosition;
+        private Quaternion _originalPlayerRotation;
+
         private void Start()
         {
             _hitChecker.OnHit += x =>
@@ -109,6 +112,12 @@ namespace September.InGame.Kraken
                 return;
             }
 
+            _originalPlayerPosition = playerObject.transform.position;
+            _originalPlayerRotation = playerObject.transform.rotation;
+
+            playerObject.transform.position = transform.position;
+            playerObject.transform.rotation = transform.rotation;
+
             // 元のプレイヤーオブジェクトを非表示にする
             if (playerObject.TryGetComponent<PlayerManager>(out var playerManager))
             {
@@ -143,6 +152,9 @@ namespace September.InGame.Kraken
                 Debug.LogWarning($"{owner}のプレイヤーオブジェクトが見つかりませんでした");
                 return;
             }
+
+            playerObject.transform.position = _originalPlayerPosition;
+            playerObject.transform.rotation = _originalPlayerRotation;
 
             // 元のプレイヤーオブジェクトを表示する
             var playerManager = playerObject.GetComponent<PlayerManager>();
