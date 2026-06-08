@@ -97,12 +97,9 @@ namespace September.InGame.Kraken
         public void GetOn(PlayerRef owner)
         {
             // カメラを有効化する
-            if (Runner.LocalPlayer == owner)
-            {
-                _cameraController.Init(true);
-                _cameraController.CameraReset();
-                _cameraController.SetCameraPriority(CameraPriority);
-            }
+            _cameraController.Init(true);
+            _cameraController.CameraReset();
+            RPC_SetCameraPriority(owner, CameraPriority);
 
             // 元のプレイヤーオブジェクトを取得
             var playerObject = Runner.GetPlayerObject(owner);
@@ -139,11 +136,8 @@ namespace September.InGame.Kraken
         public void GetOff(PlayerRef owner)
         {
             // カメラを無効化する
-            if (Runner.LocalPlayer == owner)
-            {
-                _cameraController.CameraReset();
-                _cameraController.SetCameraPriority(0);
-            }
+            _cameraController.CameraReset();
+            RPC_SetCameraPriority(owner, 0);
 
             // 元のプレイヤーオブジェクトを取得
             var playerObject = Runner.GetPlayerObject(owner);
@@ -201,6 +195,13 @@ namespace September.InGame.Kraken
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
             _hitChecker.EndHitCheck();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_SetCameraPriority(PlayerRef player, int priority)
+        {
+            if (player == Runner.LocalPlayer)
+                _cameraController.SetCameraPriority(priority);
         }
     }
 }
