@@ -219,6 +219,7 @@ namespace InGame.Player.Okubo
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_HookStart(PlayerRef playerRef)
         {
+            _wireCyl.gameObject.SetActive(true);
             var targetData = TryGetTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
 
@@ -238,6 +239,7 @@ namespace InGame.Player.Okubo
         [Rpc(RpcSources.All, RpcTargets.All)]   
         public void RPC_HookEnd(PlayerRef playerRef)
         {
+            _wireCyl.gameObject.SetActive(false);
             var targetData = TryGetTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
 
