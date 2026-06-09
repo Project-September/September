@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace September.InGame.Common.Stats
 {
+    /// <summary>
+    /// ビルドシステムのベースクラス
+    /// PlayerStatus.csにアサインしないと起動しない
+    /// </summary>
     public abstract class BuildSystem : StatsEffectorBase
     {
         [SerializeField] protected BuildDataBase _buildData;
