@@ -25,7 +25,7 @@ namespace InGame.Exhibit
 		[SerializeField] private NetworkObject _fireParticlePrefab;
 		[SerializeField] private NetworkObject _explosionParticlePrefab;
 
-		[Header("射撃")] [SerializeField] private LayerMask _playerHitMask;
+		[Header("射撃")] [SerializeField] private LayerMask _hitLayer;
 		[SerializeField] private float _simulationStepTime = 0.1f;
 		[SerializeField] private Vector3 _gravity;
 		[SerializeField] private float _ballSpeed;
@@ -43,37 +43,39 @@ namespace InGame.Exhibit
 		private Quaternion _baseDefaultRotation;
 		private Quaternion _barrelDefaultRotation;
 		private int _currentAmmo;
-		private Vector3[] _linePositions = new Vector3[32];
-		private NetworkObject _fireParticle;
-		private NetworkObject _explosionParticle;
-		private NetworkObject _aimObj;
+		private readonly Vector3[] _linePositions = new Vector3[32];
+		[Networked] private NetworkObject FireParticle { get; set; }
+		[Networked] private NetworkObject ExplosionParticle { get; set; }
+		[Networked] private NetworkObject AimParticle { get; set; }
 
-		[Networked] private Quaternion _baseRotation { get; set; }
-		[Networked] private Quaternion _barrelRotation { get; set; }
+		[Networked] private Quaternion BaseRotation { get; set; }
+		[Networked] private Quaternion BarrelRotation { get; set; }
 
 		[Networked] public bool IsActive { get; private set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
-		[Networked] private int _lastPositionIndex { get; set; }
-
-		#region Networked Methods
+		[Networked] private int LastPositionIndex { get; set; }
 
 		public override void Spawned()
 		{
 			base.Spawned();
 			_baseDefaultRotation = _cannonBase.localRotation;
 			_barrelDefaultRotation = _cannonBarrel.localRotation;
-			_baseRotation = _cannonBase.localRotation;
-			_barrelRotation = _cannonBarrel.localRotation;
-			_fireParticle = Runner.Spawn(_fireParticlePrefab, Vector3.zero, Quaternion.identity);
-			_explosionParticle = Runner.Spawn(_explosionParticlePrefab, Vector3.zero, Quaternion.identity);
+			BaseRotation = _cannonBase.localRotation;
+			BarrelRotation = _cannonBarrel.localRotation;
+
+			if (Runner.IsServer)
+			{
+				FireParticle = Runner.Spawn(_fireParticlePrefab, Vector3.zero, Quaternion.identity);
+				ExplosionParticle = Runner.Spawn(_explosionParticlePrefab, Vector3.zero, Quaternion.identity);
+			}
 		}
 
 		public override void Render()
 		{
 			base.Render();
 			CreateLine();
-			_cannonBarrel.localRotation = _barrelRotation;
-			_cannonBase.localRotation = _baseRotation;
+			_cannonBarrel.localRotation = BarrelRotation;
+			_cannonBase.localRotation = BaseRotation;
 		}
 
 
@@ -97,8 +99,6 @@ namespace InGame.Exhibit
 			}
 		}
 
-		#endregion
-		
 		/// <summary>
 		///     インタラクト開始時の初期化処理
 		/// </summary>
@@ -113,6 +113,9 @@ namespace InGame.Exhibit
 			if (_currentUsePlayer == null) return;
 			RPC_PlayerUnActive();
 			_currentUsePlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
+
+			// Playerがダメージを受けた際にInteractを終了する
+			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
 		}
 
 		/// <summary>
@@ -121,17 +124,20 @@ namespace InGame.Exhibit
 		public void OnInteractEnd()
 		{
 			IsActive = false;
-			Refresh();
+			RPC_Refresh();
 			if (_currentUsePlayer == null) return;
 			Object.RemoveInputAuthority();
 			PlayerActive(true);
 			_currentUsePlayer = null;
 
 			IsActive = false;
+
+			if (_currentUsePlayer)
+				_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
 		}
 
-
-		private void Refresh()
+		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+		private void RPC_Refresh()
 		{
 			_lineRenderer.positionCount = 0;
 			_cannonBarrel.rotation = _barrelDefaultRotation;
@@ -142,10 +148,10 @@ namespace InGame.Exhibit
 		{
 			if (!IsActive) return;
 			BuildTrajectory(); // 描画位置の計算
-			_lineRenderer.positionCount = _lastPositionIndex + 1;
+			_lineRenderer.positionCount = LastPositionIndex + 1;
 			_lineRenderer.SetPositions(_linePositions);
 
-			var endPos = _linePositions[_lastPositionIndex];
+			var endPos = _linePositions[LastPositionIndex];
 			_aimHitViewObject.position = endPos;
 			_aimHitViewObject.gameObject.SetActive(true);
 		}
@@ -174,12 +180,12 @@ namespace InGame.Exhibit
 				{
 					_lineRenderer.positionCount = i;
 					_linePositions[i] = hit.point;
-					_lastPositionIndex = i;
+					LastPositionIndex = i;
 					return;
 				}
 			}
 
-			_lastPositionIndex = _linePositions.Length - 1;
+			LastPositionIndex = _linePositions.Length - 1;
 		}
 
 		private void PlayerActive(bool isActive)
@@ -214,35 +220,63 @@ namespace InGame.Exhibit
 			var muzzlePosition = _muzzle.position;
 			var muzzleForward = _muzzle.transform.forward;
 			var ballSpeed = _ballSpeed;
-			var endPos = _linePositions[_lastPositionIndex];
-			var endTime = _simulationStepTime * _lastPositionIndex;
-			
-			RPC_ParticleRenderActive(_fireParticle, true);
+			var endPos = _linePositions[LastPositionIndex];
+			var endTime = _simulationStepTime * LastPositionIndex;
+
+			RPC_ParticleRenderActive(FireParticle, true);
 
 			// 弾丸の位置をUpdateする
 			while (timer < endTime)
 			{
 				timer += Runner.DeltaTime;
-				var pos = TrajectoryCalculator(muzzlePosition,
+				var from = TrajectoryCalculator(muzzlePosition,
 					muzzleForward * ballSpeed, 9.8f, timer);
+				var to = TrajectoryCalculator(muzzlePosition,
+					muzzleForward * ballSpeed, 9.8f, timer + Runner.DeltaTime);
+
 				//弾の位置更新
-				_fireParticle.transform.position = pos;
+				FireParticle.transform.position = from;
+
+				// 弾の着弾確認
+				var fromTo = to - from;
+				if (Physics.Raycast(from, fromTo.normalized, out var hit, fromTo.magnitude * 2, _hitLayer))
+				{
+					endPos = hit.point;
+					break;
+				}
 
 				// シミュレーション終了条件
-				if ((endPos - pos).magnitude < 0.1f) // TODO:計算負荷
-					break;
-
 				await UniTask.WaitForSeconds(Runner.DeltaTime);
 			}
 
-			RPC_ParticleRenderActive(_fireParticle, false);
+			RPC_ParticleRenderActive(FireParticle, false);
 
+			RPC_Explosion(endPos, Quaternion.identity);
+		}
+
+		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+		private void RPC_Explosion(Vector3 position, Quaternion rotation)
+		{
+			Explosion(position, rotation);
+		}
+
+		private void Explosion(Vector3 position, Quaternion rotation)
+		{
 			// 着弾時のエフェクト
-			var explosionEffect = Runner.Spawn(_explosionParticlePrefab, endPos, Quaternion.identity);
-			Destroy(explosionEffect.gameObject, 3f);
-			Runner.Despawn(explosionEffect);
+			ExplosionParticle.transform.position = position;
+			ExplosionParticle.transform.rotation = rotation;
+			RPC_ParticleRenderActive(ExplosionParticle, true);
+			UniTask.Void(async () =>
+			{
+				var particle = ExplosionParticle.GetComponent<ParticleSystem>();
+				if (particle) return;
+				while (particle.isPlaying)
+					await UniTask.Yield();
+				RPC_ParticleRenderActive(ExplosionParticle, false);
+			});
+			Debug.Log("Explosion at: " + position);
 
-			var cols = Physics.OverlapSphere(endPos, _radius, _playerHitMask); // TODO:当たり判定統一するかも
+			var cols = Physics.OverlapSphere(position, _radius, _hitLayer); // TODO:当たり判定統一するかも
 			// ダメージ処理
 			foreach (var col in cols)
 			{
@@ -261,30 +295,26 @@ namespace InGame.Exhibit
 			var currentBaseAxis = _cannonBase.localEulerAngles.y +
 			                      _baseRotateSpeed * baseRotateInput;
 			currentBaseAxis = WarpAngle(currentBaseAxis);
-			_baseRotation = _baseDefaultRotation * Quaternion.Euler(0,
+			BaseRotation = _baseDefaultRotation * Quaternion.Euler(0,
 				Mathf.Clamp(currentBaseAxis, _angleLimitY.x, _angleLimitY.y), 0);
 
 			// 砲身の回転
 			var currentBarrelAxis = _cannonBarrel.localEulerAngles.x +
 			                        _barrelRotateSpeed * barrelRotateInput;
 			currentBarrelAxis = WarpAngle(currentBarrelAxis);
-			_barrelRotation = _cannonBase.localRotation * Quaternion.Euler(
+			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(
 				Mathf.Clamp(currentBarrelAxis, _angleLimitX.x, _angleLimitX.y), 0, 0);
 		}
-		
+
+		private void PlayerHitTaken(HitData hitData)
+		{
+			OnInteractEnd();
+		}
+
 		[Rpc(RpcSources.All, RpcTargets.All)]
-		void RPC_ParticleRenderActive(NetworkObject obj, bool isActive)
+		private void RPC_ParticleRenderActive(NetworkObject obj, bool isActive)
 		{
 			obj.gameObject.SetActive(isActive);
-			// var particle = obj.GetComponentInChildren<ParticleSystem>();
-			// if (IsActive)
-			// {
-			// 	particle.Play();
-			// }
-			// else
-			// {
-			// 	particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-			// }
 		}
 
 		#region Math Helper
