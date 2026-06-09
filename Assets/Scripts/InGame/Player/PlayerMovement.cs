@@ -420,6 +420,7 @@ namespace InGame.Player
         public void OnStartHook()
         {
             IgnoreMoveInput = true;
+            InputDirection = Vector2.zero;
         }
 
         public void OnHookFollow(Transform targetHook)

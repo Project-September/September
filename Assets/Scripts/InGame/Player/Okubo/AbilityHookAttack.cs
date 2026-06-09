@@ -121,13 +121,16 @@ namespace InGame.Player.Okubo
 
         private void OnPulling()
         {
-            float resistance = 0;
+            float maxResistance = 0;
             foreach (var player in _targetData.Values)
             {
-                resistance = Mathf.Max(player.PlayerMovement.InputDirection.magnitude,resistance);
+                Vector2 inputDirection = player.PlayerMovement.InputDirection;
+                var angle = Vector2.Angle(_wireCyl.up, inputDirection);
+                float resistance = 1f - (angle / 180);
+                maxResistance = Mathf.Max(resistance * inputDirection.magnitude, maxResistance);
+                Debug.Log($"抵抗 {player.Player}  {resistance}");
             }
-            Debug.Log("抵抗"+resistance);
-            _currentHookLength -= (_wireLength / _pullSpeed - resistance * _resistanceAmount)* Runner.DeltaTime;
+            _currentHookLength -= (_wireLength / _pullSpeed - maxResistance * _resistanceAmount)* Runner.DeltaTime;
 
             if (_currentHookLength <= 0)
             {
