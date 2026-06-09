@@ -16,13 +16,14 @@ namespace InGame.Player.Okubo
         [SerializeField] private float _pullSpeed;
         [SerializeField] private float _wireLength;
         [SerializeField] private float _stretchedWaitTime = 0.3f;
-        [SerializeField] private float _coolDownTime = 1.0f;
         [SerializeField] private float _wireThickness;
         [SerializeField] private float _hitRadius;
         [SerializeField] private Transform _wireCyl;
         [SerializeField] private Transform _hookObject;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _resistanceAmount;
+        [SerializeField] private float _missAtttackCoolTime;
+        [SerializeField] private float _hitCoolTime;
 
         private HookAttackState _currentState;
         private float _currentHookLength;
@@ -70,7 +71,6 @@ namespace InGame.Player.Okubo
             switch (state)
             {
                 case HookAttackState.Idol:
-                    _playerMovement.IgnoreMoveInput = false;
                     break;
                 //フック攻撃初期化
                 case HookAttackState.Stretching:
@@ -86,14 +86,17 @@ namespace InGame.Player.Okubo
                     break;
 
                 case HookAttackState.CoolDown:
+                    bool isTarget = false;
                     foreach (var kv in _targetData)
                     {
                         if (!kv.Value.IsTarget) continue;
                         RPC_HookEnd(kv.Key);
                         kv.Value.IsTarget = false;
+                        isTarget = true;
                     }
                     _wireCyl.gameObject.SetActive(false);
-                    _waitTimer = _coolDownTime;
+                    _waitTimer = isTarget ? _hitCoolTime : _missAtttackCoolTime;
+                    _playerMovement.IgnoreMoveInput = false;
                     break;
             }
         }
