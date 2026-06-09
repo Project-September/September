@@ -22,6 +22,7 @@ namespace InGame.Player.Okubo
         [SerializeField] private Transform _wireCyl;
         [SerializeField] private Transform _hookObject;
         [SerializeField] private int _damageAmount;
+        [SerializeField] private float _resistanceAmount;
 
         private HookAttackState _currentState;
         private float _currentHookLength;
@@ -120,7 +121,13 @@ namespace InGame.Player.Okubo
 
         private void OnPulling()
         {
-            _currentHookLength -= _wireLength / _pullSpeed * Runner.DeltaTime;
+            float resistance = 0;
+            foreach (var player in _targetData.Values)
+            {
+                resistance = Mathf.Max(player.PlayerMovement.InputDirection.magnitude,resistance);
+            }
+            Debug.Log("抵抗"+resistance);
+            _currentHookLength -= (_wireLength / _pullSpeed - resistance * _resistanceAmount)* Runner.DeltaTime;
 
             if (_currentHookLength <= 0)
             {

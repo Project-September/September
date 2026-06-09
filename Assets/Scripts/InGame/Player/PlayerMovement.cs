@@ -62,7 +62,7 @@ namespace InGame.Player
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
-        [Networked] public Vector3 InputDirection { get; private set; }
+        [Networked] public Vector2 InputDirection { get; private set; }
         private bool _isHookFollow;
         private Transform _hookTarget;
         private float _vaultTimer;
@@ -100,7 +100,6 @@ namespace InGame.Player
         {
             CheckGroundManual();
 
-            if (IgnoreMoveInput) moveInput = Vector2.zero;
 
             if (_isHookFollow)
             {
@@ -108,8 +107,11 @@ namespace InGame.Player
                 hookDirection.y = 0;
                 //_rb.linearVelocity = hookDirection;
                 //this.transform.position += hookDirection;
+                InputDirection = moveInput;
                 _moveVelocity = hookDirection * _hookPower;
             }
+
+            if (IgnoreMoveInput) moveInput = Vector2.zero;
 
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
@@ -431,6 +433,7 @@ namespace InGame.Player
             IgnoreMoveInput = false;
             _isHookFollow = false;
             _hookTarget = null;
+            InputDirection = Vector2.zero;
         }
 
         private void CheckGroundManual()
