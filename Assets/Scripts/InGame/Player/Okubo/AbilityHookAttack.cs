@@ -83,12 +83,6 @@ namespace InGame.Player.Okubo
                     _waitTimer = _stretchedWaitTime;
                     break;
                 case HookAttackState.Pulling:
-                    foreach (var kv in _targetData)
-                    {
-                        if (!kv.Value.IsTarget) continue;
-                        Debug.Log(kv.Value);
-                        RPC_HookStart(kv.Key);
-                    }
                     break;
 
                 case HookAttackState.CoolDown:
@@ -213,6 +207,8 @@ namespace InGame.Player.Okubo
                         if (target == null) continue;
                         //フック攻撃対象にする
                         target.IsTarget = true;
+
+                        RPC_HookStart(pair.Key);
 
                         //ダメージ処理
                         if (pair.Value.TryGetComponent(out IDamageable damageable))
