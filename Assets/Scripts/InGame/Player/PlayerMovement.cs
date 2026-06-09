@@ -107,7 +107,7 @@ namespace InGame.Player
                 hookDirection.y = 0;
                 //_rb.linearVelocity = hookDirection;
                 //this.transform.position += hookDirection;
-                InputDirection = moveInput;
+                InputDirection = GetMoveDirection(moveInput, cameraYaw);
                 _moveVelocity = hookDirection * _hookPower;
             }
 
