@@ -10,14 +10,12 @@ namespace September.Common
         {
             _showRequestStack++;
             Debug.Log($"[CursorStateManager] Show Requested. (currentStack: {_showRequestStack})");
-            UpdateCursorState();
         }
 
         public static void HideCursor()
         {
             _showRequestStack--;
             Debug.Log($"[CursorStateManager] Hide Requested. (currentStack: {_showRequestStack})");
-            UpdateCursorState();
         }
 
         public static void UpdateCursorState()
