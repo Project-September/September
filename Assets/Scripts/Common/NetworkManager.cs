@@ -19,8 +19,9 @@ namespace September.Common
         [SerializeField, Scene] string _gameSceneName;
         [SerializeField, Scene] string _resultSceneName;
         NetworkRunner _networkRunner;
-        UniTask _currentTask;
-        private void Start()
+        UniTask<StartGameResult> _currentTask;
+
+        private void Awake()
         {
             if (Instance == null)
             {
@@ -33,14 +34,31 @@ namespace September.Common
                 Destroy(gameObject);
             }
         }
-        public void CreateLobby(string gameName, int playerCount)
+
+        public async UniTask<StartGameResult> CreateLobby(string gameName, int playerCount)
         {
-            if (!_currentTask.Status.IsCompleted()) return;
+            if (!_currentTask.Status.IsCompleted())
+                return default;
+
             _loadingIcon.StartAnimation();
-            _currentTask = CreateLobbyAsync(gameName, playerCount).Preserve();
-            _currentTask.GetAwaiter().OnCompleted(()=>_loadingIcon.StopAnimation());
+
+            try
+            {
+                _currentTask = CreateLobbyAsync(gameName, playerCount).Preserve();
+                return await _currentTask;
+            }
+            finally
+            {
+                _loadingIcon.StopAnimation();
+            }
         }
-        async UniTask CreateLobbyAsync(string gameName, int playerCount)
+
+        public async UniTask LoadLobbyScene()
+        {
+            await _networkRunner.LoadScene(_lobbySceneName);
+        }
+
+        async UniTask<StartGameResult> CreateLobbyAsync(string gameName, int playerCount)
         {
             var result = await _networkRunner.StartGame(new StartGameArgs
             {
@@ -48,40 +66,58 @@ namespace September.Common
                 SessionName = gameName,
                 PlayerCount = playerCount
             });
+
             if (!result.Ok)
             {
-                Debug.Log(result.ShutdownReason);
                 await InitializeRunner();
-                return;
+                return result;
             }
             await _networkRunner.SpawnAsync(_playerDatabasePrefab);
-            await _networkRunner.LoadScene(_lobbySceneName);
+
+            return result;
         }
-        public void JoinLobby(string gameName)
+
+        public async UniTask<StartGameResult> JoinLobby(string gameName)
         {
-            if (!_currentTask.Status.IsCompleted()) return;
+            if (!_currentTask.Status.IsCompleted())
+                return default;
             _loadingIcon.StartAnimation();
-            _currentTask = JoinLobbyAsync(gameName).Preserve();
-            _currentTask.GetAwaiter().OnCompleted(()=>_loadingIcon.StopAnimation());
+
+            try
+            {
+                _currentTask = JoinLobbyAsync(gameName).Preserve();
+                return await _currentTask;
+
+            }
+            finally
+            {
+                _loadingIcon.StopAnimation();
+            }
+
         }
-        async UniTask JoinLobbyAsync(string gameName)
+
+        async UniTask<StartGameResult> JoinLobbyAsync(string gameName)
         {
             var result = await _networkRunner.StartGame(new StartGameArgs
             {
                 GameMode = GameMode.Client,
                 SessionName = gameName,
             });
+
             if (!result.Ok)
             {
-                Debug.Log(result.ShutdownReason);
+
                 await InitializeRunner();
             }
+            return result;
         }
+
         public async UniTask InitializeRunner()
         {
             await _networkRunner.Shutdown();
             _networkRunner = Instantiate(_runnerPrefab);
         }
+
         public async UniTaskVoid QuitLobby()
         {
             await _networkRunner.Shutdown();
@@ -93,10 +129,10 @@ namespace September.Common
         {
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
-            
+
             await _networkRunner.LoadScene(_gameSceneName);
         }
-        
+
         public async UniTask Fade(Image fadeImage)
         {
             fadeImage.gameObject.SetActive(true);
@@ -105,18 +141,17 @@ namespace September.Common
             await fadeImage.DOFade(1f, 0.5f).SetEase(Ease.InOutQuad);
         }
 
-        
         public async UniTask QuitInGame()
         {
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
-            
+
             if (!SceneManager.GetSceneByName("Field").isLoaded)
             {
                 return;
             }
-            
-            await _networkRunner.UnloadScene("Field"); 
+
+            await _networkRunner.UnloadScene("Field");
             await _networkRunner.LoadScene(_resultSceneName);
         }
     }

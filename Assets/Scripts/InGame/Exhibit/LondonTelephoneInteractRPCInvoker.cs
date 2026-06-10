@@ -15,16 +15,16 @@ namespace InGame.Exhibit
     /// </summary>
     public class LondonTelephoneInteractRPCInvoker : NetworkBehaviour
     {
-        [SerializeField,Label("Effect持続時間")] private float _interactTimer;
+        [SerializeField, Label("Effect持続時間")] private float _interactTimer;
         [SerializeField, Label("エフェクトの位置")] private Transform _effectPos;
-        
+
         private EffectSpawner _effectSpawner;
         private CancellationTokenSource _cts;
-        private InteractableBase  _interactableBase;
+        private InteractableBase _interactableBase;
 
         private void Awake()
         {
-            _cts =  new CancellationTokenSource();
+            _cts = new CancellationTokenSource();
             _interactableBase = GetComponent<InteractableBase>();
         }
 
@@ -32,10 +32,11 @@ namespace InGame.Exhibit
         public void Rpc_RequestInteraction(PlayerRef requestingPlayer)
         {
             // ここで他のプレイヤーに通知
-            foreach (var player in Runner.ActivePlayers)
+            foreach (var kv in PlayerDatabase.Instance.PlayerObjectDic)
             {
+                var player = kv.Key;
                 if (player != requestingPlayer)
-                { 
+                {
                     ShowEffect(player).Forget();
                 }
             }
@@ -43,7 +44,7 @@ namespace InGame.Exhibit
 
         private async UniTask ShowEffect(PlayerRef player)
         {
-            if (!Runner.TryGetPlayerObject(player, out var playerObject))
+            if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(player, out var playerObject))
                 return;
 
             // 同時インタラクト不可

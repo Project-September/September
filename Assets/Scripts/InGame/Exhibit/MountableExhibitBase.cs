@@ -148,7 +148,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
             Object.AssignInputAuthority(playerRef);
-            RPC_ChangeDescriptionUI(playerRef,1);
+            RPC_ChangeDescriptionUI(playerRef, ControlDescriptionType.Exhibit);
             CameraController.Init(true);
             RPC_SetCameraPriority(playerRef,15);
             RPC_SetIsKinematic(false);
@@ -159,7 +159,7 @@ namespace InGame.Exhibit
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ChangeDescriptionUI(PlayerRef target, int mode)
+        private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
         {
             if (Runner.LocalPlayer == target)
             {
@@ -174,26 +174,22 @@ namespace InGame.Exhibit
         public virtual void GetOff(PlayerRef playerRef)
         {
             PlayerDatabase.Instance.PlayerDataDic.TryGet(playerRef, out var playerData);
-            int num;
-            if(playerData.CharacterType == CharacterType.Sarutobi)
-            {
-                num = 3;
-            }
-            else if(playerData.CharacterType == CharacterType.Tanihira)
-            {
-                num = 4;
-            }
-            else
-            {
-                num = 2;
-            }
-            RPC_ChangeDescriptionUI(playerRef, num);
+            ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
+            
+            // UIの切り替え
+            RPC_ChangeDescriptionUI(playerRef, type);
+            
+            // インタラクト物を基の位置に移動
+            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+            
+            // クールダウン処理
             var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
                 : _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
-            _interactable.LastUsedCooldownTime = time;
-            _interactable.LastInteractTime = Runner.SimulationTime;
+            _interactable.SetCooldown(time);
+            
+            // プレイヤーの状態復帰
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetUseGrav(true);
             _ownerPlayerManager.RPC_SetColliderActive(true);
@@ -209,8 +205,6 @@ namespace InGame.Exhibit
                 formationManager.WarpFriendNearPlayer(obj.transform.position,obj.transform.rotation);
             }
             Executor = null;
-            transform.SetPositionAndRotation(_initialPosition, _initialRotation);
-            _interactable.PlayCooldownEffect(time).Forget();
             CameraController.CameraReset();
         }
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

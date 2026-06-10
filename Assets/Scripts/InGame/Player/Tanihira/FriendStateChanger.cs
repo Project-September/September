@@ -7,7 +7,7 @@ namespace Ingame.Tanihira
     {
         [SerializeField] private FormationManager _formationManager;
         [SerializeField] private GameObject _friendOwner;
-
+        
         public void SetMoveState()
         {
             if (_formationManager == null)
@@ -42,11 +42,14 @@ namespace Ingame.Tanihira
         {
             if (_formationManager == null || target == null)
                 return;
-
+            
             foreach (var friend in _formationManager.FriendsList)
             {
-                friend.SetDestination(target);
-                friend.ChangeState(FriendState.Chase);
+                if (friend.IsAttackPossible) //攻撃処理
+                {
+                    friend.SetDestination(target);
+                    friend.ChangeState(FriendState.Chase);
+                }
             }
         }
     }

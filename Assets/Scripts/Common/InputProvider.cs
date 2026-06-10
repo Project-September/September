@@ -20,7 +20,8 @@ namespace September.Common
         Ability3,
         Warp,
         AirplaneForward,
-        AirPlaneBack
+        AirPlaneBack,
+        Shooting
     }
 
     public struct PlayerInput : INetworkInput
@@ -97,6 +98,7 @@ namespace September.Common
                     playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Ability3, playerActions.Ability3.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Shooting, playerActions.Shooting.IsPressed());
                 }
                 else
                 {
@@ -105,6 +107,7 @@ namespace September.Common
                     playerInput.Buttons.Set(PlayerButtons.Ability2, false);
                     playerInput.Buttons.Set(PlayerButtons.Ability3, false);
                     playerInput.Buttons.Set(PlayerButtons.Interact, false);
+                    playerInput.Buttons.Set(PlayerButtons.Shooting, false);
                 }
 
                 // その他の入力（常に有効）

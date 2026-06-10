@@ -1,19 +1,16 @@
-﻿using System;
-using Fusion;
-using September.Common;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CRISound;
 using Cysharp.Threading.Tasks;
+using Fusion;
+using InGame.Player;
 using Result;
-using September.InGame.Effect;
+using September.Common;
 using September.InGame;
 using September.InGame.Common;
-using InGame.Player;
-using CRISound;
+using September.InGame.Effect;
 using September.InGame.UI;
-using WebSocketSharp;
-using System.Threading;
+using UnityEngine;
 
 namespace InGame.Interact
 {
@@ -93,7 +90,9 @@ namespace InGame.Interact
         /// <summary>現在アクティブなインタラクト効果</summary>
         private CharacterInteractEffectBase _activeEffectBase;
 
-        private CharacterType _characterType; 
+        private CharacterType _characterType;
+
+        [SerializeField] private bool _debug;
 
         /// <summary>
         /// インタラクトのメイン処理（Host側でのみ実行）
@@ -115,17 +114,14 @@ namespace InGame.Interact
             _characterType = context.CharacterType;
 
             // CharacterType.All を優先、なければキャラ固有のクールダウン時間を取得
-            LastUsedCooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+            var cooldownTime = _cooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
                 : _cooldownTimeDictionary.Dictionary.GetValueOrDefault(_characterType, 0f);
 
-            // インタラクト時刻を記録（NetworkRunnerがあればシミュレーション時刻、なければローカル時刻）
-            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-
             // クールダウンのループエフェクトを再生（設定がONで、クールダウン時間が0より大きい場合）
-            if (_spawnCooldownEffectOnStart && LastUsedCooldownTime > 0f)
+            if (_spawnCooldownEffectOnStart && cooldownTime > 0f)
             {
-                PlayCooldownEffect(LastUsedCooldownTime).Forget();
+                SetCooldown(cooldownTime);
             }
 
             // インタラクト完了エフェクトを再生（ワンショット）
@@ -155,14 +151,36 @@ namespace InGame.Interact
         }
 
         /// <summary>
-        /// クールダウンエフェクトを再生する非同期処理
-        /// 指定時間経過後にエフェクトを停止し、回復音を再生
+        /// クールダウンを開始する。すでにクールダウン中であればクールダウン時間を上書きする
         /// </summary>
-        /// <param name="cooldownTime">クールダウン時間（秒）</param>
-        public async UniTask PlayCooldownEffect(float cooldownTime)
+        public void SetCooldown(float seconds)
         {
-            if (cooldownTime <= 0f) return;
+            if (!HasStateAuthority || seconds <= 0f)
+            {
+                Debug.LogWarning($"[InteractableBase] クールダウンの開始に失敗しました\n詳細：{HasStateAuthority} {seconds}");
+                return;
+            }
 
+            // すでにクールダウン中か評価する。（クールダウンの設定前に評価しないと常に真となるため事前に行う必要あり）
+            var isInCooldown = IsInCooldown();
+
+            // インタラクト時刻を記録（NetworkRunnerがあればシミュレーション時刻、なければローカル時刻）
+            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
+            LastUsedCooldownTime = seconds;
+
+            // 二重にエフェクトが表示されないようクールダウン中なら処理しない
+            if (!isInCooldown)
+            {
+                PlayCooldownEffect().Forget();
+            }
+        }
+
+        /// <summary>
+        /// クールダウンエフェクトを再生する非同期処理
+        /// クールダウン終了後にエフェクトを停止し、回復音を再生
+        /// </summary>
+        private async UniTask PlayCooldownEffect()
+        {
             var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             var uniqueEffectId = $"cooldown_{Object.Id}"; // オブジェクトIDを使って一意なIDを生成
             var effectTransform = _cooldownEffectTransform != null ? _cooldownEffectTransform : transform;
@@ -172,8 +190,8 @@ namespace InGame.Interact
                 effectTransform.position + _cooldownEffectOffset, Quaternion.Euler(_cooldownEffectRotation),
                 _cooldownEffectScale);
 
-            // クールダウン時間待機
-            await UniTask.Delay(TimeSpan.FromSeconds(cooldownTime), ignoreTimeScale: false, cancellationToken: this.GetCancellationTokenOnDestroy());
+            // クールダウン終了待機
+            await UniTask.WaitUntil(this, s => !s.IsInCooldown(), cancellationToken: this.GetCancellationTokenOnDestroy());
 
             // エフェクトを停止
             effectSpawner?.StopEffect(uniqueEffectId);
@@ -207,45 +225,32 @@ namespace InGame.Interact
             // クールダウン中はインタラクト不可
             if (IsInCooldown())
             {
-                //Debug.LogError("[InteractableBase] クールダウン中のためインタラクトできません");
+                if (_debug) Debug.Log("[InteractableBase] クールダウン中のためインタラクトできません");
                 return false;
             }
 
             // オブジェクトが無効な場合はインタラクト不可
             if (!Object.isActiveAndEnabled)
             {
-                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが無効です");
+                if (_debug) Debug.Log($"[{name}] インタラクト可能なオブジェクトが無効です");
                 return false;
             }
 
             // 強制無効化フラグがfalseの場合はインタラクト不可
             if (!ForceSetInteractable)
             {
-                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
+                if (_debug) Debug.Log($"[{name}] インタラクト可能なオブジェクトが強制的に無効化されています");
                 return false;
             }
 
             // 派生クラスの個別条件をチェック
             if (!OnValidateInteraction(context, type))
             {
-                //Debug.LogError($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
+                if (_debug) Debug.Log($"[{name}] インタラクト可能なオブジェクトが OnValidateInteraction により拒否されました");
                 return false;
             }
 
             return true;
-        }
-
-        public void ForceStartCooldown(float seconds)
-        {
-            if (!HasStateAuthority) return;
-
-            LastUsedCooldownTime = seconds;
-            LastInteractTime = Runner ? Runner.SimulationTime : Time.time;
-
-            if (_spawnCooldownEffectOnStart && seconds > 0f)
-            {
-                PlayCooldownEffect(seconds).Forget();
-            }
         }
 
         /// <summary>
@@ -339,9 +344,7 @@ namespace InGame.Interact
             var charaType = context.CharacterType;
 
             // CharacterType.All を優先、なければキャラ固有の効果を取得
-            var effect = _characterEffects
-                             .FirstOrDefault(e => e is { CharacterType: CharacterType.All })
-                         ?? _characterEffects.FirstOrDefault(e => e != null && e.CharacterType == charaType);
+            var effect = _characterEffects.FirstOrDefault(e => e != null && e.IsExecutable(charaType));
 
             if (effect != null)
             {
@@ -425,20 +428,8 @@ namespace InGame.Interact
         public void EndInteract()
         {
             _activeEffectBase?.OnInteractEnd();
-            int num;
-            if(_characterType == CharacterType.Tanihira)
-            {
-                num = 4;
-            }
-            else if(_characterType == CharacterType.Sarutobi)
-            {
-                num = 3;
-            }
-            else
-            {
-                num = 2;
-            }
-            RPC_ChangeDescriptionUI(num);
+            ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(_characterType);
+            RPC_ChangeDescriptionUI(type);
             _activeEffectBase = null;
             _characterType = CharacterType.None;
         }
@@ -448,7 +439,7 @@ namespace InGame.Interact
         /// </summary>
         /// <param name="mode">UIモード</param>
         [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
-        private void RPC_ChangeDescriptionUI(int mode)
+        private void RPC_ChangeDescriptionUI(ControlDescriptionType mode)
         {
             UIController.I.ChangeDescriptionUI(mode);
         }
@@ -468,6 +459,15 @@ namespace InGame.Interact
             }
         }
 
+        /// <summary>
+        /// オフセットを考慮した位置を取得
+        /// </summary>
+        public Vector3 GetInteractPosition()
+        {
+            Vector3 result = this.transform.position;
+            result.y += _cooldownEffectOffset.y;
+            return result;
+        }
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
@@ -497,23 +497,23 @@ namespace InGame.Interact
     }
 }
 
-    /// <summary>
-    /// インタラクト時のコンテキスト情報を保持するインターフェース
-    /// </summary>
-    public interface IInteractableContext : INetworkStruct
-    {
-        /// <summary>インタラクト実行者のPlayerRef（エンコード済み）</summary>
-        int Interactor { get; }
-        /// <summary>インタラクト実行者のキャラクタータイプ</summary>
-        CharacterType CharacterType { get; set; }
-    }
+/// <summary>
+/// インタラクト時のコンテキスト情報を保持するインターフェース
+/// </summary>
+public interface IInteractableContext : INetworkStruct
+{
+    /// <summary>インタラクト実行者のPlayerRef（エンコード済み）</summary>
+    int Interactor { get; }
+    /// <summary>インタラクト実行者のキャラクタータイプ</summary>
+    CharacterType CharacterType { get; set; }
+}
 
-    /// <summary>
-    /// IInteractableContextのシンプルな実装
-    /// 必要に応じて情報を追加可能
-    /// </summary>
-    public struct InteractableContext : IInteractableContext
-    {
-        public int Interactor { get; set; }
-        public CharacterType CharacterType { get; set; }
-    }
+/// <summary>
+/// IInteractableContextのシンプルな実装
+/// 必要に応じて情報を追加可能
+/// </summary>
+public struct InteractableContext : IInteractableContext
+{
+    public int Interactor { get; set; }
+    public CharacterType CharacterType { get; set; }
+}

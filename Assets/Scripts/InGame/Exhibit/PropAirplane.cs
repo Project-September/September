@@ -364,7 +364,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
-            RPC_ChangeDescriptionUI(ownerPlayerRef,1);
+            RPC_ChangeDescriptionUI(ownerPlayerRef, ControlDescriptionType.Exhibit);
             RPC_SetIsKinematic(false);
             // 乗った時刻を記録
             GetOnTime = Runner.SimulationTime;
@@ -376,7 +376,7 @@ namespace InGame.Exhibit
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ChangeDescriptionUI(PlayerRef target, int mode)
+        private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
         {
             if (Runner.LocalPlayer == target)
             {
@@ -389,13 +389,8 @@ namespace InGame.Exhibit
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
             
             PlayerDatabase.Instance.PlayerDataDic.TryGet(OwnerPlayerRef, out var playerData);
-            RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? 3 : 2);
+            RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? ControlDescriptionType.Sarutobi : ControlDescriptionType.Player);
             var chara = PlayerDatabase.Instance.PlayerDataDic[OwnerPlayerRef].CharacterType;
-            var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
-                ? all
-                : CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
-            LastUsedCooldownTime = time;
-            LastInteractTime = Runner.SimulationTime;
 
             // Authority
             OwnerPlayerRef = PlayerRef.None;
@@ -410,12 +405,20 @@ namespace InGame.Exhibit
 
             // 飛行機を初期位置・回転に戻す（ティラノと同じ仕組み）
             transform.SetPositionAndRotation(_initialPosition, _initialRotation);
-            PlayCooldownEffect(time).Forget();
+
+            // クールダウン開始
+            var time = CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+                ? all
+                : CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
+            SetCooldown(time);
+
+            // パラメータリセット
             CurrentAccel = 0;
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
             RPC_SetIsKinematic(true);
             _interactTimer = 0f;
+
             //隊列がある場合の処理
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {

@@ -232,6 +232,18 @@ namespace Ingame.Tanihira
             }
         }
         
+        /// <summary>
+        /// 隊列のペンギンに攻撃指示状態を設定する
+        /// </summary>
+        /// <param name="isOrdered">攻撃指示を行う場合はtrue</param>
+        public void SetAllAttackOrdered(bool isOrdered)
+        {
+            foreach (var friend in CurrentFriendsList)
+            {
+                friend.SetAttackOrdered(isOrdered);
+            }
+        }
+        
 #if UNITY_EDITOR       
         private void OnDrawGizmos()
         {

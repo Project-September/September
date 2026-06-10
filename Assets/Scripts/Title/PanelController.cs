@@ -13,7 +13,7 @@ namespace September.Title
         [SerializeField] Selectable _selectWhenHide;
         private CanvasGroup _panel;
         private bool _isInitialized;
-        
+
         [SerializeField] UnityEvent OnShow;
         [SerializeField] UnityEvent OnHide;
 

@@ -1,7 +1,7 @@
 using Fusion;
+using September.Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class DebugUI : MonoBehaviour
 {
@@ -83,10 +83,9 @@ public class DebugUI : MonoBehaviour
     {
         _previousCursorLockMode = Cursor.lockState;
         _previousCursorVisible = Cursor.visible;
-        
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        
+
+        CursorStateManager.ShowCursor();
+
         if (_debugPanel != null)
         {
             _debugPanel.transform.SetAsLastSibling();
@@ -95,7 +94,6 @@ public class DebugUI : MonoBehaviour
     
     private void HideDebugUI()
     {
-        Cursor.lockState = _previousCursorLockMode;
-        Cursor.visible = _previousCursorVisible;
+        CursorStateManager.HideCursor();
     }
 }

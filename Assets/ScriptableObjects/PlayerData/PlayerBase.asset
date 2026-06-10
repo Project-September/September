@@ -12,9 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b10e7b9c18af92e4ea7d4b50318f7035, type: 3}
   m_Name: PlayerBase
   m_EditorClassIdentifier: 
-  _health: 100
-  _speed: 1
-  _stamina: 100
-  _staminaConsumption: 20
-  _staminaRegen: 100
-  _attackDamage: 10
+  _stats:
+  - _statType: 0
+    _Value:
+      Data: 0000c842
+    MaxValue: 100
+    MinValue: 0
+  - _statType: 1
+    _Value:
+      Data: 0000803f
+    MaxValue: Infinity
+    MinValue: 0
+  - _statType: 2
+    _Value:
+      Data: 0000c842
+    MaxValue: 100
+    MinValue: 0
+  - _statType: 3
+    _Value:
+      Data: 0000c842
+    MaxValue: Infinity
+    MinValue: 0
+  - _statType: 4
+    _Value:
+      Data: 0000a041
+    MaxValue: Infinity
+    MinValue: 0
+  - _statType: 5
+    _Value:
+      Data: 00002041
+    MaxValue: Infinity
+    MinValue: 0
+  - _statType: 6
+    _Value:
+      Data: 0000803f
+    MaxValue: Infinity
+    MinValue: 0
+  - _statType: 7
+    _Value:
+      Data: 0000803f
+    MaxValue: Infinity
+    MinValue: 0
