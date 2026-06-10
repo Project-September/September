@@ -14,18 +14,22 @@ namespace September.InGame.Common.Stats
         [Serializable]
         class BuildGenerateInfo
         {
+            [SerializeField] BuildRouteType _buildRouteType;
             [SerializeField] IngameBuildView _view;
             [SerializeField] IngameBuildFactory _factory;
+
+            public BuildRouteType BuildRouteType => _buildRouteType;
+            public IngameBuildView View => _view;
 
             public void GenerateBuild(BuildRouteType build)
             {
                 _factory?.CreateBuild(_view);
-                _view?.TrySetEnableBuild(build);
+                if (_buildRouteType == build) _view?.TrySetEnableBuild();
             }
         }
 
         [Header("ビルドルートの機能"), SerializeField] BuildGenerateInfo[] _builds;
-        readonly Dictionary<BuildType, IngameBuildView> _buildDict = new();
+        readonly Dictionary<BuildRouteType, IngameBuildView> _buildDict = new();
 
         /// <summary>
         /// プレイヤーが選択したビルドルートに応じてシステムを有効化するメソッド
@@ -37,6 +41,7 @@ namespace September.InGame.Common.Stats
             {
                 if (build == null) continue;
                 build.GenerateBuild(buildType);
+                _buildDict[build.BuildRouteType] = build.View;
             }
         }
 
@@ -45,7 +50,7 @@ namespace September.InGame.Common.Stats
         /// </summary>
         /// <param name="buildType">ビルドルート</param>
         /// <param name="value">ビルド量</param>
-        public void UpdateBuild(BuildType buildType, float value)
+        public void UpdateBuild(BuildRouteType buildType, float value = 1)
         {
             if (!_buildDict.TryGetValue(buildType, out var build)) return;
             build.UpdateBuild(value);
@@ -56,7 +61,7 @@ namespace September.InGame.Common.Stats
         /// </summary>
         /// <param name="buildType">有効かどうかを調べるビルドルート</param>
         /// <returns>有効かどうか</returns>
-        public bool TryGetBuildEnable(BuildType buildType)
+        public bool TryGetBuildEnable(BuildRouteType buildType)
         {
             return _buildDict.TryGetValue(buildType, out var build) && build.IsEnable;
         }

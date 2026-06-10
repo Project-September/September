@@ -153,7 +153,7 @@ namespace InGame.Player.Ability
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
-            _buildGenerator?.UpdateBuild(BuildType.AttackPower, 1); // 成功した回数を送るため１を引数に渡す
+            _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
 
             //エフェクトの再生
             _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);

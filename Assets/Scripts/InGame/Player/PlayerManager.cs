@@ -178,7 +178,7 @@ namespace InGame.Player
             IsStun = false;
             _playerHealth.IsInvincible = false;
             _playerEffectController.StopStunEffect();
-            _buildGenerator?.UpdateBuild(BuildType.StunResistance, 1); // 気絶から治ったときの回数を記録するため１を引数に渡す
+            _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
 
         void OnDeath(HitData lastHitData)

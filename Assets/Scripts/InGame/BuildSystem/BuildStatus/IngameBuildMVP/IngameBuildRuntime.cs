@@ -46,9 +46,8 @@ namespace September.InGame.Common.Stats
             }
         }
 
-        public void EnableBuild(BuildRouteType build)
+        public void EnableBuild()
         {
-            if (build != _buildRouteType) return;
             _enabled = true;
             _onEnableBuild?.Invoke();
         }

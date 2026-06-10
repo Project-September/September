@@ -18,9 +18,9 @@ namespace September.InGame.Common.Stats
         bool _isEnable;
         public bool IsEnable => _isEnable;
 
-        event Action<BuildRouteType> _onEnableBuild;
+        event Action _onEnableBuild;
         event Action<float> _onUpdateBuild;
-        public Action OnEnableBuild(Action<BuildRouteType> act)
+        public Action OnEnableBuild(Action act)
         {
             _onEnableBuild += act;
             return () => _onEnableBuild -= act;
@@ -39,17 +39,16 @@ namespace September.InGame.Common.Stats
         /// <summary>
         /// プレイヤーが選択したビルドルートに応じて有効化するメソッド
         /// </summary>
-        /// <param name="build">プレイヤーが選択したビルドルート</param>
-        public void TrySetEnableBuild(BuildRouteType build)
+        public void TrySetEnableBuild()
         {
-            _onEnableBuild?.Invoke(build);
+            _onEnableBuild?.Invoke();
         }
 
         /// <summary>
         /// ビルド状況の更新メソッド
         /// </summary>
         /// <param name="value">更新する値</param>
-        public void UpdateBuild(float value = 1)
+        public void UpdateBuild(float value)
         {
             _onUpdateBuild?.Invoke(value);
         }
@@ -59,6 +58,9 @@ namespace September.InGame.Common.Stats
         /// </summary>
         public void EnableBuild()
         {
+#if UNITY_EDITOR
+            Debug.Log(name);
+#endif
             _isEnable = true;
         }
 

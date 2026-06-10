@@ -349,7 +349,7 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
 
-            _buildGenerator?.UpdateBuild(BuildType.FastInteract, 1); // インタラクト成功回数を記録するため１を引数に渡す
+            _buildGenerator?.UpdateBuild(BuildRouteType.FastInteract);
 
             if (GetSessionPlayerData(Object.InputAuthority.RawEncoded, out var data))
             {
