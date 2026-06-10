@@ -15,13 +15,13 @@ namespace September.InGame.Common.Stats
         readonly Queue<BuildConditionParams> _buildParamsQueue = new();
 
         event Action _onEnableBuild;
-        event Action<bool, BuildConditionParams, StatType> _onAddProgress;
+        event Action<bool, float, StatType> _onAddProgress;
         public Action OnEnableBuild(Action act)
         {
             _onEnableBuild = act;
             return () => _onEnableBuild -= act;
         }
-        public Action OnAddProgress(Action<bool, BuildConditionParams, StatType> act)
+        public Action OnAddProgress(Action<bool, float, StatType> act)
         {
             _onAddProgress += act;
             return () => _onAddProgress -= act;
@@ -79,7 +79,7 @@ namespace September.InGame.Common.Stats
 
             // ビルドレベルアップしたら描画用に通知
             if (_buildParamsQueue.Count <= 0) return;
-            _onAddProgress?.Invoke(upgrade, _buildParamsQueue.Peek(), _statType);
+            _onAddProgress?.Invoke(upgrade, _buildParamsQueue.Peek().CurrentBuildParam, _statType);
         }
     }
 }

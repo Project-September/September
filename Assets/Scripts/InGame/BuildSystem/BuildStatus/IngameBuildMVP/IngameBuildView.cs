@@ -10,7 +10,7 @@ namespace September.InGame.Common.Stats
     /// </summary>
     public class IngameBuildView : StatsEffectorBase
     {
-        BuildConditionParams _currentConditionParams;
+        float _currentBuildValue;
         StatType _currentStatType;
         // MVPを使う都合上、現在のビルド状況をRuntimeから受け取って直接使えないため
         // 一時的に保存するための変数を定義
@@ -33,19 +33,7 @@ namespace September.InGame.Common.Stats
 
         public override void Apply(ref StatsContainer stats)
         {
-            switch (_currentConditionParams.CalculateType)
-            {
-                case BuildCalculateType.Add:
-                    // 獲得ビルドを加算
-                    stats.TryAddStatValue(_currentStatType, _currentConditionParams.CurrentBuildParam);
-                    break;
-                case BuildCalculateType.Multiply:
-                    if (stats.TryGetStatValue(_currentStatType, out var value))
-                    {
-                        stats.TrySetStatValue(_currentStatType, value * _currentConditionParams.CurrentBuildParam);
-                    }
-                    break;
-            }
+            stats.TrySetStatValue(_currentStatType, _currentBuildValue);
         }
 
         /// <summary>
@@ -79,9 +67,10 @@ namespace September.InGame.Common.Stats
         /// </summary>
         /// <param name="upgraded">ビルドしたかどうか</param>
         /// <param name="param">現在のビルド状況</param>
-        public void VisualizeBuild(bool upgraded, BuildConditionParams param, StatType statType)
+        /// <param name="statType">ステータスの種類</param>
+        public void VisualizeBuild(bool upgraded, float param, StatType statType)
         {
-            _currentConditionParams = param;
+            _currentBuildValue = param;
             if (upgraded)
             {
 #if UNITY_EDITOR
