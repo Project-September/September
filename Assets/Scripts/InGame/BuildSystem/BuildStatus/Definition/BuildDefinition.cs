@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using September.Common;
 
 namespace September.InGame.Common.Stats
 {
@@ -21,7 +22,8 @@ namespace September.InGame.Common.Stats
         [Header("ビルド状況"), SerializeField] BuildRouteConditionType _buildCondition;
         [Header("パラメータの計算方法"), SerializeField] BuildCalculateType _calculateType;
         [Header("現在のビルドパラメータ\n"), SerializeField] float _currentBuildParam;
-        [Header("次のビルドまでの条件値\nこの値に到達したら次のレベルに進む\n最大レベルの場合-1を入れておくといい"), SerializeField, Min(-1), Tooltip("攻撃力 : 回\nスピード : m\netc...")]
+        [Header("次のビルドまでの条件値\nこの値に到達したら次のレベルに進む\n最大レベルの場合-1を入れておくといい"),
+            SerializeField, Min(-1), Tooltip("攻撃力 : 回\nスピード : m\netc...")]
         float _requiredValue;
 
         public BuildRouteConditionType BuildCondition => _buildCondition;

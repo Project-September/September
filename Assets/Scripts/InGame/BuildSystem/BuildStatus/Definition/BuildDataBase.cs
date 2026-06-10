@@ -1,11 +1,13 @@
 using UnityEngine;
+using September.Common;
 
-namespace September.Common
+namespace September.Lobby
 {
-    public abstract class BuildDataBase : ScriptableObject
+    [CreateAssetMenu(fileName = "LobbyBuild", menuName = "Build/LobbyBuild")]
+    public class BuildDataBase : ScriptableObject
     {
         [Header("ビルドルートのラベル")]
-        [SerializeField] BuildType _buildType;
+        [SerializeField] BuildRouteType _buildType;
         [Header("ビルドルートの名前\n画面表示用")]
         [SerializeField] string _buildName;
         [Header("ビルドルートの説明")]
@@ -13,13 +15,9 @@ namespace September.Common
         [Header("ビルドルートの画像\n画面表示用")]
         [SerializeField] Sprite _buildSprite;
 
-        public BuildType BuildType => _buildType;
+        public BuildRouteType BuildType => _buildType;
         public string BuildName => _buildName;
         public string BuildInfo => _buildInfo;
         public Sprite BuildSprite => _buildSprite;
-
-        /// <summary>ビルドクラス生成メソッド</summary>
-        /// <returns>生成したビルドクラス</returns>
-        public abstract IBuild CreateBuildInstance();
     }
 }

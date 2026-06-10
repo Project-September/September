@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September.InGame.Common.Stats
+namespace September.Common
 {
     /// <summary>ビルドルートの種類を定義した列挙型</summary>
     public enum BuildRouteType

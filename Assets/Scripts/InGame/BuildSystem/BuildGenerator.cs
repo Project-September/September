@@ -1,5 +1,6 @@
 using Fusion;
 using September.Common;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,21 +11,32 @@ namespace September.InGame.Common.Stats
     /// </summary>
     public class BuildGenerator : NetworkBehaviour
     {
-        [Header("ビルドルートの機能"), SerializeField] BuildSystem[] _builds;
-        readonly Dictionary<BuildType, BuildSystem> _buildDict = new();
+        [Serializable]
+        class BuildGenerateInfo
+        {
+            [SerializeField] IngameBuildView _view;
+            [SerializeField] IngameBuildFactory _factory;
+
+            public void GenerateBuild(BuildRouteType build)
+            {
+                _factory?.CreateBuild(_view);
+                _view?.TrySetEnableBuild(build);
+            }
+        }
+
+        [Header("ビルドルートの機能"), SerializeField] BuildGenerateInfo[] _builds;
+        readonly Dictionary<BuildType, IngameBuildView> _buildDict = new();
 
         /// <summary>
         /// プレイヤーが選択したビルドルートに応じてシステムを有効化するメソッド
         /// </summary>
         /// <param name="buildType">選択したビルドルート</param>
-        public void GenerateBuild(BuildType buildType)
+        public void GenerateBuild(BuildRouteType buildType)
         {
             foreach (var build in _builds)
             {
                 if (build == null) continue;
-                build.Init();
-                _buildDict[build.BuildType] = build;
-                build.TryEnableBuild(buildType);
+                build.GenerateBuild(buildType);
             }
         }
 
