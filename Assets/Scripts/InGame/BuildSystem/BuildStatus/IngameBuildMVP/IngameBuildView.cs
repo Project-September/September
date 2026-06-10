@@ -73,10 +73,15 @@ namespace September.InGame.Common.Stats
         public void VisualizeBuild(bool upgraded, float param, StatType statType)
         {
             _currentBuildValue = param;
+            _currentStatType = statType;
             if (upgraded)
             {
 #if UNITY_EDITOR
-                Debug.Log("ビルドレベルアップ");
+                var root = transform.root;
+                if (root != null)
+                {
+                    Debug.Log($"{root.name} : ビルドレベルアップ\n{statType} 上昇 => {param}");
+                }
 #endif
             }
         }
