@@ -5316,6 +5316,10 @@ PrefabInstance:
       propertyPath: '_footstepBlockClipList.Array.data[0]'
       value: 
       objectReference: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+    - target: {fileID: 3072171202605207076, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: SortKey
+      value: 3012785253
+      objectReference: {fileID: 0}
     - target: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _dashSpeed
       value: 7.1
@@ -5645,6 +5649,8 @@ MonoBehaviour:
   _meshObj: {fileID: 1310722873612347470}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _IsStun:
     _value: 0
 --- !u!114 &236253585277270675

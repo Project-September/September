@@ -5876,6 +5876,10 @@ PrefabInstance:
       value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[4146068609868497005]._playerStatus
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._searchRadius
       value: 3
       objectReference: {fileID: 0}
@@ -5894,6 +5898,10 @@ PrefabInstance:
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[8120059475615547481]._cutInDuration
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[4146068609868497005]._buildGenerator
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[4146068609868497005]._endAttackFrame
@@ -6003,6 +6011,10 @@ PrefabInstance:
       propertyPath: '_footstepBlockClipList.Array.data[0]'
       value: 
       objectReference: {fileID: 7400000, guid: 5ac91ad8e248c6547bf8c19bc58beb16, type: 2}
+    - target: {fileID: 3072171202605207076, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: SortKey
+      value: 227391001
+      objectReference: {fileID: 0}
     - target: {fileID: 3119274839795611784, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -6483,6 +6495,7 @@ MonoBehaviour:
     m_Bits: 191
   _friendStateChanger: {fileID: 2957292007609013862}
   _formationManager: {fileID: 913702230075351532}
+  _friendOrder: {fileID: 0}
   _isWaiting: 0
   _tyrannoInteractables: []
   _isSerching: 1
@@ -6595,6 +6608,8 @@ MonoBehaviour:
   _meshObj: {fileID: 4081215343970159104}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _IsStun:
     _value: 0
 --- !u!114 &-447696985582618000

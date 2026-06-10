@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7144572564158509959}
-  - component: {fileID: 5577594907379097316}
+  - component: {fileID: 1725364523016823053}
   m_Layer: 0
   m_Name: FastInteractBuild
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 947736130491716030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5577594907379097316
+--- !u!114 &1725364523016823053
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,10 +41,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1221500341116003552}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f61a7b0d318e644982be1061d1ae8ab, type: 3}
+  m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buildData: {fileID: 11400000, guid: f1a14f9b84f73f64688e6a51e441e6e9, type: 2}
 --- !u!1 &5320518871302278878
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,10 +94,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _builds:
-  - {fileID: 8816792405982754374}
-  - {fileID: 6860865023150519161}
-  - {fileID: 6541090730786939502}
-  - {fileID: 5577594907379097316}
+  - _buildRouteType: 0
+    _view: {fileID: 5523960276001352608}
+    _factory: {fileID: 11400000, guid: 8a96520697b375a439febdd53e47b764, type: 2}
+  - _buildRouteType: 1
+    _view: {fileID: 887975659898470511}
+    _factory: {fileID: 11400000, guid: ee4aeac64db032145a11a13fdf5b6841, type: 2}
+  - _buildRouteType: 2
+    _view: {fileID: 8446535216309459691}
+    _factory: {fileID: 11400000, guid: 9a712e5f158b52648981e4413296bbcc, type: 2}
+  - _buildRouteType: 3
+    _view: {fileID: 1725364523016823053}
+    _factory: {fileID: 11400000, guid: 43deef761dded174db934a35e14a0ea7, type: 2}
 --- !u!114 &4248016666278182378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,10 +124,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4950416088258455676}
-  - {fileID: 8816792405982754374}
-  - {fileID: 6860865023150519161}
-  - {fileID: 6541090730786939502}
-  - {fileID: 5577594907379097316}
+  - {fileID: 5523960276001352608}
+  - {fileID: 887975659898470511}
+  - {fileID: 8446535216309459691}
+  - {fileID: 1725364523016823053}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &6763741726178231006
 GameObject:
@@ -131,7 +138,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1450467962526940599}
-  - component: {fileID: 8816792405982754374}
+  - component: {fileID: 5523960276001352608}
   m_Layer: 0
   m_Name: AttackPowerBuild
   m_TagString: Untagged
@@ -154,7 +161,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 947736130491716030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8816792405982754374
+--- !u!114 &5523960276001352608
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -163,10 +170,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6763741726178231006}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64e29f959d9b0d949b84144bae7f2c02, type: 3}
+  m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buildData: {fileID: 11400000, guid: bcea00445f7180e4dac00d9e21459ee0, type: 2}
 --- !u!1 &7801732431677565602
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,7 +182,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2741221430640250081}
-  - component: {fileID: 6541090730786939502}
+  - component: {fileID: 8446535216309459691}
   m_Layer: 0
   m_Name: StunResistanceBuild
   m_TagString: Untagged
@@ -199,7 +205,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 947736130491716030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6541090730786939502
+--- !u!114 &8446535216309459691
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -208,10 +214,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7801732431677565602}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b875e2fc224b39c47b4d39f94f2bb3db, type: 3}
+  m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buildData: {fileID: 11400000, guid: a36a34c20849a4e4984433c76142aa6e, type: 2}
 --- !u!1 &8985711291285684272
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,7 +226,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9023699957488481097}
-  - component: {fileID: 6860865023150519161}
+  - component: {fileID: 887975659898470511}
   m_Layer: 0
   m_Name: MoveSpeedBuild
   m_TagString: Untagged
@@ -244,7 +249,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 947736130491716030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6860865023150519161
+--- !u!114 &887975659898470511
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -253,7 +258,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 8985711291285684272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 086f93add03d0d84aba7eaecc50c502d, type: 3}
+  m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buildData: {fileID: 11400000, guid: 0badecac6d3557741b217571640c51f3, type: 2}
