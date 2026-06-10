@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c25231292be4f4f96e02fa69b7f39f, type: 3}
+  m_Name: StunResistanceBuildDefinition
+  m_EditorClassIdentifier: 
+  _buildType: 2
+  _buildTable:
+  - _buildCondition: 0
+    _calculateType: 1
+    _currentBuildParam: 1
+    _requiredValue: 1
+  - _buildCondition: 0
+    _calculateType: 1
+    _currentBuildParam: 0.9
+    _requiredValue: 3
+  - _buildCondition: 0
+    _calculateType: 1
+    _currentBuildParam: 0.8
+    _requiredValue: 6
+  - _buildCondition: 0
+    _calculateType: 1
+    _currentBuildParam: 0.7
+    _requiredValue: 10
+  - _buildCondition: 0
+    _calculateType: 1
+    _currentBuildParam: 0.6
+    _requiredValue: 15
+  - _buildCondition: 1
+    _calculateType: 1
+    _currentBuildParam: 0.5
+    _requiredValue: -1
