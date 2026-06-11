@@ -14447,8 +14447,8 @@ MonoBehaviour:
   _meshObj: {fileID: 8360875997416129576}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
-  _buildGenerator: {fileID: 0}
-  _playerStatus: {fileID: 0}
+  _buildGenerator: {fileID: 6133156092747190984}
+  _playerStatus: {fileID: -3905644752378878134}
   _IsStun:
     _value: 0
 --- !u!114 &5628340922608597896
@@ -15456,6 +15456,10 @@ PrefabInstance:
     - target: {fileID: 5320518871302278878, guid: 6f11600cd2c4d814db5f2b4eff2405b7, type: 3}
       propertyPath: m_Name
       value: BuildSystem
+      objectReference: {fileID: 0}
+    - target: {fileID: 5320518871302278878, guid: 6f11600cd2c4d814db5f2b4eff2405b7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -5412,6 +5412,10 @@ PrefabInstance:
       propertyPath: _punchEffect
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 6451178254424931600, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6462417923102071326, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: '_hitPoints.Array.data[0]'
       value: 
@@ -5649,8 +5653,8 @@ MonoBehaviour:
   _meshObj: {fileID: 1310722873612347470}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
-  _buildGenerator: {fileID: 0}
-  _playerStatus: {fileID: 0}
+  _buildGenerator: {fileID: 3662918627473127380}
+  _playerStatus: {fileID: 3457373785259641644}
   _IsStun:
     _value: 0
 --- !u!114 &236253585277270675
@@ -5731,6 +5735,17 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 6099435784402053345, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
   m_PrefabInstance: {fileID: 7365447978694257766}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3662918627473127380 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6116485311636888498, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 7365447978694257766}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b618686980dbfad4d9026a963f0cd451, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4582497511770257016 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6462417923102071326, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
