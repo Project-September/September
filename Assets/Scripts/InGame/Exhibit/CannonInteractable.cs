@@ -9,45 +9,44 @@ namespace InGame.Exhibit
 {
 	public class CannonInteractable : NetworkBehaviour
 	{
-		[SerializeField] private Transform _muzzle;
 		[Header("移動関連")] [SerializeField] private Transform _cannonBase;
 		[SerializeField] private Transform _cannonBarrel;
 		[SerializeField] private float _baseRotateSpeed;
-
 		[SerializeField] private float _barrelRotateSpeed;
-
 		// minをxとして、maxをyとして扱う
-		[SerializeField] private Vector2 _angleLimitX = new(-90, 90);
-		[SerializeField] private Vector2 _angleLimitY = new(-90, 90);
+		[SerializeField] private Vector2 _rotateAngleLimitX = new(-90, 90);
+		[SerializeField] private Vector2 _rotateAngleLimitY = new(-90, 90);
 
-		[Header("描画")] [SerializeField] private Transform _aimHitViewObject;
-		[SerializeField] private LineRenderer _lineRenderer;
-		[SerializeField] private NetworkObject _fireParticlePrefab;
-		[SerializeField] private NetworkObject _explosionParticlePrefab;
-
-		[Header("射撃")] [SerializeField] private LayerMask _hitLayer;
+		[Header("砲弾に関する設定")] 
+		[SerializeField] private Transform _muzzle;
 		[SerializeField] private float _simulationStepTime = 0.1f;
+		[SerializeField] private float _lifeTime = 10f;
 		[SerializeField] private Vector3 _gravity;
 		[SerializeField] private float _ballSpeed;
 		[SerializeField] private int _maxAmmo;
 		[SerializeField] private float _reloadTime;
 		[SerializeField] private float _radius;
-		public int _damage = 10;
+		[SerializeField] private LayerMask _hitLayer;
+		[SerializeField] private int _baseDamage = 10;
+		
+		[Header("エフェクト設定")] [SerializeField] private NetworkObject _aimPositionViewPrefab;
+		[SerializeField] private NetworkObject _fireParticlePrefab;
+		[SerializeField] private NetworkObject _explosionParticlePrefab;
+		[SerializeField] private LineRenderer _lineRenderer;
 
-		[Header("PlayerCharacter")] [SerializeField]
+		[Header("その他")] [SerializeField]
 		private Transform _waitCharacterTransform;
 
 		public PlayerRef _ownerPlayerRef;
-
 		private PlayerManager _currentUsePlayer;
 		private Quaternion _baseDefaultRotation;
 		private Quaternion _barrelDefaultRotation;
 		private int _currentAmmo;
 		private readonly Vector3[] _linePositions = new Vector3[32];
+		[Networked] public int Damage { get; set; }
 		[Networked] private NetworkObject FireParticle { get; set; }
 		[Networked] private NetworkObject ExplosionParticle { get; set; }
-		[Networked] private NetworkObject AimParticle { get; set; }
-
+		[Networked] private NetworkObject AimPositionViewObj { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 
@@ -67,25 +66,55 @@ namespace InGame.Exhibit
 			{
 				FireParticle = Runner.Spawn(_fireParticlePrefab, Vector3.zero, Quaternion.identity);
 				ExplosionParticle = Runner.Spawn(_explosionParticlePrefab, Vector3.zero, Quaternion.identity);
+				AimPositionViewObj = Runner.Spawn(_aimPositionViewPrefab, Vector3.zero, Quaternion.identity);
+				RPC_ParticleRenderActive(FireParticle,false);
+				RPC_ParticleRenderActive(ExplosionParticle,false);
+				RPC_ParticleRenderActive(AimPositionViewObj,false);
 			}
 		}
 
 		public override void Render()
 		{
 			base.Render();
+			// 放物線描画
 			CreateLine();
+			
+			// キャノンの回転描画
 			_cannonBarrel.localRotation = BarrelRotation;
 			_cannonBase.localRotation = BaseRotation;
 		}
 
+		/// <summary>
+		///     インタラクト開始時の初期化処理
+		/// </summary>
+		public void OnInteractStart(PlayerRef playerRef)
+		{
+			IsActive = true;
+			Object.AssignInputAuthority(playerRef);
+			_currentAmmo = _maxAmmo;
+			RPC_ParticleRenderActive(AimPositionViewObj,true);
+			AimPositionViewObj.transform.localScale = Vector3.one * _radius * 2;
 
+			// プレイヤーの取得
+			_currentUsePlayer = Runner.GetPlayerObject(playerRef).GetComponent<PlayerManager>();
+			if (_currentUsePlayer == null) return;
+			RPC_PlayerUnActive();
+			_currentUsePlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
+
+			// Playerがダメージを受けた際にInteractを終了する
+			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
+		}
+		
+		/// <summary>
+		/// インタラクト中の処理
+		/// </summary>
 		public void OnInteractFixedNetworkUpdate(PlayerInput input)
 		{
 			base.FixedUpdateNetwork();
-			//if (!GetInput<PlayerInput>(out var input)) return;
-
-			// キャノンの回転処理
+			
+			// キャノンの回転内部処理
 			CannonRotate(input.MoveDirection.x, input.LookDirection.y);
+			AimPositionViewObj.transform.position = GetTargetPoint();
 			_currentUsePlayer?.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 
 			// 射撃処理
@@ -100,40 +129,20 @@ namespace InGame.Exhibit
 		}
 
 		/// <summary>
-		///     インタラクト開始時の初期化処理
-		/// </summary>
-		public void OnInteractStart(PlayerRef playerRef)
-		{
-			IsActive = true;
-			Object.AssignInputAuthority(playerRef);
-			_currentAmmo = _maxAmmo;
-
-			// プレイヤーの取得
-			_currentUsePlayer = Runner.GetPlayerObject(playerRef).GetComponent<PlayerManager>();
-			if (_currentUsePlayer == null) return;
-			RPC_PlayerUnActive();
-			_currentUsePlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
-
-			// Playerがダメージを受けた際にInteractを終了する
-			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
-		}
-
-		/// <summary>
 		///     インタラクト終了時の処理
 		/// </summary>
 		public void OnInteractEnd()
 		{
 			IsActive = false;
+			RPC_ParticleRenderActive(AimPositionViewObj, false);
 			RPC_Refresh();
 			if (_currentUsePlayer == null) return;
 			Object.RemoveInputAuthority();
 			PlayerActive(true);
-			_currentUsePlayer = null;
-
-			IsActive = false;
 
 			if (_currentUsePlayer)
 				_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
+			_currentUsePlayer = null;
 		}
 
 		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -150,10 +159,6 @@ namespace InGame.Exhibit
 			BuildTrajectory(); // 描画位置の計算
 			_lineRenderer.positionCount = LastPositionIndex + 1;
 			_lineRenderer.SetPositions(_linePositions);
-
-			var endPos = _linePositions[LastPositionIndex];
-			_aimHitViewObject.position = endPos;
-			_aimHitViewObject.gameObject.SetActive(true);
 		}
 
 		/// <summary>
@@ -220,7 +225,7 @@ namespace InGame.Exhibit
 			var muzzlePosition = _muzzle.position;
 			var muzzleForward = _muzzle.transform.forward;
 			var ballSpeed = _ballSpeed;
-			var endPos = _linePositions[LastPositionIndex];
+			var endPos = GetTargetPoint();
 			var endTime = _simulationStepTime * LastPositionIndex;
 
 			RPC_ParticleRenderActive(FireParticle, true);
@@ -239,13 +244,11 @@ namespace InGame.Exhibit
 
 				// 弾の着弾確認
 				var fromTo = to - from;
-				if (Physics.Raycast(from, fromTo.normalized, out var hit, fromTo.magnitude * 2, _hitLayer))
+				if (Physics.Raycast(from, fromTo.normalized, out var hit, fromTo.sqrMagnitude, _hitLayer))
 				{
 					endPos = hit.point;
 					break;
 				}
-
-				// シミュレーション終了条件
 				await UniTask.WaitForSeconds(Runner.DeltaTime);
 			}
 
@@ -257,6 +260,7 @@ namespace InGame.Exhibit
 		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
 		private void RPC_Explosion(Vector3 position, Quaternion rotation)
 		{
+			Debug.Log("Explosion RPC: " + position);
 			Explosion(position, rotation);
 		}
 
@@ -270,21 +274,21 @@ namespace InGame.Exhibit
 			{
 				var particle = ExplosionParticle.GetComponent<ParticleSystem>();
 				if (particle) return;
-				while (particle.isPlaying)
+				particle.Play(true);
+				while (!particle.isPlaying)
 					await UniTask.Yield();
 				RPC_ParticleRenderActive(ExplosionParticle, false);
 			});
-			Debug.Log("Explosion at: " + position);
 
 			var cols = Physics.OverlapSphere(position, _radius, _hitLayer); // TODO:当たり判定統一するかも
+			
 			// ダメージ処理
 			foreach (var col in cols)
 			{
-				Debug.Log("Hit: " + col.name);
 				var damageable = col.GetComponentInParent<IDamageable>();
 				if (damageable == null) continue;
 				if (damageable.OwnerPlayerRef == _ownerPlayerRef) continue;
-				var hitData = new HitData(HitActionType.Damage, _damage, _ownerPlayerRef, damageable.OwnerPlayerRef);
+				var hitData = new HitData(HitActionType.Damage, _baseDamage, _ownerPlayerRef, damageable.OwnerPlayerRef);
 				damageable.TakeHit(ref hitData);
 			}
 		}
@@ -296,14 +300,14 @@ namespace InGame.Exhibit
 			                      _baseRotateSpeed * baseRotateInput;
 			currentBaseAxis = WarpAngle(currentBaseAxis);
 			BaseRotation = _baseDefaultRotation * Quaternion.Euler(0,
-				Mathf.Clamp(currentBaseAxis, _angleLimitY.x, _angleLimitY.y), 0);
+				Mathf.Clamp(currentBaseAxis, _rotateAngleLimitY.x, _rotateAngleLimitY.y), 0);
 
 			// 砲身の回転
 			var currentBarrelAxis = _cannonBarrel.localEulerAngles.x +
 			                        _barrelRotateSpeed * barrelRotateInput;
 			currentBarrelAxis = WarpAngle(currentBarrelAxis);
 			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(
-				Mathf.Clamp(currentBarrelAxis, _angleLimitX.x, _angleLimitX.y), 0, 0);
+				Mathf.Clamp(currentBarrelAxis, _rotateAngleLimitX.x, _rotateAngleLimitX.y), 0, 0);
 		}
 
 		private void PlayerHitTaken(HitData hitData)
@@ -317,7 +321,12 @@ namespace InGame.Exhibit
 			obj.gameObject.SetActive(isActive);
 		}
 
-		#region Math Helper
+		#region Helper
+
+		private Vector3 GetTargetPoint()
+		{
+			return _linePositions[LastPositionIndex];
+		}
 
 		/// <summary>
 		///     角度を-180~180に変換する
@@ -340,5 +349,17 @@ namespace InGame.Exhibit
 		}
 
 		#endregion
+		
+		#region Gizmos
+		private void OnDrawGizmos()
+		{
+			if(!Object || !Object.IsValid) return;
+			// 当たり判定の可視化
+			var colliderPos = GetTargetPoint();
+			Gizmos.color = Color.green;
+			Gizmos.DrawWireSphere(colliderPos, _radius);
+		}
+		#endregion
+		
 	}
 }

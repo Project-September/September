@@ -15,8 +15,8 @@ namespace InGame.Exhibit.Editor
 
 		private void OnEnable()
 		{
-			_angleLimitX = serializedObject.FindProperty("_angleLimitX");
-			_angleLimitY = serializedObject.FindProperty("_angleLimitY");
+			_angleLimitX = serializedObject.FindProperty("_rotateAngleLimitX");
+			_angleLimitY = serializedObject.FindProperty("_rotateAngleLimitY");
 			 _barrel = serializedObject.FindProperty("_cannonBarrel");
 			 if (_barrel == null)
 			 {

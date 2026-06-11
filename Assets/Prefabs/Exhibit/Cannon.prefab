@@ -43,8 +43,9 @@ GameObject:
   - component: {fileID: 4488181076112366405}
   - component: {fileID: 788815102460632112}
   - component: {fileID: 8131506775056946169}
-  - component: {fileID: 6260353130394744944}
   - component: {fileID: 7931722243513256251}
+  - component: {fileID: 6260353130394744944}
+  - component: {fileID: 2854802136032515514}
   m_Layer: 0
   m_Name: Cannon
   m_TagString: Untagged
@@ -126,7 +127,6 @@ MonoBehaviour:
       data:
         _characterType: 5
         _cannonInteractable: {fileID: 8131506775056946169}
-        _interactable: {fileID: 0}
         _interactTime: 152.76
 --- !u!114 &8131506775056946169
 MonoBehaviour:
@@ -140,53 +140,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34462d70804fd4941a58d2c6927c61bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _muzzle: {fileID: 8618401258012466577}
   _cannonBase: {fileID: 4314399791349489745}
   _cannonBarrel: {fileID: 3510080553243110555}
   _baseRotateSpeed: 1
   _barrelRotateSpeed: 1
-  _maxXAngle: 58.598194
-  _minXAngle: -37.9985
-  _maxYAngle: -11.451998
-  _minYAngle: -36.746613
+  _rotateAngleLimitX: {x: -90, y: 69.55752}
+  _rotateAngleLimitY: {x: -90, y: 90}
+  _muzzle: {fileID: 8618401258012466577}
   _simulationStepTime: 0.1
-  _simulationEndTime: 5
+  _lifeTime: 10
   _gravity: {x: 0, y: 9.8, z: 0}
   _ballSpeed: 20.07
-  _aimHitViewObject: {fileID: 0}
-  _lineRenderer: {fileID: 7931722243513256251}
   _maxAmmo: 3
   _reloadTime: 3
-  _waitCharacterTransform: {fileID: 4275066865890829726}
-  _IsActive: 0
-  _playerHitMask:
+  _radius: 10
+  _hitLayer:
     serializedVersion: 2
     m_Bits: 192
-  _radius: 10
-  _fireParticle: {fileID: 7145253233522768830, guid: a94003fc19ce4f44984dc1df010b55fb, type: 3}
-  _explosionParticle: {fileID: 3681082649069878751, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
-  _damage: 10
---- !u!114 &6260353130394744944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1678150108003665120}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 976904819
-  ObjectInterest: 1
-  Flags: 131073
-  NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 4488181076112366405}
-  - {fileID: 788815102460632112}
-  - {fileID: 8131506775056946169}
-  ForceRemoteRenderTimeframe: 0
+  _baseDamage: 10
+  _aimPositionViewPrefab: {fileID: 3514354484089743415, guid: 2f63568dd852db8408a6c5838dbffb8b, type: 3}
+  _fireParticlePrefab: {fileID: -6299654888396855261, guid: a94003fc19ce4f44984dc1df010b55fb, type: 3}
+  _explosionParticlePrefab: {fileID: -1181434899788494621, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
+  _lineRenderer: {fileID: 7931722243513256251}
+  _waitCharacterTransform: {fileID: 4275066865890829726}
+  _Damage: 0
+  _IsActive: 0
 --- !u!120 &7931722243513256251
 LineRenderer:
   serializedVersion: 2
@@ -294,6 +272,45 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &6260353130394744944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1678150108003665120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 976904819
+  ObjectInterest: 1
+  Flags: 131073
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 4488181076112366405}
+  - {fileID: 788815102460632112}
+  - {fileID: 8131506775056946169}
+  - {fileID: 2854802136032515514}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &2854802136032515514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1678150108003665120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
 --- !u!1 &5770879989371144546
 GameObject:
   m_ObjectHideFlags: 0
