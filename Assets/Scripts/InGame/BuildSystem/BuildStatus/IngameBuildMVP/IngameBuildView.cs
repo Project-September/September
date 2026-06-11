@@ -58,9 +58,6 @@ namespace September.InGame.Common.Stats
         /// </summary>
         public void EnableBuild()
         {
-#if UNITY_EDITOR
-            Debug.Log(name);
-#endif
             _isEnable = true;
         }
 

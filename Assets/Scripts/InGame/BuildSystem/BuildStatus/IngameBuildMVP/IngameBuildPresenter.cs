@@ -1,8 +1,6 @@
 using September.Common;
 using September.InGame.Common.Stats;
-using September.Lobby;
 using System;
-using UnityEngine;
 
 namespace September
 {
