@@ -12,18 +12,24 @@ namespace September.InGame.Common.Stats
     public class BuildGenerator : NetworkBehaviour
     {
         [Serializable]
-        class BuildGenerateInfo
+        class BuildGenerateInfo : IDisposable
         {
             [SerializeField] BuildRouteType _buildRouteType;
             [SerializeField] IngameBuildView _view;
             [SerializeField] IngameBuildFactory _factory;
+            IngameBuildPresenter _presenter;
 
             public BuildRouteType BuildRouteType => _buildRouteType;
             public IngameBuildView View => _view;
 
+            public void Dispose()
+            {
+                _presenter?.Dispose();
+            }
+
             public void GenerateBuild(BuildRouteType build)
             {
-                _factory?.CreateBuild(_view);
+                _presenter = _factory?.CreateBuild(_view);
                 if (_buildRouteType == build) _view?.TrySetEnableBuild();
             }
         }
@@ -64,6 +70,14 @@ namespace September.InGame.Common.Stats
         public bool TryGetBuildEnable(BuildRouteType buildType)
         {
             return _buildDict.TryGetValue(buildType, out var build) && build.IsEnable;
+        }
+
+        private void OnDisable()
+        {
+            foreach(var build in _builds)
+            {
+                build?.Dispose();
+            }
         }
     }
 }
