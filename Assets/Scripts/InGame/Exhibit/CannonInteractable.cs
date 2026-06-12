@@ -1,6 +1,8 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
+using InGame.Interact;
 using InGame.Player;
 using September.Common;
 using UnityEngine;
@@ -12,13 +14,14 @@ namespace InGame.Exhibit
 		[Header("移動関連")] [SerializeField] private Transform _cannonBase;
 		[SerializeField] private Transform _cannonBarrel;
 		[SerializeField] private float _baseRotateSpeed;
+
 		[SerializeField] private float _barrelRotateSpeed;
+
 		// minをxとして、maxをyとして扱う
 		[SerializeField] private Vector2 _rotateAngleLimitX = new(-90, 90);
 		[SerializeField] private Vector2 _rotateAngleLimitY = new(-90, 90);
 
-		[Header("砲弾に関する設定")] 
-		[SerializeField] private Transform _muzzle;
+		[Header("砲弾に関する設定")] [SerializeField] private Transform _muzzle;
 		[SerializeField] private float _simulationStepTime = 0.1f;
 		[SerializeField] private float _lifeTime = 10f;
 		[SerializeField] private Vector3 _gravity;
@@ -28,29 +31,29 @@ namespace InGame.Exhibit
 		[SerializeField] private float _radius;
 		[SerializeField] private LayerMask _hitLayer;
 		[SerializeField] private int _baseDamage = 10;
-		
+
 		[Header("エフェクト設定")] [SerializeField] private NetworkObject _aimPositionViewPrefab;
 		[SerializeField] private NetworkObject _fireParticlePrefab;
 		[SerializeField] private NetworkObject _explosionParticlePrefab;
 		[SerializeField] private LineRenderer _lineRenderer;
 
-		[Header("その他")] [SerializeField]
-		private Transform _waitCharacterTransform;
+		[Header("その他")] [SerializeField] private Transform _waitCharacterTransform;
+		[SerializeField] private CameraController _cameraController;
+		[SerializeField] private InteractableBase _interactable;
 
-		public PlayerRef _ownerPlayerRef;
+		private PlayerRef _currentUsePlayerRef;
 		private PlayerManager _currentUsePlayer;
 		private Quaternion _baseDefaultRotation;
 		private Quaternion _barrelDefaultRotation;
+		private UniTask _fireUniTask;
 		private int _currentAmmo;
 		private readonly Vector3[] _linePositions = new Vector3[32];
-		[Networked] public int Damage { get; set; }
 		[Networked] private NetworkObject FireParticle { get; set; }
 		[Networked] private NetworkObject ExplosionParticle { get; set; }
 		[Networked] private NetworkObject AimPositionViewObj { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
-
-		[Networked] public bool IsActive { get; private set; }
+		[Networked] public float InteractCoolTime { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
 		[Networked] private int LastPositionIndex { get; set; }
 
@@ -67,9 +70,10 @@ namespace InGame.Exhibit
 				FireParticle = Runner.Spawn(_fireParticlePrefab, Vector3.zero, Quaternion.identity);
 				ExplosionParticle = Runner.Spawn(_explosionParticlePrefab, Vector3.zero, Quaternion.identity);
 				AimPositionViewObj = Runner.Spawn(_aimPositionViewPrefab, Vector3.zero, Quaternion.identity);
-				RPC_ParticleRenderActive(FireParticle,false);
-				RPC_ParticleRenderActive(ExplosionParticle,false);
-				RPC_ParticleRenderActive(AimPositionViewObj,false);
+				AimPositionViewObj.transform.localScale = Vector3.one * (_radius * 2);
+				RPC_SetActive(FireParticle, false);
+				RPC_SetActive(ExplosionParticle, false);
+				RPC_SetActive(AimPositionViewObj, false);
 			}
 		}
 
@@ -78,10 +82,12 @@ namespace InGame.Exhibit
 			base.Render();
 			// 放物線描画
 			CreateLine();
-			
+			if (Runner.IsServer) AimPositionViewObj.transform.position = GetTargetPoint();
+
 			// キャノンの回転描画
 			_cannonBarrel.localRotation = BarrelRotation;
 			_cannonBase.localRotation = BaseRotation;
+			_cameraController.transform.rotation = BaseRotation;
 		}
 
 		/// <summary>
@@ -89,32 +95,32 @@ namespace InGame.Exhibit
 		/// </summary>
 		public void OnInteractStart(PlayerRef playerRef)
 		{
-			IsActive = true;
-			Object.AssignInputAuthority(playerRef);
+			_interactable.enabled = false; // インタラクトの機能を一時的に無効化する
+			_currentUsePlayerRef = playerRef;
+			RPC_SetCameraPriority(_currentUsePlayerRef, 15);
+			Object.AssignInputAuthority(_currentUsePlayerRef);
 			_currentAmmo = _maxAmmo;
-			RPC_ParticleRenderActive(AimPositionViewObj,true);
-			AimPositionViewObj.transform.localScale = Vector3.one * _radius * 2;
+			RPC_SetActive(AimPositionViewObj, true);
 
 			// プレイヤーの取得
-			_currentUsePlayer = Runner.GetPlayerObject(playerRef).GetComponent<PlayerManager>();
-			if (_currentUsePlayer == null) return;
-			RPC_PlayerUnActive();
+			_currentUsePlayer = Runner.GetPlayerObject(_currentUsePlayerRef).GetComponent<PlayerManager>();
+			if (!_currentUsePlayer) return;
+			PlayerActive(false);
 			_currentUsePlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 
 			// Playerがダメージを受けた際にInteractを終了する
 			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
 		}
-		
+
 		/// <summary>
-		/// インタラクト中の処理
+		///     インタラクト中の処理
 		/// </summary>
 		public void OnInteractFixedNetworkUpdate(PlayerInput input)
 		{
 			base.FixedUpdateNetwork();
-			
+
 			// キャノンの回転内部処理
 			CannonRotate(input.MoveDirection.x, input.LookDirection.y);
-			AimPositionViewObj.transform.position = GetTargetPoint();
 			_currentUsePlayer?.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 
 			// 射撃処理
@@ -124,7 +130,7 @@ namespace InGame.Exhibit
 				RPC_Fire();
 				LastFireTime = TickTimer.CreateFromSeconds(Runner, _reloadTime);
 				_currentAmmo -= 1;
-				if (_currentAmmo <= 0) Invoke(nameof(OnInteractEnd), .1f);
+				if (_currentAmmo <= 0) OnInteractEnd();
 			}
 		}
 
@@ -133,19 +139,28 @@ namespace InGame.Exhibit
 		/// </summary>
 		public void OnInteractEnd()
 		{
-			IsActive = false;
-			RPC_ParticleRenderActive(AimPositionViewObj, false);
+			_interactable.SetCooldown(InteractCoolTime);
 			RPC_Refresh();
-			if (_currentUsePlayer == null) return;
+			_currentUsePlayer?.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
+			if (!_currentUsePlayer) return;
 			Object.RemoveInputAuthority();
 			PlayerActive(true);
-
+			RPC_SetCameraPriority(_currentUsePlayerRef, 5);
 			if (_currentUsePlayer)
 				_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
 			_currentUsePlayer = null;
+			_currentUsePlayerRef = default;
+			_interactable.EndInteract();
+			
+			UniTask.Void(async () =>
+			{
+				if (_fireUniTask.Status == UniTaskStatus.Pending)
+					await _fireUniTask;
+				RPC_SetActive(AimPositionViewObj, false);
+			});
 		}
 
-		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+		[Rpc(RpcSources.All, RpcTargets.All)]
 		private void RPC_Refresh()
 		{
 			_lineRenderer.positionCount = 0;
@@ -155,7 +170,7 @@ namespace InGame.Exhibit
 
 		private void CreateLine()
 		{
-			if (!IsActive) return;
+			if (!_currentUsePlayer) return;
 			BuildTrajectory(); // 描画位置の計算
 			_lineRenderer.positionCount = LastPositionIndex + 1;
 			_lineRenderer.SetPositions(_linePositions);
@@ -197,6 +212,7 @@ namespace InGame.Exhibit
 		{
 			if (Runner.IsServer)
 			{
+				RPC_SetCameraPriority(_currentUsePlayerRef, isActive ? 0 : 15);
 				_currentUsePlayer.RPC_SetControlState(isActive
 					? PlayerManager.PlayerControlState.Normal
 					: PlayerManager.PlayerControlState.ForcedControl);
@@ -204,16 +220,10 @@ namespace InGame.Exhibit
 			}
 		}
 
-		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-		private void RPC_PlayerUnActive()
-		{
-			PlayerActive(false);
-		}
-
-		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+		[Rpc(RpcSources.All, RpcTargets.All)]
 		private void RPC_Fire()
 		{
-			_ = Fire();
+			_fireUniTask = Fire();
 		}
 
 		private async UniTask Fire()
@@ -228,7 +238,7 @@ namespace InGame.Exhibit
 			var endPos = GetTargetPoint();
 			var endTime = _simulationStepTime * LastPositionIndex;
 
-			RPC_ParticleRenderActive(FireParticle, true);
+			RPC_SetActive(FireParticle, true);
 
 			// 弾丸の位置をUpdateする
 			while (timer < endTime)
@@ -249,18 +259,18 @@ namespace InGame.Exhibit
 					endPos = hit.point;
 					break;
 				}
+
 				await UniTask.WaitForSeconds(Runner.DeltaTime);
 			}
 
-			RPC_ParticleRenderActive(FireParticle, false);
+			RPC_SetActive(FireParticle, false);
 
 			RPC_Explosion(endPos, Quaternion.identity);
 		}
 
-		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+		[Rpc(RpcSources.All, RpcTargets.All)]
 		private void RPC_Explosion(Vector3 position, Quaternion rotation)
 		{
-			Debug.Log("Explosion RPC: " + position);
 			Explosion(position, rotation);
 		}
 
@@ -269,26 +279,27 @@ namespace InGame.Exhibit
 			// 着弾時のエフェクト
 			ExplosionParticle.transform.position = position;
 			ExplosionParticle.transform.rotation = rotation;
-			RPC_ParticleRenderActive(ExplosionParticle, true);
+			RPC_SetActive(ExplosionParticle, true);
 			UniTask.Void(async () =>
 			{
 				var particle = ExplosionParticle.GetComponent<ParticleSystem>();
-				if (particle) return;
+				if (!particle) return;
 				particle.Play(true);
-				while (!particle.isPlaying)
+				while (particle.isPlaying)
 					await UniTask.Yield();
-				RPC_ParticleRenderActive(ExplosionParticle, false);
+				RPC_SetActive(ExplosionParticle, false);
 			});
 
 			var cols = Physics.OverlapSphere(position, _radius, _hitLayer); // TODO:当たり判定統一するかも
-			
+
 			// ダメージ処理
 			foreach (var col in cols)
 			{
 				var damageable = col.GetComponentInParent<IDamageable>();
 				if (damageable == null) continue;
-				if (damageable.OwnerPlayerRef == _ownerPlayerRef) continue;
-				var hitData = new HitData(HitActionType.Damage, _baseDamage, _ownerPlayerRef, damageable.OwnerPlayerRef);
+				if (damageable.OwnerPlayerRef == _currentUsePlayerRef) continue;
+				var hitData = new HitData(HitActionType.Damage, _baseDamage, _currentUsePlayerRef,
+					damageable.OwnerPlayerRef);
 				damageable.TakeHit(ref hitData);
 			}
 		}
@@ -300,14 +311,14 @@ namespace InGame.Exhibit
 			                      _baseRotateSpeed * baseRotateInput;
 			currentBaseAxis = WarpAngle(currentBaseAxis);
 			BaseRotation = _baseDefaultRotation * Quaternion.Euler(0,
-				Mathf.Clamp(currentBaseAxis, _rotateAngleLimitY.x, _rotateAngleLimitY.y), 0);
+				Mathf.Clamp(currentBaseAxis, _rotateAngleLimitX.x, _rotateAngleLimitX.y), 0);
 
 			// 砲身の回転
 			var currentBarrelAxis = _cannonBarrel.localEulerAngles.x +
 			                        _barrelRotateSpeed * barrelRotateInput;
 			currentBarrelAxis = WarpAngle(currentBarrelAxis);
 			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(
-				Mathf.Clamp(currentBarrelAxis, _rotateAngleLimitX.x, _rotateAngleLimitX.y), 0, 0);
+				Mathf.Clamp(currentBarrelAxis, _rotateAngleLimitY.x, _rotateAngleLimitY.y), 0, 0);
 		}
 
 		private void PlayerHitTaken(HitData hitData)
@@ -316,12 +327,26 @@ namespace InGame.Exhibit
 		}
 
 		[Rpc(RpcSources.All, RpcTargets.All)]
-		private void RPC_ParticleRenderActive(NetworkObject obj, bool isActive)
+		private void RPC_SetActive(NetworkObject obj, bool isActive)
 		{
-			obj.gameObject.SetActive(isActive);
+			var particle = obj.GetComponentInChildren<ParticleSystem>();
+
+			if (isActive)
+				particle.Play();
+			else
+				particle.Stop(
+					true,
+					ParticleSystemStopBehavior.StopEmittingAndClear);
 		}
 
 		#region Helper
+
+		[Rpc(RpcSources.All, RpcTargets.All)]
+		private void RPC_SetCameraPriority(PlayerRef playerRef, int priority)
+		{
+			if (Runner.LocalPlayer != playerRef) return;
+			_cameraController.SetCameraPriority(priority);
+		}
 
 		private Vector3 GetTargetPoint()
 		{
@@ -349,17 +374,18 @@ namespace InGame.Exhibit
 		}
 
 		#endregion
-		
+
 		#region Gizmos
+
 		private void OnDrawGizmos()
 		{
-			if(!Object || !Object.IsValid) return;
+			if (!Object || !Object.IsValid) return;
 			// 当たり判定の可視化
 			var colliderPos = GetTargetPoint();
 			Gizmos.color = Color.green;
 			Gizmos.DrawWireSphere(colliderPos, _radius);
 		}
+
 		#endregion
-		
 	}
 }

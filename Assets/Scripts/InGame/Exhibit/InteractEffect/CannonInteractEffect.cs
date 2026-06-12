@@ -11,13 +11,12 @@ namespace InGame.Exhibit
     public class CannonInteractEffect : CharacterInteractEffectBase
     {
         [SerializeField] private CannonInteractable _cannonInteractable;
-        [SerializeField] private InteractableBase _interactable;
-        [SerializeField] private float _interactTime;
+        [SerializeField] private float _interactCoolTime;
 
-        public CannonInteractEffect(CannonInteractable cannonInteractable, float time)
+        public CannonInteractEffect(CannonInteractable cannonInteractable, float coolTime)
         {
             _cannonInteractable = cannonInteractable;
-            _interactTime = time;
+            _interactCoolTime = coolTime;
         }
         public CannonInteractEffect()
         {
@@ -26,13 +25,13 @@ namespace InGame.Exhibit
         {
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
             _cannonInteractable.OnInteractStart(playerRef);
-            _interactable = target;
+            _cannonInteractable.InteractCoolTime = _interactCoolTime;
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
             base.OnInteractFixedNetworkUpdate(playerInput);
-            //_cannonInteractable.OnInteractFixedNetworkUpdate(playerInput);
+            _cannonInteractable.OnInteractFixedNetworkUpdate(playerInput);
         }
 
         public override void OnInteractEnd()
@@ -42,7 +41,7 @@ namespace InGame.Exhibit
 
         public override CharacterInteractEffectBase Clone()
         {
-            return new CannonInteractEffect(_cannonInteractable, _interactTime);
+            return new CannonInteractEffect(_cannonInteractable, _interactCoolTime);
         }
     }
 }
