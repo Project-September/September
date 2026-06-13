@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7144572564158509959}
   - component: {fileID: 1725364523016823053}
+  - component: {fileID: 7691417260915590021}
   m_Layer: 0
   m_Name: FastInteractBuild
   m_TagString: Untagged
@@ -42,6 +43,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7691417260915590021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221500341116003552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4c386eb904e984a8f019475f108110, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5320518871302278878
@@ -97,15 +110,19 @@ MonoBehaviour:
   - _buildRouteType: 0
     _view: {fileID: 5523960276001352608}
     _factory: {fileID: 11400000, guid: 8a96520697b375a439febdd53e47b764, type: 2}
+    _effector: {fileID: 2271442649355220344}
   - _buildRouteType: 1
     _view: {fileID: 887975659898470511}
     _factory: {fileID: 11400000, guid: ee4aeac64db032145a11a13fdf5b6841, type: 2}
+    _effector: {fileID: 8916064774132154501}
   - _buildRouteType: 2
     _view: {fileID: 8446535216309459691}
     _factory: {fileID: 11400000, guid: 9a712e5f158b52648981e4413296bbcc, type: 2}
+    _effector: {fileID: 682633043677434304}
   - _buildRouteType: 3
     _view: {fileID: 1725364523016823053}
     _factory: {fileID: 11400000, guid: 43deef761dded174db934a35e14a0ea7, type: 2}
+    _effector: {fileID: 7691417260915590021}
 --- !u!114 &4248016666278182378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,10 +141,10 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4950416088258455676}
-  - {fileID: 5523960276001352608}
-  - {fileID: 887975659898470511}
-  - {fileID: 8446535216309459691}
-  - {fileID: 1725364523016823053}
+  - {fileID: 2271442649355220344}
+  - {fileID: 8916064774132154501}
+  - {fileID: 682633043677434304}
+  - {fileID: 7691417260915590021}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &6763741726178231006
 GameObject:
@@ -139,6 +156,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1450467962526940599}
   - component: {fileID: 5523960276001352608}
+  - component: {fileID: 2271442649355220344}
   m_Layer: 0
   m_Name: AttackPowerBuild
   m_TagString: Untagged
@@ -173,6 +191,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2271442649355220344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6763741726178231006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4c386eb904e984a8f019475f108110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7801732431677565602
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,6 +213,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2741221430640250081}
   - component: {fileID: 8446535216309459691}
+  - component: {fileID: 682633043677434304}
   m_Layer: 0
   m_Name: StunResistanceBuild
   m_TagString: Untagged
@@ -217,6 +248,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &682633043677434304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7801732431677565602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4c386eb904e984a8f019475f108110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8985711291285684272
 GameObject:
   m_ObjectHideFlags: 0
@@ -227,6 +270,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9023699957488481097}
   - component: {fileID: 887975659898470511}
+  - component: {fileID: 8916064774132154501}
   m_Layer: 0
   m_Name: MoveSpeedBuild
   m_TagString: Untagged
@@ -259,5 +303,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51fce3e49eae4664c8b88b469047dd5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8916064774132154501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8985711291285684272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4c386eb904e984a8f019475f108110, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
