@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7c25231292be4f4f96e02fa69b7f39f, type: 3}
-  m_Name: StunResistanceBuildDefinition 1
+  m_Name: StunResistanceBuildDefinitionTest
   m_EditorClassIdentifier: 
   _buildType: 2
   _buildTable:
@@ -18,7 +18,7 @@ MonoBehaviour:
     _currentBuildParam: 1
     _requiredValue: 1
   - _buildCondition: 1
-    _currentBuildParam: 0.5
+    _currentBuildParam: 0.2
     _requiredValue: -1
   - _buildCondition: 0
     _currentBuildParam: 0.8
