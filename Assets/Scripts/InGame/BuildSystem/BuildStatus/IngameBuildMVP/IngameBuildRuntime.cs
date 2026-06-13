@@ -40,16 +40,8 @@ namespace September.InGame.Common.Stats
         {
             _enabled = true;
 
-            // ビルドルートの種類に応じてステータス更新に必要なStatTypeをEffectorに送信
-            _onEnableBuild?.Invoke(
-                _definition.BuildType switch
-                {
-                    BuildRouteType.AttackPower => StatType.AttackDamage,
-                    BuildRouteType.MoveSpeed => StatType.Speed,
-                    BuildRouteType.StunResistance => StatType.StunDurationMultiply,
-                    BuildRouteType.FastInteract => StatType.InteractDurationMultiply,
-                    _ => StatType.AttackDamage
-                });
+            // ステータス更新に必要なStatTypeをEffectorに送信
+            _onEnableBuild?.Invoke(_definition.StatType);
 
             // ビルドルートのパラメータテーブルを登録
             foreach (var buildParams in _definition.BuildTable)
@@ -84,7 +76,7 @@ namespace September.InGame.Common.Stats
                 upgrade = true;
             }
 
-            // ビルドレベルアップしたら通知
+            // ビルドレベルアップしたかどうかと現在のステータスを送信
             if (_buildParamsQueue.Count <= 0) return;
             _onAddProgress?.Invoke(upgrade, _buildParamsQueue.Peek().CurrentBuildParam);
         }

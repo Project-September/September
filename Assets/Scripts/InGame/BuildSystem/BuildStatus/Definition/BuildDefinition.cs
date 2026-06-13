@@ -9,9 +9,11 @@ namespace September.InGame.Common.Stats
     public class BuildDefinition : ScriptableObject
     {
         [SerializeField] BuildRouteType _buildType;
+        [SerializeField] StatType _statType;
         [Header("ビルドシステムの配列\nElement0は未ビルド（ステータス上昇していないとき）の状態"), SerializeField] BuildConditionParams[] _buildTable;
 
         public BuildRouteType BuildType => _buildType;
+        public StatType StatType => _statType;
         public BuildConditionParams[] BuildTable => _buildTable;
     }
 

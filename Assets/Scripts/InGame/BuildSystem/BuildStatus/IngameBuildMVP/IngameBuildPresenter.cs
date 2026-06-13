@@ -1,8 +1,7 @@
 using September.Common;
-using September.InGame.Common.Stats;
 using System;
 
-namespace September
+namespace September.InGame.Common.Stats
 {
     public class IngameBuildPresenter : IDisposable
     {
