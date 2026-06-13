@@ -6,22 +6,21 @@ namespace September.InGame.Common.Stats
 {
     public class IngameBuildRuntime
     {
-        BuildRouteType _buildRouteType;
-        StatType _statType;
+        BuildDefinition _definition;
         bool _enabled;
         /// <summary>現在の進捗</summary>
         float _progressValue;
         /// <summary>ビルドシステムのパラメータテーブル</summary>
-        readonly Queue<BuildConditionParams> _buildParamsQueue = new();
+        readonly Queue<BuildConditionParams> _buildParamsQueue;
 
-        event Action _onEnableBuild;
-        event Action<bool, float, StatType> _onAddProgress;
-        public Action OnEnableBuild(Action act)
+        event Action<StatType> _onEnableBuild;
+        event Action<bool, float> _onAddProgress;
+        public Action OnEnableBuild(Action<StatType> act)
         {
-            _onEnableBuild = act;
+            _onEnableBuild += act;
             return () => _onEnableBuild -= act;
         }
-        public Action OnAddProgress(Action<bool, float, StatType> act)
+        public Action OnAddProgress(Action<bool, float> act)
         {
             _onAddProgress += act;
             return () => _onAddProgress -= act;
@@ -29,27 +28,36 @@ namespace September.InGame.Common.Stats
 
         public IngameBuildRuntime(BuildDefinition definition)
         {
+            _definition = definition;
             _enabled = false;
-            _buildRouteType = definition.BuildType;
-            _statType = _buildRouteType switch
-            {
-                BuildRouteType.AttackPower => StatType.AttackDamage,
-                BuildRouteType.MoveSpeed => StatType.Speed,
-                BuildRouteType.StunResistance => StatType.StunDurationMultiply,
-                BuildRouteType.FastInteract => StatType.InteractDurationMultiply,
-                _ => StatType.AttackDamage
-            };
-
-            foreach (var buildParams in definition.BuildTable)
-            {
-                _buildParamsQueue.Enqueue(buildParams);
-            }
+            _buildParamsQueue = new Queue<BuildConditionParams>();
         }
 
+        /// <summary>
+        /// このビルドルートを有効化するメソッド
+        /// </summary>
         public void EnableBuild()
         {
             _enabled = true;
-            _onEnableBuild?.Invoke();
+
+            // ビルドルートの種類に応じてステータス更新に必要なStatTypeをEffectorに送信
+            _onEnableBuild?.Invoke(
+                _definition.BuildType switch
+                {
+                    BuildRouteType.AttackPower => StatType.AttackDamage,
+                    BuildRouteType.MoveSpeed => StatType.Speed,
+                    BuildRouteType.StunResistance => StatType.StunDurationMultiply,
+                    BuildRouteType.FastInteract => StatType.InteractDurationMultiply,
+                    _ => StatType.AttackDamage
+                });
+
+            // ビルドルートのパラメータテーブルを登録
+            foreach (var buildParams in _definition.BuildTable)
+            {
+                _buildParamsQueue.Enqueue(buildParams);
+            }
+            // 有効な場合はステータスを初期化
+            _onAddProgress?.Invoke(true, _buildParamsQueue.Peek().CurrentBuildParam);
         }
 
         /// <summary>
@@ -76,9 +84,9 @@ namespace September.InGame.Common.Stats
                 upgrade = true;
             }
 
-            // ビルドレベルアップしたら描画用に通知
+            // ビルドレベルアップしたら通知
             if (_buildParamsQueue.Count <= 0) return;
-            _onAddProgress?.Invoke(upgrade, _buildParamsQueue.Peek().CurrentBuildParam, _statType);
+            _onAddProgress?.Invoke(upgrade, _buildParamsQueue.Peek().CurrentBuildParam);
         }
     }
 }

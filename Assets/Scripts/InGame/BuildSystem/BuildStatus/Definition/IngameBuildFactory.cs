@@ -7,10 +7,10 @@ namespace September.InGame.Common.Stats
     {
         [SerializeField] BuildDefinition _definition;
 
-        public IngameBuildPresenter CreateBuild(IngameBuildView view)
+        public IngameBuildPresenter CreateBuild(IngameBuildView view, BuildEffector effector)
         {
-            if (view == null || _definition == null) return null;
-            return new IngameBuildPresenter(_definition, view);
+            if (_definition == null || view == null || effector == null) return null;
+            return new IngameBuildPresenter(_definition, view, effector);
         }
     }
 }

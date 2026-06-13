@@ -17,10 +17,11 @@ namespace September.InGame.Common.Stats
             [SerializeField] BuildRouteType _buildRouteType;
             [SerializeField] IngameBuildView _view;
             [SerializeField] IngameBuildFactory _factory;
+            [SerializeField] BuildEffector _effector;
             IngameBuildPresenter _presenter;
 
             public BuildRouteType BuildRouteType => _buildRouteType;
-            public IngameBuildView View => _view;
+            public BuildEffector Effector => _effector;
 
             public void Dispose()
             {
@@ -29,13 +30,13 @@ namespace September.InGame.Common.Stats
 
             public void GenerateBuild(BuildRouteType build)
             {
-                _presenter = _factory?.CreateBuild(_view);
-                if (_buildRouteType == build) _view?.TrySetEnableBuild();
+                _presenter = _factory?.CreateBuild(_view, _effector);
+                if (_buildRouteType == build) _effector?.TrySetEnableBuild();
             }
         }
 
         [Header("ビルドルートの機能"), SerializeField] BuildGenerateInfo[] _builds;
-        readonly Dictionary<BuildRouteType, IngameBuildView> _buildDict = new();
+        readonly Dictionary<BuildRouteType, BuildEffector> _buildDict = new();
 
         /// <summary>
         /// プレイヤーが選択したビルドルートに応じてシステムを有効化するメソッド
@@ -47,7 +48,7 @@ namespace September.InGame.Common.Stats
             {
                 if (build == null) continue;
                 build.GenerateBuild(buildType);
-                _buildDict[build.BuildRouteType] = build.View;
+                _buildDict[build.BuildRouteType] = build.Effector;
             }
         }
 
@@ -74,7 +75,7 @@ namespace September.InGame.Common.Stats
 
         private void OnDisable()
         {
-            foreach(var build in _builds)
+            foreach (var build in _builds)
             {
                 build?.Dispose();
             }
