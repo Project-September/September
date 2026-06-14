@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September.Common
+namespace September.Lobby
 {
     [CreateAssetMenu(fileName = "BuildDatas", menuName = "Build/BuildDatas")]
     public class BuildDatas : ScriptableObject

@@ -101,7 +101,9 @@ namespace September.Common
                 var buildGenerator = player.GetComponentInChildren<BuildGenerator>();
                 if (buildGenerator != null) buildGenerator.GenerateBuild(pair.Value.BuildType);
 #if UNITY_EDITOR
-                Debug.Log("ビルドシステムの構築に" + (buildGenerator != null ? $"成功しました\n選択ビルド : {pair.Value.BuildType}" : "失敗しました"));
+                var root = transform.root;
+                if (root != null)
+                    Debug.Log($"{root.name} : ビルドシステムの構築に" + (buildGenerator != null ? $"成功しました\n選択ビルド : {pair.Value.BuildType}" : "失敗しました"));
 #endif
                 #endregion
 

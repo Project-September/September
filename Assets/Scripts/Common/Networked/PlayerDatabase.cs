@@ -331,7 +331,7 @@ namespace September.Common
         /// <param name="playerRef">プレイヤーの情報</param>
         /// <param name="buildType">決定したビルドルート</param>
         [Rpc(RpcSources.All, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-        public void Rpc_SetBuild(PlayerRef playerRef, BuildType buildType)
+        public void Rpc_SetBuild(PlayerRef playerRef, BuildRouteType buildType)
         {
             if (!PlayerDataDic.TryGet(playerRef, out var playerData)) return;
             playerData.BuildType = buildType;
