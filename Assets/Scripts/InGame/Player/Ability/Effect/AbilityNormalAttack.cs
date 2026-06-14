@@ -56,7 +56,7 @@ namespace InGame.Player.Ability
         private float _debugDrawDuration = 1f; // 例: 0.05f
 
         [Header("ビルドシステム関連の参照")]
-        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] protected BuildGenerator _buildGenerator;
         [SerializeField] PlayerStatus _playerStatus;
 
         // 変換後のTickオフセット
