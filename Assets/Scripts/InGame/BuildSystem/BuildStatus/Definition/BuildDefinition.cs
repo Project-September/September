@@ -21,13 +21,11 @@ namespace September.InGame.Common.Stats
     [Serializable]
     public struct BuildConditionParams
     {
-        [Header("ビルド状況"), SerializeField] BuildRouteConditionType _buildCondition;
         [Header("現在のビルドパラメータ\n初期パラメータとの差分"), SerializeField] float _currentBuildParam;
-        [Header("次のビルドまでの条件値\nこの値に到達したら次のレベルに進む\n最大レベルの場合-1を入れておくといい"),
+        [Header("現在のビルドパラメータに到達するために必要な数値"),
             SerializeField, Min(-1), Tooltip("攻撃力 : 回\nスピード : m\netc...")]
         float _requiredValue;
 
-        public BuildRouteConditionType BuildCondition => _buildCondition;
         public float CurrentBuildParam => _currentBuildParam;
         public float RequiredValue => _requiredValue;
     }

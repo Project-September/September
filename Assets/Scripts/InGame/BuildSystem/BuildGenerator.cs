@@ -14,13 +14,13 @@ namespace September.InGame.Common.Stats
         [Serializable]
         class BuildGenerateInfo : IDisposable
         {
-            [SerializeField] BuildRouteType _buildRouteType;
-            [SerializeField] IngameBuildView _view;
             [SerializeField] IngameBuildFactory _factory;
+            [SerializeField] BuildDefinition _definition;
+            [SerializeField] IngameBuildView _view;
             [SerializeField] BuildEffector _effector;
             IngameBuildPresenter _presenter;
 
-            public BuildRouteType BuildRouteType => _buildRouteType;
+            public BuildRouteType BuildRouteType { get; private set; }
             public BuildEffector Effector => _effector;
 
             public void Dispose()
@@ -30,8 +30,9 @@ namespace September.InGame.Common.Stats
 
             public void GenerateBuild(BuildRouteType build)
             {
-                _presenter = _factory?.CreateBuild(_view, _effector);
-                if (_buildRouteType == build) _effector?.TrySetEnableBuild();
+                _presenter = _factory?.CreateBuild(_definition, _view, _effector);
+                BuildRouteType = _definition.BuildType;
+                if (BuildRouteType == build) _effector?.TrySetEnableBuild();
             }
         }
 

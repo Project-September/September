@@ -1,16 +1,15 @@
 using UnityEngine;
+using September.Common;
 
 namespace September.InGame.Common.Stats
 {
     [CreateAssetMenu(fileName = "IngameBuildFactory", menuName = "Build/IngameBuildFactory")]
     public class IngameBuildFactory : ScriptableObject
     {
-        [SerializeField] BuildDefinition _definition;
-
-        public IngameBuildPresenter CreateBuild(IngameBuildView view, BuildEffector effector)
+        public IngameBuildPresenter CreateBuild(BuildDefinition definition, IngameBuildView view, BuildEffector effector)
         {
-            if (_definition == null || view == null || effector == null) return null;
-            return new IngameBuildPresenter(_definition, view, effector);
+            if (definition == null || view == null || effector == null) return null;
+            return new IngameBuildPresenter(definition, view, effector);
         }
     }
 }

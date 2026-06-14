@@ -1,4 +1,3 @@
-using September.Common;
 using System;
 using System.Collections.Generic;
 
@@ -8,6 +7,8 @@ namespace September.InGame.Common.Stats
     {
         BuildDefinition _definition;
         bool _enabled;
+        /// <summary>現在のビルドパラメータ</summary>
+        float _currentParam;
         /// <summary>現在の進捗</summary>
         float _progressValue;
         /// <summary>ビルドシステムのパラメータテーブル</summary>
@@ -48,8 +49,10 @@ namespace September.InGame.Common.Stats
             {
                 _buildParamsQueue.Enqueue(buildParams);
             }
+
             // 有効な場合はステータスを初期化
-            _onAddProgress?.Invoke(true, _buildParamsQueue.Peek().CurrentBuildParam);
+            if (_buildParamsQueue.Count > 0) _currentParam = _buildParamsQueue.Dequeue().CurrentBuildParam;
+            _onAddProgress?.Invoke(true, _currentParam);
         }
 
         /// <summary>
@@ -67,18 +70,15 @@ namespace September.InGame.Common.Stats
             if (_buildParamsQueue.Count <= 0) return;
             // 進捗が条件を満たしているか判定
             var nextBuildParams = _buildParamsQueue.Peek();
-            if (nextBuildParams.BuildCondition != BuildRouteConditionType.MaxBuild
-                && nextBuildParams.RequiredValue != -1
-                && _progressValue >= nextBuildParams.RequiredValue)
+            if (_progressValue >= nextBuildParams.RequiredValue)
             {
                 // 条件を満たしていたらビルドレベルアップ
-                _buildParamsQueue.Dequeue();
+                _currentParam = _buildParamsQueue.Dequeue().CurrentBuildParam;
                 upgrade = true;
             }
 
             // ビルドレベルアップしたかどうかと現在のステータスを送信
-            if (_buildParamsQueue.Count <= 0) return;
-            _onAddProgress?.Invoke(upgrade, _buildParamsQueue.Peek().CurrentBuildParam);
+            _onAddProgress?.Invoke(upgrade, _currentParam);
         }
     }
 }
