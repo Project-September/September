@@ -172,7 +172,7 @@ namespace InGame.Player.Ability
                 if (playerDatabase.PlayerDataDic.TryGet(Parameter.Owner.InputAuthority, out SessionPlayerData playerData))
                 {
                     // ビルドの上昇分を加算して計算
-                    return playerData.IsOgre ? _ogreAttackDamage : _attackDamage + (_playerStatus ? (int)_playerStatus.AttackDamage : 0);
+                    return (playerData.IsOgre ? _ogreAttackDamage : _attackDamage) + (_playerStatus ? (int)_playerStatus.AttackDamage : 0);
                 }
             }
             catch (System.Exception)
