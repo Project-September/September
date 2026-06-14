@@ -18,7 +18,7 @@ namespace InGame.Player.Ability
         private float _interactionTimer;
         [Header("判定を取るためのBoxの大きさ")]
         [SerializeField] private Vector3 _judgmentBoxSize;
-
+        
         /// <summary>
         /// 現在、インタラクション中のオブジェクトを保持
         /// </summary>

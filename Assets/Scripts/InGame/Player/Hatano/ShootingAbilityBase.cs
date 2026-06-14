@@ -1,5 +1,7 @@
 using System;
+using InGame.Common;
 using September.Common;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace InGame.Player.Ability.Effect.Shooting
@@ -7,20 +9,25 @@ namespace InGame.Player.Ability.Effect.Shooting
     [Serializable]
     public abstract class ShootingAbilityBase : AbilityBase
     {
+        [Header("AnimationClipPlayer")]
+        [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         [Header("AimCameraController")]
         [SerializeField] protected AimCameraController _aimCameraController;
-        
         //現在と最後の射撃ステートを比較して状態の管理を行う
         [Header("射撃ステート（現在）")]
         [SerializeField] protected ShootingStateType _shootingType;
         [Header("射撃ステート（最後）")]
         [SerializeField] protected ShootingStateType _lastShootingType;
-
         [Header("射撃Abilityの設定")]
         [Header("射撃距離")]
         [SerializeField] protected float _shootingDistance;
         [Header("マズル（数に応じて追加）")]
         [SerializeField] protected Transform[] _muzzlePos;
+        [Header("AnimationClip")]
+        [Header("構え")]
+        [SerializeField] private AnimationClip _stanceAnimationClip;
+        [Header("撃つ")] 
+        [SerializeField] private AnimationClip _shootAnimationClip;
         
         private PlayerManager _playerManager;
 
@@ -48,6 +55,8 @@ namespace InGame.Player.Ability.Effect.Shooting
                 {
                     OnNoShooting();
                 }
+                
+                PlayAnimation().Forget();
             }
 
             //構え入力が終了➤構える前の状態に戻す
@@ -126,5 +135,23 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// 構え状態が終了したときに行う処理を書く
         /// </summary>
         protected virtual void OnStopTheStance(){}
+
+        private async UniTask PlayAnimation()
+        {
+            // 構えアニメーションを再生
+            if (_shootingType == ShootingStateType.Stance)
+            {
+                _animationClipPlayer.PlayClip(_stanceAnimationClip);
+            }
+            else if (_shootingType == ShootingStateType.Shooting) // 撃つアニメーションを再生
+            {
+                // 撃つアニメーションの再生が終了するまで待機し、構えアニメーションを再生
+                var endType = await _animationClipPlayer.PlayClipAndWait(_shootAnimationClip);
+                if (endType == EndClipType.Complete)
+                {
+                    _animationClipPlayer.PlayClip(_stanceAnimationClip);
+                }
+            }
+        }
     }
 }

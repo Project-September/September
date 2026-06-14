@@ -5485,10 +5485,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82df9dd14a0794b429f808e8d246e3c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputManager: {fileID: 0}
   _colliderObj: {fileID: 2287520664147054077}
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _IsStun:
     _value: 0
 --- !u!114 &3242880713039265549
@@ -5546,6 +5549,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   _printVaultFailedLog: 0
   _visibleGizmos: 0
+  _vaultGizmoDebugger: {fileID: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _IsGroundNet:
@@ -5601,9 +5607,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97fa1f5e591252438ae6f1ea8b0742b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _param: {fileID: 11400000, guid: 5ca879c9eaa06b04ebbd2aa1af5da9cd, type: 2}
-  _CurrentHealth: 0
-  _CurrentStamina: 0
+  _modifiers: []
+  _params: {fileID: 0}
 --- !u!114 &4737425158909762900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5628,6 +5633,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30522911d6f01d94e88b4f6d3fe4de7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inputManager: {fileID: 0}
   _interactRadius: 2.5
   _interactMask:
     serializedVersion: 2
@@ -5641,6 +5647,8 @@ MonoBehaviour:
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
   _playerAudioController: {fileID: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _isHoldingInteract: 0
 --- !u!114 &7508249662566368237
 MonoBehaviour:
@@ -5681,6 +5689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c7244242fca19c4caa942020db8defa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerInputManager: {fileID: 0}
   _abilities:
   - rid: 1502005709025574997
   - rid: 1502005779782697044
@@ -5699,12 +5708,15 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
+        _animationClipPlayer: {fileID: 3570017578186338863}
         _aimCameraController: {fileID: 2677403803585906037}
         _shootingType: 0
         _lastShootingType: 0
         _shootingDistance: 100
         _muzzlePos:
         - {fileID: 915611406105039834}
+        _stanceAnimationClip: {fileID: 0}
+        _shootAnimationClip: {fileID: 0}
         _playerInteractionController: {fileID: 7710838205980989238}
         _interactionTime: 2
         _judgmentBoxSize: {x: 2, y: 2, z: 2}
@@ -5716,12 +5728,15 @@ MonoBehaviour:
       data:
         _cooldown: 5
         _phase: 0
+        _animationClipPlayer: {fileID: 3570017578186338863}
         _aimCameraController: {fileID: 2677403803585906037}
         _shootingType: 0
         _lastShootingType: 0
         _shootingDistance: 100
         _muzzlePos:
         - {fileID: 6159245481983791538}
+        _stanceAnimationClip: {fileID: 0}
+        _shootAnimationClip: {fileID: 0}
         _rocketLauncherRadius: 10
         _damage: 5
         _ogreDamage: 10
@@ -5733,6 +5748,7 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
+        _animationClipPlayer: {fileID: 3570017578186338863}
         _aimCameraController: {fileID: 2677403803585906037}
         _shootingType: 0
         _lastShootingType: 0
@@ -5740,6 +5756,8 @@ MonoBehaviour:
         _muzzlePos:
         - {fileID: 9070121316509825322}
         - {fileID: 900395334813402302}
+        _stanceAnimationClip: {fileID: 0}
+        _shootAnimationClip: {fileID: 0}
         _shootingInterval: 2
         _damage: 5
         _ogreDamage: 10
@@ -5771,6 +5789,8 @@ MonoBehaviour:
         _triggerInteraction: 1
         _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
         _debugDrawDuration: 1
+        _buildGenerator: {fileID: 0}
+        _playerStatus: {fileID: 0}
     - rid: 1502006044739502164
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
