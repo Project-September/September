@@ -37,7 +37,8 @@ namespace September.InGame.Common.Stats
         public override void Apply(ref StatsContainer stats)
         {
             if (!_initialized || !_isEnable) return;
-            Debug.Log($"{name} : {_statType} => {_currentProgress}");
+            // テスト用だが毎フレーム出るものかつ書き直すのが大変なのでコメントアウトで残しておく
+            // Debug.Log($"{name} : {_statType} => {_currentProgress}");
             stats.TrySetStatValue(_statType, _currentProgress);
         }
 
