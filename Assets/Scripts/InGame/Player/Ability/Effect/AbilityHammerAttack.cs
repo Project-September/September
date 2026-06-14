@@ -17,11 +17,14 @@ namespace InGame.Player.Ability.Effect
             var disableInteractEffect = hitInfo.gameObject.GetComponentInHierarchy<DisableInteractEffect>();
             if (damageable == null && !disableInteractEffect) return;
 
+            // 鬼状態かどうかでダメージを変更
+            int damage = GetAttackDamage();
+
             if (damageable != null)
             {
                 var hitData = new HitData(
                     HitActionType.Damage,
-                    _attackDamage,
+                    damage,
                     Parameter.Owner.InputAuthority,
                     damageable.OwnerPlayerRef);
                 damageable.TakeHit(ref hitData);
