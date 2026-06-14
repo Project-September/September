@@ -15,21 +15,15 @@ MonoBehaviour:
   _buildType: 2
   _statType: 7
   _buildTable:
-  - _buildCondition: 0
-    _currentBuildParam: 1
+  - _currentBuildParam: 1
+    _requiredValue: 0
+  - _currentBuildParam: 0.9
     _requiredValue: 1
-  - _buildCondition: 0
-    _currentBuildParam: 0.9
+  - _currentBuildParam: 0.8
     _requiredValue: 3
-  - _buildCondition: 0
-    _currentBuildParam: 0.8
+  - _currentBuildParam: 0.7
     _requiredValue: 6
-  - _buildCondition: 0
-    _currentBuildParam: 0.7
+  - _currentBuildParam: 0.6
     _requiredValue: 10
-  - _buildCondition: 0
-    _currentBuildParam: 0.6
+  - _currentBuildParam: 0.5
     _requiredValue: 15
-  - _buildCondition: 1
-    _currentBuildParam: 0.5
-    _requiredValue: -1
