@@ -1,9 +1,10 @@
-using System.Linq;
 using Fusion;
 using InGame.Exhibit.InteractEffect;
 using InGame.Health;
 using InGame.Interact;
 using September.Common;
+using September.InGame.Common.Stats;
+using System.Linq;
 using UnityEngine;
 
 namespace InGame.Player.Ability.Effect
@@ -17,14 +18,18 @@ namespace InGame.Player.Ability.Effect
             var disableInteractEffect = hitInfo.gameObject.GetComponentInHierarchy<DisableInteractEffect>();
             if (damageable == null && !disableInteractEffect) return;
 
+            // 鬼状態かどうかでダメージを変更
+            int damage = GetAttackDamage();
+
             if (damageable != null)
             {
                 var hitData = new HitData(
                     HitActionType.Damage,
-                    _attackDamage,
+                    damage,
                     Parameter.Owner.InputAuthority,
                     damageable.OwnerPlayerRef);
                 damageable.TakeHit(ref hitData);
+                _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
             }
 
             if (disableInteractEffect)
