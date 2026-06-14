@@ -9,7 +9,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Editor.AssetAutomation
+namespace September.Editor.AssetAutomation
 {
     internal static class CurtainEffectGenerator
     {
