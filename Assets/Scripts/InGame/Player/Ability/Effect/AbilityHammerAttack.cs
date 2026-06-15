@@ -3,8 +3,6 @@ using InGame.Exhibit.InteractEffect;
 using InGame.Health;
 using InGame.Interact;
 using September.Common;
-using September.InGame.Common.Stats;
-using System.Linq;
 using UnityEngine;
 
 namespace InGame.Player.Ability.Effect
