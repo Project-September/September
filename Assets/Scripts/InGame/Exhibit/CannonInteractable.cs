@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -54,7 +55,6 @@ namespace InGame.Exhibit
 		[Networked] private Quaternion BarrelRotation { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
 		[Networked] private int LastPositionIndex { get; set; }
-		[Networked] public float InteractCoolTime { get; set; }
 
 		public override void Spawned()
 		{
@@ -141,9 +141,15 @@ namespace InGame.Exhibit
 		/// </summary>
 		public void OnInteractEnd()
 		{
+			
+			// クールダウン処理
+			var chara = PlayerDatabase.Instance.PlayerDataDic[_currentUsePlayerRef].CharacterType;
+			var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
+				? all
+				: _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
+			_interactable.SetCooldown(time);
 			_interactable.ForceSetInteractable = true;
 			
-			_interactable.SetCooldown(InteractCoolTime);
 			RPC_Refresh();
 			_currentUsePlayer?.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 			if (!_currentUsePlayer) return;
@@ -155,6 +161,7 @@ namespace InGame.Exhibit
 			_currentUsePlayerRef = default;
 			_interactable.EndInteract();
 
+			// 現在砲弾が発射中であった場合、一部エフェクトの終了処理を待つ
 			UniTask.Void(async () =>
 			{
 				if (_fireUniTask.Status == UniTaskStatus.Pending)

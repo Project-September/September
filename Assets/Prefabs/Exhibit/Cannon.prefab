@@ -100,8 +100,9 @@ MonoBehaviour:
     keys: 
     values: []
   _cooldownTimeDictionary:
-    keys: 
-    values: []
+    keys: 05000000
+    values:
+    - 5
   _characterEffects:
   - rid: 2611078826810409046
   _type: 0
@@ -112,7 +113,7 @@ MonoBehaviour:
   _cooldownEffectScale: {x: 1, y: 1, z: 1}
   _interactEffectType: 9
   _cooldownEffectType: 11
-  _spawnCooldownEffectOnStart: 1
+  _spawnCooldownEffectOnStart: 0
   _audioBroadcaster: {fileID: 0}
   _interactSoundCueName: 
   _interactSoundTrackingType: 0
@@ -166,7 +167,6 @@ MonoBehaviour:
   _waitCharacterTransform: {fileID: 4275066865890829726}
   _cameraController: {fileID: 3748556067587992180}
   _interactable: {fileID: 788815102460632112}
-  _InteractCoolTime: 0
 --- !u!120 &7931722243513256251
 LineRenderer:
   serializedVersion: 2
