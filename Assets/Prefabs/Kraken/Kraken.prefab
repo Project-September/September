@@ -959,6 +959,7 @@ MonoBehaviour:
   _damage: 50
   _animator: {fileID: 6997606137825029927}
   _animationName: KrakenAttack
+  _interactable: {fileID: 4783785741626355923}
   _interactArea: {fileID: 2820056890666656220}
   _dealScore: 10
 --- !u!114 &872495872056710133
@@ -968,7 +969,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1021459888500919411}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 549068b2e6fdfd442a5bba033df184c9, type: 3}
   m_Name: 

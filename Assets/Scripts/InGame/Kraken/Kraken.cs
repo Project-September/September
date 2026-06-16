@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
+using InGame.Interact;
 using InGame.Player;
 using September.Common;
 using September.Common.Input;
@@ -30,7 +31,7 @@ namespace September.InGame.Kraken
         [SerializeField] private string _animationName;
 
         [Header("インタラクト設定")]
-        [SerializeField] private Collider _interactArea;
+        [SerializeField] private InteractableBase _interactable;
 
         [Header("ダメージ設定")]
         [SerializeField] private int _dealScore = 10;
@@ -129,8 +130,7 @@ namespace September.InGame.Kraken
             // このプレイヤーから入力を受け取るように設定する
             Object.AssignInputAuthority(owner);
 
-            // インタラクト用の判定を消す
-            RPC_SetInteractAreaActive(false);
+            _interactable.ForceSetInteractable = false;
 
             OwnerPlayerRef = owner;
         }
@@ -194,12 +194,6 @@ namespace September.InGame.Kraken
                 Debug.DrawRay(transform.position, forward * 100f, Color.green, 10f);
                 Attack(Vector3.down).Forget();
             }
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetInteractAreaActive(bool active)
-        {
-            _interactArea.enabled = active;
         }
 
         private async UniTask Attack(Vector3 targetPos)
