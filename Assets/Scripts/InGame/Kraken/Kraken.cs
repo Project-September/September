@@ -3,6 +3,7 @@ using Fusion;
 using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
+using RootMotion.FinalIK;
 using September.Common;
 using September.Common.Input;
 using September.InGame.Mountable;
@@ -29,6 +30,7 @@ namespace September.InGame.Kraken
         [Header("アニメーション設定")]
         [SerializeField] private Animator _animator;
         [SerializeField] private string _animationName;
+        [SerializeField] private FABRIKRoot _armIKRoot;
 
         [Header("インタラクト設定")]
         [SerializeField] private InteractableBase _interactable;
@@ -192,12 +194,26 @@ namespace September.InGame.Kraken
                 forward.y = 0;
                 forward.Normalize();
                 Debug.DrawRay(transform.position, forward * 100f, Color.green, 10f);
-                Attack(Vector3.down).Forget();
+                Attack(forward * 100f).Forget();
             }
         }
 
-        private async UniTask Attack(Vector3 targetPos)
+        private async UniTask Attack(Vector3 targetPosition)
         {
+            IKSolver.UpdateDelegate del = () =>
+            {
+                var forward = -_armIKRoot.transform.right;
+                var dir = Vector3.ProjectOnPlane(targetPosition - _armIKRoot.transform.position, _armIKRoot.transform.up).normalized;
+                Debug.DrawRay(_armIKRoot.transform.position, dir * 100f, Color.red, 3f);
+
+                var rot = Quaternion.FromToRotation(forward, dir);
+                _armIKRoot.transform.rotation *= rot;
+                Debug.Log($"{targetPosition} {forward} {dir} {rot.eulerAngles}");
+            };
+
+            _armIKRoot.solver.OnPostUpdate += del;
+
+            Debug.Log("Start Attack");
             _animator.Play(_animationName, 0, 0f);
             await UniTask.WaitForSeconds(_hitStartTime);
             _hitChecker.StartHitCheck();
@@ -205,6 +221,9 @@ namespace September.InGame.Kraken
             _hitChecker.EndHitCheck();
             _isAttacking = false;
             IsAttackTriggered = false;
+            Debug.Log("End Attack");
+
+            _armIKRoot.solver.OnPostUpdate -= del;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
