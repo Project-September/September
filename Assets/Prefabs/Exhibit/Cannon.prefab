@@ -148,10 +148,10 @@ MonoBehaviour:
   _rotateAngleLimitX: {x: -90, y: 69.55752}
   _rotateAngleLimitY: {x: -90, y: -1.4690039}
   _muzzle: {fileID: 8618401258012466577}
-  _simulationStepTime: 0.1
+  _simulationStepTime: 0.25
   _lifeTime: 10
-  _gravity: {x: 0, y: 9.8, z: 0}
-  _ballSpeed: 20.07
+  _gravity: {x: 0, y: -9.8, z: 0}
+  _projectileVelocity: 20
   _maxAmmo: 3
   _reloadTime: 3
   _radius: 3

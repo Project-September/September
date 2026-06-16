@@ -14,7 +14,6 @@ namespace InGame.Exhibit
 		[Header("移動関連")] [SerializeField] private Transform _cannonBase;
 		[SerializeField] private Transform _cannonBarrel;
 		[SerializeField] private float _baseRotateSpeed;
-
 		[SerializeField] private float _barrelRotateSpeed;
 
 		// minをxとして、maxをyとして扱う
@@ -24,8 +23,8 @@ namespace InGame.Exhibit
 		[Header("砲弾に関する設定")] [SerializeField] private Transform _muzzle;
 		[SerializeField] private float _simulationStepTime = 0.1f;
 		[SerializeField] private float _lifeTime = 10f;
-		[SerializeField] private Vector3 _gravity;
-		[SerializeField] private float _ballSpeed;
+		[SerializeField] private Vector3 _gravity = new(0, -9.81f, 0);
+		[SerializeField] private float _projectileVelocity;
 		[SerializeField] private int _maxAmmo;
 		[SerializeField] private float _reloadTime;
 		[SerializeField] private float _radius;
@@ -47,19 +46,20 @@ namespace InGame.Exhibit
 		private Quaternion _barrelDefaultRotation;
 		private UniTask _fireUniTask;
 		private int _currentAmmo;
-		private readonly Vector3[] _linePositions = new Vector3[32];
+		private Vector3[] _linePositions;
 		[Networked] private NetworkObject FireParticle { get; set; }
 		[Networked] private NetworkObject ExplosionParticle { get; set; }
 		[Networked] private NetworkObject AimPositionViewObj { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
-		[Networked] public float InteractCoolTime { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
 		[Networked] private int LastPositionIndex { get; set; }
+		[Networked] public float InteractCoolTime { get; set; }
 
 		public override void Spawned()
 		{
 			base.Spawned();
+			_linePositions = new Vector3[(int)(_lifeTime / _simulationStepTime)];
 			_baseDefaultRotation = _cannonBase.localRotation;
 			_barrelDefaultRotation = _cannonBarrel.localRotation;
 			BaseRotation = _cannonBase.localRotation;
@@ -95,7 +95,9 @@ namespace InGame.Exhibit
 		/// </summary>
 		public void OnInteractStart(PlayerRef playerRef)
 		{
-			_interactable.enabled = false; // インタラクトの機能を一時的に無効化する
+			// インタラクトの機能を一時的に無効化する
+			_interactable.ForceSetInteractable = false;
+			
 			_currentUsePlayerRef = playerRef;
 			RPC_SetCameraPriority(_currentUsePlayerRef, 15);
 			Object.AssignInputAuthority(_currentUsePlayerRef);
@@ -139,6 +141,8 @@ namespace InGame.Exhibit
 		/// </summary>
 		public void OnInteractEnd()
 		{
+			_interactable.ForceSetInteractable = true;
+			
 			_interactable.SetCooldown(InteractCoolTime);
 			RPC_Refresh();
 			_currentUsePlayer?.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
@@ -146,12 +150,11 @@ namespace InGame.Exhibit
 			Object.RemoveInputAuthority();
 			PlayerActive(true);
 			RPC_SetCameraPriority(_currentUsePlayerRef, 5);
-			if (_currentUsePlayer)
-				_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
+			if (_currentUsePlayer) _currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
 			_currentUsePlayer = null;
 			_currentUsePlayerRef = default;
 			_interactable.EndInteract();
-			
+
 			UniTask.Void(async () =>
 			{
 				if (_fireUniTask.Status == UniTaskStatus.Pending)
@@ -164,8 +167,8 @@ namespace InGame.Exhibit
 		private void RPC_Refresh()
 		{
 			_lineRenderer.positionCount = 0;
-			_cannonBarrel.rotation = _barrelDefaultRotation;
-			_cannonBase.rotation = _baseDefaultRotation;
+			BarrelRotation = _barrelDefaultRotation;
+			BaseRotation = _baseDefaultRotation;
 		}
 
 		private void CreateLine()
@@ -177,7 +180,7 @@ namespace InGame.Exhibit
 		}
 
 		/// <summary>
-		///     放物線の軌道を計算し、当たり判定を取得する。
+		///     放物線の軌道を計算する。
 		///     障害物に当たった場合、そこを最終地点とする。
 		///     結果は_linePositionsと_lastPositionIndexに保存される。
 		/// </summary>
@@ -187,8 +190,8 @@ namespace InGame.Exhibit
 			{
 				// 次の地点の計算
 				var time = i * _simulationStepTime;
-				var pos = TrajectoryCalculator(_muzzle.position,
-					_muzzle.transform.forward * _ballSpeed, 9.8f, time);
+				var pos = CalculatorTrajectoryPosition(_muzzle.position,
+					_muzzle.transform.forward * _projectileVelocity, _gravity, time);
 				_linePositions[i] = pos;
 
 				if (i == 0) continue;
@@ -198,7 +201,6 @@ namespace InGame.Exhibit
 				// 障害物が存在した場合、その地点を最終地点とする。
 				if (Physics.Raycast(ray, out var hit, Vector3.Distance(_linePositions[i - 1], _linePositions[i])))
 				{
-					_lineRenderer.positionCount = i;
 					_linePositions[i] = hit.point;
 					LastPositionIndex = i;
 					return;
@@ -234,27 +236,27 @@ namespace InGame.Exhibit
 			// 発射向きなどの情報を保持しておく
 			var muzzlePosition = _muzzle.position;
 			var muzzleForward = _muzzle.transform.forward;
-			var ballSpeed = _ballSpeed;
+			var ballSpeed = _projectileVelocity;
 			var endPos = GetTargetPoint();
-			var endTime = _simulationStepTime * LastPositionIndex;
 
 			RPC_SetActive(FireParticle, true);
 
 			// 弾丸の位置をUpdateする
-			while (timer < endTime)
+			while (timer < _lifeTime)
 			{
 				timer += Runner.DeltaTime;
-				var from = TrajectoryCalculator(muzzlePosition,
-					muzzleForward * ballSpeed, 9.8f, timer);
-				var to = TrajectoryCalculator(muzzlePosition,
-					muzzleForward * ballSpeed, 9.8f, timer + Runner.DeltaTime);
+				var currentPos = CalculatorTrajectoryPosition(muzzlePosition,
+					muzzleForward * ballSpeed, _gravity, timer);
+				var nextPos = CalculatorTrajectoryPosition(muzzlePosition,
+					muzzleForward * ballSpeed, _gravity, timer + Runner.DeltaTime);
 
-				//弾の位置更新
-				FireParticle.transform.position = from;
+				// 弾の更新
+				FireParticle.transform.position = currentPos;
+				FireParticle.transform.forward = nextPos;
 
 				// 弾の着弾確認
-				var fromTo = to - from;
-				if (Physics.Raycast(from, fromTo.normalized, out var hit, fromTo.sqrMagnitude, _hitLayer))
+				var movement = nextPos - currentPos;
+				if (Physics.Raycast(currentPos, movement.normalized, out var hit, movement.magnitude, _hitLayer))
 				{
 					endPos = hit.point;
 					break;
@@ -309,14 +311,14 @@ namespace InGame.Exhibit
 			// 土台の回転
 			var currentBaseAxis = _cannonBase.localEulerAngles.y +
 			                      _baseRotateSpeed * baseRotateInput;
-			currentBaseAxis = WarpAngle(currentBaseAxis);
+			currentBaseAxis = WrapAngle(currentBaseAxis);
 			BaseRotation = _baseDefaultRotation * Quaternion.Euler(0,
 				Mathf.Clamp(currentBaseAxis, _rotateAngleLimitX.x, _rotateAngleLimitX.y), 0);
 
 			// 砲身の回転
 			var currentBarrelAxis = _cannonBarrel.localEulerAngles.x +
 			                        _barrelRotateSpeed * barrelRotateInput;
-			currentBarrelAxis = WarpAngle(currentBarrelAxis);
+			currentBarrelAxis = WrapAngle(currentBarrelAxis);
 			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(
 				Mathf.Clamp(currentBarrelAxis, _rotateAngleLimitY.x, _rotateAngleLimitY.y), 0, 0);
 		}
@@ -356,7 +358,7 @@ namespace InGame.Exhibit
 		/// <summary>
 		///     角度を-180~180に変換する
 		/// </summary>
-		private float WarpAngle(float angle)
+		private float WrapAngle(float angle)
 		{
 			angle %= 360;
 			if (angle > 180) angle -= 360;
@@ -368,9 +370,9 @@ namespace InGame.Exhibit
 		///     特定の時間での放物線位置を計算する
 		/// </summary>
 		/// <returns>入力時間の時の位置</returns>
-		private Vector3 TrajectoryCalculator(Vector3 startPos, Vector3 power, float gravity, float time)
+		private Vector3 CalculatorTrajectoryPosition(Vector3 startPos, Vector3 velocity, Vector3 gravity, float time)
 		{
-			return startPos + power * time + Vector3.down * (gravity * time * time);
+			return startPos + velocity * time + 0.5f * gravity * (time * time);
 		}
 
 		#endregion
