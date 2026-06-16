@@ -99,8 +99,7 @@ namespace InGame.Player
             if (_moveBuildEnabled)
                 Debug.Log("ビルドシステムが正常に動きます");
             else
-                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
-            // 後でパスを登録
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerMovement.csを確認してください", this);
 #endif
             _prePos = transform.position;
         }
@@ -193,10 +192,10 @@ namespace InGame.Player
             }
 
             // ========== ビルドシステム ==========
-            if (_moveBuildEnabled && _buildGenerator.TryGetBuildEnable(BuildType.MoveSpeed))
+            if (_moveBuildEnabled && _buildGenerator.TryGetBuildEnable(BuildRouteType.MoveSpeed))
             {
                 var moveDistance = Vector3.Distance(transform.position, _prePos);
-                _buildGenerator?.UpdateBuild(BuildType.MoveSpeed, moveDistance);
+                _buildGenerator?.UpdateBuild(BuildRouteType.MoveSpeed, moveDistance);
                 _prePos = transform.position;
             }
 

@@ -23,7 +23,7 @@ namespace September.Common
         readonly NetworkString<_16> _nickName;
         readonly int _nickNameOrder;
         public CharacterType CharacterType;
-        public BuildType BuildType;
+        public BuildRouteType BuildType;
         public NetworkBool IsOgre;
         public int Score;
         [Networked, Capacity(7)] public NetworkDictionary<PlayerRef, int> StunData => default;
@@ -38,7 +38,7 @@ namespace September.Common
             _nickName = nickName;
             _nickNameOrder = nickNameOrder;
             CharacterType = CharacterType.OkabeWright;
-            BuildType = BuildType.AttackPower;
+            BuildType = BuildRouteType.AttackPower;
             IsOgre = false;
             Score = 0;
 
