@@ -156,6 +156,10 @@ namespace InGame.Player
         public void SetCameraPriority(int priority)
         {
             _camera.Priority = priority;
+
+            // Priorityの変更を即時反映させる
+            // このメソッド自体は同じPriority同士のカメラ順序を入れ替えるためのものだが、内部的には自身をコレクションの先頭に入れなおしてからソートしているだけ
+            _camera.MoveToTopOfPrioritySubqueue();
         }
 
         public void ChangeOffset(Vector3 newOffset, float duration)
