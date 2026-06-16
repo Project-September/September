@@ -219,8 +219,18 @@ namespace September.InGame.Kraken
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
             _hitChecker.EndHitCheck();
+
+            if (HasStateAuthority)
+            {
+                await _animator.WaitUntilEndState(_animationName);
+                IsAttackTriggered = false;
+            }
+            else
+            {
+                await UniTask.WaitUntil(IsAttackTriggered, (b) => !b);
+            }
+
             _isAttacking = false;
-            IsAttackTriggered = false;
             Debug.Log("End Attack");
 
             _armIKRoot.solver.OnPostUpdate -= del;
