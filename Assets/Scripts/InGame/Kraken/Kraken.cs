@@ -27,6 +27,7 @@ namespace September.InGame.Kraken
 
         [Header("アニメーション設定")]
         [SerializeField] private Animator _animator;
+        [SerializeField] private string _animationName;
 
         [Header("インタラクト設定")]
         [SerializeField] private Collider _interactArea;
@@ -41,6 +42,9 @@ namespace September.InGame.Kraken
 
         private Vector3 _originalPlayerPosition;
         private Quaternion _originalPlayerRotation;
+
+        [Networked] private NetworkBool IsAttackTriggered { get; set; }
+        private bool _isAttacking;
 
         private void Start()
         {
@@ -62,6 +66,8 @@ namespace September.InGame.Kraken
 
             _initialPosition = transform.position;
             _initialRotation = transform.rotation;
+
+            _cameraController.Init(true);
         }
 
         /// <summary>
@@ -97,7 +103,7 @@ namespace September.InGame.Kraken
         public void GetOn(PlayerRef owner)
         {
             // カメラを有効化する
-            RPC_InitCamera(owner);
+            RPC_ResetCamera(owner);
             RPC_SetCameraPriority(owner, CameraPriority);
 
             // 元のプレイヤーオブジェクトを取得
@@ -135,7 +141,6 @@ namespace September.InGame.Kraken
         public void GetOff(PlayerRef owner)
         {
             // カメラを無効化する
-            _cameraController.CameraReset();
             RPC_SetCameraPriority(owner, 0);
 
             // 元のプレイヤーオブジェクトを取得
@@ -167,18 +172,27 @@ namespace September.InGame.Kraken
         {
             if (GetInput<PlayerInput>(out var input))
             {
-                _attack.SetInput(input.Buttons.IsSet(PlayerButtons.Attack));
+                // transform.Rotate(0, 10 * input.MoveDirection.x * Runner.DeltaTime, 0);
 
-                transform.Rotate(0, 10 * input.MoveDirection.x * Runner.DeltaTime, 0);
+                _attack.SetInput(input.Buttons.IsSet(PlayerButtons.Attack));
 
                 if (_attack.IsJustPressed)
                 {
-                    if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f)), out var hit))
-                    {
-                        var targetPos = hit.point;
-                        Attack(targetPos).Forget();
-                    }
+                    IsAttackTriggered = true;
                 }
+            }
+        }
+
+        public override void Render()
+        {
+            if (IsAttackTriggered && !_isAttacking)
+            {
+                _isAttacking = true;
+                var forward = Camera.main.transform.forward;
+                forward.y = 0;
+                forward.Normalize();
+                Debug.DrawRay(transform.position, forward * 100f, Color.green, 10f);
+                Attack(Vector3.down).Forget();
             }
         }
 
@@ -190,18 +204,21 @@ namespace September.InGame.Kraken
 
         private async UniTask Attack(Vector3 targetPos)
         {
+            _animator.Play(_animationName, 0, 0f);
             await UniTask.WaitForSeconds(_hitStartTime);
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
             _hitChecker.EndHitCheck();
+            _isAttacking = false;
+            IsAttackTriggered = false;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_InitCamera(PlayerRef player)
+        private void RPC_ResetCamera(PlayerRef player)
         {
             if (player != Runner.LocalPlayer) return;
 
-            _cameraController.Init(true);
+            _cameraController.CameraReset();
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
