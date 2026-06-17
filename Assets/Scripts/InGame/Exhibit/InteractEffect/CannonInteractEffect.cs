@@ -25,7 +25,6 @@ namespace InGame.Exhibit
         {
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
             _cannonInteractable.OnInteractStart(playerRef);
-            _cannonInteractable.InteractCoolTime = _interactCoolTime;
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
