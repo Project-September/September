@@ -32,7 +32,7 @@ namespace InGame.Exhibit
 		[SerializeField] private LayerMask _hitLayer;
 		[SerializeField] private int _baseDamage = 10;
 
-		[Header("エフェクト設定")] [SerializeField] private NetworkObject _aimPositionViewPrefab;
+		[Header("エフェクト設定")] [SerializeField] private NetworkObject _aimPositionEffect;
 		[SerializeField] private NetworkObject _fireParticlePrefab;
 		[SerializeField] private NetworkObject _explosionParticlePrefab;
 		[SerializeField] private LineRenderer _lineRenderer;
@@ -50,7 +50,7 @@ namespace InGame.Exhibit
 		private Vector3[] _linePositions;
 		[Networked] private NetworkObject FireParticle { get; set; }
 		[Networked] private NetworkObject ExplosionParticle { get; set; }
-		[Networked] private NetworkObject AimPositionViewObj { get; set; }
+		[Networked] private NetworkObject AimPositionEffect { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
@@ -69,11 +69,11 @@ namespace InGame.Exhibit
 			{
 				FireParticle = Runner.Spawn(_fireParticlePrefab, Vector3.zero, Quaternion.identity);
 				ExplosionParticle = Runner.Spawn(_explosionParticlePrefab, Vector3.zero, Quaternion.identity);
-				AimPositionViewObj = Runner.Spawn(_aimPositionViewPrefab, Vector3.zero, Quaternion.identity);
-				AimPositionViewObj.transform.localScale = Vector3.one * (_radius * 2);
+				AimPositionEffect = Runner.Spawn(_aimPositionEffect, Vector3.zero, Quaternion.identity);
+				AimPositionEffect.transform.localScale = Vector3.one * (_radius * 2);
 				RPC_SetActive(FireParticle, false);
 				RPC_SetActive(ExplosionParticle, false);
-				RPC_SetActive(AimPositionViewObj, false);
+				RPC_SetActive(AimPositionEffect, false);
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace InGame.Exhibit
 			base.Render();
 			// 放物線描画
 			CreateLine();
-			if (Runner.IsServer) AimPositionViewObj.transform.position = GetTargetPoint();
+			if (Runner.IsServer) AimPositionEffect.transform.position = GetTargetPoint();
 
 			// キャノンの回転描画
 			_cannonBarrel.localRotation = BarrelRotation;
@@ -101,9 +101,9 @@ namespace InGame.Exhibit
 			_currentUsePlayerRef = playerRef;
 			RPC_SetCameraPriority(_currentUsePlayerRef, 15);
 			Object.AssignInputAuthority(_currentUsePlayerRef);
-			_currentAmmo = _maxAmmo;
-			RPC_SetActive(AimPositionViewObj, true);
+			RPC_SetActive(AimPositionEffect, true);
 
+			_currentAmmo = _maxAmmo;
 			// プレイヤーの取得
 			_currentUsePlayer = Runner.GetPlayerObject(_currentUsePlayerRef).GetComponent<PlayerManager>();
 			if (!_currentUsePlayer) return;
@@ -166,7 +166,7 @@ namespace InGame.Exhibit
 			{
 				if (_fireUniTask.Status == UniTaskStatus.Pending)
 					await _fireUniTask;
-				RPC_SetActive(AimPositionViewObj, false);
+				RPC_SetActive(AimPositionEffect, false);
 			});
 		}
 
@@ -197,7 +197,7 @@ namespace InGame.Exhibit
 			{
 				// 次の地点の計算
 				var time = i * _simulationStepTime;
-				var pos = CalculatorTrajectoryPosition(_muzzle.position,
+				var pos = CalculateTrajectoryPosition(_muzzle.position,
 					_muzzle.transform.forward * _projectileVelocity, _gravity, time);
 				_linePositions[i] = pos;
 
@@ -252,9 +252,9 @@ namespace InGame.Exhibit
 			while (timer < _lifeTime)
 			{
 				timer += Runner.DeltaTime;
-				var currentPos = CalculatorTrajectoryPosition(muzzlePosition,
+				var currentPos = CalculateTrajectoryPosition(muzzlePosition,
 					muzzleForward * ballSpeed, _gravity, timer);
-				var nextPos = CalculatorTrajectoryPosition(muzzlePosition,
+				var nextPos = CalculateTrajectoryPosition(muzzlePosition,
 					muzzleForward * ballSpeed, _gravity, timer + Runner.DeltaTime);
 
 				// 弾の更新
@@ -377,7 +377,7 @@ namespace InGame.Exhibit
 		///     特定の時間での放物線位置を計算する
 		/// </summary>
 		/// <returns>入力時間の時の位置</returns>
-		private Vector3 CalculatorTrajectoryPosition(Vector3 startPos, Vector3 velocity, Vector3 gravity, float time)
+		private Vector3 CalculateTrajectoryPosition(Vector3 startPos, Vector3 velocity, Vector3 gravity, float time)
 		{
 			return startPos + velocity * time + 0.5f * gravity * (time * time);
 		}
