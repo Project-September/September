@@ -7,8 +7,7 @@ using UnityEngine;
 public class DamageTextFactory : NetworkBehaviour
 {
     [Header("DamageTextUI Settings")]
-    [SerializeField] private GameObject _damageText;
-    [SerializeField] private GameObject _damageTextAnim;
+    [SerializeField] private DamageTextBox _damageTextAnim;
     [SerializeField] private PlayerHealth _ownPlayer;
     [SerializeField] private float _textOffsetY = 10.0f;
     [SerializeField] private float _randomOffsetRadius = 50.0f;
@@ -18,7 +17,7 @@ public class DamageTextFactory : NetworkBehaviour
     private Camera _mainCamera;
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_ConfigureDamageText(int damage, PlayerRef playerRef)
+    private void RPC_ConfigureDamageText(int damage, PlayerRef playerRef)
     {
         if (Runner.LocalPlayer.PlayerId == playerRef.PlayerId)
         {
@@ -46,26 +45,20 @@ public class DamageTextFactory : NetworkBehaviour
     {
         _ownPlayer.OnHitTaken -= OnHit;
     }
-        
-    private void CreateDamageText(HitData data) => CreateDamageText(data.Amount);
 
     private void CreateDamageText(int damage)
     {
-        GameObject parentObject = Instantiate(_damageTextAnim);
-        GameObject childText = Instantiate(_damageText, parentObject.transform);
-        parentObject.transform.SetParent(_canvas.transform);
+        if (damage == 0) return;
 
-        parentObject.SetActive(true);
+        DamageTextBox parentObject = Instantiate(_damageTextAnim, _canvas.transform);
         parentObject.GetComponentInChildren<TextMeshProUGUI>().text = damage.ToString();
-        if (damage == 0) parentObject.SetActive(false);
 
         Vector3 worldPosition = _ownPlayer.transform.position + Vector3.up * _textOffsetY;
         Vector3 randomOffset = new Vector3(
             Random.Range(-_randomOffsetRadius, _randomOffsetRadius),
             Random.Range(-_randomOffsetRadius, _randomOffsetRadius), 0);
 
-        DamageTextBox positionBox = parentObject.GetComponent<DamageTextBox>();
-        positionBox.GenerateValueBox(worldPosition, randomOffset, _mainCamera);
+        parentObject.GenerateValueBox(worldPosition, randomOffset, _mainCamera);
 
         Destroy(parentObject, _textDestroyTime);
     }
