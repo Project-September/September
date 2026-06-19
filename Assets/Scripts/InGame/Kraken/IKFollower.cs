@@ -12,7 +12,7 @@ namespace September.InGame.Kraken
         [SerializeField] private Rigidbody[] _followers;
         [SerializeField] private float _radius = .55f;
 
-        private readonly List<float> _maxDistanceList = new();
+        [SerializeField, HideInInspector] private List<float> _maxDistanceList = new();
 
         private void Start()
         {
@@ -33,6 +33,11 @@ namespace September.InGame.Kraken
                 Debug.DrawLine(_ik.solver.GetPoints()[i].solverPosition, _ik.solver.GetPoints()[i + 1].solverPosition, Color.yellow);
             }
 
+            for (int i = 0; i < _ik.solver.GetPoints().Length; i++)
+            {
+                DebugDrawUtility.DrawWireSphere(_ik.solver.GetPoints()[i].solverPosition, .2f, Color.yellow);
+            }
+
             CheckHit(_followers, _ik, _radius, out var rawPoints, out var resultSpline, out var rigidbodyHitFlags);
 
             for (int i = 0; i < rawPoints.Length - 1; i++)
@@ -49,13 +54,47 @@ namespace September.InGame.Kraken
                 Debug.DrawLine(position, endPosition, Color.blue);
             }
 
+            int hitCount = -1;
+            for (int i = rigidbodyHitFlags.Length - 1; i >= 0; i--)
+            {
+                if (rigidbodyHitFlags[i])
+                {
+                    hitCount = i + 1;
+                    break;
+                }
+            }
+
+            var hullPoints = BuildUpperHull(rawPoints.Take(hitCount).ToArray());
+            foreach (var point in hullPoints)
+            {
+                DebugDrawUtility.DrawWireSphere(point, _radius-.1f, Color.magenta);
+            }
+
+            for (int i = 0; i < hullPoints.Count - 1; i++)
+            {
+                var p0 = hullPoints[i];
+                var p1 = hullPoints[i + 1];
+                Debug.DrawLine(p0, p1, Color.magenta);
+            }
+
             if (!rigidbodyHitFlags.Any(x => x))
             {
                 UpdatePosition(rawPoints);
                 return;
             }
 
-            UpdatePosition(rawPoints);
+            var notCollidedPoint = rawPoints.Skip(hitCount).ToArray();
+            foreach (var point in notCollidedPoint)
+            {
+                DebugDrawUtility.DrawWireSphere(point, _radius-.1f, Color.green);
+            }
+
+            var resultPoints = hullPoints.Concat(rawPoints.Skip(hitCount)).ToArray();
+
+            var hullSpline = CreateSpline(resultPoints);
+            var hullSolvedPoints = GetPosition(hullSpline);
+
+            UpdatePosition(hullSolvedPoints);
         }
 
         private static void CheckHit(Rigidbody[] followerBodies, FABRIK ik, float radius, out Vector3[] rawPoints, out Spline resultSpline, out bool[] rigidbodyHitFlags)
@@ -104,6 +143,16 @@ namespace September.InGame.Kraken
             resultSpline.Add(rawPoints[^1]);
         }
 
+        private static Spline CreateSpline(IReadOnlyList<Vector3> points)
+        {
+            var spline = new Spline();
+            foreach (var point in points)
+            {
+                spline.Add(point, TangentMode.Broken);
+            }
+            return spline;
+        }
+
         private void UpdatePosition(Vector3[] rawPoints)
         {
             for (int i = 0; i < _followers.Length; i++)
@@ -114,9 +163,10 @@ namespace September.InGame.Kraken
             }
         }
 
-        private void UpdatePosition(Spline spline)
+        private Vector3[] GetPosition(Spline spline)
         {
-            // Attach Curve to Positions
+            var results = new Vector3[_followers.Length];
+
             var distancePrefixSum = new List<float>();
             for (int i = 0; i < _maxDistanceList.Count; i++)
             {
@@ -132,10 +182,93 @@ namespace September.InGame.Kraken
                 var t = targetLength / curveLength;
                 spline.Evaluate(t, out var position, out _, out _);
 
-                DebugDrawUtility.DrawWireSphere(position, .3f, Color.red);
-
-                _followers[i].MovePosition(position);
+                results[i] = position;
             }
+
+            return results;
         }
+
+        #region ConvexHull
+
+        // AI生成
+        // Monotone Chainらしい
+        struct HullPoint
+        {
+            public float u;
+            public float y;
+            public Vector3 position;
+        }
+
+        private static List<Vector3> BuildUpperHull(
+            IReadOnlyList<Vector3> points)
+        {
+            if (points.Count <= 2)
+                return new List<Vector3>(points);
+
+            Vector3 horizontal =
+                Vector3.ProjectOnPlane(
+                    points[points.Count - 1] - points[0],
+                    Vector3.up);
+
+            if (horizontal.sqrMagnitude < 0.000001f)
+            {
+                for (int i = 1; i < points.Count; i++)
+                {
+                    horizontal =
+                        Vector3.ProjectOnPlane(
+                            points[i] - points[0],
+                            Vector3.up);
+
+                    if (horizontal.sqrMagnitude > 0.000001f)
+                        break;
+                }
+            }
+
+            horizontal.Normalize();
+
+            List<HullPoint> projected = new();
+
+            foreach (var p in points)
+            {
+                projected.Add(new HullPoint
+                {
+                    u = Vector3.Dot(p, horizontal),
+                    y = p.y,
+                    position = p
+                });
+            }
+
+            projected.Sort((a, b) => a.u.CompareTo(b.u));
+
+            List<HullPoint> upper = new();
+
+            foreach (var p in projected)
+            {
+                while (upper.Count >= 2)
+                {
+                    var a = upper[upper.Count - 2];
+                    var b = upper[upper.Count - 1];
+
+                    float cross =
+                        (b.u - a.u) * (p.y - a.y) -
+                        (b.y - a.y) * (p.u - a.u);
+
+                    if (cross >= 0f)
+                        upper.RemoveAt(upper.Count - 1);
+                    else
+                        break;
+                }
+
+                upper.Add(p);
+            }
+
+            List<Vector3> result = new(upper.Count);
+
+            foreach (var p in upper)
+                result.Add(p.position);
+
+            return result;
+        }
+        #endregion
     }
 }
