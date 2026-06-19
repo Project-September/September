@@ -8,7 +8,6 @@ public class DamageTextBox : MonoBehaviour
 
     private void Update()
     {
-        GenerateValueBox(_worldPosition, _randomOffset, _mainCamera);
         Vector3 screenPosition = _mainCamera.WorldToScreenPoint(_worldPosition);
         transform.position = screenPosition + _randomOffset;
     }
