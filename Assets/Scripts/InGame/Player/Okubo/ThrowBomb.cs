@@ -55,7 +55,7 @@ namespace InGame.Player.Okubo
             _previousButtons = input.Buttons;
         }
 
-        private async void OnThrow()
+        private void OnThrow()
         {
             if (_coolTimer > 0f)
                 return;
@@ -70,8 +70,8 @@ namespace InGame.Player.Okubo
                 Debug.Log(direction);
                 var bomb = Runner.Spawn(_bombPrefab, _clonePosition.position + direction, Quaternion.identity);
 
-                bomb.AddForce(direction, _throwPower, _throwUpAmount);
-                await UniTask.WaitForSeconds(0f);
+                Vector3 force = direction * _throwPower + Vector3.up * _throwUpAmount;
+                bomb.SetData(force, Object.InputAuthority);
             }
         }
 
