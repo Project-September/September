@@ -17,7 +17,7 @@ namespace September.InGame.Common.Stats
 
         /// <summary> エフェクト適用前のステータス </summary>
         [Networked] private ref StatsContainer BaseStats => ref MakeRef<StatsContainer>();
-        
+
         private StatusPipeline _pipeline;
 
         /// <summary> エフェクト適用後のステータス </summary>
@@ -25,13 +25,13 @@ namespace September.InGame.Common.Stats
 
         /// <summary> 変更を検知する用 </summary>
         private StatsContainer _prevStats;
-        
+
         /// <summary> ステータスの変更を外に通知する用 </summary>
         private Dictionary<StatType, Subject<float>> _statOnChangedSubjectsTable;
-        
+
         /// <summary> 変更があったステータスを追跡する用 </summary>
         private readonly HashSet<StatType> _statDirtyFlags = new();
-        
+
         /// <summary>
         /// ステータスの種類や値を初期化するために使用する
         /// </summary>
@@ -61,7 +61,7 @@ namespace September.InGame.Common.Stats
             {
                 OnNextStatOnChanged(dirtyStatType, CurrentStats.Stats[dirtyStatType].Value);
             }
-            
+
             _statDirtyFlags.Clear();
         }
 
@@ -71,9 +71,9 @@ namespace September.InGame.Common.Stats
         private void CalcStats()
         {
             Profiler.BeginSample("StatsManager.CalcStats");
-            
+
             _pipeline.CalcStats(BaseStats, ref CurrentStats);
-            
+
             // 変更があったステータスを検出
             foreach (var (statType, prevStat) in _prevStats.Stats)
             {
@@ -84,10 +84,10 @@ namespace September.InGame.Common.Stats
             }
 
             _prevStats = CurrentStats;
-            
+
             Profiler.EndSample();
         }
-        
+
         /// <summary>
         /// ステータスの変化を外部に通知する
         /// </summary>

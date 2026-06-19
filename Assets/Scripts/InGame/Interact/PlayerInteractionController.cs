@@ -1,19 +1,21 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Bot;
 using InGame.Player;
 using InGame.Player.Ability;
-using UnityEngine;
 using September.Common;
 using September.InGame;
+using September.InGame.Common.Stats;
 using September.InGame.UI;
+using UnityEngine;
 
 namespace InGame.Interact
 {
     [DisallowMultipleComponent]
     public class PlayerInteractionController : NetworkBehaviour
     {
+        [SerializeField] private PlayerInputManager _inputManager;
         [SerializeField] private float _interactRadius = 2.5f;
         [SerializeField] private LayerMask _interactMask;
         [SerializeField, Range(0f, 180f)] private float _interactAngle = 90f; // 前方180度
@@ -25,9 +27,12 @@ namespace InGame.Interact
         [SerializeField] private float _interactAngleBuffer = 10f; // 角度に+10°
         [SerializeField] private float _interactRadiusBuffer = 0.3f; // 距離に+0.3m
         [SerializeField] private PlayerAudioController _playerAudioController; // インタラクト時のボイス再生用
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
         //許容できる高さの差
         private float _heightDifference = 0.1f;
-        
+
         private bool _isWaitingForResponse = false;
         private float _interactWaitTimer = 0f;
         private readonly Collider[] _hitBuffer = new Collider[32];
@@ -38,7 +43,8 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
-       
+        private bool _isBot;
+
         [Networked] private bool IsRemoting { get; set; } //遠距離インタラクション中かの判定
         [Networked] private InteractableBase RemoteFocusedObject { get; set; } //遠インタラクションの対象オブジェクト
         [Networked] private float RemoteInteractTime { get; set; } //遠インタラクション時間
@@ -49,7 +55,19 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
-            _playerAudioController = GetComponentInChildren<PlayerAudioController>(); //
+            _playerAudioController = GetComponentInChildren<PlayerAudioController>();
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerInteractionController.csを確認してください", this);
+#endif
+
+            if (_inputManager == null)
+                _inputManager = GetComponent<PlayerInputManager>();
+
+            _isBot = _inputManager?.GetType() == typeof(BotInputManager);
         }
 
         public override void Spawned()
@@ -60,17 +78,17 @@ namespace InGame.Interact
             }
             else
             {
-                 _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType ;
+                _characterType = PlayerDatabase.Instance.PlayerDataDic[Object.InputAuthority].CharacterType;
             }
         }
 
         private void Update()
         {
-            if (!HasInputAuthority) return;
+            if (!HasInputAuthority && !_isBot) return;
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
-            
+
             if (_isHoldingInteract)
             {
                 if (!_isExecutingInteraction)
@@ -84,9 +102,15 @@ namespace InGame.Interact
                         _hasCompletedInteraction = true;
                         CompleteInteraction();
                         _playerAudioController?.PlayInteractActionVoice();  // インタラクト時ボイスの再生依頼
-                        UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        if (!_isBot)
+                        {
+                            UIController.I.ShowInteractUI(false); // 終了時に消すだけならここでもOK
+                        }
                     }
-                    UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    if (!_isBot)
+                    {
+                        UIController.I.SetInteractProgress(Mathf.Clamp01(_currentInteractTime / _requiredInteractTime));
+                    }
                 }
             }
             else
@@ -118,9 +142,9 @@ namespace InGame.Interact
         public override void FixedUpdateNetwork()
         {
             _isHoldingInteract = false; // 毎フレームリセット
-            
-            if (!HasInputAuthority) return;
-            if (!GetInput(out PlayerInput input)) return;
+
+            if (!HasInputAuthority && !_isBot) return;
+            if (!_inputManager.GetPlayerInput(out PlayerInput input)) return;
 
             // Fusionのシミュレーション内でのみ行う処理
             if (_isWaitingForResponse)
@@ -146,15 +170,15 @@ namespace InGame.Interact
         /// <param name="interactableBase">Rayで当たったインタラクション可能なオブジェクト</param>>
         /// <param name="abilityPhase">アビリティの状態</param>>
         /// <param name="aimCameraController">このAbilityを使っているキャラのカメラ</param>>
-        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase, 
+        public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase,
             ref AbilityBase.AbilityPhase abilityPhase, AimCameraController aimCameraController)
         {
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
             };
-            if(!interactableBase.ValidateInteraction(context)) return;
-            
+            if (!interactableBase.ValidateInteraction(context)) return;
+
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
             _focusedObj = interactableBase;
@@ -162,7 +186,7 @@ namespace InGame.Interact
 
             IsRemoting = true;
             RemoteFocusedObject = interactableBase;
-            
+
             timer += Runner.DeltaTime;
             RemoteInteractTime = time;
             RemoteInteractTimer = timer;
@@ -173,7 +197,7 @@ namespace InGame.Interact
                 RemoteInteractTimer = 0f;
                 CompleteInteraction();
                 UIController.I.ShowInteractUI(false);
-                
+
                 //インタラクションに成功したらアビリティを終了
                 abilityPhase = AbilityBase.AbilityPhase.Ending;
                 aimCameraController.RPC_NormalCamera();
@@ -206,14 +230,14 @@ namespace InGame.Interact
                     Debug.Log("Nullにする");
                 }
             }
-            
+
             //別のインタラクションオブジェクトに上書きされないようにする
-            if(IsRemoting) return;
+            if (IsRemoting) return;
 
             // より近い候補があれば差し替え
             int count = Physics.OverlapSphereNonAlloc(_interactOrigin.position, _interactRadius, _hitBuffer,
                 _interactMask);
-            float closestDistanceSqr = _focusedObj? (_focusedObj.transform.position - _interactOrigin.position).sqrMagnitude
+            float closestDistanceSqr = _focusedObj ? (_focusedObj.transform.position - _interactOrigin.position).sqrMagnitude
                 : float.MaxValue;
 
             for (int i = 0; i < count; i++)
@@ -235,6 +259,15 @@ namespace InGame.Interact
                 }
             }
 
+            //Playerが処理する
+            if (!_isBot)
+            {
+                UpdateInteractUI();
+            }
+        }
+
+        private void UpdateInteractUI()
+        {
             if (_focusedObj)
             {
                 var context = new InteractableContext
@@ -253,7 +286,6 @@ namespace InGame.Interact
                 if (UIController.I)
                     UIController.I.ShowInteractUI(false, _focusedObj?.gameObject);
             }
-            //if (Runner.IsClient) Debug.Log(_focusedObj is not null);
         }
 
         /// <summary>
@@ -279,8 +311,9 @@ namespace InGame.Interact
         private void TryStartInteraction()
         {
             if (!_focusedObj) return;
-            
-            _requiredInteractTime = GetRequireInteractTime();
+
+            _requiredInteractTime = GetRequireInteractTime() * (_playerStatus ? _playerStatus.InteractDurationMultiply : 1);
+
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
@@ -289,7 +322,7 @@ namespace InGame.Interact
             {
                 return;
             }
-            
+
             _currentInteractTime = 0f;
             _isExecutingInteraction = true;
             _hasCompletedInteraction = false;
@@ -315,6 +348,8 @@ namespace InGame.Interact
         private void CompleteInteraction()
         {
             _isExecutingInteraction = false;
+
+            _buildGenerator?.UpdateBuild(BuildRouteType.FastInteract);
 
             if (GetSessionPlayerData(Object.InputAuthority.RawEncoded, out var data))
             {
@@ -350,7 +385,7 @@ namespace InGame.Interact
                 _interactWaitTimer = 0f;
 
                 Debug.Log($"[Client] RPC_RequestInteract 送信: {context.Interactor} -> {_focusedObj.name} NetObj is null? {!netObj}");
-                RPC_RequestInteract(context.Interactor, (int)context.CharacterType,netObj);
+                RPC_RequestInteract(context.Interactor, (int)context.CharacterType, netObj);
             }
         }
 
@@ -358,7 +393,10 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIController.I?.SetInteractProgress(0f);
+            if (!_isBot)
+            {
+                UIController.I?.SetInteractProgress(0f);
+            }
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -368,15 +406,15 @@ namespace InGame.Interact
             if (target && target.TryGetComponent(out InteractableBase interactable))
             {
                 var context = new InteractableContext
-                 {
-                     Interactor = interactor,
-                     CharacterType = (CharacterType)characterType
-                 };
+                {
+                    Interactor = interactor,
+                    CharacterType = (CharacterType)characterType
+                };
 
                 interactable.Interact(context);
             }
         }
-        
+
         private static bool GetSessionPlayerData(int interactor, out SessionPlayerData data)
         {
             if (!PlayerDatabase.Instance.PlayerDataDic.TryGet(PlayerRef.FromEncoded(interactor), out data))

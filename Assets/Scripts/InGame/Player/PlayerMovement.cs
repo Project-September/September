@@ -37,6 +37,12 @@ namespace InGame.Player
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
         [SerializeField] private VaultGizmoDebugger _vaultGizmoDebugger;
+        // ========== ビルドシステム ==========
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
+        Vector3 _prePos;
+        bool _moveBuildEnabled;
 
         private Rigidbody _rb;
         private PlayerStatus _status;
@@ -87,6 +93,15 @@ namespace InGame.Player
             _rb.useGravity = true;
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
+            // ========== ビルドシステム ==========
+            _moveBuildEnabled = _playerStatus & _buildGenerator;
+#if UNITY_EDITOR
+            if (_moveBuildEnabled)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerMovement.csを確認してください", this);
+#endif
+            _prePos = transform.position;
         }
 
 
@@ -157,7 +172,6 @@ namespace InGame.Player
                 _moveVelocity = Vector3.zero;
                 return;
             }
-
             // Dash処理
             isDash = isDash && CanDash;
             _isDash = isDash;
@@ -175,6 +189,14 @@ namespace InGame.Player
                     Observable.Timer(TimeSpan.FromSeconds(_dashCooldown))
                         .Subscribe(_ => _isDashCoolTime = false).AddTo(this);
                 }
+            }
+
+            // ========== ビルドシステム ==========
+            if (_moveBuildEnabled && _buildGenerator.TryGetBuildEnable(BuildRouteType.MoveSpeed))
+            {
+                var moveDistance = Vector3.Distance(transform.position, _prePos);
+                _buildGenerator?.UpdateBuild(BuildRouteType.MoveSpeed, moveDistance);
+                _prePos = transform.position;
             }
 
             CalcMoveVelocity(moveDirection, isDash, deltaTime);
@@ -232,7 +254,9 @@ namespace InGame.Player
         /// </summary>
         private float GetCurrentMoveSpeed()
         {
-            return IsOgreState() ? _ogreMoveSpeed : _moveSpeed;
+            // ========== ビルドシステム ==========
+            // ビルドの上昇分を乗算
+            return (IsOgreState() ? _ogreMoveSpeed : _moveSpeed) * (_moveBuildEnabled ? _playerStatus.Speed : 1);
         }
 
         /// <summary>
@@ -240,7 +264,9 @@ namespace InGame.Player
         /// </summary>
         private float GetCurrentDashSpeed()
         {
-            return IsOgreState() ? _ogreDashSpeed : _dashSpeed;
+            // ========== ビルドシステム ==========
+            // ビルドの上昇分を乗算
+            return (IsOgreState() ? _ogreDashSpeed : _dashSpeed) * (_moveBuildEnabled ? _playerStatus.Speed : 1);
         }
 
         void AdsorptionOnGround()

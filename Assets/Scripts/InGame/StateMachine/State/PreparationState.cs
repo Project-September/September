@@ -11,6 +11,7 @@ using InGame.Exhibit;
 using InGame.Health;
 using InGame.Player;
 using September.InGame.Common;
+using September.InGame.Common.Stats;
 using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -87,12 +88,29 @@ namespace September.Common
             {
                 // ランダム化の際にPlayerのrotationを制御可能にするために、spawnPositionのrotationに合わせる。
                 var spawnTransform = spawnPositions[index % spawnPositions.Length];
+                var characterData = container.GetCharacterData(pair.Value.CharacterType);
+                var prefab = pair.Key.AsIndex >= PlayerDatabase.BotStartIndex ? characterData.BotPrefab : characterData.Prefab;
+
                 var player = await Context.Runner.SpawnAsync(
-                    container.GetCharacterData(pair.Value.CharacterType).Prefab,
+                    prefab,
                     spawnTransform.position,
                     spawnTransform.rotation,
                     inputAuthority: pair.Key);
+
+                #region ビルドシステム
+                var buildGenerator = player.GetComponentInChildren<BuildGenerator>();
+                if (buildGenerator != null) buildGenerator.GenerateBuild(pair.Value.BuildType);
+#if UNITY_EDITOR
+                var root = transform.root;
+                if (root != null)
+                    Debug.Log($"{root.name} : ビルドシステムの構築に" + (buildGenerator != null ? $"成功しました\n選択ビルド : {pair.Value.BuildType}" : "失敗しました"));
+#endif
+                #endregion
+
+                PlayerDatabase.Instance.AddPlayerObject(pair.Key, player);
+
                 Context.Runner.SetPlayerObject(pair.Key, player);
+
                 if (!Context.PlayerDataDic.ContainsKey(pair.Key))
                 {
                     Context.AddPlayerObject(pair.Key, player);
@@ -201,11 +219,11 @@ namespace September.Common
         {
             var playerDatabase = PlayerDatabase.Instance;
             var characterDataContainer = CharacterDataContainer.Instance;
-            foreach (var pair in playerDatabase.PlayerDataDic)
+            foreach (var pair in playerDatabase.PlayerObjectDic)
             {
-                var player = Context.Runner.GetPlayerObject(pair.Key);
+                var player = pair.Value;
                 var animClipPlayer = player.GetComponent<AnimationClipPlayer>();
-                var characterType = pair.Value.CharacterType;
+                var characterType = playerDatabase.PlayerDataDic[pair.Key].CharacterType;
                 var emoteClip = characterDataContainer.GetCharacterData(characterType).EmoteAnimation;
                 _startCamera.transform.position = player.transform.position + player.transform.rotation * _cameraOffset;
                 _startCamera.transform.rotation = player.transform.rotation;

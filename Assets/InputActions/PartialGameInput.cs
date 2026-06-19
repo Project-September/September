@@ -12,12 +12,35 @@ public partial class GameInput
     public DeviceType UseDeviceType { get; private set; } = DeviceType.Unknown;
     public event Action<DeviceType> OnDeviceTypeChanged;
 
+    public bool IsMoveInput { get; private set; } = true;
+    public bool IsActionInput {  get; private set; } = true;
+    public bool IsLookInput { get; private set; } = true;
+
+    private bool _isInputBlockedByUI;
+    public bool IsInputBlockedByUI
+    {
+        get => _isInputBlockedByUI;
+        set
+        {
+            _isInputBlockedByUI = value;
+            UpdateInputState();
+        }
+    }
+
+    private void UpdateInputState()
+    {
+        ToggleMoveInput(IsMoveInput);
+        ToggleActionInput(IsActionInput);
+        ToggleLookInput(IsLookInput);
+    }
+
     static GameInput Init()
     {
         // インスタンスの生成、イベントの購読
         _instance = new GameInput();
         _instance.SubscribeToInput();
         if (Application.isPlaying) _instance.Enable();
+        _instance.UpdateInputState();
         return _instance;
     }
     
@@ -88,7 +111,8 @@ public partial class GameInput
 
     public void ToggleMoveInput(bool value)
     {
-        if (value)
+        IsMoveInput = value;
+        if (value && !_isInputBlockedByUI)
         {
             Player.Jump.Enable();
             Player.Move.Enable();
@@ -105,7 +129,8 @@ public partial class GameInput
     }
     public void ToggleActionInput(bool value)
     {
-        if (value)
+        IsActionInput = value;
+        if (value && !_isInputBlockedByUI)
         {
             Player.Attack.Enable();
             Player.Ability1.Enable();
@@ -123,7 +148,8 @@ public partial class GameInput
 
     public void ToggleLookInput(bool value)
     {
-        if (value)
+        IsLookInput = value;
+        if (value && !_isInputBlockedByUI)
         {
             Player.Look.Enable();
         }

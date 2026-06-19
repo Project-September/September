@@ -19,7 +19,7 @@ namespace InGame.Exhibit
         public float BoostMultiplier = 1.5f;
 
         [SerializeField] private StatusEffect _buffEffect;
-        
+
         private float OriginalSpeedRate = -1f;
         // 過剰Destroy防止
         private bool _isDestroyScheduled;
@@ -32,9 +32,8 @@ namespace InGame.Exhibit
             _isDestroyScheduled = false;
             PlayerRef playerRef = PlayerRef.FromEncoded(context.Interactor);
 
-            if (target.Runner.TryGetPlayerObject(playerRef, out var playerNetworkObject))
+            if (PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef, out var playerNetworkObject))
             {
-                
                 if (playerNetworkObject.TryGetComponent(out StatusEffectManager statusEffectManager))
                 {
                     StatusEffectManager.StatusEffectSpec spec = new(_buffEffect);
@@ -42,7 +41,7 @@ namespace InGame.Exhibit
                     spec.Modifiers[0].SetByCallerMagnitude(BoostMultiplier);
                     statusEffectManager.AddEffect(spec);
                 }
-                
+
                 if (playerNetworkObject.TryGetComponent(out FormationManager formationManager))
                 {
                     var friendList = formationManager.FriendsList;
@@ -51,7 +50,7 @@ namespace InGame.Exhibit
                         friend.StartBuff(BoostMultiplier);
                     }
                 }
-                
+
                 _targetPlayerObject = playerNetworkObject;
                 Invoker.RPC_AttachHeadMask(playerNetworkObject, EffectDuration);
                 PlayEffect();
@@ -63,14 +62,14 @@ namespace InGame.Exhibit
 
         public override void OnInteractUpdate(float deltaTime)
         {
-            if (_isDestroyScheduled || Invoker == null || !Invoker.IsMaskAttached) 
+            if (_isDestroyScheduled || Invoker == null || !Invoker.IsMaskAttached)
                 return;
-            
+
             _isDestroyScheduled = true;
             Invoker.RPC_DestroyMask();
             RestorePlayerSpeed();
         }
-        
+
         // Buffを初期値に戻す
         private void RestorePlayerSpeed()
         {
@@ -96,7 +95,7 @@ namespace InGame.Exhibit
             // Effect生成処理
             _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
             _effectSpawner?.RequestPlayOneShotEffect(EffectType.Tutankhamen, EffectPos.transform.position,
-                EffectPos.transform.rotation,EffectPos.transform);
+                EffectPos.transform.rotation, EffectPos.transform);
         }
     }
 }

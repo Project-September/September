@@ -1,7 +1,8 @@
 using Fusion;
-using InGame.Health;
 using Ingame.Tanihira;
+using InGame.Health;
 using September.Common;
+using September.InGame.Common.Stats;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 
@@ -12,11 +13,15 @@ namespace InGame.Player
     /// </summary>
     public class PlayerManager : NetworkBehaviour, IAfterTick
     {
+        [SerializeField] private PlayerInputManager _playerInputManager;
         [SerializeField] GameObject _colliderObj;
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
         [SerializeField] private Vector3 _respawnPosition;
-        
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
+
         PlayerMovement _playerMovement;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
@@ -30,25 +35,25 @@ namespace InGame.Player
         private bool _isVaultingLastFrame = false;
         public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
-        public void SetWarpTarget(Vector3 targetPosition,Quaternion targetRotation)
+        public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
         {
-            if(!HasStateAuthority)
+            if (!HasStateAuthority)
                 return;
-            
+
             _targetPosition = targetPosition;
             _targetRotation = targetRotation;
             _shouldWarp = true;
         }
-        
+
         public bool IsLocalPlayer => HasInputAuthority;
-        
+
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
 
         public override void Spawned()
         {
             InitComponents();
-            
+
             _respawnPosition = transform.position;
         }
 
@@ -69,6 +74,14 @@ namespace InGame.Player
                 _playerHealth = health;
                 health.OnDeath += OnDeath;
             }
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
+            // 後でパスを登録
+#endif
         }
 
         protected virtual void LateUpdate()
@@ -102,7 +115,7 @@ namespace InGame.Player
             //             break;
             //     }
             // }
-            
+
             // Localでの処理にInputを送る
             if (HasInputAuthority)
             {
@@ -110,7 +123,7 @@ namespace InGame.Player
                 {
                     _cameraController.CameraReset();
                 }
-                
+
                 _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
             }
         }
@@ -124,17 +137,17 @@ namespace InGame.Player
                     Restart();
                 }
             }
-            
+
             // プレイヤーの入力の管理
-            if (GetPlayerInput(out var input))
+            if (_playerInputManager != null && _playerInputManager.GetPlayerInput(out var input))
             {
                 if (!IsStun && _playerControlState == PlayerControlState.Normal)
                 {
-                    // player movement に入力を与えて更新する
+                    // player movement に入力を与えて更新する_playerInputManager
                     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
                         input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
                 }
-                
+
                 _playerMovement.MoveTick(Runner.DeltaTime);
 
                 if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Warp))
@@ -151,7 +164,7 @@ namespace InGame.Player
                 _shouldWarp = false;
             }
 
-            
+
         }
 
         public void AfterTick()
@@ -165,13 +178,15 @@ namespace InGame.Player
             IsStun = false;
             _playerHealth.IsInvincible = false;
             _playerEffectController.StopStunEffect();
+            _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
 
         void OnDeath(HitData lastHitData)
         {
             IsStun = true;
-            
-            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime);
+
+            // ビルドの減衰分を乗算
+            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             _playerHealth.IsInvincible = true;
             _playerEffectController.PlayStunEffect();
         }
@@ -203,20 +218,20 @@ namespace InGame.Player
         {
             _meshObj.SetActive(active);
         }
-        
+
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetUseGrav(NetworkBool active)
         {
-           _rigidbody.useGravity = active;
+            _rigidbody.useGravity = active;
         }
 
         /// <summary> 非常用リスポーン </summary>
         void Respawn()
         {
             if (!HasStateAuthority) return;
-            
+
             _playerMovement.Teleport(_respawnPosition);
-            
+
             //タニヒラ用の処理を追記
             if (this.gameObject.TryGetComponent<FormationManager>(out FormationManager formationManager))
             {
@@ -231,7 +246,7 @@ namespace InGame.Player
         {
             return GetInput(out input);
         }
-        
+
         public enum PlayerControlState
         {
             Normal,

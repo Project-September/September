@@ -3,7 +3,7 @@ using CRISound;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor
+namespace September.Editor
 {
     public class CRISoundController : EditorWindow
     {

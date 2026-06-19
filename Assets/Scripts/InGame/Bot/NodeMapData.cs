@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace InGame.Bot
 {
-    [CreateAssetMenu(fileName = "NodeMapData", menuName = "ScriptableObject/NodeMapData")]
+    [CreateAssetMenu(fileName = "NodeMapData", menuName = "ScriptableObjects/Bot/NodeMapData")]
     public class NodeMapData : ScriptableObject
     {
         [SerializeField] private List<NodeDataSerializable> _serializableNodeDatas = new();
@@ -51,7 +51,7 @@ namespace InGame.Bot
                 }
                 result.Add(nodeDataPair.Key);
 
-                if(nodeDataPair.Value.VaultNode != -1)
+                if (nodeDataPair.Value.VaultNode != -1)
                 {
                     if (!indexDic.TryGetValue(nodeDataPair.Value.VaultNode, out NodeData nodeData))
                     {

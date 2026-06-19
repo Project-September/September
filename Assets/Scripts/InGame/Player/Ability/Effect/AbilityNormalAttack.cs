@@ -8,6 +8,7 @@ using InGame.Health;
 using InGame.Player;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.Common.Stats;
 using September.InGame.Effect;
 using UnityEngine;
 
@@ -23,22 +24,22 @@ namespace InGame.Player.Ability
         [Header("ヒットチェック開始フレーム")]
         [SerializeField] protected int _startHitCheckFrame = 17;
         [Header("ヒットチェック終了フレーム")]
-        [SerializeField] protected int _endHitCheckFrame   = 21;
+        [SerializeField] protected int _endHitCheckFrame = 21;
         [Header("攻撃終了フレーム")]
-        [SerializeField] private int _endAttackFrame     = 22;
+        [SerializeField] private int _endAttackFrame = 22;
         [Header("ヒットエフェクト")]
         [SerializeField] protected EffectType _hitEffect = EffectType.HitNormal;
-        
+
         [Header("参照")]
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
-        
+
         [Header("自動エイム設定")]
         [SerializeField] private bool _enableAutoAim = true;
         [SerializeField] protected float _moveForwardSpeed = 2f;
         [Header("どれくらいの距離までの敵を狙って攻撃するか")]
         [SerializeField] private float _searchRadius = 2f;
-        
+
         [Header("Hit Box 設定")]
         [SerializeField] private Vector3 _boxHalfExtents = new Vector3(0.45f, 0.85f, 0.45f);
         [SerializeField] private Vector3 _boxLocalOffset = new Vector3(0f, 0.9f, 0.6f);
@@ -48,18 +49,22 @@ namespace InGame.Player.Ability
         [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Ignore;
         private readonly RaycastHit[] _hitBuffer = new RaycastHit[16];
         protected readonly HashSet<Collider> _alreadyHit = new HashSet<Collider>();
-        
+
         [Header("Debug Draw")]
-        [SerializeField] private Color _debugHitBoxColor   = new Color(0f, 0.6f, 1f, 1f);
+        [SerializeField] private Color _debugHitBoxColor = new Color(0f, 0.6f, 1f, 1f);
         [SerializeField, Tooltip("Debug 線の表示秒数。0 なら 1 フレームだけ")]
         private float _debugDrawDuration = 1f; // 例: 0.05f
+
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] protected BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
 
         // 変換後のTickオフセット
         protected int _startHitTick, _endHitTick, _endAttackTick;
 
         // 攻撃開始Tick
         protected int _attackStartTick = -1;
-        
+
         // 最も近い敵のTransform
         protected Transform _closestEnemyTransform;
         protected PlayerMovement _playerMovement;
@@ -67,31 +72,38 @@ namespace InGame.Player.Ability
 
         protected override void OnStart()
         {
-            if (_animationClipPlayer&& _normalAttackAnimationClip)
+            if (_animationClipPlayer && _normalAttackAnimationClip)
             {
                 _animationClipPlayer.PlayClip(_normalAttackAnimationClip);
             }
-            
+
             if (!_effectSpawner)
                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
-            
-            _startHitTick  = FrameToTick(_startHitCheckFrame);
-            _endHitTick    = FrameToTick(_endHitCheckFrame);
+
+            _startHitTick = FrameToTick(_startHitCheckFrame);
+            _endHitTick = FrameToTick(_endHitCheckFrame);
             _endAttackTick = FrameToTick(_endAttackFrame);
 
             _attackStartTick = Runner != null ? Runner.Tick : 0;
-            
+
             // PlayerMovementコンポーネントを取得
             _playerMovement = Parameter.Owner.GetComponent<PlayerMovement>();
-            
+
             // 自動エイムが有効な場合のみ最も近い敵を取得
             if (_enableAutoAim)
             {
                 _closestEnemyTransform = GetClosestEnemy();
             }
-            
-            _startHitTick  = FrameToTick(_startHitCheckFrame);
+
+            _startHitTick = FrameToTick(_startHitCheckFrame);
             _playerMovement.IgnoreMoveInput = true;
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerAbilityManager.csを確認してください");
+#endif
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)
@@ -103,9 +115,9 @@ namespace InGame.Player.Ability
 
                 // BoxCast の原点と向き
                 var origin = t.position + t.TransformVector(_boxLocalOffset);
-                var dir    = t.forward;
-                var rot    = t.rotation;
-                
+                var dir = t.forward;
+                var rot = t.rotation;
+
                 if (HitboxDebugUtility.IsDebugModeEnabled)
                 {
                     // 表示したい位置を1つだけ選ぶ
@@ -141,6 +153,7 @@ namespace InGame.Player.Ability
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
+            _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
 
             //エフェクトの再生
             _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
@@ -158,7 +171,8 @@ namespace InGame.Player.Ability
 
                 if (playerDatabase.PlayerDataDic.TryGet(Parameter.Owner.InputAuthority, out SessionPlayerData playerData))
                 {
-                    return playerData.IsOgre ? _ogreAttackDamage : _attackDamage;
+                    // ビルドの上昇分を加算して計算
+                    return (playerData.IsOgre ? _ogreAttackDamage : _attackDamage) + (_playerStatus ? (int)_playerStatus.AttackDamage : 0);
                 }
             }
             catch (System.Exception)
@@ -175,8 +189,8 @@ namespace InGame.Player.Ability
 
             // BoxCast の原点と向き
             var origin = t.position + t.TransformVector(_boxLocalOffset);
-            var dir    = t.forward;
-            var rot    = t.rotation;
+            var dir = t.forward;
+            var rot = t.rotation;
 
             // 掃引（NonAlloc で GC しない）
             int hitCount = Physics.BoxCastNonAlloc(
@@ -217,7 +231,7 @@ namespace InGame.Player.Ability
         protected override void OnUpdate(float deltaTime)
         {
             //if (_isStopWhenAttack && _playerMovement) _playerMovement.Stop();
-            int now    = Runner.Tick;
+            int now = Runner.Tick;
             int elapsed = now - _attackStartTick;
 
             // 最も近い敵の方向を向く
@@ -225,7 +239,7 @@ namespace InGame.Player.Ability
             {
                 Vector3 directionToEnemy = (_closestEnemyTransform.position - Parameter.Owner.transform.position).normalized;
                 directionToEnemy.y = 0; // Y軸は無視して水平方向のみ
-                
+
                 if (directionToEnemy.magnitude > 0.1f)
                 {
                     _playerMovement.SetRotationDirection(directionToEnemy);
@@ -245,7 +259,7 @@ namespace InGame.Player.Ability
                 if (elapsed >= _endHitTick && _alreadyHit.Count > 0)
                     _alreadyHit.Clear();
             }
-            
+
             _playerMovement.AddForce(Parameter.Owner.transform.forward * _moveForwardSpeed);
 
             // 攻撃終了
@@ -259,10 +273,10 @@ namespace InGame.Player.Ability
         protected int FrameToTick(int f)
         {
             float fps = _normalAttackAnimationClip ? _normalAttackAnimationClip.frameRate : 60f;
-            float dt  = Runner != null ? Runner.DeltaTime : Time.fixedDeltaTime;
+            float dt = Runner != null ? Runner.DeltaTime : Time.fixedDeltaTime;
             return Mathf.RoundToInt((f / fps) / dt);
         }
-        
+
         private Transform GetClosestEnemy()
         {
             try

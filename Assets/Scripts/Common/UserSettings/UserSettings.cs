@@ -70,6 +70,14 @@ namespace Common.UserSettings
                 {
                     Debug.LogWarning("Load failed (file locked)");
                 }
+                catch (ArgumentException)
+                {
+                    Debug.LogWarning("Load failed (file is corrupted or empty)");
+                }
+                catch (Exception e) // ä½•ãŒã‚ã£ã¦ã‚‚å†ç”Ÿæˆã™ã‚‹
+                {
+                    Debug.LogException(e);
+                }
             }
 
             return userSettings;
@@ -83,12 +91,12 @@ namespace Common.UserSettings
             {
                 using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                 {
-                    return false; // ŠJ‚¯‚½ = ƒƒbƒN‚³‚ê‚Ä‚È‚¢
+                    return false; // é–‹ã‘ãŸ = ãƒ­ãƒƒã‚¯ã•ã‚Œã¦ãªã„
                 }
             }
             catch (IOException)
             {
-                return true; // ŠJ‚¯‚È‚¢ = ’N‚©‚ªg‚Á‚Ä‚é
+                return true; // é–‹ã‘ãªã„ = èª°ã‹ãŒä½¿ã£ã¦ã‚‹
             }
         }
     }
