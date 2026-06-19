@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using September.Common;
@@ -36,6 +35,8 @@ namespace InGame.Player
         [SerializeField] private AnimationCurve _vaultCurve;
         [Header("Hook")]
         [SerializeField] private float _hookPower = 10f;
+        [Header("Bomb")]
+        [SerializeField] private float _flyingDamping = 8f;
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
@@ -48,6 +49,8 @@ namespace InGame.Player
         // base move
         private Vector3 _moveVelocity;
         public Vector3 MoveVelocity => _moveVelocity;
+        private Vector3 _flyingVelocity;
+
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
@@ -280,9 +283,21 @@ namespace InGame.Player
         {
             if (IsGround)
             {
-                _rb.linearVelocity = _moveVelocity;
-                NetworkVelocity = _moveVelocity;
+                _rb.linearVelocity = _moveVelocity + _flyingVelocity;
+                NetworkVelocity = _moveVelocity + _flyingVelocity;
             }
+            else
+            {
+                _rb.linearVelocity += _flyingVelocity;
+                NetworkVelocity += _flyingVelocity;
+            }
+
+            // 減衰
+            _flyingVelocity = Vector3.Lerp(_flyingVelocity, Vector3.zero, _flyingDamping * deltaTime);
+
+            // 微小値になったら0にする
+            if (_flyingVelocity.sqrMagnitude < 0.001f)
+                _flyingVelocity = Vector3.zero;
 
             // 回転の向きを代入
             if (!_setDirection) _rotationDirection = _moveVelocity;
@@ -437,6 +452,10 @@ namespace InGame.Player
             InputDirection = Vector2.zero;
         }
 
+        public void AddFlyingVelocity(Vector3 force)
+        {
+            _flyingVelocity = force;
+        }
         private void CheckGroundManual()
         {
             Vector3 origin = transform.position + Vector3.up * 0.1f;

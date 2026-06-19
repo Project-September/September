@@ -10,6 +10,7 @@ namespace InGame.Player.Okubo
         [SerializeField] private float _waitDuration;
         [SerializeField] private float _range;
         [SerializeField] private int _damageAmount;
+        [SerializeField] private float _flyingPower;
         [SerializeField] private Rigidbody _rb;
 
         private float _waitTimer;
@@ -60,6 +61,10 @@ namespace InGame.Player.Okubo
                     //É_ÉÅÅ[ÉWèàóù
                     var hitData = new HitData(HitActionType.Damage, _damageAmount, _ownerRef, damageable.OwnerPlayerRef);
                     damageable.TakeHit(ref hitData);
+
+                    if (!pair.Value.TryGetComponent(out PlayerMovement movement))
+                        continue;
+                    movement.AddFlyingVelocity((movement.transform.position - this.transform.position) * _flyingPower);
                     break; ;
                 }
             }
