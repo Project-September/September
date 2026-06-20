@@ -28,31 +28,13 @@ namespace September.InGame.Kraken
 
         private void Update()
         {
-            for (int i = 0; i < _ik.solver.GetPoints().Length - 1; i++)
-            {
-                Debug.DrawLine(_ik.solver.GetPoints()[i].solverPosition, _ik.solver.GetPoints()[i + 1].solverPosition, Color.yellow);
-            }
+            DebugDrawLine(_ik.solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
+            DebugDrawSpheres(_ik.solver.GetPoints().Select(x => x.solverPosition).ToArray(), .2f, Color.yellow);
 
-            for (int i = 0; i < _ik.solver.GetPoints().Length; i++)
-            {
-                DebugDrawUtility.DrawWireSphere(_ik.solver.GetPoints()[i].solverPosition, .2f, Color.yellow);
-            }
+            CheckHit(_followers, _ik, _radius, out Vector3[] rawPoints, out var resultSpline, out var rigidbodyHitFlags);
 
-            CheckHit(_followers, _ik, _radius, out var rawPoints, out var resultSpline, out var rigidbodyHitFlags);
-
-            for (int i = 0; i < rawPoints.Length - 1; i++)
-            {
-                var p0 = rawPoints[i];
-                var p1 = rawPoints[i + 1];
-                Debug.DrawLine(p0, p1, Color.green);
-            }
-
-            for (int i = 0; i <= 50; i++)
-            {
-                resultSpline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
-                resultSpline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
-                Debug.DrawLine(position, endPosition, Color.blue);
-            }
+            DebugDrawLine(rawPoints, Color.green);
+            DebugDrawSpline(resultSpline, Color.blue);
 
             int hitCount = -1;
             for (int i = rigidbodyHitFlags.Length - 1; i >= 0; i--)
@@ -65,17 +47,8 @@ namespace September.InGame.Kraken
             }
 
             var hullPoints = BuildUpperHull(rawPoints.Take(hitCount).ToArray());
-            foreach (var point in hullPoints)
-            {
-                DebugDrawUtility.DrawWireSphere(point, _radius-.1f, Color.magenta);
-            }
-
-            for (int i = 0; i < hullPoints.Count - 1; i++)
-            {
-                var p0 = hullPoints[i];
-                var p1 = hullPoints[i + 1];
-                Debug.DrawLine(p0, p1, Color.magenta);
-            }
+            DebugDrawSpheres(hullPoints, .2f, Color.magenta);
+            DebugDrawLine(hullPoints, Color.magenta);
 
             if (!rigidbodyHitFlags.Any(x => x))
             {
@@ -84,10 +57,7 @@ namespace September.InGame.Kraken
             }
 
             var notCollidedPoint = rawPoints.Skip(hitCount).ToArray();
-            foreach (var point in notCollidedPoint)
-            {
-                DebugDrawUtility.DrawWireSphere(point, _radius-.1f, Color.green);
-            }
+            DebugDrawSpheres(notCollidedPoint, _radius-.1f, Color.green);
 
             var resultPoints = hullPoints.Concat(rawPoints.Skip(hitCount)).ToArray();
 
@@ -268,6 +238,36 @@ namespace September.InGame.Kraken
                 result.Add(p.position);
 
             return result;
+        }
+        #endregion
+
+        #region Debug
+        private static void DebugDrawSpline(Spline spline, Color color)
+        {
+            for (int i = 0; i <= 50; i++)
+            {
+                spline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
+                spline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
+                Debug.DrawLine(position, endPosition, color);
+            }
+        }
+
+        private void DebugDrawLine(IReadOnlyList<Vector3> points, Color color)
+        {
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Vector3 p0 = points[i];
+                Vector3 p1 = points[i + 1];
+                Debug.DrawLine(p0, p1, color);
+            }
+        }
+
+        private void DebugDrawSpheres(IReadOnlyList<Vector3> points, float radius, Color color)
+        {
+            foreach (var p in points)
+            {
+                DebugDrawUtility.DrawWireSphere(p, radius, color);
+            }
         }
         #endregion
     }
