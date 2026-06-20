@@ -65,6 +65,18 @@ namespace September.InGame.Kraken
             var hullSolvedPoints = GetPosition(hullSpline);
 
             UpdatePosition(hullSolvedPoints);
+            DebugDrawSpheres(hullSolvedPoints, _radius-.1f, Color.magenta);
+
+            var correctedPoints = new Vector3[hullSolvedPoints.Length];
+            for (int i = 0; i < hullSolvedPoints.Length; i++)
+            {
+                correctedPoints[i] = CorrectTargetPosition(hullSolvedPoints[i], _followers[i], _followers, _radius);
+            }
+            var correctedSpline = CreateSpline(correctedPoints);
+            var finalPoints = GetPosition(correctedSpline);
+
+            DebugDrawLine(correctedPoints, Color.red);
+            DebugDrawLine(finalPoints, Color.cyan);
         }
 
         private static void CheckHit(Rigidbody[] followerBodies, FABRIK ik, float radius, out Vector3[] rawPoints, out Spline resultSpline, out bool[] rigidbodyHitFlags)
@@ -156,6 +168,29 @@ namespace September.InGame.Kraken
             }
 
             return results;
+        }
+
+        private static Vector3 CorrectTargetPosition(Vector3 originalPosition, Rigidbody target, Rigidbody[] followerBodies, float radius)
+        {
+            var overlaps = Physics.OverlapSphere(originalPosition, radius)
+                .Where(x => !followerBodies.Contains(x.GetComponent<Rigidbody>()))
+                .ToArray();
+
+            foreach (Collider overlap in overlaps)
+            {
+                if (Physics.ComputePenetration(
+                        target.GetComponent<Collider>(), originalPosition, target.transform.rotation,
+                        overlap, overlap.transform.position, overlap.transform.rotation,
+                        out Vector3 dir, out float distance))
+                {
+                    DebugDrawUtility.DrawWireSphere(originalPosition, .2f, Color.red);
+                    Debug.DrawRay(originalPosition, dir * distance, Color.red);
+                    DebugDrawUtility.DrawWireSphere(originalPosition + dir * (distance + .1f), radius, Color.red);
+                    return originalPosition + dir * (distance + .1f);
+                }
+            }
+
+            return originalPosition;
         }
 
         #region ConvexHull
