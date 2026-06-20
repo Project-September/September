@@ -8,7 +8,7 @@ namespace September.InGame.Kraken
 {
     public class IKFollower : MonoBehaviour
     {
-        [SerializeField] private FABRIK _ik;
+        [SerializeField] private IK _ik;
         [SerializeField] private Rigidbody[] _followers;
         [SerializeField] private float _radius = .55f;
 
@@ -28,10 +28,11 @@ namespace September.InGame.Kraken
 
         private void Update()
         {
-            DebugDrawLine(_ik.solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
-            DebugDrawSpheres(_ik.solver.GetPoints().Select(x => x.solverPosition).ToArray(), .2f, Color.yellow);
+            IKSolver solver = _ik.GetIKSolver();
+            DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
+            DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), .2f, Color.yellow);
 
-            CheckHit(_followers, _ik, _radius, out Vector3[] rawPoints, out var resultSpline, out var rigidbodyHitFlags);
+            CheckHit(_followers, solver, _radius, out Vector3[] rawPoints, out var resultSpline, out var rigidbodyHitFlags);
 
             DebugDrawLine(rawPoints, Color.green);
             DebugDrawSpline(resultSpline, Color.blue);
@@ -79,9 +80,9 @@ namespace September.InGame.Kraken
             DebugDrawLine(finalPoints, Color.cyan);
         }
 
-        private static void CheckHit(Rigidbody[] followerBodies, FABRIK ik, float radius, out Vector3[] rawPoints, out Spline resultSpline, out bool[] rigidbodyHitFlags)
+        private static void CheckHit(Rigidbody[] followerBodies, IKSolver solver, float radius, out Vector3[] rawPoints, out Spline resultSpline, out bool[] rigidbodyHitFlags)
         {
-            var ikPoints = ik.solver.GetPoints();
+            var ikPoints = solver.GetPoints();
 
             rigidbodyHitFlags = new bool[followerBodies.Length];
             rawPoints = new Vector3[ikPoints.Length];
