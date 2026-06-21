@@ -31,6 +31,8 @@ namespace Result
         Instrument,
         [DisplayName("ムラマサ")]
         Muramasa,
+        [DisplayName("鮫")]
+        Shark
     }
 
     [Serializable]
