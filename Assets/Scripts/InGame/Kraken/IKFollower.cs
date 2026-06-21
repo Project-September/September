@@ -49,9 +49,13 @@ namespace September.InGame.Kraken
             DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
             DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), .2f, Color.yellow);
 
-            CheckHit(_followers, solver, _radius, out Vector3[] rawPoints, out var resultSpline, out var rigidbodyHitFlags);
+            CheckHit(_followers, solver, _radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags);
 
             DebugDrawLine(rawPoints, Color.green);
+
+            var splinePoints = rawPoints.Where((_, i) => i == 0 || i == rawPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
+            Spline resultSpline = CreateSpline(splinePoints);
+
             DebugDrawSpline(resultSpline, Color.blue);
 
             int hitCount = -1;
@@ -96,14 +100,12 @@ namespace September.InGame.Kraken
             DebugDrawLine(finalPoints, Color.cyan);
         }
 
-        private static void CheckHit(Rigidbody[] followerBodies, IKSolver solver, float radius, out Vector3[] rawPoints, out Spline resultSpline, out bool[] rigidbodyHitFlags)
+        private static void CheckHit(Rigidbody[] followerBodies, IKSolver solver, float radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags)
         {
             var ikPoints = solver.GetPoints();
 
             rigidbodyHitFlags = new bool[followerBodies.Length];
             rawPoints = new Vector3[ikPoints.Length];
-            resultSpline = new Spline();
-            resultSpline.Add(followerBodies[0].position);
 
             for (int i = 0; i < ikPoints.Length; i++)
             {
@@ -135,11 +137,7 @@ namespace September.InGame.Kraken
                 {
                     rawPoints[i] = nearestHitInfo.point + nearestHitInfo.normal * radius;
                 }
-
-                resultSpline.Add(rawPoints[i]);
             }
-
-            resultSpline.Add(rawPoints[^1]);
         }
 
         private static Spline CreateSpline(IReadOnlyList<Vector3> points)
