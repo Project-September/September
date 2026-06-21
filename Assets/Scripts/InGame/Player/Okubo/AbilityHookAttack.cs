@@ -22,7 +22,7 @@ namespace InGame.Player.Okubo
         [SerializeField] private Transform _hookObject;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _resistanceAmount;
-        [SerializeField] private float _missAtttackCoolTime;
+        [SerializeField] private float _missAttackCoolTime;
         [SerializeField] private float _hitCoolTime;
 
         private HookAttackState _currentState;
@@ -64,6 +64,7 @@ namespace InGame.Player.Okubo
                     break;
             }
         }
+
         private void ChangeState(HookAttackState state)
         {
             _currentState = state;
@@ -95,7 +96,7 @@ namespace InGame.Player.Okubo
                         isTarget = true;
                     }
                     _wireCyl.gameObject.SetActive(false);
-                    _waitTimer = isTarget ? _hitCoolTime : _missAtttackCoolTime;
+                    _waitTimer = isTarget ? _hitCoolTime : _missAttackCoolTime;
                     _playerMovement.IgnoreMoveInput = false;
                     break;
             }
@@ -127,7 +128,7 @@ namespace InGame.Player.Okubo
                 maxResistance = Mathf.Max(resistance * inputDirection.magnitude, maxResistance);
                 Debug.Log($"抵抗 {player.Player}  {resistance}");
             }
-            _currentHookLength -= (_wireLength / _pullSpeed - maxResistance * _resistanceAmount)* Runner.DeltaTime;
+            _currentHookLength -= (_wireLength / _pullSpeed - maxResistance * _resistanceAmount) * Runner.DeltaTime;
 
             if (_currentHookLength <= 0)
             {

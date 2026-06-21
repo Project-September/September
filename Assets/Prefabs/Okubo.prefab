@@ -285,6 +285,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8277276683108733647}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &299351701384428432
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4121941244813626382}
+  m_Layer: 0
+  m_Name: BombClonePosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4121941244813626382
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 299351701384428432}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.58, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8736522266100138394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &591720085317159237
 GameObject:
   m_ObjectHideFlags: 0
@@ -5569,6 +5600,7 @@ GameObject:
   - component: {fileID: 8299193541871035024}
   - component: {fileID: 4943096902174970823}
   - component: {fileID: 7428561950604722073}
+  - component: {fileID: 2578447838527597611}
   m_Layer: 6
   m_Name: Okubo
   m_TagString: Player
@@ -5597,6 +5629,7 @@ Transform:
   - {fileID: 5844572294565568658}
   - {fileID: 685670002647529611}
   - {fileID: 3088326584113224399}
+  - {fileID: 4121941244813626382}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &6099435784402053345
@@ -5661,6 +5694,7 @@ MonoBehaviour:
   - {fileID: -7886593714486123081}
   - {fileID: 4943096902174970823}
   - {fileID: 7428561950604722073}
+  - {fileID: 2578447838527597611}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -5779,12 +5813,13 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _hookPower: 10
+  _flyingDamping: 5
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
-  _InputDirection: {x: 0, y: 0, z: 0}
+  _InputDirection: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
@@ -6183,12 +6218,35 @@ MonoBehaviour:
   _pullSpeed: 1
   _wireLength: 10
   _stretchedWaitTime: 0.3
-  _coolDownTime: 1
   _wireThickness: 0.1
   _hitRadius: 1
   _wireCyl: {fileID: 3088326584113224399}
   _hookObject: {fileID: 6224232624936183249}
   _damageAmount: 1
+  _resistanceAmount: 7
+  _missAttackCoolTime: 0.1
+  _hitCoolTime: 5
+--- !u!114 &2578447838527597611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: febf1077557c27249b631e91c8c6ac22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerInputManager: {fileID: 4943096902174970823}
+  _bombPrefab: {fileID: 6301738253428440414, guid: 1442dccdd529a684a982dbf358125118, type: 3}
+  _clonePosition: {fileID: 4121941244813626382}
+  _throwInterval: 1
+  _throwCount: 5
+  _throwRange: 1
+  _randomDirectionAmount: 0.4
+  _throwPower: 3
+  _throwUpAmount: 1
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
