@@ -47,7 +47,7 @@ namespace September.InGame.Kraken
         {
             IKSolver solver = _ik.GetIKSolver();
             DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
-            DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), .2f, Color.yellow);
+            DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
 
             CheckHit(_followers, solver, _radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags);
 
@@ -69,7 +69,7 @@ namespace September.InGame.Kraken
             }
 
             var hullPoints = BuildUpperHull(rawPoints.Take(hitCount).ToArray());
-            DebugDrawSpheres(hullPoints, .2f, Color.magenta);
+            DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
             DebugDrawLine(hullPoints, Color.magenta);
 
             if (!rigidbodyHitFlags.Any(x => x))
@@ -79,7 +79,7 @@ namespace September.InGame.Kraken
             }
 
             var notCollidedPoint = rawPoints.Skip(hitCount).ToArray();
-            DebugDrawSpheres(notCollidedPoint, _radius-.1f, Color.green);
+            DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
 
             var resultPoints = hullPoints.Concat(rawPoints.Skip(hitCount)).ToArray();
 
@@ -87,7 +87,7 @@ namespace September.InGame.Kraken
             var hullSolvedPoints = GetPoints(hullSpline);
 
             UpdatePosition(hullSolvedPoints);
-            DebugDrawSpheres(hullSolvedPoints, _radius-.1f, Color.magenta);
+            DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
 
             var correctedPoints = new Vector3[hullSolvedPoints.Length];
             for (int i = 0; i < hullSolvedPoints.Length; i++)
