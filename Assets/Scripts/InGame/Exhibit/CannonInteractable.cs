@@ -80,10 +80,14 @@ namespace InGame.Exhibit
 		public override void Render()
 		{
 			base.Render();
-			// 放物線描画
+			// 内部で放物瀬作成
 			CreateLine();
-			if (Runner.IsServer) AimPositionEffect.transform.position = GetTargetPoint();
-
+			// 放物線描画設定
+			if (Runner.IsServer)
+			{
+				AimPositionEffect.transform.position = GetTargetPoint();
+				AimPositionEffect.transform.rotation = BaseRotation;
+			}
 			// キャノンの回転描画
 			_cannonBarrel.localRotation = BarrelRotation;
 			_cannonBase.localRotation = BaseRotation;
@@ -180,8 +184,8 @@ namespace InGame.Exhibit
 
 		private void CreateLine()
 		{
-			if (Runner.LocalPlayer != CurrentUsePlayerRef) return;
 			BuildTrajectory(); // 描画位置の計算
+			if (Runner.LocalPlayer != CurrentUsePlayerRef) return;
 			_lineRenderer.positionCount = LastPositionIndex + 1;
 			_lineRenderer.SetPositions(_linePositions);
 		}
@@ -226,6 +230,7 @@ namespace InGame.Exhibit
 					? PlayerManager.PlayerControlState.Normal
 					: PlayerManager.PlayerControlState.ForcedControl);
 				_currentUsePlayer.RPC_SetUseGrav(isActive);
+				_currentUsePlayer.GetComponent<Rigidbody>().isKinematic = !isActive;
 			}
 		}
 
