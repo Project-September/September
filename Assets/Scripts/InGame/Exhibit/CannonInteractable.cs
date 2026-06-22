@@ -40,13 +40,14 @@ namespace InGame.Exhibit
 		[SerializeField] private CameraController _cameraController;
 		[SerializeField] private InteractableBase _interactable;
 
-		private PlayerRef _currentUsePlayerRef;
 		private PlayerManager _currentUsePlayer;
 		private Quaternion _baseDefaultRotation;
 		private Quaternion _barrelDefaultRotation;
 		private UniTask _fireUniTask;
 		private int _currentAmmo;
 		private Vector3[] _linePositions;
+		[Networked]
+		private PlayerRef CurrentUsePlayerRef { get; set; }
 		[Networked] private NetworkObject FireParticle { get; set; }
 		[Networked] private NetworkObject ExplosionParticle { get; set; }
 		[Networked] private NetworkObject AimPositionEffect { get; set; }
@@ -97,14 +98,14 @@ namespace InGame.Exhibit
 			// インタラクトの機能を一時的に無効化する
 			_interactable.ForceSetInteractable = false;
 			
-			_currentUsePlayerRef = playerRef;
-			RPC_SetCameraPriority(_currentUsePlayerRef, 15);
-			Object.AssignInputAuthority(_currentUsePlayerRef);
+			CurrentUsePlayerRef = playerRef;
+			RPC_SetCameraPriority(CurrentUsePlayerRef, 15);
+			Object.AssignInputAuthority(CurrentUsePlayerRef);
 			RPC_SetActive(AimPositionEffect, true);
 
 			_currentAmmo = _maxAmmo;
 			// プレイヤーの取得
-			_currentUsePlayer = Runner.GetPlayerObject(_currentUsePlayerRef).GetComponent<PlayerManager>();
+			_currentUsePlayer = Runner.GetPlayerObject(CurrentUsePlayerRef).GetComponent<PlayerManager>();
 			if (!_currentUsePlayer) return;
 			PlayerActive(false);
 			_currentUsePlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
@@ -142,7 +143,7 @@ namespace InGame.Exhibit
 		{
 			
 			// クールダウン処理
-			var chara = PlayerDatabase.Instance.PlayerDataDic[_currentUsePlayerRef].CharacterType;
+			var chara = PlayerDatabase.Instance.PlayerDataDic[CurrentUsePlayerRef].CharacterType;
 			var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
 				? all
 				: _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
@@ -154,10 +155,10 @@ namespace InGame.Exhibit
 			if (!_currentUsePlayer) return;
 			Object.RemoveInputAuthority();
 			PlayerActive(true);
-			RPC_SetCameraPriority(_currentUsePlayerRef, 5);
+			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 			if (_currentUsePlayer) _currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
 			_currentUsePlayer = null;
-			_currentUsePlayerRef = default;
+			CurrentUsePlayerRef = default;
 			_interactable.EndInteract();
 
 			// 現在砲弾が発射中であった場合、一部エフェクトの終了処理を待つ
@@ -179,7 +180,7 @@ namespace InGame.Exhibit
 
 		private void CreateLine()
 		{
-			if (!_currentUsePlayer) return;
+			if (Runner.LocalPlayer != CurrentUsePlayerRef) return;
 			BuildTrajectory(); // 描画位置の計算
 			_lineRenderer.positionCount = LastPositionIndex + 1;
 			_lineRenderer.SetPositions(_linePositions);
@@ -220,7 +221,7 @@ namespace InGame.Exhibit
 		{
 			if (Runner.IsServer)
 			{
-				RPC_SetCameraPriority(_currentUsePlayerRef, isActive ? 0 : 15);
+				RPC_SetCameraPriority(CurrentUsePlayerRef, isActive ? 0 : 15);
 				_currentUsePlayer.RPC_SetControlState(isActive
 					? PlayerManager.PlayerControlState.Normal
 					: PlayerManager.PlayerControlState.ForcedControl);
@@ -258,10 +259,10 @@ namespace InGame.Exhibit
 
 				// 弾の更新
 				FireParticle.transform.position = currentPos;
-				FireParticle.transform.forward = nextPos;
-
 				// 弾の着弾確認
 				var movement = nextPos - currentPos;
+				FireParticle.transform.forward = movement.normalized;
+
 				if (Physics.Raycast(currentPos, movement.normalized, out var hit, movement.magnitude, _hitLayer))
 				{
 					endPos = hit.point;
@@ -305,8 +306,8 @@ namespace InGame.Exhibit
 			{
 				var damageable = col.GetComponentInParent<IDamageable>();
 				if (damageable == null) continue;
-				if (damageable.OwnerPlayerRef == _currentUsePlayerRef) continue;
-				var hitData = new HitData(HitActionType.Damage, _baseDamage, _currentUsePlayerRef,
+				if (damageable.OwnerPlayerRef == CurrentUsePlayerRef) continue;
+				var hitData = new HitData(HitActionType.Damage, _baseDamage, CurrentUsePlayerRef,
 					damageable.OwnerPlayerRef);
 				damageable.TakeHit(ref hitData);
 			}
