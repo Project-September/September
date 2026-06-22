@@ -183,9 +183,15 @@ namespace September.InGame.Kraken
                 Debug.DrawRay(position, tangent, Color.red);
                 Debug.DrawRay(position, upVector, Color.green);
 
-                var rotation = Quaternion.LookRotation(tangent, upVector);
-
-                results[i] = new Point(position, rotation);
+                if (Vector3.SqrMagnitude(tangent) > 0f && Vector3.SqrMagnitude(upVector) > 0f)
+                {
+                    var rotation = Quaternion.LookRotation(tangent, upVector);
+                    results[i] = new Point(position, rotation);
+                }
+                else
+                {
+                    results[i] = new Point(position, Quaternion.identity);
+                }
             }
 
             return results;
