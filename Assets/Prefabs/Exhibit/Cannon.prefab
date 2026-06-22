@@ -62,15 +62,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1678150108003665120}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.035025153, y: -0.48777148, z: -0.019590966, w: -0.87204844}
-  m_LocalPosition: {x: 5.98, y: -10.71, z: 4.49}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3510080553243110555}
   - {fileID: 4314399791349489745}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -4.6, y: -301.56, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4488181076112366405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,7 +129,6 @@ MonoBehaviour:
       data:
         _characterType: 5
         _cannonInteractable: {fileID: 8131506775056946169}
-        _interactCoolTime: 1
 --- !u!114 &8131506775056946169
 MonoBehaviour:
   m_ObjectHideFlags: 0

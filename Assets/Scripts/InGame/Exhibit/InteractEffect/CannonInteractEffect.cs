@@ -1,7 +1,6 @@
 using System;
 using Fusion;
 using InGame.Interact;
-using September;
 using September.Common;
 using UnityEngine;
 
@@ -11,12 +10,10 @@ namespace InGame.Exhibit
     public class CannonInteractEffect : CharacterInteractEffectBase
     {
         [SerializeField] private CannonInteractable _cannonInteractable;
-        [SerializeField] private float _interactCoolTime;
 
-        public CannonInteractEffect(CannonInteractable cannonInteractable, float coolTime)
+        public CannonInteractEffect(CannonInteractable cannonInteractable)
         {
             _cannonInteractable = cannonInteractable;
-            _interactCoolTime = coolTime;
         }
         public CannonInteractEffect()
         {
@@ -33,14 +30,9 @@ namespace InGame.Exhibit
             _cannonInteractable.OnInteractFixedNetworkUpdate(playerInput);
         }
 
-        public override void OnInteractEnd()
-        {
-            base.OnInteractEnd();
-        }
-
         public override CharacterInteractEffectBase Clone()
         {
-            return new CannonInteractEffect(_cannonInteractable, _interactCoolTime);
+            return new CannonInteractEffect(_cannonInteractable);
         }
     }
 }
