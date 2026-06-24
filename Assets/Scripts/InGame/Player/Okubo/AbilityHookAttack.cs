@@ -10,10 +10,9 @@ namespace InGame.Player.Okubo
     {
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private PlayerInputManager _playerInputManager;
-        [SerializeField] private Material _wireMaterial;
         [SerializeField] private Transform _hookOrigin;
-        [SerializeField] private float _stretchSpeed;
-        [SerializeField] private float _pullSpeed;
+        [SerializeField] private float _stretchDuration;
+        [SerializeField] private float _pullDuration;
         [SerializeField] private float _wireLength;
         [SerializeField] private float _stretchedWaitTime = 0.3f;
         [SerializeField] private float _wireThickness;
@@ -75,9 +74,9 @@ namespace InGame.Player.Okubo
                     break;
                 //フック攻撃初期化
                 case HookAttackState.Stretching:
-                    _wireCyl.gameObject.SetActive(true);
+                    RPC_ChangeWireActive(true);
                     _targetData.Clear();
-                    _playerMovement.IgnoreMoveInput = true;
+                    _playerMovement.IsHookLocked = true;
                     _currentHookLength = 0;
                     break;
                 case HookAttackState.Stretched:
@@ -85,7 +84,6 @@ namespace InGame.Player.Okubo
                     break;
                 case HookAttackState.Pulling:
                     break;
-
                 case HookAttackState.CoolDown:
                     bool isTarget = false;
                     foreach (var kv in _targetData)
@@ -95,16 +93,16 @@ namespace InGame.Player.Okubo
                         kv.Value.IsTarget = false;
                         isTarget = true;
                     }
-                    _wireCyl.gameObject.SetActive(false);
+                    RPC_ChangeWireActive(false);
                     _waitTimer = isTarget ? _hitCoolTime : _missAttackCoolTime;
-                    _playerMovement.IgnoreMoveInput = false;
+                    _playerMovement.IsHookLocked = false;
                     break;
             }
         }
 
         private void OnStretching()
         {
-            _currentHookLength += _wireLength / _stretchSpeed * Runner.DeltaTime;
+            _currentHookLength += _wireLength / _stretchDuration * Runner.DeltaTime;
 
             //最大の長さまで伸びた
             if (_currentHookLength >= _wireLength)
@@ -122,13 +120,14 @@ namespace InGame.Player.Okubo
             float maxResistance = 0;
             foreach (var player in _targetData.Values)
             {
-                Vector2 inputDirection = player.PlayerMovement.InputDirection;
-                var angle = Vector2.Angle(_wireCyl.up, inputDirection);
+                Vector3 inputDirection = new Vector3(player.PlayerMovement.MoveDirection.x, 0, player.PlayerMovement.MoveDirection.y);
+                var angle = Vector3.Angle(_wireCyl.up, inputDirection);
+
                 float resistance = 1f - (angle / 180);
                 maxResistance = Mathf.Max(resistance * inputDirection.magnitude, maxResistance);
                 Debug.Log($"抵抗 {player.Player}  {resistance}");
             }
-            _currentHookLength -= (_wireLength / _pullSpeed - maxResistance * _resistanceAmount) * Runner.DeltaTime;
+            _currentHookLength -= (_wireLength / _pullDuration - maxResistance * _resistanceAmount) * Runner.DeltaTime;
 
             if (_currentHookLength <= 0)
             {
@@ -143,11 +142,11 @@ namespace InGame.Player.Okubo
             {
                 if (kv.Value.IsHookFollow) continue;
                 if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(kv.Key, out var obj)) continue;
-                var targetSqer = (this.transform.position - obj.transform.position).sqrMagnitude;
+                var targetSqr = (this.transform.position - obj.transform.position).sqrMagnitude;
 
-                if (targetSqer > hookSqr)
+                if (targetSqr > hookSqr)
                 {
-                    RPC_HookFollow(kv.Key);
+                    HookFollow(kv.Key);
                     _targetData[kv.Key].IsHookFollow = true;
                 }
             }
@@ -199,7 +198,7 @@ namespace InGame.Player.Okubo
                 GameObject hitObject = obj.transform.root.gameObject;
                 if (hitObject == this.gameObject || !hitObject.CompareTag("Player")) continue;
 
-                //ヒットしたオブジェクトからPrayerRefを取得
+                //ヒットしたオブジェクトからPlayerRefを取得
                 foreach (var pair in PlayerDatabase.Instance.PlayerObjectDic)
                 {
                     if (pair.Value.gameObject == hitObject)
@@ -207,7 +206,7 @@ namespace InGame.Player.Okubo
                         if (_targetData.ContainsKey(pair.Key)) continue;
 
                         //ターゲットデータに入れる
-                        var target = TryGetTargetData(pair.Key);
+                        var target = GetOrCreateTargetData(pair.Key);
                         if (target == null) continue;
                         //フック攻撃対象にする
                         target.IsTarget = true;
@@ -220,49 +219,52 @@ namespace InGame.Player.Okubo
                             var hitData = new HitData(HitActionType.Damage, _damageAmount, _ownerRef, damageable.OwnerPlayerRef);
                             damageable.TakeHit(ref hitData);
                         }
-                        break; ;
+                        break;
                     }
                 }
             }
         }
 
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_HookStart(PlayerRef playerRef)
+        private void HookFollow(PlayerRef playerRef)
+        {
+            Debug.Log($"follow {Object.InputAuthority} => {playerRef}");
+            var targetData = GetOrCreateTargetData(playerRef);
+            if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
+
+            targetData.PlayerMovement.OnHookFollow(_hookObject);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_HookStart(PlayerRef playerRef)
         {
             Debug.Log($"start {Object.InputAuthority} => {playerRef}");
-            _wireCyl.gameObject.SetActive(true);
-            var targetData = TryGetTargetData(playerRef);
+            var targetData = GetOrCreateTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
 
             Debug.Log("StartHook");
             targetData.PlayerMovement.OnStartHook();
         }
 
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_HookFollow(PlayerRef playerRef)
-        {
-            Debug.Log($"follow {Object.InputAuthority} => {playerRef}");
-            var targetData = TryGetTargetData(playerRef);
-            if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
-
-            targetData.PlayerMovement.OnHookFollow(_hookObject);
-        }
-
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_HookEnd(PlayerRef playerRef)
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_HookEnd(PlayerRef playerRef)
         {
             Debug.Log($"end {Object.InputAuthority} => {playerRef}");
-            _wireCyl.gameObject.SetActive(false);
-            var targetData = TryGetTargetData(playerRef);
+            var targetData = GetOrCreateTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
 
             targetData.PlayerMovement.OnEndHook();
         }
 
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_ChangeWireActive(bool active)
+        {
+            _wireCyl.gameObject.SetActive(active);
+        }
+
         /// <summary>
         /// RPCで飛んだ先にTargetDataがない時の対策
         /// </summary>
-        private HookTargetData TryGetTargetData(PlayerRef playerRef)
+        private HookTargetData GetOrCreateTargetData(PlayerRef playerRef)
         {
             if (_targetData.TryGetValue(playerRef, out var targetData)) return targetData;
 
@@ -280,12 +282,12 @@ namespace InGame.Player.Okubo
             return true;
         }
 
-        public enum HookAttackState
+        private enum HookAttackState
         {
             Idol, Stretching, Stretched, Pulling, CoolDown
         }
 
-        public class HookTargetData
+        private class HookTargetData
         {
             public PlayerRef Player { get; private set; }
             public NetworkObject PlayerObject { get; private set; }

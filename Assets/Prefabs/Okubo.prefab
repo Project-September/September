@@ -5819,7 +5819,7 @@ MonoBehaviour:
   _vaultGizmoDebugger: {fileID: 0}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
-  _InputDirection: {x: 0, y: 0}
+  _MoveDirection: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
@@ -6212,10 +6212,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerMovement: {fileID: 3242880713039265549}
   _playerInputManager: {fileID: 4943096902174970823}
-  _wireMaterial: {fileID: 2100000, guid: 3e33a38e2349f447d9fb9ae62269009c, type: 2}
   _hookOrigin: {fileID: 2462965415467351492}
-  _stretchSpeed: 1
-  _pullSpeed: 1
+  _stretchDuration: 1
+  _pullDuration: 1
   _wireLength: 10
   _stretchedWaitTime: 0.3
   _wireThickness: 0.1
@@ -6243,7 +6242,6 @@ MonoBehaviour:
   _clonePosition: {fileID: 4121941244813626382}
   _throwInterval: 1
   _throwCount: 5
-  _throwRange: 1
   _randomDirectionAmount: 0.4
   _throwPower: 3
   _throwUpAmount: 1

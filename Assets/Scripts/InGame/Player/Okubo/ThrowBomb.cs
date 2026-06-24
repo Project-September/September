@@ -12,7 +12,6 @@ namespace InGame.Player.Okubo
 
         [SerializeField] private float _throwInterval = 1f;
         [SerializeField] private int _throwCount = 3;
-        [SerializeField] private float _throwRange = 5f;
 
         [SerializeField, Range(0f, 0.5f)]
         private float _randomDirectionAmount = 0.4f;

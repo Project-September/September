@@ -65,7 +65,7 @@ namespace InGame.Player
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
-        [Networked] public Vector2 InputDirection { get; private set; }
+        [Networked] public Vector2 MoveDirection { get; private set; }
         private bool _isHookFollow;
         private Transform _hookTarget;
         private float _vaultTimer;
@@ -89,6 +89,7 @@ namespace InGame.Player
         public CapsuleCollider MoveCapsuleCollider => _moveCapsuleCollider;
         public LayerMask GroundLayer => _groundLayer;
         [Networked] public bool IgnoreMoveInput { get; set; }
+        [Networked] public bool IsHookLocked { get; set; }
 
         private void Awake()
         {
@@ -106,15 +107,13 @@ namespace InGame.Player
 
             if (_isHookFollow)
             {
-                var hookDirection = _hookTarget.transform.position - this.transform.position;
-                hookDirection.y = 0;
-                //_rb.linearVelocity = hookDirection;
-                //this.transform.position += hookDirection;
-                InputDirection = GetMoveDirection(moveInput, cameraYaw);
-                _moveVelocity = hookDirection * _hookPower;
+                var followDirection = _hookTarget.transform.position - this.transform.position;
+                followDirection.y = 0;
+                MoveDirection = GetMoveDirection(moveInput, cameraYaw);
+                _moveVelocity = followDirection * _hookPower;
             }
 
-            if (IgnoreMoveInput) moveInput = Vector2.zero;
+            if (IgnoreMoveInput || IsHookLocked) moveInput = Vector2.zero;
 
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
@@ -434,8 +433,8 @@ namespace InGame.Player
 
         public void OnStartHook()
         {
-            IgnoreMoveInput = true;
-            InputDirection = Vector2.zero;
+            IsHookLocked = true;
+            MoveDirection = Vector2.zero;
         }
 
         public void OnHookFollow(Transform targetHook)
@@ -446,16 +445,17 @@ namespace InGame.Player
 
         public void OnEndHook()
         {
-            IgnoreMoveInput = false;
+            IsHookLocked = false;
             _isHookFollow = false;
             _hookTarget = null;
-            InputDirection = Vector2.zero;
+            MoveDirection = Vector2.zero;
         }
 
         public void AddFlyingVelocity(Vector3 force)
         {
             _flyingVelocity = force;
         }
+
         private void CheckGroundManual()
         {
             Vector3 origin = transform.position + Vector3.up * 0.1f;

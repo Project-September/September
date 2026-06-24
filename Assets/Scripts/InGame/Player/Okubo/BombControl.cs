@@ -64,8 +64,16 @@ namespace InGame.Player.Okubo
 
                     if (!pair.Value.TryGetComponent(out PlayerMovement movement))
                         continue;
-                    movement.AddFlyingVelocity((movement.transform.position - this.transform.position) * _flyingPower);
-                    break; ;
+
+                    //êÅÇ´îÚÇŒÇ∑èàóù
+                    var dir = movement.transform.position - transform.position;
+                    var distance = dir.magnitude;
+
+                    var power = _flyingPower / Mathf.Max(distance, 0.1f);
+
+                    movement.AddFlyingVelocity(dir.normalized * power);
+
+                    break;
                 }
             }
             Runner.Despawn(Object);
