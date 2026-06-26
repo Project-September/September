@@ -104,12 +104,12 @@ namespace InGame.Player
         {
             CheckGroundManual();
 
+            MoveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             if (_isHookFollow)
             {
                 var followDirection = _hookTarget.transform.position - this.transform.position;
                 followDirection.y = 0;
-                MoveDirection = GetMoveDirection(moveInput, cameraYaw);
                 _moveVelocity = followDirection * _hookPower;
             }
 
