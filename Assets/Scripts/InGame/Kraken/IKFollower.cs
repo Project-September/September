@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RootMotion.FinalIK;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -17,6 +18,12 @@ namespace September.InGame.Kraken
             {
                 Position = position;
                 Rotation = rotation;
+            }
+
+            public Point(Rigidbody rigidbody)
+            {
+                Position = rigidbody.position;
+                Rotation = rigidbody.rotation;
             }
 
             public static Vector3[] ConvertToVector(IReadOnlyList<Point> points)
@@ -58,8 +65,13 @@ namespace September.InGame.Kraken
             DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
             DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
 
+            foreach (var p in solver.GetPoints())
+            {
+                Debug.DrawRay(p.transform.position, p.transform.up, Color.green);
+            }
+
             // 1. スイープ移動した位置を計算
-            CalcSweptPosition(_followers, solver, _radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags);
+            CalcSweptPosition(_followers, solver, _radius, out Point[] rawPoints, out bool[] rigidbodyHitFlags);
             DebugDrawLine(rawPoints, Color.green);
 
             var splinePoints = rawPoints.Where((_, i) => i == 0 || i == rawPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
@@ -85,7 +97,7 @@ namespace September.InGame.Kraken
                 }
             }
 
-            var hullPoints = ConvexHull.BuildUpperHull(rawPoints.Take(hitCount).ToArray());
+            var hullPoints = ConvexHull.BuildUpperHull(rawPoints.Take(hitCount).Select(x => x.Position).ToArray());
             DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
             DebugDrawLine(hullPoints, Color.magenta);
 
@@ -93,7 +105,7 @@ namespace September.InGame.Kraken
             var notCollidedPoint = rawPoints.Skip(hitCount).ToArray();
             DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
 
-            var resultPoints = hullPoints.Concat(rawPoints.Skip(hitCount)).ToArray();
+            var resultPoints = hullPoints.Concat(rawPoints.Skip(hitCount).Select(x => x.Position)).ToArray();
 
             var hullSpline = CreateSpline(resultPoints);
             var hullSolvedPoints = GetPoints(hullSpline);
@@ -114,12 +126,13 @@ namespace September.InGame.Kraken
             DebugDrawLine(finalPoints, Color.cyan);
         }
 
-        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver solver, float radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags)
+        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver solver, float radius, out Point[] rawPoints,
+            out bool[] rigidbodyHitFlags)
         {
             var ikPoints = solver.GetPoints();
 
             rigidbodyHitFlags = new bool[followerBodies.Length];
-            rawPoints = new Vector3[ikPoints.Length];
+            rawPoints = new Point[ikPoints.Length];
 
             for (int i = 0; i < ikPoints.Length; i++)
             {
@@ -134,7 +147,7 @@ namespace September.InGame.Kraken
 
                 if (nearestHitInfo.collider == null)
                 {
-                    rawPoints[i] = ikPoints[i].solverPosition;
+                    rawPoints[i] = new Point(ikPoints[i].solverPosition, ikPoints[i].solverRotation);
                     continue;
                 }
 
@@ -145,12 +158,38 @@ namespace September.InGame.Kraken
                         followerBodies[i].GetComponent<Collider>(), followerBodies[i].position, followerBodies[i].transform.rotation,
                         out var dir, out var distance))
                 {
-                    rawPoints[i] = followerBodies[i].position + dir * (distance + .1f);
+                    rawPoints[i] = new Point(followerBodies[i].position + dir * (distance + .1f), followerBodies[i].rotation);
                 }
                 else
                 {
-                    rawPoints[i] = nearestHitInfo.point + nearestHitInfo.normal * radius;
+                    Vector3 pos = nearestHitInfo.point + nearestHitInfo.normal * radius;
+                    if (i < followerBodies.Length - 1)
+                    {
+                        rawPoints[i] = new Point(pos, GetInterpolatedRotation(new Point(followerBodies[i]), new Point(followerBodies[i + 1]), pos));
+                    }
+                    else
+                    {
+                        rawPoints[i] = new Point(pos, followerBodies[i].rotation);
+                    }
                 }
+            }
+
+            Quaternion GetInterpolatedRotation(Point p0, Point p1, Vector3 target)
+            {
+                Vector3 v0 = target - p0.Position;
+                Vector3 v1 = target - p1.Position;
+
+                float d0 = v0.magnitude;
+                float d1 = v1.magnitude;
+
+                // d0 = 0 => 0
+                // d1 = 0 => 1
+                // d0 = d1 => .5
+                float m = Mathf.Max(d0, d1);
+
+                float ratio = ((d0 - d1) / m + 1f) * 0.5f;
+
+                return Quaternion.Slerp(p0.Rotation, p1.Rotation, ratio);
             }
         }
 
@@ -189,6 +228,16 @@ namespace September.InGame.Kraken
             return spline;
         }
 
+        private static Spline CreateSpline(IReadOnlyList<Point> points)
+        {
+            var spline = new Spline();
+            foreach (var point in points)
+            {
+                spline.Add(new BezierKnot(point.Position, float3.zero, float3.zero, point.Rotation));
+            }
+            return spline;
+        }
+
         private Point[] GetPoints(Spline spline)
         {
             var results = new Point[_followers.Length];
@@ -207,8 +256,6 @@ namespace September.InGame.Kraken
                 var targetLength = distancePrefixSum[i];
                 var t = targetLength / curveLength;
                 spline.Evaluate(t, out var position, out var tangent, out var upVector);
-
-                Debug.DrawRay(position, upVector, Color.green);
 
                 if (Vector3.SqrMagnitude(tangent) > 0f && Vector3.SqrMagnitude(upVector) > 0f)
                 {
