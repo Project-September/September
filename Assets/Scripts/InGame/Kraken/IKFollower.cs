@@ -8,6 +8,23 @@ namespace September.InGame.Kraken
 {
     public class IKFollower : MonoBehaviour
     {
+        private readonly struct Point
+        {
+            public readonly Vector3 Position;
+            public readonly Quaternion Rotation;
+
+            public Point(Vector3 position, Quaternion rotation)
+            {
+                Position = position;
+                Rotation = rotation;
+            }
+
+            public static Vector3[] ConvertToVector(IReadOnlyList<Point> points)
+            {
+                return points.Select(x => x.Position).ToArray();
+            }
+        }
+
         [SerializeField] private IK _ik;
         [SerializeField] private Rigidbody[] _followers;
         [SerializeField] private float _radius = .55f;
@@ -15,22 +32,9 @@ namespace September.InGame.Kraken
         [SerializeField, HideInInspector] private List<float> _maxDistanceList = new();
         [SerializeField, HideInInspector] private Quaternion[] _defaultRotations;
 
-        private struct Point
-        {
-            public Vector3 position;
-            public Quaternion rotation;
-
-            public Point(Vector3 position, Quaternion rotation)
-            {
-                this.position = position;
-                this.rotation = rotation;
-            }
-
-            public static implicit operator Vector3(Point point) => point.position;
-        }
-
         private void Start()
         {
+            // ボーンの長さをキャッシュ
             _maxDistanceList.Add(0);
             for (int i = 0; i < _followers.Length - 1; i++)
             {
@@ -40,17 +44,22 @@ namespace September.InGame.Kraken
                 _maxDistanceList.Add((p1 - p0).magnitude);
             }
 
+            // ボーンの回転をキャッシュ
             _defaultRotations = _followers.Select(x => x.rotation).ToArray();
         }
 
+        // Todo: 船に沿わせるための処理
+        // Todo: スイープ後の回転を安定させる
+        // Todo: スイープが貫通する問題を修正する
         private void Update()
         {
+            // 0. FABRIKで障害物がない時のボーン位置を計算
             IKSolver solver = _ik.GetIKSolver();
             DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
             DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
 
-            CheckHit(_followers, solver, _radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags);
-
+            // 1. スイープ移動した位置を計算
+            CalcSweptPosition(_followers, solver, _radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags);
             DebugDrawLine(rawPoints, Color.green);
 
             var splinePoints = rawPoints.Where((_, i) => i == 0 || i == rawPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
@@ -58,6 +67,14 @@ namespace September.InGame.Kraken
 
             DebugDrawSpline(resultSpline, Color.blue);
 
+            // 2. 衝突がなければそのままにする
+            if (!rigidbodyHitFlags.Any(x => x))
+            {
+                UpdatePosition(GetPoints(resultSpline));
+                return;
+            }
+
+            // 3. 衝突のあるセクションを凸包に変換
             int hitCount = -1;
             for (int i = rigidbodyHitFlags.Length - 1; i >= 0; i--)
             {
@@ -68,16 +85,11 @@ namespace September.InGame.Kraken
                 }
             }
 
-            var hullPoints = BuildUpperHull(rawPoints.Take(hitCount).ToArray());
+            var hullPoints = ConvexHull.BuildUpperHull(rawPoints.Take(hitCount).ToArray());
             DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
             DebugDrawLine(hullPoints, Color.magenta);
 
-            if (!rigidbodyHitFlags.Any(x => x))
-            {
-                UpdatePosition(GetPoints(resultSpline));
-                return;
-            }
-
+            // 4. 衝突のないセクションと結合する
             var notCollidedPoint = rawPoints.Skip(hitCount).ToArray();
             DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
 
@@ -89,18 +101,20 @@ namespace September.InGame.Kraken
             UpdatePosition(hullSolvedPoints);
             DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
 
+            // 5. 埋まりを修正する
             var correctedPoints = new Vector3[hullSolvedPoints.Length];
             for (int i = 0; i < hullSolvedPoints.Length; i++)
             {
-                correctedPoints[i] = CorrectTargetPosition(hullSolvedPoints[i], _followers[i], _followers, _radius);
+                correctedPoints[i] = CorrectTargetPosition(hullSolvedPoints[i].Position, _followers[i], _followers, _radius);
             }
             var correctedSpline = CreateSpline(correctedPoints);
             var finalPoints = GetPoints(correctedSpline);
 
+            DebugDrawSpheres(finalPoints, _radius * .9f, Color.cyan);
             DebugDrawLine(finalPoints, Color.cyan);
         }
 
-        private static void CheckHit(Rigidbody[] followerBodies, IKSolver solver, float radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags)
+        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver solver, float radius, out Vector3[] rawPoints, out bool[] rigidbodyHitFlags)
         {
             var ikPoints = solver.GetPoints();
 
@@ -140,63 +154,6 @@ namespace September.InGame.Kraken
             }
         }
 
-        private static Spline CreateSpline(IReadOnlyList<Vector3> points)
-        {
-            var spline = new Spline();
-            foreach (var point in points)
-            {
-                spline.Add(point, TangentMode.Broken);
-            }
-            return spline;
-        }
-
-        private void UpdatePosition(Point[] points)
-        {
-            for (int i = 0; i < _followers.Length; i++)
-            {
-                if (_followers[i] == null) continue;
-
-                _followers[i].MovePosition(points[i].position);
-                _followers[i].MoveRotation(points[i].rotation * _defaultRotations[i]);
-            }
-        }
-
-        private Point[] GetPoints(Spline spline)
-        {
-            var results = new Point[_followers.Length];
-
-            var distancePrefixSum = new List<float>();
-            for (int i = 0; i < _maxDistanceList.Count; i++)
-            {
-                distancePrefixSum.Add(_maxDistanceList.Take(i + 1).Sum());
-            }
-
-            for (int i = 0; i < _followers.Length; i++)
-            {
-                if (_followers[i] == null) continue;
-
-                var curveLength = spline.GetLength();
-                var targetLength = distancePrefixSum[i];
-                var t = targetLength / curveLength;
-                spline.Evaluate(t, out var position, out var tangent, out var upVector);
-
-                Debug.DrawRay(position, tangent, Color.red);
-                Debug.DrawRay(position, upVector, Color.green);
-
-                if (Vector3.SqrMagnitude(tangent) > 0f && Vector3.SqrMagnitude(upVector) > 0f)
-                {
-                    var rotation = Quaternion.LookRotation(tangent, upVector);
-                    results[i] = new Point(position, rotation);
-                }
-                else
-                {
-                    results[i] = new Point(position, Quaternion.identity);
-                }
-            }
-
-            return results;
-        }
-
         private static Vector3 CorrectTargetPosition(Vector3 originalPosition, Rigidbody target, Rigidbody[] followerBodies, float radius)
         {
             var overlaps = Physics.OverlapSphere(originalPosition, radius)
@@ -220,8 +177,109 @@ namespace September.InGame.Kraken
             return originalPosition;
         }
 
-        #region ConvexHull
+        #region Common
 
+        private static Spline CreateSpline(IReadOnlyList<Vector3> points)
+        {
+            var spline = new Spline();
+            foreach (var point in points)
+            {
+                spline.Add(point, TangentMode.Broken);
+            }
+            return spline;
+        }
+
+        private Point[] GetPoints(Spline spline)
+        {
+            var results = new Point[_followers.Length];
+
+            var distancePrefixSum = new List<float>();
+            for (int i = 0; i < _maxDistanceList.Count; i++)
+            {
+                distancePrefixSum.Add(_maxDistanceList.Take(i + 1).Sum());
+            }
+
+            for (int i = 0; i < _followers.Length; i++)
+            {
+                if (_followers[i] == null) continue;
+
+                var curveLength = spline.GetLength();
+                var targetLength = distancePrefixSum[i];
+                var t = targetLength / curveLength;
+                spline.Evaluate(t, out var position, out var tangent, out var upVector);
+
+                Debug.DrawRay(position, upVector, Color.green);
+
+                if (Vector3.SqrMagnitude(tangent) > 0f && Vector3.SqrMagnitude(upVector) > 0f)
+                {
+                    var rotation = Quaternion.LookRotation(tangent, upVector);
+                    results[i] = new Point(position, rotation);
+                }
+                else
+                {
+                    results[i] = new Point(position, Quaternion.identity);
+                }
+            }
+
+            return results;
+        }
+
+        private void UpdatePosition(Point[] points)
+        {
+            for (int i = 0; i < _followers.Length; i++)
+            {
+                if (_followers[i] == null) continue;
+
+                _followers[i].MovePosition(points[i].Position);
+                _followers[i].MoveRotation(points[i].Rotation * _defaultRotations[i]);
+            }
+        }
+
+        #endregion
+
+        #region Debug
+        private static void DebugDrawSpline(Spline spline, Color color)
+        {
+            for (int i = 0; i <= 50; i++)
+            {
+                spline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
+                spline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
+                Debug.DrawLine(position, endPosition, color);
+            }
+        }
+
+        private void DebugDrawLine(IReadOnlyList<Vector3> points, Color color)
+        {
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Vector3 p0 = points[i];
+                Vector3 p1 = points[i + 1];
+                Debug.DrawLine(p0, p1, color);
+            }
+        }
+
+        private void DebugDrawLine(IReadOnlyList<Point> points, Color color)
+        {
+            DebugDrawLine(Point.ConvertToVector(points), color);
+        }
+
+        private void DebugDrawSpheres(IReadOnlyList<Vector3> points, float radius, Color color)
+        {
+            foreach (var p in points)
+            {
+                DebugDrawUtility.DrawWireSphere(p, radius, color);
+            }
+        }
+
+        private void DebugDrawSpheres(IReadOnlyList<Point> points, float radius, Color color)
+        {
+            DebugDrawSpheres(Point.ConvertToVector(points), radius, color);
+        }
+        #endregion
+    }
+
+    public static class ConvexHull
+    {
         // AI生成
         // Monotone Chainらしい
         struct HullPoint
@@ -231,8 +289,7 @@ namespace September.InGame.Kraken
             public Vector3 position;
         }
 
-        private static List<Vector3> BuildUpperHull(
-            IReadOnlyList<Vector3> points)
+        public static List<Vector3> BuildUpperHull(IReadOnlyList<Vector3> points)
         {
             if (points.Count <= 2)
                 return new List<Vector3>(points);
@@ -301,51 +358,5 @@ namespace September.InGame.Kraken
 
             return result;
         }
-        #endregion
-
-        #region Debug
-        private static void DebugDrawSpline(Spline spline, Color color)
-        {
-            for (int i = 0; i <= 50; i++)
-            {
-                spline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
-                spline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
-                Debug.DrawLine(position, endPosition, color);
-            }
-        }
-
-        private void DebugDrawLine(IReadOnlyList<Vector3> points, Color color)
-        {
-            for (int i = 0; i < points.Count - 1; i++)
-            {
-                Vector3 p0 = points[i];
-                Vector3 p1 = points[i + 1];
-                Debug.DrawLine(p0, p1, color);
-            }
-        }
-
-        private void DebugDrawLine(IReadOnlyList<Point> points, Color color)
-        {
-            DebugDrawLine(ConvertToVector(points), color);
-        }
-
-        private void DebugDrawSpheres(IReadOnlyList<Vector3> points, float radius, Color color)
-        {
-            foreach (var p in points)
-            {
-                DebugDrawUtility.DrawWireSphere(p, radius, color);
-            }
-        }
-
-        private void DebugDrawSpheres(IReadOnlyList<Point> points, float radius, Color color)
-        {
-            DebugDrawSpheres(ConvertToVector(points), radius, color);
-        }
-
-        private Vector3[] ConvertToVector(IReadOnlyList<Point> points)
-        {
-            return points.Select(x => x.position).ToArray();
-        }
-        #endregion
     }
 }
