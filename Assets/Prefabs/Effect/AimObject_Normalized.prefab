@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2684928178316765106, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.07
       objectReference: {fileID: 0}
     - target: {fileID: 2684928178316765106, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
       propertyPath: m_LocalPosition.y
@@ -22,6 +22,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2684928178316765106, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
       propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2684928178316765106, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2684928178316765106, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2684928178316765106, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
@@ -64,6 +72,10 @@ PrefabInstance:
       propertyPath: SyncScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5513344064715602192, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5541553858370325891, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -71,6 +83,18 @@ PrefabInstance:
     - target: {fileID: 5541553858370325891, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
       propertyPath: m_RenderMode
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5541553858370325891, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: m_RenderAlignment
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5541553858370325891, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 008f67fd9356ee24cb854ceb8be30189, type: 2}
+    - target: {fileID: 8935472175343285080, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: looping
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8935472175343285080, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
       propertyPath: InitialModule.startSize.scalar

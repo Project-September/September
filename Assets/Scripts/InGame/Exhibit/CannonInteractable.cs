@@ -35,6 +35,7 @@ namespace InGame.Exhibit
 		[SerializeField] private NetworkObject _fireParticlePrefab;
 		[SerializeField] private NetworkObject _explosionParticlePrefab;
 		[SerializeField] private LineRenderer _lineRenderer;
+		[SerializeField] private float _aimPositionOffset = .5f;
 
 		[Header("その他")] [SerializeField] private Transform _waitCharacterTransform;
 		[SerializeField] private CameraController _cameraController;
@@ -51,6 +52,7 @@ namespace InGame.Exhibit
 		[Networked] private NetworkObject FireParticle { get; set; }
 		[Networked] private NetworkObject ExplosionParticle { get; set; }
 		[Networked] private NetworkObject AimPositionEffect { get; set; }
+		[Networked] private Vector3 HitNormal { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
@@ -80,18 +82,23 @@ namespace InGame.Exhibit
 		public override void Render()
 		{
 			base.Render();
-			// 内部で放物瀬作成
-			CreateLine();
 			// 放物線描画設定
 			if (Runner.IsServer)
 			{
-				AimPositionEffect.transform.position = GetTargetPoint();
-				AimPositionEffect.transform.rotation = BaseRotation;
+				AimPositionEffect.transform.position = GetTargetPoint() + HitNormal * _aimPositionOffset;
+				AimPositionEffect.transform.up = HitNormal.normalized;
 			}
 			// キャノンの回転描画
 			_cannonBarrel.localRotation = BarrelRotation;
 			_cannonBase.localRotation = BaseRotation;
 			_cameraController.transform.rotation = BaseRotation;
+		}
+
+		public override void FixedUpdateNetwork()
+		{
+			base.FixedUpdateNetwork();
+			// 放物線の作成
+			CreateLine();
 		}
 
 		/// <summary>
@@ -214,11 +221,13 @@ namespace InGame.Exhibit
 				{
 					_linePositions[i] = hit.point;
 					LastPositionIndex = i;
+					HitNormal = hit.normal;
 					return;
 				}
 			}
 
 			LastPositionIndex = _linePositions.Length - 1;
+			HitNormal = Vector3.up;
 		}
 
 		private void PlayerActive(bool isActive)
