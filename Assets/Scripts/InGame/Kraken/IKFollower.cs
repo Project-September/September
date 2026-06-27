@@ -39,6 +39,17 @@ namespace September.InGame.Kraken
         [SerializeField, HideInInspector] private List<float> _maxDistanceList = new();
         [SerializeField, HideInInspector] private Quaternion[] _defaultRotations;
 
+        [Header("Debug Settings")]
+        [SerializeField] private bool _debugFabrikPoints;
+        [SerializeField] private bool _debugFabrikUpward;
+        [SerializeField] private bool _debugSweptPoints;
+        [SerializeField] private bool _debugSweptUpward;
+        [SerializeField] private bool _debugHittedSpline;
+        [SerializeField] private bool _debugHullPoints;
+        [SerializeField] private bool _debugNotCollided;
+        [SerializeField] private bool _debugConcat;
+        [SerializeField] private bool _debugCorrected;
+
         private void Start()
         {
             // ボーンの長さをキャッシュ
@@ -62,22 +73,40 @@ namespace September.InGame.Kraken
         {
             // 0. FABRIKで障害物がない時のボーン位置を計算
             IKSolver solver = _ik.GetIKSolver();
-            DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
-            DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
 
-            foreach (var p in solver.GetPoints())
+            if (_debugFabrikPoints)
             {
-                Debug.DrawRay(p.transform.position, p.transform.up, Color.green);
+                DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
+                DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
+            }
+
+            if (_debugFabrikUpward)
+            {
+                foreach (var p in solver.GetPoints())
+                {
+                    Debug.DrawRay(p.transform.position, p.transform.up, Color.green);
+                }
             }
 
             // 1. スイープ移動した位置を計算
             CalcSweptPosition(_followers, solver, _radius, out Point[] rawPoints, out bool[] rigidbodyHitFlags);
-            DebugDrawLine(rawPoints, Color.green);
+
+            if (_debugSweptPoints)
+                DebugDrawLine(rawPoints, Color.green);
+
+            if (_debugSweptUpward)
+            {
+                foreach (var p in rawPoints)
+                {
+                    Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.red);
+                }
+            }
 
             var splinePoints = rawPoints.Where((_, i) => i == 0 || i == rawPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
             Spline resultSpline = CreateSpline(splinePoints);
 
-            DebugDrawSpline(resultSpline, Color.blue);
+            if (_debugHittedSpline)
+                DebugDrawSpline(resultSpline, Color.blue);
 
             // 2. 衝突がなければそのままにする
             if (!rigidbodyHitFlags.Any(x => x))
@@ -98,12 +127,18 @@ namespace September.InGame.Kraken
             }
 
             var hullPoints = ConvexHull.BuildUpperHull(rawPoints.Take(hitCount).Select(x => x.Position).ToArray());
-            DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
-            DebugDrawLine(hullPoints, Color.magenta);
+
+            if (_debugHullPoints)
+            {
+                DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
+                DebugDrawLine(hullPoints, Color.magenta);
+            }
 
             // 4. 衝突のないセクションと結合する
             var notCollidedPoint = rawPoints.Skip(hitCount).ToArray();
-            DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
+
+            if (_debugNotCollided)
+                DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
 
             var resultPoints = hullPoints.Concat(rawPoints.Skip(hitCount).Select(x => x.Position)).ToArray();
 
@@ -111,7 +146,9 @@ namespace September.InGame.Kraken
             var hullSolvedPoints = GetPoints(hullSpline);
 
             UpdatePosition(hullSolvedPoints);
-            DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
+
+            if (_debugConcat)
+                DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
 
             // 5. 埋まりを修正する
             var correctedPoints = new Vector3[hullSolvedPoints.Length];
@@ -122,8 +159,11 @@ namespace September.InGame.Kraken
             var correctedSpline = CreateSpline(correctedPoints);
             var finalPoints = GetPoints(correctedSpline);
 
-            DebugDrawSpheres(finalPoints, _radius * .9f, Color.cyan);
-            DebugDrawLine(finalPoints, Color.cyan);
+            if (_debugCorrected)
+            {
+                DebugDrawSpheres(finalPoints, _radius * .9f, Color.cyan);
+                DebugDrawLine(finalPoints, Color.cyan);
+            }
         }
 
         private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver solver, float radius, out Point[] rawPoints,
