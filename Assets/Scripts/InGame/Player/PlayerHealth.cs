@@ -51,6 +51,7 @@ namespace InGame.Player
             {
                 // イベントの発火はStateAuthorityなのか？
                 OnHitTaken?.Invoke(hitData);
+                Debug.Log($"PlayerHealth: TakeHit - HitActionType: {hitData.HitActionType}, Amount: {hitData.Amount}, IsLastHit: {hitData.IsLastHit}");
                 if (!IsAlive) OnDeath?.Invoke(hitData);
                 hitData.Executor?.HitExecution(hitData);
                 
@@ -126,6 +127,7 @@ namespace InGame.Player
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             OnHitTaken = null;
+            Debug.Log("PlayerHealth: Despawned - OnHitTaken event handlers cleared");
             OnDeath = null;
             _cts.Cancel();
             _cts.Dispose();

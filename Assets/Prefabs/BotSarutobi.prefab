@@ -13651,6 +13651,7 @@ GameObject:
   - component: {fileID: -6185430689018103594}
   - component: {fileID: 5628340922608597896}
   - component: {fileID: 791899454190680927}
+  - component: {fileID: -6116986361749802095}
   m_Layer: 6
   m_Name: BotSarutobi
   m_TagString: Player
@@ -13745,6 +13746,7 @@ MonoBehaviour:
   - {fileID: 649019293918567276}
   - {fileID: -6185430689018103594}
   - {fileID: 791899454190680927}
+  - {fileID: -6116986361749802095}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -14490,6 +14492,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stateMachine: {fileID: 5628340922608597896}
+--- !u!114 &-6116986361749802095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf640fa3ae3d804c810471a975e0d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _damageTextAnim: {fileID: 6811309715659894738, guid: fd075fadeeff6b340ac5d58e478512dd, type: 3}
+  _ownPlayer: {fileID: 5358505061852357365}
+  _textOffsetY: 1.5
+  _randomOffsetRadius: 60
+  _textDestroyTime: 1.3
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0

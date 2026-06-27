@@ -5412,6 +5412,7 @@ GameObject:
   - component: {fileID: -7586087860081670000}
   - component: {fileID: 8187313864737420619}
   - component: {fileID: 5078540296886538316}
+  - component: {fileID: -7371569288617054287}
   m_Layer: 6
   m_Name: BotOKBPrefab
   m_TagString: Player
@@ -5502,6 +5503,7 @@ MonoBehaviour:
   - {fileID: -7886593714486123081}
   - {fileID: -7586087860081670000}
   - {fileID: 5078540296886538316}
+  - {fileID: -7371569288617054287}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -6039,6 +6041,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stateMachine: {fileID: 8187313864737420619}
+--- !u!114 &-7371569288617054287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf640fa3ae3d804c810471a975e0d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _damageTextAnim: {fileID: 6811309715659894738, guid: fd075fadeeff6b340ac5d58e478512dd, type: 3}
+  _ownPlayer: {fileID: 5358505061852357365}
+  _textOffsetY: 1.5
+  _randomOffsetRadius: 60
+  _textDestroyTime: 1.3
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

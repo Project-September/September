@@ -13650,6 +13650,7 @@ GameObject:
   - component: {fileID: 7277775284634146950}
   - component: {fileID: 3668101618786491776}
   - component: {fileID: 5415657216799147661}
+  - component: {fileID: 4602719662583423015}
   m_Layer: 6
   m_Name: Sarutobi
   m_TagString: Player
@@ -13744,6 +13745,7 @@ MonoBehaviour:
   - {fileID: 4461238842832938777}
   - {fileID: 649019293918567276}
   - {fileID: 5415657216799147661}
+  - {fileID: 4602719662583423015}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -14466,6 +14468,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d209bb15182b7642b72658a821ece7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4602719662583423015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf640fa3ae3d804c810471a975e0d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _damageTextAnim: {fileID: 6811309715659894738, guid: fd075fadeeff6b340ac5d58e478512dd, type: 3}
+  _ownPlayer: {fileID: 5358505061852357365}
+  _textOffsetY: 1.5
+  _randomOffsetRadius: 60
+  _textDestroyTime: 1.3
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0
