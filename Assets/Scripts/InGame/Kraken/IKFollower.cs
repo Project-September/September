@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RootMotion.FinalIK;
+using September.Common.Extensions;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -26,9 +27,33 @@ namespace September.InGame.Kraken
                 Rotation = rigidbody.rotation;
             }
 
+            public Point(IKSolver.Point point)
+            {
+                Position = point.solverPosition;
+                Rotation = point.solverRotation;
+            }
+
             public static Vector3[] ConvertToVector(IReadOnlyList<Point> points)
             {
                 return points.Select(x => x.Position).ToArray();
+            }
+
+            public static Quaternion GetInterpolatedRotation(Point p0, Point p1, Vector3 target)
+            {
+                Vector3 v0 = target - p0.Position;
+                Vector3 v1 = target - p1.Position;
+
+                float d0 = v0.magnitude;
+                float d1 = v1.magnitude;
+
+                // d0 = 0 => 0
+                // d1 = 0 => 1
+                // d0 = d1 => .5
+                float m = Mathf.Max(d0, d1);
+
+                float ratio = ((d0 - d1) / m + 1f) * 0.5f;
+
+                return Quaternion.Slerp(p0.Rotation, p1.Rotation, ratio);
             }
         }
 
@@ -66,6 +91,15 @@ namespace September.InGame.Kraken
             _defaultRotations = _followers.Select(x => x.rotation).ToArray();
         }
 
+        private void Validate()
+        {
+            Debug.Assert(_maxDistanceList.Count > 0, "Max distance list is empty");
+
+            Debug.Assert(_maxDistanceList.Skip(1).All(x => x > float.Epsilon), "Max distance element is too small");
+
+            Debug.Assert(_defaultRotations.Length > 0, "Default rotation array is empty");
+        }
+
         // Todo: 船に沿わせるための処理
         // Todo: スイープ後の回転を安定させる
         // Todo: スイープが貫通する問題を修正する
@@ -74,45 +108,54 @@ namespace September.InGame.Kraken
             // 0. FABRIKで障害物がない時のボーン位置を計算
             IKSolver solver = _ik.GetIKSolver();
 
+            List<IKSolver.Point> temp = solver.GetPoints().DistinctBy(x => x.transform).ToList();
+
+            IKSolver.Point[] points = temp.Where(x => temp.Count(y => y.transform == x.transform) == 1).ToArray();
+
+            Debug.Log(string.Join(",", points.Select(x => x.transform.name)), this);
+
             if (_debugFabrikPoints)
             {
-                DebugDrawSpheres(solver.GetPoints().Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
-                DebugDrawLine(solver.GetPoints().Select(x => x.solverPosition).ToArray(), Color.yellow);
+                DebugDrawSpheres(points.Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
+                DebugDrawLine(points.Select(x => x.solverPosition).ToArray(), Color.yellow);
             }
 
             if (_debugFabrikUpward)
             {
-                foreach (var p in solver.GetPoints())
+                foreach (var p in points)
                 {
-                    Debug.DrawRay(p.transform.position, p.transform.up, Color.green);
+                    Debug.DrawRay(p.transform.position, p.transform.up, Color.yellow);
                 }
             }
 
             // 1. スイープ移動した位置を計算
-            CalcSweptPosition(_followers, solver, _radius, out Point[] rawPoints, out bool[] rigidbodyHitFlags);
+            CalcSweptPosition(_followers, points, _radius, out Point[] sweptPoints, out bool[] rigidbodyHitFlags);
 
             if (_debugSweptPoints)
-                DebugDrawLine(rawPoints, Color.green);
+                DebugDrawLine(sweptPoints, Color.green);
 
             if (_debugSweptUpward)
             {
-                foreach (var p in rawPoints)
+                foreach (var p in sweptPoints)
                 {
                     Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.red);
                 }
             }
 
-            var splinePoints = rawPoints.Where((_, i) => i == 0 || i == rawPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
-            Spline resultSpline = CreateSpline(splinePoints);
-
-            if (_debugHittedSpline)
-                DebugDrawSpline(resultSpline, Color.blue);
-
-            // 2. 衝突がなければそのままにする
-            if (!rigidbodyHitFlags.Any(x => x))
+            // 衝突がなければそのままにする
+            // if (!rigidbodyHitFlags.Any(x => x))
             {
-                UpdatePosition(GetPoints(resultSpline));
+                UpdatePosition(sweptPoints);
                 return;
+            }
+
+            {
+                // 衝突を考慮したスプラインを作成（未使用）
+                var splinePoints = sweptPoints.Where((_, i) => i == 0 || i == sweptPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
+                Spline resultSpline = CreateSpline(splinePoints);
+
+                if (_debugHittedSpline)
+                    DebugDrawSpline(resultSpline, Color.blue);
             }
 
             // 3. 衝突のあるセクションを凸包に変換
@@ -126,7 +169,7 @@ namespace September.InGame.Kraken
                 }
             }
 
-            var hullPoints = ConvexHull.BuildUpperHull(rawPoints.Take(hitCount).Select(x => x.Position).ToArray());
+            var hullPoints = ConvexHull.BuildUpperHull(sweptPoints.Take(hitCount).Select(x => x.Position).ToArray());
 
             if (_debugHullPoints)
             {
@@ -135,12 +178,12 @@ namespace September.InGame.Kraken
             }
 
             // 4. 衝突のないセクションと結合する
-            var notCollidedPoint = rawPoints.Skip(hitCount).ToArray();
+            var notCollidedPoint = sweptPoints.Skip(hitCount).ToArray();
 
             if (_debugNotCollided)
                 DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
 
-            var resultPoints = hullPoints.Concat(rawPoints.Skip(hitCount).Select(x => x.Position)).ToArray();
+            var resultPoints = hullPoints.Concat(sweptPoints.Skip(hitCount).Select(x => x.Position)).ToArray();
 
             var hullSpline = CreateSpline(resultPoints);
             var hullSolvedPoints = GetPoints(hullSpline);
@@ -166,13 +209,11 @@ namespace September.InGame.Kraken
             }
         }
 
-        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver solver, float radius, out Point[] rawPoints,
+        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver.Point[] ikPoints, float radius, out Point[] sweptPoints,
             out bool[] rigidbodyHitFlags)
         {
-            var ikPoints = solver.GetPoints();
-
             rigidbodyHitFlags = new bool[followerBodies.Length];
-            rawPoints = new Point[ikPoints.Length];
+            sweptPoints = new Point[ikPoints.Length];
 
             for (int i = 0; i < ikPoints.Length; i++)
             {
@@ -187,49 +228,21 @@ namespace September.InGame.Kraken
 
                 if (nearestHitInfo.collider == null)
                 {
-                    rawPoints[i] = new Point(ikPoints[i].solverPosition, ikPoints[i].solverRotation);
+                    sweptPoints[i] = new Point(ikPoints[i].solverPosition, ikPoints[i].solverRotation);
                     continue;
                 }
 
                 rigidbodyHitFlags[i] = true;
 
-                if (Physics.ComputePenetration(
-                        nearestHitInfo.collider, nearestHitInfo.transform.position, nearestHitInfo.collider.transform.rotation,
-                        followerBodies[i].GetComponent<Collider>(), followerBodies[i].position, followerBodies[i].transform.rotation,
-                        out var dir, out var distance))
+                Vector3 pos = nearestHitInfo.point + nearestHitInfo.normal * radius;
+                if (i < ikPoints.Length - 1)
                 {
-                    rawPoints[i] = new Point(followerBodies[i].position + dir * (distance + .1f), followerBodies[i].rotation);
+                    sweptPoints[i] = new Point(pos, Point.GetInterpolatedRotation(new Point(ikPoints[i]), new Point(ikPoints[i + 1]), pos));
                 }
                 else
                 {
-                    Vector3 pos = nearestHitInfo.point + nearestHitInfo.normal * radius;
-                    if (i < followerBodies.Length - 1)
-                    {
-                        rawPoints[i] = new Point(pos, GetInterpolatedRotation(new Point(followerBodies[i]), new Point(followerBodies[i + 1]), pos));
-                    }
-                    else
-                    {
-                        rawPoints[i] = new Point(pos, followerBodies[i].rotation);
-                    }
+                    sweptPoints[i] = new Point(pos, ikPoints[i].solverRotation);
                 }
-            }
-
-            Quaternion GetInterpolatedRotation(Point p0, Point p1, Vector3 target)
-            {
-                Vector3 v0 = target - p0.Position;
-                Vector3 v1 = target - p1.Position;
-
-                float d0 = v0.magnitude;
-                float d1 = v1.magnitude;
-
-                // d0 = 0 => 0
-                // d1 = 0 => 1
-                // d0 = d1 => .5
-                float m = Mathf.Max(d0, d1);
-
-                float ratio = ((d0 - d1) / m + 1f) * 0.5f;
-
-                return Quaternion.Slerp(p0.Rotation, p1.Rotation, ratio);
             }
         }
 
@@ -318,7 +331,10 @@ namespace September.InGame.Kraken
                 if (_followers[i] == null) continue;
 
                 _followers[i].MovePosition(points[i].Position);
-                _followers[i].MoveRotation(points[i].Rotation * _defaultRotations[i]);
+                _followers[i].MoveRotation(points[i].Rotation);
+
+                DebugDrawUtility.DrawWireSphere(points[i].Position, _radius, Color.green);
+                Debug.DrawRay(points[i].Position, points[i].Rotation * Vector3.forward, Color.green);
             }
         }
 
