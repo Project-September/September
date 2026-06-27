@@ -71,6 +71,7 @@ namespace September.InGame.Kraken
         [SerializeField] private bool _debugSweptUpward;
         [SerializeField] private bool _debugHittedSpline;
         [SerializeField] private bool _debugHullPoints;
+        [SerializeField] private bool _debugHullUpward;
         [SerializeField] private bool _debugNotCollided;
         [SerializeField] private bool _debugConcat;
         [SerializeField] private bool _debugCorrected;
@@ -89,6 +90,8 @@ namespace September.InGame.Kraken
 
             // ボーンの回転をキャッシュ
             _defaultRotations = _followers.Select(x => x.rotation).ToArray();
+
+            Validate();
         }
 
         private void Validate()
@@ -143,7 +146,7 @@ namespace September.InGame.Kraken
             }
 
             // 衝突がなければそのままにする
-            // if (!rigidbodyHitFlags.Any(x => x))
+            if (!rigidbodyHitFlags.Any(x => x))
             {
                 UpdatePosition(sweptPoints);
                 return;
@@ -169,12 +172,22 @@ namespace September.InGame.Kraken
                 }
             }
 
-            var hullPoints = ConvexHull.BuildUpperHull(sweptPoints.Take(hitCount).Select(x => x.Position).ToArray());
+            int[] hullPointIndexes = ConvexHull.BuildUpperHull(sweptPoints.Take(hitCount).Select(x => x.Position).ToArray());
+
+            Point[] hullPoints = sweptPoints.Where((_, i) => hullPointIndexes.Contains(i)).ToArray();
 
             if (_debugHullPoints)
             {
                 DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
                 DebugDrawLine(hullPoints, Color.magenta);
+            }
+
+            if (_debugHullUpward)
+            {
+                foreach (Point p in hullPoints)
+                {
+                    Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.magenta);
+                }
             }
 
             // 4. 衝突のないセクションと結合する
@@ -183,7 +196,7 @@ namespace September.InGame.Kraken
             if (_debugNotCollided)
                 DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
 
-            var resultPoints = hullPoints.Concat(sweptPoints.Skip(hitCount).Select(x => x.Position)).ToArray();
+            var resultPoints = hullPoints.Concat(sweptPoints.Skip(hitCount)).ToArray();
 
             var hullSpline = CreateSpline(resultPoints);
             var hullSolvedPoints = GetPoints(hullSpline);
@@ -310,15 +323,21 @@ namespace September.InGame.Kraken
                 var t = targetLength / curveLength;
                 spline.Evaluate(t, out var position, out var tangent, out var upVector);
 
-                if (Vector3.SqrMagnitude(tangent) > 0f && Vector3.SqrMagnitude(upVector) > 0f)
+                // Splineのちょうど両端の法線は必ずゼロベクトルになるっぽい
+                if (Vector3.SqrMagnitude(tangent) == 0f)
                 {
-                    var rotation = Quaternion.LookRotation(tangent, upVector);
-                    results[i] = new Point(position, rotation);
+                    spline.Evaluate(t + .01f, out _, out tangent, out _);
+                    if (Vector3.SqrMagnitude(tangent) == 0f)
+                    {
+                        spline.Evaluate(t - .01f, out _, out tangent, out _);
+                    }
+
+                    Debug.Log($"{tangent} {upVector}");
                 }
-                else
-                {
-                    results[i] = new Point(position, Quaternion.identity);
-                }
+
+                // TODO: tangent情報が元の姿勢を表していないためアーティファクトが発生する。
+                var rotation = Quaternion.LookRotation(tangent, upVector) * Quaternion.LookRotation(Vector3.right);
+                results[i] = new Point(position, rotation);
             }
 
             return results;
@@ -332,9 +351,6 @@ namespace September.InGame.Kraken
 
                 _followers[i].MovePosition(points[i].Position);
                 _followers[i].MoveRotation(points[i].Rotation);
-
-                DebugDrawUtility.DrawWireSphere(points[i].Position, _radius, Color.green);
-                Debug.DrawRay(points[i].Position, points[i].Rotation * Vector3.forward, Color.green);
             }
         }
 
@@ -348,6 +364,8 @@ namespace September.InGame.Kraken
                 spline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
                 spline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
                 Debug.DrawLine(position, endPosition, color);
+                Debug.DrawRay(position, normal, Color.green);
+                Debug.DrawRay(position, tangent, Color.red * new Color(1f, 1f, 1f, .1f));
             }
         }
 
@@ -390,12 +408,12 @@ namespace September.InGame.Kraken
             public float u;
             public float y;
             public Vector3 position;
+            public int index;
         }
 
-        public static List<Vector3> BuildUpperHull(IReadOnlyList<Vector3> points)
+        public static int[] BuildUpperHull(IReadOnlyList<Vector3> points)
         {
-            if (points.Count <= 2)
-                return new List<Vector3>(points);
+            if (points.Count <= 2) return Enumerable.Range(0, points.Count).ToArray();
 
             Vector3 horizontal =
                 Vector3.ProjectOnPlane(
@@ -420,13 +438,15 @@ namespace September.InGame.Kraken
 
             List<HullPoint> projected = new();
 
-            foreach (var p in points)
+            for (int i = 0; i < points.Count; i++)
             {
+                Vector3 p = points[i];
                 projected.Add(new HullPoint
                 {
                     u = Vector3.Dot(p, horizontal),
                     y = p.y,
-                    position = p
+                    position = p,
+                    index = i
                 });
             }
 
@@ -454,12 +474,7 @@ namespace September.InGame.Kraken
                 upper.Add(p);
             }
 
-            List<Vector3> result = new(upper.Count);
-
-            foreach (var p in upper)
-                result.Add(p.position);
-
-            return result;
+            return upper.Select(h => h.index).ToArray();
         }
     }
 }
