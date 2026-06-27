@@ -51,7 +51,8 @@ namespace InGame.Exhibit
 
         private bool CheckInteractEnd()
         {
-            return _interactTimer > _interactTime || !_sharkInteractable.IsAlive;
+            // 海に落ちるまで、インタラクションを辞めない
+            return !_sharkInteractable.IsSharkInteracting;
         }
 
         private void GetOn(PlayerRef ownerPlayerRef)
