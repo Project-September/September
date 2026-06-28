@@ -10,7 +10,7 @@ namespace September.InGame.Kraken
 {
     public class IKFollower : MonoBehaviour
     {
-        private readonly struct Point
+        public readonly struct Point
         {
             public readonly Vector3 Position;
             public readonly Quaternion Rotation;
@@ -86,6 +86,11 @@ namespace September.InGame.Kraken
                 var p1 = _followers[i + 1].position;
 
                 _maxDistanceList.Add((p1 - p0).magnitude);
+
+                if (i != 0)
+                {
+                    _maxDistanceList[i] += _maxDistanceList[i - 1];
+                }
             }
 
             // ボーンの回転をキャッシュ
@@ -114,8 +119,6 @@ namespace September.InGame.Kraken
             List<IKSolver.Point> temp = solver.GetPoints().DistinctBy(x => x.transform).ToList();
 
             IKSolver.Point[] points = temp.Where(x => temp.Count(y => y.transform == x.transform) == 1).ToArray();
-
-            Debug.Log(string.Join(",", points.Select(x => x.transform.name)), this);
 
             if (_debugFabrikPoints)
             {
@@ -155,10 +158,10 @@ namespace September.InGame.Kraken
             {
                 // 衝突を考慮したスプラインを作成（未使用）
                 var splinePoints = sweptPoints.Where((_, i) => i == 0 || i == sweptPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
-                Spline resultSpline = CreateSpline(splinePoints);
+                IPointInterpolator resultSpline = new SplinePointInterpolator(splinePoints);
 
                 if (_debugHittedSpline)
-                    DebugDrawSpline(resultSpline, Color.blue);
+                    resultSpline.DebugDraw(Color.blue);
             }
 
             // 3. 衝突のあるセクションを凸包に変換
@@ -198,28 +201,28 @@ namespace September.InGame.Kraken
 
             var resultPoints = hullPoints.Concat(sweptPoints.Skip(hitCount)).ToArray();
 
-            var hullSpline = CreateSpline(resultPoints);
-            var hullSolvedPoints = GetPoints(hullSpline);
+            IPointInterpolator hullSpline = new SplinePointInterpolator(resultPoints);
+            Point[] hullSolvedPoints = hullSpline.Evaluate(_maxDistanceList);
 
             UpdatePosition(hullSolvedPoints);
 
-            if (_debugConcat)
-                DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
-
-            // 5. 埋まりを修正する
-            var correctedPoints = new Vector3[hullSolvedPoints.Length];
-            for (int i = 0; i < hullSolvedPoints.Length; i++)
-            {
-                correctedPoints[i] = CorrectTargetPosition(hullSolvedPoints[i].Position, _followers[i], _followers, _radius);
-            }
-            var correctedSpline = CreateSpline(correctedPoints);
-            var finalPoints = GetPoints(correctedSpline);
-
-            if (_debugCorrected)
-            {
-                DebugDrawSpheres(finalPoints, _radius * .9f, Color.cyan);
-                DebugDrawLine(finalPoints, Color.cyan);
-            }
+            // if (_debugConcat)
+            //     DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
+            //
+            // // 5. 埋まりを修正する
+            // var correctedPoints = new Vector3[hullSolvedPoints.Length];
+            // for (int i = 0; i < hullSolvedPoints.Length; i++)
+            // {
+            //     correctedPoints[i] = CorrectTargetPosition(hullSolvedPoints[i].Position, _followers[i], _followers, _radius);
+            // }
+            // var correctedSpline = CreateSpline(correctedPoints);
+            // var finalPoints = GetPoints(correctedSpline);
+            //
+            // if (_debugCorrected)
+            // {
+            //     DebugDrawSpheres(finalPoints, _radius * .9f, Color.cyan);
+            //     DebugDrawLine(finalPoints, Color.cyan);
+            // }
         }
 
         private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver.Point[] ikPoints, float radius, out Point[] sweptPoints,
@@ -284,65 +287,6 @@ namespace September.InGame.Kraken
 
         #region Common
 
-        private static Spline CreateSpline(IReadOnlyList<Vector3> points)
-        {
-            var spline = new Spline();
-            foreach (var point in points)
-            {
-                spline.Add(point, TangentMode.Broken);
-            }
-            return spline;
-        }
-
-        private static Spline CreateSpline(IReadOnlyList<Point> points)
-        {
-            var spline = new Spline();
-            foreach (var point in points)
-            {
-                spline.Add(new BezierKnot(point.Position, float3.zero, float3.zero, point.Rotation));
-            }
-            return spline;
-        }
-
-        private Point[] GetPoints(Spline spline)
-        {
-            var results = new Point[_followers.Length];
-
-            var distancePrefixSum = new List<float>();
-            for (int i = 0; i < _maxDistanceList.Count; i++)
-            {
-                distancePrefixSum.Add(_maxDistanceList.Take(i + 1).Sum());
-            }
-
-            for (int i = 0; i < _followers.Length; i++)
-            {
-                if (_followers[i] == null) continue;
-
-                var curveLength = spline.GetLength();
-                var targetLength = distancePrefixSum[i];
-                var t = targetLength / curveLength;
-                spline.Evaluate(t, out var position, out var tangent, out var upVector);
-
-                // Splineのちょうど両端の法線は必ずゼロベクトルになるっぽい
-                if (Vector3.SqrMagnitude(tangent) == 0f)
-                {
-                    spline.Evaluate(t + .01f, out _, out tangent, out _);
-                    if (Vector3.SqrMagnitude(tangent) == 0f)
-                    {
-                        spline.Evaluate(t - .01f, out _, out tangent, out _);
-                    }
-
-                    Debug.Log($"{tangent} {upVector}");
-                }
-
-                // TODO: tangent情報が元の姿勢を表していないためアーティファクトが発生する。
-                var rotation = Quaternion.LookRotation(tangent, upVector) * Quaternion.LookRotation(Vector3.right);
-                results[i] = new Point(position, rotation);
-            }
-
-            return results;
-        }
-
         private void UpdatePosition(Point[] points)
         {
             for (int i = 0; i < _followers.Length; i++)
@@ -357,18 +301,6 @@ namespace September.InGame.Kraken
         #endregion
 
         #region Debug
-        private static void DebugDrawSpline(Spline spline, Color color)
-        {
-            for (int i = 0; i <= 50; i++)
-            {
-                spline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
-                spline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
-                Debug.DrawLine(position, endPosition, color);
-                Debug.DrawRay(position, normal, Color.green);
-                Debug.DrawRay(position, tangent, Color.red * new Color(1f, 1f, 1f, .1f));
-            }
-        }
-
         private void DebugDrawLine(IReadOnlyList<Vector3> points, Color color)
         {
             for (int i = 0; i < points.Count - 1; i++)
@@ -475,6 +407,71 @@ namespace September.InGame.Kraken
             }
 
             return upper.Select(h => h.index).ToArray();
+        }
+    }
+
+    public interface IPointInterpolator
+    {
+        public IKFollower.Point Evaluate(float distance);
+        public IKFollower.Point[] Evaluate(IReadOnlyList<float> distances);
+        public void DebugDraw(Color color);
+    }
+
+    public class SplinePointInterpolator : IPointInterpolator
+    {
+        private readonly Spline _spline;
+
+        public SplinePointInterpolator(IKFollower.Point[] points)
+        {
+            _spline = CreateSpline(points);
+        }
+
+        private static Spline CreateSpline(IReadOnlyList<IKFollower.Point> points)
+        {
+            var spline = new Spline();
+            foreach (var point in points)
+            {
+                spline.Add(new BezierKnot(point.Position, float3.zero, float3.zero, point.Rotation));
+            }
+            return spline;
+        }
+
+        public IKFollower.Point[] Evaluate(IReadOnlyList<float> distances)
+        {
+            return distances.Select(Evaluate).ToArray();
+        }
+
+        public IKFollower.Point Evaluate(float distance)
+        {
+            float curveLength = _spline.GetLength();
+            float t = distance / curveLength;
+            _spline.Evaluate(t, out var position, out var tangent, out var upVector);
+
+            // Splineのちょうど両端の法線は必ずゼロベクトルになるっぽい
+            if (Vector3.SqrMagnitude(tangent) == 0f)
+            {
+                _spline.Evaluate(t + .01f, out _, out tangent, out _);
+                if (Vector3.SqrMagnitude(tangent) == 0f)
+                {
+                    _spline.Evaluate(t - .01f, out _, out tangent, out _);
+                }
+            }
+
+            // TODO: tangent情報が元の姿勢を表していないためアーティファクトが発生する。
+            var rotation = Quaternion.LookRotation(tangent, upVector) * Quaternion.LookRotation(Vector3.right);
+            return new IKFollower.Point(position, rotation);
+        }
+
+        public void DebugDraw(Color color)
+        {
+            for (int i = 0; i <= 50; i++)
+            {
+                _spline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
+                _spline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
+                Debug.DrawLine(position, endPosition, color);
+                Debug.DrawRay(position, normal, Color.green);
+                Debug.DrawRay(position, tangent, Color.red * new Color(1f, 1f, 1f, .1f));
+            }
         }
     }
 }
