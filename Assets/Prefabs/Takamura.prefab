@@ -5798,21 +5798,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerInputManager: {fileID: 4943096902174970823}
   _abilities:
-  - rid: 2879281568291487894
+  - rid: 1705309116627681364
   - rid: 8000700287031967830
   _conditions:
-  - rid: 2879281568291487895
+  - rid: 1705309116627681365
   - rid: 8000700287031967829
   references:
     version: 2
     RefIds:
-    - rid: 2879281568291487894
-      type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
+    - rid: 1705309116627681364
+      type: {class: AbilityCameraAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
         _cooldown: 0
         _phase: 0
-        _attackDamage: 35
-        _ogreAttackDamage: 55
+        _attackDamage: 20
+        _ogreAttackDamage: 35
         _startHitCheckFrame: 9
         _endHitCheckFrame: 17
         _endAttackFrame: 22
@@ -5833,8 +5833,9 @@ MonoBehaviour:
         _debugDrawDuration: 1
         _buildGenerator: {fileID: 4801122016894673731}
         _playerStatus: {fileID: -3905644752378878134}
-    - rid: 2879281568291487895
-      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
+        _knockbackPower: 300
+    - rid: 1705309116627681365
+      type: {class: AbilityCameraCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 
     - rid: 8000700287031967829
       type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
