@@ -173,11 +173,16 @@ MonoBehaviour:
           rid: 4418194648007966878
         _addAbilityCondition:
           rid: 4418194648007966879
+        _overrideDisabledAbilitys:
+        - {fileID: 11500000, guid: a1f8987ec72cdb04dba0e51ef4f9ebfb, type: 3}
+        - {fileID: 11500000, guid: 35109763571fc7e4e85b28c96e094fa2, type: 3}
+        _duration: 5
     - rid: 4418194648007966878
       type: {class: AbilityMultiHitAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _attackDamage: 10
         _ogreAttackDamage: 15
         _startHitCheckFrame: 17
@@ -208,7 +213,7 @@ MonoBehaviour:
     - rid: 4418194648007966879
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _targetAbilityName: AbilityNormalAttack
+        _targetAbilityName: AbilityMultiHitAttack
 --- !u!114 &5346824491244401101
 MonoBehaviour:
   m_ObjectHideFlags: 0

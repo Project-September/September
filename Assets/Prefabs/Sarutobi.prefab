@@ -10650,6 +10650,37 @@ Transform:
   - {fileID: 6423076655238101188}
   m_Father: {fileID: 4714224371057430281}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6672869952209400471
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9042805881768964208}
+  m_Layer: 0
+  m_Name: RightHand
+  m_TagString: RightHand
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9042805881768964208
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6672869952209400471}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1661348190536254133}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6717327794057653767
 GameObject:
   m_ObjectHideFlags: 0
@@ -10941,6 +10972,7 @@ Transform:
   - {fileID: 8263847269055346790}
   - {fileID: 3049049661101644793}
   - {fileID: 8639972687659849686}
+  - {fileID: 9042805881768964208}
   m_Father: {fileID: 7757830407370218699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6980201142059266708
@@ -13808,6 +13840,7 @@ MonoBehaviour:
   _meshObj: {fileID: 1292013223828287825}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _attackWeapon: {fileID: 8983706877233368428}
   _buildGenerator: {fileID: 9161826860572704744}
   _playerStatus: {fileID: -3905644752378878134}
   _IsStun:
@@ -13865,6 +13898,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _hookPower: 10
+  _flyingDamping: 8
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
@@ -13872,9 +13907,11 @@ MonoBehaviour:
   _playerStatus: {fileID: -3905644752378878134}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
+  _MoveDirection: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
+  _IsHookLocked: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14139,6 +14176,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _attackDamage: 10
         _ogreAttackDamage: 13
         _startHitCheckFrame: 3
@@ -14174,6 +14212,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _duration: 10
         _addProjectileCount: 2
     - rid: 8000700352795770966

@@ -10941,6 +10941,7 @@ Transform:
   - {fileID: 8263847269055346790}
   - {fileID: 3049049661101644793}
   - {fileID: 8639972687659849686}
+  - {fileID: 6960110181958855566}
   m_Father: {fileID: 7757830407370218699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6980201142059266708
@@ -13190,6 +13191,37 @@ Transform:
   - {fileID: 1606753785635340041}
   m_Father: {fileID: 6895717978626512480}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8223018290465189427
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6960110181958855566}
+  m_Layer: 0
+  m_Name: RightHand
+  m_TagString: RightHand
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6960110181958855566
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8223018290465189427}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1661348190536254133}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8234278500935788927
 GameObject:
   m_ObjectHideFlags: 0
@@ -13845,6 +13877,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _hookPower: 10
+  _flyingDamping: 8
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
@@ -13852,9 +13886,11 @@ MonoBehaviour:
   _playerStatus: {fileID: -3905644752378878134}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
+  _MoveDirection: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
+  _IsHookLocked: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14109,7 +14145,7 @@ MonoBehaviour:
   - rid: 1755462043767144544
   - rid: 8000700352795770965
   _conditions:
-  - rid: 1755462127588212827
+  - rid: 4418194648007966847
   - rid: 8000700352795770966
   references:
     version: 2
@@ -14119,6 +14155,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _attackDamage: 10
         _ogreAttackDamage: 13
         _startHitCheckFrame: 3
@@ -14146,14 +14183,16 @@ MonoBehaviour:
           End: 12
         - Start: 18
           End: 20
-    - rid: 1755462127588212827
-      type: {class: SarutobiAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
-      data: 
+    - rid: 4418194648007966847
+      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _targetAbilityName: AbilityNormalAttack
     - rid: 8000700352795770965
       type: {class: AbilitySarutobiUlt, ns: InGame.Player.Ability.Effect, asm: Scripts}
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _duration: 10
         _addProjectileCount: 2
     - rid: 8000700352795770966
@@ -14453,6 +14492,7 @@ MonoBehaviour:
   _meshObj: {fileID: 8360875997416129576}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _attackWeapon: {fileID: 8983706877233368428}
   _buildGenerator: {fileID: 6133156092747190984}
   _playerStatus: {fileID: -3905644752378878134}
   _IsStun:

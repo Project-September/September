@@ -16,8 +16,10 @@ namespace InGame.Exhibit
         [SerializeReference, SubclassSelector] private IAbilityExecuteCondition _addAbilityCondition;
         [SerializeField] private MonoScript[] _overrideDisabledAbilitys;
         [SerializeField] private float _duration;
+        [SerializeField] private GameObject _attackWeapon;
 
         private PlayerAbilityManager _playerAbility;
+        private PlayerManager _playerManager;
         public override CharacterInteractEffectBase Clone()
         {
             return new ArmoryInteractEffect()
@@ -38,7 +40,7 @@ namespace InGame.Exhibit
                 return;
             }
 
-            if (!playerObject.TryGetComponent(out _playerAbility))
+            if (!playerObject.TryGetComponent(out _playerAbility) || !playerObject.TryGetComponent(out _playerManager))
             {
                 return;
             }
@@ -51,6 +53,8 @@ namespace InGame.Exhibit
             _playerAbility.SetAbilityEnabled(false, _overrideDisabledAbilitys.Select(x => x.name).ToArray());
             _playerAbility.AddAbility(_addAbility,_addAbilityCondition);
 
+            _playerManager.RPC_SetWeaponVisible(false);
+
             Debug.Log(player + "start");
 
             ReleaseWeapon();
@@ -62,6 +66,7 @@ namespace InGame.Exhibit
             _playerAbility.SetAbilityEnabled(true, _overrideDisabledAbilitys.Select(x => x.name).ToArray());
             _playerAbility.RemoveAbility(_addAbility.GetType().Name);
 
+            _playerManager.RPC_SetWeaponVisible(true);
             Debug.Log("end");
         }
     }

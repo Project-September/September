@@ -4,7 +4,7 @@ using Fusion;
 using September.Common;
 using UnityEngine;
 
-namespace  InGame.Player.Ability
+namespace InGame.Player.Ability
 {
     /// <summary>
     /// アビリティに渡されるパラメータ
@@ -46,6 +46,8 @@ namespace  InGame.Player.Ability
         [SerializeField] protected float _cooldown;
         /// <summary>現在のアビリティフェーズ</summary>
         [SerializeField] protected AbilityPhase _phase = AbilityPhase.Available;
+        /// <summary> アビリティの有効、無効 </summary>
+        [HideInInspector] public bool IsEnabled = true;
         /// <summary>NetworkRunnerのインスタンス（シミュレーション時刻取得用）</summary>
         protected NetworkRunner Runner => NetworkRunner.Instances.FirstOrDefault();
 
@@ -57,10 +59,10 @@ namespace  InGame.Player.Ability
         protected float CooldownEndTime { get; private set; }
         /// <summary>現在のアビリティフェーズ（読み取り専用）</summary>
         public AbilityPhase Phase => _phase;
-        
+
         //inputを保持するために追加
         protected PlayerInput _playerInput;
-        
+
         /// <summary>アビリティ開始時のティック</summary>
         public int StartTick { get; private set; }
         /// <summary>アビリティ開始時の時間</summary>
@@ -98,7 +100,7 @@ namespace  InGame.Player.Ability
         {
             _phase = AbilityPhase.Ending;
         }
-        
+
         /// <summary>
         /// プレイヤーの入力を設定する
         /// </summary>
@@ -137,7 +139,7 @@ namespace  InGame.Player.Ability
                     break;
             }
         }
-        
+
         /// <summary>
         /// クールダウン時刻を計算してセットする
         /// </summary>
@@ -146,7 +148,7 @@ namespace  InGame.Player.Ability
             // NetworkRunnerがあればシミュレーション時刻、なければローカル時刻を使用
             CooldownEndTime = Runner ? Runner.SimulationTime + _cooldown : Time.time + _cooldown;
         }
-        
+
         /// <summary>
         /// クールダウン中の処理
         /// クールダウン終了時刻を超えたらAvailableフェーズに遷移

@@ -18,6 +18,7 @@ namespace InGame.Player
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
         [SerializeField] private Vector3 _respawnPosition;
+        [SerializeField] private GameObject _attackWeapon;
         [Header("ビルドシステム関連の参照")]
         [SerializeField] BuildGenerator _buildGenerator;
         [SerializeField] PlayerStatus _playerStatus;
@@ -199,6 +200,14 @@ namespace InGame.Player
             {
                 _playerMovement.Stop();
             }
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetWeaponVisible(bool visible)
+        {
+            if (_attackWeapon == null) return;
+
+            _attackWeapon.SetActive(visible);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
