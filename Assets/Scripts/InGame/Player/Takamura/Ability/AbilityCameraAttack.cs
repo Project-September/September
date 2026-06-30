@@ -27,8 +27,8 @@ namespace InGame.Player.Ability
             damageable.TakeHit(ref hitData);
             _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
 
-            var rb = hitInfo.GetComponentInParent<Rigidbody>();
-            if (rb != null)
+            var playerMovement = hitInfo.GetComponentInParent<PlayerMovement>();
+            if (playerMovement != null)
             {
                 // 自分を始点、相手を終点としたときベクトル
                 var knockbackVector = (hitInfo.transform.position - Parameter.Owner.transform.position);
@@ -38,9 +38,11 @@ namespace InGame.Player.Ability
                 knockbackVector = knockbackVector.normalized;
                 // 度数法を弧度法に直してtanを用いて上方向の力を加える
                 knockbackVector.y = Mathf.Tan(Mathf.Deg2Rad * _upDegree);
+                //もう一度正規化
+                knockbackVector = knockbackVector.normalized;
 
                 // ノックバックの力を相手にかける
-                rb.AddForce(knockbackVector * _knockbackPower, ForceMode.Impulse);
+                playerMovement.AddFlyingVelocity(knockbackVector * _knockbackPower);
 
 #if UNITY_EDITOR
                 Debug.Log("<color=green>Takamura</color> : Attack!");

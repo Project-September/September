@@ -5833,7 +5833,8 @@ MonoBehaviour:
         _debugDrawDuration: 1
         _buildGenerator: {fileID: 4801122016894673731}
         _playerStatus: {fileID: -3905644752378878134}
-        _knockbackPower: 300
+        _upDegree: 30
+        _knockbackPower: 10
     - rid: 1705309116627681365
       type: {class: AbilityCameraCondition, ns: InGame.Player.Ability, asm: Scripts}
       data: 

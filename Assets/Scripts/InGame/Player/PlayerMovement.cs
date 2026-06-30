@@ -276,7 +276,7 @@ namespace InGame.Player
         {
             // ========== ビルドシステム ==========
             // ビルドの上昇分を乗算
-            return (IsOgreState() ? _ogreMoveSpeed : _moveSpeed) * (_moveBuildEnabled ? _playerStatus.Speed : 1);
+            return (IsOgreState() ? _ogreMoveSpeed : _moveSpeed) * GetMoveMagnification();
         }
 
         /// <summary>
@@ -286,7 +286,20 @@ namespace InGame.Player
         {
             // ========== ビルドシステム ==========
             // ビルドの上昇分を乗算
-            return (IsOgreState() ? _ogreDashSpeed : _dashSpeed) * (_moveBuildEnabled ? _playerStatus.Speed : 1);
+            return (IsOgreState() ? _ogreDashSpeed : _dashSpeed) * GetMoveMagnification();
+        }
+
+        /// <summary>
+        /// 移動速度倍率を計算するメソッド
+        /// </summary>
+        /// <returns>諸々を計算した最終的な移動速度倍率</returns>
+        protected virtual float GetMoveMagnification()
+        {
+            var result = 1f;    // 計算結果
+
+            result *= _moveBuildEnabled ? _playerStatus.Speed : 1;   // 現在のステータスによる倍率
+
+            return result;
         }
 
         void AdsorptionOnGround()
@@ -311,11 +324,6 @@ namespace InGame.Player
             {
                 _rb.linearVelocity = _moveVelocity + _flyingVelocity;
                 NetworkVelocity = _moveVelocity + _flyingVelocity;
-            }
-            else
-            {
-                _rb.linearVelocity += _flyingVelocity;
-                NetworkVelocity += _flyingVelocity;
             }
 
             // 減衰
