@@ -307,6 +307,13 @@ namespace InGame.Player.Ability
                 return null;
             }
         }
+
+        public void SetPlayerComponent(GameObject player)
+        {
+            _animationClipPlayer = player.GetComponentInChildren<AnimationClipPlayer>();
+            _buildGenerator = player.GetComponentInChildren<BuildGenerator>();
+            _playerStatus = player.GetComponentInChildren<PlayerStatus>();
+        }
     }
 }
 
