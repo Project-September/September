@@ -10,7 +10,8 @@ namespace  InGame.Player.Ability
     [Serializable]
     public class AbilityNormalAttackExecuteCondition : IAbilityExecuteCondition
     {
-        public string TargetAbilityName => nameof(AbilityNormalAttack);
+        [SerializeField ] private string _targetAbilityName = nameof(AbilityNormalAttack);
+        public string TargetAbilityName => _targetAbilityName;
         private PlayerMovement _playerMovement;
         private PlayerManager _playerManager;
 

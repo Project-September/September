@@ -32,7 +32,9 @@ namespace Result
         [DisplayName("ムラマサ")]
         Muramasa,
         [DisplayName("マスト")]
-        Mast
+        Mast,
+        [DisplayName("武器庫")]
+        Armory
     }
 
     [Serializable]
@@ -42,7 +44,7 @@ namespace Result
         public int Points;
         public int DestroyPoints;
     }
-    
+
     [AttributeUsage(AttributeTargets.Field)]
     public class DisplayNameAttribute : Attribute
     {
