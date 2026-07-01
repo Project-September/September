@@ -80,17 +80,16 @@ namespace September.InGame.Kraken
         {
             // ボーンの長さをキャッシュ
             _maxDistanceList.Add(0);
-            for (int i = 0; i < _followers.Length - 1; i++)
+            for (int i = 1; i < _followers.Length; i++)
             {
-                var p0 = _followers[i].position;
-                var p1 = _followers[i + 1].position;
+                var p0 = _followers[i - 1].position;
+                var p1 = _followers[i].position;
 
                 _maxDistanceList.Add((p1 - p0).magnitude);
 
-                if (i != 0)
-                {
-                    _maxDistanceList[i] += _maxDistanceList[i - 1];
-                }
+                _maxDistanceList[i] += _maxDistanceList[i - 1];
+
+                Debug.Log($"p0:{p0} p1:{p1} distance:{(p1 - p0).magnitude} sum:{_maxDistanceList[i]}");
             }
 
             // ボーンの回転をキャッシュ
@@ -102,9 +101,8 @@ namespace September.InGame.Kraken
         private void Validate()
         {
             Debug.Assert(_maxDistanceList.Count > 0, "Max distance list is empty");
-
             Debug.Assert(_maxDistanceList.Skip(1).All(x => x > float.Epsilon), "Max distance element is too small");
-
+            Debug.Assert(_maxDistanceList.SequenceEqual(_maxDistanceList.OrderBy(x => x)), $"Max distance is not ordered\n{string.Join(",\n", _maxDistanceList)}");
             Debug.Assert(_defaultRotations.Length > 0, "Default rotation array is empty");
         }
 
