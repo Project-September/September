@@ -118,8 +118,8 @@ namespace September.InGame.Kraken
 
             if (_debugFabrikPoints)
             {
-                DebugDrawSpheres(points.Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
-                DebugDrawLine(points.Select(x => x.solverPosition).ToArray(), Color.yellow);
+                IKFollowerDebug.DebugDrawSpheres(points.Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
+                IKFollowerDebug.DebugDrawLine(points.Select(x => x.solverPosition).ToArray(), Color.yellow);
             }
 
             if (_debugFabrikUpward)
@@ -134,7 +134,7 @@ namespace September.InGame.Kraken
             CalcSweptPosition(_followers, points, _radius, out Point[] sweptPoints, out bool[] rigidbodyHitFlags);
 
             if (_debugSweptPoints)
-                DebugDrawLine(sweptPoints, Color.green);
+                IKFollowerDebug.DebugDrawLine(sweptPoints, Color.green);
 
             if (_debugSweptUpward)
             {
@@ -177,8 +177,8 @@ namespace September.InGame.Kraken
 
             if (_debugHullPoints)
             {
-                DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
-                DebugDrawLine(hullPoints, Color.magenta);
+                IKFollowerDebug.DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
+                IKFollowerDebug.DebugDrawLine(hullPoints, Color.magenta);
             }
 
             if (_debugHullUpward)
@@ -193,7 +193,7 @@ namespace September.InGame.Kraken
             var notCollidedPoint = sweptPoints.Skip(hitCount).ToArray();
 
             if (_debugNotCollided)
-                DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
+                IKFollowerDebug.DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
 
             var resultPoints = hullPoints.Concat(sweptPoints.Skip(hitCount)).ToArray();
 
@@ -281,8 +281,6 @@ namespace September.InGame.Kraken
             return originalPosition;
         }
 
-        #region Common
-
         private void UpdatePosition(Point[] points)
         {
             for (int i = 0; i < _followers.Length; i++)
@@ -293,37 +291,5 @@ namespace September.InGame.Kraken
                 _followers[i].MoveRotation(points[i].Rotation);
             }
         }
-
-        #endregion
-
-        #region Debug
-        private void DebugDrawLine(IReadOnlyList<Vector3> points, Color color)
-        {
-            for (int i = 0; i < points.Count - 1; i++)
-            {
-                Vector3 p0 = points[i];
-                Vector3 p1 = points[i + 1];
-                Debug.DrawLine(p0, p1, color);
-            }
-        }
-
-        private void DebugDrawLine(IReadOnlyList<Point> points, Color color)
-        {
-            DebugDrawLine(Point.ConvertToVector(points), color);
-        }
-
-        private void DebugDrawSpheres(IReadOnlyList<Vector3> points, float radius, Color color)
-        {
-            foreach (var p in points)
-            {
-                DebugDrawUtility.DrawWireSphere(p, radius, color);
-            }
-        }
-
-        private void DebugDrawSpheres(IReadOnlyList<Point> points, float radius, Color color)
-        {
-            DebugDrawSpheres(Point.ConvertToVector(points), radius, color);
-        }
-        #endregion
     }
 }
