@@ -5799,9 +5799,11 @@ MonoBehaviour:
   _playerInputManager: {fileID: 4943096902174970823}
   _abilities:
   - rid: 1705309116627681364
+  - rid: 7093537774386282579
   - rid: 8000700287031967830
   _conditions:
-  - rid: 1705309116627681365
+  - rid: 7093537774386282580
+  - rid: 7093537774386282581
   - rid: 8000700287031967829
   references:
     version: 2
@@ -5835,8 +5837,34 @@ MonoBehaviour:
         _playerStatus: {fileID: -3905644752378878134}
         _upDegree: 30
         _knockbackPower: 10
-    - rid: 1705309116627681365
-      type: {class: AbilityCameraCondition, ns: InGame.Player.Ability, asm: Scripts}
+    - rid: 7093537774386282579
+      type: {class: AbilityRevealAttack, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        _attackDamage: 30
+        _ogreAttackDamage: 40
+        _startHitCheckFrame: 17
+        _endHitCheckFrame: 21
+        _endAttackFrame: 22
+        _hitEffect: 18
+        _revealAttackAnimationClip: {fileID: 0}
+        _animationClipPlayer: {fileID: 0}
+        _currentExhibitType: 2
+        _attackParams: {fileID: 11400000, guid: 1aba3bd8f10d0324bb3b9693a8786de2, type: 2}
+        _hitLayer:
+          serializedVersion: 2
+          m_Bits: 64
+        _triggerInteraction: 1
+        _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
+        _debugDrawDuration: 1
+        _upDegree: 30
+        _knockbackPower: 10
+    - rid: 7093537774386282580
+      type: {class: AbilityCameraCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+      data: 
+    - rid: 7093537774386282581
+      type: {class: AbilityRevealAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
       data: 
     - rid: 8000700287031967829
       type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
