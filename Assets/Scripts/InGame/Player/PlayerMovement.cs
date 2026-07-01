@@ -325,6 +325,17 @@ namespace InGame.Player
                 _rb.linearVelocity = _moveVelocity + _flyingVelocity;
                 NetworkVelocity = _moveVelocity + _flyingVelocity;
             }
+            else
+            {
+                var linearVelocity = _flyingVelocity;
+                var networkVelocity = _flyingVelocity;
+
+                linearVelocity.y = _rb.linearVelocity.y;
+                networkVelocity.y = NetworkVelocity.y;
+
+                _rb.linearVelocity = linearVelocity;
+                NetworkVelocity = linearVelocity;
+            }
 
             // 減衰
             _flyingVelocity = Vector3.Lerp(_flyingVelocity, Vector3.zero, _flyingDamping * deltaTime);
