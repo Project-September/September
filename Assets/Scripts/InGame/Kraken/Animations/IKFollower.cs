@@ -109,7 +109,7 @@ namespace September.InGame.Kraken
         // Todo: スイープが貫通する問題を修正する
         private void Update()
         {
-            // 0. FABRIKで障害物がない時のボーン位置を計算
+            // FABRIKで障害物がない時のボーン位置を計算
             IKSolver solver = _ik.GetIKSolver();
 
             List<IKSolver.Point> temp = solver.GetPoints().DistinctBy(x => x.transform).ToList();
@@ -130,7 +130,7 @@ namespace September.InGame.Kraken
                 }
             }
 
-            // 1. スイープ移動した位置を計算
+            // スイープ移動した位置を計算
             CalcSweptPosition(_followers, points, _radius, out Point[] sweptPoints, out bool[] rigidbodyHitFlags);
 
             if (_debugSweptPoints)
@@ -160,7 +160,7 @@ namespace September.InGame.Kraken
                     resultSpline.DebugDraw(Color.blue);
             }
 
-            // 3. 衝突のあるセクションを凸包に変換
+            // 衝突のあるセクションを凸包に変換
             int hitCount = -1;
             for (int i = rigidbodyHitFlags.Length - 1; i >= 0; i--)
             {
@@ -200,11 +200,11 @@ namespace September.InGame.Kraken
             IPointInterpolator hullSpline = new SplinePointInterpolator(resultPoints);
             Point[] hullSolvedPoints = hullSpline.Evaluate(_maxDistanceList);
 
+            if (_debugConcat)
+                IKFollowerDebug.DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
+
             UpdatePosition(hullSolvedPoints);
 
-            // if (_debugConcat)
-            //     DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
-            //
             // // 5. 埋まりを修正する
             // var correctedPoints = new Vector3[hullSolvedPoints.Length];
             // for (int i = 0; i < hullSolvedPoints.Length; i++)
