@@ -1,7 +1,7 @@
 using September.Common;
 using September.InGame.Common;
 
-namespace InGame.Player.Ability
+namespace InGame.Player.Ability.Condition
 {
     public class AbilityCameraCondition : IAbilityExecuteCondition
     {

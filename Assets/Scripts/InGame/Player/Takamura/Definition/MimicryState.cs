@@ -6,7 +6,7 @@ namespace InGame.Player
     public enum MimicryState
     {
         [InspectorName("擬態していない")] Default = 0,
-        [InspectorName("展示物に擬態")] MimicDisplay = 1,
+        [InspectorName("展示物に擬態")] MimicExhibit = 1,
         [InspectorName("キャラクターに擬態")] MimicCharacter = 2,
     }
 }
