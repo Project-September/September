@@ -58,6 +58,7 @@ namespace September.InGame.Kraken
         [SerializeField] private IK _ik;
         [SerializeField] private Rigidbody[] _followers;
         [SerializeField] private float _radius = .55f;
+        [SerializeField] private LayerMask _layerMask;
 
         [SerializeField, HideInInspector] private List<float> _maxDistanceList = new();
         [SerializeField, HideInInspector] private Quaternion[] _defaultRotations;
@@ -131,7 +132,7 @@ namespace September.InGame.Kraken
             }
 
             // スイープ移動した位置を計算
-            CalcSweptPosition(_followers, points, _radius, out Point[] sweptPoints, out bool[] rigidbodyHitFlags);
+            CalcSweptPosition(_followers, points, _radius, _layerMask, out Point[] sweptPoints, out bool[] rigidbodyHitFlags);
 
             if (_debugSweptPoints)
                 IKFollowerDebug.DebugDrawLine(sweptPoints, Color.green);
@@ -221,7 +222,7 @@ namespace September.InGame.Kraken
             // }
         }
 
-        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver.Point[] ikPoints, float radius, out Point[] sweptPoints,
+        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver.Point[] ikPoints, float radius, LayerMask layerMask, out Point[] sweptPoints,
             out bool[] rigidbodyHitFlags)
         {
             rigidbodyHitFlags = new bool[followerBodies.Length];
@@ -235,6 +236,7 @@ namespace September.InGame.Kraken
                 var results = followerBodies[i].SweepTestAll(offset, offset.magnitude);
 
                 var nearestHitInfo = results
+                    .Where(x => (layerMask.value & (1 << x.transform.gameObject.layer)) != 0)
                     .OrderBy(x => (x.point - followerBodies[i].position).sqrMagnitude)
                     .FirstOrDefault(x => !followerBodies.Contains(x.rigidbody));
 
