@@ -446,41 +446,5 @@ namespace InGame.Player.Sarutobi
             Jumping,
             Landing
         }
-
-        [System.Serializable]
-        public struct MinMaxRange 
-        {
-            public MinMaxRange(float min, float max)
-            {
-                Min  = min;
-                Max = max;
-            }
-            
-            public float Min;
-            public float Max;
-
-#if UNITY_EDITOR
-            [CustomPropertyDrawer(typeof(MinMaxRange))]
-            public class MinMaxRangeDrawer : PropertyDrawer
-            {
-                public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-                {
-                    var minProp = property.FindPropertyRelative("Min");
-                    var maxProp = property.FindPropertyRelative("Max");
-                    
-                    EditorGUI.BeginProperty(position, label, property);
-                    
-                    position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-                    
-                    float[] values = { minProp.floatValue, maxProp.floatValue };
-                    EditorGUI.MultiFloatField(position, new[]{ new GUIContent("Min"), new GUIContent("Max")}, values);
-                    minProp.floatValue = values[0];
-                    maxProp.floatValue = values[1];
-                    
-                    EditorGUI.EndProperty();
-                }
-            }
-#endif
-        }
     }
 }
