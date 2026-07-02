@@ -3,9 +3,9 @@ using Fusion;
 using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
-using RootMotion.FinalIK;
 using September.Common;
 using September.Common.Input;
+using September.InGame.Kraken.Animations;
 using September.InGame.Mountable;
 using UnityEngine;
 
@@ -28,9 +28,7 @@ namespace September.InGame.Kraken
         [SerializeField] private int _damage;
 
         [Header("アニメーション設定")]
-        [SerializeField] private Animator _animator;
-        [SerializeField] private string _animationName;
-        [SerializeField] private FABRIKRoot _armIKRoot;
+        [SerializeField] private KrakenAttackAnimationHandler _tentacleAnimator;
 
         [Header("インタラクト設定")]
         [SerializeField] private InteractableBase _interactable;
@@ -200,21 +198,8 @@ namespace September.InGame.Kraken
 
         private async UniTask Attack(Vector3 targetPosition)
         {
-            IKSolver.UpdateDelegate del = () =>
-            {
-                var forward = -_armIKRoot.transform.right;
-                var dir = Vector3.ProjectOnPlane(targetPosition - _armIKRoot.transform.position, _armIKRoot.transform.up).normalized;
-                Debug.DrawRay(_armIKRoot.transform.position, dir * 100f, Color.red, 3f);
-
-                var rot = Quaternion.FromToRotation(forward, dir);
-                _armIKRoot.transform.rotation *= rot;
-                Debug.Log($"{targetPosition} {forward} {dir} {rot.eulerAngles}");
-            };
-
-            _armIKRoot.solver.OnPostUpdate += del;
-
             Debug.Log("Start Attack");
-            _animator.Play(_animationName, 0, 0f);
+            var task = _tentacleAnimator.Attack(targetPosition);
             await UniTask.WaitForSeconds(_hitStartTime);
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
@@ -222,7 +207,7 @@ namespace September.InGame.Kraken
 
             if (HasStateAuthority)
             {
-                await _animator.WaitUntilEndState(_animationName);
+                await task;
                 IsAttackTriggered = false;
             }
             else
@@ -232,8 +217,6 @@ namespace September.InGame.Kraken
 
             _isAttacking = false;
             Debug.Log("End Attack");
-
-            _armIKRoot.solver.OnPostUpdate -= del;
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
