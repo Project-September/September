@@ -314,8 +314,14 @@ namespace InGame.Player
             }
             else
             {
-                _rb.linearVelocity += _flyingVelocity;
-                NetworkVelocity += _flyingVelocity;
+                Vector3 linearVelocity = _flyingVelocity;
+                Vector3 networkVelocity = _flyingVelocity;
+
+                linearVelocity.y = _rb.linearVelocity.y;
+                networkVelocity.y = NetworkVelocity.y;
+
+                _rb.linearVelocity = linearVelocity;
+                NetworkVelocity = networkVelocity;
             }
 
             // 減衰

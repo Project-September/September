@@ -12,11 +12,11 @@ namespace InGame.Exhibit
 {
     public class ArmoryInteractEffect : CharacterInteractEffectBase
     {
+        [SerializeField] private ArmoryInteractRPCInvoker _invoker;
         [SerializeReference, SubclassSelector] private AbilityBase _addAbility;
         [SerializeReference, SubclassSelector] private IAbilityExecuteCondition _addAbilityCondition;
-        [SerializeField] private MonoScript[] _overrideDisabledAbilitys;
+        [SerializeField] private string[] _overrideDisabledAbilities;
         [SerializeField] private float _duration;
-        [SerializeField] private GameObject _attackWeapon;
 
         private PlayerAbilityManager _playerAbility;
         private PlayerManager _playerManager;
@@ -24,9 +24,10 @@ namespace InGame.Exhibit
         {
             return new ArmoryInteractEffect()
             {
+                _invoker = _invoker,
                 _addAbility = _addAbility,
                 _addAbilityCondition = _addAbilityCondition,
-                _overrideDisabledAbilitys = _overrideDisabledAbilitys,
+                _overrideDisabledAbilities = _overrideDisabledAbilities,
                 _duration = _duration
             };
         }
@@ -50,12 +51,12 @@ namespace InGame.Exhibit
                 normalAttack.SetPlayerComponent(playerObject.gameObject);
             }
 
-            _playerAbility.SetAbilityEnabled(false, _overrideDisabledAbilitys.Select(x => x.name).ToArray());
+            _playerAbility.SetAbilityEnabled(false, _overrideDisabledAbilities);
             _playerAbility.AddAbility(_addAbility,_addAbilityCondition);
 
             _playerManager.RPC_SetWeaponVisible(false);
 
-            Debug.Log(player + "start");
+            _invoker.RPC_AttachWeapon(playerObject);
 
             ReleaseWeapon();
         }
@@ -63,10 +64,11 @@ namespace InGame.Exhibit
         {
             await UniTask.WaitForSeconds(_duration);
 
-            _playerAbility.SetAbilityEnabled(true, _overrideDisabledAbilitys.Select(x => x.name).ToArray());
+            _playerAbility.SetAbilityEnabled(true, _overrideDisabledAbilities);
             _playerAbility.RemoveAbility(_addAbility.GetType().Name);
 
             _playerManager.RPC_SetWeaponVisible(true);
+            _invoker.RPC_DestroyWeapon();
             Debug.Log("end");
         }
     }

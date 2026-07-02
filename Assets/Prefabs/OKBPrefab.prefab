@@ -5088,7 +5088,7 @@ GameObject:
   - component: {fileID: 6533201052866988780}
   m_Layer: 0
   m_Name: RightHand
-  m_TagString: Untagged
+  m_TagString: RightHand
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5599,6 +5599,7 @@ MonoBehaviour:
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _attackWeapon: {fileID: 0}
   _buildGenerator: {fileID: 4801122016894673731}
   _playerStatus: {fileID: -3905644752378878134}
   _IsStun:
