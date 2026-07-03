@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 6268622650917794893}
   - component: {fileID: 5624172255545513684}
   - component: {fileID: 7332413252645484968}
+  - component: {fileID: -6263480614593985820}
   m_Layer: 0
   m_Name: Shark
   m_TagString: Untagged
@@ -373,6 +374,7 @@ MonoBehaviour:
   - {fileID: 1490673361395146691}
   - {fileID: 5624172255545513684}
   - {fileID: 7332413252645484968}
+  - {fileID: -6263480614593985820}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3466500518305658904
 MonoBehaviour:
@@ -545,6 +547,7 @@ MonoBehaviour:
   _interactable: {fileID: 1490673361395146691}
   IsEnding: 0
   _invincibleTime: 0.5
+  _movementProcessing: {fileID: -6263480614593985820}
   _walkSpeed: 6
   _dashSpeed: 15
   _rayDistance: 1.3
@@ -553,6 +556,24 @@ MonoBehaviour:
   _maxRotateValue: 250
   _cooldownTime: 3
   _IsSharkInteracting: 0
+--- !u!114 &-6263480614593985820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922303140376795393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa73aa156f946e446b58a4d0f6cba452, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _walkSpeed: 6
+  _dashSpeed: 15
+  _rayDistance: 1.3
+  _groundMaximumAngle: 90
+  _fallGravity: {x: 0, y: -200, z: 0}
+  _maxRotateValue: 250
 --- !u!1 &7717640968328691010
 GameObject:
   m_ObjectHideFlags: 0
