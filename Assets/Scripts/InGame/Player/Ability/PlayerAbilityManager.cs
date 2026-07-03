@@ -102,19 +102,20 @@ namespace InGame.Player.Ability
                 ability.Tick(Time.deltaTime);
             }
         }
+
         public void SetAbilityEnabled(bool enabled, params string[] types)
         {
             foreach (var type in types)
             {
                 if (!_abilityByName.TryGetValue(type, out var targetAbility))
                 {
-                    Debug.Log(type);
                     continue;
                 }
 
                 targetAbility.IsEnabled = enabled;
             }
         }
+
         public void AddAbility(AbilityBase abilityBase, IAbilityExecuteCondition condition)
         {
             string abilityName = abilityBase.GetType().Name;
@@ -135,13 +136,21 @@ namespace InGame.Player.Ability
             _conditions.Add(condition);
             _abilityByName[abilityName] = abilityBase;
         }
+
         public void RemoveAbility(string type)
         {
             if (!_abilityByName.TryGetValue(type, out var targetAbility))
                 return;
 
             _abilities.Remove(targetAbility);
-            _conditions.Remove(_conditions.Where(x => x.TargetAbilityName == type).FirstOrDefault());
+
+            var condition = _conditions.FirstOrDefault(x => x.TargetAbilityName == type);
+
+            if (condition != null)
+            {
+                _conditions.Remove(condition);
+            }
+
             _abilityByName.Remove(type);
         }
     }

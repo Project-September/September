@@ -8,14 +8,15 @@ namespace InGame.Exhibit
         [SerializeField] private GameObject _attackWeapon;
         [SerializeField] private Vector3 _handPosition;
         [SerializeField] private Vector3 _handRotation;
-
-        private GameObject _instantiateWeapon;
+        [Networked] public bool IsEquipped { get; private set; }
+        private GameObject _attachedWeapon;
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RPC_AttachWeapon(NetworkObject player)
         {
             AttachWeapon(player);
         }
+
         private void AttachWeapon(NetworkObject player)
         {
             if (_attackWeapon == null)
@@ -24,9 +25,47 @@ namespace InGame.Exhibit
                 return;
             }
 
+            // Player‚Ì‰EŽè‚ð’T‚·
+            Transform rightHand = FindRightHand(player);
+
+            if (rightHand == null || _attachedWeapon != null)
+                return;
+
+            _attachedWeapon = Instantiate(_attackWeapon, rightHand.transform);
+            _attachedWeapon.transform.localPosition = _handPosition;
+            _attachedWeapon.transform.localEulerAngles = _handRotation;
+
+            if (HasStateAuthority)
+            {
+                IsEquipped = true;
+            }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_DestroyWeapon()
+        {
+            DestroyWeapon();
+        }
+
+        private void DestroyWeapon()
+        {
+            if (_attachedWeapon == null)
+                return;
+
+            Destroy(_attachedWeapon);
+            _attachedWeapon = null;
+
+            if (HasStateAuthority)
+            {
+                IsEquipped = false;
+            }
+        }
+
+        private Transform FindRightHand(NetworkObject player)
+        {
             Transform rightHand = null;
             Transform[] allChildren = player.GetComponentsInChildren<Transform>(true);
-            // Player‚Ì“ª‚ÌˆÊ’u‚ð’T‚·
+
             foreach (Transform child in allChildren)
             {
                 if (child.CompareTag("RightHand"))
@@ -38,27 +77,11 @@ namespace InGame.Exhibit
 
             if (rightHand == null)
             {
-                Debug.LogError("AttackWeapon RightHand is null");
-                return;
+                Debug.LogError($"RightHand not found on {player.name}");
+                return null;
             }
 
-            _instantiateWeapon = Instantiate(_attackWeapon, rightHand.transform);
-            _instantiateWeapon.transform.localPosition = _handPosition;
-            _instantiateWeapon.transform.localEulerAngles = _handRotation;
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_DestroyWeapon()
-        {
-            DestroyWeapon();
-        }
-        private void DestroyWeapon()
-        {
-            if (_instantiateWeapon == null)
-                return;
-
-            Destroy(_instantiateWeapon);
-            _instantiateWeapon = null;
+            return rightHand;
         }
     }
 }
