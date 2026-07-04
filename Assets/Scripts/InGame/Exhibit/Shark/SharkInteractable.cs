@@ -22,9 +22,6 @@ public class SharkInteractable : MountableExhibitBase
     [Networked] private bool IsAttacking { get; set; }
     
     private InteractableBase _interactableBase;
-    
-    private PlayerInput _playerInput;
-    private float _deltaTime;
     private float _cooldownTimer; // 攻撃のクールダウンタイマー
     private float _attackAnimationFrame; // 攻撃アニメーションの現在のフレーム
         
@@ -58,21 +55,13 @@ public class SharkInteractable : MountableExhibitBase
 
     public override void FixedUpdateNetwork()
     {
-        // 移動処理関連
-        _movementProcessing.CheckGroundManual(Rigidbody);
-        var moveDirection = _movementProcessing.Move(_playerInput, Rigidbody);
-        moveDirection.y = 0;
-        _movementProcessing.Rotate(_deltaTime, moveDirection);
-        _movementProcessing.AdsorptionOnGround(_deltaTime, Rigidbody);
-        _movementProcessing.UpdatePositionBeforeWaterFall(transform.position);
+        if(!GetInput<PlayerInput>(out var playerInput)) return;
+        _movementProcessing.UpdateMovement(playerInput, Runner.DeltaTime, Rigidbody);
     }
 
     public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
     {
         base.OnInteractFixedUpdate(playerInput, deltaTime);
-            
-        _playerInput = playerInput;
-        _deltaTime = deltaTime;
             
         // ここから攻撃処理関連
         _cooldownTimer = Mathf.Min(_cooldownTime, _cooldownTimer + deltaTime);
