@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RootMotion.FinalIK;
-using September.Common.Extensions;
+using September.InGame.Kraken.Animations;
 using UnityEngine;
 
 namespace September.InGame.Kraken
@@ -17,18 +17,6 @@ namespace September.InGame.Kraken
             {
                 Position = position;
                 Rotation = rotation;
-            }
-
-            public Point(Rigidbody rigidbody)
-            {
-                Position = rigidbody.position;
-                Rotation = rigidbody.rotation;
-            }
-
-            public Point(IKSolver.Point point)
-            {
-                Position = point.solverPosition;
-                Rotation = point.solverRotation;
             }
 
             public static Vector3[] ConvertToVector(IReadOnlyList<Point> points)
@@ -111,9 +99,8 @@ namespace September.InGame.Kraken
         private void Update()
         {
             // FABRIKで障害物がない時のボーン位置を計算
-            IKSolver solver = _ik.GetIKSolver();
-
-            Point[] points = solver.GetPoints().DistinctBy(x => x.transform).Select(x => new Point(x)).ToArray();
+            IPointProvider provider = new IKSolverPointProvider(_ik.GetIKSolver());
+            Point[] points = provider.GetPoints();
 
             if (_debugFabrikPoints)
             {
