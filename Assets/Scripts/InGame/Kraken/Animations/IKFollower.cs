@@ -113,21 +113,19 @@ namespace September.InGame.Kraken
             // FABRIKで障害物がない時のボーン位置を計算
             IKSolver solver = _ik.GetIKSolver();
 
-            List<IKSolver.Point> temp = solver.GetPoints().DistinctBy(x => x.transform).ToList();
-
-            IKSolver.Point[] points = temp.Where(x => temp.Count(y => y.transform == x.transform) == 1).ToArray();
+            Point[] points = solver.GetPoints().DistinctBy(x => x.transform).Select(x => new Point(x)).ToArray();
 
             if (_debugFabrikPoints)
             {
-                IKFollowerDebug.DebugDrawSpheres(points.Select(x => x.solverPosition).ToArray(), _radius * .2f, Color.yellow);
-                IKFollowerDebug.DebugDrawLine(points.Select(x => x.solverPosition).ToArray(), Color.yellow);
+                IKFollowerDebug.DebugDrawSpheres(points, _radius * .2f, Color.yellow);
+                IKFollowerDebug.DebugDrawLine(points, Color.yellow);
             }
 
             if (_debugFabrikUpward)
             {
                 foreach (var p in points)
                 {
-                    Debug.DrawRay(p.transform.position, p.transform.up, Color.yellow);
+                    Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.yellow);
                 }
             }
 
@@ -222,7 +220,7 @@ namespace September.InGame.Kraken
             // }
         }
 
-        private static void CalcSweptPosition(Rigidbody[] followerBodies, IKSolver.Point[] ikPoints, float radius, LayerMask layerMask, out Point[] sweptPoints,
+        private static void CalcSweptPosition(Rigidbody[] followerBodies, Point[] ikPoints, float radius, LayerMask layerMask, out Point[] sweptPoints,
             out bool[] rigidbodyHitFlags)
         {
             rigidbodyHitFlags = new bool[followerBodies.Length];
@@ -232,7 +230,7 @@ namespace September.InGame.Kraken
             {
                 if (followerBodies.Length < i || followerBodies[i] == null) continue;
 
-                var offset = ikPoints[i].solverPosition - followerBodies[i].position;
+                var offset = ikPoints[i].Position - followerBodies[i].position;
                 var results = followerBodies[i].SweepTestAll(offset, offset.magnitude);
 
                 var nearestHitInfo = results
@@ -242,7 +240,7 @@ namespace September.InGame.Kraken
 
                 if (nearestHitInfo.collider == null)
                 {
-                    sweptPoints[i] = new Point(ikPoints[i].solverPosition, ikPoints[i].solverRotation);
+                    sweptPoints[i] = new Point(ikPoints[i].Position, ikPoints[i].Rotation);
                     continue;
                 }
 
@@ -251,11 +249,11 @@ namespace September.InGame.Kraken
                 Vector3 pos = nearestHitInfo.point + nearestHitInfo.normal * radius;
                 if (i < ikPoints.Length - 1)
                 {
-                    sweptPoints[i] = new Point(pos, Point.GetInterpolatedRotation(new Point(ikPoints[i]), new Point(ikPoints[i + 1]), pos));
+                    sweptPoints[i] = new Point(pos, Point.GetInterpolatedRotation(ikPoints[i], ikPoints[i + 1], pos));
                 }
                 else
                 {
-                    sweptPoints[i] = new Point(pos, ikPoints[i].solverRotation);
+                    sweptPoints[i] = new Point(pos, ikPoints[i].Rotation);
                 }
             }
         }
