@@ -1052,6 +1052,7 @@ GameObject:
   - component: {fileID: 8998011957403086214}
   - component: {fileID: 8239168205459342440}
   - component: {fileID: 6014455148580474590}
+  - component: {fileID: 4338213053746092552}
   m_Layer: 0
   m_Name: Kraken
   m_TagString: Untagged
@@ -1233,9 +1234,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tentacle:
     _animator: {fileID: 5402723530809029941}
-    _root: {fileID: 9134894440104543494}
+    _armRoot: {fileID: 6051664828323406195}
     _fabrikRoot: {fileID: 6944576786749344180}
     _animationName: KrakenAttack
+--- !u!114 &4338213053746092552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021459888500919411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c789b5d85b2a10c41aff247b06bc78bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _radius: 0.55
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _maxBendingAngle: 25
+  _maxRotationSpeed: 180
+  _pbdIterations: 5
+  _stayDuration: 2
+  _releaseDuration: 0.5
 --- !u!1 &1117892369982223670
 GameObject:
   m_ObjectHideFlags: 0
@@ -5431,10 +5453,11 @@ MonoBehaviour:
   _layerMask:
     serializedVersion: 2
     m_Bits: 4096
+  _constraintSolver: {fileID: 4338213053746092552}
   _maxDistanceList: []
   _defaultRotations: []
-  _debugFabrikPoints: 0
-  _debugFabrikUpward: 0
+  _debugFabrikPoints: 1
+  _debugFabrikUpward: 1
   _debugSweptPoints: 0
   _debugSweptUpward: 0
   _debugHittedSpline: 0

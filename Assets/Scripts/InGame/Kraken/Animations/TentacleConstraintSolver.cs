@@ -1,0 +1,396 @@
+using UnityEngine;
+
+namespace September.InGame.Kraken.Animations
+{
+    /// <summary>
+    /// Position-Based Dynamics (PBD) based collision solver for tentacles.
+    /// Satisfies non-penetration, distance, and bending/rotation constraints
+    /// to ensure natural-looking animations that snap to deck colliders.
+    /// Supports landed/staying state to keep the tentacle on the deck for a given duration.
+    /// </summary>
+    public class TentacleConstraintSolver : MonoBehaviour
+    {
+        [Header("Collision Settings")]
+        [SerializeField] private float _radius = 0.55f;
+        [SerializeField] private LayerMask _layerMask;
+
+        [Header("Constraint Settings")]
+        [SerializeField] private float _maxBendingAngle = 25f; // Max angle (degrees) between adjacent segments
+        [SerializeField] private float _maxRotationSpeed = 180f; // Max rotation change (degrees/second) for stability
+        [SerializeField] private int _pbdIterations = 5;
+
+        [Header("Slam-Down Stay Settings")]
+        [SerializeField] private float _stayDuration = 2.0f;     // How long to stay on the deck after landing
+        [SerializeField] private float _releaseDuration = 0.5f;  // Smoothly blend back to the animation after staying
+
+        // State Tracking
+        public enum SolverState
+        {
+            Airborne,
+            Landed,
+            Releasing
+        }
+
+        private SolverState _state = SolverState.Airborne;
+        private float _stateTimer = 0f;
+
+        private float[] _segmentLengths;
+        private IKFollower.Point[] _prevSolvedPoints;
+        
+        private Vector3[] _pinnedPositions;
+        private bool[] _isPinned;
+
+        // Properties for configuration
+        public float Radius { get => _radius; set => _radius = value; }
+        public LayerMask LayerMask { get => _layerMask; set => _layerMask = value; }
+        public float MaxBendingAngle { get => _maxBendingAngle; set => _maxBendingAngle = value; }
+        public float MaxRotationSpeed { get => _maxRotationSpeed; set => _maxRotationSpeed = value; }
+        public int PbdIterations { get => _pbdIterations; set => _pbdIterations = value; }
+        public float StayDuration { get => _stayDuration; set => _stayDuration = value; }
+        public float ReleaseDuration { get => _releaseDuration; set => _releaseDuration = value; }
+        public SolverState State => _state;
+        public float StateTimer => _stateTimer;
+
+        /// <summary>
+        /// Resets the solver's state (e.g. if the tentacle is re-spawned or reset).
+        /// </summary>
+        public void Reset()
+        {
+            _state = SolverState.Airborne;
+            _stateTimer = 0f;
+            _prevSolvedPoints = null;
+            _segmentLengths = null;
+            _pinnedPositions = null;
+            _isPinned = null;
+        }
+
+        /// <summary>
+        /// Solves constraints for the given input points.
+        /// </summary>
+        public IKFollower.Point[] Solve(IKFollower.Point[] inputPoints, float deltaTime)
+        {
+            if (inputPoints == null || inputPoints.Length == 0)
+                return inputPoints;
+
+            int count = inputPoints.Length;
+
+            // 1. Initialize segment lengths and cache buffers on first run or when bone count changes
+            InitializeBuffers(inputPoints);
+
+            // 2. Prepare predicted positions
+            Vector3[] solvedPositions = new Vector3[count];
+            Quaternion[] solvedRotations = new Quaternion[count];
+            for (int i = 0; i < count; i++)
+            {
+                solvedPositions[i] = inputPoints[i].Position;
+                solvedRotations[i] = inputPoints[i].Rotation;
+            }
+
+            // 3. Update stay timer and state machine
+            UpdateStateMachine(inputPoints, solvedPositions, deltaTime);
+
+            // 4. Run PBD Iterative Solver to satisfy constraints
+            for (int iter = 0; iter < _pbdIterations; iter++)
+            {
+                // A. Non-penetration Constraint (非侵入拘束)
+                for (int i = 0; i < count; i++)
+                {
+                    if (_isPinned[i] && _state == SolverState.Landed)
+                    {
+                        // Pin directly to the landed spot
+                        solvedPositions[i] = _pinnedPositions[i];
+                    }
+                    else if (_isPinned[i] && _state == SolverState.Releasing)
+                    {
+                        // Smoothly blend from pinned position to animation position
+                        float blend = Mathf.Clamp01(_stateTimer / _releaseDuration);
+                        solvedPositions[i] = Vector3.Lerp(solvedPositions[i], _pinnedPositions[i], blend);
+                    }
+                    else
+                    {
+                        solvedPositions[i] = ResolveCollisions(solvedPositions[i], _radius, _layerMask);
+                    }
+                }
+
+                // B. Distance Constraint (距離拘束) - standard PBD with mass weights
+                for (int i = 1; i < count; i++)
+                {
+                    float w1 = (_isPinned[i - 1] && _state == SolverState.Landed) ? 0f : 1f;
+                    float w2 = (_isPinned[i] && _state == SolverState.Landed) ? 0f : 1f;
+
+                    if (w1 + w2 > 0f)
+                    {
+                        float targetDist = _segmentLengths[i];
+                        Vector3 diff = solvedPositions[i] - solvedPositions[i - 1];
+                        float currentDist = diff.magnitude;
+
+                        if (currentDist > 0.0001f)
+                        {
+                            Vector3 dir = diff / currentDist;
+                            float error = currentDist - targetDist;
+                            Vector3 correction = dir * error / (w1 + w2);
+
+                            solvedPositions[i - 1] += correction * w1;
+                            solvedPositions[i] -= correction * w2;
+                        }
+                    }
+                }
+
+                // C. Bending / Rotation Constraint (回転拘束)
+                // Restricts the angle between consecutive bone segments
+                for (int i = 2; i < count; i++)
+                {
+                    Vector3 v1 = solvedPositions[i - 1] - solvedPositions[i - 2];
+                    Vector3 v2 = solvedPositions[i] - solvedPositions[i - 1];
+
+                    float angle = Vector3.Angle(v1, v2);
+                    if (angle > _maxBendingAngle)
+                    {
+                        Vector3 axis = Vector3.Cross(v1, v2).normalized;
+                        if (axis.sqrMagnitude < 0.001f) 
+                            axis = Vector3.up;
+
+                        Quaternion limitRot = Quaternion.AngleAxis(_maxBendingAngle - angle, axis);
+                        Vector3 constrainedV2 = limitRot * v2;
+
+                        bool isPointPinned = _isPinned[i] && _state == SolverState.Landed;
+                        if (!isPointPinned)
+                        {
+                            solvedPositions[i] = solvedPositions[i - 1] + constrainedV2.normalized * _segmentLengths[i];
+                        }
+                    }
+                }
+            }
+
+            // 5. Compute Orientations (Rotations)
+            // Align bone rotations with the solved bone segment directions
+            for (int i = 0; i < count; i++)
+            {
+                if (i < count - 1)
+                {
+                    Vector3 origDir = inputPoints[i + 1].Position - inputPoints[i].Position;
+                    Vector3 solvedDir = solvedPositions[i + 1] - solvedPositions[i];
+
+                    if (origDir.sqrMagnitude > 0.0001f && solvedDir.sqrMagnitude > 0.0001f)
+                    {
+                        Quaternion deltaRot = Quaternion.FromToRotation(origDir.normalized, solvedDir.normalized);
+                        Quaternion targetRot = deltaRot * inputPoints[i].Rotation;
+
+                        // Apply temporal damping to satisfy the rotational velocity constraint
+                        if (_prevSolvedPoints != null && _prevSolvedPoints.Length == count)
+                        {
+                            float maxAngleChange = _maxRotationSpeed * deltaTime;
+                            solvedRotations[i] = Quaternion.RotateTowards(_prevSolvedPoints[i].Rotation, targetRot, maxAngleChange);
+                        }
+                        else
+                        {
+                            solvedRotations[i] = targetRot;
+                        }
+                    }
+                    else
+                    {
+                        solvedRotations[i] = inputPoints[i].Rotation;
+                    }
+                }
+                else
+                {
+                    // For the tip, match the previous segment's solved rotation or fallback to original
+                    if (count >= 2)
+                    {
+                        solvedRotations[i] = solvedRotations[i - 1];
+                    }
+                    else
+                    {
+                        solvedRotations[i] = inputPoints[i].Rotation;
+                    }
+                }
+            }
+
+            // 6. Build the final resolved Points
+            IKFollower.Point[] solvedPoints = new IKFollower.Point[count];
+            for (int i = 0; i < count; i++)
+            {
+                solvedPoints[i] = new IKFollower.Point(solvedPositions[i], solvedRotations[i]);
+            }
+
+            // Cache for next frame
+            _prevSolvedPoints = solvedPoints;
+
+            return solvedPoints;
+        }
+
+        private void InitializeBuffers(IKFollower.Point[] inputPoints)
+        {
+            int count = inputPoints.Length;
+            if (_segmentLengths == null || _segmentLengths.Length != count)
+            {
+                _segmentLengths = new float[count];
+                _segmentLengths[0] = 0f;
+                for (int i = 1; i < count; i++)
+                {
+                    _segmentLengths[i] = Vector3.Distance(inputPoints[i - 1].Position, inputPoints[i].Position);
+                }
+
+                _pinnedPositions = new Vector3[count];
+                _isPinned = new bool[count];
+                _prevSolvedPoints = null;
+            }
+        }
+
+        private void UpdateStateMachine(IKFollower.Point[] inputPoints, Vector3[] solvedPositions, float deltaTime)
+        {
+            switch (_state)
+            {
+                case SolverState.Airborne:
+                    // Check for slam-down impact on deck
+                    bool hitDetected = false;
+                    for (int i = 0; i < inputPoints.Length; i++)
+                    {
+                        if (Physics.CheckSphere(solvedPositions[i], _radius, _layerMask))
+                        {
+                            hitDetected = true;
+                            _isPinned[i] = true;
+                            // Pre-resolve and record exactly where it sits on the deck
+                            _pinnedPositions[i] = ResolveCollisions(solvedPositions[i], _radius, _layerMask);
+                        }
+                        else
+                        {
+                            _isPinned[i] = false;
+                        }
+                    }
+
+                    if (hitDetected)
+                    {
+                        _state = SolverState.Landed;
+                        _stateTimer = _stayDuration;
+                    }
+                    break;
+
+                case SolverState.Landed:
+                    _stateTimer -= deltaTime;
+                    if (_stateTimer <= 0f)
+                    {
+                        _state = SolverState.Releasing;
+                        _stateTimer = _releaseDuration;
+                    }
+                    break;
+
+                case SolverState.Releasing:
+                    _stateTimer -= deltaTime;
+                    if (_stateTimer <= 0f)
+                    {
+                        _state = SolverState.Airborne;
+                        _stateTimer = 0f;
+                        for (int i = 0; i < _isPinned.Length; i++)
+                        {
+                            _isPinned[i] = false;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Precision sphere-to-box collision solver.
+        /// Transforms sphere coordinates to local BoxCollider space to handle deep penetrations
+        /// and compute accurate contact surface normals and points.
+        /// </summary>
+        private Vector3 ResolveCollisions(Vector3 position, float radius, LayerMask layerMask)
+        {
+            // Gather overlapping colliders
+            Collider[] colliders = Physics.OverlapSphere(position, radius, layerMask);
+            if (colliders == null || colliders.Length == 0)
+                return position;
+
+            foreach (var col in colliders)
+            {
+                if (col is BoxCollider box)
+                {
+                    // Compute custom high-precision sphere-box collision resolution
+                    position = ResolveSphereBoxCollision(position, radius, box);
+                }
+                else
+                {
+                    // Standard fallback closest point resolution for other types of colliders
+                    Vector3 closestPoint = col.ClosestPoint(position);
+                    float dist = Vector3.Distance(position, closestPoint);
+                    if (dist < radius)
+                    {
+                        Vector3 dir = (position - closestPoint).normalized;
+                        if (dir == Vector3.zero) 
+                            dir = Vector3.up;
+                        position = closestPoint + dir * radius;
+                    }
+                }
+            }
+
+            return position;
+        }
+
+        private Vector3 ResolveSphereBoxCollision(Vector3 sphereCenter, float radius, BoxCollider box)
+        {
+            // Transform sphere center to box local space
+            Vector3 localCenter = box.transform.InverseTransformPoint(sphereCenter);
+
+            Vector3 center = box.center;
+            Vector3 extents = box.size * 0.5f;
+
+            // Clamped coordinates to find closest point inside or on box in local space
+            Vector3 closestLocal = new Vector3(
+                Mathf.Clamp(localCenter.x, center.x - extents.x, center.x + extents.x),
+                Mathf.Clamp(localCenter.y, center.y - extents.y, center.y + extents.y),
+                Mathf.Clamp(localCenter.z, center.z - extents.z, center.z + extents.z)
+            );
+
+            // Distance in local space
+            if (closestLocal == localCenter)
+            {
+                // Sphere center is INSIDE the box. Push it out to the nearest face.
+                float dx1 = localCenter.x - (center.x - extents.x);
+                float dx2 = (center.x + extents.x) - localCenter.x;
+                float dy1 = localCenter.y - (center.y - extents.y);
+                float dy2 = (center.y + extents.y) - localCenter.y;
+                float dz1 = localCenter.z - (center.z - extents.z);
+                float dz2 = (center.z + extents.z) - localCenter.z;
+
+                float minDist = Mathf.Min(dx1, Mathf.Min(dx2, Mathf.Min(dy1, Mathf.Min(dy2, Mathf.Min(dz1, dz2)))));
+
+                if (minDist == dx1) closestLocal.x = center.x - extents.x;
+                else if (minDist == dx2) closestLocal.x = center.x + extents.x;
+                else if (minDist == dy1) closestLocal.y = center.y - extents.y;
+                else if (minDist == dy2) closestLocal.y = center.y + extents.y;
+                else if (minDist == dz1) closestLocal.z = center.z - extents.z;
+                else closestLocal.z = center.z + extents.z;
+
+                Vector3 closestWorld = box.transform.TransformPoint(closestLocal);
+                Vector3 normal = box.transform.up; // Standard fallback (deck top face)
+                
+                // Better normal calculation from the face we projected onto
+                if (minDist == dx1) normal = -box.transform.right;
+                else if (minDist == dx2) normal = box.transform.right;
+                else if (minDist == dy1) normal = -box.transform.up;
+                else if (minDist == dy2) normal = box.transform.up;
+                else if (minDist == dz1) normal = -box.transform.forward;
+                else normal = box.transform.forward;
+
+                return closestWorld + normal * radius;
+            }
+            else
+            {
+                // Sphere center is OUTSIDE the box. Push out if overlapping.
+                Vector3 closestWorld = box.transform.TransformPoint(closestLocal);
+                float distToSurface = Vector3.Distance(sphereCenter, closestWorld);
+
+                if (distToSurface < radius)
+                {
+                    Vector3 normal = (sphereCenter - closestWorld).normalized;
+                    if (normal == Vector3.zero) 
+                        normal = box.transform.up;
+                    return closestWorld + normal * radius;
+                }
+            }
+
+            return sphereCenter;
+        }
+    }
+}

@@ -47,6 +47,8 @@ namespace September.InGame.Kraken
         [SerializeField] private Rigidbody[] _followers;
         [SerializeField] private float _radius = .55f;
         [SerializeField] private LayerMask _layerMask;
+        [SerializeField] private TentacleConstraintSolver _constraintSolver;
+        [SerializeField] private int _subPointCount = 3;
 
         [SerializeField, HideInInspector] private List<float> _maxDistanceList = new();
         [SerializeField, HideInInspector] private Quaternion[] _defaultRotations;
@@ -116,6 +118,24 @@ namespace September.InGame.Kraken
                 }
             }
 
+            IPointInterpolator spline = new SplinePointInterpolator(points);
+            float length = _maxDistanceList[^1];
+            float sectionLength = length / (_subPointCount  * points.Length);
+            int pointCount = Mathf.CeilToInt(length / sectionLength);
+            var distanceArray = new float[pointCount].Select((x, i) => i * sectionLength).ToArray();
+            Point[] sub = spline.Evaluate(distanceArray);
+
+            Point[] solved = _constraintSolver.Solve(sub, Time.deltaTime);
+
+            IKFollowerDebug.DebugDrawSpheres(solved, 6f, Color.red);
+            IKFollowerDebug.DebugDrawLine(solved, Color.red);
+
+            IPointInterpolator solvedSpline = new SplinePointInterpolator(solved);
+            Point[] solvedCon = solvedSpline.Evaluate(_maxDistanceList);
+
+            UpdatePosition(solvedCon);
+
+            /*
             // スイープ移動した位置を計算
             CalcSweptPosition(_followers, points, _radius, _layerMask, out Point[] sweptPoints, out bool[] rigidbodyHitFlags);
 
@@ -205,6 +225,7 @@ namespace September.InGame.Kraken
             //     DebugDrawSpheres(finalPoints, _radius * .9f, Color.cyan);
             //     DebugDrawLine(finalPoints, Color.cyan);
             // }
+            */
         }
 
         private static void CalcSweptPosition(Rigidbody[] followerBodies, Point[] ikPoints, float radius, LayerMask layerMask, out Point[] sweptPoints,
