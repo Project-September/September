@@ -18,6 +18,7 @@ namespace September.InGame.Kraken.Animations
         [SerializeField] private float _maxBendingAngle = 25f; // Max angle (degrees) between adjacent segments
         [SerializeField] private float _maxRotationSpeed = 180f; // Max rotation change (degrees/second) for stability
         [SerializeField] private int _pbdIterations = 5;
+        [SerializeField] private int _pbdSubsteps = 5;
 
         [Header("Slam-Down Stay Settings")]
         [SerializeField] private float _stayDuration = 2.0f;     // How long to stay on the deck after landing
@@ -82,81 +83,87 @@ namespace September.InGame.Kraken.Animations
             Quaternion[] solvedRotations = new Quaternion[count];
             for (int i = 0; i < count; i++)
             {
-                solvedPositions[i] = inputPoints[i].Position;
+                solvedPositions[i] = _prevSolvedPoints[i].Position;
                 solvedRotations[i] = inputPoints[i].Rotation;
             }
 
             // 3. Update stay timer and state machine
-            UpdateStateMachine(inputPoints, solvedPositions, deltaTime);
+            // UpdateStateMachine(inputPoints, solvedPositions, deltaTime);
 
             // 4. Run PBD Iterative Solver to satisfy constraints
             for (int iter = 0; iter < _pbdIterations; iter++)
             {
-                // A. Non-penetration Constraint (非侵入拘束)
-                for (int i = 0; i < count; i++)
+                for (int step = 0; step < _pbdSubsteps; step++)
                 {
-                    if (_isPinned[i] && _state == SolverState.Landed)
+                    // A. Non-penetration Constraint (非侵入拘束)
+                    for (int i = 0; i < count; i++)
                     {
-                        // Pin directly to the landed spot
-                        solvedPositions[i] = _pinnedPositions[i];
-                    }
-                    else if (_isPinned[i] && _state == SolverState.Releasing)
-                    {
-                        // Smoothly blend from pinned position to animation position
-                        float blend = Mathf.Clamp01(_stateTimer / _releaseDuration);
-                        solvedPositions[i] = Vector3.Lerp(solvedPositions[i], _pinnedPositions[i], blend);
-                    }
-                    else
-                    {
-                        solvedPositions[i] = ResolveCollisions(solvedPositions[i], _radius, _layerMask);
-                    }
-                }
+                        var h = (inputPoints[i].Position - solvedPositions[i]) * (1f / _pbdSubsteps);
+                        var p = solvedPositions[i] + h;
 
-                // B. Distance Constraint (距離拘束) - standard PBD with mass weights
-                for (int i = 1; i < count; i++)
-                {
-                    float w1 = (_isPinned[i - 1] && _state == SolverState.Landed) ? 0f : 1f;
-                    float w2 = (_isPinned[i] && _state == SolverState.Landed) ? 0f : 1f;
-
-                    if (w1 + w2 > 0f)
-                    {
-                        float targetDist = _segmentLengths[i];
-                        Vector3 diff = solvedPositions[i] - solvedPositions[i - 1];
-                        float currentDist = diff.magnitude;
-
-                        if (currentDist > 0.0001f)
+                        if (_isPinned[i] && _state == SolverState.Landed)
                         {
-                            Vector3 dir = diff / currentDist;
-                            float error = currentDist - targetDist;
-                            Vector3 correction = dir * error / (w1 + w2);
-
-                            solvedPositions[i - 1] += correction * w1;
-                            solvedPositions[i] -= correction * w2;
+                            // Pin directly to the landed spot
+                            solvedPositions[i] = _pinnedPositions[i];
+                        }
+                        else if (_isPinned[i] && _state == SolverState.Releasing)
+                        {
+                            // Smoothly blend from pinned position to animation position
+                            float blend = Mathf.Clamp01(_stateTimer / _releaseDuration);
+                            solvedPositions[i] = Vector3.Lerp(solvedPositions[i], _pinnedPositions[i], blend);
+                        }
+                        else
+                        {
+                            solvedPositions[i] = ResolveCollisions(i, p, _radius, _layerMask);
                         }
                     }
-                }
 
-                // C. Bending / Rotation Constraint (回転拘束)
-                // Restricts the angle between consecutive bone segments
-                for (int i = 2; i < count; i++)
-                {
-                    Vector3 v1 = solvedPositions[i - 1] - solvedPositions[i - 2];
-                    Vector3 v2 = solvedPositions[i] - solvedPositions[i - 1];
-
-                    float angle = Vector3.Angle(v1, v2);
-                    if (angle > _maxBendingAngle)
+                    // B. Distance Constraint (距離拘束) - standard PBD with mass weights
+                    for (int i = 1; i < count; i++)
                     {
-                        Vector3 axis = Vector3.Cross(v1, v2).normalized;
-                        if (axis.sqrMagnitude < 0.001f) 
-                            axis = Vector3.up;
+                        float w1 = (_isPinned[i - 1] && _state == SolverState.Landed) ? 0f : 1f;
+                        float w2 = (_isPinned[i] && _state == SolverState.Landed) ? 0f : 1f;
 
-                        Quaternion limitRot = Quaternion.AngleAxis(_maxBendingAngle - angle, axis);
-                        Vector3 constrainedV2 = limitRot * v2;
-
-                        bool isPointPinned = _isPinned[i] && _state == SolverState.Landed;
-                        if (!isPointPinned)
+                        if (w1 + w2 > 0f)
                         {
-                            solvedPositions[i] = solvedPositions[i - 1] + constrainedV2.normalized * _segmentLengths[i];
+                            float targetDist = _segmentLengths[i];
+                            Vector3 diff = solvedPositions[i] - solvedPositions[i - 1];
+                            float currentDist = diff.magnitude;
+
+                            if (currentDist > 0.0001f)
+                            {
+                                Vector3 dir = diff / currentDist;
+                                float error = currentDist - targetDist;
+                                Vector3 correction = dir * error / (w1 + w2);
+
+                                solvedPositions[i - 1] += correction * w1;
+                                solvedPositions[i] -= correction * w2;
+                            }
+                        }
+                    }
+
+                    // C. Bending / Rotation Constraint (回転拘束)
+                    // Restricts the angle between consecutive bone segments
+                    for (int i = 2; i < count; i++)
+                    {
+                        Vector3 v1 = solvedPositions[i - 1] - solvedPositions[i - 2];
+                        Vector3 v2 = solvedPositions[i] - solvedPositions[i - 1];
+
+                        float angle = Vector3.Angle(v1, v2);
+                        if (angle > _maxBendingAngle)
+                        {
+                            Vector3 axis = Vector3.Cross(v1, v2).normalized;
+                            if (axis.sqrMagnitude < 0.001f)
+                                axis = Vector3.up;
+
+                            Quaternion limitRot = Quaternion.AngleAxis(_maxBendingAngle - angle, axis);
+                            Vector3 constrainedV2 = limitRot * v2;
+
+                            bool isPointPinned = _isPinned[i] && _state == SolverState.Landed;
+                            if (!isPointPinned)
+                            {
+                                solvedPositions[i] = solvedPositions[i - 1] + constrainedV2.normalized * _segmentLengths[i];
+                            }
                         }
                     }
                 }
@@ -233,7 +240,7 @@ namespace September.InGame.Kraken.Animations
 
                 _pinnedPositions = new Vector3[count];
                 _isPinned = new bool[count];
-                _prevSolvedPoints = null;
+                _prevSolvedPoints = inputPoints;
             }
         }
 
@@ -251,7 +258,7 @@ namespace September.InGame.Kraken.Animations
                             hitDetected = true;
                             _isPinned[i] = true;
                             // Pre-resolve and record exactly where it sits on the deck
-                            _pinnedPositions[i] = ResolveCollisions(solvedPositions[i], _radius, _layerMask);
+                            _pinnedPositions[i] = ResolveCollisions(i, solvedPositions[i], _radius, _layerMask);
                         }
                         else
                         {
@@ -295,21 +302,30 @@ namespace September.InGame.Kraken.Animations
         /// Transforms sphere coordinates to local BoxCollider space to handle deep penetrations
         /// and compute accurate contact surface normals and points.
         /// </summary>
-        private Vector3 ResolveCollisions(Vector3 position, float radius, LayerMask layerMask)
+        private Vector3 ResolveCollisions(int i, Vector3 position, float radius, LayerMask layerMask)
         {
-            // Gather overlapping colliders
+            // if (_prevSolvedPoints != null && _prevSolvedPoints.Length > i)
+            // {
+            //     // Gather overlapping colliders
+            //     var hits = Physics.SphereCastAll(position, radius, position - _prevSolvedPoints[i].Position, layerMask);
+            //     if (hits.Length > 0)
+            //     {
+            //         return hits[0].point + hits[0].normal * radius;
+            //     }
+            // }
+
             Collider[] colliders = Physics.OverlapSphere(position, radius, layerMask);
             if (colliders == null || colliders.Length == 0)
                 return position;
 
             foreach (var col in colliders)
             {
-                if (col is BoxCollider box)
-                {
-                    // Compute custom high-precision sphere-box collision resolution
-                    position = ResolveSphereBoxCollision(position, radius, box);
-                }
-                else
+                // if (col is BoxCollider box)
+                // {
+                //     // Compute custom high-precision sphere-box collision resolution
+                //     position = ResolveSphereBoxCollision(position, radius, box);
+                // }
+                // else
                 {
                     // Standard fallback closest point resolution for other types of colliders
                     Vector3 closestPoint = col.ClosestPoint(position);
