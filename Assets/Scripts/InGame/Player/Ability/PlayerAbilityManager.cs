@@ -23,7 +23,7 @@ namespace InGame.Player.Ability
         /// <summary>このプレイヤーのNetworkObject</summary>
         private NetworkObject _networkObject;
         /// <summary>アビリティ名（クラス名）でアビリティを検索するための辞書</summary>
-        private Dictionary<string, AbilityBase> _abilityByName = new();
+        private readonly Dictionary<string, AbilityBase> _abilityByName = new();
 
         /// <summary>
         /// ネットワーク生成時の初期化処理
@@ -120,7 +120,7 @@ namespace InGame.Player.Ability
         {
             string abilityName = abilityBase.GetType().Name;
 
-            if (_abilityByName.TryGetValue(abilityName, out var targetAbility))
+            if (_abilityByName.ContainsKey(abilityName))
             {
                 Debug.LogError($"[PlayerAbilityManager] '{abilityName}' は既に追加されています。");
                 return;

@@ -11,7 +11,6 @@ namespace InGame.Exhibit
 {
     public class ArmoryInteractEffect : CharacterInteractEffectBase
     {
-        [SerializeField] private ArmoryInteractRPCInvoker _invoker;
         [SerializeReference, SubclassSelector] private AbilityBase _addAbility;
         [SerializeReference, SubclassSelector] private IAbilityExecuteCondition _addAbilityCondition;
         [SerializeField] private string[] _overrideDisabledAbilities;
@@ -21,7 +20,6 @@ namespace InGame.Exhibit
         {
             return new ArmoryInteractEffect()
             {
-                _invoker = _invoker,
                 _addAbility = _addAbility,
                 _addAbilityCondition = _addAbilityCondition,
                 _overrideDisabledAbilities = _overrideDisabledAbilities,
@@ -31,9 +29,6 @@ namespace InGame.Exhibit
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            //他の人が装備していたら実行しない
-            if (_invoker.IsEquipped) return;
-
             //コンポーネント取得
             var player = PlayerRef.FromEncoded(context.Interactor);
             if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(player, out var playerObject))
@@ -43,15 +38,12 @@ namespace InGame.Exhibit
             }
 
             if (!playerObject.TryGetComponent(out PlayerAbilityManager playerAbility)
-                || !playerObject.TryGetComponent(out PlayerManager playerManager))
+                || !playerObject.TryGetComponent(out PlayerEquipmentManager equipmentManager))
             {
                 return;
             }
 
-            if (_addAbility is AbilityNormalAttack normalAttack)
-            {
-                normalAttack.SetPlayerComponent(playerObject.gameObject);
-            }
+            _addAbility.SetPlayerComponent(playerObject.gameObject);
 
             //上書きするAbilityを無効化
             playerAbility.SetAbilityEnabled(false, _overrideDisabledAbilities);
@@ -59,16 +51,12 @@ namespace InGame.Exhibit
             //Abilityを追加する
             playerAbility.AddAbility(_addAbility, _addAbilityCondition);
 
-            //元から持っている武器を非表示にする
-            playerManager.RPC_SetWeaponVisible(false);
+            equipmentManager.RPC_ChangeEquipment(EquipmentType.Armory);
 
-            //指定の武器を装備する
-            _invoker.RPC_AttachWeapon(playerObject);
-
-            ReleaseWeaponAsync(playerAbility, playerManager, playerObject.GetCancellationTokenOnDestroy()).Forget();
+            ReleaseWeaponAsync(playerAbility, equipmentManager, playerObject.GetCancellationTokenOnDestroy()).Forget();
         }
 
-        private async UniTask ReleaseWeaponAsync(PlayerAbilityManager abilityManager, PlayerManager playerManager, CancellationToken token)
+        private async UniTask ReleaseWeaponAsync(PlayerAbilityManager abilityManager, PlayerEquipmentManager equipmentManager, CancellationToken token)
         {
             await UniTask.WaitForSeconds(_duration, cancellationToken: token);
 
@@ -79,8 +67,7 @@ namespace InGame.Exhibit
             abilityManager.RemoveAbility(_addAbility.GetType().Name);
 
             //武器を元に戻す
-            playerManager.RPC_SetWeaponVisible(true);
-            _invoker.RPC_DestroyWeapon();
+            equipmentManager.RPC_ChangeEquipment(EquipmentType.NormalAttack);
         }
     }
 }

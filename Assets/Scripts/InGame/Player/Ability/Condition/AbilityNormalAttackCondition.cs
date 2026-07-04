@@ -1,16 +1,14 @@
 using System;
-using Fusion;
-using InGame.Player.Ability;
 using September.Common;
 using September.InGame.Common;
 using UnityEngine;
 
-namespace  InGame.Player.Ability
+namespace InGame.Player.Ability
 {
     [Serializable]
     public class AbilityNormalAttackExecuteCondition : IAbilityExecuteCondition
     {
-        [SerializeField ] private string _targetAbilityName = nameof(AbilityNormalAttack);
+        [SerializeField] private string _targetAbilityName = nameof(AbilityNormalAttack);
         public string TargetAbilityName => _targetAbilityName;
         private PlayerMovement _playerMovement;
         private PlayerManager _playerManager;
@@ -21,7 +19,7 @@ namespace  InGame.Player.Ability
             if (!_playerMovement) _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
 
-            
+
             //Available状態でAttackボタンが押されたら条件を満たす
             return _playerMovement.IsGround && !_playerManager.IsStun && !IsGameEnded() &&
                    _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal &&
@@ -29,7 +27,7 @@ namespace  InGame.Player.Ability
                    context.AbilityRef.CanStartAbilityOverride() &&
                    context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(PlayerButtons.Attack);
         }
-        
+
         private bool IsGameEnded()
         {
             try

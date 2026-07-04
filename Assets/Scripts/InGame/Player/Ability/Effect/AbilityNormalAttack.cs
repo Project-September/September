@@ -135,7 +135,7 @@ namespace InGame.Player.Ability
 
         }
 
-        public void SetPlayerComponent(GameObject player)
+        public override void SetPlayerComponent(GameObject player)
         {
             _animationClipPlayer = player.GetComponentInChildren<AnimationClipPlayer>();
             _buildGenerator = player.GetComponentInChildren<BuildGenerator>();

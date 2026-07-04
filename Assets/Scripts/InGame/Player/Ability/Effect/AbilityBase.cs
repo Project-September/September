@@ -188,6 +188,11 @@ namespace InGame.Player.Ability
         public virtual void OnUpdateLocal(float deltaTime, GameObject owner) { }
 
         /// <summary>
+        /// AbilityにあるPlayerがもつComponentを取得する
+        /// </summary>
+        public virtual void SetPlayerComponent(GameObject player) { }
+
+        /// <summary>
         /// アビリティ終了時の処理（派生クラスでオーバーライド可能）
         /// </summary>
         protected virtual void OnEndAbility() { }
