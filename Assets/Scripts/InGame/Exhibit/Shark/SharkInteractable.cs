@@ -112,7 +112,7 @@ public class SharkInteractable : MountableExhibitBase
         if (!(_attackAnimationFrame >= EndFrame)) return;
         Executor?.Init();
             
-        // 攻撃状態をの期化
+        // 攻撃状態を初期化
         _attackAnimationFrame = 0;
         IsAttacking = false;
         Executor = null;
