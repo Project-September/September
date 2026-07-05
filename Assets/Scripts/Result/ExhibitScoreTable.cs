@@ -35,6 +35,8 @@ namespace Result
         Mast,
         [DisplayName("武器庫")]
         Armory
+        [DisplayName("サメ")]
+        Shark
     }
 
     [Serializable]
