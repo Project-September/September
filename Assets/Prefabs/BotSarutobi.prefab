@@ -14186,7 +14186,7 @@ MonoBehaviour:
     - rid: 4418194648007966847
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data:
-        _targetAbilityName: AbilityNormalAttack
+        _targetAbilityName: AbilityMultiHitAttack
     - rid: 8000700352795770965
       type: {class: AbilitySarutobiUlt, ns: InGame.Player.Ability.Effect, asm: Scripts}
       data:
@@ -15037,6 +15037,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.015393197, y: -0.10544878, z: -0.04851184}
     m_Extent: {x: 0.005840241, y: 0.0060171634, z: 0.008541986}
   m_DirtyAABB: 0
+--- !u!1 &8983706877233368428
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 1219307050782259563, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
+  m_PrefabInstance: {fileID: 7802293407002129415}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8639972687659849686}
+  m_Layer: 0
+  m_Name: 'WpMD_Katana_0101 (Missing Prefab with guid: bd678171ec35e0645853a1cb9d75a010)'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8639972687659849686
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
+  m_PrefabInstance: {fileID: 7802293407002129415}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8983706877233368428}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.3555777, y: 0.38483503, z: 0.34375107, w: 0.7792957}
+  m_LocalPosition: {x: 0.063, y: -0.047, z: 0.011}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1661348190536254133}
+  m_LocalEulerAnglesHint: {x: -54.962, y: 38.238, z: 27.162}
 --- !u!1 &9007375091109236216
 GameObject:
   m_ObjectHideFlags: 0
@@ -15746,13 +15777,3 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
---- !u!4 &8639972687659849686 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-  m_PrefabInstance: {fileID: 7802293407002129415}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8983706877233368428 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1219307050782259563, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-  m_PrefabInstance: {fileID: 7802293407002129415}
-  m_PrefabAsset: {fileID: 0}
