@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4275066865890829726}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: CharacterPos
   m_TagString: Untagged
   m_Icon: {fileID: 7422848464349959988, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -159,10 +159,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 192
   _baseDamage: 50
-  _aimPositionEffect: {fileID: 3514354484089743415, guid: 2f63568dd852db8408a6c5838dbffb8b, type: 3}
+  _aimPositionEffect: {fileID: 1481952551229307314, guid: 2f63568dd852db8408a6c5838dbffb8b, type: 3}
   _fireParticlePrefab: {fileID: -6299654888396855261, guid: a94003fc19ce4f44984dc1df010b55fb, type: 3}
   _explosionParticlePrefab: {fileID: -1181434899788494621, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
   _lineRenderer: {fileID: 7931722243513256251}
+  _aimPositionOffset: 0.5
   _waitCharacterTransform: {fileID: 4275066865890829726}
   _cameraController: {fileID: 3748556067587992180}
   _interactable: {fileID: 788815102460632112}
@@ -211,9 +212,7 @@ LineRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Positions:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 1}
+  m_Positions: []
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -500,14 +499,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7018564803253940232}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.25671104, y: 0, z: 0, w: 0.9664882}
   m_LocalPosition: {x: 0, y: 0.05, z: -0.16}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2479096299303080806}
   m_Father: {fileID: 1759608479674104938}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -29.75, y: 0, z: 0}
 --- !u!1 &7089265804518172916
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,7 +607,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8618401258012466577}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: MuzzlePos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

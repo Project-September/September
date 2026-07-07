@@ -12,6 +12,14 @@ PrefabInstance:
       propertyPath: SortKey
       value: 171840482
       objectReference: {fileID: 0}
+    - target: {fileID: 1022633943823893049, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1022633943823893049, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2684928178316765106, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.07
@@ -100,7 +108,10 @@ PrefabInstance:
       propertyPath: InitialModule.startSize.scalar
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5513344064715602192, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+    - {fileID: 1022633943823893049, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
+    - {fileID: 66833954372244376, guid: 8a39005418a2eb1428da884d97aed112, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

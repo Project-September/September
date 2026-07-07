@@ -31,7 +31,7 @@ namespace InGame.Exhibit
 		[SerializeField] private LayerMask _hitLayer;
 		[SerializeField] private int _baseDamage = 10;
 
-		[Header("エフェクト設定")] [SerializeField] private NetworkObject _aimPositionEffect;
+		[Header("エフェクト設定")] [SerializeField] private GameObject _aimPositionEffect;
 		[SerializeField] private NetworkObject _fireParticlePrefab;
 		[SerializeField] private NetworkObject _explosionParticlePrefab;
 		[SerializeField] private LineRenderer _lineRenderer;
@@ -47,12 +47,13 @@ namespace InGame.Exhibit
 		private UniTask _fireUniTask;
 		private int _currentAmmo;
 		private Vector3[] _linePositions;
-		[Networked]
-		private PlayerRef CurrentUsePlayerRef { get; set; }
+		private int _lastTick = -1;
+		private GameObject AimPositionEffect { get; set; }
+		private Vector3 HitNormal { get; set; }
+		
+		[Networked] private PlayerRef CurrentUsePlayerRef { get; set; }
 		[Networked] private NetworkObject FireParticle { get; set; }
 		[Networked] private NetworkObject ExplosionParticle { get; set; }
-		[Networked] private NetworkObject AimPositionEffect { get; set; }
-		[Networked] private Vector3 HitNormal { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
@@ -66,53 +67,75 @@ namespace InGame.Exhibit
 			_barrelDefaultRotation = _cannonBarrel.localRotation;
 			BaseRotation = _cannonBase.localRotation;
 			BarrelRotation = _cannonBarrel.localRotation;
+			AimPositionEffect = Instantiate(_aimPositionEffect);
+			AimPositionEffect.SetActive(false);
+			AimPositionEffect.transform.localScale = Vector3.one * (_radius * 2);
 
 			if (Runner.IsServer)
 			{
 				FireParticle = Runner.Spawn(_fireParticlePrefab, Vector3.zero, Quaternion.identity);
 				ExplosionParticle = Runner.Spawn(_explosionParticlePrefab, Vector3.zero, Quaternion.identity);
-				AimPositionEffect = Runner.Spawn(_aimPositionEffect, Vector3.zero, Quaternion.identity);
-				AimPositionEffect.transform.localScale = Vector3.one * (_radius * 2);
-				RPC_SetActive(FireParticle, false);
-				RPC_SetActive(ExplosionParticle, false);
-				RPC_SetActive(AimPositionEffect, false);
+				RPC_ParticleActive(FireParticle, false);
+				RPC_ParticleActive(ExplosionParticle, false);
+				//RPC_SetActive(AimPositionEffect, false);
 			}
 		}
 
 		public override void Render()
 		{
 			base.Render();
-			// 放物線描画設定
-			if (Runner.IsServer)
+			if (_lastTick != Runner.Tick.Raw)
 			{
-				AimPositionEffect.transform.position = GetTargetPoint() + HitNormal * _aimPositionOffset;
-				AimPositionEffect.transform.up = HitNormal.normalized;
+				_lastTick = Runner.Tick.Raw;
+				BuildTrajectory();
 			}
-			// キャノンの回転描画
+			// 放物線の作成
+			if (Runner.LocalPlayer == CurrentUsePlayerRef)
+			{
+				CreateLine();
+			}
+			
+			// 着弾地点の描画
+			AimPositionEffect.transform.position = GetTargetPoint() + HitNormal * _aimPositionOffset;
+			AimPositionEffect.transform.up = HitNormal.normalized;
+			// キャノンの回転
 			_cannonBarrel.localRotation = BarrelRotation;
 			_cannonBase.localRotation = BaseRotation;
-			_cameraController.transform.rotation = BaseRotation;
 		}
 
 		public override void FixedUpdateNetwork()
 		{
 			base.FixedUpdateNetwork();
-			// 放物線の作成
-			CreateLine();
+		}
+		
+		[Rpc(RpcSources.All, RpcTargets.All)]
+		public void RPC_InteractStart(PlayerRef playerRef)
+		{
+			AimPositionEffect.SetActive(true);
+			// インタラクト中のプレイヤーに対する初期化処理
+			if(playerRef != Runner.LocalPlayer) return;
+		}
+
+		[Rpc(RpcSources.All, RpcTargets.All)]
+		public void RPC_InteractEnd(PlayerRef playerRef)
+		{
+			AimPositionEffect.SetActive(false);
+			// インタラクト中のプレイヤーに対する終了処理
+			if(playerRef != Runner.LocalPlayer) return;
 		}
 
 		/// <summary>
-		///     インタラクト開始時の初期化処理
+		///     Hostのみで実行されるインタラクト開始時の初期化処理
 		/// </summary>
 		public void OnInteractStart(PlayerRef playerRef)
 		{
 			// インタラクトの機能を一時的に無効化する
 			_interactable.ForceSetInteractable = false;
-			
+
 			CurrentUsePlayerRef = playerRef;
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 15);
+			//RPC_SetActive(AimPositionEffect, true);
 			Object.AssignInputAuthority(CurrentUsePlayerRef);
-			RPC_SetActive(AimPositionEffect, true);
 
 			_currentAmmo = _maxAmmo;
 			// プレイヤーの取得
@@ -123,6 +146,7 @@ namespace InGame.Exhibit
 
 			// Playerがダメージを受けた際にInteractを終了する
 			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
+			RPC_InteractStart(playerRef);
 		}
 
 		/// <summary>
@@ -152,7 +176,6 @@ namespace InGame.Exhibit
 		/// </summary>
 		public void OnInteractEnd()
 		{
-			
 			// クールダウン処理
 			var chara = PlayerDatabase.Instance.PlayerDataDic[CurrentUsePlayerRef].CharacterType;
 			var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
@@ -160,7 +183,7 @@ namespace InGame.Exhibit
 				: _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
 			_interactable.SetCooldown(time);
 			_interactable.ForceSetInteractable = true;
-			
+
 			RPC_Refresh();
 			_currentUsePlayer?.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 			if (!_currentUsePlayer) return;
@@ -170,15 +193,18 @@ namespace InGame.Exhibit
 			if (_currentUsePlayer) _currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
 			_currentUsePlayer = null;
 			CurrentUsePlayerRef = default;
-			_interactable.EndInteract();
+			
+			RPC_InteractEnd(CurrentUsePlayerRef);
+			//RPC_SetActive(AimPositionEffect, false);
 
 			// 現在砲弾が発射中であった場合、一部エフェクトの終了処理を待つ
-			UniTask.Void(async () =>
-			{
-				if (_fireUniTask.Status == UniTaskStatus.Pending)
-					await _fireUniTask;
-				RPC_SetActive(AimPositionEffect, false);
-			});
+			// UniTask.Void(async () =>
+			// {
+			// 	if (_fireUniTask.Status == UniTaskStatus.Pending)
+			// 		await _fireUniTask;
+			// 	
+			// });
+			_interactable.EndInteract();
 		}
 
 		[Rpc(RpcSources.All, RpcTargets.All)]
@@ -189,10 +215,11 @@ namespace InGame.Exhibit
 			BaseRotation = _baseDefaultRotation;
 		}
 
+		/// <summary>
+		/// 事前に計算された軌道に沿って線描画する
+		/// </summary>
 		private void CreateLine()
 		{
-			BuildTrajectory(); // 描画位置の計算
-			if (Runner.LocalPlayer != CurrentUsePlayerRef) return;
 			_lineRenderer.positionCount = LastPositionIndex + 1;
 			_lineRenderer.SetPositions(_linePositions);
 		}
@@ -213,7 +240,7 @@ namespace InGame.Exhibit
 				_linePositions[i] = pos;
 
 				if (i == 0) continue;
-				// 当たり判定の取得
+				// 弾が移動予定の位置までRayを飛ばし、当たり判定を確認する
 				var ray = new Ray(_linePositions[i - 1], _linePositions[i] - _linePositions[i - 1]);
 
 				// 障害物が存在した場合、その地点を最終地点とする。
@@ -260,9 +287,9 @@ namespace InGame.Exhibit
 			var ballSpeed = _projectileVelocity;
 			var endPos = GetTargetPoint();
 
-			RPC_SetActive(FireParticle, true);
+			RPC_ParticleActive(FireParticle, true);
 
-			// 弾丸の位置をUpdateする
+			// 砲弾の位置をUpdateする
 			while (timer < _lifeTime)
 			{
 				timer += Runner.DeltaTime;
@@ -271,22 +298,22 @@ namespace InGame.Exhibit
 				var nextPos = CalculateTrajectoryPosition(muzzlePosition,
 					muzzleForward * ballSpeed, _gravity, timer + Runner.DeltaTime);
 
-				// 弾の更新
-				FireParticle.transform.position = currentPos;
 				// 弾の着弾確認
 				var movement = nextPos - currentPos;
-				FireParticle.transform.forward = movement.normalized;
-
 				if (Physics.Raycast(currentPos, movement.normalized, out var hit, movement.magnitude, _hitLayer))
 				{
 					endPos = hit.point;
 					break;
 				}
+				
+				// particleの更新
+				FireParticle.transform.position = currentPos;
+				FireParticle.transform.forward = movement.normalized;
 
 				await UniTask.WaitForSeconds(Runner.DeltaTime);
 			}
 
-			RPC_SetActive(FireParticle, false);
+			RPC_ParticleActive(FireParticle, false);
 
 			RPC_Explosion(endPos, Quaternion.identity);
 		}
@@ -302,7 +329,7 @@ namespace InGame.Exhibit
 			// 着弾時のエフェクト
 			ExplosionParticle.transform.position = position;
 			ExplosionParticle.transform.rotation = rotation;
-			RPC_SetActive(ExplosionParticle, true);
+			RPC_ParticleActive(ExplosionParticle, true);
 			UniTask.Void(async () =>
 			{
 				var particle = ExplosionParticle.GetComponent<ParticleSystem>();
@@ -310,7 +337,7 @@ namespace InGame.Exhibit
 				particle.Play(true);
 				while (particle.isPlaying)
 					await UniTask.Yield();
-				RPC_SetActive(ExplosionParticle, false);
+				RPC_ParticleActive(ExplosionParticle, false);
 			});
 
 			var cols = Physics.OverlapSphere(position, _radius, _hitLayer); // TODO:当たり判定統一するかも
@@ -350,7 +377,7 @@ namespace InGame.Exhibit
 		}
 
 		[Rpc(RpcSources.All, RpcTargets.All)]
-		private void RPC_SetActive(NetworkObject obj, bool isActive)
+		private void RPC_ParticleActive(NetworkObject obj, bool isActive)
 		{
 			var particle = obj.GetComponentInChildren<ParticleSystem>();
 
