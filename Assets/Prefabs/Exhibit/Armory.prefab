@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 373157578816395978}
   - component: {fileID: 1069073459263324954}
   - component: {fileID: 5346824491244401101}
-  - component: {fileID: 4806982484980525543}
   m_Layer: 0
   m_Name: Armory
   m_TagString: Untagged
@@ -170,7 +169,6 @@ MonoBehaviour:
       type: {class: ArmoryInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 5
-        _invoker: {fileID: 4806982484980525543}
         _addAbility:
           rid: 4418194648007966878
         _addAbilityCondition:
@@ -236,20 +234,4 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 373157578816395978}
   - {fileID: 1069073459263324954}
-  - {fileID: 4806982484980525543}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &4806982484980525543
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5344940182192764311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36475946053c781499a4f7c7cb7f6a82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _attackWeapon: {fileID: 1219307050782259563, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-  _handPosition: {x: 0.118, y: 0.009, z: 0.003}
-  _handRotation: {x: 0, y: 180, z: 0}

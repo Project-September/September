@@ -34,7 +34,7 @@ namespace Result
         [DisplayName("マスト")]
         Mast,
         [DisplayName("武器庫")]
-        Armory
+        Armory,
         [DisplayName("サメ")]
         Shark
     }
