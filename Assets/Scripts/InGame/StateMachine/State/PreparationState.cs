@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using GameEvent;
-using InGame.Common;
 using InGame.Exhibit;
 using InGame.Health;
 using InGame.Player;
@@ -29,9 +28,7 @@ namespace September.Common
         [SerializeField] private SetIcon _setIcon;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
-        private PlayerRef _firstOgrePlayer;
         private bool _hasRecordedPlayerSelection = false;
-        private static readonly string _cueSheetName = "ALLCue";
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
         protected internal override void OnEnter()
@@ -202,7 +199,6 @@ namespace September.Common
             SetOgreLamp();
 
             ShowStatusUpUI();
-            _firstOgrePlayer = PlayerRef.None;
             if (Context.Runner.IsServer)
             {
                 //  ステート終了
@@ -256,7 +252,6 @@ namespace September.Common
             var data = dic.Get(ogreKey);
             data.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
-            _firstOgrePlayer = ogreKey;
             PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
         }
 
