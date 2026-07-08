@@ -1301,7 +1301,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.21333332
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 5cd3f11d9e3fdcc44b3d51575eb4064b, type: 2}
   m_BuildHeightMesh: 0
@@ -8085,10 +8085,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2175680204289375604, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: _overlayMessage
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
       propertyPath: _setIcon
       value: 
@@ -8097,14 +8093,6 @@ PrefabInstance:
       propertyPath: _fadeImage
       value: 
       objectReference: {fileID: 542693325}
-    - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: _countdownAnimation
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: _timeOverlayMessage
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
       propertyPath: '_spawnPositions.Array.data[0]'
       value: 
@@ -8168,10 +8156,6 @@ PrefabInstance:
     - target: {fileID: 5209492667959224886, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
       propertyPath: m_Name
       value: RunTimeSystems
-      objectReference: {fileID: 0}
-    - target: {fileID: 5209492667959224886, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6912504652589192043, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
       propertyPath: _statusView
@@ -8293,8 +8277,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1285741891474971311}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.15260132, y: -0.8086604, z: 0.23953608, w: 0.5151735}
-  m_LocalPosition: {x: 20.002966, y: 0.77697897, z: 24.885712}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
