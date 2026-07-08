@@ -19,7 +19,7 @@ using Random = UnityEngine.Random;
 
 namespace September.Common
 {
-    public class PreparationState : ImtStateMachine<InGameManager>.State
+    public partial class PreparationState : ImtStateMachine<InGameManager>.State
     {
         [SerializeField] private Transform[] _spawnPositions;
         [SerializeField] private Image _fadeImage;
@@ -155,16 +155,19 @@ namespace September.Common
             //  黒画面フェードアウト
             await FadeOut();
 
-            IGameStartPerformance.Context ctx = new()
+            if (!_skipPreparationPerformances)
             {
-                Runner = Runner,
-                ToggleInputs = RPC_ToggleInputs
-            };
+                IGameStartPerformance.Context ctx = new()
+                {
+                    Runner = Runner,
+                    ToggleInputs = RPC_ToggleInputs
+                };
 
-            foreach (IGameStartPerformance p in _gameStartPerformances)
-            {
-                if (!p.Enabled) continue;
-                await p.RunPerformance(ctx);
+                foreach (IGameStartPerformance p in _gameStartPerformances)
+                {
+                    if (!p.Enabled) continue;
+                    await p.RunPerformance(ctx);
+                }
             }
 
             _startCamera.Priority = -999;
