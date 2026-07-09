@@ -27,7 +27,7 @@ namespace September.Common
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
         [SerializeReference, SubclassSelector] private IPlayerKilledUseCase _playerKilledUseCase;
-        [SerializeField] private TagRulePlayerUIPresenter _tagRulePlayerUIPresenter;
+        [SerializeField, RequireInterface(typeof(IPlayerKilledPresenter))] private MonoBehaviour _playerKilledPresenter;
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
@@ -124,7 +124,10 @@ namespace September.Common
                     PlayerRef killer = hitData.ExecutorRef;
                     PlayerRef victim = hitData.TargetRef;
 
-                    _tagRulePlayerUIPresenter.OnKilled(killer, victim);
+                    if (_playerKilledPresenter is IPlayerKilledPresenter presenter)
+                    {
+                        presenter.OnPlayerKilled(killer, victim);
+                    }
                     _playerKilledUseCase.ProcessKillEvent(killer, victim);
                 };
 

@@ -5,7 +5,7 @@ using September.InGame.UI;
 
 namespace September.Common
 {
-    public class TagRulePlayerUIPresenter : NetworkBehaviour
+    public class TagRulePlayerKilledUIPresenter : NetworkBehaviour, IPlayerKilledPresenter
     {
         private void Start()
         {
@@ -19,7 +19,7 @@ namespace September.Common
             };
         }
 
-        public void OnKilled(PlayerRef killer, PlayerRef victim)
+        public void OnPlayerKilled(PlayerRef killer, PlayerRef victim)
         {
             RPC_ShowKillLog(killer, victim);
 
