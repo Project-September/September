@@ -26,12 +26,14 @@ namespace September.Common
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
-        [SerializeReference, SubclassSelector] private IGameStartStrategy _gameStartStrategy;
+        [SerializeField] private GameRule _gameRule;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
-        [SerializeReference, SubclassSelector] private IPlayerKilledUseCase _playerKilledUseCase;
         [SerializeField, RequireInterface(typeof(IPlayerKilledPresenter))] private MonoBehaviour _playerKilledPresenter;
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
+
+        private IGameStartStrategy GameStartStrategy => _gameRule.GameStartStrategy;
+        private IPlayerKilledUseCase PlayerKilledUseCase => _gameRule.PlayerKilledUseCase;
 
         protected internal override void OnEnter()
         {
@@ -48,7 +50,7 @@ namespace September.Common
 
             if (Context.Runner.IsServer)
             {
-                _gameStartStrategy.OnGameStarted();
+                GameStartStrategy.OnGameStarted();
                 Initialize().Forget();
                 RPC_OpeningSequence();
             }
@@ -130,7 +132,7 @@ namespace September.Common
                     {
                         presenter.OnPlayerKilled(killer, victim);
                     }
-                    _playerKilledUseCase.ProcessKillEvent(killer, victim);
+                    PlayerKilledUseCase.ProcessKillEvent(killer, victim);
                 };
 
                 var spd = pair.Value;
