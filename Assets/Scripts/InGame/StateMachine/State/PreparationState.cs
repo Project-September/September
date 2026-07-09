@@ -28,6 +28,7 @@ namespace September.Common
         [SerializeField] private SetIcon _setIcon;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
+        [SerializeReference, SubclassSelector] private IPlayerKilledUseCase _playerKilledUseCase;
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
@@ -120,7 +121,7 @@ namespace September.Common
 
                 var playerHealth = player.GetComponent<PlayerHealth>();
                 //PlayerHealthのOnDeathに登録
-                playerHealth.OnDeath += OnPlayerKilled;
+                playerHealth.OnDeath += hitData => _playerKilledUseCase.ProcessKillEvent(hitData.ExecutorRef, hitData.TargetRef);
                 var spd = pair.Value;
                 foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
                 {
@@ -224,23 +225,6 @@ namespace September.Common
             }
         }
 
-        private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
-        {
-            if (killerData.StunData.TryGet(killedPlayer, out int count))
-            {
-                killerData.StunData.Set(killedPlayer, count + 1);
-            }
-            else
-            {
-                killerData.StunData.Set(killedPlayer, 1);
-            }
-
-            PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
-
-            // スコアの更新処理
-            PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
-        }
-
         /// <summary>
         /// 鬼を抽選するメソッド
         /// </summary>
@@ -256,36 +240,6 @@ namespace September.Common
             data.IsOgre = true;
             PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
             PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
-        }
-
-        /// <summary>
-        /// 各Playerの気絶時に呼ばれるメソッド
-        /// </summary>
-        private void OnPlayerKilled(HitData data)
-        {
-            if (!Context.Runner.IsServer) return;
-            //.Instance.Server_AddStun(data.ExecutorRef);
-
-            // TODO: Insert GameRule
-            SessionPlayerData killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef);
-            var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
-            if (killerData.IsOgre && data.ExecutorRef != data.TargetRef)
-            {
-                killerData.IsOgre = false;
-                RPC_ShowStatusUpUI(data.ExecutorRef, false);
-                PlayerDatabase.Instance.PlayerDataDic.Set(data.ExecutorRef, killerData);
-                killedData.IsOgre = true;
-                PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
-                RPC_ShowStatusUpUI(data.TargetRef, true);
-                RPC_SetOgreUI(data.ExecutorRef, data.TargetRef);
-                PlayerDatabase.Instance.Server_AddOgreCount(data.TargetRef);
-            }
-
-            if (data.ExecutorRef == data.TargetRef)
-                return;
-
-            UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
-            Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
         }
 
         private void HideCursor()

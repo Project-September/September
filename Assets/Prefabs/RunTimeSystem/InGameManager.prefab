@@ -103,6 +103,8 @@ MonoBehaviour:
   _gameStartPerformances:
   - rid: 7765555050530472034
   - rid: 7765555050530472041
+  _playerKilledUseCase:
+    rid: 7765555065531400310
   references:
     version: 2
     RefIds:
@@ -116,6 +118,9 @@ MonoBehaviour:
       type: {class: CountdownPerformance, ns: September.Common, asm: Scripts}
       data:
         _enabled: 1
+    - rid: 7765555065531400310
+      type: {class: TagPlayerKilledUseCase, ns: September.Common, asm: Scripts}
+      data: 
 --- !u!114 &4864244944479918103
 MonoBehaviour:
   m_ObjectHideFlags: 0
