@@ -1328,9 +1328,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 792960411302418462, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: Flags
+      value: 262145
+      objectReference: {fileID: 0}
+    - target: {fileID: 792960411302418462, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: SortKey
+      value: 3341980846
+      objectReference: {fileID: 0}
+    - target: {fileID: 792960411302418462, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 792960411302418462, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[0]'
+      value: 
+      objectReference: {fileID: 542693326}
     - target: {fileID: 5350015315830211674, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5775137310579412787, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8375941926255285459, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
       propertyPath: m_Name
@@ -1441,6 +1461,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &542693326 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2106186069054512436, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+  m_PrefabInstance: {fileID: 542693323}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 248857c8872140cfb5d7ed6b59f56530, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &644244725
@@ -8093,6 +8124,10 @@ PrefabInstance:
       propertyPath: _fadeImage
       value: 
       objectReference: {fileID: 542693325}
+    - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
+      propertyPath: _tagRulePlayerUIPresenter
+      value: 
+      objectReference: {fileID: 542693326}
     - target: {fileID: 3554229034233665262, guid: d36569df6a8b8a24e8d0ff9667cb7b31, type: 3}
       propertyPath: '_spawnPositions.Array.data[0]'
       value: 

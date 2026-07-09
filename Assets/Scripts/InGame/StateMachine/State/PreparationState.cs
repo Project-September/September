@@ -6,8 +6,6 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using GameEvent;
-using InGame.Exhibit;
-using InGame.Health;
 using InGame.Player;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
@@ -29,6 +27,7 @@ namespace September.Common
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
         [SerializeReference, SubclassSelector] private IPlayerKilledUseCase _playerKilledUseCase;
+        [SerializeField] private TagRulePlayerUIPresenter _tagRulePlayerUIPresenter;
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
@@ -49,6 +48,7 @@ namespace September.Common
             {
                 ChooseOgre();
                 Initialize().Forget();
+                RPC_OpeningSequence();
             }
         }
 
@@ -72,7 +72,6 @@ namespace September.Common
             }
 
             Context.Register(StaticServiceLocator.Instance);
-            RPC_OpeningSequence();
         }
 
         private async UniTask SpawnPlayers()
@@ -120,8 +119,15 @@ namespace September.Common
                 }
 
                 var playerHealth = player.GetComponent<PlayerHealth>();
-                //PlayerHealthのOnDeathに登録
-                playerHealth.OnDeath += hitData => _playerKilledUseCase.ProcessKillEvent(hitData.ExecutorRef, hitData.TargetRef);
+                playerHealth.OnDeath += hitData =>
+                {
+                    PlayerRef killer = hitData.ExecutorRef;
+                    PlayerRef victim = hitData.TargetRef;
+
+                    _tagRulePlayerUIPresenter.OnKilled(killer, victim);
+                    _playerKilledUseCase.ProcessKillEvent(killer, victim);
+                };
+
                 var spd = pair.Value;
                 foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
                 {
@@ -198,11 +204,6 @@ namespace September.Common
                 await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.GameStart);
             }
 
-            //  ゲーム開始表示終了後に役職開示を行う
-            // TODO: Insert GameRule
-            SetOgreLamp();
-
-            ShowStatusUpUI();
             if (Context.Runner.IsServer)
             {
                 //  ステート終了
@@ -246,70 +247,6 @@ namespace September.Common
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-        }
-
-        private void SetOgreLamp()
-        {
-            if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
-            {
-                UIController.I.ShowOgreLamp(true);
-                UIController.I.ChangeTagNotice(0);
-            }
-            else
-            {
-                UIController.I.ChangeTagNotice(1);
-            }
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void Rpc_ShowKillLog(PlayerRef killer, PlayerRef killed)
-        {
-            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(killer, out SessionPlayerData killerData) &&
-                PlayerDatabase.Instance.PlayerDataDic.TryGet(killed, out SessionPlayerData killedData))
-            {
-                string killerName = killerData.DisplayNickName;
-                string killedName = killedData.DisplayNickName;
-                UIController.I.ShowLog($"{killerName} が {killedName} を倒した");
-            }
-        }
-
-        // 鬼変更時のUI更新通知
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
-        {
-            if (executor == Context.Runner.LocalPlayer)
-            {
-                UIController.I.ShowOgreLamp(false);
-            }
-            else if (targetRef == Context.Runner.LocalPlayer)
-            {
-                UIController.I.ShowOgreLamp(true);
-                UIController.I.ChangeTagNotice(2);
-            }
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ShowStatusUpUI(PlayerRef playerRef, bool showStatusUpUI)
-        {
-            if (Runner.LocalPlayer == playerRef)
-            {
-                if (showStatusUpUI)
-                {
-                    UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
-                }
-                else
-                {
-                    UIController.I.ShowStatusUpUI(-1, StatusUpType.None);
-                }
-            }
-        }
-
-        private void ShowStatusUpUI()
-        {
-            if (PlayerDatabase.Instance.PlayerDataDic[Runner.LocalPlayer].IsOgre)
-            {
-                UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
-            }
         }
 
         /// <summary>
