@@ -7,6 +7,7 @@ using DG.Tweening;
 using Fusion;
 using GameEvent;
 using InGame.Player;
+using September.Common.Attribute;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
 using September.InGame.UI;
@@ -25,6 +26,7 @@ namespace September.Common
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
+        [SerializeReference, SubclassSelector] private IGameStartStrategy _gameStartStrategy;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
         [SerializeReference, SubclassSelector] private IPlayerKilledUseCase _playerKilledUseCase;
         [SerializeField, RequireInterface(typeof(IPlayerKilledPresenter))] private MonoBehaviour _playerKilledPresenter;
@@ -46,7 +48,7 @@ namespace September.Common
 
             if (Context.Runner.IsServer)
             {
-                ChooseOgre();
+                _gameStartStrategy.OnGameStarted();
                 Initialize().Forget();
                 RPC_OpeningSequence();
             }
@@ -227,23 +229,6 @@ namespace September.Common
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(1f));
             }
-        }
-
-        /// <summary>
-        /// 鬼を抽選するメソッド
-        /// </summary>
-        private void ChooseOgre()
-        {
-            var dic = PlayerDatabase.Instance.PlayerDataDic;
-            if (dic.Count <= 0 || !Context.Runner.IsServer)
-                return;
-
-            var index = Random.Range(0, dic.Count);
-            var ogreKey = dic.ToArray()[index].Key;
-            var data = dic.Get(ogreKey);
-            data.IsOgre = true;
-            PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
-            PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
         }
 
         private void HideCursor()
