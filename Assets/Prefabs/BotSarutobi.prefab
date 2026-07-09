@@ -10940,7 +10940,6 @@ Transform:
   - {fileID: 495852518451193283}
   - {fileID: 8263847269055346790}
   - {fileID: 3049049661101644793}
-  - {fileID: 8639972687659849686}
   - {fileID: 6960110181958855566}
   m_Father: {fileID: 7757830407370218699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -13684,6 +13683,7 @@ GameObject:
   - component: {fileID: 5628340922608597896}
   - component: {fileID: 791899454190680927}
   - component: {fileID: -6116986361749802095}
+  - component: {fileID: 7220808548736631341}
   m_Layer: 6
   m_Name: BotSarutobi
   m_TagString: Player
@@ -14492,7 +14492,7 @@ MonoBehaviour:
   _meshObj: {fileID: 8360875997416129576}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
-  _attackWeapon: {fileID: 8983706877233368428}
+  _attackWeapon: {fileID: 0}
   _buildGenerator: {fileID: 6133156092747190984}
   _playerStatus: {fileID: -3905644752378878134}
   _IsStun:
@@ -14549,6 +14549,34 @@ MonoBehaviour:
   _textOffsetY: 1.5
   _randomOffsetRadius: 60
   _textDestroyTime: 1.3
+--- !u!114 &7220808548736631341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d4e884242336e5409ec045ec7b47706, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 2525442923973757293, guid: b552d055c3cf3794f85668e6d886bc61, type: 3}
+  _equipmentData:
+  - _type: 0
+    _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
+    _positionOffset: {x: 0.063, y: -0.047, z: 0.011}
+    _rotationOffset: {x: -54.962, y: 38.238, z: 27.162}
+    _humanBodyBones: 18
+    _startingEquipment: 1
+    ClonedObject: {fileID: 0}
+  - _type: 1
+    _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
+    _positionOffset: {x: 0.063, y: -0.047, z: 0.011}
+    _rotationOffset: {x: -54.962, y: 38.238, z: 27.162}
+    _humanBodyBones: 18
+    _startingEquipment: 0
+    ClonedObject: {fileID: 0}
 --- !u!1 &8448165706584407693
 GameObject:
   m_ObjectHideFlags: 0
@@ -15037,37 +15065,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.015393197, y: -0.10544878, z: -0.04851184}
     m_Extent: {x: 0.005840241, y: 0.0060171634, z: 0.008541986}
   m_DirtyAABB: 0
---- !u!1 &8983706877233368428
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 1219307050782259563, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-  m_PrefabInstance: {fileID: 7802293407002129415}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8639972687659849686}
-  m_Layer: 0
-  m_Name: 'WpMD_Katana_0101 (Missing Prefab with guid: bd678171ec35e0645853a1cb9d75a010)'
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8639972687659849686
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-  m_PrefabInstance: {fileID: 7802293407002129415}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8983706877233368428}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.3555777, y: 0.38483503, z: 0.34375107, w: 0.7792957}
-  m_LocalPosition: {x: 0.063, y: -0.047, z: 0.011}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1661348190536254133}
-  m_LocalEulerAnglesHint: {x: -54.962, y: 38.238, z: 27.162}
 --- !u!1 &9007375091109236216
 GameObject:
   m_ObjectHideFlags: 0
@@ -15720,60 +15717,3 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1958715547358007740, guid: b26439f0b380320429dc3175fc091eb3, type: 3}
   m_PrefabInstance: {fileID: 7161641625631155279}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &7802293407002129415
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1661348190536254133}
-    m_Modifications:
-    - target: {fileID: 1219307050782259563, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_Name
-      value: WpMD_Katana_0101
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.063
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.047
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.011
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7792957
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.3555777
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.38483503
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.34375107
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -54.962
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 38.238
-      objectReference: {fileID: 0}
-    - target: {fileID: 1990601901173973969, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 27.162
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: bd678171ec35e0645853a1cb9d75a010, type: 3}

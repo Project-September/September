@@ -6104,14 +6104,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animator: {fileID: 2525442923973757293}
   _equipmentData:
-  - type: 0
+  - _type: 0
     _prefab: {fileID: 0}
     _positionOffset: {x: 0, y: 0, z: 0}
     _rotationOffset: {x: 0, y: 0, z: 0}
     _humanBodyBones: 18
     _startingEquipment: 1
     ClonedObject: {fileID: 0}
-  - type: 1
+  - _type: 1
     _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
     _positionOffset: {x: 0.119, y: 0.015, z: -0.073}
     _rotationOffset: {x: 0, y: -180, z: 0}

@@ -81,6 +81,8 @@ namespace InGame.Player.Ability
                     continue;
                 }
 
+                if (!targetAbility.IsEnabled) continue;
+
                 // 条件判定用のコンテキストを作成
                 var ctx = new TriggerEventContext(gameObject, targetAbility, _currentButtons, _previousButtons);
                 // 条件を満たしていればアビリティを開始

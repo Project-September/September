@@ -28,7 +28,11 @@ namespace InGame.Player
         {
             var equipment = _equipmentData.FirstOrDefault(x => x.Type == type);
 
-            if (equipment == null) return;
+            if (equipment == null)
+            {
+                Debug.LogError($"[EquipmentManager] EquipmentType '{type}' was not found in EquipmentData.");
+                return;
+            }
 
             ChangeEquipment(equipment);
         }
@@ -44,6 +48,7 @@ namespace InGame.Player
 
             _currentEquipments[targetEquipment.HumanBodyBones] = targetEquipment;
         }
+
         private void InstanceEquipment(Equipment targetEquipment)
         {
             if (targetEquipment.Prefab == null) return;
@@ -68,8 +73,8 @@ namespace InGame.Player
     [System.Serializable]
     public class Equipment
     {
-        [SerializeField] private EquipmentType type;
-        public EquipmentType Type => type;
+        [SerializeField] private EquipmentType _type;
+        public EquipmentType Type => _type;
         [SerializeField] private GameObject _prefab;
         public GameObject Prefab => _prefab;
         [SerializeField] private Vector3 _positionOffset;
