@@ -49,7 +49,6 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-
         public override void Spawned()
         {
             InitComponents();
@@ -223,6 +222,12 @@ namespace InGame.Player
         public void RPC_SetUseGrav(NetworkBool active)
         {
             _rigidbody.useGravity = active;
+        }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_Constraints(NetworkBool active)
+        {
+            _rigidbody.constraints = active? RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : RigidbodyConstraints.None;
         }
 
         /// <summary> 非常用リスポーン </summary>
