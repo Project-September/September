@@ -49,6 +49,7 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
+        
         public override void Spawned()
         {
             InitComponents();
@@ -225,9 +226,11 @@ namespace InGame.Player
         }
         
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_Constraints(NetworkBool active)
+        public void RPC_SetPositionLock(NetworkBool isLocked)
         {
-            _rigidbody.constraints = active? RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : RigidbodyConstraints.None;
+            _rigidbody.constraints = isLocked ?
+                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
+                RigidbodyConstraints.None;
         }
 
         /// <summary> 非常用リスポーン </summary>
