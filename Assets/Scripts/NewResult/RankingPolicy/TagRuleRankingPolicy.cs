@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using September.NewResult.RankingPolicy;
 
 namespace September.NewResult
 {
     /// <summary>
-    /// 順位決めのルールを適用するサービス
+    /// 鬼ごっこルールのランキング順位付け方針
     /// </summary>
-    public struct RankingService
+    public class TagRuleRankingPolicy : IRankingPolicy
     {
-        public static IEnumerable<PlayerResultEntry> Apply(IEnumerable<PlayerResultEntry> playerResultInfo)
+        public IEnumerable<PlayerResultEntry> Apply(IEnumerable<PlayerResultEntry> playerResultInfo)
         {
             var ordered = playerResultInfo.OrderByDescending(x => x.TotalScore).ToArray();
             ordered = ordered.Where(x => !x.IsOgre).Concat(ordered.Where(x => x.IsOgre)).ToArray();

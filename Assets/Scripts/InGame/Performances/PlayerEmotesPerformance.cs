@@ -5,27 +5,11 @@ using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
-using September.InGame.UI;
+using September.Common;
 using UnityEngine;
 
-namespace September.Common
+namespace September.InGame.Performances
 {
-    /// <summary>
-    /// ゲーム開始時の演出
-    /// </summary>
-    public interface IGameStartPerformance
-    {
-        public bool Enabled { get; }
-
-        public struct Context
-        {
-            public NetworkRunner Runner;
-            public Action<bool, bool, bool> ToggleInputs;
-        }
-
-        public UniTask RunPerformance(Context ctx);
-    }
-
     [Serializable]
     public class PlayerEmotesPerformance : IGameStartPerformance
     {
@@ -66,27 +50,6 @@ namespace September.Common
             }
 
             _startCamera.Priority = -999;
-        }
-    }
-
-    [Serializable]
-    public class CountdownPerformance : IGameStartPerformance
-    {
-        [SerializeField] private bool _enabled = true;
-
-        public bool Enabled => _enabled;
-
-        public async UniTask RunPerformance(IGameStartPerformance.Context ctx)
-        {
-            // カメラが変わったタイミングで視点入力だけ有効化
-            if (ctx.Runner.IsServer) ctx.ToggleInputs(false, false, true);
-            //  カメラが元の位置に戻るまで待つ
-            await UniTask.WaitForSeconds(1.5f);
-            //  カウントダウン開始
-            if (UIController.I.TimeOverlayMessage != null)
-            {
-                await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.Countdown);
-            }
         }
     }
 }

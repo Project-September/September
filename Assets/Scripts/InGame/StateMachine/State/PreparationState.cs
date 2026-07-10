@@ -6,11 +6,11 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using GameEvent;
-using InGame.Exhibit;
-using InGame.Health;
 using InGame.Player;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
+using September.InGame.Performances;
+using September.InGame.Rules;
 using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -31,6 +31,9 @@ namespace September.Common
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
+        private IGameStartStrategy GameStartStrategy => Context.GameRule.GameStartStrategy;
+        private IPlayerKilledUseCase PlayerKilledUseCase => Context.GameRule.PlayerKilledUseCase;
+
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
@@ -46,8 +49,9 @@ namespace September.Common
 
             if (Context.Runner.IsServer)
             {
-                ChooseOgre();
+                GameStartStrategy.OnGameStarted();
                 Initialize().Forget();
+                RPC_OpeningSequence();
             }
         }
 
@@ -71,7 +75,6 @@ namespace September.Common
             }
 
             Context.Register(StaticServiceLocator.Instance);
-            RPC_OpeningSequence();
         }
 
         private async UniTask SpawnPlayers()
@@ -119,8 +122,14 @@ namespace September.Common
                 }
 
                 var playerHealth = player.GetComponent<PlayerHealth>();
-                //PlayerHealthのOnDeathに登録
-                playerHealth.OnDeath += OnPlayerKilled;
+                playerHealth.OnDeath += hitData =>
+                {
+                    PlayerRef killer = hitData.ExecutorRef;
+                    PlayerRef victim = hitData.TargetRef;
+                    Context.PlayerKilled?.Invoke(killer, victim);
+                    PlayerKilledUseCase.ProcessKillEvent(killer, victim);
+                };
+
                 var spd = pair.Value;
                 foreach (var playerData in PlayerDatabase.Instance.PlayerDataDic)
                 {
@@ -197,11 +206,6 @@ namespace September.Common
                 await UIController.I.TimeOverlayMessage.Invoke(TimeMessageType.GameStart);
             }
 
-            //  ゲーム開始表示終了後に役職開示を行う
-            // TODO: Insert GameRule
-            SetOgreLamp();
-
-            ShowStatusUpUI();
             if (Context.Runner.IsServer)
             {
                 //  ステート終了
@@ -224,138 +228,10 @@ namespace September.Common
             }
         }
 
-        private void UpdateStunData(PlayerRef killerRef, SessionPlayerData killerData, PlayerRef killedPlayer)
-        {
-            if (killerData.StunData.TryGet(killedPlayer, out int count))
-            {
-                killerData.StunData.Set(killedPlayer, count + 1);
-            }
-            else
-            {
-                killerData.StunData.Set(killedPlayer, 1);
-            }
-
-            PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
-
-            // スコアの更新処理
-            PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
-        }
-
-        /// <summary>
-        /// 鬼を抽選するメソッド
-        /// </summary>
-        private void ChooseOgre()
-        {
-            var dic = PlayerDatabase.Instance.PlayerDataDic;
-            if (dic.Count <= 0 || !Context.Runner.IsServer)
-                return;
-
-            var index = Random.Range(0, dic.Count);
-            var ogreKey = dic.ToArray()[index].Key;
-            var data = dic.Get(ogreKey);
-            data.IsOgre = true;
-            PlayerDatabase.Instance.PlayerDataDic.Set(ogreKey, data);
-            PlayerDatabase.Instance.Server_AddOgreCount(ogreKey);
-        }
-
-        /// <summary>
-        /// 各Playerの気絶時に呼ばれるメソッド
-        /// </summary>
-        private void OnPlayerKilled(HitData data)
-        {
-            if (!Context.Runner.IsServer) return;
-            //.Instance.Server_AddStun(data.ExecutorRef);
-
-            // TODO: Insert GameRule
-            SessionPlayerData killerData = PlayerDatabase.Instance.PlayerDataDic.Get(data.ExecutorRef);
-            var killedData = PlayerDatabase.Instance.PlayerDataDic.Get(data.TargetRef);
-            if (killerData.IsOgre && data.ExecutorRef != data.TargetRef)
-            {
-                killerData.IsOgre = false;
-                RPC_ShowStatusUpUI(data.ExecutorRef, false);
-                PlayerDatabase.Instance.PlayerDataDic.Set(data.ExecutorRef, killerData);
-                killedData.IsOgre = true;
-                PlayerDatabase.Instance.PlayerDataDic.Set(data.TargetRef, killedData);
-                RPC_ShowStatusUpUI(data.TargetRef, true);
-                RPC_SetOgreUI(data.ExecutorRef, data.TargetRef);
-                PlayerDatabase.Instance.Server_AddOgreCount(data.TargetRef);
-            }
-
-            if (data.ExecutorRef == data.TargetRef)
-                return;
-
-            UpdateStunData(data.ExecutorRef, killerData, data.TargetRef);
-            Rpc_ShowKillLog(data.ExecutorRef, data.TargetRef);
-        }
-
         private void HideCursor()
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-        }
-
-        private void SetOgreLamp()
-        {
-            if (PlayerDatabase.Instance.PlayerDataDic[Context.Runner.LocalPlayer].IsOgre)
-            {
-                UIController.I.ShowOgreLamp(true);
-                UIController.I.ChangeTagNotice(0);
-            }
-            else
-            {
-                UIController.I.ChangeTagNotice(1);
-            }
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void Rpc_ShowKillLog(PlayerRef killer, PlayerRef killed)
-        {
-            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(killer, out SessionPlayerData killerData) &&
-                PlayerDatabase.Instance.PlayerDataDic.TryGet(killed, out SessionPlayerData killedData))
-            {
-                string killerName = killerData.DisplayNickName;
-                string killedName = killedData.DisplayNickName;
-                UIController.I.ShowLog($"{killerName} が {killedName} を倒した");
-            }
-        }
-
-        // 鬼変更時のUI更新通知
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
-        {
-            if (executor == Context.Runner.LocalPlayer)
-            {
-                UIController.I.ShowOgreLamp(false);
-            }
-            else if (targetRef == Context.Runner.LocalPlayer)
-            {
-                UIController.I.ShowOgreLamp(true);
-                UIController.I.ChangeTagNotice(2);
-            }
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ShowStatusUpUI(PlayerRef playerRef, bool showStatusUpUI)
-        {
-            if (Runner.LocalPlayer == playerRef)
-            {
-                if (showStatusUpUI)
-                {
-                    UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
-                }
-                else
-                {
-                    UIController.I.ShowStatusUpUI(-1, StatusUpType.None);
-                }
-            }
-        }
-
-        private void ShowStatusUpUI()
-        {
-            if (PlayerDatabase.Instance.PlayerDataDic[Runner.LocalPlayer].IsOgre)
-            {
-                UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
-            }
         }
 
         /// <summary>
