@@ -1,24 +1,11 @@
 using Fusion;
 using InGame.Exhibit;
-using September.InGame.Common;
 using September.InGame.UI;
 
 namespace September.Common
 {
     public class TagRulePlayerKilledUIPresenter : NetworkBehaviour, IPlayerKilledPresenter
     {
-        private void Start()
-        {
-            var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
-
-            //  ゲーム開始表示終了後に役職開示を行う
-            inGameManager.GameStarted += () =>
-            {
-                ShowOgreLamp();
-                ShowStatusUpUI();
-            };
-        }
-
         public void OnPlayerKilled(PlayerRef killer, PlayerRef victim)
         {
             RPC_ShowKillLog(killer, victim);
@@ -37,22 +24,6 @@ namespace September.Common
             RPC_ShowStatusUpUI(victim, true);
         }
 
-        // 役職開示時のテキスト表示
-        private void ShowOgreLamp()
-        {
-            // 鬼だったら「あなたが鬼です」と表示
-            if (PlayerDatabase.Instance.PlayerDataDic[Runner.LocalPlayer].IsOgre)
-            {
-                UIController.I.ShowOgreLamp(true);
-                UIController.I.ChangeTagNotice(0);
-            }
-            // 鬼じゃなかったら「鬼に選ばれなかった」と表示
-            else
-            {
-                UIController.I.ChangeTagNotice(1);
-            }
-        }
-
         // 鬼変更時の鬼ランプの表示・非表示処理
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetOgreUI(PlayerRef executor, PlayerRef targetRef)
@@ -68,14 +39,6 @@ namespace September.Common
             {
                 UIController.I.ShowOgreLamp(true);
                 UIController.I.ChangeTagNotice(2);
-            }
-        }
-
-        private void ShowStatusUpUI()
-        {
-            if (PlayerDatabase.Instance.PlayerDataDic[Runner.LocalPlayer].IsOgre)
-            {
-                UIController.I.ShowStatusUpUI(-1, StatusUpType.Ogre);
             }
         }
 
