@@ -1,11 +1,18 @@
 using Fusion;
 using InGame.Exhibit;
+using September.InGame.Common;
 using September.InGame.UI;
 
 namespace September.Common
 {
     public class TagRulePlayerKilledUIPresenter : NetworkBehaviour, IPlayerKilledPresenter
     {
+        private void Start()
+        {
+            var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+            inGameManager.PlayerKilled += OnPlayerKilled;
+        }
+
         public void OnPlayerKilled(PlayerRef killer, PlayerRef victim)
         {
             RPC_ShowKillLog(killer, victim);

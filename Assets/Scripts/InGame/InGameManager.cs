@@ -22,6 +22,7 @@ namespace September.InGame.Common
         public CancellationTokenSource Cts { get; private set; }
 
         public System.Action GameStarted { get; set; }
+        public System.Action<PlayerRef, PlayerRef> PlayerKilled { get; set; }
 
         /// <summary>
         /// 現在のゲーム状態名を取得する

@@ -7,7 +7,6 @@ using DG.Tweening;
 using Fusion;
 using GameEvent;
 using InGame.Player;
-using September.Common.Attribute;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
 using September.InGame.UI;
@@ -28,7 +27,6 @@ namespace September.Common
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         [SerializeField] private GameRule _gameRule;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
-        [SerializeField, RequireInterface(typeof(IPlayerKilledPresenter))] private MonoBehaviour _playerKilledPresenter;
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
@@ -127,11 +125,7 @@ namespace September.Common
                 {
                     PlayerRef killer = hitData.ExecutorRef;
                     PlayerRef victim = hitData.TargetRef;
-
-                    if (_playerKilledPresenter is IPlayerKilledPresenter presenter)
-                    {
-                        presenter.OnPlayerKilled(killer, victim);
-                    }
+                    Context.PlayerKilled?.Invoke(killer, victim);
                     PlayerKilledUseCase.ProcessKillEvent(killer, victim);
                 };
 
