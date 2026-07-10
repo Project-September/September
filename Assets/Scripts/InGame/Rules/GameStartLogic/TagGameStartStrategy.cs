@@ -1,13 +1,9 @@
 using System.Linq;
+using September.Common;
 using UnityEngine;
 
-namespace September.Common
+namespace September.InGame.Rules
 {
-    public interface IGameStartStrategy
-    {
-        public void OnGameStarted();
-    }
-
     /// <summary>
     /// 鬼ごっこ開始時の処理
     /// </summary>

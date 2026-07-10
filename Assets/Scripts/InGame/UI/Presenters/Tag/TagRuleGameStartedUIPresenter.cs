@@ -1,9 +1,9 @@
 using Fusion;
 using InGame.Exhibit;
+using September.Common;
 using September.InGame.Common;
-using September.InGame.UI;
 
-namespace September.Common
+namespace September.InGame.UI.Presenters.Tag
 {
     public class TagRuleGameStartedUIPresenter : NetworkBehaviour, IGameStartedPresenter
     {

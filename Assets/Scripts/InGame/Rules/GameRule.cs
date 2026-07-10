@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace September.Common
+namespace September.InGame.Rules
 {
     public interface IGameRule
     {

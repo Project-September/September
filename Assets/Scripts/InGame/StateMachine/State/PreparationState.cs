@@ -9,6 +9,8 @@ using GameEvent;
 using InGame.Player;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
+using September.InGame.Performances;
+using September.InGame.Rules;
 using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;

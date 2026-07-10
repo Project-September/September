@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: TagGameRule
   m_EditorClassIdentifier: 
   _gameStartStrategy:
-    rid: 7765555065531400350
+    rid: 7765555094382968937
   _playerKilledUseCase:
-    rid: 7765555065531400351
+    rid: 7765555094382968938
   references:
     version: 2
     RefIds:
-    - rid: 7765555065531400350
-      type: {class: TagGameStartStrategy, ns: September.Common, asm: Scripts}
+    - rid: 7765555094382968937
+      type: {class: TagGameStartStrategy, ns: September.InGame.Rules, asm: Scripts}
       data: 
-    - rid: 7765555065531400351
-      type: {class: TagPlayerKilledUseCase, ns: September.Common, asm: Scripts}
+    - rid: 7765555094382968938
+      type: {class: TagPlayerKilledUseCase, ns: September.InGame.Rules, asm: Scripts}
       data: 

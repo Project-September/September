@@ -102,19 +102,19 @@ MonoBehaviour:
   _isRandomSpawn: 0
   _gameRule: {fileID: 11400000, guid: 97a1f1b8124cf854bac792fff8e9565b, type: 2}
   _gameStartPerformances:
-  - rid: 7765555050530472034
-  - rid: 7765555050530472041
+  - rid: 7765555094382968935
+  - rid: 7765555094382968936
   references:
     version: 2
     RefIds:
-    - rid: 7765555050530472034
-      type: {class: PlayerEmotesPerformance, ns: September.Common, asm: Scripts}
+    - rid: 7765555094382968935
+      type: {class: PlayerEmotesPerformance, ns: September.InGame.Performances, asm: Scripts}
       data:
         _enabled: 1
         _startCamera: {fileID: 1329500297884584287}
         _cameraOffset: {x: 0, y: 1, z: -3}
-    - rid: 7765555050530472041
-      type: {class: CountdownPerformance, ns: September.Common, asm: Scripts}
+    - rid: 7765555094382968936
+      type: {class: CountdownPerformance, ns: September.InGame.Performances, asm: Scripts}
       data:
         _enabled: 1
 --- !u!114 &4864244944479918103

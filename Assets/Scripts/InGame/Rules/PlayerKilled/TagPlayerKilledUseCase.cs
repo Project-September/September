@@ -1,15 +1,8 @@
 using Fusion;
+using September.Common;
 
-namespace September.Common
+namespace September.InGame.Rules
 {
-    /// <summary>
-    /// プレイヤーをキルした際の処理を定義するユースケース
-    /// </summary>
-    public interface IPlayerKilledUseCase
-    {
-        public void ProcessKillEvent(PlayerRef killer, PlayerRef victim);
-    }
-
     /// <summary>
     /// 鬼ごっこルールにおけるプレイヤーキル時のユースケース
     /// </summary>
