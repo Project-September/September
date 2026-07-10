@@ -27,13 +27,12 @@ namespace September.Common
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
-        [SerializeField] private GameRule _gameRule;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
-        private IGameStartStrategy GameStartStrategy => _gameRule.GameStartStrategy;
-        private IPlayerKilledUseCase PlayerKilledUseCase => _gameRule.PlayerKilledUseCase;
+        private IGameStartStrategy GameStartStrategy => Context.GameRule.GameStartStrategy;
+        private IPlayerKilledUseCase PlayerKilledUseCase => Context.GameRule.PlayerKilledUseCase;
 
         protected internal override void OnEnter()
         {

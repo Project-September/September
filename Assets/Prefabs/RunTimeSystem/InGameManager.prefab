@@ -55,6 +55,7 @@ MonoBehaviour:
   - {fileID: 4864244944479918103}
   - {fileID: 170840761869481480}
   _timerData: {fileID: 11400000, guid: e2ca3e11eb6f46047839bebd36fd3c24, type: 2}
+  _gameRule: {fileID: 11400000, guid: 97a1f1b8124cf854bac792fff8e9565b, type: 2}
 --- !u!114 &8149397541848376858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,7 +101,6 @@ MonoBehaviour:
   _cameraOffset: {x: 0, y: 1, z: -3}
   _setIcon: {fileID: 0}
   _isRandomSpawn: 0
-  _gameRule: {fileID: 11400000, guid: 97a1f1b8124cf854bac792fff8e9565b, type: 2}
   _gameStartPerformances:
   - rid: 7765555094382968935
   - rid: 7765555094382968936

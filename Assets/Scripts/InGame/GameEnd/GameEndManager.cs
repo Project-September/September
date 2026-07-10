@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
 using September.Common;
+using September.InGame.Common;
 using September.InGame.UI;
 using September.NewResult;
-using September.NewResult.RankingPolicy;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,11 +14,6 @@ namespace September.InGame
         [SerializeField] private FinishAnimation _finishAnimation;
         [SerializeField] private SceneTransitionEffect _sceneTransitionEffect;
 
-        [Header("順位付けルール")]
-        [SerializeReference, SubclassSelector] private IRankingPolicy _rankingPolicy;
-
-        private static IRankingPolicy _selectedRankingPolicy;
-
         private async void Start()
         {
             UIController.I.OnGameEnd.Subscribe(_ => GameEnd().Forget()).AddTo(this);
@@ -26,8 +21,6 @@ namespace September.InGame
 
         public async UniTask GameEnd()
         {
-            _selectedRankingPolicy = _rankingPolicy;
-
             await _finishAnimation.Play();
             await TransitionToResultScene(_sceneTransitionEffect);
         }
@@ -46,7 +39,8 @@ namespace September.InGame
 
         private static bool BuildGameResultInfo()
         {
-            var builder = new GameResultInfoBuilder(_selectedRankingPolicy);
+            var rankingPolicy = StaticServiceLocator.Instance.Get<InGameManager>().GameRule.RankingPolicy;
+            var builder = new GameResultInfoBuilder(rankingPolicy);
 
             var db = PlayerDatabase.Instance;
             if (!db)

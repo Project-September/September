@@ -1,3 +1,4 @@
+using September.NewResult.RankingPolicy;
 using UnityEngine;
 
 namespace September.InGame.Rules
@@ -6,6 +7,7 @@ namespace September.InGame.Rules
     {
         public IGameStartStrategy GameStartStrategy { get; }
         public IPlayerKilledUseCase PlayerKilledUseCase { get; }
+        public IRankingPolicy RankingPolicy { get; }
     }
 
     [CreateAssetMenu(fileName = "GameRule", menuName = "September/Game Rule")]
@@ -13,8 +15,10 @@ namespace September.InGame.Rules
     {
         [SerializeReference, SubclassSelector, Header("ゲーム開始時の処理")] private IGameStartStrategy _gameStartStrategy;
         [SerializeReference, SubclassSelector, Header("プレイヤーキル時の処理")] private IPlayerKilledUseCase _playerKilledUseCase;
+        [SerializeReference, SubclassSelector, Header("順位付けルール")] private IRankingPolicy _rankingPolicy;
 
         public IGameStartStrategy GameStartStrategy => _gameStartStrategy;
         public IPlayerKilledUseCase PlayerKilledUseCase => _playerKilledUseCase;
+        public IRankingPolicy RankingPolicy => _rankingPolicy;
     }
 }
