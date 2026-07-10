@@ -5601,6 +5601,7 @@ GameObject:
   - component: {fileID: 4943096902174970823}
   - component: {fileID: 7428561950604722073}
   - component: {fileID: 2578447838527597611}
+  - component: {fileID: -676145326416564930}
   m_Layer: 6
   m_Name: Okubo
   m_TagString: Player
@@ -5757,6 +5758,9 @@ MonoBehaviour:
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _attackWeapon: {fileID: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _IsStun:
     _value: 0
 --- !u!114 &3242880713039265549
@@ -5817,12 +5821,15 @@ MonoBehaviour:
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _MoveDirection: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
+  _IsHookLocked: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5926,6 +5933,8 @@ MonoBehaviour:
   _interactAngleBuffer: 10
   _interactRadiusBuffer: 0.3
   _playerAudioController: {fileID: 0}
+  _buildGenerator: {fileID: 0}
+  _playerStatus: {fileID: 0}
   _isHoldingInteract: 0
 --- !u!114 &7508249662566368237
 MonoBehaviour:
@@ -5979,6 +5988,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _attackDamage: 35
         _ogreAttackDamage: 55
         _startHitCheckFrame: 9
@@ -5999,9 +6009,12 @@ MonoBehaviour:
         _triggerInteraction: 1
         _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
         _debugDrawDuration: 1
+        _buildGenerator: {fileID: 0}
+        _playerStatus: {fileID: 0}
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
-      data: 
+      data:
+        _targetAbilityName: AbilityNormalAttack
 --- !u!114 &8254388696613982807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6245,6 +6258,34 @@ MonoBehaviour:
   _randomDirectionAmount: 0.4
   _throwPower: 3
   _throwUpAmount: 1
+--- !u!114 &-676145326416564930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d4e884242336e5409ec045ec7b47706, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 2525442923973757293}
+  _equipmentData:
+  - _type: 0
+    _prefab: {fileID: 0}
+    _positionOffset: {x: 0, y: 0, z: 0}
+    _rotationOffset: {x: 0, y: 0, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 1
+    ClonedObject: {fileID: 0}
+  - _type: 1
+    _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
+    _positionOffset: {x: 0.119, y: 0.015, z: -0.073}
+    _rotationOffset: {x: 0, y: -180, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 0
+    ClonedObject: {fileID: 0}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

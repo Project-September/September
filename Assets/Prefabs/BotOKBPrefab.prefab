@@ -94,6 +94,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6063272011640703568}
   m_LocalEulerAnglesHint: {x: -1.1730033e-15, y: -5.8650165e-16, z: -1.0996906e-15}
+--- !u!1 &140737926469266255
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 70541154945678229}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: RightHand
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &70541154945678229
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140737926469266255}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2462965415467351492}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &222055179418498548
 GameObject:
   m_ObjectHideFlags: 0
@@ -5284,6 +5315,7 @@ Transform:
   - {fileID: 5645407088099010296}
   - {fileID: 4169774940667772143}
   - {fileID: 7064404139853078016}
+  - {fileID: 70541154945678229}
   m_Father: {fileID: 750593193299160763}
   m_LocalEulerAnglesHint: {x: 74.132, y: 167.60927, z: -179.81311}
 --- !u!1 &7870680726349616738
@@ -5413,6 +5445,7 @@ GameObject:
   - component: {fileID: 8187313864737420619}
   - component: {fileID: 5078540296886538316}
   - component: {fileID: -7371569288617054287}
+  - component: {fileID: 1999456120255419093}
   m_Layer: 6
   m_Name: BotOKBPrefab
   m_TagString: Player
@@ -5602,6 +5635,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _hookPower: 10
+  _flyingDamping: 3
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
@@ -5609,9 +5644,11 @@ MonoBehaviour:
   _playerStatus: {fileID: -3905644752378878134}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
+  _MoveDirection: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
+  _IsHookLocked: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5763,6 +5800,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _attackDamage: 35
         _ogreAttackDamage: 55
         _startHitCheckFrame: 9
@@ -5787,7 +5825,8 @@ MonoBehaviour:
         _playerStatus: {fileID: -3905644752378878134}
     - rid: 2879281568291487895
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
-      data: 
+      data:
+        _targetAbilityName: AbilityNormalAttack
     - rid: 8000700287031967829
       type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
       data:
@@ -5798,6 +5837,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _duration: 10
         _buffEffect: {fileID: 11400000, guid: eb825a65a95ae924eb8f98bc05831cf5, type: 2}
         _effectType: 0
@@ -6002,6 +6042,7 @@ MonoBehaviour:
   _meshObj: {fileID: 8360875997416129576}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _attackWeapon: {fileID: 0}
   _buildGenerator: {fileID: 8437207651533504532}
   _playerStatus: {fileID: -3905644752378878134}
   _IsStun:
@@ -6058,6 +6099,34 @@ MonoBehaviour:
   _textOffsetY: 1.5
   _randomOffsetRadius: 60
   _textDestroyTime: 1.3
+--- !u!114 &1999456120255419093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d4e884242336e5409ec045ec7b47706, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 2525442923973757293}
+  _equipmentData:
+  - _type: 0
+    _prefab: {fileID: 0}
+    _positionOffset: {x: 0, y: 0, z: 0}
+    _rotationOffset: {x: 0, y: 0, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 1
+    ClonedObject: {fileID: 0}
+  - _type: 1
+    _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
+    _positionOffset: {x: 0.119, y: 0.015, z: -0.073}
+    _rotationOffset: {x: 0, y: -180, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 0
+    ClonedObject: {fileID: 0}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
