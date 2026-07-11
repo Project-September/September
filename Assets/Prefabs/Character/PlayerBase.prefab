@@ -393,7 +393,6 @@ GameObject:
   - component: {fileID: 1920212954294529003}
   - component: {fileID: 2525442923973757293}
   - component: {fileID: 6261861407256658100}
-  - component: {fileID: 6462417923102071326}
   - component: {fileID: 4810525472409146702}
   - component: {fileID: 2132102575819528591}
   - component: {fileID: 3043690341386287730}
@@ -459,24 +458,6 @@ MonoBehaviour:
   _namePartsToMatch:
   - R_Hand
   _sockets: []
---- !u!114 &6462417923102071326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292013223828287825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 224c75cd33ef4d74f9cf5b541cc9b898, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hitPoints:
-  - {fileID: 5645407088099010296}
-  - {fileID: 750593193299160763}
-  _radius: 0.1
-  _alreadyHit: []
-  IsActive: 0
 --- !u!114 &4810525472409146702
 MonoBehaviour:
   m_ObjectHideFlags: 0
