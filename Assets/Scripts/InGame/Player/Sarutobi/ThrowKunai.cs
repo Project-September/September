@@ -147,9 +147,12 @@ namespace InGame.Player.Sarutobi
                 _cameraController.ChangeOffset(_stanceCameraOffset, _changeOffsetDuration);
                 _crosshair.SetActive(true);
             }
-            if (!HasStateAuthority) return;
 
-            RPC_ChangeDescriptionUI(ControlDescriptionType.SarutobiAiming);
+            if (HasStateAuthority)
+            {
+                RPC_ChangeDescriptionUI(ControlDescriptionType.SarutobiAiming);
+            }
+
             State = KunaiStateType.Stance;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             var endType = await _clipPlayer.PlayClipAndWait(_stance);
