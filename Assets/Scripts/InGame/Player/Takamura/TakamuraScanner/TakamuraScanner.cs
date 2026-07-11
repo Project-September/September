@@ -8,10 +8,6 @@ namespace InGame.Player
     /// <summary>タカムラキャラのスキャンスキルを管理するクラス</summary>
     public partial class TakamuraScanner : NetworkBehaviour, IAfterTick
     {
-        [Header("カメラ制御")]
-        [SerializeField, Tooltip("フォーカス時のカメラの位置")] Vector3 _focusPosition = new(0.5f, 1, -2);
-        [SerializeField, Tooltip("カメラの移動時間")] float _cameraMoveDuration = 0.2f;
-
         PlayerManager _playerManager;
         TakamuraMovement _tkmrMovement;
         CameraController _cameraController;
@@ -22,6 +18,7 @@ namespace InGame.Player
         {
             _playerManager = GetComponent<PlayerManager>();
             _tkmrMovement = GetComponent<TakamuraMovement>();
+            _scannerCanvas.gameObject.SetActive(false);
             if (HasInputAuthority) InitInputAuthority();
             if (HasStateAuthority) InitStateAuthority();
         }
