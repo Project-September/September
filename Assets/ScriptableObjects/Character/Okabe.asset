@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bb23cd2aae0432b965beaa171d65944, type: 3}
+  m_Name: Okabe
+  m_EditorClassIdentifier: 
+  CharacterType: 1
+  TemplatePrefab: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  OutputPath: Assets/ScriptableObjects/Character/Okabe.prefab
+  MoveSpeed: 0
+  GroundSlopeThreshold: 45
+  GroundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  OgreMoveSpeed: 0
+  OgreDashSpeed: 0
+  DashSpeed: 0
+  DashCooldown: 3
+  StaminaConsumption: 0
+  RotationSpeed: 5
+  MaxLedgeHeight: 0
+  MinLedgeHeight: 0
+  MaxLedgeDepth: 0
+  ReachDistance: 0
+  TimeToVault: 0
+  VaultCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _abilities: []
+  _conditions: []
+  _layerInfo: []
+  Wait: {fileID: 0}
+  Walk: {fileID: 0}
+  Run: {fileID: 0}
+  JumpOver: {fileID: 0}
+  JumpOverDuration: 0.2
+  FallDown: {fileID: 0}
+  Faint: {fileID: 0}
+  GetUp: {fileID: 0}
+  InteractRadius: 2.5
+  InteractMask:
+    serializedVersion: 2
+    m_Bits: 0
+  InteractAngle: 90
+  InteractOrigin: {fileID: 0}
+  BaseInteractTime: 1
+  OgreInteractMultiplier: 1
+  InteractResponseTimeout: 3
+  InteractAngleBuffer: 10
+  InteractRadiusBuffer: 0.3
+  EquipmentData: []
+  RequireScore: 0
+  UltSequence: {fileID: 0}
+  _animatorController: {fileID: 0}
+  _avatar: {fileID: 0}
+  PunchEffect: {fileID: 0}
+  StunEffectPositionOffset: {x: 0, y: 0, z: 0}
+  FootstepCueName: 
+  PunchSwingCueName: 
+  PunchHitCueName: 
+  _footstepBlockClipList: []
+  MeshFbx: {fileID: 0}
+  references:
+    version: 2
+    RefIds: []
