@@ -1,5 +1,6 @@
 using System.Linq;
 using September.Common;
+using September.NewResult.RankingPolicy;
 using UnityEngine;
 
 namespace September.NewResult
@@ -21,9 +22,9 @@ namespace September.NewResult
             _data = data.OrderBy(x => x._rank).ToArray();
         }
 
-        public GameResultInfo Create(ExhibitScoreConfig config)
+        public GameResultInfo Create(ExhibitScoreConfig config, IRankingPolicy rankingPolicy)
         {
-            var builder = new GameResultInfoBuilder();
+            var builder = new GameResultInfoBuilder(rankingPolicy);
             builder.SetStageName("Field");
 
             var playerCount = _data.Length;
