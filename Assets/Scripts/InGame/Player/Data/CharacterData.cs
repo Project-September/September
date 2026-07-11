@@ -41,10 +41,8 @@ namespace September.InGame.Player.Data
         [SerializeField] public float TimeToVault;
         [SerializeField] public AnimationCurve VaultCurve;
 
-        /// <summary> 管理するアビリティのリスト（InspectorでSubclassSelectorで選択）</summary>
         [Header("PlayerAbilityManager")]
         [SerializeReference, SubclassSelector] private List<AbilityBase> _abilities = new();
-        /// <summary> アビリティ実行条件のリスト（InspectorでSubclassSelectorで選択）</summary>
         [SerializeReference, SubclassSelector] private List<IAbilityExecuteCondition> _conditions = new();
 
         [Header("AnimationClipPlayer")]
@@ -64,7 +62,6 @@ namespace September.InGame.Player.Data
         [SerializeField] public float InteractRadius = 2.5f;
         [SerializeField] public LayerMask InteractMask;
         [SerializeField, Range(0f, 180f)] public float InteractAngle = 90f; // 前方180度
-        [SerializeField] public Transform InteractOrigin;
         [SerializeField] public float BaseInteractTime = 1.0f;
         [SerializeField] public float OgreInteractMultiplier = 1.0f;
         [SerializeField] public float InteractResponseTimeout = 3f;
@@ -88,7 +85,6 @@ namespace September.InGame.Player.Data
         [SerializeField] private Avatar _avatar;
 
         [Header("PlayerEffectController")]
-        [SerializeField] public ParticleSystem PunchEffect;
         [SerializeField] public Vector3 StunEffectPositionOffset;
 
         [Header("PlayerAudioController")]
@@ -102,6 +98,9 @@ namespace September.InGame.Player.Data
 
         [Header("Mesh")]
         [SerializeField] public GameObject MeshFbx;
+
+        [Header("ReadTargetPrefab")]
+        [SerializeField] public GameObject ReadTargetPrefab;
 
         [Button]
         public void CreateCharacterFromTemplate()
@@ -159,6 +158,182 @@ namespace September.InGame.Player.Data
             var playerAudioController = meshObject.GetComponent<PlayerAudioController>();
 
             PrefabUtility.SaveAsPrefabAsset(cloneCharacter, OutputPath);
+
+            DestroyImmediate(cloneCharacter);
+
+            Debug.Log(OutputPath);
+        }
+
+        /// <summary>
+        /// TemplatePrefabのコンポーネントが持つデータを読み取って自身のフィールドに書き込む処理
+        /// </summary>
+
+        [Button]
+        public void ReadPropertiesFromTemplate()
+        {
+            Undo.RecordObject(this, "Read Character Data");
+
+            GameObject cloneCharacter = (GameObject)PrefabUtility.InstantiatePrefab(ReadTargetPrefab);
+
+            var playerMovement = cloneCharacter.GetComponent<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                var so = new SerializedObject(playerMovement);
+                MoveSpeed = so.FindProperty("_moveSpeed").floatValue;
+                GroundSlopeThreshold = so.FindProperty("_groundSlopeThreshold").floatValue;
+                GroundLayer = so.FindProperty("_groundLayer").intValue;
+                OgreMoveSpeed = so.FindProperty("_ogreMoveSpeed").floatValue;
+                OgreDashSpeed = so.FindProperty("_ogreDashSpeed").floatValue;
+                DashSpeed = so.FindProperty("_dashSpeed").floatValue;
+                DashCooldown = so.FindProperty("_dashCooldown").floatValue;
+                StaminaConsumption = so.FindProperty("_staminaConsumption").floatValue;
+                RotationSpeed = so.FindProperty("_rotationSpeed").floatValue;
+                MaxLedgeHeight = so.FindProperty("_maxLedgeHeight").floatValue;
+                MinLedgeHeight = so.FindProperty("_minLedgeHeight").floatValue;
+                MaxLedgeDepth = so.FindProperty("_maxLedgeDepth").floatValue;
+                ReachDistance = so.FindProperty("_reachDistance").floatValue;
+                TimeToVault = so.FindProperty("_timeToVault").floatValue;
+                VaultCurve = so.FindProperty("_vaultCurve").animationCurveValue;
+            }
+
+            var playerInteractionController = cloneCharacter.GetComponent<PlayerInteractionController>();
+            if (playerInteractionController != null)
+            {
+                var so = new SerializedObject(playerInteractionController);
+                InteractRadius = so.FindProperty("_interactRadius").floatValue;
+                InteractMask = so.FindProperty("_interactMask").intValue;
+                InteractAngle = so.FindProperty("_interactAngle").floatValue;
+                BaseInteractTime = so.FindProperty("_baseInteractTime").floatValue;
+                OgreInteractMultiplier = so.FindProperty("_ogreInteractMultiplier").floatValue;
+                InteractResponseTimeout = so.FindProperty("_interactResponseTimeout").floatValue;
+                InteractAngleBuffer = so.FindProperty("_interactAngleBuffer").floatValue;
+                InteractRadiusBuffer = so.FindProperty("_interactRadiusBuffer").floatValue;
+            }
+
+            var playerAbilityManager = cloneCharacter.GetComponent<PlayerAbilityManager>();
+            if (playerAbilityManager != null)
+            {
+                var so = new SerializedObject(playerAbilityManager);
+                
+                var abilitiesProp = so.FindProperty("_abilities");
+                _abilities = new List<AbilityBase>();
+                for (int i = 0; i < abilitiesProp.arraySize; i++)
+                {
+                    _abilities.Add(abilitiesProp.GetArrayElementAtIndex(i).managedReferenceValue as AbilityBase);
+                }
+
+                var conditionsProp = so.FindProperty("_conditions");
+                _conditions = new List<IAbilityExecuteCondition>();
+                for (int i = 0; i < conditionsProp.arraySize; i++)
+                {
+                    _conditions.Add(conditionsProp.GetArrayElementAtIndex(i).managedReferenceValue as IAbilityExecuteCondition);
+                }
+            }
+
+            var animationClipPlayer = cloneCharacter.GetComponent<AnimationClipPlayer>();
+            if (animationClipPlayer != null)
+            {
+                var so = new SerializedObject(animationClipPlayer);
+                
+                var field = typeof(AnimationClipPlayer).GetField("_layerInfo", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (field != null)
+                {
+                    var val = field.GetValue(animationClipPlayer) as List<LayerInfo>;
+                    _layerInfo = val != null ? new List<LayerInfo>(val) : new List<LayerInfo>();
+                }
+
+                Wait = so.FindProperty("_wait").objectReferenceValue as AnimationClip;
+                Walk = so.FindProperty("_walk").objectReferenceValue as AnimationClip;
+                Run = so.FindProperty("_run").objectReferenceValue as AnimationClip;
+            }
+
+            var animationClipPlayerManager = cloneCharacter.GetComponent<AnimationClipPlayerManager>();
+            if (animationClipPlayerManager != null)
+            {
+                var so = new SerializedObject(animationClipPlayerManager);
+                JumpOver = so.FindProperty("_jumpOver").objectReferenceValue as AnimationClip;
+                JumpOverDuration = so.FindProperty("_jumpOverDuration").floatValue;
+                FallDown = so.FindProperty("_fallDown").objectReferenceValue as AnimationClip;
+                Faint = so.FindProperty("_faint").objectReferenceValue as AnimationClip;
+                GetUp = so.FindProperty("_getUp").objectReferenceValue as AnimationClip;
+            }
+
+            var playerEquipmentManager = cloneCharacter.GetComponent<PlayerEquipmentManager>();
+            if (playerEquipmentManager != null)
+            {
+                var field = typeof(PlayerEquipmentManager).GetField("_equipmentData", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (field != null)
+                {
+                    EquipmentData = field.GetValue(playerEquipmentManager) as Equipment[];
+                }
+            }
+
+            var ultCondition = cloneCharacter.GetComponent<UltCondition>();
+            if (ultCondition != null)
+            {
+                var so = new SerializedObject(ultCondition);
+                RequireScore = so.FindProperty("_requiredScore").intValue;
+            }
+
+            var playableDirector = cloneCharacter.GetComponent<PlayableDirector>();
+            if (playableDirector != null)
+            {
+                var so = new SerializedObject(playableDirector);
+                UltSequence = so.FindProperty("m_PlayableAsset").objectReferenceValue as PlayableAsset;
+            }
+
+            GameObject meshObject = null;
+
+            foreach (Transform child in cloneCharacter.transform)
+            {
+                if (child.name == "Mesh")
+                {
+                    meshObject = child.gameObject;
+                    break;
+                }
+            }
+
+            if (meshObject != null)
+            {
+                meshObject.GetComponent<Animator>().applyRootMotion = true;
+
+                var animator = meshObject.GetComponent<Animator>();
+                if (animator != null)
+                {
+                    var so = new SerializedObject(animator);
+                    _animatorController = so.FindProperty("m_Controller").objectReferenceValue as AnimatorController;
+                    _avatar = so.FindProperty("m_Avatar").objectReferenceValue as Avatar;
+                }
+
+                var playerEffectController = meshObject.GetComponent<PlayerEffectController>();
+                if (playerEffectController != null)
+                {
+                    var so = new SerializedObject(playerEffectController);
+                    StunEffectPositionOffset = so.FindProperty("_stunEffectPositionOffset").vector3Value;
+                }
+
+                var playerAudioController = meshObject.GetComponent<PlayerAudioController>();
+                if (playerAudioController != null)
+                {
+                    var so = new SerializedObject(playerAudioController);
+                    FootstepCueName = so.FindProperty("_footstepCueName").stringValue;
+                    PunchSwingCueName = so.FindProperty("_punchSwingCueName").stringValue;
+                    PunchHitCueName = so.FindProperty("_punchHitCueName").stringValue;
+
+                    var field = typeof(PlayerAudioController).GetField("_footstepBlockClipList", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (field != null)
+                    {
+                        var val = field.GetValue(playerAudioController) as List<AnimationClip>;
+                        _footstepBlockClipList = val != null ? new List<AnimationClip>(val) : new List<AnimationClip>();
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Meshオブジェクトが見つかりません");
+            }
+
+            EditorUtility.SetDirty(this);
 
             DestroyImmediate(cloneCharacter);
 
