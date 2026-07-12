@@ -1,7 +1,6 @@
 using Cinemachine;
 using InGame.Interact;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace InGame.Player
 {
@@ -13,8 +12,9 @@ namespace InGame.Player
         [SerializeField, Tooltip("フォーカス時のカメラの位置")] Vector3 _focusPosition = new(0.5f, 1, -2);
         [SerializeField, Tooltip("カメラの移動時間")] float _cameraMoveDuration = 0.2f;
         [Header("カメラスキャンの有効領域についてのパラメータ")]
-        [SerializeField, Tooltip("カメラから見た領域の中心の位置")] Vector3 _centerOffset = new Vector3(0, 0, 5);
-        [SerializeField, Tooltip("スキャン範囲の半分の長さ")] Vector3 _halfExtents = new Vector3(5, 2.5f, 2.5f);
+        [SerializeField, Tooltip("OverlapBoxの中心の位置")] Vector3 _centerOffset = new Vector3(0, 0, 5);
+        [SerializeField, Tooltip("OverlapBoxの半分の長さ")] Vector3 _halfExtents = new Vector3(5, 2.5f, 2.5f);
+        [SerializeField, Range(0, 90), Tooltip("水平方向の視野角（片側）")] float _horizontalAngle = 60;
         [SerializeField, Tooltip("スキャン対象のレイヤー")] LayerMask _exhibitLayer;
         [SerializeField, Tooltip("演出用キャンバス")] ScannerCanvas _scannerCanvas;
         Collider[] _scanedColliders;
@@ -63,19 +63,36 @@ namespace InGame.Player
         /// </summary>
         void UpdateNearestExhibit()
         {
-            var count = Physics.OverlapBoxNonAlloc(_virtualCamera.transform.TransformPoint(_centerOffset), _halfExtents, _scanedColliders, _virtualCamera.transform.rotation, _exhibitLayer);
+            var count = Physics.OverlapBoxNonAlloc(_virtualCamera.transform.TransformPoint(_centerOffset)
+                , _halfExtents
+                , _scanedColliders
+                , _virtualCamera.transform.rotation
+                , _exhibitLayer);
             var minDistance = float.MaxValue;
             _currentScanedObject = null;
             for (int i = 0; i < count; i++)
             {
                 if (_scanedColliders[i] == null) continue;
 
+                // ターゲットとの距離を計算
+                var targetDir = _scanedColliders[i].transform.position - _virtualCamera.transform.position;
+                var distance = Vector3.SqrMagnitude(targetDir);
+
+                // 視線とターゲットまでの距離が水平方向になす角を計算
+                var sight = _virtualCamera.transform.forward;
+                sight.y = 0;
+                sight = sight.normalized;
+                targetDir.y = 0;
+                targetDir = targetDir.normalized;
+                var angle = Vector3.Dot(sight, targetDir);
+
                 // より近いオブジェクトをスキャン対象にする
-                // TODO : 一定の視野角内にいるものだけをスキャン対象にする
-                var distance = Vector3.SqrMagnitude(_scanedColliders[i].transform.position - transform.position);
-                if (_currentScanedObject == null || minDistance > distance)
+                // 一定の視野角内にいるものだけをスキャン対象にする
+                if (Mathf.Cos(_horizontalAngle * Mathf.Deg2Rad) <= angle && angle <= 1
+                    && minDistance > distance)
                 {
                     _currentScanedObject = _scanedColliders[i];
+                    minDistance = distance;
                 }
             }
         }
@@ -103,11 +120,60 @@ namespace InGame.Player
         void DrawScanArea()
         {
             Gizmos.color = Color.green;
-            var pos = _virtualCamera == null ? _focusPosition + _centerOffset : _virtualCamera.transform.TransformPoint(_centerOffset);
-            var rot = _virtualCamera == null ? Quaternion.identity : _virtualCamera.transform.rotation;
 
-            Gizmos.matrix = Matrix4x4.TRS(pos, rot, Vector3.one);
-            Gizmos.DrawWireCube(Vector3.zero, _halfExtents * 2);
+            var cameraPos = _virtualCamera.transform.position;
+            var halfZ = _centerOffset.z + _halfExtents.z;
+            var halfY = _halfExtents.y;
+            // 視野角に応じた横方向の長さ
+            var halfX = Mathf.Tan(_horizontalAngle * Mathf.Deg2Rad) * halfZ;
+            // 上下方向の領域開始点
+            var cameraOffsetUp = _virtualCamera.transform.TransformPoint(Vector3.up * halfY);
+            var cameraOffsetDown = _virtualCamera.transform.TransformPoint(-Vector3.up * halfY);
+            // 最大奥行きの四隅の点
+            var point1 = _virtualCamera.transform.TransformPoint(new Vector3(halfX, halfY, halfZ));
+            var point2 = _virtualCamera.transform.TransformPoint(new Vector3(halfX, -halfY, halfZ));
+            var point3 = _virtualCamera.transform.TransformPoint(new Vector3(-halfX, halfY, halfZ));
+            var point4 = _virtualCamera.transform.TransformPoint(new Vector3(-halfX, -halfY, halfZ));
+            if (halfX <= _halfExtents.x)
+            {
+                // 最大奥行きの四隅の点を判定領域に含まないまたはぴったりの場合の描画
+                // 領域の形としては三角柱
+                Gizmos.DrawLine(cameraOffsetUp, point1);
+                Gizmos.DrawLine(cameraOffsetDown, point2);
+                Gizmos.DrawLine(cameraOffsetUp, point3);
+                Gizmos.DrawLine(cameraOffsetDown, point4);
+            }
+            else
+            {
+                // 視野角が最大奥行きの四隅の点より大きくなる場合
+                // 領域の形としては五角柱
+                var nearZ = Mathf.Tan((90 - _horizontalAngle) * Mathf.Deg2Rad) * _halfExtents.x;
+                var nearPoint1 = _virtualCamera.transform.TransformPoint(new Vector3(_halfExtents.x, halfY, nearZ));
+                var nearPoint2 = _virtualCamera.transform.TransformPoint(new Vector3(_halfExtents.x, -halfY, nearZ));
+                var nearPoint3 = _virtualCamera.transform.TransformPoint(new Vector3(-_halfExtents.x, halfY, nearZ));
+                var nearPoint4 = _virtualCamera.transform.TransformPoint(new Vector3(-_halfExtents.x, -halfY, nearZ));
+                point1 = _virtualCamera.transform.TransformPoint(new Vector3(_halfExtents.x, halfY, halfZ));
+                point2 = _virtualCamera.transform.TransformPoint(new Vector3(_halfExtents.x, -halfY, halfZ));
+                point3 = _virtualCamera.transform.TransformPoint(new Vector3(-_halfExtents.x, halfY, halfZ));
+                point4 = _virtualCamera.transform.TransformPoint(new Vector3(-_halfExtents.x, -halfY, halfZ));
+                Gizmos.DrawLine(cameraOffsetUp, nearPoint1);
+                Gizmos.DrawLine(cameraOffsetDown, nearPoint2);
+                Gizmos.DrawLine(cameraOffsetUp, nearPoint3);
+                Gizmos.DrawLine(cameraOffsetDown, nearPoint4);
+                Gizmos.DrawLine(nearPoint1, nearPoint2);
+                Gizmos.DrawLine(nearPoint2, nearPoint4);
+                Gizmos.DrawLine(nearPoint4, nearPoint3);
+                Gizmos.DrawLine(nearPoint3, nearPoint1);
+                Gizmos.DrawLine(point1, nearPoint1);
+                Gizmos.DrawLine(point2, nearPoint2);
+                Gizmos.DrawLine(point3, nearPoint3);
+                Gizmos.DrawLine(point4, nearPoint4);
+            }
+            Gizmos.DrawLine(point1, point2);
+            Gizmos.DrawLine(point2, point4);
+            Gizmos.DrawLine(point4, point3);
+            Gizmos.DrawLine(point3, point1);
+            Gizmos.DrawLine(cameraOffsetUp, cameraOffsetDown);
         }
     }
 }
