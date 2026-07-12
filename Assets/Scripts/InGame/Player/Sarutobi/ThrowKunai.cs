@@ -82,7 +82,7 @@ namespace InGame.Player.Sarutobi
                     //自身以外のプレイヤーを保持（クナイホーミングのため）
                     foreach (var p in players)
                     {
-                        if(p == gameObject) continue;
+                        if (p == gameObject) continue;
                         _otherPlayers.Add(p);
                     }
                 }
@@ -233,7 +233,7 @@ namespace InGame.Player.Sarutobi
                 bool isRange = Mathf.Abs(screenPoint.x - center.x) <= _homingRange.x &&
                                Mathf.Abs(screenPoint.y - center.y) <= _homingRange.y;
                 bool isView = isScreen && isRange;
-                if(!isView) continue;
+                if (!isView) continue;
 
                 // 画面中央からプレイヤーの距離を計算
                 float distance = Vector2.Distance(new Vector2(screenPoint.x, screenPoint.y), center);
@@ -284,7 +284,7 @@ namespace InGame.Player.Sarutobi
             {
                 Rpc_EndStance();
             }
-            if(HasStateAuthority)
+            if (HasStateAuthority)
             {
                 RPC_ChangeDescriptionUI(ControlDescriptionType.Sarutobi);
             }
