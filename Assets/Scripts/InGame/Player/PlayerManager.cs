@@ -33,6 +33,7 @@ namespace InGame.Player
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
+        private RigidbodyConstraints _defaultConstraints;
         public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
@@ -55,6 +56,7 @@ namespace InGame.Player
             InitComponents();
 
             _respawnPosition = transform.position;
+            _defaultConstraints = _rigidbody.constraints;
         }
 
         /// <summary> Player関連コンポーネントの初期化 </summary>
@@ -230,7 +232,7 @@ namespace InGame.Player
         {
             _rigidbody.constraints = isLocked ?
                 RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
-                RigidbodyConstraints.None;
+                _defaultConstraints;
         }
 
         /// <summary> 非常用リスポーン </summary>
