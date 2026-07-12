@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using InGame.Common;
 using InGame.Interact;
@@ -10,10 +11,9 @@ using UnityEngine;
 using UnityEngine.Playables;
 using InGame.Bot;
 
-#if UNITY_EDITOR
-using UnityEditor;
 using UnityEditor.Animations;
-#endif
+using September.Editor.Common;
+using UnityEditor;
 
 namespace September.InGame.Player.Data
 {
@@ -110,7 +110,6 @@ namespace September.InGame.Player.Data
         [Header("ReadTargetPrefab")]
         [SerializeField] public GameObject ReadTargetPrefab;
 
-#if UNITY_EDITOR
         [Button]
         public void CreateCharacterFromTemplate()
         {
@@ -526,6 +525,6 @@ namespace September.InGame.Player.Data
 
             Debug.Log(AssetPath);
         }
-#endif
     }
 }
+#endif
