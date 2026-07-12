@@ -65,9 +65,9 @@ namespace September.InGame.Player.Data
                 {
                     Debug.Log($"{dstProp.objectReferenceValue} {dstComponent.gameObject} {src.gameObject}");
 
-                    if (dstComponent.gameObject == src.gameObject)
+                    if (dstComponent.gameObject == src.gameObject || dstComponent.gameObject.transform.IsChildOf(src.gameObject.transform.root))
                     {
-                        dstProp.objectReferenceValue = dst.GetComponent(dstComponent.GetType());
+                        dstProp.objectReferenceValue = dst.GetComponentInChildren(dstComponent.GetType());
                     }
                 }
                 else if (dstProp.objectReferenceValue is GameObject gameObject

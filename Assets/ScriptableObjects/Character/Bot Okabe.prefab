@@ -5564,7 +5564,7 @@ MonoBehaviour:
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
   _attackWeapon: {fileID: 0}
-  _buildGenerator: {fileID: 3789720849090292403, guid: 438af04c2bad2894d8bfb59f2799e49e, type: 3}
+  _buildGenerator: {fileID: 2380937017320208690}
   _playerStatus: {fileID: 4333742313703900618}
   _IsStun:
     _value: 0
@@ -5666,6 +5666,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30522911d6f01d94e88b4f6d3fe4de7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2380937017320208690 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3526442681266126824, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+  m_PrefabInstance: {fileID: 1295551756936562394}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b618686980dbfad4d9026a963f0cd451, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!54 &2399675201142327905 stripped
