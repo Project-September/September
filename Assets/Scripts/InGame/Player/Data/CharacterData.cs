@@ -339,13 +339,13 @@ namespace September.InGame.Player.Data
             var srcBotStateMachine = BotTemplatePrefab.GetComponent<BotStateMachine>();
             var srcBotInputManager = BotTemplatePrefab.GetComponent<BotInputManager>();
 
-            var dstBotManager = SerializedObjectExtensions.PasteComponentAsNew(srcBotManager, cloneCharacter);
-            var dstBotStateMachine = SerializedObjectExtensions.PasteComponentAsNew(srcBotStateMachine, cloneCharacter);
-            var dstBotInputManager = SerializedObjectExtensions.PasteComponentAsNew(srcBotInputManager, cloneCharacter);
+            var dstBotManager = ExComponentUtility.PasteComponentAsNew(srcBotManager, cloneCharacter);
+            var dstBotStateMachine = ExComponentUtility.PasteComponentAsNew(srcBotStateMachine, cloneCharacter);
+            var dstBotInputManager = ExComponentUtility.PasteComponentAsNew(srcBotInputManager, cloneCharacter);
 
-            SerializedObjectExtensions.ReplaceReferencesGlobalToLocal(dstBotManager, srcBotManager);
-            SerializedObjectExtensions.ReplaceReferencesGlobalToLocal(dstBotStateMachine, srcBotStateMachine);
-            SerializedObjectExtensions.ReplaceReferencesGlobalToLocal(dstBotInputManager, srcBotInputManager);
+            ExComponentUtility.ReplaceReferencesGlobalToLocal(dstBotManager, srcBotManager);
+            ExComponentUtility.ReplaceReferencesGlobalToLocal(dstBotStateMachine, srcBotStateMachine);
+            ExComponentUtility.ReplaceReferencesGlobalToLocal(dstBotInputManager, srcBotInputManager);
 
             DestroyImmediate(cloneCharacter.GetComponent<PlayerManager>());
             DestroyImmediate(cloneCharacter.GetComponent<PlayerInputManager>());
