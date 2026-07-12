@@ -2,18 +2,20 @@ using UnityEngine;
 using InGame.Exhibit;
 
 /// <summary> 具体的な霧の処理するクラス </summary>
-public class ConcreteFogController : NauticalChartInteractEffect, IFogController
+public class ConcreteFogController : IFogController
 {
     [SerializeField] private Material _stormSkyboxMaterial;
 
     /// <summary> Skyboxを変更する </summary>
-    protected override void SkyBoxChange()
+    public void SkyBoxChange()
     {
         RenderSettings.skybox = _stormSkyboxMaterial;
     }
 
-    protected override void PlayFogEffect()
+
+    public void ShowFog()
     {
+        SkyBoxChange();
         // TODO：霧のエフェクトを実装する
     }
 

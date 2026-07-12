@@ -1,8 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// 霧の制御を行うインターフェース
-/// </summary>
+/// <summary> 霧の制御を行うインターフェース </summary>
 public interface IFogController
 {
     public void ShowFog();
