@@ -56,11 +56,11 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _abilities:
-  - rid: 7765555116474368149
-  - rid: 7765555116474368150
+  - rid: 7765555134153883780
+  - rid: 7765555134153883781
   _conditions:
-  - rid: 7765555116474368151
-  - rid: 7765555116474368152
+  - rid: 7765555134153883782
+  - rid: 7765555134153883783
   _layerInfo:
   - Type: 0
     LayerMask: {fileID: 0}
@@ -127,7 +127,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 7765555116474368149
+    - rid: 7765555134153883780
       type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
         _cooldown: 0
@@ -155,7 +155,7 @@ MonoBehaviour:
         _debugDrawDuration: 1
         _buildGenerator: {fileID: 0}
         _playerStatus: {fileID: 0}
-    - rid: 7765555116474368150
+    - rid: 7765555134153883781
       type: {class: AbilityOkabeUlt, ns: InGame.Player.Ability.Effect, asm: Scripts}
       data:
         _cooldown: 0
@@ -164,11 +164,11 @@ MonoBehaviour:
         _duration: 10
         _buffEffect: {fileID: 11400000, guid: eb825a65a95ae924eb8f98bc05831cf5, type: 2}
         _effectType: 0
-    - rid: 7765555116474368151
+    - rid: 7765555134153883782
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
       data:
         _targetAbilityName: AbilityNormalAttack
-    - rid: 7765555116474368152
+    - rid: 7765555134153883783
       type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
       data:
         _targetAbilityName: AbilityOkabeUlt

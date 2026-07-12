@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using InGame.Common;
 using InGame.Interact;
@@ -116,21 +117,100 @@ namespace September.InGame.Player.Data
             GameObject cloneCharacter = (GameObject)PrefabUtility.InstantiatePrefab(TemplatePrefab);
 
             var playerMovement = cloneCharacter.GetComponent<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                var so = new SerializedObject(playerMovement);
+                so.FindProperty("_moveSpeed").floatValue = MoveSpeed;
+                so.FindProperty("_groundSlopeThreshold").floatValue = GroundSlopeThreshold;
+                so.FindProperty("_groundLayer").intValue = GroundLayer;
+                so.FindProperty("_ogreMoveSpeed").floatValue = OgreMoveSpeed;
+                so.FindProperty("_ogreDashSpeed").floatValue = OgreDashSpeed;
+                so.FindProperty("_dashSpeed").floatValue = DashSpeed;
+                so.FindProperty("_dashCooldown").floatValue = DashCooldown;
+                so.FindProperty("_staminaConsumption").floatValue = StaminaConsumption;
+                so.FindProperty("_rotationSpeed").floatValue = RotationSpeed;
+                so.FindProperty("_maxLedgeHeight").floatValue = MaxLedgeHeight;
+                so.FindProperty("_minLedgeHeight").floatValue = MinLedgeHeight;
+                so.FindProperty("_maxLedgeDepth").floatValue = MaxLedgeDepth;
+                so.FindProperty("_reachDistance").floatValue = ReachDistance;
+                so.FindProperty("_timeToVault").floatValue = TimeToVault;
+                so.FindProperty("_vaultCurve").animationCurveValue = VaultCurve;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             var playerInteractionController = cloneCharacter.GetComponent<PlayerInteractionController>();
+            if (playerInteractionController != null)
+            {
+                var so = new SerializedObject(playerInteractionController);
+                so.FindProperty("_interactRadius").floatValue = InteractRadius;
+                so.FindProperty("_interactMask").intValue = InteractMask;
+                so.FindProperty("_interactAngle").floatValue = InteractAngle;
+                so.FindProperty("_baseInteractTime").floatValue = BaseInteractTime;
+                so.FindProperty("_ogreInteractMultiplier").floatValue = OgreInteractMultiplier;
+                so.FindProperty("_interactResponseTimeout").floatValue = InteractResponseTimeout;
+                so.FindProperty("_interactAngleBuffer").floatValue = InteractAngleBuffer;
+                so.FindProperty("_interactRadiusBuffer").floatValue = InteractRadiusBuffer;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             var playerAbilityManager = cloneCharacter.GetComponent<PlayerAbilityManager>();
+            if (playerAbilityManager != null)
+            {
+                var so = new SerializedObject(playerAbilityManager);
+
+                so.FindProperty("_abilities").SetArrayManagedReferences(_abilities);
+                so.FindProperty("_conditions").SetArrayManagedReferences(_conditions);
+
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             var animationClipPlayer = cloneCharacter.GetComponent<AnimationClipPlayer>();
+            if (animationClipPlayer != null)
+            {
+                var so = new SerializedObject(animationClipPlayer);
+
+                so.FindProperty("_layerInfo").SetArrayBoxedValues(_layerInfo);
+                so.FindProperty("_wait").objectReferenceValue = Wait;
+                so.FindProperty("_walk").objectReferenceValue = Walk;
+                so.FindProperty("_run").objectReferenceValue = Run;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             var animationClipPlayerManager = cloneCharacter.GetComponent<AnimationClipPlayerManager>();
+            if (animationClipPlayerManager != null)
+            {
+                var so = new SerializedObject(animationClipPlayerManager);
+                so.FindProperty("_jumpOver").objectReferenceValue = JumpOver;
+                so.FindProperty("_jumpOverDuration").floatValue = JumpOverDuration;
+                so.FindProperty("_fallDown").objectReferenceValue = FallDown;
+                so.FindProperty("_faint").objectReferenceValue = Faint;
+                so.FindProperty("_getUp").objectReferenceValue = GetUp;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             var playerEquipmentManager = cloneCharacter.GetComponent<PlayerEquipmentManager>();
+            if (playerEquipmentManager != null)
+            {
+                var so = new SerializedObject(playerEquipmentManager);
+                so.FindProperty("_equipmentData").SetArrayBoxedValues(EquipmentData);
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             var ultCondition = cloneCharacter.GetComponent<UltCondition>();
+            if (ultCondition != null)
+            {
+                var so = new SerializedObject(ultCondition);
+                so.FindProperty("_requiredScore").intValue = RequireScore;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             var playableDirector = cloneCharacter.GetComponent<PlayableDirector>();
-
+            if (playableDirector != null)
+            {
+                var so = new SerializedObject(playableDirector);
+                so.FindProperty("m_PlayableAsset").objectReferenceValue = UltSequence;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
 
             GameObject meshObject = null;
 
@@ -143,19 +223,40 @@ namespace September.InGame.Player.Data
                 }
             }
 
-            if (meshObject == null)
+            if (meshObject != null)
+            {
+                var animator = meshObject.GetComponent<Animator>();
+                if (animator != null)
+                {
+                    var so = new SerializedObject(animator);
+                    so.FindProperty("m_Controller").objectReferenceValue = _animatorController;
+                    so.FindProperty("m_Avatar").objectReferenceValue = _avatar;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+
+                var playerEffectController = meshObject.GetComponent<PlayerEffectController>();
+                if (playerEffectController != null)
+                {
+                    var so = new SerializedObject(playerEffectController);
+                    so.FindProperty("_stunEffectPositionOffset").vector3Value = StunEffectPositionOffset;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+
+                var playerAudioController = meshObject.GetComponent<PlayerAudioController>();
+                if (playerAudioController != null)
+                {
+                    var so = new SerializedObject(playerAudioController);
+                    so.FindProperty("_footstepCueName").stringValue = FootstepCueName;
+                    so.FindProperty("_punchSwingCueName").stringValue = PunchSwingCueName;
+                    so.FindProperty("_punchHitCueName").stringValue = PunchHitCueName;
+                    so.FindProperty("_footstepBlockClipList").SetArrayBoxedValues(_footstepBlockClipList);
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+            }
+            else
             {
                 Debug.LogWarning("Meshオブジェクトが見つかりません");
-                return;
             }
-
-            meshObject.GetComponent<Animator>().applyRootMotion = true;
-
-            var animator = meshObject.GetComponent<Animator>();
-
-            var playerEffectController = meshObject.GetComponent<PlayerEffectController>();
-
-            var playerAudioController = meshObject.GetComponent<PlayerAudioController>();
 
             PrefabUtility.SaveAsPrefabAsset(cloneCharacter, OutputPath);
 
@@ -338,6 +439,31 @@ namespace September.InGame.Player.Data
             DestroyImmediate(cloneCharacter);
 
             Debug.Log(OutputPath);
+        }
+    }
+
+    public static class SerializedObjectExtensions
+    {
+        public static void SetArrayManagedReferences<T>(this SerializedProperty dest, IReadOnlyList<T> from)
+        {
+            if (!dest.isArray) throw new ArgumentException("dest in not an array");
+            dest.arraySize = from.Count;
+            for (int i = 0; i < from.Count; i++)
+            {
+                dest.GetArrayElementAtIndex(i).managedReferenceValue = from[i];
+            }
+        }
+
+        public static void SetArrayBoxedValues<T>(this SerializedProperty dest, IReadOnlyList<T> from)
+        {
+            if (!dest.isArray) throw new ArgumentException("dest in not an array");
+            Debug.Log("setarray: " + dest.arrayElementType);
+
+            dest.arraySize = from.Count;
+            for (int i = 0; i < from.Count; i++)
+            {
+                dest.GetArrayElementAtIndex(i).boxedValue = from[i];
+            }
         }
     }
 }
