@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bb23cd2aae0432b965beaa171d65944, type: 3}
   m_Name: Sarutobi
   m_EditorClassIdentifier: 
-  CharacterType: 1
+  CharacterType: 4
   TemplatePrefab: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
   OutputPath: Assets/ScriptableObjects/Character
   MoveSpeed: 1.9
@@ -122,7 +122,7 @@ MonoBehaviour:
   _footstepBlockClipList:
   - {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
   - {fileID: 7400000, guid: 7d6ee42e50a5e3046917db7f6ac26f3b, type: 2}
-  MeshFbx: {fileID: 0}
+  MeshFbx: {fileID: 6510127906185832021, guid: df21134ee0debea41b20b9aa6727e352, type: 3}
   ReadTargetPrefab: {fileID: 8360875997416129576, guid: b552d055c3cf3794f85668e6d886bc61, type: 3}
   references:
     version: 2

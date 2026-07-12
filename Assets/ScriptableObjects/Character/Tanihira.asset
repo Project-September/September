@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bb23cd2aae0432b965beaa171d65944, type: 3}
   m_Name: Tanihira
   m_EditorClassIdentifier: 
-  CharacterType: 1
+  CharacterType: 3
   TemplatePrefab: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
   OutputPath: Assets/ScriptableObjects/Character
   MoveSpeed: 1.75
@@ -121,7 +121,7 @@ MonoBehaviour:
   PunchHitCueName: SE_Player_Punch_Hit
   _footstepBlockClipList:
   - {fileID: 7400000, guid: 5ac91ad8e248c6547bf8c19bc58beb16, type: 2}
-  MeshFbx: {fileID: 0}
+  MeshFbx: {fileID: 919132149155446097, guid: 6983203e1fbf28847a97053a4620de91, type: 3}
   ReadTargetPrefab: {fileID: 4081215343970159104, guid: c51e20dc0358be140806cad642d4f4af, type: 3}
   references:
     version: 2

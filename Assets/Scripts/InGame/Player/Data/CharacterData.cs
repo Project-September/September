@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using InGame.Common;
 using InGame.Interact;
 using InGame.Player;
@@ -226,6 +227,33 @@ namespace September.InGame.Player.Data
 
             if (meshObject != null)
             {
+                {
+                    for (int i = meshObject.transform.childCount - 1; i >= 0; i--)
+                    {
+                        DestroyImmediate(meshObject.transform.GetChild(i).gameObject);
+                    }
+                }
+
+                {
+                    GameObject newMesh = Instantiate(MeshFbx, meshObject.transform);
+
+                    var renderers = newMesh.GetComponentsInChildren<Renderer>();
+                    var playerRenderer = cloneCharacter.GetComponent<PlayerRenderer>();
+                    {
+                        var so = new SerializedObject(playerRenderer);
+                        so.FindProperty("_renderers").SetArrayBoxedValues(renderers);
+                        so.ApplyModifiedPropertiesWithoutUndo();
+                    }
+
+                    for (int i = newMesh.transform.childCount - 1; i >= 0; i--)
+                    {
+                        var child = newMesh.transform.GetChild(i);
+                        child.parent = meshObject.transform;
+                    }
+
+                    DestroyImmediate(newMesh);
+                }
+
                 var animator = meshObject.GetComponent<Animator>();
                 if (animator != null)
                 {
@@ -464,6 +492,18 @@ namespace September.InGame.Player.Data
             for (int i = 0; i < from.Count; i++)
             {
                 dest.GetArrayElementAtIndex(i).boxedValue = from[i];
+            }
+        }
+
+        public static void SetArrayObjectReferenceValues<T>(this SerializedProperty dest, IReadOnlyList<T> from) where T : UnityEngine.Object
+        {
+            if (!dest.isArray) throw new ArgumentException("dest in not an array");
+            Debug.Log("setarray: " + dest.arrayElementType);
+
+            dest.arraySize = from.Count;
+            for (int i = 0; i < from.Count; i++)
+            {
+                dest.GetArrayElementAtIndex(i).objectReferenceValue = from[i];
             }
         }
     }
