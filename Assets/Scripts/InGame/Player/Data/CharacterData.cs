@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using InGame.Common;
 using InGame.Interact;
 using InGame.Player;
@@ -8,10 +6,13 @@ using InGame.Player.Ability;
 using InGame.Player.Ult;
 using NaughtyAttributes;
 using September.Common;
-using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Playables;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.Animations;
+#endif
 
 namespace September.InGame.Player.Data
 {
@@ -105,6 +106,7 @@ namespace September.InGame.Player.Data
         [Header("ReadTargetPrefab")]
         [SerializeField] public GameObject ReadTargetPrefab;
 
+#if UNITY_EDITOR
         [Button]
         public void CreateCharacterFromTemplate()
         {
@@ -469,42 +471,6 @@ namespace September.InGame.Player.Data
 
             Debug.Log(AssetPath);
         }
-    }
-
-    public static class SerializedObjectExtensions
-    {
-        public static void SetArrayManagedReferences<T>(this SerializedProperty dest, IReadOnlyList<T> from)
-        {
-            if (!dest.isArray) throw new ArgumentException("dest in not an array");
-            dest.arraySize = from.Count;
-            for (int i = 0; i < from.Count; i++)
-            {
-                dest.GetArrayElementAtIndex(i).managedReferenceValue = from[i];
-            }
-        }
-
-        public static void SetArrayBoxedValues<T>(this SerializedProperty dest, IReadOnlyList<T> from)
-        {
-            if (!dest.isArray) throw new ArgumentException("dest in not an array");
-            Debug.Log("setarray: " + dest.arrayElementType);
-
-            dest.arraySize = from.Count;
-            for (int i = 0; i < from.Count; i++)
-            {
-                dest.GetArrayElementAtIndex(i).boxedValue = from[i];
-            }
-        }
-
-        public static void SetArrayObjectReferenceValues<T>(this SerializedProperty dest, IReadOnlyList<T> from) where T : UnityEngine.Object
-        {
-            if (!dest.isArray) throw new ArgumentException("dest in not an array");
-            Debug.Log("setarray: " + dest.arrayElementType);
-
-            dest.arraySize = from.Count;
-            for (int i = 0; i < from.Count; i++)
-            {
-                dest.GetArrayElementAtIndex(i).objectReferenceValue = from[i];
-            }
-        }
+#endif
     }
 }
