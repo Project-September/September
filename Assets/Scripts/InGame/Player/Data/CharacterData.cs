@@ -22,6 +22,7 @@ namespace September.InGame.Player.Data
         [SerializeField] public GameObject TemplatePrefab;
         [SerializeField] public string OutputPath;
 
+        public string AssetPath => $"{OutputPath}/{name}.prefab";
 
         // Root Object Components
 
@@ -108,10 +109,10 @@ namespace September.InGame.Player.Data
         {
             Undo.RecordObject(this, "Create Character Data");
 
-            var existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(OutputPath);
+            var existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetPath);
             if (existingPrefab)
             {
-                AssetDatabase.DeleteAsset(OutputPath);
+                AssetDatabase.DeleteAsset(AssetPath);
             }
 
             GameObject cloneCharacter = (GameObject)PrefabUtility.InstantiatePrefab(TemplatePrefab);
@@ -258,11 +259,11 @@ namespace September.InGame.Player.Data
                 Debug.LogWarning("Meshオブジェクトが見つかりません");
             }
 
-            PrefabUtility.SaveAsPrefabAsset(cloneCharacter, OutputPath);
+            PrefabUtility.SaveAsPrefabAsset(cloneCharacter, AssetPath);
 
             DestroyImmediate(cloneCharacter);
 
-            Debug.Log(OutputPath);
+            Debug.Log(AssetPath);
         }
 
         /// <summary>
@@ -438,7 +439,7 @@ namespace September.InGame.Player.Data
 
             DestroyImmediate(cloneCharacter);
 
-            Debug.Log(OutputPath);
+            Debug.Log(AssetPath);
         }
     }
 
