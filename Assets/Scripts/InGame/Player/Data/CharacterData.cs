@@ -152,8 +152,6 @@ namespace September.InGame.Player.Data
 
             GameObject cloneCharacter = (GameObject)PrefabUtility.InstantiatePrefab(GeneratedCharacterPrefab);
 
-            OverwriteProperties(cloneCharacter);
-
             AttachBotComponents(cloneCharacter);
 
             PrefabUtility.SaveAsPrefabAsset(cloneCharacter, BotAssetPath);
