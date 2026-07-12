@@ -8,6 +8,7 @@ using NaughtyAttributes;
 using September.Common;
 using UnityEngine;
 using UnityEngine.Playables;
+using InGame.Bot;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -22,9 +23,12 @@ namespace September.InGame.Player.Data
         [Header("基本設定")]
         [SerializeField] public CharacterType CharacterType = CharacterType.OkabeWright;
         [SerializeField] public GameObject TemplatePrefab;
+        [SerializeField] public GameObject BotTemplatePrefab;
+        [SerializeField] public GameObject GeneratedCharacterPrefab;
         [SerializeField] public string OutputPath;
 
         public string AssetPath => $"{OutputPath}/{name}.prefab";
+        public string BotAssetPath => $"{OutputPath}/Bot {name}.prefab";
 
         // Root Object Components
 
@@ -120,6 +124,47 @@ namespace September.InGame.Player.Data
 
             GameObject cloneCharacter = (GameObject)PrefabUtility.InstantiatePrefab(TemplatePrefab);
 
+            OverwriteProperties(cloneCharacter);
+
+            GeneratedCharacterPrefab = PrefabUtility.SaveAsPrefabAsset(cloneCharacter, AssetPath);
+
+            DestroyImmediate(cloneCharacter);
+
+            Debug.Log(AssetPath);
+        }
+
+        [Button]
+        public void CreateBotCharacterFromTemplate()
+        {
+            Undo.RecordObject(this, "Create Character Data");
+
+            if (!AssetDatabase.LoadAssetAtPath<GameObject>(AssetPath))
+            {
+                Debug.LogWarning("元となるキャラクタープレハブが存在しないため、ボットの作成に失敗しました");
+                return;
+            }
+
+            var existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BotAssetPath);
+            if (existingPrefab)
+            {
+                AssetDatabase.DeleteAsset(BotAssetPath);
+            }
+
+            GameObject cloneCharacter = (GameObject)PrefabUtility.InstantiatePrefab(GeneratedCharacterPrefab);
+
+            OverwriteProperties(cloneCharacter);
+
+            AttachBotComponents(cloneCharacter);
+
+            PrefabUtility.SaveAsPrefabAsset(cloneCharacter, BotAssetPath);
+
+            DestroyImmediate(cloneCharacter);
+
+            Debug.Log(BotAssetPath);
+        }
+
+        private void OverwriteProperties(GameObject cloneCharacter)
+        {
             var playerMovement = cloneCharacter.GetComponent<PlayerMovement>();
             if (playerMovement != null)
             {
@@ -288,12 +333,24 @@ namespace September.InGame.Player.Data
             {
                 Debug.LogWarning("Meshオブジェクトが見つかりません");
             }
+        }
 
-            PrefabUtility.SaveAsPrefabAsset(cloneCharacter, AssetPath);
+        private void AttachBotComponents(GameObject cloneCharacter)
+        {
+            var srcBotManager = BotTemplatePrefab.GetComponent<BotManager>();
+            var srcBotStateMachine = BotTemplatePrefab.GetComponent<BotStateMachine>();
+            var srcBotInputManager = BotTemplatePrefab.GetComponent<BotInputManager>();
 
-            DestroyImmediate(cloneCharacter);
+            var dstBotManager = SerializedObjectExtensions.PasteComponentAsNew(srcBotManager, cloneCharacter);
+            var dstBotStateMachine = SerializedObjectExtensions.PasteComponentAsNew(srcBotStateMachine, cloneCharacter);
+            var dstBotInputManager = SerializedObjectExtensions.PasteComponentAsNew(srcBotInputManager, cloneCharacter);
 
-            Debug.Log(AssetPath);
+            SerializedObjectExtensions.ReplaceReferencesGlobalToLocal(dstBotManager, srcBotManager);
+            SerializedObjectExtensions.ReplaceReferencesGlobalToLocal(dstBotStateMachine, srcBotStateMachine);
+            SerializedObjectExtensions.ReplaceReferencesGlobalToLocal(dstBotInputManager, srcBotInputManager);
+
+            DestroyImmediate(cloneCharacter.GetComponent<PlayerManager>());
+            DestroyImmediate(cloneCharacter.GetComponent<PlayerInputManager>());
         }
 
         /// <summary>
