@@ -2,6 +2,7 @@ using System;
 using Fusion;
 using InGame.Interact;
 using September.Common;
+using September.InGame.Exhibit;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -9,11 +10,10 @@ namespace InGame.Exhibit
     [Serializable]
     public class CannonInteractEffect : CharacterInteractEffectBase
     {
-        [SerializeField] private CannonInteractable _cannonInteractable;
-
-        public CannonInteractEffect(CannonInteractable cannonInteractable)
+        [SerializeField] private CannonInteractable _cannonAimPosRenderer;
+        public CannonInteractEffect(CannonInteractable cannonAimPosRenderer)
         {
-            _cannonInteractable = cannonInteractable;
+            _cannonAimPosRenderer = cannonAimPosRenderer;
         }
         public CannonInteractEffect()
         {
@@ -21,18 +21,18 @@ namespace InGame.Exhibit
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
-            _cannonInteractable.OnInteractStart(playerRef);
+            _cannonAimPosRenderer.OnInteractStart(playerRef);
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
             base.OnInteractFixedNetworkUpdate(playerInput);
-            _cannonInteractable.OnInteractFixedNetworkUpdate(playerInput);
+            _cannonAimPosRenderer.OnInteractFixedNetworkUpdate(playerInput);
         }
 
         public override CharacterInteractEffectBase Clone()
         {
-            return new CannonInteractEffect(_cannonInteractable);
+            return new CannonInteractEffect(_cannonAimPosRenderer);
         }
     }
 }

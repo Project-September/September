@@ -1,0 +1,131 @@
+using System;
+using Fusion;
+using September.InGame.Common.Stats;
+using UnityEngine;
+
+namespace September.InGame.Exhibit
+{
+	public class Projectile : NetworkBehaviour
+	{
+		private IProjectileHitEffect _projectileHitEffect;
+		private LayerMask _hitLayer;
+		private GameObject _projectile;
+		/// <summary>
+		/// サーバーで実行されるHit時のコールバック処理
+		/// </summary>
+		private Action<Vector3, Quaternion, GameObject> OnHitCallback;
+
+		[Networked] public ProjectileLauncher.ProjectileData CurrentProjectileData { get; set; }
+		[Networked] private PlayerRef PlayerRef { get; set; }
+		
+
+		public override void FixedUpdateNetwork()
+		{
+			base.FixedUpdateNetwork();
+			if (!Runner.IsServer) return;
+			CurrentProjectileData = ProjectileUpdate(CurrentProjectileData);
+			if (CurrentProjectileData.HasHit)
+			{
+				Runner.Despawn(Object);
+			}
+		}
+
+		public override void Render()
+		{
+			base.Render();
+			RenderProjectile();
+		}
+
+		public override void Despawned(NetworkRunner runner, bool hasState)
+		{
+			OnHitCallback = null;
+			Destroy(_projectile.gameObject);
+		}
+
+		/// <summary>
+		/// 全てのクライアント共通の値の初期化処理
+		/// </summary>
+		/// <param name="projectilePrefab"></param>
+		/// <param name="hitEffect"></param>
+		/// <param name="hitLayer"></param>
+		public void Initialized(GameObject projectilePrefab, IProjectileHitEffect hitEffect, LayerMask hitLayer)
+		{
+			_projectile = Instantiate(projectilePrefab);
+			_projectileHitEffect = hitEffect;
+			_hitLayer = hitLayer;
+		}
+
+		public void Fire(ProjectileLauncher.ProjectileData projectileData, PlayerRef playerRef,
+			Action<Vector3, Quaternion, GameObject> onHitCallback)
+		{
+			CurrentProjectileData = projectileData;
+			PlayerRef = playerRef;
+			OnHitCallback = onHitCallback;
+		}
+
+		public void Refresh()
+		{
+			var data = new ProjectileLauncher.ProjectileData();
+			data.HasHit = true;
+			CurrentProjectileData = data;
+
+			_projectile = null;
+			OnHitCallback = null;
+		}
+
+		private void RenderProjectile()
+		{
+			if(!_projectile) return;
+			if (CurrentProjectileData.HasHit) return;
+			
+			// particleの更新
+			_projectile.transform.position = CurrentProjectileData.CurrentPosition;
+			_projectile.transform.forward = CurrentProjectileData.CurrentForward.magnitude > 0
+				? CurrentProjectileData.CurrentForward
+				: Vector3.forward;
+		}
+
+		private ProjectileLauncher.ProjectileData ProjectileUpdate(ProjectileLauncher.ProjectileData data)
+		{
+			if (data.HasHit) return data;
+
+			var currentPos = CalculateTrajectoryPosition(data.StartPosition,
+				data.InitialVelocity, data.Gravity, data.Timer);
+			var nextPos = CalculateTrajectoryPosition(data.StartPosition,
+				data.InitialVelocity, data.Gravity, data.Timer + Runner.DeltaTime);
+
+			// 弾の着弾確認
+			var movement = nextPos - currentPos;
+			if (Physics.Raycast(currentPos, movement.normalized, out var hit, movement.magnitude, _hitLayer))
+			{
+				data.HasHit = true;
+				_projectileHitEffect.Hit(hit.point, Quaternion.LookRotation(hit.normal), hit.transform.gameObject, PlayerRef);
+				OnHitCallback?.Invoke(hit.point, Quaternion.LookRotation(hit.normal), hit.transform.gameObject);
+				return data;
+			}
+
+			// particleの更新
+			data.CurrentPosition = currentPos;
+			data.CurrentForward = movement.normalized;
+			data.Timer += Runner.DeltaTime;
+
+			return data;
+		}
+
+		[Rpc(RpcSources.All, RpcTargets.All)]
+		private void RPC_PlayHitEffect(Vector3 point, Vector3 normal)
+		{
+			_projectileHitEffect.PlayHitEffect(point, Quaternion.LookRotation(normal));
+		}
+
+		/// <summary>
+		///     特定の時間での放物線位置を計算する
+		/// </summary>
+		/// <returns>入力時間の時の位置</returns>
+		public static Vector3 CalculateTrajectoryPosition(Vector3 startPos, Vector3 velocity, Vector3 gravity,
+			float time)
+		{
+			return startPos + velocity * time + 0.5f * gravity * (time * time);
+		}
+	}
+}

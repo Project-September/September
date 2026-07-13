@@ -1,22 +1,23 @@
 # if UNITY_EDITOR
 using System;
+using September.InGame.Exhibit;
 using UnityEngine;
 using UnityEditor;
 
 
 namespace InGame.Exhibit.Editor
 {
-	[CustomEditor(typeof(CannonInteractable))]
+	[CustomEditor(typeof(CannonMove))]
 	public class CannonHelper : UnityEditor.Editor
 	{
-		private SerializedProperty _angleLimitX;
-		private SerializedProperty _angleLimitY;
+		private SerializedProperty _baseAngleLimit;
+		private SerializedProperty _barrelAngleLimitY;
 		private SerializedProperty _barrel;
 
 		private void OnEnable()
 		{
-			_angleLimitX = serializedObject.FindProperty("_rotateAngleLimitX");
-			_angleLimitY = serializedObject.FindProperty("_rotateAngleLimitY");
+			_baseAngleLimit = serializedObject.FindProperty("_baseRotateAngleLimit");
+			_barrelAngleLimitY = serializedObject.FindProperty("_barrelRotateAngleLimit");
 			 _barrel = serializedObject.FindProperty("_cannonBarrel");
 			 if (_barrel == null)
 			 {
@@ -26,17 +27,17 @@ namespace InGame.Exhibit.Editor
 
 		private void OnSceneGUI()
 		{
-			var limit = (CannonInteractable)target;
+			var limit = (CannonMove)target;
 			var t = limit.transform;
 			var pos = t.position;
 			var barrelPos = _barrel.objectReferenceValue != null ? ((Transform)_barrel.objectReferenceValue).position : pos;
 			var radius = limit.transform.localScale.y;
 
 			var forward = t.forward;
-			var maxX = _angleLimitX.vector2Value.y;
-			var minX = _angleLimitX.vector2Value.x;
-			var maxY = _angleLimitY.vector2Value.y;
-			var minY = _angleLimitY.vector2Value.x;
+			var maxX = _baseAngleLimit.vector2Value.y;
+			var minX = _baseAngleLimit.vector2Value.x;
+			var maxY = _barrelAngleLimitY.vector2Value.y;
+			var minY = _barrelAngleLimitY.vector2Value.x;
 
 			// ドラッグ可能な点の作成
 			DrawAngleHandle(
@@ -73,8 +74,8 @@ namespace InGame.Exhibit.Editor
 			);
 
 			// inspector上の値更新
-			_angleLimitX.vector2Value = new Vector2(minX, maxX);
-			_angleLimitY.vector2Value = new Vector2(minY, maxY);
+			_baseAngleLimit.vector2Value = new Vector2(minX, maxX);
+			_barrelAngleLimitY.vector2Value = new Vector2(minY, maxY);
 			serializedObject.ApplyModifiedProperties();
 
 			// 可動範囲の描画
