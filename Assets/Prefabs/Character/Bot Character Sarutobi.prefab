@@ -79,17 +79,21 @@ PrefabInstance:
     - target: {fileID: 1037442771735039011, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[15]'
       value: 
-      objectReference: {fileID: 6236530426983315225}
+      objectReference: {fileID: 6783284853501433932}
     - target: {fileID: 1037442771735039011, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[16]'
       value: 
-      objectReference: {fileID: 4248726239824517959}
+      objectReference: {fileID: 6236530426983315225}
     - target: {fileID: 1037442771735039011, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[17]'
       value: 
-      objectReference: {fileID: 5530186531661245486}
+      objectReference: {fileID: 4248726239824517959}
     - target: {fileID: 1037442771735039011, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[18]'
+      value: 
+      objectReference: {fileID: 5530186531661245486}
+    - target: {fileID: 1037442771735039011, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[19]'
       value: 
       objectReference: {fileID: 1387035089509385029}
     - target: {fileID: 6154959219696710164, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
@@ -134,7 +138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6364534128585291686, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: m_Name
-      value: Bot Sarutobi
+      value: Bot Character Sarutobi
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1397205008550058865, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
@@ -354,6 +358,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30522911d6f01d94e88b4f6d3fe4de7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6783284853501433932 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4843476073648427662, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
+  m_PrefabInstance: {fileID: 2095416761151556290}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4992016301300628836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 789ac39cde461aa4286561ef0dfc67a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7323669894483763966 stripped
