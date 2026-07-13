@@ -14,16 +14,24 @@ namespace InGame
 
         private Vector3 _velocity;
         private bool _isGrounded;
+
         public void Start()
         {
-            Initialize();
+            Initialize().Forget();
         }
-        public async void Initialize()
+
+        public async UniTask Initialize()
         {
             _collider.enabled = false;
-            await UniTask.WaitForSeconds(_getCoolTime);
+            await UniTask.WaitForSeconds(_getCoolTime, cancellationToken: destroyCancellationToken);
             _collider.enabled = true;
         }
+
+        public void Throw(Vector3 velocity)
+        {
+            _velocity = velocity;
+        }
+
         public override void FixedUpdateNetwork()
         {
             if (!HasStateAuthority || _isGrounded)
@@ -32,20 +40,29 @@ namespace InGame
             _velocity += Vector3.down * _gravity * Runner.DeltaTime;
 
             Vector3 nextPos = this.transform.position + _velocity * Runner.DeltaTime;
-            Ray ray = new Ray(nextPos + Vector3.up * 0.1f, Vector3.down);
 
-            if (Physics.Raycast(ray, out RaycastHit hit, _groundCheckDistance, _groundLayer))
+            if (IsGrounded(out var hitPos))
             {
-                //nextPos.y = hit.point.y + (_collider.bounds.size.y);
+                _collider.enabled = true;
+                nextPos.y = hitPos.y + _collider.bounds.extents.y;
                 _velocity = Vector3.zero;
                 _isGrounded = true;
             }
 
             this.transform.position = nextPos;
         }
-        public void Throw(Vector3 velocity)
+
+        private bool IsGrounded(out Vector3 hitPos)
         {
-            _velocity = velocity;
+            Vector3 origin = transform.position + Vector3.up * 0.1f;
+
+            if (Physics.Raycast(origin, Vector3.down, out var hit, _groundCheckDistance, _groundLayer))
+            {
+                hitPos = hit.point;
+                return true;
+            }
+            hitPos = Vector3.zero;
+            return false;
         }
     }
 }

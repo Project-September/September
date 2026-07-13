@@ -10,7 +10,7 @@ namespace September.InGame.Common.Stats
     public readonly struct StatsContainer : INetworkStruct
     {
         public const int MaxCapacity = 9;
-        
+
         [Networked, Capacity(MaxCapacity)] public NetworkDictionary<StatType, Stat> Stats => default;
 
         public StatsContainer(ReadOnlySpan<Stat> stats)
@@ -19,13 +19,13 @@ namespace September.InGame.Common.Stats
             {
                 Debug.LogWarning($"[StatsContainer] {stats.Length}個のステータスを持つコンテナを作成しようとしましたが、最大ステータス数（{MaxCapacity}個）を超過しているため正常に動作しない可能性があります。{nameof(MaxCapacity)}を増やすことを検討してください");
             }
-            
+
             foreach (var stat in stats)
             {
                 Stats.Add(stat.StatType, stat);
             }
         }
-        
+
         public Stat GetStat(StatType type)
         {
             return Stats[type];
@@ -47,13 +47,13 @@ namespace September.InGame.Common.Stats
         {
             if (TryGetStat(type, out var stat))
             {
-                value = stat.Value; 
+                value = stat.Value;
                 return true;
             }
             value = 0;
             return false;
         }
-        
+
         public bool TrySetStatValue(StatType type, float value)
         {
             if (Stats.ContainsKey(type))
@@ -72,7 +72,7 @@ namespace September.InGame.Common.Stats
                 SetStatValueInternal(type, stat.Value + value);
                 return true;
             }
-            
+
             return false;
         }
 
