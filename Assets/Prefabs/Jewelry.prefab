@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 5234411196316020459}
   - component: {fileID: 7591190371671259731}
   - component: {fileID: 4608124095483453520}
-  - component: {fileID: 1392833882602234130}
+  - component: {fileID: 5553430812545105003}
   - component: {fileID: -2426375230676360092}
+  - component: {fileID: 4243231678177404559}
   m_Layer: 0
   m_Name: Jewelry
   m_TagString: Jewelry
@@ -30,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.418369, y: -10.029199, z: 6.228268}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -42,7 +43,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1724966896955776321}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &4608124095483453520
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -88,8 +89,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1392833882602234130
-BoxCollider:
+--- !u!135 &5553430812545105003
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -105,9 +106,9 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-2426375230676360092
 MonoBehaviour:
@@ -125,5 +126,25 @@ MonoBehaviour:
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 4243231678177404559}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &4243231678177404559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1724966896955776321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe1a1b5d44762e345a2efae85e9b9128, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gravity: 10
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  _groundCheckDistance: 0.25
+  _getCoolTime: 5
+  _collider: {fileID: 5553430812545105003}

@@ -6109,6 +6109,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _status: {fileID: -3905644752378878134}
+  _health: {fileID: 5358505061852357365}
+  _jewelryPrefab: {fileID: -2426375230676360092, guid: e14ea0caa74491347a5d59bc76798f5c, type: 3}
+  _horizontalThrowForce: 5
+  _upwardThrowForce: 3
+  _heightOffset: 1.58
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
