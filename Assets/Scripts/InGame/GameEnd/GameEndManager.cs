@@ -1,6 +1,6 @@
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using September.Common;
+using September.InGame.Common;
 using September.InGame.UI;
 using September.NewResult;
 using UniRx;
@@ -39,7 +39,8 @@ namespace September.InGame
 
         private static bool BuildGameResultInfo()
         {
-            var builder = new GameResultInfoBuilder();
+            var rankingPolicy = StaticServiceLocator.Instance.Get<InGameManager>().GameRule.RankingPolicy;
+            var builder = new GameResultInfoBuilder(rankingPolicy);
 
             var db = PlayerDatabase.Instance;
             if (!db)

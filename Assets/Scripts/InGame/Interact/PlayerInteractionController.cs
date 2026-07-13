@@ -6,6 +6,7 @@ using InGame.Player;
 using InGame.Player.Ability;
 using September.Common;
 using September.InGame;
+using September.InGame.Common.Stats;
 using September.InGame.UI;
 using UnityEngine;
 
@@ -26,6 +27,9 @@ namespace InGame.Interact
         [SerializeField] private float _interactAngleBuffer = 10f; // 角度に+10°
         [SerializeField] private float _interactRadiusBuffer = 0.3f; // 距離に+0.3m
         [SerializeField] private PlayerAudioController _playerAudioController; // インタラクト時のボイス再生用
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
         //許容できる高さの差
         private float _heightDifference = 0.1f;
 
@@ -52,6 +56,13 @@ namespace InGame.Interact
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
             _playerAudioController = GetComponentInChildren<PlayerAudioController>();
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerInteractionController.csを確認してください", this);
+#endif
 
             if (_inputManager == null)
                 _inputManager = GetComponent<PlayerInputManager>();
@@ -301,7 +312,8 @@ namespace InGame.Interact
         {
             if (!_focusedObj) return;
 
-            _requiredInteractTime = GetRequireInteractTime();
+            _requiredInteractTime = GetRequireInteractTime() * (_playerStatus ? _playerStatus.InteractDurationMultiply : 1);
+
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
@@ -336,6 +348,8 @@ namespace InGame.Interact
         private void CompleteInteraction()
         {
             _isExecutingInteraction = false;
+
+            _buildGenerator?.UpdateBuild(BuildRouteType.FastInteract);
 
             if (GetSessionPlayerData(Object.InputAuthority.RawEncoded, out var data))
             {
@@ -379,7 +393,10 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            UIController.I?.SetInteractProgress(0f);
+            if (!_isBot)
+            {
+                UIController.I?.SetInteractProgress(0f);
+            }
         }
 
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]

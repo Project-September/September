@@ -31,6 +31,12 @@ namespace Result
         Instrument,
         [DisplayName("ムラマサ")]
         Muramasa,
+        [DisplayName("マスト")]
+        Mast,
+        [DisplayName("武器庫")]
+        Armory,
+        [DisplayName("サメ")]
+        Shark
     }
 
     [Serializable]
@@ -40,7 +46,7 @@ namespace Result
         public int Points;
         public int DestroyPoints;
     }
-    
+
     [AttributeUsage(AttributeTargets.Field)]
     public class DisplayNameAttribute : Attribute
     {

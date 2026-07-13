@@ -27,8 +27,8 @@ namespace September.Lobby
             _canvasGroup.alpha = _startIsActive ? 1 : 0;
             _canvasGroup.interactable = _startIsActive;
             _canvasGroup.blocksRaycasts = _startIsActive;
-            _openButton.onClick.AddListener(Open);
-            _closeButton.onClick.AddListener(Close);
+            _openButton?.onClick.AddListener(Open);
+            _closeButton?.onClick.AddListener(Close);
         }
 
         private void Open()
@@ -39,8 +39,8 @@ namespace September.Lobby
             {
                 _canvasGroup.interactable = true;
                 _canvasGroup.blocksRaycasts = true;
-                if(SelectWhenOpen) EventSystem.current.SetSelectedGameObject(SelectWhenOpen.gameObject);
-            }).ToUniTask()); 
+                if (SelectWhenOpen) EventSystem.current.SetSelectedGameObject(SelectWhenOpen.gameObject);
+            }).ToUniTask());
             for (int i = 0; i < _rectOffsets.Length; i++)
             {
                 var rectOffset = _rectOffsets[i];

@@ -2,6 +2,7 @@ using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
 using September.Common;
+using September.InGame.Common.Stats;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 
@@ -17,6 +18,10 @@ namespace InGame.Player
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
         [SerializeField] private Vector3 _respawnPosition;
+        [SerializeField] private GameObject _attackWeapon;
+        [Header("ビルドシステム関連の参照")]
+        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] PlayerStatus _playerStatus;
 
         PlayerMovement _playerMovement;
         CameraController _cameraController;
@@ -29,6 +34,7 @@ namespace InGame.Player
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
+        private RigidbodyConstraints _defaultConstraints;
         public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
@@ -45,12 +51,13 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-
+        
         public override void Spawned()
         {
             InitComponents();
 
             _respawnPosition = transform.position;
+            _defaultConstraints = _rigidbody.constraints;
         }
 
         /// <summary> Player関連コンポーネントの初期化 </summary>
@@ -70,6 +77,14 @@ namespace InGame.Player
                 _playerHealth = health;
                 health.OnDeath += OnDeath;
             }
+
+#if UNITY_EDITOR
+            if (_buildGenerator & _playerStatus)
+                Debug.Log("ビルドシステムが正常に動きます");
+            else
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
+            // 後でパスを登録
+#endif
         }
 
         protected virtual void LateUpdate()
@@ -166,13 +181,15 @@ namespace InGame.Player
             IsStun = false;
             _playerHealth.IsInvincible = false;
             _playerEffectController.StopStunEffect();
+            _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
 
         void OnDeath(HitData lastHitData)
         {
             IsStun = true;
 
-            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime);
+            // ビルドの減衰分を乗算
+            _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             _playerHealth.IsInvincible = true;
             _playerEffectController.PlayStunEffect();
         }
@@ -185,6 +202,14 @@ namespace InGame.Player
             {
                 _playerMovement.Stop();
             }
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetWeaponVisible(bool visible)
+        {
+            if (_attackWeapon == null) return;
+
+            _attackWeapon.SetActive(visible);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -209,6 +234,14 @@ namespace InGame.Player
         public void RPC_SetUseGrav(NetworkBool active)
         {
             _rigidbody.useGravity = active;
+        }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetPositionLock(NetworkBool isLocked)
+        {
+            _rigidbody.constraints = isLocked ?
+                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
+                _defaultConstraints;
         }
 
         /// <summary> 非常用リスポーン </summary>

@@ -16,7 +16,7 @@ namespace September.Lobby
         protected int _currentCharacterIndex;
         protected PlayerRef _localPlayerRef;
 
-        private readonly List<SelectCharacterIcon> _selectCharacterIcons = new();
+        protected readonly List<SelectCharacterIcon> _selectCharacterIcons = new();
         protected void CreateCharacterIcons(string[] characterNames)
         {
             for (int i = 0; i < characterNames.Length; i++)

@@ -49,6 +49,7 @@ namespace InGame.Exhibit
         private PlayerRef _owner;
         private LayerMask _groundLayer;
         private Vector3 _hitPosition;
+        private readonly RaycastHit[] _aimHits = new RaycastHit[30];
         
         [Header("乗った時の上昇アニメーション")]
         [SerializeField, Tooltip("GetOnした時に上昇する高さ")]
@@ -175,28 +176,39 @@ namespace InGame.Exhibit
 
         private RaycastHit GetAimPosition()
         {
-            RaycastHit[] hits = new RaycastHit[30];
-
             Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
 
-            var count = Physics.RaycastNonAlloc(_muzzle.position, angleForward, hits, _rayDistance);
+            var count = Physics.RaycastNonAlloc(_muzzle.position, angleForward, _aimHits, _rayDistance);
+            var closestDistance = float.MaxValue;
+            var closestHit = new RaycastHit();
+            var hasHit = false;
 
             for (int i = 0; i < count; i++)
             {
                 // ヒットしたオブジェクトのTransformを取得
-                Transform hitTransform = hits[i].transform;
+                Transform hitTransform = _aimHits[i].transform;
                 // ヒットしたオブジェクトが自分自身、または自分の子オブジェクトか確認
                 if (hitTransform == transform || hitTransform.IsChildOf(transform)) continue;
-                var point = hits[i].point;
+                if (_aimHits[i].distance >= closestDistance) continue;
+
+                closestDistance = _aimHits[i].distance;
+                closestHit = _aimHits[i];
+                hasHit = true;
+            }
+
+            if (hasHit)
+            {
+                var point = closestHit.point;
                 if (!IsAimObjectActive)
                 {
                     IsAimObjectActive = true;
                 }
-                var offset = hits[i].normal * 1f;
+
+                var offset = closestHit.normal * 1f;
                 AimObjectPosition = point + offset;
-                var rot = Quaternion.FromToRotation(Vector3.up,hits[i].normal);
+                var rot = Quaternion.FromToRotation(Vector3.up, closestHit.normal);
                 AimObjectRotation = rot;
-                return hits[i];
+                return closestHit;
             }
 
             if (IsAimObjectActive)
