@@ -7,7 +7,6 @@ namespace September.InGame.Exhibit
 {
 	public class Projectile : NetworkBehaviour
 	{
-		private IProjectileHitEffect _projectileHitEffect;
 		private LayerMask _hitLayer;
 		private GameObject _projectile;
 		/// <summary>
@@ -22,10 +21,14 @@ namespace September.InGame.Exhibit
 		public override void FixedUpdateNetwork()
 		{
 			base.FixedUpdateNetwork();
-			if (!Runner.IsServer) return;
-			CurrentProjectileData = ProjectileUpdate(CurrentProjectileData);
+			if(HasStateAuthority)
+			{
+				CurrentProjectileData = ProjectileUpdate(CurrentProjectileData);
+			}
+			
 			if (CurrentProjectileData.HasHit)
 			{
+				OnHitCallback = null;
 				Runner.Despawn(Object);
 			}
 		}
@@ -46,12 +49,10 @@ namespace September.InGame.Exhibit
 		/// 全てのクライアント共通の値の初期化処理
 		/// </summary>
 		/// <param name="projectilePrefab"></param>
-		/// <param name="hitEffect"></param>
 		/// <param name="hitLayer"></param>
-		public void Initialized(GameObject projectilePrefab, IProjectileHitEffect hitEffect, LayerMask hitLayer)
+		public void Initialized(GameObject projectilePrefab, LayerMask hitLayer)
 		{
 			_projectile = Instantiate(projectilePrefab);
-			_projectileHitEffect = hitEffect;
 			_hitLayer = hitLayer;
 		}
 
@@ -99,7 +100,6 @@ namespace September.InGame.Exhibit
 			if (Physics.Raycast(currentPos, movement.normalized, out var hit, movement.magnitude, _hitLayer))
 			{
 				data.HasHit = true;
-				_projectileHitEffect.Hit(hit.point, Quaternion.LookRotation(hit.normal), hit.transform.gameObject, PlayerRef);
 				OnHitCallback?.Invoke(hit.point, Quaternion.LookRotation(hit.normal), hit.transform.gameObject);
 				return data;
 			}
@@ -111,13 +111,7 @@ namespace September.InGame.Exhibit
 
 			return data;
 		}
-
-		[Rpc(RpcSources.All, RpcTargets.All)]
-		private void RPC_PlayHitEffect(Vector3 point, Vector3 normal)
-		{
-			_projectileHitEffect.PlayHitEffect(point, Quaternion.LookRotation(normal));
-		}
-
+		
 		/// <summary>
 		///     特定の時間での放物線位置を計算する
 		/// </summary>

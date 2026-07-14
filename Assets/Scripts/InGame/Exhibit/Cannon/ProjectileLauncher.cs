@@ -39,7 +39,6 @@ namespace September.InGame.Exhibit
 
 		public Vector3 HitNormal { get; private set; }
 		[Networked] private int LastPositionIndex { get; set; }
-		[Networked] private PlayerRef _playerRef { get; set; }
 		[Networked] private ProjectileData CurrentProjectileData { get; set; }
 
 		/// <summary>
@@ -62,6 +61,7 @@ namespace September.InGame.Exhibit
 		{
 			base.Spawned();
 			_linePositions = new Vector3[(int)(_lifeTime / _simulationStepTime)];
+			
 		}
 
 		public override void Render()
@@ -73,7 +73,7 @@ namespace September.InGame.Exhibit
 		/// <summary>
 		///     投射物を発射する
 		/// </summary>
-		public void Fire()
+		public void Fire(PlayerRef usePlayerRef)
 		{
 			CurrentProjectileData = new ProjectileData
 			{
@@ -84,15 +84,20 @@ namespace September.InGame.Exhibit
 				Timer = 0f,
 				HasHit = false
 			};
-
-			// 投射物の管理は個々のPrefabに任せる。Hit時のコールバックで処理。
-			Runner.Spawn(_projectilePrefab, onBeforeSpawned: (runner, obj) =>
+			
+			Runner.Spawn(_projectilePrefab, _projectileSpawnPoint.position, _projectileSpawnPoint.rotation, onBeforeSpawned: (runner, obj) =>
 			{
 				var projectile = obj.GetComponent<Projectile>();
+			
 				RPC_InitializedProjectile(projectile);
-				_projectileHitEffect.Hit(projectile.transform.position, projectile.transform.rotation, obj.gameObject,
-					_playerRef);
-				RPC_Fire(projectile);
+			
+				projectile.Fire(CurrentProjectileData, usePlayerRef, (position, rotation, hitObject) =>
+				{
+					if(Runner.IsServer)
+						_projectileHitEffect.Hit(position, rotation, hitObject,
+							usePlayerRef);
+					RPC_PlayEffect(position, rotation);
+				});
 			});
 		}
 
@@ -151,29 +156,26 @@ namespace September.InGame.Exhibit
 		[Rpc]
 		private void RPC_InitializedProjectile(Projectile projectile)
 		{
-			projectile.Initialized(_projectileEffectPrefab.gameObject, _projectileHitEffect, _hitLayer);
+			projectile.Initialized(_projectileEffectPrefab.gameObject, _hitLayer); 
 		}
 
 		[Rpc]
-		private void RPC_Fire(Projectile projectile)
+		private void RPC_PlayEffect(Vector3 position, Quaternion rotation)
 		{
-			projectile.Fire(CurrentProjectileData, _playerRef, (position, rotation, hitObject) =>
-			{
-				RPC_PlayHitEffect(position, rotation);
-				OnHit?.Invoke(position, rotation);
-			});
-		}
-
-		[Rpc(RpcSources.All, RpcTargets.All)]
-		private void RPC_PlayHitEffect(Vector3 point, Quaternion rotation)
-		{
-			_projectileHitEffect.PlayHitEffect(point, rotation);
+			_projectileHitEffect.PlayEffect(position, rotation);
 		}
 	}
 
 	public interface IProjectileHitEffect
 	{
+		/// <summary>
+		/// ProjectileHit時にサーバで上のゲームロジック処理
+		/// </summary>
 		void Hit(Vector3 position, Quaternion rotation, GameObject hitObject, PlayerRef usePlayer);
-		void PlayHitEffect(Vector3 position, Quaternion rotation);
+		
+		/// <summary> 
+		/// ProjectileHit時に全クライアントで行う処理
+		/// </summary>
+		void PlayEffect(Vector3 position, Quaternion rotation);
 	}
 }

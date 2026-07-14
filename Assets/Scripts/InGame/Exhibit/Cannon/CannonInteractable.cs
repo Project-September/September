@@ -28,6 +28,7 @@ namespace September.InGame.Exhibit
 
 		[Networked] private PlayerRef CurrentUsePlayerRef { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
+		[Networked] private TickTimer WaitForSeconds { get; set; }
 
 		public override void Spawned()
 		{
@@ -73,16 +74,24 @@ namespace September.InGame.Exhibit
 
 			// キャノンの回転内部処理
 			_move.MoveUpdate(input);
-			_currentUsePlayer?.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
-
+			_currentUsePlayer?.
+				SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
+			_currentUsePlayer.transform.position = _waitCharacterTransform.position;
+			
 			// 射撃処理
 			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTime.ExpiredOrNotRunning(Runner) &&
 			    _currentAmmo > 0)
 			{
-				_launcher.Fire();
+				_launcher.Fire(CurrentUsePlayerRef);
 				LastFireTime = TickTimer.CreateFromSeconds(Runner, _reloadTime);
 				_currentAmmo -= 1;
-				if (_currentAmmo <= 0) OnInteractEnd();
+				if (_currentAmmo <= 0) WaitForSeconds = TickTimer.CreateFromSeconds(Runner, 1f);
+			}
+
+			if (WaitForSeconds.Expired(Runner))
+			{
+				WaitForSeconds = TickTimer.None;
+				OnInteractEnd();
 			}
 		}
 
@@ -93,14 +102,16 @@ namespace September.InGame.Exhibit
 		{
 			SetCooldown();
 			_move.Refresh();
+			Object.RemoveInputAuthority();
+			RPC_EffectActive(false);
+			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 
 			// 使用中のプレイヤークライアント限定処理
 			if (!_currentUsePlayer) return;
-			Object.RemoveInputAuthority();
 			PlayerActive(true);
-			RPC_EffectActive(false);
-			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
-			if (_currentUsePlayer) _currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
+			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
+			_currentUsePlayer.GetComponent<CameraController>().CameraReset();
+			
 			_currentUsePlayer = null;
 			CurrentUsePlayerRef = default;
 			_interactable.EndInteract();

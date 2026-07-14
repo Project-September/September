@@ -1,6 +1,7 @@
 using Fusion;
 using InGame.Health;
 using InGame.Player;
+using September.Common;
 using UnityEngine;
 
 namespace September.InGame.Exhibit
@@ -15,7 +16,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] private LayerMask _hitLayer;
 		private GameObject _explosionParticle;
 
-		public void PlayHitEffect(Vector3 position, Quaternion rotation)
+		public void PlayEffect(Vector3 position, Quaternion rotation)
 		{
 			if (_explosionParticle == null) _explosionParticle = Object.Instantiate(_explosionParticlePrefab);
 			// 着弾時のエフェクト
@@ -49,6 +50,9 @@ namespace September.InGame.Exhibit
 		{
 			var hitData = new HitData(HitActionType.Damage, _damage, usingPlayer,
 				damageable.OwnerPlayerRef);
+			PlayerDatabase.Instance.PlayerDataDic.Get(damageable.OwnerPlayerRef);
+			PlayerDatabase.Instance.PlayerDataDic.Get(usingPlayer);
+			
 			damageable.TakeHit(ref hitData);
 		}
 
