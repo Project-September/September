@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gameStartStrategy:
     rid: 7765555094382968937
-  _playerKilledUseCase:
-    rid: 7765555094382968938
+  _playerKilledStrategy:
+    rid: 7765555185143251044
   _rankingPolicy:
     rid: 7765555097832521866
   references:
@@ -24,9 +24,9 @@ MonoBehaviour:
     - rid: 7765555094382968937
       type: {class: TagGameStartStrategy, ns: September.InGame.Rules, asm: Scripts}
       data: 
-    - rid: 7765555094382968938
-      type: {class: TagPlayerKilledUseCase, ns: September.InGame.Rules, asm: Scripts}
-      data: 
     - rid: 7765555097832521866
       type: {class: TagRuleRankingPolicy, ns: September.NewResult, asm: Scripts}
+      data: 
+    - rid: 7765555185143251044
+      type: {class: TagPlayerKilledStrategy, ns: September.InGame.Rules, asm: Scripts}
       data: 
