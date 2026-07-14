@@ -1,5 +1,4 @@
 using Fusion;
-using September.InGame.Common.Stats;
 using UnityEngine;
 
 namespace InGame.Player
@@ -15,10 +14,7 @@ namespace InGame.Player
 
         private const string JewelryTag = "Jewelry";
 
-        private void Start()
-        {
-            _status.SetBaseValue(StatType.Jewelry, 10);
-        }
+        [Networked] public int JewelryCount { get; private set; }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -36,7 +32,7 @@ namespace InGame.Player
         public int DropJewelry(int removeAmount, IJewelry[] resultDropped)
         {
             Vector3 spawnCenter = transform.position + Vector3.up * _heightOffset;
-            _status.AddBaseValue(StatType.Jewelry, -removeAmount);
+            JewelryCount -= removeAmount;
 
             int result = 0;
             for (int i = 0; i < removeAmount; i++)
@@ -72,12 +68,12 @@ namespace InGame.Player
 
         public void PickUp(IJewelry jewelry)
         {
-            _status.AddBaseValue(StatType.Jewelry, jewelry.Score);
+            JewelryCount++;
         }
 
         public int GetJewelryCount()
         {
-            return _status.Jewelry;
+            return JewelryCount;
         }
     }
 }
