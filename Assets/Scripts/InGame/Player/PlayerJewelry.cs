@@ -33,6 +33,9 @@ namespace InGame.Player
         public int DropJewelry(int dropAmount, IJewelry[] resultDropped)
         {
             Vector3 spawnCenter = transform.position + Vector3.up * _heightOffset;
+
+            // 現在の所持数より多くの宝石はドロップしない
+            dropAmount = Mathf.Min(dropAmount, JewelryCount);
             JewelryCount -= dropAmount;
 
             int result = 0;

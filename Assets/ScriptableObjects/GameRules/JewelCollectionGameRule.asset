@@ -27,7 +27,9 @@ MonoBehaviour:
     - rid: 7765555185143251033
       type: {class: JewelPlayerKilledStrategy, ns: September.InGame.Rules, asm: Scripts}
       data:
-        _jewelPrefab: {fileID: 0}
+        _minDropAmount: 1
+        _minDropRatio: 0
+        _additionalDropRatio: 0.5
     - rid: 7765555185143251047
       type: {class: NullGameStartStrategy, ns: September.InGame.Rules, asm: Scripts}
       data: 
