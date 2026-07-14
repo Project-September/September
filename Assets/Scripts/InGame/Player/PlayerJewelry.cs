@@ -1,4 +1,5 @@
 using Fusion;
+using September.InGame.Jewelry;
 using UnityEngine;
 
 namespace InGame.Player
@@ -21,10 +22,8 @@ namespace InGame.Player
             if (!HasStateAuthority) return;
 
             if (other.gameObject.CompareTag(JewelryTag)
-                && other.TryGetComponent<NetworkObject>(out var networkObject)
                 && other.TryGetComponent<IJewelry>(out var jewelry))
             {
-                Runner.Despawn(networkObject);
                 PickUp(jewelry);
             }
         }
@@ -69,6 +68,20 @@ namespace InGame.Player
         public void PickUp(IJewelry jewelry)
         {
             JewelryCount++;
+
+            if (!HasStateAuthority) return;
+
+            if (jewelry is Jewelry jewelComponent)
+            {
+                if (jewelComponent.TryGetComponent<NetworkObject>(out var jewelObj))
+                {
+                    Runner.Despawn(jewelObj);
+                }
+                else
+                {
+                    Destroy(jewelComponent.gameObject);
+                }
+            }
         }
 
         public int GetJewelryCount()
