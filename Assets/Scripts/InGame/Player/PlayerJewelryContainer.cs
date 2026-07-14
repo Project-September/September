@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace InGame.Player
 {
-    public class PlayerJewelry : NetworkBehaviour, IJewelryContainer
+    public class PlayerJewelryContainer : NetworkBehaviour, IJewelryContainer
     {
         [SerializeField] private NetworkObject _jewelryPrefab;
         [Header("Throw")]
