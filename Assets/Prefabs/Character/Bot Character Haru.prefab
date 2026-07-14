@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2187076012426182504, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
       propertyPath: m_Name
-      value: Bot Haru
+      value: Bot Character Haru
       objectReference: {fileID: 0}
     - target: {fileID: 2187076012426182504, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
       propertyPath: m_IsActive
@@ -123,9 +123,13 @@ PrefabInstance:
     - target: {fileID: 5218806301530637549, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[15]'
       value: 
-      objectReference: {fileID: 84366129210140047}
+      objectReference: {fileID: 3281995512287652278}
     - target: {fileID: 5218806301530637549, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[16]'
+      value: 
+      objectReference: {fileID: 84366129210140047}
+    - target: {fileID: 5218806301530637549, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[17]'
       value: 
       objectReference: {fileID: 335028402206312136}
     - target: {fileID: 5452555632598930903, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
@@ -243,6 +247,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e61063c74074ca18761d832a0f30177, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3281995512287652278 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 377787564149873216, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
+  m_PrefabInstance: {fileID: 2933486363366028278}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3958620390771838110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 789ac39cde461aa4286561ef0dfc67a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &3958620390771838110 stripped
