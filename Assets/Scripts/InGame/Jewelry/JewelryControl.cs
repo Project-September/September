@@ -27,6 +27,16 @@ namespace InGame
             _collider.enabled = true;
         }
 
+        public void RandomThrow(float horizontalThrowForce, float upwardThrowForce)
+        {
+            Vector3 dir = Random.insideUnitSphere;
+            dir.y = 0f;
+            dir.Normalize();
+
+            Vector3 force = dir * horizontalThrowForce + Vector3.up * upwardThrowForce;
+            Throw(force);
+        }
+
         public void Throw(Vector3 velocity)
         {
             _velocity = velocity;

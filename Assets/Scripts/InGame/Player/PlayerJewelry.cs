@@ -58,12 +58,7 @@ namespace InGame.Player
                 if (!obj.TryGetComponent(out JewelryControl jewelry))
                     return;
 
-                Vector3 dir = Random.insideUnitSphere;
-                dir.y = 0f;
-                dir.Normalize();
-
-                Vector3 force = dir * _horizontalThrowForce + Vector3.up * _upwardThrowForce;
-                jewelry.Throw(force);
+                jewelry.RandomThrow(_horizontalThrowForce, _upwardThrowForce);
             }
         }
 
