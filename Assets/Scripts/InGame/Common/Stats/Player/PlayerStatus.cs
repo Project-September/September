@@ -26,6 +26,5 @@ namespace InGame.Player
         public float AttackDamage => CurrentStats.GetStat(StatType.AttackDamage).Value;
         public float InteractDurationMultiply => CurrentStats.GetStat(StatType.InteractDurationMultiply).Value;
         public float StunDurationMultiply => CurrentStats.GetStat(StatType.StunDurationMultiply).Value;
-        public int Jewelry => (int)CurrentStats.GetStat(StatType.Jewelry).Value;
     }
 }

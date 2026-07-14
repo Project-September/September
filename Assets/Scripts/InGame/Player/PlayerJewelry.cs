@@ -6,7 +6,6 @@ namespace InGame.Player
 {
     public class PlayerJewelry : NetworkBehaviour, IJewelryContainer
     {
-        [SerializeField] private PlayerStatus _status;
         [SerializeField] private NetworkObject _jewelryPrefab;
         [Header("Throw")]
         [SerializeField] private float _horizontalThrowForce = 5f;
