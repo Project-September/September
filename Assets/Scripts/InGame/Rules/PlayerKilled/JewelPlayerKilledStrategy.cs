@@ -7,8 +7,6 @@ namespace September.InGame.Rules
 {
     public class JewelPlayerKilledStrategy : IPlayerKilledStrategy
     {
-        [SerializeField] private NetworkObject _jewelPrefab;
-
         public void ProcessKillEvent(PlayerRef killer, PlayerRef victim)
         {
             NetworkObject victimObj = PlayerDatabase.Instance.PlayerObjectDic.Get(victim);
