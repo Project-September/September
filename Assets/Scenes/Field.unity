@@ -5420,76 +5420,6 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 4218279919788378075, guid: 53376ac157ca36644a0e41e961b92d83, type: 3}
   m_PrefabInstance: {fileID: 4467634824709606858}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1672582428
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2463801933549895597, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: SortKey
-      value: 3266602959
-      objectReference: {fileID: 0}
-    - target: {fileID: 8360875997416129576, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_Name
-      value: OKBPrefabBot
-      objectReference: {fileID: 0}
-    - target: {fileID: 8360875997416129576, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8736522266100138394, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
---- !u!136 &1672582429 stripped
-CapsuleCollider:
-  m_CorrespondingSourceObject: {fileID: 3128034714514688337, guid: ee14b1a9eb69ab94eb6c499fda5e1b27, type: 3}
-  m_PrefabInstance: {fileID: 1672582428}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1685483012 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6321852013500925542, guid: 53376ac157ca36644a0e41e961b92d83, type: 3}
@@ -5568,7 +5498,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   _positionQuantize: 1000
   _navMeshTolerance: 2
-  _botCapsuleCollider: {fileID: 1672582429}
+  _botCapsuleCollider: {fileID: 0}
   _maxLedgeHeight: 1.5
   _minLedgeHeight: 0.4
   _maxLedgeDepth: 0.9
@@ -5629,6 +5559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0427bc7577caf3d40b8b90fc2c5b76cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _randomDistanceAmount: 50
 --- !u!1 &1733126982 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7360682837990751661, guid: 53376ac157ca36644a0e41e961b92d83, type: 3}
@@ -20121,7 +20052,6 @@ SceneRoots:
   - {fileID: 1791308097}
   - {fileID: 4467634824709606858}
   - {fileID: 1703115900}
-  - {fileID: 1672582428}
   - {fileID: 1255293577}
   - {fileID: 82659554}
   - {fileID: 1018905469}
