@@ -16,9 +16,22 @@ namespace InGame.Player
 
         private const string JewelryTag = "Jewelry";
 
-        public void Start()
+        private void Start()
         {
             _status.SetBaseValue(StatType.Jewelry, 10);
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!HasStateAuthority) return;
+
+            if (other.gameObject.CompareTag(JewelryTag)
+                && other.TryGetComponent<NetworkObject>(out var networkObject)
+                && other.TryGetComponent<IJewelry>(out var jewelry))
+            {
+                Runner.Despawn(networkObject);
+                PickUp(jewelry);
+            }
         }
 
         public IEnumerable<IJewelry> DropJewelry(int removeAmount)
@@ -56,19 +69,6 @@ namespace InGame.Player
         public int GetJewelryCount()
         {
             return _status.Jewelry;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!HasStateAuthority) return;
-
-            if (other.gameObject.CompareTag(JewelryTag)
-                && other.TryGetComponent<NetworkObject>(out var networkObject)
-                && other.TryGetComponent<IJewelry>(out var jewelry))
-            {
-                Runner.Despawn(networkObject);
-                PickUp(jewelry);
-            }
         }
     }
 }
