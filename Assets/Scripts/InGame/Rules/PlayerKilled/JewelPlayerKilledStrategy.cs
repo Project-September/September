@@ -1,0 +1,20 @@
+using Fusion;
+using InGame.Player;
+using September.Common;
+using UnityEngine;
+
+namespace September.InGame.Rules
+{
+    public class JewelPlayerKilledStrategy : IPlayerKilledStrategy
+    {
+        [SerializeField] private NetworkObject _jewelPrefab;
+
+        public void ProcessKillEvent(PlayerRef killer, PlayerRef victim)
+        {
+            NetworkObject victimObj = PlayerDatabase.Instance.PlayerObjectDic.Get(victim);
+
+            var container = victimObj.GetComponent<IJewelryContainer>();
+            container.DropJewelry(Mathf.FloorToInt(container.GetJewelryCount() * .5f));
+        }
+    }
+}

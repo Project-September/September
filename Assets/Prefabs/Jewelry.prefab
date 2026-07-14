@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5553430812545105003}
   - component: {fileID: 5589114008520084412}
   - component: {fileID: -2787156225861185796}
+  - component: {fileID: 7448878693309109563}
   - component: {fileID: 4243231678177404559}
   m_Layer: 0
   m_Name: Jewelry
@@ -129,6 +130,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: -2787156225861185796}
+  - {fileID: 7448878693309109563}
   - {fileID: 4243231678177404559}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &-2787156225861185796
@@ -148,6 +150,19 @@ MonoBehaviour:
   SyncParent: 0
   _autoAOIOverride: 1
   DisableSharedModeInterpolation: 0
+--- !u!114 &7448878693309109563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1724966896955776321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc616a0a7cf64425bdf22d40857e531e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _score: 1
 --- !u!114 &4243231678177404559
 MonoBehaviour:
   m_ObjectHideFlags: 0
