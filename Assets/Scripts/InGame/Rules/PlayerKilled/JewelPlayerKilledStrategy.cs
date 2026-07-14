@@ -12,7 +12,7 @@ namespace September.InGame.Rules
             NetworkObject victimObj = PlayerDatabase.Instance.PlayerObjectDic.Get(victim);
 
             var container = victimObj.GetComponent<IJewelryContainer>();
-            container.DropJewelry(Mathf.FloorToInt(container.GetJewelryCount() * .5f));
+            container.DropJewelry(Mathf.FloorToInt(container.JewelryCount * .5f));
         }
     }
 }

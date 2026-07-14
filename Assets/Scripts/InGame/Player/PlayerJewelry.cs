@@ -16,6 +16,9 @@ namespace InGame.Player
 
         [Networked] public int JewelryCount { get; private set; }
 
+        /// <summary>
+        /// 触れた宝石を拾う処理
+        /// </summary>
         private void OnTriggerEnter(Collider other)
         {
             if (!HasStateAuthority) return;
@@ -27,13 +30,13 @@ namespace InGame.Player
             }
         }
 
-        public int DropJewelry(int removeAmount, IJewelry[] resultDropped)
+        public int DropJewelry(int dropAmount, IJewelry[] resultDropped)
         {
             Vector3 spawnCenter = transform.position + Vector3.up * _heightOffset;
-            JewelryCount -= removeAmount;
+            JewelryCount -= dropAmount;
 
             int result = 0;
-            for (int i = 0; i < removeAmount; i++)
+            for (int i = 0; i < dropAmount; i++)
             {
                 NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefab, spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
 
@@ -78,11 +81,6 @@ namespace InGame.Player
                     Destroy(jewelComponent.gameObject);
                 }
             }
-        }
-
-        public int GetJewelryCount()
-        {
-            return JewelryCount;
         }
     }
 }
