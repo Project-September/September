@@ -38,6 +38,8 @@ namespace InGame.Player
             {
                 NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefab, spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
 
+                if (resultDropped == null) continue;
+
                 if (resultDropped.Length > i)
                 {
                     resultDropped[i] = jewelryObj.GetComponent<IJewelry>();
