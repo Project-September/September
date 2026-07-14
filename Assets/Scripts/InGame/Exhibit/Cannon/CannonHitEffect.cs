@@ -38,11 +38,6 @@ namespace September.InGame.Exhibit
 				if (damageable == null) continue;
 				if (damageable.OwnerPlayerRef == usePlayer) continue;
 				TakeDamage(damageable, usePlayer);
-
-				var playerMovement = col.GetComponentInParent<PlayerMovement>();
-				if (!playerMovement) continue;
-				var knockBackDirection = (col.transform.position - position).normalized;
-				SetKnockBack(playerMovement.gameObject, knockBackDirection);
 			}
 		}
 
@@ -54,11 +49,6 @@ namespace September.InGame.Exhibit
 			PlayerDatabase.Instance.PlayerDataDic.Get(usingPlayer);
 			
 			damageable.TakeHit(ref hitData);
-		}
-
-		private void SetKnockBack(GameObject obj, Vector3 force)
-		{
-			obj.GetComponent<PlayerMovement>()?.KnockBack(force, _nockBackPower);
 		}
 	}
 }
