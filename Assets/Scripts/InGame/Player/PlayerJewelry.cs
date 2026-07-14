@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Fusion;
 using September.InGame.Common.Stats;
 using UnityEngine;
@@ -34,18 +33,28 @@ namespace InGame.Player
             }
         }
 
-        public IEnumerable<IJewelry> DropJewelry(int removeAmount)
+        public int DropJewelry(int removeAmount, IJewelry[] resultDropped)
         {
             Vector3 spawnCenter = transform.position + Vector3.up * _heightOffset;
             _status.AddBaseValue(StatType.Jewelry, -removeAmount);
 
+            int result = 0;
             for (int i = 0; i < removeAmount; i++)
             {
                 NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefab, spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
-                yield return jewelryObj.GetComponent<IJewelry>();
+
+                if (resultDropped.Length > i)
+                {
+                    resultDropped[i] = jewelryObj.GetComponent<IJewelry>();
+                    result = i;
+                }
+                else
+                {
+                    Debug.LogWarning("result buffer size is too small");
+                }
             }
 
-            yield break;
+            return result;
 
             void InitializeSpawnedJewelry(NetworkRunner runner, NetworkObject obj)
             {
