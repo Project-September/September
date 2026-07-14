@@ -32,13 +32,17 @@ namespace September.Common
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
         private IGameStartStrategy GameStartStrategy => Context.GameRule.GameStartStrategy;
-        private IPlayerKilledUseCase PlayerKilledUseCase => Context.GameRule.PlayerKilledUseCase;
+        private IPlayerKilledStrategy PlayerKilledStrategy => Context.GameRule.PlayerKilledStrategy;
+
+        private PlayerKillUseCase _playerKillUseCase;
 
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
             UIController.I.SetUpStartUI();
+
+            _playerKillUseCase = new PlayerKillUseCase(PlayerKilledStrategy);
 
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData localData))
             {
@@ -127,7 +131,7 @@ namespace September.Common
                     PlayerRef killer = hitData.ExecutorRef;
                     PlayerRef victim = hitData.TargetRef;
                     Context.PlayerKilled?.Invoke(killer, victim);
-                    PlayerKilledUseCase.ProcessKillEvent(killer, victim);
+                    _playerKillUseCase.Execute(hitData);
                 };
 
                 var spd = pair.Value;

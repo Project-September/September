@@ -3,9 +3,9 @@ using Fusion;
 namespace September.InGame.Rules
 {
     /// <summary>
-    /// プレイヤーをキルした際の処理を定義するユースケース
+    /// プレイヤーをキルした際の処理
     /// </summary>
-    public interface IPlayerKilledUseCase
+    public interface IPlayerKilledStrategy
     {
         public void ProcessKillEvent(PlayerRef killer, PlayerRef victim);
     }
