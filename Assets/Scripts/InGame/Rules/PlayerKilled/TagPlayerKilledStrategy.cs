@@ -4,7 +4,7 @@ using September.Common;
 namespace September.InGame.Rules
 {
     /// <summary>
-    /// 鬼ごっこルールにおけるプレイヤーキル時のユースケース
+    /// 鬼ごっこルールにおけるプレイヤーキル時の処理
     /// </summary>
     public class TagPlayerKilledStrategy : IPlayerKilledStrategy
     {
