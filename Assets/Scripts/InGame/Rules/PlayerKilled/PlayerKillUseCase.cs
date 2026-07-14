@@ -20,28 +20,28 @@ namespace September.InGame.Rules
 
             _strategy.ProcessKillEvent(killer, victim);
 
-            if (killer == victim) return;
-
             UpdateStunData(killer, victim);
         }
 
-        private void UpdateStunData(PlayerRef killerRef, PlayerRef killedPlayer)
+        private void UpdateStunData(PlayerRef killer, PlayerRef victim)
         {
-            var killerData = PlayerDatabase.Instance.PlayerDataDic.Get(killerRef);
+            // セルフキルの場合は変更しない
+            if (killer == victim) return;
 
-            if (killerData.StunData.TryGet(killedPlayer, out int count))
+            SessionPlayerData killerData = PlayerDatabase.Instance.PlayerDataDic.Get(killer);
+
+            if (!killerData.StunData.TryGet(victim, out int count))
             {
-                killerData.StunData.Set(killedPlayer, count + 1);
+                killerData.StunData.Set(victim, count + 1);
             }
             else
             {
-                killerData.StunData.Set(killedPlayer, 1);
+                killerData.StunData.Set(victim, 1);
             }
 
-            PlayerDatabase.Instance.PlayerDataDic.Set(killerRef, killerData);
-
-            // スコアの更新処理
-            PlayerDatabase.Instance.Server_RecalculateScore(killerRef);
+            PlayerDatabase.Instance.PlayerDataDic.Set(killer, killerData);
+            // スコアの更新処理（スタン回数に応じてスコアが変化するため）
+            PlayerDatabase.Instance.Server_RecalculateScore(killer);
         }
     }
 }
