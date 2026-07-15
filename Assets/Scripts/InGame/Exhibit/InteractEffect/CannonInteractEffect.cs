@@ -10,10 +10,10 @@ namespace InGame.Exhibit
     [Serializable]
     public class CannonInteractEffect : CharacterInteractEffectBase
     {
-        [SerializeField] private CannonInteractable _cannonAimPosRenderer;
-        public CannonInteractEffect(CannonInteractable cannonAimPosRenderer)
+        [SerializeField] private CannonInteractable _cannonInteractable;
+        public CannonInteractEffect(CannonInteractable cannonInteractable)
         {
-            _cannonAimPosRenderer = cannonAimPosRenderer;
+            _cannonInteractable = cannonInteractable;
         }
         public CannonInteractEffect()
         {
@@ -21,18 +21,18 @@ namespace InGame.Exhibit
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
-            _cannonAimPosRenderer.OnInteractStart(playerRef);
+            _cannonInteractable.InteractStart(playerRef);
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
         {
             base.OnInteractFixedNetworkUpdate(playerInput);
-            _cannonAimPosRenderer.OnInteractFixedNetworkUpdate(playerInput);
+            _cannonInteractable.InteractFixedNetworkUpdate(playerInput);
         }
 
         public override CharacterInteractEffectBase Clone()
         {
-            return new CannonInteractEffect(_cannonAimPosRenderer);
+            return new CannonInteractEffect(_cannonInteractable);
         }
     }
 }

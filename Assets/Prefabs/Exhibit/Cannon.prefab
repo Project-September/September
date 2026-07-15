@@ -131,7 +131,7 @@ MonoBehaviour:
       type: {class: CannonInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 5
-        _cannonAimPosRenderer: {fileID: 529782041092624048}
+        _cannonInteractable: {fileID: 529782041092624048}
 --- !u!120 &7931722243513256251
 LineRenderer:
   serializedVersion: 2
@@ -325,6 +325,7 @@ MonoBehaviour:
   _hitLayer:
     serializedVersion: 2
     m_Bits: 192
+  _baseDamage: 50
   _projectileHitEffect:
     rid: 8123140420533747796
   IsRenderLine: 0
@@ -334,6 +335,7 @@ MonoBehaviour:
     - rid: 8123140420533747796
       type: {class: CannonHitEffect, ns: September.InGame.Exhibit, asm: Scripts}
       data:
+        _cannonAimRenderer: {fileID: 6702564643286458677}
         _explosionParticlePrefab: {fileID: 3681082649069878751, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
         _radius: 3
         _damage: 50
@@ -367,13 +369,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ed38c15f1ce98c488b83b9a7e93ce11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxAmmo: 3
-  _reloadTime: 3
-  _radius: 10
-  _baseDamage: 50
   _waitCharacterTransform: {fileID: 4275066865890829726}
   _cameraController: {fileID: 3748556067587992180}
   _interactable: {fileID: 788815102460632112}
+  _maxAmmo: 3
+  _reloadTime: 3
+  _radius: 3
   _cannonAimRenderer: {fileID: 6702564643286458677}
 --- !u!114 &2840434559801315600
 MonoBehaviour:

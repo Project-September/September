@@ -10,7 +10,6 @@ namespace September.InGame.Exhibit
 {
 	public class ProjectileLauncher : NetworkBehaviour
 	{
-		[SerializeField] private int _baseDamage;
 		[SerializeField] private Transform _projectileSpawnPoint;
 		[SerializeField] private Projectile _projectilePrefab;
 		[SerializeField] private NetworkObject _projectileEffectPrefab;
@@ -20,6 +19,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Vector3 _gravity = new(0, -9.81f, 0);
 		[SerializeField] private float _projectileVelocity;
 		[SerializeField] private LayerMask _hitLayer;
+		[SerializeField] private int _baseDamage;
 
 		[Header("Hit時の処理")] [SerializeReference] [SubclassSelector]
 		private IProjectileHitEffect _projectileHitEffect;
@@ -60,8 +60,8 @@ namespace September.InGame.Exhibit
 		public override void Spawned()
 		{
 			base.Spawned();
+			_projectileHitEffect.Initialize();
 			_linePositions = new Vector3[(int)(_lifeTime / _simulationStepTime)];
-			
 		}
 
 		public override void Render()
@@ -85,20 +85,22 @@ namespace September.InGame.Exhibit
 				HasHit = false
 			};
 			
-			Runner.Spawn(_projectilePrefab, _projectileSpawnPoint.position, _projectileSpawnPoint.rotation, onBeforeSpawned: (runner, obj) =>
-			{
-				var projectile = obj.GetComponent<Projectile>();
-			
-				RPC_InitializedProjectile(projectile);
-			
-				projectile.Fire(CurrentProjectileData, usePlayerRef, (position, rotation, hitObject) =>
+			Runner.Spawn(_projectilePrefab, _projectileSpawnPoint.position, _projectileSpawnPoint.rotation,
+				onBeforeSpawned: (runner, obj) =>
 				{
-					if(Runner.IsServer)
-						_projectileHitEffect.Hit(position, rotation, hitObject,
-							usePlayerRef);
-					RPC_PlayEffect(position, rotation);
+					var projectile = obj.GetComponent<Projectile>();
+
+					RPC_InitializedProjectile(projectile);
+
+					projectile.Fire(CurrentProjectileData, usePlayerRef, (position, rotation, hitObject) =>
+					{
+						var normal = rotation * Vector3.forward;
+						if (Runner.IsServer)
+							_projectileHitEffect.Hit(position, normal, hitObject,
+								usePlayerRef);
+						RPC_PlayEffect(position, normal);
+					});
 				});
-			});
 		}
 
 		/// <summary>
@@ -156,26 +158,43 @@ namespace September.InGame.Exhibit
 		[Rpc]
 		private void RPC_InitializedProjectile(Projectile projectile)
 		{
-			projectile.Initialized(_projectileEffectPrefab.gameObject, _hitLayer); 
+			projectile.Initialized(_projectileEffectPrefab.gameObject, _hitLayer);
 		}
 
 		[Rpc]
-		private void RPC_PlayEffect(Vector3 position, Quaternion rotation)
+		private void RPC_PlayEffect(Vector3 position, Vector3 normal)
 		{
-			_projectileHitEffect.PlayEffect(position, rotation);
+			_projectileHitEffect.PlayEffect(position, normal);
 		}
+
+		#region Gizmos
+
+#if UNITY_EDITOR
+		private void OnDrawGizmos()
+		{
+			if (!Object || !Object.IsValid) return;
+			// 当たり判定の可視化
+			_projectileHitEffect.DrawGizmos(HitPosition, HitNormal);
+		}
+#endif
+
+		#endregion
 	}
 
 	public interface IProjectileHitEffect
 	{
-		/// <summary>
-		/// ProjectileHit時にサーバで上のゲームロジック処理
-		/// </summary>
-		void Hit(Vector3 position, Quaternion rotation, GameObject hitObject, PlayerRef usePlayer);
+		void Initialize();
 		
-		/// <summary> 
-		/// ProjectileHit時に全クライアントで行う処理
+		/// <summary>
+		///     ProjectileHit時にサーバで上のゲームロジック処理
 		/// </summary>
-		void PlayEffect(Vector3 position, Quaternion rotation);
+		void Hit(Vector3 hitPos, Vector3 normal, GameObject hitObject, PlayerRef usePlayer);
+
+		/// <summary>
+		///     ProjectileHit時に全クライアントで行う処理
+		/// </summary>
+		void PlayEffect(Vector3 hitPos, Vector3 normal);
+
+		void DrawGizmos(Vector3 hitPos, Vector3 normal);
 	}
 }
