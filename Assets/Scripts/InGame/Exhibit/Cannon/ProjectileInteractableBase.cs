@@ -79,7 +79,8 @@ namespace September.InGame.Exhibit
 			base.FixedUpdateNetwork();
 
 			_move.MoveUpdate(input);
-			_usingPlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
+			_usingPlayer.transform.position = _waitCharacterTransform.position;
+			_usingPlayer.transform.rotation = _waitCharacterTransform.rotation;
 			
 			// 射撃処理
 			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTimer.ExpiredOrNotRunning(Runner) &&

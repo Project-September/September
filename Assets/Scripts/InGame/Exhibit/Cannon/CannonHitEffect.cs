@@ -9,15 +9,16 @@ namespace September.InGame.Exhibit
 	public class CannonHitEffect : IProjectileHitEffect
 	{
 		[SerializeField] private CannonAimRenderer _cannonAimRenderer;
-		[SerializeField] private GameObject _explosionParticlePrefab;
+		[SerializeField] private ParticleSystem _explosionParticlePrefab;
 		[SerializeField] private float _radius;
 		[SerializeField] private int _damage;
 		[SerializeField] private LayerMask _hitLayer;
-		private GameObject _explosionParticle;
+		private ParticleSystem _explosionParticle;
 
 		public void Initialize()
 		{
 			_explosionParticle = Object.Instantiate(_explosionParticlePrefab);
+			_explosionParticle.Stop();
 			_cannonAimRenderer.Initialize(_radius * 2);// 半径からObjectScaleに
 		}
 		
@@ -26,10 +27,9 @@ namespace September.InGame.Exhibit
 			// 着弾時のエフェクト
 			_explosionParticle.transform.position = position;
 			_explosionParticle.transform.up = normal.normalized;
-
-			var particle = _explosionParticle.GetComponent<ParticleSystem>();
-			if (!particle) return;
-			particle.Play(true);
+			
+			if (!_explosionParticle) return;
+			_explosionParticle.Play(true);
 		}
 
 		public void Hit(Vector3 position, Vector3 normal, GameObject hitObject, PlayerRef usePlayer)
