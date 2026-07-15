@@ -1,6 +1,5 @@
 using System;
 using Fusion;
-using September.InGame.Common.Stats;
 using UnityEngine;
 
 namespace September.InGame.Exhibit
@@ -14,7 +13,7 @@ namespace September.InGame.Exhibit
 		/// </summary>
 		private Action<Vector3, Quaternion, GameObject> OnHitCallback;
 
-		[Networked] public ProjectileLauncher.ProjectileData CurrentProjectileData { get; set; }
+		[Networked] private ProjectileLauncher.ProjectileData CurrentProjectileData { get; set; }
 		[Networked] private PlayerRef PlayerRef { get; set; }
 		
 
@@ -63,17 +62,7 @@ namespace September.InGame.Exhibit
 			PlayerRef = playerRef;
 			OnHitCallback = onHitCallback;
 		}
-
-		public void Refresh()
-		{
-			var data = new ProjectileLauncher.ProjectileData();
-			data.HasHit = true;
-			CurrentProjectileData = data;
-
-			_projectile = null;
-			OnHitCallback = null;
-		}
-
+		
 		private void RenderProjectile()
 		{
 			if(!_projectile) return;

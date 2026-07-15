@@ -1,10 +1,5 @@
-using System;
-using Cysharp.Threading.Tasks;
 using Fusion;
-using InGame.Health;
-using UniRx.Toolkit;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace September.InGame.Exhibit
 {
@@ -19,7 +14,6 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Vector3 _gravity = new(0, -9.81f, 0);
 		[SerializeField] private float _projectileVelocity;
 		[SerializeField] private LayerMask _hitLayer;
-		[SerializeField] private int _baseDamage;
 
 		[Header("Hit時の処理")] [SerializeReference] [SubclassSelector]
 		private IProjectileHitEffect _projectileHitEffect;
