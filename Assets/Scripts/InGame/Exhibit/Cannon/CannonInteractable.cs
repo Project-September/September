@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
 using InGame.Interact;
@@ -25,8 +24,10 @@ namespace September.InGame.Exhibit
 		private IProjectileMovement _move;
 		private PlayerManager _currentUsePlayer;
 		private int _currentAmmo;
+		private Transform playerDefaultParent;
 
-		[Networked] private PlayerRef CurrentUsePlayerRef { get; set; }
+ 		[Networked] private PlayerRef CurrentUsePlayerRef { get; set; }
+	    [Networked] private TickTimer InteractEndLockTimer { get; set; }
 		[Networked] private TickTimer LastFireTime { get; set; }
 		[Networked] private TickTimer WaitForSeconds { get; set; }
 
@@ -52,7 +53,7 @@ namespace September.InGame.Exhibit
 			_interactable.ForceSetInteractable = false;
 
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 15);
-			RPC_EffectActive(true);
+			RPC_EffectActive(CurrentUsePlayerRef, true);
 			Object.AssignInputAuthority(CurrentUsePlayerRef);
 			_currentAmmo = _maxAmmo;
 
@@ -63,6 +64,9 @@ namespace September.InGame.Exhibit
 
 			// Playerがダメージを受けた際にInteractを終了する
 			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
+			
+			// インタラクトして1秒後からインタラクト解除可能にする
+			InteractEndLockTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 		}
 
 		/// <summary>
@@ -76,7 +80,6 @@ namespace September.InGame.Exhibit
 			_move.MoveUpdate(input);
 			_currentUsePlayer?.
 				SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
-			_currentUsePlayer.transform.position = _waitCharacterTransform.position;
 			
 			// 射撃処理
 			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTime.ExpiredOrNotRunning(Runner) &&
@@ -85,7 +88,15 @@ namespace September.InGame.Exhibit
 				_launcher.Fire(CurrentUsePlayerRef);
 				LastFireTime = TickTimer.CreateFromSeconds(Runner, _reloadTime);
 				_currentAmmo -= 1;
-				if (_currentAmmo <= 0) WaitForSeconds = TickTimer.CreateFromSeconds(Runner, 1f);
+				if (_currentAmmo <= 0)
+				{
+					WaitForSeconds = TickTimer.CreateFromSeconds(Runner, 1f);
+				}
+			}
+
+			if (input.Buttons.IsSet(PlayerButtons.Interact) && InteractEndLockTimer.ExpiredOrNotRunning(Runner))
+			{
+				OnInteractEnd();
 			}
 
 			if (WaitForSeconds.Expired(Runner))
@@ -103,14 +114,13 @@ namespace September.InGame.Exhibit
 			SetCooldown();
 			_move.Refresh();
 			Object.RemoveInputAuthority();
-			RPC_EffectActive(false);
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 
 			// 使用中のプレイヤークライアント限定処理
 			if (!_currentUsePlayer) return;
 			PlayerActive(true);
+			RPC_EffectActive(CurrentUsePlayerRef, false);
 			_currentUsePlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
-			_currentUsePlayer.GetComponent<CameraController>().CameraReset();
 			
 			_currentUsePlayer = null;
 			CurrentUsePlayerRef = default;
@@ -125,9 +135,7 @@ namespace September.InGame.Exhibit
 				_currentUsePlayer.RPC_SetControlState(isActive
 					? PlayerManager.PlayerControlState.Normal
 					: PlayerManager.PlayerControlState.ForcedControl);
-				_currentUsePlayer.RPC_SetUseGrav(isActive);
-				// TODO : Playerの Rigidbodyを直接触るのは良くないので、PlayerManagerにisKinematicを設定する関数を作る
-				_currentUsePlayer.GetComponent<Rigidbody>().isKinematic = !isActive;
+				_currentUsePlayer.RPC_SetUseGrav(isActive); 
 			}
 		}
 
@@ -143,12 +151,11 @@ namespace September.InGame.Exhibit
 		}
 		
 		[Rpc]
-		private void RPC_EffectActive(bool isActive)
-		{Debug.Log(
-				$"Local={Runner.LocalPlayer}, Current={CurrentUsePlayerRef}, Active={isActive}");
+		private void RPC_EffectActive(PlayerRef currentPlayer, bool isActive)
+		{
 			_cannonAimRenderer.RenderActive(isActive);
 			
-			if(Runner.LocalPlayer == CurrentUsePlayerRef)
+			if(Runner.LocalPlayer == currentPlayer)
 			{
 				_launcher.IsRenderLine = isActive;
 			}
