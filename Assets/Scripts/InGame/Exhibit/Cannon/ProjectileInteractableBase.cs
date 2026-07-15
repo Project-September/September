@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace September.InGame.Exhibit
 {
+	[DefaultExecutionOrder(100)] // 他のNetworkBehaviourより遅く実行する
 	public class ProjectileInteractableBase : NetworkBehaviour
 	{
 		[SerializeField] protected Transform _waitCharacterTransform;
@@ -32,6 +33,12 @@ namespace September.InGame.Exhibit
 			base.Spawned();
 			_launcher = GetComponent<ProjectileLauncher>();
 			_move = GetComponent<IProjectileMovement>();
+		}
+		
+		public override void Render()
+		{
+			base.Render();
+			_launcher.EffectRender();
 		}
 
 		/// <summary>

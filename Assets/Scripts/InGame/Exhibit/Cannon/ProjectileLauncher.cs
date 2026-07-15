@@ -25,26 +25,14 @@ namespace September.InGame.Exhibit
 		private IProjectileHitEffect _projectileHitEffect;
 
 		public bool IsRenderLine;
-		private Tick _lastTrajectoryUpdateTick;
 		private Vector3[] _linePositions;
+		[SerializeField] private CannonAimRenderer _cannonAimRenderer;
 
-		public Vector3 HitPosition
-		{
-			get
-			{
-				BuildTrajectory();
-				return _linePositions[LastPositionIndex];
-			}
-		}
+		public Vector3 HitPosition => _linePositions[LastPositionIndex];
 
 		public Vector3 HitNormal { get; private set; }
-		[Networked] private int LastPositionIndex { get; set; }
+		private int LastPositionIndex { get; set; }
 		[Networked] private ProjectileData CurrentProjectileData { get; set; }
-
-		/// <summary>
-		///     投射物が着弾した際のevent。引数は着弾位置と着弾時の回転。
-		/// </summary>
-		public event Action<Vector3, Quaternion> OnHit;
 
 		public struct ProjectileData : INetworkStruct
 		{
@@ -64,8 +52,10 @@ namespace September.InGame.Exhibit
 			_linePositions = new Vector3[(int)(_lifeTime / _simulationStepTime)];
 		}
 
-		public override void Render()
+		public void EffectRender()
 		{
+			BuildTrajectory();
+			//_cannonAimRenderer.RenderUpdate();
 			if (IsRenderLine) RenderLine();
 			else RefreshLineRenderer();
 		}
@@ -108,7 +98,6 @@ namespace September.InGame.Exhibit
 		/// </summary>
 		private void RenderLine()
 		{
-			BuildTrajectory();
 			_lineRenderer.positionCount = LastPositionIndex + 1;
 			_lineRenderer.SetPositions(_linePositions);
 		}
@@ -120,10 +109,6 @@ namespace September.InGame.Exhibit
 		/// </summary>
 		private void BuildTrajectory()
 		{
-			// 同Tick内で更新済みなら更新しない
-			if (Runner.Tick == _lastTrajectoryUpdateTick) return;
-			_lastTrajectoryUpdateTick = Runner.Tick;
-
 			for (var i = 0; i < _linePositions.Length; i++)
 			{
 				// 次の地点の計算

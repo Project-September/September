@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace September.InGame.Exhibit
 {
+	[DefaultExecutionOrder(100)]
 	public class CannonInteractable : ProjectileInteractableBase
 	{
 		[SerializeField] private CannonAimRenderer _cannonAimRenderer;
@@ -13,21 +14,16 @@ namespace September.InGame.Exhibit
 			_cannonAimRenderer.RenderActive(false);
 		}
 
+		public override void Render()
+		{
+			base.Render();
+			_cannonAimRenderer.RenderUpdate();	
+		}
+
 		protected override void EffectActive(PlayerRef currentPlayer, bool isActive)
 		{
 			base.EffectActive(currentPlayer, isActive);
 			_cannonAimRenderer.RenderActive(isActive);
-		}
-
-		[Rpc]
-		private void RPC_EffectActive(PlayerRef currentPlayer, bool isActive)
-		{
-			_cannonAimRenderer.RenderActive(isActive);
-			
-			if(Runner.LocalPlayer == currentPlayer)
-			{
-				_launcher.IsRenderLine = isActive;
-			}
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace September.InGame.Exhibit
 		private GameObject AimPositionEffect;
 		private bool IsActive = false;
 
-		private void FixedUpdate()
+		public void RenderUpdate()
 		{
 			if(!IsActive) return;
 			AimPositionEffect.transform.position =
@@ -35,7 +35,7 @@ namespace September.InGame.Exhibit
 		
 		public void RenderActive(bool active)
 		{
-			AimPositionEffect.SetActive(active);
+			AimPositionEffect?.SetActive(active);
 			IsActive = active;
 		}
 	}

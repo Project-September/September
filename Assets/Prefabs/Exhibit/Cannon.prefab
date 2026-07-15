@@ -329,6 +329,7 @@ MonoBehaviour:
   _projectileHitEffect:
     rid: 8123140420533747796
   IsRenderLine: 0
+  _cannonAimRenderer: {fileID: 6702564643286458677}
   references:
     version: 2
     RefIds:
@@ -374,7 +375,6 @@ MonoBehaviour:
   _interactable: {fileID: 788815102460632112}
   _maxAmmo: 3
   _reloadTime: 3
-  _radius: 3
   _cannonAimRenderer: {fileID: 6702564643286458677}
 --- !u!114 &2840434559801315600
 MonoBehaviour:
