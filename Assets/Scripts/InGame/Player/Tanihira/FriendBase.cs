@@ -307,16 +307,20 @@ namespace Ingame.Tanihira
             // 新しいステートに変更
             _currentState = FriendState.None;
         }
-        
-        //アニメーションイベント用
+
+        // アニメーションイベントから呼び出されます
         public void StartAttack()
         {
             IsAttack = true;
+            _hitChecker.StartHitCheck();
         }
 
+        // アニメーションイベントから呼び出されます
         public void EndAttack()
         {
             IsAttack = false;
+            _hitChecker.EndHitCheck();
+            ChangeState(FriendState.Chase);
         }
 
         public override void Render()

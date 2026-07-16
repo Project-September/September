@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
 using InGame.Health;
-using InGame.Player;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
@@ -56,7 +53,7 @@ namespace InGame.Player.Ability
         private float _debugDrawDuration = 1f; // 例: 0.05f
 
         [Header("ビルドシステム関連の参照")]
-        [SerializeField] BuildGenerator _buildGenerator;
+        [SerializeField] protected BuildGenerator _buildGenerator;
         [SerializeField] PlayerStatus _playerStatus;
 
         // 変換後のTickオフセット
@@ -102,8 +99,7 @@ namespace InGame.Player.Ability
             if (_buildGenerator & _playerStatus)
                 Debug.Log("ビルドシステムが正常に動きます");
             else
-                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
-            // 後でパスを登録
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerAbilityManager.csを確認してください");
 #endif
         }
 
@@ -139,6 +135,13 @@ namespace InGame.Player.Ability
 
         }
 
+        public override void SetPlayerComponent(GameObject player)
+        {
+            _animationClipPlayer = player.GetComponentInChildren<AnimationClipPlayer>();
+            _buildGenerator = player.GetComponentInChildren<BuildGenerator>();
+            _playerStatus = player.GetComponentInChildren<PlayerStatus>();
+        }
+
         protected virtual void OnHitEnemy(Collider hitInfo, Vector3 hitPosition)
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
@@ -154,7 +157,7 @@ namespace InGame.Player.Ability
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
-            _buildGenerator?.UpdateBuild(BuildType.AttackPower, 1); // 成功した回数を送るため１を引数に渡す
+            _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
 
             //エフェクトの再生
             _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
@@ -173,7 +176,7 @@ namespace InGame.Player.Ability
                 if (playerDatabase.PlayerDataDic.TryGet(Parameter.Owner.InputAuthority, out SessionPlayerData playerData))
                 {
                     // ビルドの上昇分を加算して計算
-                    return playerData.IsOgre ? _ogreAttackDamage : _attackDamage + (_playerStatus ? (int)_playerStatus.AttackDamage : 0);
+                    return (playerData.IsOgre ? _ogreAttackDamage : _attackDamage) + (_playerStatus ? (int)_playerStatus.AttackDamage : 0);
                 }
             }
             catch (System.Exception)

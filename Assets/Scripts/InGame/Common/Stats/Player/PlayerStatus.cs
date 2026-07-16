@@ -9,7 +9,7 @@ namespace InGame.Player
     public class PlayerStatus : StatsManager
     {
         [SerializeField] private PlayerParameter _params;
-        
+
         protected override StatsContainer GetInitialStats()
         {
             return _params.GetStats();

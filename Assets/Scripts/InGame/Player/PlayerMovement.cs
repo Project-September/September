@@ -33,6 +33,10 @@ namespace InGame.Player
         [SerializeField] private float _reachDistance;
         [SerializeField] private float _timeToVault;
         [SerializeField] private AnimationCurve _vaultCurve;
+        [Header("Hook")]
+        [SerializeField] private float _hookPower = 10f;
+        [Header("Bomb")]
+        [SerializeField] private float _flyingDamping = 8f;
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
@@ -51,6 +55,8 @@ namespace InGame.Player
         // base move
         private Vector3 _moveVelocity;
         public Vector3 MoveVelocity => _moveVelocity;
+        private Vector3 _flyingVelocity;
+
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
@@ -65,6 +71,9 @@ namespace InGame.Player
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
+        [Networked] public Vector2 MoveDirection { get; private set; }
+        private bool _isHookFollow;
+        private Transform _hookTarget;
         private float _vaultTimer;
         private Vector3 _vaultStartPos;
         private Vector3 _vaultTopPos;
@@ -86,6 +95,7 @@ namespace InGame.Player
         public CapsuleCollider MoveCapsuleCollider => _moveCapsuleCollider;
         public LayerMask GroundLayer => _groundLayer;
         [Networked] public bool IgnoreMoveInput { get; set; }
+        [Networked] public bool IsHookLocked { get; set; }
 
         private void Awake()
         {
@@ -99,8 +109,7 @@ namespace InGame.Player
             if (_moveBuildEnabled)
                 Debug.Log("ビルドシステムが正常に動きます");
             else
-                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
-            // 後でパスを登録
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerMovement.csを確認してください", this);
 #endif
             _prePos = transform.position;
         }
@@ -110,7 +119,17 @@ namespace InGame.Player
         {
             CheckGroundManual();
 
-            if (IgnoreMoveInput) moveInput = Vector2.zero;
+            MoveDirection = GetMoveDirection(moveInput, cameraYaw);
+
+            if (_isHookFollow)
+            {
+                var followDirection = _hookTarget.transform.position - this.transform.position;
+                followDirection.y = 0;
+                _moveVelocity = followDirection * _hookPower;
+            }
+
+            if (IgnoreMoveInput || IsHookLocked) moveInput = Vector2.zero;
+
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             // set velocity
@@ -193,10 +212,10 @@ namespace InGame.Player
             }
 
             // ========== ビルドシステム ==========
-            if (_moveBuildEnabled && _buildGenerator.TryGetBuildEnable(BuildType.MoveSpeed))
+            if (_moveBuildEnabled && _buildGenerator.TryGetBuildEnable(BuildRouteType.MoveSpeed))
             {
                 var moveDistance = Vector3.Distance(transform.position, _prePos);
-                _buildGenerator?.UpdateBuild(BuildType.MoveSpeed, moveDistance);
+                _buildGenerator?.UpdateBuild(BuildRouteType.MoveSpeed, moveDistance);
                 _prePos = transform.position;
             }
 
@@ -290,9 +309,21 @@ namespace InGame.Player
         {
             if (IsGround)
             {
-                _rb.linearVelocity = _moveVelocity;
-                NetworkVelocity = _moveVelocity;
+                _rb.linearVelocity = _moveVelocity + _flyingVelocity;
+                NetworkVelocity = _moveVelocity + _flyingVelocity;
             }
+            else
+            {
+                _rb.linearVelocity += _flyingVelocity;
+                NetworkVelocity += _flyingVelocity;
+            }
+
+            // 減衰
+            _flyingVelocity = Vector3.Lerp(_flyingVelocity, Vector3.zero, _flyingDamping * deltaTime);
+
+            // 微小値になったら0にする
+            if (_flyingVelocity.sqrMagnitude < 0.001f)
+                _flyingVelocity = Vector3.zero;
 
             // 回転の向きを代入
             if (!_setDirection) _rotationDirection = _moveVelocity;
@@ -425,6 +456,31 @@ namespace InGame.Player
             Vector3 onPlaneVec = normalRot * _rb.linearVelocity;
             onPlaneVec.y = 0;
             return onPlaneVec.magnitude;
+        }
+
+        public void OnStartHook()
+        {
+            IsHookLocked = true;
+            MoveDirection = Vector2.zero;
+        }
+
+        public void OnHookFollow(Transform targetHook)
+        {
+            _isHookFollow = true;
+            _hookTarget = targetHook;
+        }
+
+        public void OnEndHook()
+        {
+            IsHookLocked = false;
+            _isHookFollow = false;
+            _hookTarget = null;
+            MoveDirection = Vector2.zero;
+        }
+
+        public void AddFlyingVelocity(Vector3 force)
+        {
+            _flyingVelocity = force;
         }
 
         private void CheckGroundManual()

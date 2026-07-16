@@ -61,10 +61,8 @@ namespace InGame.Interact
             if (_buildGenerator & _playerStatus)
                 Debug.Log("ビルドシステムが正常に動きます");
             else
-                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nプレハブを確認してください");
-            // 後でパスを登録
+                Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerInteractionController.csを確認してください", this);
 #endif
-
 
             if (_inputManager == null)
                 _inputManager = GetComponent<PlayerInputManager>();
@@ -351,7 +349,7 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
 
-            _buildGenerator?.UpdateBuild(BuildType.FastInteract, 1); // インタラクト成功回数を記録するため１を引数に渡す
+            _buildGenerator?.UpdateBuild(BuildRouteType.FastInteract);
 
             if (GetSessionPlayerData(Object.InputAuthority.RawEncoded, out var data))
             {

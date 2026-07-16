@@ -1,0 +1,177 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bb23cd2aae0432b965beaa171d65944, type: 3}
+  m_Name: Okabe
+  m_EditorClassIdentifier: 
+  CharacterType: 1
+  TemplatePrefab: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  BotTemplatePrefab: {fileID: 1473268200689759529, guid: 438af04c2bad2894d8bfb59f2799e49e, type: 3}
+  GeneratedCharacterPrefab: {fileID: 1159011118462689394, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+  OutputPath: Assets/Prefabs/Character
+  MoveSpeed: 1.8
+  GroundSlopeThreshold: 45
+  GroundLayer:
+    serializedVersion: 2
+    m_Bits: 159
+  OgreMoveSpeed: 2.16
+  OgreDashSpeed: 8.64
+  DashSpeed: 7.2
+  DashCooldown: 1
+  StaminaConsumption: 21
+  RotationSpeed: 720
+  MaxLedgeHeight: 1.5
+  MinLedgeHeight: 0.4
+  MaxLedgeDepth: 0.9
+  ReachDistance: 0.2
+  TimeToVault: 0.5
+  VaultCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 3.1011324
+      outSlope: 3.1011324
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.042589433
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _abilities:
+  - rid: 7765555134153883780
+  - rid: 7765555134153883781
+  _conditions:
+  - rid: 7765555134153883782
+  - rid: 7765555134153883783
+  _layerInfo:
+  - Type: 0
+    LayerMask: {fileID: 0}
+    Weight: 1
+    Additive: 0
+  - Type: 1
+    LayerMask: {fileID: 31900000, guid: d2a9b2d5401ebb64393d28fbc2986379, type: 2}
+    Weight: 0
+    Additive: 0
+  - Type: 2
+    LayerMask: {fileID: 31900000, guid: 1422e64155a2f1a4fafe7cd620bda205, type: 2}
+    Weight: 0
+    Additive: 0
+  - Type: 3
+    LayerMask: {fileID: 0}
+    Weight: 1
+    Additive: 0
+  Wait: {fileID: 7400000, guid: e281b9c0b3aad9f49b64687001943220, type: 2}
+  Walk: {fileID: 7400000, guid: b0eef498192b4af4da58c49f42d6f6fe, type: 2}
+  Run: {fileID: 7400000, guid: 1b75d33f3707cec46a636ae1779bb096, type: 2}
+  JumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
+  JumpOverDuration: 0.6
+  FallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+  Faint: {fileID: 7400000, guid: 00a8b652748ed8f4ea8e54c508f4eb58, type: 2}
+  GetUp: {fileID: 7400000, guid: 185b7a4f581769045a34df560bf6ab0c, type: 2}
+  InteractRadius: 2.5
+  InteractMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  InteractAngle: 90
+  BaseInteractTime: 1
+  OgreInteractMultiplier: 1
+  InteractResponseTimeout: 3
+  InteractAngleBuffer: 10
+  InteractRadiusBuffer: 0.3
+  EquipmentData:
+  - _type: 0
+    _prefab: {fileID: 0}
+    _positionOffset: {x: 0, y: 0, z: 0}
+    _rotationOffset: {x: 0, y: 0, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 1
+    ClonedObject: {fileID: 0}
+  - _type: 1
+    _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
+    _positionOffset: {x: 0.119, y: 0.015, z: -0.073}
+    _rotationOffset: {x: 0, y: -180, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 0
+    ClonedObject: {fileID: 0}
+  RequireScore: 2147483647
+  UltSequence: {fileID: 11400000, guid: 0e2d0a70a3419ad4fb13d8b86bd0aecf, type: 2}
+  _animatorController: {fileID: 9100000, guid: cb3d2de5fef4c364da24b9ae4f719a16, type: 2}
+  _avatar: {fileID: 9000000, guid: cd799a2b68062f94789149da707e4e54, type: 2}
+  StunEffectPositionOffset: {x: 0, y: 2, z: 0}
+  FootstepCueName: SE_OKB_Footstep
+  PunchSwingCueName: SE_Player_Punch_Swing
+  PunchHitCueName: SE_Player_Punch_Hit
+  _footstepBlockClipList:
+  - {fileID: 7400000, guid: bca6193f688d20a43b0b8202f53a204a, type: 2}
+  - {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+  MeshFbx: {fileID: 919132149155446097, guid: 7334276acd6d3714ca1fc69e7288bbbc, type: 3}
+  ReadTargetPrefab: {fileID: 8360875997416129576, guid: 8793d480d91b37f4fa80441fcda2b56e, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7765555134153883780
+      type: {class: AbilityNormalAttack, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        IsEnabled: 1
+        _attackDamage: 35
+        _ogreAttackDamage: 55
+        _startHitCheckFrame: 9
+        _endHitCheckFrame: 17
+        _endAttackFrame: 22
+        _hitEffect: 18
+        _normalAttackAnimationClip: {fileID: 7400000, guid: bca6193f688d20a43b0b8202f53a204a, type: 2}
+        _animationClipPlayer: {fileID: 0}
+        _enableAutoAim: 1
+        _moveForwardSpeed: 3
+        _searchRadius: 3
+        _boxHalfExtents: {x: 0.85, y: 1, z: 0.85}
+        _boxLocalOffset: {x: 0, y: 1, z: 0}
+        _boxCastDistance: 1
+        _hitLayer:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        _triggerInteraction: 1
+        _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
+        _debugDrawDuration: 1
+        _buildGenerator: {fileID: 0}
+        _playerStatus: {fileID: 0}
+    - rid: 7765555134153883781
+      type: {class: AbilityOkabeUlt, ns: InGame.Player.Ability.Effect, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        IsEnabled: 1
+        _duration: 10
+        _buffEffect: {fileID: 11400000, guid: eb825a65a95ae924eb8f98bc05831cf5, type: 2}
+        _effectType: 0
+    - rid: 7765555134153883782
+      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _targetAbilityName: AbilityNormalAttack
+    - rid: 7765555134153883783
+      type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+      data:
+        _targetAbilityName: AbilityOkabeUlt
+        _button: 7

@@ -5338,6 +5338,7 @@ GameObject:
   - component: {fileID: 2677403803585906037}
   - component: {fileID: -3242926656974808753}
   - component: {fileID: -3759821598390054299}
+  - component: {fileID: 5049695754474396129}
   m_Layer: 6
   m_Name: HatanoErikson
   m_TagString: Player
@@ -5490,6 +5491,7 @@ MonoBehaviour:
   _meshObj: {fileID: 6419492589774123438}
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
+  _attackWeapon: {fileID: 0}
   _buildGenerator: {fileID: 0}
   _playerStatus: {fileID: 0}
   _IsStun:
@@ -5547,6 +5549,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _hookPower: 10
+  _flyingDamping: 8
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
@@ -5554,9 +5558,11 @@ MonoBehaviour:
   _playerStatus: {fileID: 0}
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
+  _MoveDirection: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
+  _IsHookLocked: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5708,15 +5714,13 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
-        _animationClipPlayer: {fileID: 3570017578186338863}
+        IsEnabled: 1
         _aimCameraController: {fileID: 2677403803585906037}
         _shootingType: 0
         _lastShootingType: 0
         _shootingDistance: 100
         _muzzlePos:
         - {fileID: 915611406105039834}
-        _stanceAnimationClip: {fileID: 0}
-        _shootAnimationClip: {fileID: 0}
         _playerInteractionController: {fileID: 7710838205980989238}
         _interactionTime: 2
         _judgmentBoxSize: {x: 2, y: 2, z: 2}
@@ -5728,15 +5732,13 @@ MonoBehaviour:
       data:
         _cooldown: 5
         _phase: 0
-        _animationClipPlayer: {fileID: 3570017578186338863}
+        IsEnabled: 1
         _aimCameraController: {fileID: 2677403803585906037}
         _shootingType: 0
         _lastShootingType: 0
         _shootingDistance: 100
         _muzzlePos:
         - {fileID: 6159245481983791538}
-        _stanceAnimationClip: {fileID: 0}
-        _shootAnimationClip: {fileID: 0}
         _rocketLauncherRadius: 10
         _damage: 5
         _ogreDamage: 10
@@ -5748,7 +5750,7 @@ MonoBehaviour:
       data:
         _cooldown: 3
         _phase: 0
-        _animationClipPlayer: {fileID: 3570017578186338863}
+        IsEnabled: 1
         _aimCameraController: {fileID: 2677403803585906037}
         _shootingType: 0
         _lastShootingType: 0
@@ -5756,8 +5758,6 @@ MonoBehaviour:
         _muzzlePos:
         - {fileID: 9070121316509825322}
         - {fileID: 900395334813402302}
-        _stanceAnimationClip: {fileID: 0}
-        _shootAnimationClip: {fileID: 0}
         _shootingInterval: 2
         _damage: 5
         _ogreDamage: 10
@@ -5769,6 +5769,7 @@ MonoBehaviour:
       data:
         _cooldown: 0
         _phase: 0
+        IsEnabled: 1
         _attackDamage: 10
         _ogreAttackDamage: 15
         _startHitCheckFrame: 17
@@ -5793,7 +5794,8 @@ MonoBehaviour:
         _playerStatus: {fileID: 0}
     - rid: 1502006044739502164
       type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
-      data: 
+      data:
+        _targetAbilityName: AbilityNormalAttack
 --- !u!114 &3570017578186338863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5924,6 +5926,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _selectedAbilityUIPrefab: {fileID: 3758444813883266440, guid: 17cdfb5a7c7423a4ebe8dca521964dc1, type: 3}
+--- !u!114 &5049695754474396129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d4e884242336e5409ec045ec7b47706, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 2525442923973757293}
+  _equipmentData:
+  - _type: 0
+    _prefab: {fileID: 0}
+    _positionOffset: {x: 0, y: 0, z: 0}
+    _rotationOffset: {x: 0, y: 0, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 1
+    ClonedObject: {fileID: 0}
+  - _type: 1
+    _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
+    _positionOffset: {x: 0.119, y: 0.015, z: -0.073}
+    _rotationOffset: {x: 0, y: -180, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 0
+    ClonedObject: {fileID: 0}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
