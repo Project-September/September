@@ -56,14 +56,6 @@ namespace September.InGame.Kraken
         [Header("Debug Settings")]
         [SerializeField] private bool _debugFabrikPoints;
         [SerializeField] private bool _debugFabrikUpward;
-        [SerializeField] private bool _debugSweptPoints;
-        [SerializeField] private bool _debugSweptUpward;
-        [SerializeField] private bool _debugHittedSpline;
-        [SerializeField] private bool _debugHullPoints;
-        [SerializeField] private bool _debugHullUpward;
-        [SerializeField] private bool _debugNotCollided;
-        [SerializeField] private bool _debugConcat;
-        [SerializeField] private bool _debugCorrected;
 
         private void Start()
         {
@@ -96,8 +88,6 @@ namespace September.InGame.Kraken
         }
 
         // Todo: 船に沿わせるための処理
-        // Todo: スイープ後の回転を安定させる
-        // Todo: スイープが貫通する問題を修正する
         private void Update()
         {
             // FABRIKで障害物がない時のボーン位置を計算
@@ -112,181 +102,21 @@ namespace September.InGame.Kraken
 
             if (_debugFabrikUpward)
             {
-                foreach (var p in points)
-                {
-                    Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.yellow);
-                }
+                IKFollowerDebug.DebugDrawNormals(points, Color.yellow);
             }
 
             IPointInterpolator spline = new SplinePointInterpolator(points);
-            float length = _maxDistanceList[^1];
-            float sectionLength = length / (_subPointCount  * points.Length);
-            int pointCount = Mathf.CeilToInt(length / sectionLength);
-            var distanceArray = new float[pointCount].Select((x, i) => i * sectionLength).ToArray();
-            Point[] sub = spline.Evaluate(distanceArray);
+            Point[] subdividedPoints = spline.Evaluate(points.Length * _subPointCount);
 
-            Point[] solved = _constraintSolver.Solve(sub, Time.deltaTime);
+            Point[] solvedPoints = _constraintSolver.Solve(subdividedPoints, Time.deltaTime);
 
-            IKFollowerDebug.DebugDrawSpheres(solved, 6f, Color.red);
-            IKFollowerDebug.DebugDrawLine(solved, Color.red);
+            IKFollowerDebug.DebugDrawSpheres(solvedPoints, 6f, Color.red);
+            IKFollowerDebug.DebugDrawLine(solvedPoints, Color.red);
 
-            IPointInterpolator solvedSpline = new SplinePointInterpolator(solved);
-            Point[] solvedCon = solvedSpline.Evaluate(_maxDistanceList);
+            IPointInterpolator solvedSpline = new SplinePointInterpolator(solvedPoints);
+            Point[] solvedResamplingPoints = solvedSpline.Evaluate(_maxDistanceList);
 
-            UpdatePosition(solvedCon);
-
-            /*
-            // スイープ移動した位置を計算
-            CalcSweptPosition(_followers, points, _radius, _layerMask, out Point[] sweptPoints, out bool[] rigidbodyHitFlags);
-
-            if (_debugSweptPoints)
-                IKFollowerDebug.DebugDrawLine(sweptPoints, Color.green);
-
-            if (_debugSweptUpward)
-            {
-                foreach (var p in sweptPoints)
-                {
-                    Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.red);
-                }
-            }
-
-            // 衝突がなければそのままにする
-            if (!rigidbodyHitFlags.Any(x => x))
-            {
-                UpdatePosition(sweptPoints);
-                return;
-            }
-
-            {
-                // 衝突を考慮したスプラインを作成（未使用）
-                var splinePoints = sweptPoints.Where((_, i) => i == 0 || i == sweptPoints.Length - 1 || rigidbodyHitFlags[i]).ToArray();
-                IPointInterpolator resultSpline = new SplinePointInterpolator(splinePoints);
-
-                if (_debugHittedSpline)
-                    resultSpline.DebugDraw(Color.blue);
-            }
-
-            // 衝突のあるセクションを凸包に変換
-            int hitCount = -1;
-            for (int i = rigidbodyHitFlags.Length - 1; i >= 0; i--)
-            {
-                if (rigidbodyHitFlags[i])
-                {
-                    hitCount = i + 1;
-                    break;
-                }
-            }
-
-            int[] hullPointIndexes = ConvexHull.BuildUpperHull(sweptPoints.Take(hitCount).Select(x => x.Position).ToArray());
-
-            Point[] hullPoints = sweptPoints.Where((_, i) => hullPointIndexes.Contains(i)).ToArray();
-
-            if (_debugHullPoints)
-            {
-                IKFollowerDebug.DebugDrawSpheres(hullPoints, _radius * .2f, Color.magenta);
-                IKFollowerDebug.DebugDrawLine(hullPoints, Color.magenta);
-            }
-
-            if (_debugHullUpward)
-            {
-                foreach (Point p in hullPoints)
-                {
-                    Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.magenta);
-                }
-            }
-
-            // 4. 衝突のないセクションと結合する
-            var notCollidedPoint = sweptPoints.Skip(hitCount).ToArray();
-
-            if (_debugNotCollided)
-                IKFollowerDebug.DebugDrawSpheres(notCollidedPoint, _radius * .9f, Color.red);
-
-            var resultPoints = hullPoints.Concat(sweptPoints.Skip(hitCount)).ToArray();
-
-            IPointInterpolator hullSpline = new SplinePointInterpolator(resultPoints);
-            Point[] hullSolvedPoints = hullSpline.Evaluate(_maxDistanceList);
-
-            if (_debugConcat)
-                IKFollowerDebug.DebugDrawSpheres(hullSolvedPoints, _radius * .9f, Color.Lerp(Color.red, Color.yellow, 0.5f));
-
-            UpdatePosition(hullSolvedPoints);
-
-            // // 5. 埋まりを修正する
-            // var correctedPoints = new Vector3[hullSolvedPoints.Length];
-            // for (int i = 0; i < hullSolvedPoints.Length; i++)
-            // {
-            //     correctedPoints[i] = CorrectTargetPosition(hullSolvedPoints[i].Position, _followers[i], _followers, _radius);
-            // }
-            // var correctedSpline = CreateSpline(correctedPoints);
-            // var finalPoints = GetPoints(correctedSpline);
-            //
-            // if (_debugCorrected)
-            // {
-            //     DebugDrawSpheres(finalPoints, _radius * .9f, Color.cyan);
-            //     DebugDrawLine(finalPoints, Color.cyan);
-            // }
-            */
-        }
-
-        private static void CalcSweptPosition(Rigidbody[] followerBodies, Point[] ikPoints, float radius, LayerMask layerMask, out Point[] sweptPoints,
-            out bool[] rigidbodyHitFlags)
-        {
-            rigidbodyHitFlags = new bool[followerBodies.Length];
-            sweptPoints = new Point[ikPoints.Length];
-
-            for (int i = 0; i < ikPoints.Length; i++)
-            {
-                if (followerBodies.Length < i || followerBodies[i] == null) continue;
-
-                var offset = ikPoints[i].Position - followerBodies[i].position;
-                var results = followerBodies[i].SweepTestAll(offset, offset.magnitude);
-
-                var nearestHitInfo = results
-                    .Where(x => (layerMask.value & (1 << x.transform.gameObject.layer)) != 0)
-                    .OrderBy(x => (x.point - followerBodies[i].position).sqrMagnitude)
-                    .FirstOrDefault(x => !followerBodies.Contains(x.rigidbody));
-
-                if (nearestHitInfo.collider == null)
-                {
-                    sweptPoints[i] = new Point(ikPoints[i].Position, ikPoints[i].Rotation);
-                    continue;
-                }
-
-                rigidbodyHitFlags[i] = true;
-
-                Vector3 pos = nearestHitInfo.point + nearestHitInfo.normal * radius;
-                if (i < ikPoints.Length - 1)
-                {
-                    sweptPoints[i] = new Point(pos, Point.GetInterpolatedRotation(ikPoints[i], ikPoints[i + 1], pos));
-                }
-                else
-                {
-                    sweptPoints[i] = new Point(pos, ikPoints[i].Rotation);
-                }
-            }
-        }
-
-        private static Vector3 CorrectTargetPosition(Vector3 originalPosition, Rigidbody target, Rigidbody[] followerBodies, float radius)
-        {
-            var overlaps = Physics.OverlapSphere(originalPosition, radius)
-                .Where(x => !followerBodies.Contains(x.GetComponent<Rigidbody>()))
-                .ToArray();
-
-            foreach (Collider overlap in overlaps)
-            {
-                if (Physics.ComputePenetration(
-                        target.GetComponent<Collider>(), originalPosition, target.transform.rotation,
-                        overlap, overlap.transform.position, overlap.transform.rotation,
-                        out Vector3 dir, out float distance))
-                {
-                    DebugDrawUtility.DrawWireSphere(originalPosition, .2f, Color.red);
-                    Debug.DrawRay(originalPosition, dir * distance, Color.red);
-                    DebugDrawUtility.DrawWireSphere(originalPosition + dir * (distance + .1f), radius, Color.red);
-                    return originalPosition + dir * (distance + .1f);
-                }
-            }
-
-            return originalPosition;
+            UpdatePosition(solvedResamplingPoints);
         }
 
         private void UpdatePosition(Point[] points)

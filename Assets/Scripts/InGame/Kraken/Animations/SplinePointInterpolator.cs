@@ -30,6 +30,19 @@ namespace September.InGame.Kraken
             return distances.Select(Evaluate).ToArray();
         }
 
+        public IKFollower.Point[] Evaluate(int pointCount)
+        {
+            var result = new IKFollower.Point[pointCount];
+
+            float length = _spline.GetLength();
+            for (int i = 0; i < pointCount; i++)
+            {
+                result[i] = Evaluate(i * (length / pointCount));
+            }
+
+            return result;
+        }
+
         public IKFollower.Point Evaluate(float distance)
         {
             float curveLength = _spline.GetLength();
