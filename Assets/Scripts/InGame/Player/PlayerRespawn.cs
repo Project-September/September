@@ -11,12 +11,13 @@ namespace InGame.Player
         [SerializeField] private float _outFieldHeight;
 
         private bool _isOutField = false;
+
         public event Action OnOutFieldEvent;
         public event Action OnRevivalFieldEvent;
         public void Update()
         {
             if (_isOutField) return;
-            if(this.transform.position.y <= _outFieldHeight)
+            if (this.transform.position.y <= _outFieldHeight)
             {
                 OnOutField();
             }

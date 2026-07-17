@@ -5,14 +5,14 @@ using InGame.Exhibit;
 using UniRx;
 using UnityEngine;
 
-namespace September.InGame.UI 
+namespace September.InGame.UI
 {
     // 各UIのイベントを所持するクラス
     // 登録も自身で行う
     public class UIController : SingletonMonoBehaviour<UIController>
     {
         #region イベント
-        
+
         private readonly Subject<bool> _onClickOptionButton = new();
         private readonly Subject<ControlDescriptionType> _onChangeDescriptionUI = new();
         private readonly ReactiveProperty<int> _onChangeSliderValue = new();
@@ -26,13 +26,13 @@ namespace September.InGame.UI
         private readonly Subject<Unit> _onGameEnd = new();
         private readonly Subject<(bool, GameObject)> _isInteracting = new();
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
-        private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
+        private readonly Subject<(float, StatusUpType)> _onInteractStatusUpObject = new();
         private readonly Subject<bool> _onOutField = new();
 
         #endregion
-        
-        # region 外部公開プロパティ
-        
+
+        #region 外部公開プロパティ
+
         public IObservable<bool> OnClickOptionButton => _onClickOptionButton;
         public IReadOnlyReactiveProperty<int> OnChangeSliderValue => _onChangeSliderValue;
         public IObservable<NetworkRunner> OnStartTimer => _onStartTimer;
@@ -45,15 +45,15 @@ namespace September.InGame.UI
         public IObservable<Unit> OnGameEnd => _onGameEnd;
         public IObservable<(bool, GameObject)> IsInteracting => _isInteracting;
         public IReadOnlyReactiveProperty<float> OnChangeInteractProgress => _onChangeInteractProgress;
-        public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
+        public IObservable<(float, StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
         public Func<TimeMessageType, UniTask> TimeOverlayMessage { get; set; }
         public IObservable<int> OnChangeScoreText => _onchangeScoreText;
         public IObservable<bool> OnOutField => _onOutField;
 
         #endregion
 
-        public InGameUIRootRefs UIRootRefs { get; set;}
-        
+        public InGameUIRootRefs UIRootRefs { get; set; }
+
         public void SetUpStartUI()
         {
             _onGameStart.OnNext(Unit.Default);
@@ -66,7 +66,7 @@ namespace September.InGame.UI
 
         public void OnChangeScore(int score)
         {
-            _onchangeScoreText.OnNext(score);   
+            _onchangeScoreText.OnNext(score);
         }
 
         public void ShowLog(string text)
@@ -78,7 +78,7 @@ namespace September.InGame.UI
         {
             _onChangeDescriptionUI.OnNext(type);
         }
-        
+
         public void StartTimer(NetworkRunner runner)
         {
             _onStartTimer.OnNext(runner);
@@ -107,7 +107,7 @@ namespace September.InGame.UI
         {
             _isInteracting.OnNext((isShow, target));
         }
-        
+
         public void SetInteractProgress(float progress)
         {
             _onChangeInteractProgress.Value = progress;
@@ -119,9 +119,9 @@ namespace September.InGame.UI
 
         public void ShowStatusUpUI(float seconds, StatusUpType status)
         {
-            _onInteractStatusUpObject.OnNext((seconds,status));
+            _onInteractStatusUpObject.OnNext((seconds, status));
         }
-        
+
         public void ShowOutFieldUI(bool isActive)
         {
             _onOutField.OnNext(isActive);

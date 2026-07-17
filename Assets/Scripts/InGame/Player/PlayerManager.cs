@@ -1,4 +1,3 @@
-using System;
 using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
@@ -41,10 +40,11 @@ namespace InGame.Player
 
         public void Start()
         {
-            _playerRespawn.OnOutFieldEvent +=() =>  IsControlLock(true);
-            _playerRespawn.OnRevivalFieldEvent +=() => IsControlLock(false);
+            _playerRespawn.OnOutFieldEvent += () => IsControlLock(true);
+            _playerRespawn.OnRevivalFieldEvent += () => IsControlLock(false);
             _playerRespawn.OnRevivalFieldEvent += () => Respawn();
         }
+
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
         {
             if (!HasStateAuthority)
@@ -59,7 +59,7 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-        
+
         public override void Spawned()
         {
             InitComponents();
@@ -247,12 +247,12 @@ namespace InGame.Player
         {
             _rigidbody.useGravity = active;
         }
-        
+
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetPositionLock(NetworkBool isLocked)
         {
             _rigidbody.constraints = isLocked ?
-                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
+                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
         }
 

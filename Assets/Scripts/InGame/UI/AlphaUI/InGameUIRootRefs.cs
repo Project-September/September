@@ -1,4 +1,3 @@
-using NaughtyAttributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,10 +23,10 @@ namespace September.InGame.UI
         public Slider HpBar;
         public Slider StaminaBar;
 
-        [Header("Interact")] 
+        [Header("Interact")]
         public InteractUi InteractUI;
 
-        [Header("Timer")] 
+        [Header("Timer")]
         public TextMeshProUGUI TimerText;
     }
 }
