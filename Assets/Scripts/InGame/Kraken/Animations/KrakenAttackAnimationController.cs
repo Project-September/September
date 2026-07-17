@@ -24,7 +24,8 @@ namespace September.InGame.Kraken.Animations
                 _startRotation = root.rotation;
 
                 var forward = -root.transform.right;
-                var dir = Vector3.ProjectOnPlane(target - root.position, root.up).normalized;
+                forward.y = 0;
+                var dir = Vector3.ProjectOnPlane(target - root.position, Vector3.up).normalized;
                 Debug.DrawRay(root.position, dir * 100f, Color.red, 3f);
 
                 var rot = Quaternion.FromToRotation(forward, dir);
@@ -35,9 +36,9 @@ namespace September.InGame.Kraken.Animations
 
             public async UniTask PlayAnimation()
             {
-                _animator.Play(_animationName, 0, 0f);
-                await _animator.WaitUntilEndState(_animationName);
+                await _animator.PlayAsync(_animationName, 0, 0f);
                 _armRoot.transform.rotation = _startRotation;
+                Debug.Log($"{_animationName} {_startRotation.eulerAngles}");
             }
 
             public Vector3 RootPosition => _armRoot.position;

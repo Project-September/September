@@ -234,8 +234,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6051664828323406195}
   - component: {fileID: 5402723530809029941}
-  - component: {fileID: 2619544676198132032}
-  - component: {fileID: 1319358222278786993}
   m_Layer: 0
   m_Name: IK_arm1_1
   m_TagString: Untagged
@@ -251,14 +249,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 332474137592395234}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.3210013, y: 0.45843738, z: 0.6788559, w: 0.47534}
-  m_LocalPosition: {x: 2.3685257, y: -7.4777565, z: 17.628458}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9134894440104543494}
   - {fileID: 5106090576206228111}
-  m_Father: {fileID: 3776372309094757496}
+  m_Father: {fileID: 7350781746424014568}
   m_LocalEulerAnglesHint: {x: -68.063, y: 0, z: 110}
 --- !u!95 &5402723530809029941
 Animator:
@@ -282,55 +280,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &2619544676198132032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 332474137592395234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd306e839c354cdc9630772ad0d87ac5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 5402723530809029941}
-  _animationName: KrakenAttack
-  _speed: 1
---- !u!114 &1319358222278786993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 332474137592395234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4673e8a76b90443298b0a0431543e888, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _progress: 0
-  _animations:
-  - _timeRange:
-      Min: 0
-      Max: 0
-    _startCurveRange:
-      Min: 0
-      Max: 0
-    _endCurveRange:
-      Min: 0
-      Max: 0
-    _curvature: 0
-  - _timeRange:
-      Min: 0
-      Max: 0
-    _startCurveRange:
-      Min: 0
-      Max: 0
-    _endCurveRange:
-      Min: 0
-      Max: 0
-    _curvature: 0
 --- !u!1 &342573190424915949
 GameObject:
   m_ObjectHideFlags: 0
@@ -1118,6 +1067,8 @@ MonoBehaviour:
   _hitStartTime: 3
   _hitEndTime: 5
   _damage: 50
+  _attackPrediction: {fileID: 0}
+  _predictionSize: {x: 0, y: 0, z: 0}
   _tentacleAnimator: {fileID: 6014455148580474590}
   _interactable: {fileID: 4783785741626355923}
   _dealScore: 10
@@ -1234,7 +1185,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tentacle:
     _animator: {fileID: 5402723530809029941}
-    _armRoot: {fileID: 6051664828323406195}
+    _armRoot: {fileID: 7350781746424014568}
     _fabrikRoot: {fileID: 6944576786749344180}
     _animationName: KrakenAttack
 --- !u!114 &4338213053746092552
@@ -1256,6 +1207,7 @@ MonoBehaviour:
   _maxBendingAngle: 25
   _maxRotationSpeed: 180
   _pbdIterations: 5
+  _pbdSubsteps: 5
   _stayDuration: 2
   _releaseDuration: 0.5
 --- !u!1 &1117892369982223670
@@ -2274,6 +2226,38 @@ Transform:
   m_Children:
   - {fileID: 6096994812020155472}
   m_Father: {fileID: 910537377393045917}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3174485578037744753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7350781746424014568}
+  m_Layer: 0
+  m_Name: IK_armRoot1_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7350781746424014568
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174485578037744753}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.32100126, y: 0.45843738, z: 0.6788559, w: 0.47533998}
+  m_LocalPosition: {x: 2.3685277, y: -7.4777584, z: 17.628456}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6051664828323406195}
+  m_Father: {fileID: 3776372309094757496}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3204280211370852235
 GameObject:
@@ -4427,7 +4411,7 @@ Transform:
   m_Children:
   - {fileID: 2117725596869332693}
   - {fileID: 7855674558587408597}
-  - {fileID: 6051664828323406195}
+  - {fileID: 7350781746424014568}
   - {fileID: 2374240995319120738}
   - {fileID: 6892009727344239060}
   - {fileID: 2084844820760275537}
@@ -5454,18 +5438,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4096
   _constraintSolver: {fileID: 4338213053746092552}
+  _subPointCount: 3
   _maxDistanceList: []
   _defaultRotations: []
   _debugFabrikPoints: 1
-  _debugFabrikUpward: 1
-  _debugSweptPoints: 0
-  _debugSweptUpward: 0
-  _debugHittedSpline: 0
-  _debugHullPoints: 0
-  _debugHullUpward: 0
-  _debugNotCollided: 0
-  _debugConcat: 0
-  _debugCorrected: 0
+  _debugFabrikAxis: 0
+  _debugSolvedPoints: 0
+  _debugSolvedAxis: 0
+  _debugSolvedSpline: 0
+  _debugSolvedResamplingPoints: 0
+  _debugSolvedResamplingAxis: 0
+  _debugSolvedResamplingSpline: 0
 --- !u!135 &4858938228408807019
 SphereCollider:
   m_ObjectHideFlags: 0
