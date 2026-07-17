@@ -51,6 +51,7 @@ namespace September.InGame.UI
         private CancellationTokenSource _cts;
         private StatusUpType _currentStatusUpType;
         private CanvasGroup _ogreGroup;
+        private CanvasGroup _fieldOutUI;
 
         public InGameUIRootRefs UIRoot => _uiRoot;
 
@@ -84,6 +85,7 @@ namespace September.InGame.UI
             ui.OnChangeDescriptionUI.Subscribe(ChangeExhibitDescriptionUI).AddTo(_cts.Token);
             ui.OnChangeScoreText.Subscribe(ChangeScore).AddTo(_cts.Token);
             ui.TimeOverlayMessage += TimeOverlayMessage;
+            ui.OnOutField.Subscribe(x => _fieldOutUI.alpha = x ? 1f : 0f).AddTo(this);
         }
         private void SetupUI()
         {
@@ -106,6 +108,7 @@ namespace September.InGame.UI
             _interactUI = _uiRoot.InteractUI;
             _statusUpUI = _uiRoot.StatusUpGroup;
             _statusUpLayout = _uiRoot.StatusUpUIRoot;
+            _fieldOutUI = _uiRoot.FieldOutUI;
             _optionUI.SetActive(true);
             _LogPanel.SetActive(true);
             _ogreUiInstance.SetActive(false);
@@ -113,8 +116,9 @@ namespace September.InGame.UI
             _staminaBarSlider.gameObject.SetActive(true);
             _interactUI.SetActive(false);
             _statusUpUI.gameObject.SetActive(true);
-            
-            
+            _fieldOutUI.gameObject.SetActive(true);
+            _fieldOutUI.alpha = 0;
+
         }
 
         private void ChangeHp(int value)

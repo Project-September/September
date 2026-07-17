@@ -5472,6 +5472,7 @@ GameObject:
   - component: {fileID: 918520937756284502}
   - component: {fileID: 6992982918667310570}
   - component: {fileID: 8026515877087289600}
+  - component: {fileID: 846463964584838234}
   m_Layer: 6
   m_Name: PlayerBase
   m_TagString: Player
@@ -5624,6 +5625,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerInputManager: {fileID: 918520937756284502}
+  _playerRespawn: {fileID: 846463964584838234}
   _colliderObj: {fileID: 2287520664147054077}
   _meshObj: {fileID: 1292013223828287825}
   _stunTime: 8
@@ -6113,6 +6115,20 @@ MonoBehaviour:
   _upwardThrowForce: 3
   _heightOffset: 1.58
   _JewelryCount: 10
+--- !u!114 &846463964584838234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52d05ab585b5d0e4987193858b7b76ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _coolTime: 3
+  _outFieldHeight: -20
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

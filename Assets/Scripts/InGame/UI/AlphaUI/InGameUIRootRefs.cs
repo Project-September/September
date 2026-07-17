@@ -18,6 +18,7 @@ namespace September.InGame.UI
         public VerticalLayoutGroup StatusUpUIRoot;
         public TextMeshProUGUI ScoreText;
         public Image IconImage;
+        public CanvasGroup FieldOutUI;
 
         [Header("Bars")]
         public Slider HpBar;

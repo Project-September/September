@@ -27,6 +27,7 @@ namespace September.InGame.UI
         private readonly Subject<(bool, GameObject)> _isInteracting = new();
         private readonly ReactiveProperty<float> _onChangeInteractProgress = new();
         private readonly Subject<(float,StatusUpType)> _onInteractStatusUpObject = new();
+        private readonly Subject<bool> _onOutField = new();
 
         #endregion
         
@@ -47,9 +48,10 @@ namespace September.InGame.UI
         public IObservable<(float,StatusUpType)> OnInteractStatusUpObject => _onInteractStatusUpObject;
         public Func<TimeMessageType, UniTask> TimeOverlayMessage { get; set; }
         public IObservable<int> OnChangeScoreText => _onchangeScoreText;
-        
+        public IObservable<bool> OnOutField => _onOutField;
+
         #endregion
-        
+
         public InGameUIRootRefs UIRootRefs { get; set;}
         
         public void SetUpStartUI()
@@ -120,5 +122,9 @@ namespace September.InGame.UI
             _onInteractStatusUpObject.OnNext((seconds,status));
         }
         
+        public void ShowOutFieldUI(bool isActive)
+        {
+            _onOutField.OnNext(isActive);
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
@@ -14,6 +15,7 @@ namespace InGame.Player
     public class PlayerManager : NetworkBehaviour, IAfterTick
     {
         [SerializeField] private PlayerInputManager _playerInputManager;
+        [SerializeField] private PlayerRespawn _playerRespawn;
         [SerializeField] GameObject _colliderObj;
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
@@ -37,6 +39,12 @@ namespace InGame.Player
         private RigidbodyConstraints _defaultConstraints;
         public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
+        public void Start()
+        {
+            _playerRespawn.OnOutFieldEvent +=() =>  IsControlLock(true);
+            _playerRespawn.OnRevivalFieldEvent +=() => IsControlLock(false);
+            _playerRespawn.OnRevivalFieldEvent += () => Respawn();
+        }
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
         {
             if (!HasStateAuthority)
@@ -178,20 +186,24 @@ namespace InGame.Player
         /// <summary> 気絶が終わったとき </summary>
         void Restart()
         {
+            IsControlLock(false);
             IsStun = false;
-            _playerHealth.IsInvincible = false;
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
 
         void OnDeath(HitData lastHitData)
         {
+            IsControlLock(true);
             IsStun = true;
-
             // ビルドの減衰分を乗算
             _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
-            _playerHealth.IsInvincible = true;
             _playerEffectController.PlayStunEffect();
+        }
+
+        private void IsControlLock(bool enabled)
+        {
+            _playerHealth.IsInvincible = enabled;
         }
 
         public void SetControlState(PlayerControlState controlState)
