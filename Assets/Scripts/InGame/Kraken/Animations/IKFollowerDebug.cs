@@ -33,7 +33,7 @@ namespace September.InGame.Kraken
             DebugDrawSpheres(IKFollower.Point.ConvertToVector(points), radius, color);
         }
 
-        public static void DebugDrawAxis(IReadOnlyList<IKFollower.Point> points, Color color)
+        public static void DebugDrawAxis(IReadOnlyList<IKFollower.Point> points)
         {
             foreach (var p in points)
             {
@@ -48,7 +48,7 @@ namespace September.InGame.Kraken
         {
             if (drawLine) DebugDrawSpheres(points, radius, color);
             if (drawSpheres) DebugDrawLine(points, color);
-            if (drawAxis) DebugDrawAxis(points, color);
+            if (drawAxis) DebugDrawAxis(points);
         }
     }
 }

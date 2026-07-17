@@ -58,8 +58,10 @@ namespace September.InGame.Kraken
         [SerializeField] private bool _debugFabrikAxis;
         [SerializeField] private bool _debugSolvedPoints;
         [SerializeField] private bool _debugSolvedAxis;
+        [SerializeField] private bool _debugSolvedSpline;
         [SerializeField] private bool _debugSolvedResamplingPoints;
         [SerializeField] private bool _debugSolvedResamplingAxis;
+        [SerializeField] private bool _debugSolvedResamplingSpline;
 
         private void Start()
         {
@@ -106,11 +108,13 @@ namespace September.InGame.Kraken
             Point[] solvedPoints = _constraintSolver.Solve(subdividedPoints, Time.deltaTime);
 
             IKFollowerDebug.DebugDraw(solvedPoints, 6f, Color.red, _debugSolvedPoints, _debugSolvedPoints, _debugSolvedAxis);
+            if (_debugSolvedSpline) spline.DebugDraw(Color.red);
 
             IPointInterpolator solvedSpline = new SplinePointInterpolator(solvedPoints);
             Point[] solvedResamplingPoints = solvedSpline.Evaluate(_maxDistanceList);
 
             IKFollowerDebug.DebugDraw(solvedResamplingPoints, 6f, Color.magenta, _debugSolvedResamplingPoints, _debugSolvedResamplingPoints, _debugSolvedResamplingAxis);
+            if (_debugSolvedResamplingSpline) solvedSpline.DebugDraw(Color.magenta);
 
             UpdatePosition(solvedResamplingPoints);
         }

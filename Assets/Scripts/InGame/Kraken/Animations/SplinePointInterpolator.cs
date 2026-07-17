@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -9,18 +8,20 @@ namespace September.InGame.Kraken
     public class SplinePointInterpolator : IPointInterpolator
     {
         private readonly Spline _spline;
+        private const float Tension = 1f;
 
         public SplinePointInterpolator(IKFollower.Point[] points)
         {
-            _spline = CreateSpline(points);
+            _spline = CreateSpline(points, Tension);
         }
 
-        private static Spline CreateSpline(IReadOnlyList<IKFollower.Point> points)
+        private static Spline CreateSpline(IReadOnlyList<IKFollower.Point> points, float tension)
         {
             var spline = new Spline();
             foreach (var point in points)
             {
-                spline.Add(new BezierKnot(point.Position, float3.zero, float3.zero, point.Rotation));
+                // tangentの向きはクラーケン用に合わせている
+                spline.Add(new BezierKnot(point.Position, Vector3.right * tension, -Vector3.right * tension, point.Rotation));
             }
             return spline;
         }
@@ -70,10 +71,12 @@ namespace September.InGame.Kraken
             {
                 _spline.Evaluate(i / 50f, out var position, out var tangent, out var normal);
                 _spline.Evaluate((i + 1) / 50f, out var endPosition, out _, out _);
-                Debug.DrawLine(position, endPosition, color);
-                Debug.DrawRay(position, normal, Color.green);
-                Debug.DrawRay(position, tangent, Color.red * new Color(1f, 1f, 1f, .1f));
+                Debug.DrawLine(position, endPosition, Color.yellow);
+                Debug.DrawRay(position, normal, Color.cyan);
+                Debug.DrawRay(position, tangent, Color.magenta * new Color(1f, 1f, 1f, .3f));
             }
+
+            IKFollowerDebug.DebugDrawAxis(_spline.Knots.Select(x => new IKFollower.Point(x.Position, x.Rotation)).ToArray());
         }
     }
 }
