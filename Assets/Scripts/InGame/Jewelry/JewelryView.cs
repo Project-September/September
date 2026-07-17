@@ -1,11 +1,25 @@
 using TMPro;
 using UnityEngine;
+using Fusion;
 
-namespace September
+namespace InGame
 {
-    public class JewelryView : MonoBehaviour
+    public class JewelryView : NetworkBehaviour
     {
+        [SerializeField] CanvasGroup _canvasGroup;
         [SerializeField] TextMeshProUGUI _jewelryCountText;
+        Camera _camera;
+
+        public override void Spawned()
+        {
+            _camera = Camera.main;
+        }
+
+        public override void FixedUpdateNetwork()
+        {
+            // カメラに向ける
+            _canvasGroup.gameObject.transform.forward = _camera.transform.forward * -1;
+        }
 
         /// <summary>
         /// 宝石の個数表示を更新するメソッド
@@ -14,14 +28,6 @@ namespace September
         public void UpdateJewelryCount(int count)
         {
             _jewelryCountText.text = "× " + count.ToString();
-        }
-
-        int count = -1;
-        [ContextMenu("a")]
-        void Test()
-        {
-            count++;
-            UpdateJewelryCount(count);
         }
     }
 }
