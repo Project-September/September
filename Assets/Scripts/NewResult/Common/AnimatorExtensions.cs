@@ -13,6 +13,13 @@ using UnityEngine.Playables;
             await WaitUntilEndState(animator, animationName);
         }
 
+        public static async UniTask PlayAsync(this Animator animator, string animationName, int layer, float normalizedTime)
+        {
+            animator.Play(animationName, layer, normalizedTime);
+            await UniTask.DelayFrame(1);
+            await WaitUntilEndState(animator, animationName);
+        }
+
         public static async UniTask WaitUntilEndState(this Animator animator, string stateName)
         {
             await UniTask.WaitUntil(
