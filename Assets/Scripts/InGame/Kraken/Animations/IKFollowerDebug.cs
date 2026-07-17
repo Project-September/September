@@ -33,12 +33,22 @@ namespace September.InGame.Kraken
             DebugDrawSpheres(IKFollower.Point.ConvertToVector(points), radius, color);
         }
 
-        public static void DebugDrawNormals(IReadOnlyList<IKFollower.Point> points, Color color)
+        public static void DebugDrawAxis(IReadOnlyList<IKFollower.Point> points, Color color)
         {
             foreach (var p in points)
             {
-                Debug.DrawRay(p.Position, p.Rotation * Vector3.up, color);
+                Debug.DrawRay(p.Position, p.Rotation * Vector3.up, Color.green);
+                Debug.DrawRay(p.Position, p.Rotation * Vector3.forward, Color.blue);
+                Debug.DrawRay(p.Position, p.Rotation * Vector3.right, Color.red);
             }
+        }
+
+        public static void DebugDraw(IReadOnlyList<IKFollower.Point> points, float radius, Color color,
+            bool drawLine, bool drawSpheres, bool drawAxis)
+        {
+            if (drawLine) DebugDrawSpheres(points, radius, color);
+            if (drawSpheres) DebugDrawLine(points, color);
+            if (drawAxis) DebugDrawAxis(points, color);
         }
     }
 }

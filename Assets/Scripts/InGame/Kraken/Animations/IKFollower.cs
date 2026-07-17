@@ -55,7 +55,11 @@ namespace September.InGame.Kraken
 
         [Header("Debug Settings")]
         [SerializeField] private bool _debugFabrikPoints;
-        [SerializeField] private bool _debugFabrikUpward;
+        [SerializeField] private bool _debugFabrikAxis;
+        [SerializeField] private bool _debugSolvedPoints;
+        [SerializeField] private bool _debugSolvedAxis;
+        [SerializeField] private bool _debugSolvedResamplingPoints;
+        [SerializeField] private bool _debugSolvedResamplingAxis;
 
         private void Start()
         {
@@ -94,27 +98,19 @@ namespace September.InGame.Kraken
             IPointProvider provider = new IKSolverPointProvider(_ik.GetIKSolver());
             Point[] points = provider.GetPoints();
 
-            if (_debugFabrikPoints)
-            {
-                IKFollowerDebug.DebugDrawSpheres(points, _radius * .2f, Color.yellow);
-                IKFollowerDebug.DebugDrawLine(points, Color.yellow);
-            }
-
-            if (_debugFabrikUpward)
-            {
-                IKFollowerDebug.DebugDrawNormals(points, Color.yellow);
-            }
+            IKFollowerDebug.DebugDraw(points, _radius * .2f, Color.yellow, _debugFabrikPoints, _debugFabrikPoints, _debugFabrikAxis);
 
             IPointInterpolator spline = new SplinePointInterpolator(points);
             Point[] subdividedPoints = spline.Evaluate(points.Length * _subPointCount);
 
             Point[] solvedPoints = _constraintSolver.Solve(subdividedPoints, Time.deltaTime);
 
-            IKFollowerDebug.DebugDrawSpheres(solvedPoints, 6f, Color.red);
-            IKFollowerDebug.DebugDrawLine(solvedPoints, Color.red);
+            IKFollowerDebug.DebugDraw(solvedPoints, 6f, Color.red, _debugSolvedPoints, _debugSolvedPoints, _debugSolvedAxis);
 
             IPointInterpolator solvedSpline = new SplinePointInterpolator(solvedPoints);
             Point[] solvedResamplingPoints = solvedSpline.Evaluate(_maxDistanceList);
+
+            IKFollowerDebug.DebugDraw(solvedResamplingPoints, 6f, Color.magenta, _debugSolvedResamplingPoints, _debugSolvedResamplingPoints, _debugSolvedResamplingAxis);
 
             UpdatePosition(solvedResamplingPoints);
         }
