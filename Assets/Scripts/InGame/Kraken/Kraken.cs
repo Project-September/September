@@ -6,6 +6,7 @@ using InGame.Player;
 using September.Common;
 using September.Common.Input;
 using September.InGame.Kraken.Animations;
+using September.InGame.Kraken.Attack;
 using September.InGame.Mountable;
 using UnityEngine;
 
@@ -26,6 +27,10 @@ namespace September.InGame.Kraken
         [SerializeField] private float _hitStartTime;
         [SerializeField] private float _hitEndTime;
         [SerializeField] private int _damage;
+
+        [Header("攻撃予測設定")]
+        [SerializeField] private AttackPrediction _attackPrediction;
+        [SerializeField] private Vector3 _predictionSize;
 
         [Header("アニメーション設定")]
         [SerializeField] private KrakenAttackAnimationHandler _tentacleAnimator;
@@ -196,11 +201,18 @@ namespace September.InGame.Kraken
             }
         }
 
-        private async UniTask Attack(Vector3 targetPosition)
+        public async UniTask Attack(Vector3 targetPosition)
         {
             Debug.Log("Start Attack");
             var task = _tentacleAnimator.Attack(targetPosition);
+            {
+                Vector3 dir = targetPosition - _tentacleAnimator.RootPosition;
+                dir.y = 0;
+                Quaternion lookRotation = Quaternion.LookRotation(dir);
+                _attackPrediction.Show(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
+            }
             await UniTask.WaitForSeconds(_hitStartTime);
+            _attackPrediction.Hide();
             _hitChecker.StartHitCheck();
             await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
             _hitChecker.EndHitCheck();

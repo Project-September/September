@@ -39,6 +39,9 @@ namespace September.InGame.Kraken.Animations
                 await _animator.WaitUntilEndState(_animationName);
                 _armRoot.transform.rotation = _startRotation;
             }
+
+            public Vector3 RootPosition => _armRoot.position;
+            public Quaternion RootRotation => _armRoot.rotation;
         }
 
         [SerializeField] private KrakenTentacleAnimationSettings _tentacle;
@@ -48,5 +51,8 @@ namespace September.InGame.Kraken.Animations
             _tentacle.LookAt(target);
             await _tentacle.PlayAnimation();
         }
+
+        public Vector3 RootPosition => _tentacle.RootPosition;
+        public Quaternion RootRotation => _tentacle.RootRotation;
     }
 }
