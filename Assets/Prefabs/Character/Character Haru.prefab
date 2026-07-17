@@ -4625,6 +4625,10 @@ PrefabInstance:
       propertyPath: _layerInfo.Array.data[2].LayerMask
       value: 
       objectReference: {fileID: 31900000, guid: f96fc62dae4e2664aa42686080ba4bbc, type: 2}
+    - target: {fileID: 4102293410906870200, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: SortKey
+      value: 133450291
+      objectReference: {fileID: 0}
     - target: {fileID: 4810525472409146702, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _punchEffect
       value: 
@@ -4647,7 +4651,7 @@ PrefabInstance:
       objectReference: {fileID: 3438016202853767898}
     - target: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_Name
-      value: Haru
+      value: Character Haru
       objectReference: {fileID: 0}
     - target: {fileID: 8736522266100138394, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_LocalPosition.x
