@@ -29,10 +29,14 @@ namespace September.InGame.Kraken
         [SerializeField] private float _hitEndTime;
         [SerializeField] private int _damage;
         [SerializeField] private LayerMask _hitGroundLayer;
+        [SerializeField] private HitChecker _armHitChecker;
+        [SerializeField] private float _armStartTime;
+        [SerializeField] private float _armEndTime;
 
         [Header("攻撃予測設定")]
         [SerializeField] private AttackPrediction _attackPrediction;
         [SerializeField] private Vector3 _predictionSize;
+        [SerializeField] private float _predictionEndTime;
 
         [Header("アニメーション設定")]
         [SerializeField] private KrakenAttackAnimationHandler _tentacleAnimator;
@@ -56,7 +60,17 @@ namespace September.InGame.Kraken
 
         private void Start()
         {
-            _hitChecker.OnHit += hitCollider =>
+            _armHitChecker.OnHit += OnHitCheckerOnOnHit;
+            _hitChecker.OnHit += OnHitCheckerOnOnHit;
+
+            _initialPosition = transform.position;
+            _initialRotation = transform.rotation;
+
+            _cameraController.Init(true);
+
+            return;
+
+            void OnHitCheckerOnOnHit(Collider hitCollider)
             {
                 float rayWorldHeight = _hitRayCastHeight + transform.position.y;
                 Vector3 hitPos = hitCollider.ClosestPoint(transform.position);
@@ -71,24 +85,13 @@ namespace September.InGame.Kraken
 
                 Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.green, 100f);
 
-                // if (hitCollider.TryGetComponent<IDamageable>(out var damageable))
-                // {
-                //     var hitData = new HitData
-                //     {
-                //         HitActionType = HitActionType.Damage,
-                //         Amount = _damage,
-                //         ExecutorRef = Object.InputAuthority,
-                //         TargetRef = damageable.OwnerPlayerRef
-                //     };
-                //
-                //     damageable.TakeHit(ref hitData);
-                // }
-            };
+                if (hitCollider.TryGetComponent<IDamageable>(out var damageable))
+                {
+                    var hitData = new HitData { HitActionType = HitActionType.Damage, Amount = _damage, ExecutorRef = Object.InputAuthority, TargetRef = damageable.OwnerPlayerRef };
 
-            _initialPosition = transform.position;
-            _initialRotation = transform.rotation;
-
-            _cameraController.Init(true);
+                    damageable.TakeHit(ref hitData);
+                }
+            }
         }
 
         /// <summary>
@@ -225,12 +228,12 @@ namespace September.InGame.Kraken
                 dir.y = 0;
                 Quaternion lookRotation = Quaternion.LookRotation(dir);
                 _attackPrediction.Show(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
+                UniTask.WaitForSeconds(_predictionEndTime).ContinueWith(() => _attackPrediction.Hide());
             }
-            await UniTask.WaitForSeconds(_hitStartTime);
-            _attackPrediction.Hide();
-            _hitChecker.StartHitCheck();
-            await UniTask.WaitForSeconds(_hitEndTime - _hitStartTime);
-            _hitChecker.EndHitCheck();
+
+            await UniTask.WhenAll(
+                HitCheck(_hitChecker, _hitStartTime, _hitEndTime),
+                HitCheck(_armHitChecker, _armStartTime, _armEndTime));
 
             if (HasStateAuthority)
             {
@@ -244,6 +247,14 @@ namespace September.InGame.Kraken
 
             _isAttacking = false;
             Debug.Log("End Attack");
+        }
+
+        public async UniTask HitCheck(HitChecker hitChecker, float startTime, float endTime)
+        {
+            await UniTask.WaitForSeconds(startTime);
+            hitChecker.StartHitCheck();
+            await UniTask.WaitForSeconds(endTime - startTime);
+            hitChecker.EndHitCheck();
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

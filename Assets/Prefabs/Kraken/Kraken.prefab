@@ -1183,8 +1183,12 @@ MonoBehaviour:
   _hitGroundLayer:
     serializedVersion: 2
     m_Bits: 128
+  _armHitChecker: {fileID: 4293175133399063176}
+  _armStartTime: 4
+  _armEndTime: 6
   _attackPrediction: {fileID: 4147116127351708076}
   _predictionSize: {x: 4, y: 3, z: 30}
+  _predictionEndTime: 6
   _tentacleAnimator: {fileID: 6014455148580474590}
   _interactable: {fileID: 4783785741626355923}
   _dealScore: 10
@@ -5549,6 +5553,7 @@ GameObject:
   - component: {fileID: 3104078414423928400}
   - component: {fileID: 4858938228408807019}
   - component: {fileID: 418363700759576022}
+  - component: {fileID: 4293175133399063176}
   m_Layer: 0
   m_Name: mn_l_arm1_1
   m_TagString: Untagged
@@ -5660,6 +5665,32 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &4293175133399063176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672573568285098950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 224c75cd33ef4d74f9cf5b541cc9b898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _hitPoints:
+  - {fileID: 7855674558587408597}
+  - {fileID: 1877654502391328742}
+  - {fileID: 2472794855853940720}
+  - {fileID: 4424635957994660606}
+  - {fileID: 5254591823134820520}
+  - {fileID: 4855739335838349869}
+  - {fileID: 7225775972759332788}
+  - {fileID: 6774260411629876140}
+  - {fileID: 211730031703643153}
+  - {fileID: 4729833918475505990}
+  _radius: 5
+  _alreadyHit: []
+  IsActive: 0
 --- !u!1 &7742405033311051634
 GameObject:
   m_ObjectHideFlags: 0
