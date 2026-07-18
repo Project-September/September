@@ -56,6 +56,8 @@ namespace September.InGame.Kraken
         private Quaternion _originalPlayerRotation;
 
         [Networked] private NetworkBool IsAttackTriggered { get; set; }
+
+        private Vector3 _targetPosition;
         private bool _isAttacking;
 
         private void Start()
@@ -202,6 +204,19 @@ namespace September.InGame.Kraken
                 if (_attack.IsJustPressed)
                 {
                     IsAttackTriggered = true;
+
+                    Camera mainCamera = Camera.main;
+                    if (mainCamera == null) return;
+                    Vector3 origin = mainCamera.transform.position;
+                    Vector3 forward = mainCamera.transform.forward;
+                    if (Physics.Raycast(origin, forward, out RaycastHit hit, Mathf.Infinity))
+                    {
+                        _targetPosition = hit.point;
+                    }
+                    else
+                    {
+                        _targetPosition = forward * 20f;
+                    }
                 }
             }
         }
@@ -211,12 +226,16 @@ namespace September.InGame.Kraken
             if (IsAttackTriggered && !_isAttacking)
             {
                 _isAttacking = true;
-                var forward = Camera.main.transform.forward;
-                forward.y = 0;
-                forward.Normalize();
-                Debug.DrawRay(transform.position, forward * 100f, Color.green, 10f);
-                Attack(forward * 100f).Forget();
+                Debug.DrawLine(transform.position, _targetPosition, Color.green, 10f);
+                DebugDrawUtility.DrawWireSphere(_targetPosition, 3f, Color.green, 10f);
+                RPC_Attack(_targetPosition);
             }
+        }
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+        private void RPC_Attack(Vector3 targetPosition)
+        {
+            Attack(targetPosition).Forget();
         }
 
         public async UniTask Attack(Vector3 targetPosition)
@@ -242,7 +261,7 @@ namespace September.InGame.Kraken
             }
             else
             {
-                await UniTask.WaitUntil(IsAttackTriggered, (b) => !b);
+                await UniTask.WaitUntil(this, t => !t.IsAttackTriggered);
             }
 
             _isAttacking = false;
