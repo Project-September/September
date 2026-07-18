@@ -246,7 +246,7 @@ namespace September.InGame.Kraken
 
             var task = _tentacleAnimator.Attack(targetPosition);
             {
-                Vector3 dir = targetPosition - _tentacleAnimator.RootPosition;
+                Vector3 dir = targetPosition - _tentacleAnimator.LatestArmRootPosition;
                 dir.y = 0;
                 Quaternion lookRotation = Quaternion.LookRotation(dir);
                 _attackPrediction.Show(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));

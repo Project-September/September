@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using RootMotion.FinalIK;
 using UnityEngine;
 
 namespace September.InGame.Kraken.Animations
@@ -10,17 +10,44 @@ namespace September.InGame.Kraken.Animations
         [Serializable]
         private class KrakenTentacleAnimationSettings
         {
-            [SerializeField] private Animator _animator;
-            [SerializeField] private Transform _armRoot;
-            [SerializeField] private FABRIKRoot _fabrikRoot;
+            [Serializable]
+            public class ArmSettings
+            {
+                [SerializeField] private Animator _animator;
+                [SerializeField] private Transform _armRoot;
+
+                public Animator Animator => _animator;
+                public Transform ArmRoot => _armRoot;
+            }
+
+            [SerializeField] private ArmSettings[] _arms;
             [SerializeField] private string _animationName;
             [SerializeField] private string _endStateName;
 
             private Quaternion _startRotation;
+            private HashSet<ArmSettings> _usingArms = new();
 
-            public void LookAt(Vector3 target)
+            public bool TryGetUnusedArm(out ArmSettings result)
             {
-                Transform root = _armRoot;
+                foreach (ArmSettings arm in _arms)
+                {
+                    if (!_usingArms.Add(arm)) continue;
+                    result = arm;
+                    return true;
+                }
+
+                result = null;
+                return false;
+            }
+
+            public void ReleaseUsingArm(ArmSettings arm)
+            {
+                _usingArms.Remove(arm);
+            }
+
+            public void LookAt(ArmSettings arm, Vector3 target)
+            {
+                var root = arm.ArmRoot;
 
                 _startRotation = root.rotation;
 
@@ -35,27 +62,26 @@ namespace September.InGame.Kraken.Animations
                 root.rotation *= rot;
             }
 
-            public async UniTask PlayAnimation()
+            public async UniTask PlayAnimation(ArmSettings arm)
             {
-                await _animator.PlayAsync(_animationName, 0, 0f);
-                await _animator.WaitState(_endStateName);
-                _armRoot.transform.rotation = _startRotation;
+                await arm.Animator.PlayAsync(_animationName, 0, 0f);
+                await arm.Animator.WaitState(_endStateName);
+                arm.Animator.transform.rotation = _startRotation;
                 Debug.Log($"{_animationName} {_startRotation.eulerAngles}");
             }
-
-            public Vector3 RootPosition => _armRoot.position;
-            public Quaternion RootRotation => _armRoot.rotation;
         }
 
         [SerializeField] private KrakenTentacleAnimationSettings _tentacle;
 
         public async UniTask Attack(Vector3 target)
         {
-            _tentacle.LookAt(target);
-            await _tentacle.PlayAnimation();
+            if (!_tentacle.TryGetUnusedArm(out var arm)) return;
+            LatestArmRootPosition = arm.ArmRoot.position;
+            _tentacle.LookAt(arm, target);
+            await _tentacle.PlayAnimation(arm);
+            _tentacle.ReleaseUsingArm(arm);
         }
 
-        public Vector3 RootPosition => _tentacle.RootPosition;
-        public Quaternion RootRotation => _tentacle.RootRotation;
+        public Vector3 LatestArmRootPosition { get; private set; }
     }
 }
