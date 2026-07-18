@@ -56,12 +56,11 @@ namespace September.InGame.Kraken
         private Vector3 _originalPlayerPosition;
         private Quaternion _originalPlayerRotation;
 
-        [Networked] private NetworkBool IsAttackTriggered { get; set; }
-
         private Vector3 _targetPosition;
-        private bool _isAttacking;
 
         private readonly HashSet<Collider> _alreadyHits = new();
+
+        [Networked] private bool IsAttacking { get; set; }
 
         private void Start()
         {
@@ -203,6 +202,9 @@ namespace September.InGame.Kraken
 
         public override void FixedUpdateNetwork()
         {
+            if (!HasStateAuthority) return;
+            if (IsAttacking) return;
+
             if (GetInput<PlayerInput>(out var input))
             {
                 // transform.Rotate(0, 10 * input.MoveDirection.x * Runner.DeltaTime, 0);
@@ -211,36 +213,24 @@ namespace September.InGame.Kraken
 
                 if (_attack.IsJustPressed)
                 {
-                    IsAttackTriggered = true;
-
                     Camera mainCamera = Camera.main;
                     if (mainCamera == null) return;
                     Vector3 origin = mainCamera.transform.position;
                     Vector3 forward = mainCamera.transform.forward;
                     if (Physics.Raycast(origin, forward, out RaycastHit hit, Mathf.Infinity))
                     {
-                        _targetPosition = hit.point;
+                        RPC_Attack(hit.point);
                     }
                     else
                     {
-                        _targetPosition = forward * 20f;
+                        RPC_Attack(forward * 20f);
                     }
+                    IsAttacking = true;
                 }
             }
         }
 
-        public override void Render()
-        {
-            if (IsAttackTriggered && !_isAttacking)
-            {
-                _isAttacking = true;
-                Debug.DrawLine(transform.position, _targetPosition, Color.green, 10f);
-                DebugDrawUtility.DrawWireSphere(_targetPosition, 3f, Color.green, 10f);
-                if (HasInputAuthority) RPC_Attack(_targetPosition);
-            }
-        }
-
-        [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_Attack(Vector3 targetPosition)
         {
             Attack(targetPosition).Forget();
@@ -249,6 +239,9 @@ namespace September.InGame.Kraken
         public async UniTask Attack(Vector3 targetPosition)
         {
             Debug.Log("Start Attack");
+            Debug.DrawLine(transform.position, targetPosition, Color.green, 10f);
+            DebugDrawUtility.DrawWireSphere(targetPosition, 3f, Color.green, 10f);
+
             _alreadyHits.Clear();
 
             var task = _tentacleAnimator.Attack(targetPosition);
@@ -264,17 +257,8 @@ namespace September.InGame.Kraken
                 HitCheck(_hitChecker, _hitStartTime, _hitEndTime),
                 HitCheck(_armHitChecker, _armStartTime, _armEndTime));
 
-            if (HasStateAuthority)
-            {
-                await task;
-                IsAttackTriggered = false;
-            }
-            else
-            {
-                await UniTask.WaitUntil(this, t => !t.IsAttackTriggered);
-            }
+            IsAttacking = false;
 
-            _isAttacking = false;
             Debug.Log("End Attack");
         }
 
