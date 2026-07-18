@@ -24,9 +24,11 @@ namespace September.InGame.Kraken
         /// <summary> 攻撃処理コンポーネント </summary>
         [Header("攻撃設定")]
         [SerializeField] private HitChecker _hitChecker;
+        [SerializeField] private float _hitRayCastHeight;
         [SerializeField] private float _hitStartTime;
         [SerializeField] private float _hitEndTime;
         [SerializeField] private int _damage;
+        [SerializeField] private LayerMask _hitGroundLayer;
 
         [Header("攻撃予測設定")]
         [SerializeField] private AttackPrediction _attackPrediction;
@@ -54,20 +56,33 @@ namespace September.InGame.Kraken
 
         private void Start()
         {
-            _hitChecker.OnHit += x =>
+            _hitChecker.OnHit += hitCollider =>
             {
-                if (x.TryGetComponent<IDamageable>(out var damageable))
-                {
-                    var hitData = new HitData
-                    {
-                        HitActionType = HitActionType.Damage,
-                        Amount = _damage,
-                        ExecutorRef = Object.InputAuthority,
-                        TargetRef = damageable.OwnerPlayerRef
-                    };
+                float rayWorldHeight = _hitRayCastHeight + transform.position.y;
+                Vector3 hitPos = hitCollider.ClosestPoint(transform.position);
+                Vector3 rayOrigin = new(hitPos.x, rayWorldHeight, hitPos.z);
+                float distance = rayWorldHeight - hitPos.y;
 
-                    damageable.TakeHit(ref hitData);
+                if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, distance, _hitGroundLayer))
+                {
+                    Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.red, 100f);
+                    return;
                 }
+
+                Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.green, 100f);
+
+                // if (hitCollider.TryGetComponent<IDamageable>(out var damageable))
+                // {
+                //     var hitData = new HitData
+                //     {
+                //         HitActionType = HitActionType.Damage,
+                //         Amount = _damage,
+                //         ExecutorRef = Object.InputAuthority,
+                //         TargetRef = damageable.OwnerPlayerRef
+                //     };
+                //
+                //     damageable.TakeHit(ref hitData);
+                // }
             };
 
             _initialPosition = transform.position;
