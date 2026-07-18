@@ -14,6 +14,7 @@ namespace September.InGame.Kraken.Animations
             [SerializeField] private Transform _armRoot;
             [SerializeField] private FABRIKRoot _fabrikRoot;
             [SerializeField] private string _animationName;
+            [SerializeField] private string _endStateName;
 
             private Quaternion _startRotation;
 
@@ -37,6 +38,7 @@ namespace September.InGame.Kraken.Animations
             public async UniTask PlayAnimation()
             {
                 await _animator.PlayAsync(_animationName, 0, 0f);
+                await _animator.WaitState(_endStateName);
                 _armRoot.transform.rotation = _startRotation;
                 Debug.Log($"{_animationName} {_startRotation.eulerAngles}");
             }
