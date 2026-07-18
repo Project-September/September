@@ -87,7 +87,8 @@ namespace September.InGame.Kraken
 
                 Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.green, 100f);
 
-                if (hitCollider.TryGetComponent<IDamageable>(out var damageable))
+                IDamageable damageable = hitCollider.GetComponentInParent<IDamageable>();
+                if (damageable != null)
                 {
                     var hitData = new HitData { HitActionType = HitActionType.Damage, Amount = _damage, ExecutorRef = Object.InputAuthority, TargetRef = damageable.OwnerPlayerRef };
 
