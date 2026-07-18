@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -60,6 +61,8 @@ namespace September.InGame.Kraken
         private Vector3 _targetPosition;
         private bool _isAttacking;
 
+        private readonly HashSet<Collider> _alreadyHits = new();
+
         private void Start()
         {
             _armHitChecker.OnHit += OnHitCheckerOnOnHit;
@@ -74,6 +77,8 @@ namespace September.InGame.Kraken
 
             void OnHitCheckerOnOnHit(Collider hitCollider)
             {
+                if (_alreadyHits.Contains(hitCollider)) return;
+
                 float rayWorldHeight = _hitRayCastHeight + transform.position.y;
                 Vector3 hitPos = hitCollider.ClosestPoint(transform.position);
                 Vector3 rayOrigin = new(hitPos.x, rayWorldHeight, hitPos.z);
@@ -86,6 +91,8 @@ namespace September.InGame.Kraken
                 }
 
                 Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.green, 100f);
+
+                _alreadyHits.Add(hitCollider);
 
                 IDamageable damageable = hitCollider.GetComponentInParent<IDamageable>();
                 if (damageable != null)
@@ -242,6 +249,8 @@ namespace September.InGame.Kraken
         public async UniTask Attack(Vector3 targetPosition)
         {
             Debug.Log("Start Attack");
+            _alreadyHits.Clear();
+
             var task = _tentacleAnimator.Attack(targetPosition);
             {
                 Vector3 dir = targetPosition - _tentacleAnimator.RootPosition;
