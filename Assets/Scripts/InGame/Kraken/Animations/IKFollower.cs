@@ -44,7 +44,7 @@ namespace September.InGame.Kraken
         }
 
         [SerializeField] private IK _ik;
-        [SerializeField] private Rigidbody[] _followers;
+        [SerializeField] private Transform[] _followers;
         [SerializeField] private float _radius = .55f;
         [SerializeField] private LayerMask _layerMask;
         [SerializeField] private TentacleConstraintSolver _constraintSolver;
@@ -125,8 +125,8 @@ namespace September.InGame.Kraken
             {
                 if (_followers[i] == null) continue;
 
-                _followers[i].MovePosition(points[i].Position);
-                _followers[i].MoveRotation(points[i].Rotation);
+                _followers[i].transform.position = points[i].Position;
+                _followers[i].transform.rotation = points[i].Rotation;
             }
         }
     }
