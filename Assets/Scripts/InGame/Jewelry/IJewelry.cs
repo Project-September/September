@@ -1,7 +1,7 @@
-namespace InGame.Player
+namespace InGame.Jewelry.Common
 {
     public interface IJewelry
     {
-        public int Score { get; }
+        public JewelryParams JewelryParams { get; }
     }
 }

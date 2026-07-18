@@ -1,6 +1,7 @@
 using System;
 using Fusion;
-using InGame.Player;
+using InGame.Jewelry;
+using InGame.Jewelry.Common;
 using September.Common;
 using UnityEngine;
 
@@ -17,12 +18,16 @@ namespace September.InGame.Rules
         {
             NetworkObject victimObj = PlayerDatabase.Instance.PlayerObjectDic.Get(victim);
 
+            // runtimeから現在の宝石所持情報を取得
+            var runtime = victimObj.GetComponentInChildren<PlayerJewelryRuntime>();
+
+            // 仮で通常宝石で計算
+            var jewelryQuantity = runtime.JewelryCounts.Get((int)JewelryType.BetterGem);
+            int minDrop = _minDropAmount + Mathf.FloorToInt(jewelryQuantity * _minDropRatio);
+            int sumDrop = minDrop + Mathf.FloorToInt((jewelryQuantity - minDrop) * _additionalDropRatio);
+            int drop = Mathf.Min(sumDrop, jewelryQuantity);
+
             var container = victimObj.GetComponent<IJewelryContainer>();
-
-            int minDrop = _minDropAmount + Mathf.FloorToInt(container.JewelryCount * _minDropRatio);
-            int sumDrop = minDrop + Mathf.FloorToInt((container.JewelryCount - minDrop) * _additionalDropRatio);
-            int drop = Mathf.Min(sumDrop, container.JewelryCount);
-
             container.DropJewelry(drop);
         }
     }
