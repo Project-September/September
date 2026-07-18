@@ -236,7 +236,7 @@ namespace September.InGame.Kraken
                 _isAttacking = true;
                 Debug.DrawLine(transform.position, _targetPosition, Color.green, 10f);
                 DebugDrawUtility.DrawWireSphere(_targetPosition, 3f, Color.green, 10f);
-                RPC_Attack(_targetPosition);
+                if (HasInputAuthority) RPC_Attack(_targetPosition);
             }
         }
 
