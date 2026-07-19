@@ -155,8 +155,6 @@ namespace September.InGame.Kraken
 
             if (GetInput<PlayerInput>(out var input))
             {
-                // transform.Rotate(0, 10 * input.MoveDirection.x * Runner.DeltaTime, 0);
-
                 _attack.SetInput(input.Buttons.IsSet(PlayerButtons.Attack));
 
                 if (_attack.IsJustPressed)
