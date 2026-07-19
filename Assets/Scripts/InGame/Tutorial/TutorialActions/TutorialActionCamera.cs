@@ -1,4 +1,4 @@
-using September.Common;
+ï»¿using September.Common;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
@@ -6,34 +6,47 @@ namespace September.InGame.Tutorial
 {
     public class TutorialActionCamera : TutorialActionBase
     {
-        [Header("ƒJƒƒ‰‚ğƒŠƒZƒbƒg‚·‚é‰ñ”"),SerializeField] private int _resetCount;
+        [Header("ã‚«ãƒ¡ãƒ©ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹å›æ•°"),SerializeField] private int _resetCount;
         [SerializeField] private string _explanationText;
         private int _currentResetCount;
         public override void OnStart(TutorialActionData actionData) 
         {
+            actionData.TutorialText.text = _explanationText;
             base.OnStart(actionData);
-            _currentResetCount = _resetCount;
-            Debug.Log($"ƒJƒƒ‰‚ğ{_resetCount}‰ñƒŠƒZƒbƒg‚µ‚æ‚¤");
+            _currentResetCount = 0;
+            ConditionTextSet();
+            Debug.Log($"ã‚«ãƒ¡ãƒ©ã‚’{_resetCount}å›ãƒªã‚»ãƒƒãƒˆã—ã‚ˆã†");
         }
         public override void OnUpdate()
         {
             base.OnUpdate();
             if (!_isActionStarted) return;
 
-            // ƒvƒŒƒCƒ„[‚ªƒJƒƒ‰‚ğƒŠƒZƒbƒg‚µ‚½‚©ƒ`ƒFƒbƒN
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚«ãƒ¡ãƒ©ã‚’ãƒªã‚»ãƒƒãƒˆã—ãŸã‹ãƒã‚§ãƒƒã‚¯
             if (GameInput.I.Player.Aim.triggered)
             {
-                _currentResetCount--;
+                _currentResetCount++;
+                ConditionTextSet();
 
-                if (_currentResetCount <= 0)
+                if (_currentResetCount >= _resetCount)
                 {
                     _actionData.Action?.Invoke();
                 }
             }
         }
+
+        /// <summary>
+        /// æ¡ä»¶è¡¨ç¤ºã‚’æ›´æ–°
+        /// </summary>
+        private void ConditionTextSet()
+        {
+            _actionData.ActionConditionText.text = 
+                $"ã‚«ãƒ¡ãƒ©ã®ãƒªã‚»ãƒƒãƒˆ{_currentResetCount}/{_resetCount}";
+        }
+
         public override void OnEndAction() 
         {
-            Debug.Log("ƒJƒƒ‰ƒŠƒZƒbƒgƒAƒNƒVƒ‡ƒ“Š®—¹");
+            Debug.Log("ã‚«ãƒ¡ãƒ©ãƒªã‚»ãƒƒãƒˆã‚¢ã‚¯ã‚·ãƒ§ãƒ³å®Œäº†");
         }
     }
 }
