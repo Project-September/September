@@ -27,7 +27,14 @@ namespace September.Common
 
         public string GetMapSceneName(MapType mapType)
         {
-            return _maps.FirstOrDefault(x => x.MapType == mapType)?.SceneName;
+            MapScene scene = _maps.FirstOrDefault(x => x.MapType == mapType);
+            if (scene != null)
+            {
+                return scene.SceneName;
+            }
+
+            Debug.LogError($"No map found for map type {mapType}");
+            return string.Empty;
         }
 
         [Serializable]
