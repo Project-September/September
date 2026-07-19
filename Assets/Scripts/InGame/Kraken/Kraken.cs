@@ -177,7 +177,7 @@ namespace September.InGame.Kraken
             }
         }
 
-        [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+        [Rpc(RpcSources.All, RpcTargets.All)]
         private void RPC_Attack(Vector3 targetPosition)
         {
             Attack(targetPosition).Forget();
