@@ -18,6 +18,7 @@ namespace InGame.Player
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
         [SerializeField] private Vector3 _respawnPosition;
+        [SerializeField] private GameObject _attackWeapon;
         [Header("ビルドシステム関連の参照")]
         [SerializeField] BuildGenerator _buildGenerator;
         [SerializeField] PlayerStatus _playerStatus;
@@ -33,6 +34,7 @@ namespace InGame.Player
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
+        private RigidbodyConstraints _defaultConstraints;
         public PlayerControlState CurrentPlayerControlState => _playerControlState;
 
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
@@ -49,12 +51,13 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-
+        
         public override void Spawned()
         {
             InitComponents();
 
             _respawnPosition = transform.position;
+            _defaultConstraints = _rigidbody.constraints;
         }
 
         /// <summary> Player関連コンポーネントの初期化 </summary>
@@ -202,6 +205,14 @@ namespace InGame.Player
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetWeaponVisible(bool visible)
+        {
+            if (_attackWeapon == null) return;
+
+            _attackWeapon.SetActive(visible);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetControlState(PlayerControlState controlState)
         {
             SetControlState(controlState);
@@ -223,6 +234,14 @@ namespace InGame.Player
         public void RPC_SetUseGrav(NetworkBool active)
         {
             _rigidbody.useGravity = active;
+        }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetPositionLock(NetworkBool isLocked)
+        {
+            _rigidbody.constraints = isLocked ?
+                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
+                _defaultConstraints;
         }
 
         /// <summary> 非常用リスポーン </summary>

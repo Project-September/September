@@ -1,5 +1,6 @@
 using NaughtyAttributes;
 using Newtonsoft.Json;
+using September.NewResult.RankingPolicy;
 using UnityEngine;
 
 namespace September.NewResult
@@ -8,6 +9,9 @@ namespace September.NewResult
     {
         [SerializeField] private ExhibitScoreConfig _exhibitScoreConfig;
         [SerializeField] private MockData.RankingEntryData[] _rankings;
+
+        [Header("順位付けルール")]
+        [SerializeReference, SubclassSelector] private IRankingPolicy _rankingPolicy;
         
         [ShowNonSerializedField] private bool _forceInject;
         
@@ -15,7 +19,7 @@ namespace September.NewResult
         {
             if (InGameResultContainer.Info == null || _forceInject)
             {
-                InGameResultContainer.Set(new MockData(_rankings).Create(_exhibitScoreConfig));
+                InGameResultContainer.Set(new MockData(_rankings).Create(_exhibitScoreConfig, _rankingPolicy));
             }
         }
 

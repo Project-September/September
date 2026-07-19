@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using UnityEngine;
 
@@ -32,8 +33,11 @@ namespace InGame.Player.Ability
         {
             _networkObject = GetComponent<NetworkObject>();
             // 全アビリティをクラス名をキーとして辞書に登録
-            foreach (var a in _abilities)
-                _abilityByName[a.GetType().Name] = a;
+            foreach (var ability in _abilities)
+            {
+                ability.IsEnabled = true;
+                _abilityByName[ability.GetType().Name] = ability;
+            }
         }
 
         /// <summary>
@@ -45,6 +49,7 @@ namespace InGame.Player.Ability
             // 全アビリティのローカル更新処理を実行（エフェクト、カメラ演出など）
             foreach (var ability in _abilities)
             {
+                if (!ability.IsEnabled) continue;
                 ability.OnUpdateLocal(Time.deltaTime, gameObject);
             }
         }
@@ -76,6 +81,8 @@ namespace InGame.Player.Ability
                     continue;
                 }
 
+                if (!targetAbility.IsEnabled) continue;
+
                 // 条件判定用のコンテキストを作成
                 var ctx = new TriggerEventContext(gameObject, targetAbility, _currentButtons, _previousButtons);
                 // 条件を満たしていればアビリティを開始
@@ -88,11 +95,64 @@ namespace InGame.Player.Ability
             // 全アビリティを更新
             foreach (var ability in _abilities)
             {
+                if (!ability.IsEnabled) continue;
+
                 //入力を保持
                 ability.SetPlayerInput(input);
 
                 ability.Tick(Time.deltaTime);
             }
+        }
+
+        public void SetAbilityEnabled(bool enabled, params string[] types)
+        {
+            foreach (var type in types)
+            {
+                if (!_abilityByName.TryGetValue(type, out var targetAbility))
+                {
+                    continue;
+                }
+
+                targetAbility.IsEnabled = enabled;
+            }
+        }
+
+        public void AddAbility(AbilityBase abilityBase, IAbilityExecuteCondition condition)
+        {
+            string abilityName = abilityBase.GetType().Name;
+
+            if (_abilityByName.ContainsKey(abilityName))
+            {
+                Debug.LogError($"[PlayerAbilityManager] '{abilityName}' は既に追加されています。");
+                return;
+            }
+
+            if (abilityName != condition.TargetAbilityName)
+            {
+                Debug.LogError($"[PlayerAbilityManager] {condition} では {abilityName} を実行できません。");
+                return;
+            }
+
+            _abilities.Add(abilityBase);
+            _conditions.Add(condition);
+            _abilityByName[abilityName] = abilityBase;
+        }
+
+        public void RemoveAbility(string type)
+        {
+            if (!_abilityByName.TryGetValue(type, out var targetAbility))
+                return;
+
+            _abilities.Remove(targetAbility);
+
+            var condition = _conditions.FirstOrDefault(x => x.TargetAbilityName == type);
+
+            if (condition != null)
+            {
+                _conditions.Remove(condition);
+            }
+
+            _abilityByName.Remove(type);
         }
     }
 }
