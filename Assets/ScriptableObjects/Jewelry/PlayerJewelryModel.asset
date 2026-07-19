@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66a82a2164735094a8a65422b554a142, type: 3}
   m_Name: PlayerJewelryModel
   m_EditorClassIdentifier: 
-  _holdingJewelryInfos: []
+  _holdingJewelryInfos:
+  - _jewelryType: 0
+    _jewelryCount: 0
+    _jewelrySprite: {fileID: 0}
+  - _jewelryType: 1
+    _jewelryCount: 0
+    _jewelrySprite: {fileID: 0}
