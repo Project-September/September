@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -46,19 +47,19 @@ namespace September.InGame.Kraken.Animations
             _tentacle.LookAt(arm, target);
 
             await UniTask.WhenAll(
-                _tentacle.PlayAnimation(arm),
-                HitCheck(arm.ArmHitChecker, _hitStartTime, _hitEndTime),
-                HitCheck(arm.AreaHitChecker, _armStartTime, _armEndTime));
+                _tentacle.PlayAnimation(arm, destroyCancellationToken),
+                HitCheck(arm.ArmHitChecker, _hitStartTime, _hitEndTime, destroyCancellationToken),
+                HitCheck(arm.AreaHitChecker, _armStartTime, _armEndTime, destroyCancellationToken));
 
             _tentacle.ReleaseUsingArm(arm);
             Debug.Log("End Attack");
         }
 
-        private static async UniTask HitCheck(HitChecker hitChecker, float startTime, float endTime)
+        private static async UniTask HitCheck(HitChecker hitChecker, float startTime, float endTime, CancellationToken token = default)
         {
-            await UniTask.WaitForSeconds(startTime);
+            await UniTask.WaitForSeconds(startTime, cancellationToken: token);
             hitChecker.StartHitCheck();
-            await UniTask.WaitForSeconds(endTime - startTime);
+            await UniTask.WaitForSeconds(endTime - startTime, cancellationToken: token);
             hitChecker.EndHitCheck();
         }
 
@@ -165,10 +166,10 @@ namespace September.InGame.Kraken.Animations
                 root.rotation *= rot;
             }
 
-            public async UniTask PlayAnimation(ArmSettings arm)
+            public async UniTask PlayAnimation(ArmSettings arm, CancellationToken token = default)
             {
-                await arm.Animator.PlayAsync(_animationName, 0, 0f);
-                await arm.Animator.WaitState(_endStateName);
+                await arm.Animator.PlayAsync(_animationName, 0, 0f, cancellationToken: token);
+                await arm.Animator.WaitState(_endStateName, cancellationToken: token);
                 arm.Animator.transform.rotation = arm.StartRotation;
                 Debug.Log($"{_animationName} {arm.StartRotation.eulerAngles}", arm.ArmRoot);
             }
