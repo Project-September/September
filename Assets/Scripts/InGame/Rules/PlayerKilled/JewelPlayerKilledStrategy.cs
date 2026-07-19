@@ -22,7 +22,7 @@ namespace September.InGame.Rules
             var runtime = victimObj.GetComponentInChildren<PlayerJewelryRuntime>();
 
             // 仮で通常宝石で計算
-            var jewelryQuantity = runtime.JewelryCounts.Get((int)JewelryType.BetterGem);
+            var jewelryQuantity = runtime.JewelryCounts.Get((int)JewelryType.NormalGem);
             int minDrop = _minDropAmount + Mathf.FloorToInt(jewelryQuantity * _minDropRatio);
             int sumDrop = minDrop + Mathf.FloorToInt((jewelryQuantity - minDrop) * _additionalDropRatio);
             int drop = Mathf.Min(sumDrop, jewelryQuantity);

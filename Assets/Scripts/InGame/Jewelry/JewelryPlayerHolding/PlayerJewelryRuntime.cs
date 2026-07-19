@@ -12,7 +12,7 @@ namespace InGame.Jewelry
     public class PlayerJewelryRuntime : NetworkBehaviour
     {
         /// <summary>宝石の種類と個数の対応表</summary>
-        [Networked, Capacity((int)JewelryType.Count), HideInInspector]
+        [Networked, Capacity((int)JewelryType.JewelryTypeCount), HideInInspector]
         public NetworkArray<int> JewelryCounts => default;
 
         event Action<JewelryType, Sprite> _onInitialize;
@@ -53,7 +53,7 @@ namespace InGame.Jewelry
         public void GetJewelry(JewelryType jewelryType)
         {
             // enumの最後の要素（Count）が渡された場合はreturn
-            if (jewelryType == JewelryType.Count) return;
+            if (jewelryType == JewelryType.JewelryTypeCount) return;
 
             var currentQuantity = JewelryCounts.Get((int)jewelryType);
             JewelryCounts.Set((int)jewelryType, currentQuantity + 1);
@@ -67,7 +67,7 @@ namespace InGame.Jewelry
         public void DropJewelry(JewelryType jewelryType)
         {
             // enumの最後の要素（Count）が渡された場合はreturn
-            if (jewelryType == JewelryType.Count) return;
+            if (jewelryType == JewelryType.JewelryTypeCount) return;
 
             var currentQuantity = JewelryCounts.Get((int)jewelryType);
             JewelryCounts.Set((int)jewelryType, currentQuantity - 1);

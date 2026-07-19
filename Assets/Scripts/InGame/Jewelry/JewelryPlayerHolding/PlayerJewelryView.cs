@@ -44,7 +44,7 @@ namespace InGame.Jewelry
             // 宝石の所持情報を満足に表示できない場合はreturn
             if (_jewelryUIArray == null
                 || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.Count) return;
+                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount) return;
 
             var image = _jewelryUIArray[(int)jewelryType].JewelryImage;
             if (image == null) return;
@@ -61,7 +61,7 @@ namespace InGame.Jewelry
             // 宝石の所持情報を満足に表示できない場合はreturn
             if (_jewelryUIArray == null
                 || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.Count) return;
+                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount) return;
 
             var text = _jewelryUIArray[(int)jewelryType].JewelryCountText;
             if (text == null) return;
