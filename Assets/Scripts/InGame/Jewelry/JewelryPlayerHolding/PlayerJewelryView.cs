@@ -28,7 +28,7 @@ namespace InGame.Jewelry
             _camera = Camera.main;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             // カメラに向ける
             _canvasGroup.gameObject.transform.forward = _camera.transform.forward * -1;
