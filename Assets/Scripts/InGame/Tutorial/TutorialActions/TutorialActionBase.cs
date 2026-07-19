@@ -2,7 +2,8 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using InGame.Player;    
+using InGame.Player;
+using TMPro;
 
 namespace September.InGame.Tutorial
 {
@@ -13,7 +14,9 @@ namespace September.InGame.Tutorial
     {
         public Action Action;
         public GameObject Player;
-        public Image Image;
+        public GameObject TutorialUI;
+        public TextMeshProUGUI TutorialText;
+        public TextMeshProUGUI ActionConditionText;
         public PlayerInputManager PlayerInputManager;
     }
     /// <summary>チュートリアルで使用する行動</summary>
@@ -27,9 +30,10 @@ namespace September.InGame.Tutorial
         public virtual void OnStart(TutorialActionData actionData)
         {
             _actionData = actionData;
-            actionData.Image.enabled = true;
-            actionData.Image.sprite = _explanationPicture;
+            actionData.TutorialUI.SetActive(true);
+            actionData.TutorialUI.GetComponent<Image>().sprite = _explanationPicture;
             _isActionStarted = true;
+            Cursor.visible = true;
         }
 
         public virtual void OnUpdate()
