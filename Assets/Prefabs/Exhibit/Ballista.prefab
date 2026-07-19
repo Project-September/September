@@ -16,7 +16,8 @@ GameObject:
   - component: {fileID: 605949265976625825}
   - component: {fileID: -4283116534182985741}
   - component: {fileID: 6425309163856342501}
-  - component: {fileID: 6031524727437765514}
+  - component: {fileID: 5101475634166198175}
+  - component: {fileID: 4565694175186777013}
   m_Layer: 0
   m_Name: Ballista
   m_TagString: Untagged
@@ -99,7 +100,7 @@ MonoBehaviour:
   - {fileID: 863474155446293771}
   - {fileID: -4283116534182985741}
   - {fileID: 6425309163856342501}
-  - {fileID: 6031524727437765514}
+  - {fileID: 5101475634166198175}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3782169157196769243
 MonoBehaviour:
@@ -158,7 +159,7 @@ MonoBehaviour:
       type: {class: ProjectileInteractEffect, ns: September.InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 5
-        _projectileInteractableBase: {fileID: 6031524727437765514}
+        _projectileInteractableBase: {fileID: 5101475634166198175}
 --- !u!120 &605949265976625825
 LineRenderer:
   serializedVersion: 2
@@ -282,9 +283,6 @@ MonoBehaviour:
   _layerMask:
     serializedVersion: 2
     m_Bits: 128
-  _sens: 10
-  _padSens: 50
-  _playerOffset: 1
 --- !u!114 &6425309163856342501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,7 +305,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _cameraRadius: 0.1
---- !u!114 &6031524727437765514
+--- !u!114 &5101475634166198175
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -316,15 +314,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 518364684307869088}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8721cbf024547feb7ed473246250421, type: 3}
+  m_Script: {fileID: 11500000, guid: c432f2662ecb48b5a3c247aa5030fdc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _waitCharacterTransform: {fileID: 2537115606131514651}
-  _cameraController: {fileID: 1576128460117959270}
+  _cameraController: {fileID: 4565694175186777013}
   _interactable: {fileID: 863474155446293771}
   _maxAmmo: 10
   _reloadTime: 1
-  _reloadSeconds: 3
+--- !u!114 &4565694175186777013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518364684307869088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 549068b2e6fdfd442a5bba033df184c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sens: 10
+  _padSens: 50
+  _characterTf: {fileID: 2006340566990065624}
+  _cameraPivot: {fileID: 3813922952977508952}
+  _cameraTf: {fileID: 2215043571382671122}
+  _camera: {fileID: 1576128460117959270}
+  _collideAgainst:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _cameraRadius: 0.1
+  _motionDuration: 0.6
+  _motionEase: 9
 --- !u!1 &1455451939750372746
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,7 +356,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2537115606131514651}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: PlayerPos
   m_TagString: Untagged
   m_Icon: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -523,7 +544,7 @@ Transform:
   m_GameObject: {fileID: 8667147679873082732}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.79, z: 0}
+  m_LocalPosition: {x: 0, y: 1.09, z: 0}
   m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
   m_ConstrainProportionsScale: 0
   m_Children:
