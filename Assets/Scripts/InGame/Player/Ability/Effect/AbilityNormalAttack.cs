@@ -135,6 +135,13 @@ namespace InGame.Player.Ability
 
         }
 
+        public override void SetPlayerComponent(GameObject player)
+        {
+            _animationClipPlayer = player.GetComponentInChildren<AnimationClipPlayer>();
+            _buildGenerator = player.GetComponentInChildren<BuildGenerator>();
+            _playerStatus = player.GetComponentInChildren<PlayerStatus>();
+        }
+
         protected virtual void OnHitEnemy(Collider hitInfo, Vector3 hitPosition)
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;

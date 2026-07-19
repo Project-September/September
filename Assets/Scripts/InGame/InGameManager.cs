@@ -4,6 +4,7 @@ using System.Threading;
 using Fusion;
 using NaughtyAttributes;
 using September.Common;
+using September.InGame.Rules;
 using September.InGame.UI;
 using UnityEngine;
 
@@ -20,9 +21,11 @@ namespace September.InGame.Common
         private NetworkRunner _networkRunner;
         public IReadOnlyDictionary<PlayerRef, NetworkObject> PlayerDataDic => _playerDataDic;
         public GameTimerData TimerData => _timerData;
+        public IGameRule GameRule => _gameRule;
         public CancellationTokenSource Cts { get; private set; }
 
         public System.Action GameStarted { get; set; }
+        public System.Action<PlayerRef, PlayerRef> PlayerKilled { get; set; }
 
         /// <summary>
         /// 現在のゲーム状態名を取得する

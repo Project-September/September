@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c629f531ec1f43d6a3d510db782d3f61, type: 3}
+  m_Name: JewelCollectionGameRule
+  m_EditorClassIdentifier: 
+  _gameStartStrategy:
+    rid: 7765555185143251047
+  _playerKilledStrategy:
+    rid: 7765555185143251033
+  _rankingPolicy:
+    rid: 7765555097832521866
+  references:
+    version: 2
+    RefIds:
+    - rid: 7765555097832521866
+      type: {class: TagRuleRankingPolicy, ns: September.NewResult, asm: Scripts}
+      data: 
+    - rid: 7765555185143251033
+      type: {class: JewelPlayerKilledStrategy, ns: September.InGame.Rules, asm: Scripts}
+      data:
+        _minDropAmount: 1
+        _minDropRatio: 0
+        _additionalDropRatio: 0.5
+    - rid: 7765555185143251047
+      type: {class: NullGameStartStrategy, ns: September.InGame.Rules, asm: Scripts}
+      data: 
