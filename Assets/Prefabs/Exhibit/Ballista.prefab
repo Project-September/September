@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 1678553239860686521}
   - component: {fileID: 3782169157196769243}
   - component: {fileID: 863474155446293771}
-  - component: {fileID: 3999792169390587101}
-  - component: {fileID: 1238019300898631645}
   - component: {fileID: 605949265976625825}
   - component: {fileID: -4283116534182985741}
+  - component: {fileID: 6425309163856342501}
+  - component: {fileID: 6031524727437765514}
   m_Layer: 0
   m_Name: Ballista
   m_TagString: Untagged
@@ -66,17 +66,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   _projectileHitEffect:
-    rid: 8123140627141230677
+    rid: 8536392112056828011
   IsRenderLine: 0
   _cannonAimRenderer: {fileID: 0}
   references:
     version: 2
     RefIds:
-    - rid: 8123140627141230677
+    - rid: 8536392112056828011
       type: {class: BallistaHitEffect, ns: September.InGame.Exhibit, asm: Scripts}
       data:
-        _baseDamage: 10
-        _hitEffectPrefab: {fileID: 893611506664009144, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
+        _baseDamage: 0
+        _hitEffectPrefab: {fileID: 0}
 --- !u!114 &1678553239860686521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,8 +97,9 @@ MonoBehaviour:
   - {fileID: 1338417818682000949}
   - {fileID: 3782169157196769243}
   - {fileID: 863474155446293771}
-  - {fileID: 1238019300898631645}
   - {fileID: -4283116534182985741}
+  - {fileID: 6425309163856342501}
+  - {fileID: 6031524727437765514}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3782169157196769243
 MonoBehaviour:
@@ -129,11 +130,11 @@ MonoBehaviour:
     keys: 
     values: []
   _cooldownTimeDictionary:
-    keys: 04000000
+    keys: 05000000
     values:
     - 5
   _characterEffects:
-  - rid: 8123140627141230680
+  - rid: 8536392112056828012
   _type: 0
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectTransform: {fileID: 0}
@@ -153,53 +154,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 8123140627141230680
+    - rid: 8536392112056828012
       type: {class: ProjectileInteractEffect, ns: September.InGame.Exhibit, asm: Scripts}
       data:
         _characterType: 5
-        _projectileInteract: {fileID: 1238019300898631645}
---- !u!114 &3999792169390587101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 518364684307869088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 549068b2e6fdfd442a5bba033df184c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _sens: 10
-  _padSens: 50
-  _characterTf: {fileID: 2006340566990065624}
-  _cameraPivot: {fileID: 3813922952977508952}
-  _cameraTf: {fileID: 2215043571382671122}
-  _camera: {fileID: 1576128460117959270}
-  _collideAgainst:
-    serializedVersion: 2
-    m_Bits: 128
-  _cameraRadius: 0.1
-  _motionDuration: 0.6
-  _motionEase: 9
-  DebugMessage: 1
---- !u!114 &1238019300898631645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 518364684307869088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c432f2662ecb48b5a3c247aa5030fdc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _waitCharacterTransform: {fileID: 2537115606131514651}
-  _cameraController: {fileID: 3999792169390587101}
-  _interactable: {fileID: 863474155446293771}
-  _maxAmmo: 50
-  _reloadTime: 1
+        _projectileInteractableBase: {fileID: 6031524727437765514}
 --- !u!120 &605949265976625825
 LineRenderer:
   serializedVersion: 2
@@ -319,14 +278,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _barrel: {fileID: 285655025946979430}
   _rotateBase: {fileID: 2298891464602226638}
-  _cameraController: {fileID: 0}
+  _cameraController: {fileID: 6425309163856342501}
   _layerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  _pitchMinMax: {x: -40, y: 40}
-  _yawMinMax: {x: -90, y: 90}
+    m_Bits: 128
   _sens: 10
   _padSens: 50
+  _playerOffset: 1
+--- !u!114 &6425309163856342501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518364684307869088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b18f84027b64ccb8b16459ea841ec60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pivot: {fileID: 3813922952977508952}
+  _cam: {fileID: 1576128460117959270}
+  _sens: 10
+  _padSens: 50
+  _pitchMinMax: {x: -40, y: 40}
+  _yawMinMax: {x: -90, y: 90}
+  _collideAgainst:
+    serializedVersion: 2
+    m_Bits: 128
+  _cameraRadius: 0.1
+--- !u!114 &6031524727437765514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518364684307869088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8721cbf024547feb7ed473246250421, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _waitCharacterTransform: {fileID: 2537115606131514651}
+  _cameraController: {fileID: 1576128460117959270}
+  _interactable: {fileID: 863474155446293771}
+  _maxAmmo: 10
+  _reloadTime: 1
+  _reloadSeconds: 3
 --- !u!1 &1455451939750372746
 GameObject:
   m_ObjectHideFlags: 0

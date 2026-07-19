@@ -1,11 +1,12 @@
 using System;
 using Cinemachine;
 using Common.UserSettings;
+using Fusion;
 using UnityEngine;
 
 namespace September.InGame.Exhibit
 {
-	public class BallistaCamera : MonoBehaviour
+	public class BallistaCamera : NetworkBehaviour
 	{
 		[SerializeField] private Transform _pivot;
 		[SerializeField] private CinemachineVirtualCameraBase _cam;
@@ -19,11 +20,14 @@ namespace September.InGame.Exhibit
 		Quaternion _defaultRotation; 
 		private float _basePitch;
 		private float _baseYaw;
-		private float _pitch;
-		private float _yaw;
+		[Networked] private float Pitch { get; set; }
+		[Networked] private float Yaw { get; set; }
 
+		private Vector3 _defaultOffset;
+		
 		private void LateUpdate()
 		{
+			_pivot.localRotation = Quaternion.Euler(Pitch, Yaw, 0);
 			CheckCameraDistance();
 		}
 
@@ -32,18 +36,19 @@ namespace September.InGame.Exhibit
 			_defaultRotation = _pivot.localRotation;
 			_baseYaw = _defaultRotation.eulerAngles.y;
 			_basePitch = _defaultRotation.eulerAngles.x;
+			_defaultOffset = _cam.transform.localPosition;
 		}
 
 		public void ResetCamera()
 		{
-			_pitch = 0;
-			_yaw = 0;
+			Pitch = 0;
+			Yaw = 0;
 		}
 
 		public void RotateCamera(float yaw, float pitch)
 		{
-			_pitch = Mathf.Clamp(pitch, _pitchMinMax.x, _pitchMinMax.y);
-			_yaw = Mathf.Clamp(yaw, _yawMinMax.x, _yawMinMax.y);
+			Pitch = Mathf.Clamp(pitch, _pitchMinMax.x, _pitchMinMax.y);
+			Yaw = Mathf.Clamp(yaw, _yawMinMax.x, _yawMinMax.y);
 		}
 
 
@@ -58,23 +63,32 @@ namespace September.InGame.Exhibit
 			float pitchInput = input.y;
 			float yawInput = input.x;
 
-			_pitch -= pitchInput * deltaTime * sens;
-			_pitch = Mathf.Clamp(_pitch, _pitchMinMax.x - _basePitch, _basePitch - _pitchMinMax.y);
-			_yaw -= yawInput * deltaTime * sens;
-			_yaw = Mathf.Clamp(_yaw, _yawMinMax.x - _baseYaw, _baseYaw - _yawMinMax.y);
+			Pitch -= pitchInput * deltaTime * sens;
+			Pitch = Mathf.Clamp(Pitch, _pitchMinMax.x, _pitchMinMax.y);
+			Yaw += yawInput * deltaTime * sens;
+			Yaw = Mathf.Clamp(Yaw, _yawMinMax.x,_yawMinMax.y);
+			
+		}
 
-			_pivot.localRotation = Quaternion.Euler(_pitch, _yaw, 0);
+		public Transform GetCameraTf()
+		{
+			return _cam.transform;
 		}
 		
 		void CheckCameraDistance()
 		{
-			var isHit = Physics.Linecast(_pivot.position, _pivot.position + _pivot.TransformDirection(_cam.transform.position),
+			var isHit = Physics.Linecast(_pivot.position, _pivot.position + _pivot.TransformDirection(_defaultOffset),
 				out var hit, _collideAgainst);
             
 			if (isHit)
 			{
 				Vector3 sphereCenter = hit.point + hit.normal * _cameraRadius;
 				_cam.transform.position = sphereCenter;
+			}
+			
+			else
+			{
+				_cam.transform.localPosition = _defaultOffset;
 			}
 		}
 	}

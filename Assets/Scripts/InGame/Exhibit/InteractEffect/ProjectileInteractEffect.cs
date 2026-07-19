@@ -6,36 +6,35 @@ using UnityEngine;
 
 namespace September.InGame.Exhibit
 {
-	[Serializable]
-	public class BallistaInteractEffect:CharacterInteractEffectBase
-	{
-		[SerializeField] private ProjectileInteractableBase _ballistaInteractable;
-		public BallistaInteractEffect(ProjectileInteractableBase interactable)
-		{
-			_ballistaInteractable = interactable;
-		}
+    [Serializable]
+    public class ProjectileInteractEffect : CharacterInteractEffectBase
+    {
+        [SerializeField] private ProjectileInteractableBase _projectileInteractableBase;
 
-		public BallistaInteractEffect()
-		{
-			
-		}
-		
-		public override void OnInteractStart(IInteractableContext context, InteractableBase target)
-		{
-			var playerRef = PlayerRef.FromEncoded(context.Interactor);
-			_ballistaInteractable.InteractStart(playerRef);
-		}
+        public ProjectileInteractEffect(ProjectileInteractableBase interactableBase)
+        {
+            _projectileInteractableBase = interactableBase;
+        }
 
-		public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
-		{
-			base.OnInteractFixedNetworkUpdate(playerInput);
-			_ballistaInteractable.InteractFixedNetworkUpdate(playerInput);
-		}
+        public ProjectileInteractEffect()
+        {
+        }
 
-		public override CharacterInteractEffectBase Clone()
-		{
-			return new BallistaInteractEffect(_ballistaInteractable);
-		}
-		
-	}
+        public override void OnInteractStart(IInteractableContext context, InteractableBase target)
+        {
+            var playerRef = PlayerRef.FromEncoded(context.Interactor);
+            _projectileInteractableBase.InteractStart(playerRef);
+        }
+
+        public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
+        {
+            base.OnInteractFixedNetworkUpdate(playerInput);
+            _projectileInteractableBase.InteractFixedNetworkUpdate(playerInput);
+        }
+
+        public override CharacterInteractEffectBase Clone()
+        {
+            return new ProjectileInteractEffect(_projectileInteractableBase);
+        }
+    }
 }
