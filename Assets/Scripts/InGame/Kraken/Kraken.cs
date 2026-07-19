@@ -151,7 +151,7 @@ namespace September.InGame.Kraken
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority) return;
+            if (!HasInputAuthority) return;
 
             if (GetInput<PlayerInput>(out var input))
             {
@@ -177,7 +177,7 @@ namespace September.InGame.Kraken
             }
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
         private void RPC_Attack(Vector3 targetPosition)
         {
             Attack(targetPosition).Forget();
