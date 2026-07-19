@@ -36,9 +36,7 @@ namespace InGame.Jewelry
 
         public override void Spawned()
         {
-            // 状態変更権限を持つ場合のみ宝石情報管理クラスを作成
-            if (HasStateAuthority)
-                _playerJewelryPresenter = new(_playerJewelryModel, _playerJewelryRuntime, _playerJewelryView, this);
+            _playerJewelryPresenter = new(_playerJewelryModel, _playerJewelryRuntime, _playerJewelryView, this);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -69,13 +67,15 @@ namespace InGame.Jewelry
             {
                 NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefab, spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
 
+                if (!jewelryObj.TryGetComponent<IJewelry>(out var jewelry)) continue;
+                _onDropJewelry?.Invoke(jewelry.JewelryParams.JewelryType);
+
                 if (resultDropped == null) continue;
 
                 if (resultDropped.Length > i)
                 {
-                    resultDropped[i] = jewelryObj.GetComponent<IJewelry>();
+                    resultDropped[i] = jewelry;
                     result = i;
-                    _onGetJewelry?.Invoke(resultDropped[i].JewelryParams.JewelryType);
                 }
                 else
                 {
@@ -96,13 +96,13 @@ namespace InGame.Jewelry
 
         public void PickUp(IJewelry jewelry)
         {
+            // 宝石を取得したことを知らせる
+            _onGetJewelry(jewelry.JewelryParams.JewelryType);
+
             if (!HasStateAuthority) return;
 
             if (jewelry is Jewelry jewelComponent)
             {
-                // 宝石を取得したことを知らせる
-                _onGetJewelry(jewelry.JewelryParams.JewelryType);
-
                 if (jewelComponent.TryGetComponent<NetworkObject>(out var jewelObj))
                 {
                     Runner.Despawn(jewelObj);

@@ -14,6 +14,8 @@ namespace InGame.Jewelry
         /// <summary>宝石の種類と個数の対応表</summary>
         [Networked, Capacity((int)JewelryType.JewelryTypeCount), HideInInspector]
         public NetworkArray<int> JewelryCounts => default;
+        /// <summary>直前の宝石の数を保存する配列</summary>
+        int[] _preJewelryCounts;
 
         event Action<JewelryType, Sprite> _onInitialize;
         event Action<JewelryType, int> _onUpdateJewelryQuantity;
@@ -40,9 +42,36 @@ namespace InGame.Jewelry
             {
                 var jewelryType = info.JewelryType;
                 var quantity = info.JewelryCount;
-                JewelryCounts.Set((int)jewelryType, quantity);
+
+                if (HasStateAuthority)
+                {
+                    JewelryCounts.Set((int)jewelryType, quantity);
+                }
+
                 _onInitialize?.Invoke(jewelryType, info.JewelrySprite);
                 _onUpdateJewelryQuantity?.Invoke(jewelryType, quantity);
+            }
+
+            // 直前の宝石の数を保存する配列の作成
+            _preJewelryCounts = new int[(int)JewelryType.JewelryTypeCount];
+            for (int i = 0; i < _preJewelryCounts.Length; i++)
+            {
+                _preJewelryCounts[i] = JewelryCounts.Get(i);
+            }
+        }
+
+        public override void Render()
+        {
+            // 値の同期が行われたタイミングで描画更新通知
+            for (int i = 0; i < (int)JewelryType.JewelryTypeCount; i++)
+            {
+                var current = JewelryCounts.Get(i);
+
+                if (current == _preJewelryCounts[i]) continue;
+
+                _preJewelryCounts[i] = current;
+
+                _onUpdateJewelryQuantity?.Invoke((JewelryType)i, current);
             }
         }
 
@@ -55,9 +84,11 @@ namespace InGame.Jewelry
             // enumの最後の要素（Count）が渡された場合はreturn
             if (jewelryType == JewelryType.JewelryTypeCount) return;
 
-            var currentQuantity = JewelryCounts.Get((int)jewelryType);
-            JewelryCounts.Set((int)jewelryType, currentQuantity + 1);
-            _onUpdateJewelryQuantity?.Invoke(jewelryType, JewelryCounts.Get((int)jewelryType));
+            if (HasStateAuthority)
+            {
+                var currentQuantity = JewelryCounts.Get((int)jewelryType);
+                JewelryCounts.Set((int)jewelryType, currentQuantity + 1);
+            }
         }
 
         /// <summary>
@@ -69,9 +100,11 @@ namespace InGame.Jewelry
             // enumの最後の要素（Count）が渡された場合はreturn
             if (jewelryType == JewelryType.JewelryTypeCount) return;
 
-            var currentQuantity = JewelryCounts.Get((int)jewelryType);
-            JewelryCounts.Set((int)jewelryType, currentQuantity - 1);
-            _onUpdateJewelryQuantity?.Invoke(jewelryType, JewelryCounts.Get((int)jewelryType));
+            if (HasStateAuthority)
+            {
+                var currentQuantity = JewelryCounts.Get((int)jewelryType);
+                JewelryCounts.Set((int)jewelryType, currentQuantity - 1);
+            }
         }
     }
 }
