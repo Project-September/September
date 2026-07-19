@@ -9,6 +9,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] private int _baseDamage;
 		[SerializeField] private ParticleSystem _hitEffectPrefab;
 		private ParticleSystem _hitParticle;
+		
 		public void Initialize()
 		{
 			if(!_hitEffectPrefab) return;
