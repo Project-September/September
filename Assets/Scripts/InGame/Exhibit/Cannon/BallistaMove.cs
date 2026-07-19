@@ -10,11 +10,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Transform _rotateBase;
 		[SerializeField] private BallistaCamera _cameraController;
 		[SerializeField] private LayerMask _layerMask;
-		[SerializeField] private float _sens;
-		[SerializeField] private float _padSens;
-		[SerializeField] private float _playerOffset = 3;
 
-		private NetworkObject _playerObject;
 		private float _basePitch;
 		private float _baseYaw;
 		[Networked] private float Pitch { get; set; }
@@ -33,11 +29,6 @@ namespace September.InGame.Exhibit
 			_barrel.rotation = Quaternion.Euler(_basePitch + Pitch, Yaw + _baseYaw, 0);
 		}
 
-		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
-		{
-			_playerObject = playerObject;
-		}
-
 		public void MoveUpdate(PlayerInput input)
 		{
 			var moveInput = input.LookDirection;
@@ -48,27 +39,16 @@ namespace September.InGame.Exhibit
 			{
 				var direction = hit.point - _rotateBase.transform.position;
 				var euler = Quaternion.LookRotation(direction.normalized).eulerAngles;
-				Debug.Log(euler);
 				Pitch = euler.x;
 				Yaw = euler.y;
-				
-				Debug.Log("pitch" + Pitch + " yaw" + Yaw);
 			}
 			else
 			{
 				Pitch = _cameraController.GetCameraTf().eulerAngles.x;
 				Yaw = _cameraController.GetCameraTf().eulerAngles.y;
 			}
-			
-			UpdatePlayerPosition();
 		}
 
-		void UpdatePlayerPosition()
-		{
-			var quaternion = Quaternion.Euler(0, Yaw, 0);
-			_playerObject.transform.rotation = quaternion;
-			_playerObject.transform.position = _rotateBase.position + quaternion * (Vector3.back * _playerOffset);
-		}
 		public void Refresh()
 		{ 
 			_cameraController.ResetCamera();
