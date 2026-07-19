@@ -22,25 +22,13 @@ namespace September.InGame.Kraken
         [Header("カメラ")]
         [SerializeField] private CameraController _cameraController;
 
-        /// <summary> 攻撃処理コンポーネント </summary>
-        [Header("攻撃設定")]
-        [SerializeField] private HitChecker _hitChecker;
-        [SerializeField] private float _hitRayCastHeight;
-        [SerializeField] private float _hitStartTime;
-        [SerializeField] private float _hitEndTime;
-        [SerializeField] private int _damage;
-        [SerializeField] private LayerMask _hitGroundLayer;
-        [SerializeField] private HitChecker _armHitChecker;
-        [SerializeField] private float _armStartTime;
-        [SerializeField] private float _armEndTime;
-
         [Header("攻撃予測設定")]
-        [SerializeField] private AttackPrediction _attackPrediction;
+        [SerializeField] private AttackPredictionFactory _attackPredictionFactory;
         [SerializeField] private Vector3 _predictionSize;
         [SerializeField] private float _predictionEndTime;
 
-        [Header("アニメーション設定")]
-        [SerializeField] private KrakenAttackAnimationHandler _tentacleAnimator;
+        [Header("攻撃設定")]
+        [SerializeField] private KrakenAttackHandler _attackHandler;
 
         [Header("インタラクト設定")]
         [SerializeField] private InteractableBase _interactable;
@@ -56,51 +44,12 @@ namespace September.InGame.Kraken
         private Vector3 _originalPlayerPosition;
         private Quaternion _originalPlayerRotation;
 
-        private Vector3 _targetPosition;
-
-        private readonly HashSet<Collider> _alreadyHits = new();
-
-        [Networked] private bool IsAttacking { get; set; }
-
         private void Start()
         {
-            _armHitChecker.OnHit += OnHitCheckerOnOnHit;
-            _hitChecker.OnHit += OnHitCheckerOnOnHit;
-
             _initialPosition = transform.position;
             _initialRotation = transform.rotation;
 
             _cameraController.Init(true);
-
-            return;
-
-            void OnHitCheckerOnOnHit(Collider hitCollider)
-            {
-                if (_alreadyHits.Contains(hitCollider)) return;
-
-                float rayWorldHeight = _hitRayCastHeight + transform.position.y;
-                Vector3 hitPos = hitCollider.ClosestPoint(transform.position);
-                Vector3 rayOrigin = new(hitPos.x, rayWorldHeight, hitPos.z);
-                float distance = rayWorldHeight - hitPos.y;
-
-                if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, distance, _hitGroundLayer))
-                {
-                    Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.red, 100f);
-                    return;
-                }
-
-                Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.green, 100f);
-
-                _alreadyHits.Add(hitCollider);
-
-                IDamageable damageable = hitCollider.GetComponentInParent<IDamageable>();
-                if (damageable != null)
-                {
-                    var hitData = new HitData { HitActionType = HitActionType.Damage, Amount = _damage, ExecutorRef = Object.InputAuthority, TargetRef = damageable.OwnerPlayerRef };
-
-                    damageable.TakeHit(ref hitData);
-                }
-            }
         }
 
         /// <summary>
@@ -203,7 +152,6 @@ namespace September.InGame.Kraken
         public override void FixedUpdateNetwork()
         {
             if (!HasStateAuthority) return;
-            if (IsAttacking) return;
 
             if (GetInput<PlayerInput>(out var input))
             {
@@ -225,7 +173,6 @@ namespace September.InGame.Kraken
                     {
                         RPC_Attack(forward * 20f);
                     }
-                    IsAttacking = true;
                 }
             }
         }
@@ -238,36 +185,20 @@ namespace September.InGame.Kraken
 
         public async UniTask Attack(Vector3 targetPosition)
         {
-            Debug.Log("Start Attack");
             Debug.DrawLine(transform.position, targetPosition, Color.green, 10f);
             DebugDrawUtility.DrawWireSphere(targetPosition, 3f, Color.green, 10f);
 
-            _alreadyHits.Clear();
+            if (!_attackHandler.IsReady) return;
 
-            var task = _tentacleAnimator.Attack(targetPosition);
+            _attackHandler.Attack(targetPosition).Forget();
+
             {
-                Vector3 dir = targetPosition - _tentacleAnimator.LatestArmRootPosition;
+                Vector3 dir = targetPosition - _attackHandler.LatestArmRootPosition;
                 dir.y = 0;
                 Quaternion lookRotation = Quaternion.LookRotation(dir);
-                _attackPrediction.Show(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
-                UniTask.WaitForSeconds(_predictionEndTime).ContinueWith(() => _attackPrediction.Hide());
+                PredictionParticle particle = _attackPredictionFactory.Create(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
+                UniTask.WaitForSeconds(_predictionEndTime).ContinueWith(() => particle.Destroy());
             }
-
-            await UniTask.WhenAll(
-                HitCheck(_hitChecker, _hitStartTime, _hitEndTime),
-                HitCheck(_armHitChecker, _armStartTime, _armEndTime));
-
-            IsAttacking = false;
-
-            Debug.Log("End Attack");
-        }
-
-        public async UniTask HitCheck(HitChecker hitChecker, float startTime, float endTime)
-        {
-            await UniTask.WaitForSeconds(startTime);
-            hitChecker.StartHitCheck();
-            await UniTask.WaitForSeconds(endTime - startTime);
-            hitChecker.EndHitCheck();
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
