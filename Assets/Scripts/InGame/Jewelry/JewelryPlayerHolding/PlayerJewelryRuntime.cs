@@ -16,6 +16,7 @@ namespace InGame.Jewelry
         public NetworkArray<int> JewelryCounts => default;
         /// <summary>直前の宝石の数を保存する配列</summary>
         int[] _preJewelryCounts;
+        bool _initialized;
 
         event Action<JewelryType, Sprite> _onInitialize;
         event Action<JewelryType, int> _onUpdateJewelryQuantity;
@@ -58,10 +59,13 @@ namespace InGame.Jewelry
             {
                 _preJewelryCounts[i] = JewelryCounts.Get(i);
             }
+
+            _initialized = true;
         }
 
         public override void Render()
         {
+            if (!_initialized) return;
             // 値の同期が行われたタイミングで描画更新通知
             for (int i = 0; i < (int)JewelryType.JewelryTypeCount; i++)
             {
