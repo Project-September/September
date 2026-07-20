@@ -67,8 +67,10 @@ namespace September.Editor.InGameDebug
 	{
 		// 拡張windowからゲームが開始したかどうか
 		public bool IsStartedFromExtensionWindow;
+		public MapType MapType;
 		public string LobbyName = "TestLobby";
 		public string Nickname = "TestPlayer";
+
 		[SerializeField] private List<PlayerSetupData> _playerSetupData = new();
 		[NonSerialized] public bool RequestMoveToGameScene;
 		public List<PlayerSetupData> PlayerData => _playerSetupData;
