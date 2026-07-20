@@ -6,8 +6,8 @@ namespace InGame.Jewelry
 {
     public class Jewelry : NetworkBehaviour, IJewelry
     {
-        [Header("この宝石のパラメータ群"), SerializeField] JewelryParams _jewelryParams;
+        [Header("この宝石のパラメータ群"), SerializeField] JewelryInfo _jewelryParams;
 
-        public JewelryParams JewelryParams => _jewelryParams;
+        public JewelryInfo JewelryParams => _jewelryParams;
     }
 }

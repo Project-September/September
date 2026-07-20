@@ -11,12 +11,12 @@ namespace InGame.Jewelry
         PlayerJewelryContainer _container;
         ActionDisposable _actionDisposable;
 
-        public PlayerJewelryPresenter(PlayerJewelryModel model
+        public PlayerJewelryPresenter(PlayerJewelryDefinition definition
             , PlayerJewelryRuntime runtime
             , PlayerJewelryView view
             , PlayerJewelryContainer container)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (definition == null) throw new ArgumentNullException(nameof(definition));
             if (runtime == null) throw new ArgumentNullException(nameof(runtime));
             if (view == null) throw new ArgumentNullException(nameof(view));
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -25,7 +25,7 @@ namespace InGame.Jewelry
             _view = view;
             _container = container;
             _actionDisposable = new();
-            Init(model);
+            Init(definition);
         }
 
         public void Dispose()
@@ -33,7 +33,7 @@ namespace InGame.Jewelry
             _actionDisposable?.Dispose();
         }
 
-        void Init(PlayerJewelryModel model)
+        void Init(PlayerJewelryDefinition definition)
         {
             // viewにアクション登録
             _actionDisposable.AddActionDisposing(_container.OnGetJewelry(_runtime.GetJewelry));
@@ -43,7 +43,7 @@ namespace InGame.Jewelry
             _actionDisposable.AddActionDisposing(_runtime.OnInitialize(_view.Init));
             _actionDisposable.AddActionDisposing(_runtime.OnUpdateJewelryQuantity(_view.UpdateJewelryCount));
 
-            _runtime.Init(model);
+            _runtime.Init(definition);
         }
     }
 }
