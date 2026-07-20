@@ -19,7 +19,6 @@ namespace InGame.Jewelry
             public TextMeshProUGUI JewelryCountText => _jewelryCountText;
         }
 
-        [SerializeField] CanvasGroup _canvasGroup;
         [SerializeField] JewelryUI[] _jewelryUIArray;
         Camera _camera;
 
@@ -31,7 +30,7 @@ namespace InGame.Jewelry
         private void LateUpdate()
         {
             // カメラに向ける
-            _canvasGroup.gameObject.transform.forward = _camera.transform.forward * -1;
+            transform.forward = _camera.transform.forward * -1;
         }
 
         /// <summary>
