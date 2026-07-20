@@ -12,10 +12,11 @@ namespace InGame.Jewelry
     public class PlayerJewelryRuntime : NetworkBehaviour
     {
         /// <summary>宝石の種類と個数の対応表</summary>
-        [Networked, Capacity((int)JewelryType.JewelryTypeCount), HideInInspector]
-        public NetworkArray<int> JewelryCounts => default;
+        [Networked, Capacity((int)JewelryType.JewelryTypeCount)]
+        NetworkArray<int> _jewelryQuantities => default;
+
         /// <summary>直前の宝石の数を保存する配列</summary>
-        int[] _preJewelryCounts;
+        int[] _preJewelryQuantities;
         bool _initialized;
 
         event Action<JewelryType, Sprite> _onInitialize;
@@ -31,35 +32,34 @@ namespace InGame.Jewelry
             return () => _onUpdateJewelryQuantity -= act;
         }
 
-        public void Init(PlayerJewelryModel model)
+        public void Init(PlayerJewelryDefinition definition)
         {
-            if (model == null || model.HoldingJewelryInfos == null)
+            if (definition == null || definition.HoldingJewelryInfos == null)
             {
                 throw new InvalidOperationException();
             }
 
             // 対応表の作成
-            foreach (var info in model.HoldingJewelryInfos)
+            foreach (var info in definition.HoldingJewelryInfos)
             {
-                var jewelryType = info.JewelryType;
+                var jewelryType = info.JewelryInfo.JewelryType;
                 var quantity = info.JewelryCount;
 
                 if (HasStateAuthority)
                 {
-                    JewelryCounts.Set((int)jewelryType, quantity);
+                    _jewelryQuantities.Set((int)jewelryType, quantity);
                 }
 
-                _onInitialize?.Invoke(jewelryType, info.JewelrySprite);
+                _onInitialize?.Invoke(jewelryType, info.JewelryInfo.JewelrySprite);
                 _onUpdateJewelryQuantity?.Invoke(jewelryType, quantity);
             }
 
             // 直前の宝石の数を保存する配列の作成
-            _preJewelryCounts = new int[(int)JewelryType.JewelryTypeCount];
-            for (int i = 0; i < _preJewelryCounts.Length; i++)
+            _preJewelryQuantities = new int[(int)JewelryType.JewelryTypeCount];
+            for (int i = 0; i < _preJewelryQuantities.Length; i++)
             {
-                _preJewelryCounts[i] = JewelryCounts.Get(i);
+                _preJewelryQuantities[i] = _jewelryQuantities.Get(i);
             }
-
             _initialized = true;
         }
 
@@ -69,11 +69,11 @@ namespace InGame.Jewelry
             // 値の同期が行われたタイミングで描画更新通知
             for (int i = 0; i < (int)JewelryType.JewelryTypeCount; i++)
             {
-                var current = JewelryCounts.Get(i);
+                var current = _jewelryQuantities.Get(i);
 
-                if (current == _preJewelryCounts[i]) continue;
+                if (current == _preJewelryQuantities[i]) continue;
 
-                _preJewelryCounts[i] = current;
+                _preJewelryQuantities[i] = current;
 
                 _onUpdateJewelryQuantity?.Invoke((JewelryType)i, current);
             }
@@ -90,8 +90,8 @@ namespace InGame.Jewelry
 
             if (HasStateAuthority)
             {
-                var currentQuantity = JewelryCounts.Get((int)jewelryType);
-                JewelryCounts.Set((int)jewelryType, currentQuantity + 1);
+                var currentQuantity = _jewelryQuantities.Get((int)jewelryType);
+                _jewelryQuantities.Set((int)jewelryType, currentQuantity + 1);
             }
         }
 
@@ -106,9 +106,21 @@ namespace InGame.Jewelry
 
             if (HasStateAuthority)
             {
-                var currentQuantity = JewelryCounts.Get((int)jewelryType);
-                JewelryCounts.Set((int)jewelryType, currentQuantity - 1);
+                var currentQuantity = _jewelryQuantities.Get((int)jewelryType);
+                _jewelryQuantities.Set((int)jewelryType, currentQuantity - 1);
             }
+        }
+
+        /// <summary>
+        /// 持っている宝石の数を種類に応じて取得するメソッド
+        /// </summary>
+        /// <param name="jewelryType">宝石の種類</param>
+        /// <returns>現在持っている宝石の数 範囲外指定で-1が返る</returns>
+        public int GetJewelryQuantity(JewelryType jewelryType)
+        {
+            return jewelryType != JewelryType.JewelryTypeCount
+                ? _jewelryQuantities.Get((int)jewelryType)
+                : -1;
         }
     }
 }

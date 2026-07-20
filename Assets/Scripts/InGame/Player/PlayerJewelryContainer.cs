@@ -12,12 +12,6 @@ namespace InGame.Jewelry
         [SerializeField] private float _horizontalThrowForce = 5f;
         [SerializeField] private float _upwardThrowForce = 3f;
         [SerializeField] private float _heightOffset;
-        [Header(@"プレイヤーの宝石保持情報に必要な参照
-このクラスにファクトリーの役割も持たせる")]
-        [SerializeField] PlayerJewelryModel _playerJewelryModel;
-        [SerializeField] PlayerJewelryRuntime _playerJewelryRuntime;
-        [SerializeField] PlayerJewelryView _playerJewelryView;
-        PlayerJewelryPresenter _playerJewelryPresenter;
 
         event Action<JewelryType> _onGetJewelry;
         event Action<JewelryType> _onDropJewelry;
@@ -33,16 +27,6 @@ namespace InGame.Jewelry
         }
 
         private const string JewelryTag = "Jewelry";
-
-        public override void Spawned()
-        {
-            _playerJewelryPresenter = new(_playerJewelryModel, _playerJewelryRuntime, _playerJewelryView, this);
-        }
-
-        public override void Despawned(NetworkRunner runner, bool hasState)
-        {
-            _playerJewelryPresenter?.Dispose();
-        }
 
         /// <summary>
         /// 触れた宝石を拾う処理
