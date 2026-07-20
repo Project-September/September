@@ -10,12 +10,13 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Transform _cannonBarrel;
 		[SerializeField] private float _baseRotateSpeed;
 		[SerializeField] private float _barrelRotateSpeed;
-
 		// minをxとして、maxをyとして扱う
 		[SerializeField] private Vector2 _baseRotateAngleLimit = new(-90, 90);
 		[SerializeField] private Vector2 _barrelRotateAngleLimit = new(-90, 90);
+		[SerializeField] private float _playerOffset = 3f;
 		private Quaternion _baseDefaultRotation;
 		private Quaternion _barrelDefaultRotation;
+		private NetworkObject _player;
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 
@@ -26,9 +27,15 @@ namespace September.InGame.Exhibit
 			_cannonBarrel.localRotation = BarrelRotation;
 		}
 
+		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
+		{
+			_player = playerObject;
+		}
+
 		public void MoveUpdate(PlayerInput input)
 		{
 			CannonRotate(input.MoveDirection.x, input.LookDirection.y);
+			UpdatePlayerPos();
 		}
 
 		public void Refresh()
@@ -41,6 +48,13 @@ namespace September.InGame.Exhibit
 		{
 			BarrelRotation = _barrelDefaultRotation;
 			BaseRotation = _baseDefaultRotation;
+		}
+
+		private void UpdatePlayerPos()
+		{
+			var quaternion = BaseRotation;
+			_player.transform.rotation = quaternion;
+			_player.transform.position = _cannonBase.position + quaternion * (Vector3.back * _playerOffset);
 		}
 
 		private void CannonRotate(float baseRotateInput, float barrelRotateInput)

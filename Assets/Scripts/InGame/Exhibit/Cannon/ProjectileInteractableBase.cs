@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cinemachine;
 using Fusion;
 using InGame.Health;
 using InGame.Interact;
@@ -12,7 +13,7 @@ namespace September.InGame.Exhibit
 	public class ProjectileInteractableBase : NetworkBehaviour
 	{
 		[SerializeField] protected Transform _waitCharacterTransform;
-		[SerializeField] protected CameraController _cameraController;
+		[SerializeField] protected CinemachineVirtualCamera _cameraController;
 		[SerializeField] protected InteractableBase _interactable;
 		
 		[Header("reload設定")] [SerializeField] protected int _maxAmmo;
@@ -24,9 +25,9 @@ namespace September.InGame.Exhibit
 		protected int _currentAmmo;
 
  		[Networked] protected PlayerRef CurrentUsePlayerRef { get; set; }
-	    [Networked] private TickTimer InteractEndLockTimer { get; set; }
-		[Networked] private TickTimer LastFireTimer { get; set; }
-		[Networked] private TickTimer WaitExitTimer { get; set; }
+		[Networked] protected TickTimer LastFireTimer { get; set; }
+		[Networked] protected TickTimer WaitExitTimer { get; set; }
+		[Networked] private TickTimer InteractEndLockTimer { get; set; }
 
 		public override void Spawned()
 		{
@@ -44,7 +45,7 @@ namespace September.InGame.Exhibit
 		/// <summary>
 		///     Hostのみで実行されるインタラクト開始時の初期化処理
 		/// </summary>
-		public void InteractStart(PlayerRef playerRef)
+		public virtual void InteractStart(PlayerRef playerRef)
 		{
 			// プレイヤーの取得
 			CurrentUsePlayerRef = playerRef;
@@ -62,6 +63,7 @@ namespace September.InGame.Exhibit
 			if (!_usingPlayer) return;
 			_usingPlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 			PlayerActive(false);
+			_move.Initialize(_usingPlayer.Object, playerRef);
 
 			// Playerがダメージを受けた際にInteractを終了する
 			_usingPlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
@@ -74,27 +76,37 @@ namespace September.InGame.Exhibit
 		/// <summary>
 		///     インタラクト中の処理(Hostのみ)
 		/// </summary>
-		public void InteractFixedNetworkUpdate(PlayerInput input)
+		public virtual void InteractFixedNetworkUpdate(PlayerInput input)
 		{
 			base.FixedUpdateNetwork();
 
 			_move.MoveUpdate(input);
-			_usingPlayer.transform.position = _waitCharacterTransform.position;
-			_usingPlayer.transform.rotation = _waitCharacterTransform.rotation;
 			
 			// 射撃処理
 			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTimer.ExpiredOrNotRunning(Runner) &&
 			    _currentAmmo > 0)
 			{
-				_launcher.Fire(CurrentUsePlayerRef);
-				LastFireTimer = TickTimer.CreateFromSeconds(Runner, _reloadTime);
-				_currentAmmo -= 1;
-				if (_currentAmmo <= 0)
-				{
-					WaitExitTimer = TickTimer.CreateFromSeconds(Runner, 1f);
-				}
+				Fire();
 			}
 
+			CheckInteractEnd(input);
+			
+			OnInteractFixedUpdate();
+		}
+
+		protected virtual void Fire()
+		{
+			_launcher.Fire(CurrentUsePlayerRef);
+			LastFireTimer = TickTimer.CreateFromSeconds(Runner, _reloadTime);
+			_currentAmmo -= 1;
+			if (_currentAmmo <= 0)
+			{
+				WaitExitTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+			}
+		}
+
+		protected virtual void CheckInteractEnd(PlayerInput input)
+		{
 			if (input.Buttons.IsSet(PlayerButtons.Interact) && InteractEndLockTimer.ExpiredOrNotRunning(Runner))
 			{
 				InteractEnd();
@@ -105,8 +117,6 @@ namespace September.InGame.Exhibit
 				WaitExitTimer = TickTimer.None;
 				InteractEnd();
 			}
-			
-			OnInteractFixedUpdate();
 		}
 
 		/// <summary>
@@ -195,7 +205,8 @@ namespace September.InGame.Exhibit
 		private void RPC_SetCameraPriority(PlayerRef playerRef, int priority)
 		{
 			if (Runner.LocalPlayer != playerRef) return;
-			_cameraController.SetCameraPriority(priority);
+			_cameraController.Priority = priority;
+			_cameraController.MoveToTopOfPrioritySubqueue();
 		}
 
 		#endregion
@@ -203,6 +214,7 @@ namespace September.InGame.Exhibit
 
 	public interface IProjectileMovement
 	{
+		public void Initialize(NetworkObject playerObject, PlayerRef playerRef);
 		public void MoveUpdate(PlayerInput input);
 		public void Refresh();
 	}

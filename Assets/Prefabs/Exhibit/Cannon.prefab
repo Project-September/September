@@ -325,7 +325,6 @@ MonoBehaviour:
   _hitLayer:
     serializedVersion: 2
     m_Bits: 192
-  _baseDamage: 50
   _projectileHitEffect:
     rid: 8123140420533747796
   IsRenderLine: 0
@@ -371,7 +370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _waitCharacterTransform: {fileID: 4275066865890829726}
-  _cameraController: {fileID: 3748556067587992180}
+  _cameraController: {fileID: 1489466347846784541}
   _interactable: {fileID: 788815102460632112}
   _maxAmmo: 3
   _reloadTime: 3
@@ -394,6 +393,7 @@ MonoBehaviour:
   _barrelRotateSpeed: 1
   _baseRotateAngleLimit: {x: -90, y: 90}
   _barrelRotateAngleLimit: {x: -90, y: 90}
+  _playerOffset: 1
 --- !u!1 &5739046775815335181
 GameObject:
   m_ObjectHideFlags: 0
