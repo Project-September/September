@@ -96,7 +96,7 @@ namespace September.Editor.InGameDebug
 				if (index < PlayersData.Count)
 					playerDatabase.Rpc_SetCharacter(player.Key, PlayersData[index++].CharacterType);
 
-			networkManager.StartGame().Forget();
+			networkManager.StartGame(new GameStartContext(_lobbyData.MapType)).Forget();
 		}
 
 		private async UniTask JoinLobby()

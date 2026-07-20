@@ -92,7 +92,7 @@ namespace September.Lobby
             if (_isStartingGame) return;
             _isStartingGame = true;
             await UniTask.WaitForSeconds(delay);
-            NetworkManager.Instance.StartGame().Forget();
+            NetworkManager.Instance.StartGame(new GameStartContext(MapType.Museum)).Forget();
         }
 
         void AddContents(PlayerRef playerRef)
