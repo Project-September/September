@@ -22,5 +22,15 @@ namespace InGame.Interact
         
         //クローン関数ではインスペクタで設定した値などをコピーする処理を書いてください
         public abstract CharacterInteractEffectBase Clone();
+
+        /// <summary>
+        /// 実行可能条件
+        /// </summary>
+        /// <param name="characterType">インタラクト者のキャラクタータイプ</param>
+        /// <returns>実行可能か？</returns>
+        public bool IsExecutable(CharacterType characterType)
+        {
+            return _characterType == CharacterType.All || _characterType == characterType;
+        }
     }
 }

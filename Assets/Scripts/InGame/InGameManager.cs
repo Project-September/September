@@ -4,6 +4,7 @@ using System.Threading;
 using Fusion;
 using NaughtyAttributes;
 using September.Common;
+using September.InGame.Rules;
 using September.InGame.UI;
 using UnityEngine;
 
@@ -11,26 +12,22 @@ namespace September.InGame.Common
 {
     public class InGameManager : NetworkStateMachineOwner<InGameManager>, IRegisterableService
     {
-        [SerializeField] private string _inGameBGMCueName = "Default_BGM";
         [Header("Timer Settings"), SerializeField, Label("TimerData")]
-        
         private GameTimerData _timerData;
-        
-        [Header("他Playerを気絶させたときに得られるスコア"), SerializeField] 
-        private int _stunScore;
 
+        [Header("Game Settings"), SerializeField]
+        private GameRule _gameRule;
+        
         private readonly Dictionary<PlayerRef, NetworkObject> _playerDataDic = new();
 
         private NetworkRunner _networkRunner;
         public IReadOnlyDictionary<PlayerRef, NetworkObject> PlayerDataDic => _playerDataDic;
         public GameTimerData TimerData => _timerData;
+        public IGameRule GameRule => _gameRule;
         public CancellationTokenSource Cts { get; private set; }
 
-        public int StunScore => _stunScore;
-        public string InGameBGMCueName => _inGameBGMCueName;
-        public string CurrentBGM { get; set; }
-
         public System.Action GameStarted { get; set; }
+        public System.Action<PlayerRef, PlayerRef> PlayerKilled { get; set; }
 
         /// <summary>
         /// 現在のゲーム状態名を取得する
@@ -54,7 +51,7 @@ namespace September.InGame.Common
             Cts = new CancellationTokenSource();
             _networkRunner = FindFirstObjectByType<NetworkRunner>();
             if (_networkRunner == null) Debug.LogError("NetworkRunnerがありません");
-            base.Spawned();
+            if (_states.Length > 0) base.Spawned();
         }
 
         protected override void InitializeStateMachine()

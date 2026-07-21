@@ -13,8 +13,8 @@ namespace InGame.Common.AnimationMontage
         [SerializeField] private Avatar _overrideAvatar;
         [Header("PlaySettings")]
         [SerializeField, Min(0)] private float _playRate = 1f;
-        [SerializeField, Min(0)] private Blend _blendIn;
-        [SerializeField, Min(0)] private Blend _blendOut;
+        [SerializeField] private Blend _blendIn;
+        [SerializeField] private Blend _blendOut;
         [SerializeField] private bool _loop;
         [SerializeField, Tooltip("")] private AvatarMask _selectedMask;
         [Header("Sections")]

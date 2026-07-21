@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using September.NewResult.RankingPolicy;
 
 namespace September.NewResult
 {
@@ -7,6 +8,12 @@ namespace September.NewResult
     {
         private string _stageName;
         private readonly List<PlayerResultEntry> _players = new();
+        private readonly IRankingPolicy _rankingPolicy;
+
+        public GameResultInfoBuilder(IRankingPolicy rankingPolicy)
+        {
+            _rankingPolicy = rankingPolicy;
+        }
         
         public void SetStageName(string stageName)
         {
@@ -25,7 +32,7 @@ namespace September.NewResult
 
         public GameResultInfo BuildInstance()
         {
-            var ranking = RankingService.Apply(_players).ToArray();
+            var ranking = _rankingPolicy.Apply(_players).ToArray();
             return new GameResultInfo(_stageName, ranking);
         }
     }

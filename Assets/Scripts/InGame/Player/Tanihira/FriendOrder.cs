@@ -26,6 +26,7 @@ namespace Ingame.Tanihira
             
             if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability1))
             {
+                _formationManager.SetAllAttackOrdered(false);
                 OrderReturnFriend();
             }
             
@@ -66,6 +67,19 @@ namespace Ingame.Tanihira
         public void AfterTick()
         {
             PreviousButtons = GetInput<PlayerInput>().GetValueOrDefault().Buttons;
+        }
+
+        /// <summary>
+        /// ペンギンの現在の攻撃量を初期化する
+        /// ・再度指示が行われたときに呼び出す
+        /// </summary>
+        public void AllResetAttackAmount()
+        {
+            // 全てのペンギンに対して現在の攻撃量を初期化する
+            foreach (var friend in _formationManager.FriendsList)
+            {
+                friend.ResetAttackAmount();
+            }
         }
     }
 }

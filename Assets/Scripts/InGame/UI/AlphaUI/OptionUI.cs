@@ -1,8 +1,5 @@
-﻿using System;
-using Common.UserSettings;
-using CriWare;
-using NaughtyAttributes;
-using UniRx;
+﻿using NaughtyAttributes;
+using September.Common;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -13,15 +10,10 @@ namespace InGame.UI
     {
         [SerializeField, Label("表示非表示させるUI")] private GameObject _optionUIPanel;
         [SerializeField, Label("表示時に選択するUI")] private Selectable _selectWhenOpen;
-        [Space(16)]
-        [SerializeField, Label("BGMVolume")] private Slider _bgmVolumeSlider;
-        [SerializeField, Label("SEVolume")] private Slider _seVolumeSlider;
-        [SerializeField, Label("VoiceVolume")] private Slider _voiceVolumeSlider;
-        [SerializeField, Label("CameraSensitivity")] private Slider _cameraSensitivitySlider;
 
         private GameInput _gameInput;
         private bool _isShow;
-        
+
         private void Start()
         {
             Initialize();
@@ -31,73 +23,57 @@ namespace InGame.UI
         {
             _optionUIPanel.SetActive(false);
             _gameInput = GameInput.I;
-
-            {
-                var settings = UserSettings.Get();
-
-                _bgmVolumeSlider.value = settings.BGMVolume;
-                _seVolumeSlider.value = settings.SEVolume;
-                _voiceVolumeSlider.value = settings.VoiceVolume;
-                _cameraSensitivitySlider.value = settings.MouseSensitivity;
-            }
-
-            SubscribeVolumeSliderSetting(_bgmVolumeSlider, "BGM", (v, s) => s.BGMVolume = v);
-            SubscribeVolumeSliderSetting(_seVolumeSlider, "SE", (v, s) => s.SEVolume = v);
-            SubscribeVolumeSliderSetting(_voiceVolumeSlider, "Voice", (v, s) => s.VoiceVolume = v);
-            
-            SubscribeSliderSetting(_cameraSensitivitySlider, (v, s) =>
-            {
-                s.MouseSensitivity = v;
-                s.PadSensitivity = v;
-            });
         }
 
-        
+
         private void Update()
         {
             // オプションUIの表示切り替え
             if (_gameInput.UI.Option.triggered)
             {
-                _isShow = !_isShow;
-                _optionUIPanel.SetActive(_isShow);
+                Show(!_isShow);
+            }
 
-                if (_isShow)
-                {
+            // オプション画面等を開いていて、かつマウスを使用している場合はカーソルを表示する
+            // 現状この機能を使うのがInGameSceneのみかつ、OptionUIが存在するのもInGameSceneのみなので動作上問題ない
+            // 他の場所でも使うようにするなら別の所で処理するようにする
+            // ↑特定のシーン上でしか動作させなくていいことに変わりはないと思うので、そこをどう制御するかは必要な時に考える
+            CursorStateManager.UpdateCursorState();
+        }
+
+        public void Show(bool isShow)
+        {
+            _isShow = isShow;
+            if (_optionUIPanel)
+                _optionUIPanel.SetActive(_isShow);
+            
+            if (_gameInput != null)
+                _gameInput.IsInputBlockedByUI = _isShow;
+
+            if (_isShow)
+            {
+                if (_optionUIPanel)
                     _optionUIPanel.transform.SetAsLastSibling();
+                if (_selectWhenOpen)
                     EventSystem.current.SetSelectedGameObject(_selectWhenOpen.gameObject);
-                }
-                
-                Cursor.visible = _isShow;
-                Cursor.lockState = _isShow ? CursorLockMode.None : CursorLockMode.Locked;
+            }
+
+            if (_isShow)
+            {
+                CursorStateManager.ShowCursor();
+            }
+            else
+            {
+                CursorStateManager.HideCursor();
             }
         }
 
-        private static void SubscribeVolumeSliderSetting(Slider slider, string category, Action<float, UserSettings> paramUpdate)
+        private void OnDestroy()
         {
-            slider
-                .OnValueChangedAsObservable()
-                .Subscribe(value =>
-                {
-                    CriAtom.SetCategoryVolume(category, value);
+            if (!_isShow) return;
 
-                    var settings = UserSettings.Get();
-                    paramUpdate?.Invoke(value, settings);
-                    UserSettings.Save(settings);
-                })
-                .AddTo(slider);
-        }
-        
-        private static void SubscribeSliderSetting(Slider slider, Action<float, UserSettings> paramUpdate)
-        {
-            slider
-                .OnValueChangedAsObservable()
-                .Subscribe(value =>
-                {
-                    var settings = UserSettings.Get();
-                    paramUpdate?.Invoke(value, settings);
-                    UserSettings.Save(settings);
-                })
-                .AddTo(slider);
+            CursorStateManager.HideCursor();
+            if (_gameInput != null) _gameInput.IsInputBlockedByUI = false;
         }
     }
 }

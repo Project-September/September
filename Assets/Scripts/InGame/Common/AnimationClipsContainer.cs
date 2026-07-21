@@ -3,6 +3,10 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace InGame.Common
 {
     // AnimationClipPlayer で使用する AnimationClip 共有用
@@ -16,7 +20,11 @@ namespace InGame.Common
         public static AnimationClipsContainer Instance { get; private set; }
         public AnimationMontageStruct[] AnimationMontages => _animationMontages;
 
+        #if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+        #else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        #endif
         static async void Init()
         {
             try

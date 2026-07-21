@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
 using September.Common;
 using TMPro;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,27 +14,41 @@ namespace September.Lobby
     public class LobbyController : NetworkBehaviour, INetworkRunnerCallbacks
     {
         [SerializeField] private PlayerConditionView _playerConditionViewPrefab;
+        [SerializeField] private BotCharacterSelect _botCharacterSelect;
         [SerializeField] private Button _readyButton;
         [SerializeField] private Button _quitButton;
+        [SerializeField] private Button _addBotButton;
         [SerializeField] private TextMeshProUGUI _playerNameText;
         [SerializeField] private TextMeshProUGUI _roomNameText;
         [SerializeField] private Image _fadePanel;
         [SerializeField] private Transform _contentTransform;
         readonly Dictionary<PlayerRef, PlayerConditionView> _lobbyPlayerUIDic = new();
-        [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(4), HideInInspector]
+        [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(8), HideInInspector]
         public NetworkDictionary<PlayerRef, NetworkBool> PlayerIsReadyDic => default;
-        public override void Spawned()
+        public override async void Spawned()
         {
             _roomNameText.text = Runner.SessionInfo.Name;
             Runner.AddCallbacks(this);
-            PlayerDatabase.Instance.AddPlayerData(Runner.LocalPlayer);
-            foreach (var pr in Runner.ActivePlayers.Reverse())
+            foreach (var kv in PlayerDatabase.Instance.PlayerDataDic)
             {
-                AddContents(pr);
+                AddContents(kv.Key);
             }
+            AddContents(Runner.LocalPlayer);
+            PlayerDatabase.Instance.AddPlayerData(Runner.LocalPlayer);
             _readyButton.onClick.AddListener(() => Rpc_ToggleReady(Runner.LocalPlayer));
             _quitButton.onClick.AddListener(() => NetworkManager.Instance.QuitLobby().Forget());
+
+            if (HasStateAuthority)
+            {
+                _addBotButton.onClick.AddListener(() => PlayerDatabase.Instance.AddBotData());
+            }
+            _addBotButton.gameObject.SetActive(HasStateAuthority);
+
             PlayerDatabase.Instance.ChangedDataAction += ChangeLobbyPlayerUI;
+            OnChangedIsReady();
+
+            PlayerDatabase.Instance.OnBotJoin.Subscribe(x => OnBotJoined(x)).AddTo(this);
+            PlayerDatabase.Instance.OnBotLeft.Subscribe(x => OnBotLeft(x)).AddTo(this);
         }
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
@@ -64,6 +78,7 @@ namespace September.Lobby
         {
             PlayerIsReadyDic.Set(playerRef, !PlayerIsReadyDic.Get(playerRef));
         }
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_Fade()
         {
@@ -77,20 +92,15 @@ namespace September.Lobby
             if (_isStartingGame) return;
             _isStartingGame = true;
             await UniTask.WaitForSeconds(delay);
-            NetworkManager.Instance.StartGame().Forget();
+            NetworkManager.Instance.StartGame(new GameStartContext(MapType.Museum)).Forget();
         }
-        
+
         void AddContents(PlayerRef playerRef)
         {
             if (_lobbyPlayerUIDic.ContainsKey(playerRef)) return;
-            if (Runner.LocalPlayer == playerRef)
-            {
-                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
-            }
-            else
-            {
-                _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
-            }
+
+            _lobbyPlayerUIDic.Add(playerRef, Instantiate(_playerConditionViewPrefab, _contentTransform));
+
         }
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -102,10 +112,24 @@ namespace September.Lobby
             if (Runner.LocalPlayer == player) return;
             AddContents(player);
         }
-        
+        public void OnBotJoined(PlayerRef bot)
+        {
+            Debug.Log(bot.AsIndex);
+            if (bot.AsIndex < PlayerDatabase.BotStartIndex) return;
+
+            if (HasStateAuthority)
+            {
+                PlayerIsReadyDic.Add(bot, true);
+            }
+            AddContents(bot);
+        }
+
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            Destroy(_lobbyPlayerUIDic[player].gameObject);
+            if (_lobbyPlayerUIDic.ContainsKey(player))
+            {
+                Destroy(_lobbyPlayerUIDic[player].gameObject);
+            }
             _lobbyPlayerUIDic.Remove(player);
             if (HasStateAuthority)
             {
@@ -113,15 +137,33 @@ namespace September.Lobby
                 PlayerIsReadyDic.Remove(player);
             }
         }
-        
+
+        public void OnBotLeft(PlayerRef bot)
+        {
+            OnPlayerLeft(null, bot);
+        }
+
         void ChangeLobbyPlayerUI(NetworkDictionary<PlayerRef, SessionPlayerData> dictionary)
         {
-            if(dictionary.ContainsKey(Runner.LocalPlayer)) _playerNameText.text = dictionary[Runner.LocalPlayer].DisplayNickName;
+            if (dictionary.ContainsKey(Runner.LocalPlayer)) _playerNameText.text = dictionary[Runner.LocalPlayer].DisplayNickName;
             foreach (var kv in dictionary)
             {
-                if (!_lobbyPlayerUIDic.TryGetValue(kv.Key, out var value)) return;
+                PlayerRef playerRef = kv.Key;
+                if (!_lobbyPlayerUIDic.TryGetValue(playerRef, out var value)) return;
                 value.PlayerNameText.text = kv.Value.DisplayNickName;
                 value.CharacterIconImage.sprite = CharacterDataContainer.Instance.GetCharacterData(kv.Value.CharacterType).CharacterIcon;
+
+                bool isBot = playerRef.AsIndex >= PlayerDatabase.BotStartIndex;
+                bool HasBotAuthority = isBot && HasStateAuthority;
+                value.CharacterChangeButton.gameObject.SetActive(HasBotAuthority);
+                value.BotRemoveButton.gameObject.SetActive(HasBotAuthority);
+
+                if (HasBotAuthority)
+                {
+                    RectTransform rect = value.CharacterChangeButton.GetComponent<RectTransform>();
+                    value.CharacterChangeButton.onClick.AddListener(() => { _botCharacterSelect.ShowPanel(playerRef, value.BotRemoveButton.transform.position); });
+                    value.BotRemoveButton.onClick.AddListener(() => PlayerDatabase.Instance.RemoveBotData(playerRef));
+                }
             }
         }
 
@@ -132,7 +174,7 @@ namespace September.Lobby
         public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
         {
         }
-        
+
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
         }

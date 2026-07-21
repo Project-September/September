@@ -1,0 +1,237 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5344940182192764311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1605890060057589556}
+  - component: {fileID: 8127163936404311049}
+  - component: {fileID: 4039633596589637880}
+  - component: {fileID: 5828656481618988257}
+  - component: {fileID: 373157578816395978}
+  - component: {fileID: 1069073459263324954}
+  - component: {fileID: 5346824491244401101}
+  m_Layer: 0
+  m_Name: Armory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1605890060057589556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5344940182192764311}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.84, y: -9.94, z: 4.98}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8127163936404311049
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5344940182192764311}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &4039633596589637880
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5344940182192764311}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &5828656481618988257
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5344940182192764311}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &373157578816395978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5344940182192764311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+--- !u!114 &1069073459263324954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5344940182192764311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 076425aa117f6da4e8296801168596ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredInteractTimeDictionary:
+    keys: 05000000
+    values:
+    - 2.5
+  _cooldownTimeDictionary:
+    keys: 05000000
+    values:
+    - 7.5
+  _characterEffects:
+  - rid: 4418194648007966877
+  _type: 14
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 0}
+  _cooldownEffectOffset: {x: 0, y: -0.36, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 0, z: 0}
+  _cooldownEffectScale: {x: 0.67, y: 1.75, z: 1}
+  _interactEffectType: 9
+  _cooldownEffectType: 10
+  _spawnCooldownEffectOnStart: 1
+  _audioBroadcaster: {fileID: 373157578816395978}
+  _interactSoundCueName: SE_Painting_Warp_In
+  _interactSoundTrackingType: 0
+  _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
+  _ForceSetInteractable: 1
+  _debug: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 4418194648007966877
+      type: {class: ArmoryInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 5
+        _addAbility:
+          rid: 4418194648007966878
+        _addAbilityCondition:
+          rid: 4418194648007966879
+        _overrideDisabledAbilities:
+        - AbilityNormalAttack
+        - AbilityHammerAttack
+        - AbilityMultiHitAttack
+        _duration: 5
+    - rid: 4418194648007966878
+      type: {class: AbilityMultiHitAttack, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        IsEnabled: 1
+        _attackDamage: 10
+        _ogreAttackDamage: 15
+        _startHitCheckFrame: 17
+        _endHitCheckFrame: 21
+        _endAttackFrame: 22
+        _hitEffect: 18
+        _normalAttackAnimationClip: {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
+        _animationClipPlayer: {fileID: 0}
+        _enableAutoAim: 1
+        _moveForwardSpeed: 2
+        _searchRadius: 2
+        _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
+        _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
+        _boxCastDistance: 1
+        _hitLayer:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        _triggerInteraction: 1
+        _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
+        _debugDrawDuration: 1
+        _buildGenerator: {fileID: 0}
+        _playerStatus: {fileID: 0}
+        _attackFrames:
+        - Start: 8
+          End: 12
+        - Start: 18
+          End: 20
+    - rid: 4418194648007966879
+      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _targetAbilityName: AbilityMultiHitAttack
+--- !u!114 &5346824491244401101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5344940182192764311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 1515017467
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 373157578816395978}
+  - {fileID: 1069073459263324954}
+  ForceRemoteRenderTimeframe: 0

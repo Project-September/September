@@ -20,13 +20,15 @@ namespace September.Common
         Ability3,
         Warp,
         AirplaneForward,
-        AirPlaneBack
+        AirPlaneBack,
+        Shooting
     }
 
     public struct PlayerInput : INetworkInput
     {
         public NetworkButtons Buttons;
         public Vector2 MoveDirection;
+        public Vector2 LookDirection;
         public float CameraYaw;
         public Vector3 DesiredLookDirection;
     }
@@ -77,6 +79,7 @@ namespace September.Common
                 if (playerActions.Move.enabled)
                 {
                     playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+                    playerInput.LookDirection = playerActions.Look.ReadValue<Vector2>();
                     playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
@@ -84,6 +87,7 @@ namespace September.Common
                 else
                 {
                     playerInput.MoveDirection = Vector2.zero;
+                    playerInput.LookDirection = Vector2.zero;
                     playerInput.Buttons.Set(PlayerButtons.Jump, false);
                     playerInput.Buttons.Set(PlayerButtons.Dash, false);
                     playerInput.Buttons.Set(PlayerButtons.Aim, false);
@@ -97,6 +101,7 @@ namespace September.Common
                     playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Ability3, playerActions.Ability3.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Shooting, playerActions.Shooting.IsPressed());
                 }
                 else
                 {
@@ -105,6 +110,7 @@ namespace September.Common
                     playerInput.Buttons.Set(PlayerButtons.Ability2, false);
                     playerInput.Buttons.Set(PlayerButtons.Ability3, false);
                     playerInput.Buttons.Set(PlayerButtons.Interact, false);
+                    playerInput.Buttons.Set(PlayerButtons.Shooting, false);
                 }
 
                 // その他の入力（常に有効）
