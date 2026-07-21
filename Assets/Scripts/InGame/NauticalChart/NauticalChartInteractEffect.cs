@@ -1,6 +1,5 @@
 using Fusion;
 using InGame.Interact;
-using NaughtyAttributes;
 using UnityEngine;
 
 namespace InGame.Exhibit
