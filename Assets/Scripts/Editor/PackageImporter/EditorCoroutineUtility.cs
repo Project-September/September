@@ -1,10 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEditor;
 
 namespace September.Editor.PackageImporter
 {
+    /// <summary>
+    /// UnityEditor上でIEnumeratorベースの処理を実行するための簡易ユーティリティ
+    /// EditorWindowはMonoBehaviourではない＝標準のStartCoroutineは使わない
+    /// EditorApplication.updateを使って自前でMoveNextを回す
+    /// ネストしたyield return（子コルーチン）には対応していない
+    /// 呼び出し側→while(!op.isDone) yield return null; のような単純な待機のみで使う
+    /// </summary>
     internal static class EditorCoroutineUtility
     {
         private static readonly List<IEnumerator> _routines = new List<IEnumerator>();
@@ -18,7 +24,7 @@ namespace September.Editor.PackageImporter
 
             if (!_subscribed)
             {
-                EditorApplication.update += UpdateRowSource;
+                EditorApplication.update += Update;
                 _subscribed = true;
             }
         }

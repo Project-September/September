@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using UnityEngine;
 
@@ -89,7 +88,7 @@ namespace September.Editor.PackageImporter
 
         public static void Update(string fileId, string fileName, string importedModifiedTime)
         {
-            var record = Find(filedId);
+            var record = Find(fileId);
             if (record == null)
             {
                 record = new ImportRecord { fileId = fileId };

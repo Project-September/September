@@ -1,27 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.WebSockets;
-using System.Numerics;
 using UnityEditor;
 using UnityEngine;
 
- namespace September.Editor.PackageImporter
+namespace September.Editor.PackageImporter
 {
     public class PackageImporter_window : EditorWindow
     {
-        private const string PrefApiKey = "GDPI_ApiKey";
+        private const string PrefWebAppUrl = "GDPI_WebAppUrl";
         private const string PrefFolderId = "GDPI_FolderId";
         private const string PrefInteractive = "GDPI_Interactive";
 
         private static readonly Color UpdatedColor = new Color(1f, 0.92f, 0.35f); // 更新ありの色ダヨ
-        private static readonly Color NormalColor = Color.White; // 最新の色ダヨ
+        private static readonly Color NormalColor = Color.white; // 最新の色ダヨ
 
-        private string _apiKey = "";
+        private string _webAppUrl = "";
         private string _folderId = "";
         private bool _interactiveImport;
         private bool _showSettings = true;
@@ -38,8 +34,8 @@ using UnityEngine;
         [MenuItem("September/Package Importer")]
         public static void ShowWindow()
         {
-            var window = GetWindow<PackageImporterWindow>("PackageImporter");
-            window.miniSize = new Vector2(480, 360);
+            var window = GetWindow<PackageImporter_window>("PackageImporter");
+            window.minSize = new Vector2(480, 360);
         }
 
         private void OnEnable()
@@ -52,19 +48,19 @@ using UnityEngine;
 
             AssetDatabase.importPackageCompleted += OnImportPackageCompleted;
             AssetDatabase.importPackageFailed += OnImportPackageFailed;
-            AssetDatabase.importPackageCompleted += OnImportPackageCancelled;
+            AssetDatabase.importPackageCancelled += OnImportPackageCancelled;
         }
 
         private void OnDisable()
         {
             AssetDatabase.importPackageCompleted -= OnImportPackageCompleted;
             AssetDatabase.importPackageFailed -= OnImportPackageFailed;
-            AssetDatabase.importPackageCompleted -= OnImportPackageCancelled;
+            AssetDatabase.importPackageCancelled -= OnImportPackageCancelled;
         }
 
         private void OnGUI()
         {
-            DrawSetting();
+            DrawSettings();
 
             EditorGUILayout.Space();
 
@@ -112,7 +108,7 @@ using UnityEngine;
                 EditorPrefs.SetBool(PrefInteractive, _interactiveImport);
             }
 
-            EditorGUI.HelpBox(
+            EditorGUILayout.HelpBox(
                 "AppsScript/Code.gs をGoogle Apps Scriptプロジェクトとしてデプロイし、" + 
                 "発行されたWebアプリのURLを入力して下さい（APIキーや請求先アカウントの設定は不要です",
                 MessageType.None);
@@ -133,7 +129,7 @@ using UnityEngine;
                 Color bgColor = updated ? UpdatedColor : NormalColor;
 
                 Rect rowRect = EditorGUILayout.BeginVertical(GUILayout.MinHeight(60));
-                if (EventArgs.current.type == EventType.Repaint)
+                if (Event.current.type == EventType.Repaint)
                 {
                     EditorGUI.DrawRect(rowRect, bgColor);
                 }
@@ -175,7 +171,11 @@ using UnityEngine;
             if (record == null || string.IsNullOrEmpty(record.importedModifiedTime)) return true;
 
             bool cloudParsed = DateTime.TryParse(
-                file.modifiedTime, CultureInfo.InvariantCulture, 
+                file.modifiedTime, CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind, out var cloudTime
+            );
+            bool importedParsed = DateTime.TryParse(
+                record.importedModifiedTime, CultureInfo.InvariantCulture, 
                 DateTimeStyles.RoundtripKind, out var importedTime
             );
 
@@ -233,7 +233,7 @@ using UnityEngine;
             ));
         }
 
-        private void ImportSingle(DriveInfo file)
+        private void ImportSingle(DriveFileInfo file)
         {
             _isBusy = true;
             _statusMessage = $"{file.name} をダウンロードしています...";
@@ -244,11 +244,11 @@ using UnityEngine;
                 _webAppUrl,
                 file,
                 tempPath,
-                onSuccess: Path =>
+                onSuccess: savedPath =>
                 {
                     _statusMessage = $"{file.name} をImportしています...";
-                    _pendingImports[Path.GetFileNameWithoutExtension(path)] = file;
-                    AssetDatabase.ImportPackage(Path, _interactiveImport);
+                    _pendingImports[Path.GetFileNameWithoutExtension(savedPath)] = file;
+                    AssetDatabase.ImportPackage(savedPath, _interactiveImport);
                     _isBusy = false;
                     Repaint();
                 },
@@ -292,11 +292,11 @@ using UnityEngine;
                 _webAppUrl,
                 file,
                 tempPath,
-                onSuccess: Path =>
+                onSuccess: savedPath =>
                 {
-                    _pendingImports[Path.GetFileNameWithoutExtension(path)] = file;
+                    _pendingImports[Path.GetFileNameWithoutExtension(savedPath)] = file;
                     _pendingBulkContinue = true;
-                    AssetDatabase.ImportPackage(Path, _interactiveImport);
+                    AssetDatabase.ImportPackage(savedPath, _interactiveImport);
                 },
                 onError: error =>
                 {
@@ -355,7 +355,7 @@ using UnityEngine;
             Repaint();
         }
 
-        private static string SanitizedFileName(string name)
+        private static string SanitizeFileName(string name)
         {
             foreach (char c in Path.GetInvalidFileNameChars())
             {
