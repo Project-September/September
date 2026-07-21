@@ -9,26 +9,26 @@ using System.Collections.Generic;
 /// <summary> 具体的な霧の処理するクラス </summary>
 public class ConcreteFogController : MonoBehaviour, IFogController
 {
-    [Header("嵐Prefab")]
+    [Header("Prefab参照")]
     [SerializeField] private Material _stormSkyboxMaterial;
-
-    [Header("霧Prefab")]
-    [SerializeField] private Image[] _fogPrefab;
-
-    [Header("雷Prefab")]
+    [SerializeField] private GameObject[] _fogPrefab;
     [SerializeField] private GameObject _thunderPrefab;
 
-    [Header("霧のアニメーション設定")]
+    [Header("霧の設定")]
+    [Tooltip("霧のアニメーション開始までの遅延時間")]
+    [SerializeField] private float _fogAnimInterval = 2.0f;
+    [Tooltip("霧のフェードアウト時間")]
+    [SerializeField] private float _fogFadeOutTime = 1.0f;
+    [Tooltip("霧のY座標移動")]
     [SerializeField] private float _fogMoveY = -3.0f;
-    [SerializeField] private float _fogDelayAnimTime = 2.0f; // 次の霧のアニメーション開始までの遅延時間
-    [SerializeField] private float _fogAnimTime = 1.0f;　// 霧のアニメーション時間
-    [SerializeField] private float _fogLifeTime = 3.0f;　// 霧の寿命時間
-    [SerializeField] private float _fogDelayLifeTime = 1.0f; // 次の霧が消滅するまでの遅延時間
+    [Tooltip("霧が消滅してから次の霧が表示されるまでの遅延時間")]
+    [SerializeField] private float _nextFogInterval = 1.0f;
 
     [Header("雷の設定")]
     [SerializeField] private float _thunderLifeTime = 5.0f;
-    [SerializeField] private float _minRadius;
-    [SerializeField] private float _maxRadius;
+    [Tooltip("落下範囲")]
+    [SerializeField] private float _minRadius; // 雷の落下範囲の最小値(船の範囲より大きい)
+    [SerializeField] private float _maxRadius; // 雷の落下範囲の最大値
 
     CancellationTokenSource _cts;
 
@@ -60,10 +60,10 @@ public class ConcreteFogController : MonoBehaviour, IFogController
     {
         for (int i = 0; i < _fogPrefab.Length; i++)
         {
-            Image fogInstance = Instantiate(_fogPrefab[i]);
-            _fogPrefab[i].DOFade(0, _fogAnimTime).SetDelay(_fogDelayAnimTime);
-            _fogPrefab[i].transform.DOMoveY(_fogMoveY, _fogAnimTime).SetDelay(_fogDelayAnimTime);
-            Destroy(fogInstance, _fogLifeTime);
+            GameObject fogInstance = Instantiate(_fogPrefab[i]);
+            fogInstance.GetComponent<Image>().DOFade(0, _fogFadeOutTime).SetDelay(_fogAnimInterval);
+            fogInstance.transform.DOMoveY(_fogMoveY, _fogFadeOutTime).SetDelay(_fogAnimInterval);
+            Destroy(fogInstance, _fogAnimInterval + _fogFadeOutTime);
         }
     }
 
@@ -71,7 +71,7 @@ public class ConcreteFogController : MonoBehaviour, IFogController
     private async UniTaskVoid PlayFogAsync()
     {
         FogAnim();
-        await UniTask.WaitForSeconds(_fogDelayLifeTime, cancellationToken: _cts.Token);
+        await UniTask.WaitForSeconds(_nextFogInterval, cancellationToken: _cts.Token);
     }
 
     public void ShowFog()
