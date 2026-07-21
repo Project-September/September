@@ -40,8 +40,14 @@ namespace InGame.Player
 
         public void Start()
         {
-            _playerRespawn.OnOutFieldEvent += () => IsControlLock(true);
-            _playerRespawn.OnRevivalFieldEvent += () => IsControlLock(false);
+            _playerRespawn.OnOutFieldEvent += () =>
+            {
+                IsMovable = false;
+            };
+            _playerRespawn.OnRevivalFieldEvent += () =>
+            {
+                IsMovable = true;
+            };
             _playerRespawn.OnRevivalFieldEvent += () => Respawn();
         }
 
@@ -59,6 +65,7 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
+        [Networked, HideInInspector] public NetworkBool IsMovable { get; private set; } = true;
 
         public override void Spawned()
         {
@@ -152,7 +159,7 @@ namespace InGame.Player
             // プレイヤーの入力の管理
             if (_playerInputManager != null && _playerInputManager.GetPlayerInput(out var input))
             {
-                if (!IsStun && _playerControlState == PlayerControlState.Normal)
+                if (!IsStun && IsMovable && _playerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する_playerInputManager
                     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
@@ -186,7 +193,7 @@ namespace InGame.Player
         /// <summary> 気絶が終わったとき </summary>
         void Restart()
         {
-            IsControlLock(false);
+            _playerHealth.IsInvincible = false; 
             IsStun = false;
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
@@ -194,16 +201,11 @@ namespace InGame.Player
 
         void OnDeath(HitData lastHitData)
         {
-            IsControlLock(true);
+            _playerHealth.IsInvincible = true;
             IsStun = true;
             // ビルドの減衰分を乗算
             _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             _playerEffectController.PlayStunEffect();
-        }
-
-        private void IsControlLock(bool enabled)
-        {
-            _playerHealth.IsInvincible = enabled;
         }
 
         public void SetControlState(PlayerControlState controlState)

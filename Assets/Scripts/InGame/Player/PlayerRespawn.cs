@@ -14,7 +14,8 @@ namespace InGame.Player
 
         public event Action OnOutFieldEvent;
         public event Action OnRevivalFieldEvent;
-        public void Update()
+
+        private void Update()
         {
             if (_isOutField) return;
             if (this.transform.position.y <= _outFieldHeight)
@@ -23,9 +24,9 @@ namespace InGame.Player
             }
         }
 
-        public async void OnOutField()
+        private async void OnOutField()
         {
-            OnOutFieldEvent.Invoke();
+            OnOutFieldEvent?.Invoke();
             _isOutField = true;
             UIController.I.ShowOutFieldUI(true);
 
@@ -34,10 +35,10 @@ namespace InGame.Player
             OnRevive();
         }
 
-        public void OnRevive()
+        private void OnRevive()
         {
             UIController.I.ShowOutFieldUI(false);
-            OnRevivalFieldEvent.Invoke();
+            OnRevivalFieldEvent?.Invoke();
             _isOutField = false;
         }
     }

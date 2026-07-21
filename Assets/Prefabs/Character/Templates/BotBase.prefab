@@ -131,6 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerInputManager: {fileID: 3166189176791333026}
+  _playerRespawn: {fileID: 7767279481967244635}
   _colliderObj: {fileID: 1473268200689759529}
   _meshObj: {fileID: 1473268200689759529}
   _stunTime: 8
@@ -140,6 +141,8 @@ MonoBehaviour:
   _playerStatus: {fileID: 3006585129494599243}
   _IsStun:
     _value: 0
+  _IsMovable:
+    _value: 1
 --- !u!114 &3523054048734839531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,6 +235,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 587e83a63041ba6409720410fb73af1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7767279481967244635 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 846463964584838234, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 6950696846245884161}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1473268200689759529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52d05ab585b5d0e4987193858b7b76ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &9071210672574097550 stripped
