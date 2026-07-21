@@ -67,7 +67,6 @@ namespace September.InGame.Exhibit
 			Pitch = Mathf.Clamp(Pitch, _pitchMinMax.x, _pitchMinMax.y);
 			Yaw += yawInput * deltaTime * sens;
 			Yaw = Mathf.Clamp(Yaw, _yawMinMax.x,_yawMinMax.y);
-			
 		}
 
 		public Transform GetCameraTf()
