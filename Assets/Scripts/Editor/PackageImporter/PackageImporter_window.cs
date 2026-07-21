@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -126,7 +127,241 @@ using UnityEngine;
                 EditorGUILayout.LabelField("パッケージがありません　リフレッシュしてください");
             }
 
-            foreach (var)
+            foreach (var file in _driveFiles)
+            {
+                bool updated = IsUpdated(file);
+                Color bgColor = updated ? UpdatedColor : NormalColor;
+
+                Rect rowRect = EditorGUILayout.BeginVertical(GUILayout.MinHeight(60));
+                if (EventArgs.current.type == EventType.Repaint)
+                {
+                    EditorGUI.DrawRect(rowRect, bgColor);
+                }
+
+                GUILayout.Space(4);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(6);
+
+                EditorGUILayout.BeginVertical();
+                EditorGUILayout.LabelField(file.name, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField($"更新日時: {FormatDate(file.modifiedTime)} サイズ: {FormatSize(file.size)}");
+                EditorGUILayout.LabelField(updated ? "状態: 更新あり" : "状態: 最新");
+                EditorGUILayout.EndVertical();
+
+                GUILayout.FlexibleSpace();
+
+                using (new EditorGUI.DisabledScope(_isBusy))
+                {
+                    if (GUILayout.Button("Import", GUILayout.Width(80), GUILayout.Height(36)))
+                    {
+                        ImportSingle(file);
+                    }
+                }
+
+                GUILayout.Space(6);
+                EditorGUILayout.EndHorizontal();
+                GUILayout.Space(4);
+                EditorGUILayout.EndVertical();
+
+                GUILayout.Space(3);
+            }
+
+            EditorGUILayout.EndScrollView();
+        }
+
+        private bool IsUpdated(DriveFileInfo file)
+        {
+            var record = PackageImportCache.Find(file.id);
+            if (record == null || string.IsNullOrEmpty(record.importedModifiedTime)) return true;
+
+            bool cloudParsed = DateTime.TryParse(
+                file.modifiedTime, CultureInfo.InvariantCulture, 
+                DateTimeStyles.RoundtripKind, out var importedTime
+            );
+
+            if (cloudParsed && importedParsed)
+            {
+                return cloudTime > importedTime;
+            }
+
+            // パース不能な場合　文字列比較にフォールバック
+            return file.modifiedTime != record.importedModifiedTime;
+        }
+
+        private static string FormatDate(string iso)
+        {
+            if (DateTime.TryParse(iso, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt))
+            {
+                return dt.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
+            }
+            return iso;
+        }
+
+        private static string FormatSize(string sizeStr)
+        {
+            if (long.TryParse(sizeStr, out long bytes))
+            {
+                double mb = bytes / 1024.0 / 1024.0;
+                return $"{mb:0.0} MB";
+            }
+            return "-";
+        }
+
+        private void RefreshList()
+        {
+            _isBusy = true;
+            _statusMessage = "更新を確認中...";
+
+            EditorCoroutineUtility.Start(AppsScriptClient.ListUnityPackages(
+                _webAppUrl,
+                _folderId,
+                onSuccess: files =>
+                {
+                    _driveFiles = files.OrderBy(f => f.name).ToList();
+                    _isBusy = false;
+                    _statusMessage = $"{_driveFiles.Count}件のパッケージを取得しました";
+
+                    Repaint();
+                },
+                onError: error =>
+                {
+                    _isBusy = false;
+                    _statusMessage = error;
+                    Debug.LogError($"[PackageImporter] {error}");
+                    Repaint();
+                }
+            ));
+        }
+
+        private void ImportSingle(DriveInfo file)
+        {
+            _isBusy = true;
+            _statusMessage = $"{file.name} をダウンロードしています...";
+
+            string tempPath = Path.Combine(Path.GetTempPath(), $"{file.id}_{SanitizeFileName(file.name)}");
+
+            EditorCoroutineUtility.Start(AppsScriptClient.DownloadFile(
+                _webAppUrl,
+                file,
+                tempPath,
+                onSuccess: Path =>
+                {
+                    _statusMessage = $"{file.name} をImportしています...";
+                    _pendingImports[Path.GetFileNameWithoutExtension(path)] = file;
+                    AssetDatabase.ImportPackage(Path, _interactiveImport);
+                    _isBusy = false;
+                    Repaint();
+                },
+                onError: error =>
+                {
+                    _isBusy = false;
+                    _statusMessage = error;
+                    Debug.LogError($"[PackageImporter] {error}");
+                    Repaint();
+                }
+            ));
+        }
+
+        private void ImportAllUpdated()
+        {
+            var targets = _driveFiles.Where(IsUpdated).ToList();
+            if (targets.Count == 0) return;
+
+            _bulkQueue = new Queue<DriveFileInfo>(targets);
+            _isBusy = true;
+            ProcessBulkQueue();
+        }
+
+        private void ProcessBulkQueue()
+        {
+            if (_bulkQueue.Count == 0)
+            {
+                _isBusy = false;
+                _statusMessage = "一括Importが完了しました";
+                Repaint();
+                return;
+            }
+
+            var file = _bulkQueue.Dequeue();
+            _statusMessage = $"{file.name} をダウンロードしています...(残り{_bulkQueue.Count + 1}件) ";
+            Repaint();
+
+            string tempPath = Path.Combine(Path.GetTempPath(), $"{file.id}_{SanitizeFileName(file.name)}");
+
+            EditorCoroutineUtility.Start(AppsScriptClient.DownloadFile(
+                _webAppUrl,
+                file,
+                tempPath,
+                onSuccess: Path =>
+                {
+                    _pendingImports[Path.GetFileNameWithoutExtension(path)] = file;
+                    _pendingBulkContinue = true;
+                    AssetDatabase.ImportPackage(Path, _interactiveImport);
+                },
+                onError: error =>
+                {
+                    Debug.LogError($"[PackageImporter] {error}");
+                    _statusMessage = error;
+                    // 失敗しても次のパッケージ処理へ進む
+                    ProcessBulkQueue();
+                }
+            ));
+        }
+
+        private void OnImportPackageCompleted(string packageName)
+        {
+            if (_pendingImports.TryGetValue(packageName, out var file))
+            {
+                PackageImportCache.Update(file.id, file.name, file.modifiedTime);
+                _pendingImports.Remove(packageName);
+                _statusMessage = $"{file.name} のImportが完了しました";
+            }
+
+            if (_pendingBulkContinue)
+            {
+                _pendingBulkContinue = false;
+                ProcessBulkQueue();
+            }
+
+            Repaint();
+        }
+
+        private void OnImportPackageFailed(string packageName, string errorMessage)
+        {
+            _pendingImports.Remove(packageName);
+            _statusMessage = $"Importに失敗しました: {errorMessage}";
+            Debug.LogError($"[PackageImporter] Import失敗 ({packageName}): {errorMessage}");
+
+            if (_pendingBulkContinue)
+            {
+                _pendingBulkContinue = false;
+                ProcessBulkQueue();
+            }
+
+            Repaint();
+        }
+
+        private void OnImportPackageCancelled(string packageName)
+        {
+            _pendingImports.Remove(packageName);
+            _statusMessage = $"Importがキャンセルされました: {packageName}";
+
+            if (_pendingBulkContinue)
+            {
+                _pendingBulkContinue = false;
+                ProcessBulkQueue();
+            }
+
+            Repaint();
+        }
+
+        private static string SanitizedFileName(string name)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                name = name.Replace(c, '_');
+            }
+            return name;
         }
     }
 }
