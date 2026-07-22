@@ -13541,6 +13541,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 843966978322878472, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 843966978322878472, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 843966978322878472, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1844372417076586983, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _faint
       value: 
@@ -13683,7 +13699,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883945]._button
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883942].IsEnabled
@@ -13969,9 +13985,17 @@ PrefabInstance:
       propertyPath: 'NetworkedBehaviours.Array.data[1]'
       value: 
       objectReference: {fileID: 1809797288821857153}
-    - target: {fileID: 7020943087661863767, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _requiredScore
-      value: -2147483648
+    - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7325268686366126974, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_PlayableAsset
