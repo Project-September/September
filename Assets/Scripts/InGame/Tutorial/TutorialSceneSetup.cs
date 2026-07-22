@@ -1,20 +1,16 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using ExitGames.Client.Photon.StructWrapping;
 using Fusion;
-using Fusion.Sockets;
 using InGame.Player;
 using September.Common;
 using September.InGame.UI;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
 namespace September.InGame.Tutorial
 {
-    public class TutorialSceneSetup : MonoBehaviour, INetworkRunnerCallbacks
+    public class TutorialSceneSetup : MonoBehaviour
     {
         [SerializeField] private TutorialManager _tutorialManager;
         [SerializeField] private NetworkPrefabRef _playerPrefab;
@@ -41,7 +37,6 @@ namespace September.InGame.Tutorial
             Debug.Log($"[Tutorial] _runner.IsRunning: {_runner?.IsRunning}");
             if (_runner != null && _runner.IsRunning)
             {
-                _runner.AddCallbacks(this);
                 _runner.ProvideInput = true;
                 UISet();
                 SpawnPlayer(_runner, _runner.LocalPlayer).Forget();
@@ -57,7 +52,6 @@ namespace September.InGame.Tutorial
 
             // Runnerの設定
             _runner.ProvideInput = true;
-            _runner.AddCallbacks(this);
             UISet();
             StartNetworkGame().Forget();
         }
@@ -151,13 +145,6 @@ namespace September.InGame.Tutorial
             }
         }
 
-
-        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-        {
-            Debug.Log($"[Tutorial] Shutdown: {shutdownReason}");
-            _runner?.RemoveCallbacks(this);
-        }
-
         /// <summary>
         /// 全クライアントの入力状態を切り替えるRPC
         /// </summary>
@@ -168,25 +155,5 @@ namespace September.InGame.Tutorial
             GameInput.I.ToggleActionInput(actionInputEnabled);
             GameInput.I.ToggleLookInput(lookInputEnabled);
         }
-
-        public void OnInput(NetworkRunner runner, NetworkInput input) { }
-        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
-        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-        public void OnConnectedToServer(NetworkRunner runner) { }
-        public void OnDisconnectedFromServer(NetworkRunner runner) { }
-        public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
-        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
-        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-        public void OnSceneLoadDone(NetworkRunner runner) { }
-        public void OnSceneLoadStart(NetworkRunner runner) { }
-        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
-        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
-        public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
     }
 }
