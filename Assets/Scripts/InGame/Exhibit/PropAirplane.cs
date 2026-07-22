@@ -12,7 +12,6 @@ using TMPro;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 using CRISound;
-using Cysharp.Threading.Tasks;
 using September.InGame.UI;
 
 namespace InGame.Exhibit
@@ -48,7 +47,8 @@ namespace InGame.Exhibit
         [SerializeField] private ParticleSystem _bulletMark;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _gunMaxDistance;
-        [SerializeField] private LayerMask _gunLayerMask = ~0;
+        [SerializeField] private LayerMask _shootingTargetLayerMask = ~0;
+        [SerializeField] private LayerMask _bulletHitLayerMask = ~0;
         [SerializeField] private float _castRadius;
         [Header("Debug")] [SerializeField] private TMP_Text _velocityText;
         [SerializeField] private TMP_Text _forwardSpeedText;
@@ -98,6 +98,7 @@ namespace InGame.Exhibit
         [SerializeField] private bool _isSpawned = false;
 
         private bool _isEnd;
+
         public override void Spawned()
         {
             _isSpawned = false;
@@ -312,7 +313,7 @@ namespace InGame.Exhibit
             _machineGunTimer = _fireInterval;
             var hits = new RaycastHit[20];
             var num = Physics.SphereCastNonAlloc(_firePoint.position, _castRadius, transform.forward, hits,
-                _gunMaxDistance, _gunLayerMask);
+                _gunMaxDistance, _shootingTargetLayerMask);
             for (int i = 0; i < num; i++)
             {
                 if(hits[i].point == Vector3.zero) continue;
@@ -333,7 +334,7 @@ namespace InGame.Exhibit
 
             foreach (var muzzle in _muzzles)
             {
-                var cast = Physics.Raycast(muzzle.position, transform.forward,out var info,_gunMaxDistance);
+                var cast = Physics.Raycast(muzzle.position, transform.forward, out var info, _gunMaxDistance, _bulletHitLayerMask);
                 RPC_PlayEffect(muzzle.position, info.point);
             }
         }
