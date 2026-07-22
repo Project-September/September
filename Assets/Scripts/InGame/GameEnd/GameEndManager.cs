@@ -1,3 +1,4 @@
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using September.Common;
 using September.InGame.Common;
@@ -39,37 +40,15 @@ namespace September.InGame
 
         private static bool BuildGameResultInfo()
         {
-            var rankingPolicy = StaticServiceLocator.Instance.Get<InGameManager>().GameRule.RankingPolicy;
-            var builder = new GameResultInfoBuilder(rankingPolicy);
+            var gameRule = StaticServiceLocator.Instance.Get<InGameManager>().GameRule;
+            var builder = new GameResultFactory(gameRule.RankingPolicy, gameRule.GameResultScorePolicy);
 
             var db = PlayerDatabase.Instance;
-            if (!db)
-                return false;
+            if (!db) return false;
 
-            if (!db.PlayerDataDic.TryGet(db.Runner.LocalPlayer, out var localPlayerData))
-            {
-                Debug.LogError("No local player data found");
-                return false;
-            }
+            GameResultInfo gameResultInfo = builder.CreateResult(db.Runner, MapType.Museum);
 
-            foreach (var kvp in db.PlayerDataDic)
-            {
-                var d = kvp.Value;
-                var player = new PlayerResultInfoBuilder();
-                player.SetPlayerName(d.DisplayNickName);
-                player.SetCharacterType(d.CharacterType);
-                player.SetTotalScore(d.Score);
-                player.SetIsOgre(d.IsOgre);
-                player.SetIsSelf(d.DisplayNickName == localPlayerData.DisplayNickName);
-                player.SetDamage(d.DamageDealt, d.DamageReceived);
-                player.SetOgreCount(d.OgreCount);
-                player.SetTotalInteractCount(d.TotalInteractCount);
-
-                builder.AddPlayer(player.BuildInstance());
-            }
-
-            builder.SetStageName("Field");
-            InGameResultContainer.Set(builder.BuildInstance());
+            InGameResultContainer.Set(gameResultInfo);
             return true;
         }
     }
