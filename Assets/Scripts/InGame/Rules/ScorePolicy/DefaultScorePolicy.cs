@@ -1,7 +1,7 @@
 using Fusion;
 using September.Common;
 
-namespace September.NewResult.Data.ScorePolicy
+namespace September.InGame.Rules.ScorePolicy
 {
     public class DefaultScorePolicy : IGameResultScorePolicy
     {

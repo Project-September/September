@@ -1,6 +1,6 @@
 using Fusion;
 
-namespace September.NewResult.Data.ScorePolicy
+namespace September.InGame.Rules.ScorePolicy
 {
     public interface IGameResultScorePolicy
     {

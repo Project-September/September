@@ -5,7 +5,7 @@ using InGame.Jewelry.Common;
 using September.Common;
 using UnityEngine;
 
-namespace September.NewResult.Data.ScorePolicy
+namespace September.InGame.Rules.ScorePolicy
 {
     public class JewelryScorePolicy : IGameResultScorePolicy
     {
