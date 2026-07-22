@@ -8,6 +8,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 142213178871829527, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1429866142053199352, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1429866142053199352, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1429866142053199352, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2346374098746059848, guid: 4e3821407920e444fa000f0867465095, type: 3}
       propertyPath: Flags
       value: 262145
@@ -168,6 +184,18 @@ PrefabInstance:
       propertyPath: _playerInputManager
       value: 
       objectReference: {fileID: 1352639085356625036}
+    - target: {fileID: 5606537923563830585, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5606537923563830585, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5606537923563830585, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5915242194361247198, guid: 4e3821407920e444fa000f0867465095, type: 3}
       propertyPath: Flags
       value: 262145
