@@ -1,4 +1,4 @@
-using NaughtyAttributes;
+using InGame.Jewelry;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +18,7 @@ namespace September.InGame.UI
         public VerticalLayoutGroup StatusUpUIRoot;
         public TextMeshProUGUI ScoreText;
         public Image IconImage;
+        public PlayerJewelryView JewelryView;
 
         [Header("Bars")]
         public Slider HpBar;
