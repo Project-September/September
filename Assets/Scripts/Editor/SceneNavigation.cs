@@ -18,6 +18,7 @@ public static class SceneNavigation
     {
         EditorSceneManager.SaveOpenScenes();
         OpenScene(1);
+        OpenScene(5, OpenSceneMode.Additive);
     }
 
     [MenuItem("Scene/ResultScene")]
@@ -41,12 +42,12 @@ public static class SceneNavigation
         OpenScene(4);
     }
 
-    private static void OpenScene(int sceneIndex)
+    private static void OpenScene(int sceneIndex, OpenSceneMode openMode = OpenSceneMode.Single)
     {
         string scenePath = SceneUtility.GetScenePathByBuildIndex(sceneIndex);
         if (!string.IsNullOrEmpty(scenePath))
         {
-            EditorSceneManager.OpenScene(scenePath);
+            EditorSceneManager.OpenScene(scenePath, openMode);
         }
     }
 }
