@@ -13,19 +13,26 @@ public static class SceneNavigation
         OpenScene(0);
     }
 
-    [MenuItem("Scene/GameScene")]
-    public static void Scene01()
+    [MenuItem("Scene/Map_Museum")]
+    public static void Museum()
     {
         EditorSceneManager.SaveOpenScenes();
         OpenScene(1);
         OpenScene(5, OpenSceneMode.Additive);
     }
 
-    [MenuItem("Scene/ResultScene")]
-    public static void Scene02()
+    [MenuItem("Scene/Map_Pirate")]
+    public static void Pirate()
     {
         EditorSceneManager.SaveOpenScenes();
-        OpenScene(2);
+        OpenScene(9);
+    }
+
+    [MenuItem("Scene/ResultScene")]
+    public static void Result()
+    {
+        EditorSceneManager.SaveOpenScenes();
+        OpenScene(7);
     }
 
     [MenuItem("Scene/DevStartInScene")]
