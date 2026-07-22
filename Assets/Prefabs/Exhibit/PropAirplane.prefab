@@ -1121,7 +1121,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4096
   m_ImplicitCom: 1
   m_ImplicitTensor: 0
   m_UseGravity: 0
@@ -1210,6 +1210,7 @@ MonoBehaviour:
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
+  _debug: 0
   _getOffPoint: {fileID: 4664626561920155601}
   _grav: 6
   _drag: {x: 0.3, y: 0.3, z: 0.1}
@@ -1241,9 +1242,12 @@ MonoBehaviour:
   _bulletMark: {fileID: 7762581465889203969, guid: 052631cb43762b9479c2428dc1d6ca4d, type: 3}
   _damageAmount: 10
   _gunMaxDistance: 1000
-  _gunLayerMask:
+  _shootingTargetLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  _bulletHitLayerMask:
+    serializedVersion: 2
+    m_Bits: 4095
   _castRadius: 3
   _velocityText: {fileID: 1464172462217974093}
   _forwardSpeedText: {fileID: 793880936398018537}
@@ -1280,7 +1284,7 @@ MonoBehaviour:
   _camera: {fileID: 3659471650815562422}
   _collideAgainst:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4095
   _cameraRadius: 0.1
   _motionDuration: 1
   _motionEase: 9
