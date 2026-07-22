@@ -7,6 +7,7 @@ using DG.Tweening;
 using Fusion;
 using GameEvent;
 using InGame.Player;
+using NaughtyAttributes;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
 using September.InGame.Performances;
@@ -26,6 +27,7 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
+        [SerializeField, Scene] private string[] _additiveLoadScenes;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
         private bool _hasRecordedPlayerSelection = false;
@@ -61,7 +63,9 @@ namespace September.Common
 
         private async UniTask Initialize()
         {
-            await Runner.LoadScene("Field", LoadSceneMode.Additive);
+            await UniTask.WhenAll(
+                _additiveLoadScenes.Select(scene => Runner.LoadScene(scene, LoadSceneMode.Additive).ToUniTask())
+            );
             await SpawnPlayers();
 
             // プレイヤーのキャラクター選択を一度だけ記録

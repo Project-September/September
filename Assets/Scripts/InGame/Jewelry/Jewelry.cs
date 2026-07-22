@@ -1,13 +1,13 @@
 using Fusion;
-using InGame.Player;
+using InGame.Jewelry.Common;
 using UnityEngine;
 
-namespace September.InGame.Jewelry
+namespace InGame.Jewelry
 {
     public class Jewelry : NetworkBehaviour, IJewelry
     {
-        [SerializeField] private int _score = 1;
+        [Header("この宝石のパラメータ群"), SerializeField] JewelryInfo _jewelryParams;
 
-        public int Score => _score;
+        public JewelryInfo JewelryParams => _jewelryParams;
     }
 }
