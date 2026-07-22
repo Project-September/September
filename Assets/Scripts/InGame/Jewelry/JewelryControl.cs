@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 
-namespace InGame
+namespace InGame.Jewelry
 {
     public class JewelryControl : NetworkBehaviour
     {

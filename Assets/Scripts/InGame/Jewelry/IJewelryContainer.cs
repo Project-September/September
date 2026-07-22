@@ -1,4 +1,4 @@
-namespace InGame.Player
+namespace InGame.Jewelry.Common
 {
     public interface IJewelryContainer
     {
@@ -16,10 +16,5 @@ namespace InGame.Player
         /// <param name="resultDropped">ドロップした宝石のデータを格納する配列（メソッド内から書き込み）</param>
         /// <returns>配列に書き込んだ数（配列のサイズより大きくなりません）</returns>
         public int DropJewelry(int dropAmount, IJewelry[] resultDropped = null);
-
-        /// <summary>
-        /// 現在所持している宝石の数
-        /// </summary>
-        public int JewelryCount { get; }
     }
 }
