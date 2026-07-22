@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0.01, y: 0.01}
+  m_SizeDelta: {x: 0, y: 0.2}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &1109022226917107273
 GameObject:
@@ -123,7 +123,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &7116631268190812810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,6 +158,7 @@ MonoBehaviour:
     _jewelryCountText: {fileID: 7713571824949355470}
   - _jewelryImage: {fileID: 4789616942701487072}
     _jewelryCountText: {fileID: 7933155151833248051}
+  _hideLocal: 1
 --- !u!114 &3057433584865446383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,7 +189,6 @@ GameObject:
   - component: {fileID: 8588264421980284856}
   - component: {fileID: 2293982945844473215}
   - component: {fileID: 4019898180518094863}
-  - component: {fileID: 3387773483825673665}
   m_Layer: 0
   m_Name: JewelryInfo
   m_TagString: Untagged
@@ -214,8 +214,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 2.392}
-  m_SizeDelta: {x: 0.01, y: 0}
+  m_AnchoredPosition: {x: 0, y: 2.4}
+  m_SizeDelta: {x: 0.7, y: 0.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2293982945844473215
 CanvasGroup:
@@ -246,29 +246,15 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: 0.3
+  m_ChildAlignment: 7
+  m_Spacing: 0.04
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &3387773483825673665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4150957951215439681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!1 &4452648753301181840
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,7 +345,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4258424295523176086
 RectTransform:
   m_ObjectHideFlags: 0
@@ -376,10 +362,10 @@ RectTransform:
   - {fileID: 4141067399021694249}
   m_Father: {fileID: 8588264421980284856}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0.01, y: 0.01}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: -0.25299996}
+  m_SizeDelta: {x: 0.7178, y: 0.2}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &7234807913866340132
 GameObject:

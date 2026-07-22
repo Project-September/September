@@ -20,11 +20,13 @@ namespace InGame.Jewelry
         }
 
         [SerializeField] JewelryUI[] _jewelryUIArray;
+        [SerializeField] private bool _hideLocal = true;
         Camera _camera;
 
         public override void Spawned()
         {
             _camera = Camera.main;
+            if (_hideLocal && Object.InputAuthority == Runner.LocalPlayer) gameObject.SetActive(false);
         }
 
         private void LateUpdate()
