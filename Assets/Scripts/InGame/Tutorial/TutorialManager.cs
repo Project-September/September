@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using InGame.Player;
 using TMPro;
+using UnityEngine.UI;
 
 namespace September.InGame.Tutorial
 {
@@ -14,6 +15,8 @@ namespace September.InGame.Tutorial
         [SerializeField] private GameObject _tutorialUI;
         [Header("説明文を表示するText")]
         [SerializeField] private TextMeshProUGUI _tutorialText;
+        [Header("説明UIを非表示にするボタン")]
+        [SerializeField] private Button _closeButton;
         [Header("アクションを完了する条件表示")]
         [SerializeField] private TextMeshProUGUI _actionConditionText;
         private int _currentActionIndex = 0;
@@ -33,6 +36,7 @@ namespace September.InGame.Tutorial
                 Action = OnCompleteCurrentAction,
                 TutorialUI = _tutorialUI,
                 TutorialText = _tutorialText,
+                CloseButton = _closeButton,
                 ActionConditionText = _actionConditionText
             };
         }

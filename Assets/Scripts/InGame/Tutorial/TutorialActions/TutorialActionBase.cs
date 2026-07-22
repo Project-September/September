@@ -1,8 +1,8 @@
-﻿using Cysharp.Threading.Tasks;
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 using InGame.Player;
+using September.Common;
 using TMPro;
 
 namespace September.InGame.Tutorial
@@ -16,6 +16,7 @@ namespace September.InGame.Tutorial
         public GameObject Player;
         public GameObject TutorialUI;
         public TextMeshProUGUI TutorialText;
+        public Button CloseButton;
         public TextMeshProUGUI ActionConditionText;
         public PlayerInputManager PlayerInputManager;
     }
@@ -23,6 +24,7 @@ namespace September.InGame.Tutorial
     [Serializable]
     public class TutorialActionBase
     {
+        [SerializeField] protected string _explanationText;
         [SerializeField] protected Sprite _explanationPicture;
         protected bool _isCompleted = false;
         protected TutorialActionData _actionData;
@@ -33,13 +35,23 @@ namespace September.InGame.Tutorial
             actionData.TutorialUI.SetActive(true);
             actionData.TutorialUI.GetComponent<Image>().sprite = _explanationPicture;
             _isActionStarted = true;
-            Cursor.visible = true;
+            CursorStateManager.ShowCursor();
+            actionData.CloseButton.onClick.AddListener(OnCloseButtonClicked);
         }
 
         public virtual void OnUpdate()
         {
             if (!_isActionStarted) return;
         }
-        public virtual void OnEndAction() { }
+
+        public virtual void OnCloseButtonClicked()
+        {
+            CursorStateManager.HideCursor();
+        }
+
+        public virtual void OnEndAction() 
+        {
+            _actionData.CloseButton.onClick.RemoveListener(OnCloseButtonClicked);
+        }
     }
 }
