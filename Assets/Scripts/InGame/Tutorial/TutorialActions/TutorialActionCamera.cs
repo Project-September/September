@@ -7,7 +7,6 @@ namespace September.InGame.Tutorial
     public class TutorialActionCamera : TutorialActionBase
     {
         [Header("カメラをリセットする回数"),SerializeField] private int _resetCount;
-        [SerializeField] private string _explanationText;
         private int _currentResetCount;
         public override void OnStart(TutorialActionData actionData) 
         {
