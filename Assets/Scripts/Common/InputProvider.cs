@@ -18,6 +18,7 @@ namespace September.Common
         Ability1,
         Ability2,
         Ability3,
+        Ultimate,
         Warp,
         AirplaneForward,
         AirPlaneBack,
@@ -117,6 +118,7 @@ namespace September.Common
                 playerInput.Buttons.Set(PlayerButtons.Warp, playerActions.Warp.IsPressed());
                 playerInput.Buttons.Set(PlayerButtons.AirplaneForward, playerActions.AirplaneForward.IsPressed());
                 playerInput.Buttons.Set(PlayerButtons.AirPlaneBack, playerActions.AirPlaneBack.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Ultimate, playerActions.Ultimate.IsPressed());
             }
             
             if (_mainCamera == null)
