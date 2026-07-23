@@ -5724,7 +5724,7 @@ MonoBehaviour:
   _camera: {fileID: 1140998407376993141}
   _collideAgainst:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4095
   _cameraRadius: 0.1
   _motionDuration: 0.3
   _motionEase: 9
@@ -7260,49 +7260,9 @@ PrefabInstance:
       value: JewelryCanvas
       objectReference: {fileID: 0}
     - target: {fileID: 3057433584865446383, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: Flags
-      value: 262145
-      objectReference: {fileID: 0}
-    - target: {fileID: 3057433584865446383, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
       propertyPath: SortKey
       value: 963172361
       objectReference: {fileID: 0}
-    - target: {fileID: 3057433584865446383, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3057433584865446383, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[0]'
-      value: 
-      objectReference: {fileID: 3676150022515654376}
-    - target: {fileID: 4258424295523176086, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4258424295523176086, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4258424295523176086, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6222114394795794407, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: Flags
-      value: 262145
-      objectReference: {fileID: 0}
-    - target: {fileID: 6222114394795794407, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: SortKey
-      value: 2415496538
-      objectReference: {fileID: 0}
-    - target: {fileID: 6222114394795794407, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7030438142900011129, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: m_PresetInfoIsWorld
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7278236405501402711, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -7312,11 +7272,11 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7278236405501402711, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: m_AnchoredPosition.y
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8588264421980284856, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
-      propertyPath: m_SizeDelta.y
+    - target: {fileID: 7278236405501402711, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8919970465301828923, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}

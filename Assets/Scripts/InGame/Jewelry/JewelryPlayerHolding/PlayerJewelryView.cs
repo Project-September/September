@@ -20,17 +20,11 @@ namespace InGame.Jewelry
         }
 
         [SerializeField] JewelryUI[] _jewelryUIArray;
-        Camera _camera;
+        [SerializeField] private bool _hideLocal = true;
 
         public override void Spawned()
         {
-            _camera = Camera.main;
-        }
-
-        private void LateUpdate()
-        {
-            // カメラに向ける
-            transform.forward = _camera.transform.forward * -1;
+            if (_hideLocal && Object.InputAuthority == Runner.LocalPlayer) gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -43,10 +37,18 @@ namespace InGame.Jewelry
             // 宝石の所持情報を満足に表示できない場合はreturn
             if (_jewelryUIArray == null
                 || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount) return;
+                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount)
+            {
+                Debug.LogWarning("宝石UIが不足しています");
+                return;
+            }
 
             var image = _jewelryUIArray[(int)jewelryType].JewelryImage;
-            if (image == null) return;
+            if (image == null)
+            {
+                Debug.LogWarning("Imageコンポーネントが見つかりませんでした");
+                return;
+            }
             image.sprite = sprite;
         }
 
@@ -60,10 +62,18 @@ namespace InGame.Jewelry
             // 宝石の所持情報を満足に表示できない場合はreturn
             if (_jewelryUIArray == null
                 || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount) return;
+                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount)
+            {
+                Debug.LogWarning("宝石UIが不足しています");
+                return;
+            }
 
             var text = _jewelryUIArray[(int)jewelryType].JewelryCountText;
-            if (text == null) return;
+            if (text == null)
+            {
+                Debug.LogWarning("テキストコンポーネントが見つかりませんでした");
+                return;
+            }
             text.text = "× " + count;
         }
     }

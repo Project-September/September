@@ -46,7 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816edc2fc85d0644bbcdb2811294fc4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _JewelryCounts: 0000000000000000
 --- !u!114 &6897165130390802129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59,7 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8db25dc8674859a408df950258dcc4ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerJewelryModel: {fileID: 11400000, guid: 6ff6f4e3875cc8644823a6ae43587b7e, type: 2}
+  _playerJewelryDefinition: {fileID: 11400000, guid: 6ff6f4e3875cc8644823a6ae43587b7e, type: 2}
   _playerJewelryRuntime: {fileID: 8992569451986281072}
   _playerJewelryView: {fileID: 0}
   _playerJewelryContainer: {fileID: 0}
