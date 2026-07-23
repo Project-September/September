@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 863474155446293771}
   - component: {fileID: 605949265976625825}
   - component: {fileID: -4283116534182985741}
-  - component: {fileID: 6425309163856342501}
   - component: {fileID: 5101475634166198175}
   - component: {fileID: 4565694175186777013}
   m_Layer: 0
@@ -99,7 +98,6 @@ MonoBehaviour:
   - {fileID: 3782169157196769243}
   - {fileID: 863474155446293771}
   - {fileID: -4283116534182985741}
-  - {fileID: 6425309163856342501}
   - {fileID: 5101475634166198175}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3782169157196769243
@@ -279,32 +277,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _barrel: {fileID: 285655025946979430}
   _rotateBase: {fileID: 2298891464602226638}
-  _cameraController: {fileID: 6425309163856342501}
+  _cameraController: {fileID: 4565694175186777013}
   _layerMask:
     serializedVersion: 2
     m_Bits: 128
---- !u!114 &6425309163856342501
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 518364684307869088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b18f84027b64ccb8b16459ea841ec60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _pivot: {fileID: 3813922952977508952}
-  _cam: {fileID: 1576128460117959270}
-  _sens: 10
-  _padSens: 50
-  _pitchMinMax: {x: -40, y: 40}
-  _yawMinMax: {x: -90, y: 90}
-  _collideAgainst:
-    serializedVersion: 2
-    m_Bits: 128
-  _cameraRadius: 0.1
+  _sens: 0
+  _padSens: 0
+  _playerOffset: 1
+  _useYawLimit: 0
+  _pitchLimit: {x: -40, y: 40}
+  _yawLimit: {x: -90, y: 90}
 --- !u!114 &5101475634166198175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,7 +300,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _waitCharacterTransform: {fileID: 2537115606131514651}
-  _cameraController: {fileID: 4565694175186777013}
+  _cameraController: {fileID: 1576128460117959270}
   _interactable: {fileID: 863474155446293771}
   _maxAmmo: 10
   _reloadTime: 1
@@ -329,7 +311,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 518364684307869088}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 549068b2e6fdfd442a5bba033df184c9, type: 3}
   m_Name: 
@@ -342,10 +324,11 @@ MonoBehaviour:
   _camera: {fileID: 1576128460117959270}
   _collideAgainst:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   _cameraRadius: 0.1
   _motionDuration: 0.6
   _motionEase: 9
+  DebugMessage: 0
 --- !u!1 &1455451939750372746
 GameObject:
   m_ObjectHideFlags: 0

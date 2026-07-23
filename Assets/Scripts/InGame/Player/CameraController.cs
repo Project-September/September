@@ -34,6 +34,9 @@ namespace InGame.Player
         private Vector3 _currentOffset;
         private Vector3 _defaultOffset;
         Tweener _offsetTweener;
+        
+        public float CameraPitch => _cameraPitch;
+        public float CameraYaw => _cameraYaw;
 
         public void Init(bool use)
         {
@@ -73,6 +76,15 @@ namespace InGame.Player
             
             _cameraPivot.rotation = Quaternion.Euler(_cameraPitch, _cameraYaw, 0);
         }
+
+        public void SetCameraRotate(float pitch, float yaw)
+        {
+            _cameraPitch = pitch;
+            _cameraPitch = Mathf.Clamp(_cameraPitch, -90 + _defaultPitch, 90 - _defaultPitch);
+            _cameraYaw = yaw;
+            _cameraYaw = ToAngle(_cameraYaw);
+            _cameraPivot.rotation = Quaternion.Euler(_cameraPitch, _cameraYaw, 0);
+        }
         
         /// <summary>
         /// カメラの水平方向（XZ）を返す
@@ -83,6 +95,11 @@ namespace InGame.Player
         /// カメラの右方向（XZ）を返す
         /// </summary>
         public Vector3 GetCameraRight() => _cameraTf.right.normalized;
+        
+        /// <summary>
+        /// カメラの現在位置を返す
+        /// </summary>
+        public Vector3 GetCameraPosition() => _cameraTf.position;
 
 
         /// <summary> 障害物に応じてカメラの距離を変える </summary>
