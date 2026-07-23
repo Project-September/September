@@ -28,5 +28,6 @@ public enum EffectType
     CooldownBig,
     CooldownPartition,
     CarDash,
+    JewelPickUp,
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
