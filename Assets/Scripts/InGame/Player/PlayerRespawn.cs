@@ -1,11 +1,12 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Fusion;
 using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Player
 {
-    public class PlayerRespawn : MonoBehaviour
+    public class PlayerRespawn : NetworkBehaviour
     {
         [SerializeField] private float _coolTime;
         [SerializeField] private float _outFieldHeight;
@@ -28,7 +29,11 @@ namespace InGame.Player
         {
             OnOutFieldEvent?.Invoke();
             _isOutField = true;
-            UIController.I.ShowOutFieldUI(true);
+
+            if (HasInputAuthority)
+            {
+                UIController.I.ShowOutFieldUI(true);
+            }
 
             await UniTask.WaitForSeconds(_coolTime);
 
@@ -37,7 +42,10 @@ namespace InGame.Player
 
         private void OnRevive()
         {
-            UIController.I.ShowOutFieldUI(false);
+            if (HasInputAuthority)
+            {
+                UIController.I.ShowOutFieldUI(false);
+            }
             OnRevivalFieldEvent?.Invoke();
             _isOutField = false;
         }
