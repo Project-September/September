@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Fusion;
+using InGame.Common;
 using UnityEngine;
 using September.Common;
 
@@ -9,6 +11,10 @@ namespace InGame.Player.Hatano
     /// </summary>
     public class HatanoAbilityStatusManagement : NetworkBehaviour
     {
+        [SerializeField] private AnimationClipPlayer _animClipPlayer;
+        [Header("切替アニメーション"), SerializeField] private AnimationClip _changeClip;
+        [Header("レーザー銃"), SerializeField] private GameObject _laser;
+        [Header("二丁拳銃"), SerializeField] private List<GameObject> _doubles;
         [Header("現在の選択中のAbility")]
         [Networked] private HatanoAbilityStatus _abilityStatus {get; set;}
         public HatanoAbilityStatus AbilityStatus => _abilityStatus;
@@ -26,7 +32,7 @@ namespace InGame.Player.Hatano
 
         public override void Spawned()
         {
-            _abilityStatus = HatanoAbilityStatus.None;
+            _abilityStatus = HatanoAbilityStatus.DoubleBarreledGun;
         }
 
         public override void FixedUpdateNetwork()
@@ -51,6 +57,8 @@ namespace InGame.Player.Hatano
                 if (HasStateAuthority)
                 {
                     _abilityStatus = next;
+                    _animClipPlayer.PlayClip(_changeClip);
+                    ChangeAbilityGun(next);
                 }
                 else
                 {
@@ -70,11 +78,9 @@ namespace InGame.Player.Hatano
         {
             return _abilityStatus switch
             {
-                HatanoAbilityStatus.None => HatanoAbilityStatus.DoubleBarreledGun,
                 HatanoAbilityStatus.DoubleBarreledGun => HatanoAbilityStatus.LaserGun,
                 HatanoAbilityStatus.LaserGun => HatanoAbilityStatus.RocketLauncher,
-                HatanoAbilityStatus.RocketLauncher => HatanoAbilityStatus.DoubleBarreledGun,
-                _ => HatanoAbilityStatus.None
+                HatanoAbilityStatus.RocketLauncher => HatanoAbilityStatus.DoubleBarreledGun
             };
         }
 
@@ -86,6 +92,27 @@ namespace InGame.Player.Hatano
         private void RPC_ChangeAbilityStatus(HatanoAbilityStatus status)
         {
             _abilityStatus = status;
+            ChangeAbilityGun(status);
+        }
+
+        /// <summary>
+        /// アビリティによって表示する銃を変更する
+        /// </summary>
+        /// <param name="status">変更後のアビリティ</param>
+        private void ChangeAbilityGun(HatanoAbilityStatus status)
+        {
+            // 表示する銃を変更
+            switch (status)
+            {
+                case HatanoAbilityStatus.LaserGun:
+                    _laser.SetActive(true);
+                    foreach (var d in _doubles) d.SetActive(false);
+                    break;
+                case HatanoAbilityStatus.DoubleBarreledGun:
+                    _laser.SetActive(false);
+                    foreach (var d in _doubles) d.SetActive(true);
+                    break;
+            }
         }
     }
 }

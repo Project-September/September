@@ -9,25 +9,17 @@ namespace InGame.Player.Ability.Effect.Shooting
     [Serializable]
     public abstract class ShootingAbilityBase : AbilityBase
     {
-        [Header("AnimationClipPlayer")]
-        [SerializeField] private AnimationClipPlayer _animationClipPlayer;
-        [Header("AimCameraController")]
-        [SerializeField] protected AimCameraController _aimCameraController;
+        [Header("AnimationClipPlayer"), SerializeField] private AnimationClipPlayer _animationClipPlayer;
+        [Header("AimCameraController"), SerializeField] protected AimCameraController _aimCameraController;
         //現在と最後の射撃ステートを比較して状態の管理を行う
-        [Header("射撃ステート（現在）")]
-        [SerializeField] protected ShootingStateType _shootingType;
-        [Header("射撃ステート（最後）")]
-        [SerializeField] protected ShootingStateType _lastShootingType;
+        [Header("射撃ステート（現在）"), SerializeField] protected ShootingStateType _shootingType;
+        [Header("射撃ステート（最後）"), SerializeField] protected ShootingStateType _lastShootingType;
         [Header("射撃Abilityの設定")]
-        [Header("射撃距離")]
-        [SerializeField] protected float _shootingDistance;
-        [Header("マズル（数に応じて追加）")]
-        [SerializeField] protected Transform[] _muzzlePos;
+        [Header("射撃距離"), SerializeField] protected float _shootingDistance;
+        [Header("マズル（数に応じて追加）"), SerializeField] protected Transform[] _muzzlePos;
         [Header("AnimationClip")]
-        [Header("構え")]
-        [SerializeField] private AnimationClip _stanceAnimationClip;
-        [Header("撃つ")] 
-        [SerializeField] private AnimationClip _shootAnimationClip;
+        [Header("構え"), SerializeField] private AnimationClip _stanceAnimationClip;
+        [Header("撃つ"), SerializeField] private AnimationClip _shootAnimationClip;
         
         private PlayerManager _playerManager;
 
@@ -42,7 +34,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// </summary>
         protected void ShootingInputJudgment()
         {
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            //_playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             //射撃ステートが構えの場合、射撃入力を受け付ける
             if (_shootingType == ShootingStateType.Stance)
             {
@@ -50,13 +42,13 @@ namespace InGame.Player.Ability.Effect.Shooting
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
                     OnShooting();
+                    _animationClipPlayer.PlayClip(_shootAnimationClip);
                 }
                 else //射撃入力がされていないときに行う処理
                 {
                     OnNoShooting();
+                    PlayStanceAnimation().Forget();
                 }
-                
-                PlayAnimation().Forget();
             }
 
             //構え入力が終了➤構える前の状態に戻す
@@ -68,6 +60,7 @@ namespace InGame.Player.Ability.Effect.Shooting
                 _shootingType = ShootingStateType.None;
                 _lastShootingType = ShootingStateType.None;
                 OnStopTheStance();
+                EndAnimation();
             }
         }
         
@@ -136,22 +129,29 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// </summary>
         protected virtual void OnStopTheStance(){}
 
-        private async UniTask PlayAnimation()
+        /// <summary>
+        /// 構えアニメーションを再生
+        /// </summary>
+        private async UniTask PlayStanceAnimation()
         {
-            // 構えアニメーションを再生
-            if (_shootingType == ShootingStateType.Stance)
+            var endType = await _animationClipPlayer.PlayClipAndWait(_stanceAnimationClip);
+            if (endType == EndClipType.Complete)
             {
                 _animationClipPlayer.PlayClip(_stanceAnimationClip);
             }
-            else if (_shootingType == ShootingStateType.Shooting) // 撃つアニメーションを再生
+            else
             {
-                // 撃つアニメーションの再生が終了するまで待機し、構えアニメーションを再生
-                var endType = await _animationClipPlayer.PlayClipAndWait(_shootAnimationClip);
-                if (endType == EndClipType.Complete)
-                {
-                    _animationClipPlayer.PlayClip(_stanceAnimationClip);
-                }
+                _animationClipPlayer.StopClip(_stanceAnimationClip);
             }
+        }
+
+        /// <summary>
+        /// アニメーションを停止
+        /// </summary>
+        private void EndAnimation()
+        {
+            _animationClipPlayer.StopClip(_stanceAnimationClip);
+            _animationClipPlayer.StopClip(_shootAnimationClip);
         }
     }
 }
