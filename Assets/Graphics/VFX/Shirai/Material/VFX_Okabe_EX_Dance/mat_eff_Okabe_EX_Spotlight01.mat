@@ -72,22 +72,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _BumpMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailAlbedoMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailMask:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailNormalMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _EmissionColorRamp:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -112,18 +96,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MetallicGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _OcclusionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -133,10 +105,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap3D:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -156,23 +124,8 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
     - _AlphaTransitionMapChannelsX: 0
     - _AlphaTransitionMapMode: 0
     - _AlphaTransitionMapOffsetXCoord: 0
@@ -227,13 +180,8 @@ Material:
     - _BaseMapToneMode: 0
     - _BaseMapToneShadows: 0.25
     - _BaseMapToneShadowsCoord: 0
-    - _Blend: 0
     - _BlendDst: 1
-    - _BlendModePreserveSpecular: 1
     - _BlendSrc: 5
-    - _BumpScale: 1
-    - _ClearCoatMask: 0
-    - _ClearCoatSmoothness: 0
     - _ColorCorrectionMode: 0
     - _Cull: 0
     - _Cutoff: 0.5
@@ -241,12 +189,8 @@ Material:
     - _DepthFadeFar: 10
     - _DepthFadeNear: 1
     - _DepthFadeWidth: 1
-    - _DetailAlbedoMapScale: 1
-    - _DetailNormalMapScale: 1
     - _DissolveSharpness: 0.29
     - _DissolveSharpnessSecondTexture: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
     - _EmissionAreaType: 0
     - _EmissionColorType: 0
     - _EmissionIntensity: 1
@@ -263,7 +207,6 @@ Material:
     - _EmissionMapRotationCoord: 0
     - _EmissionMapRowCount: 1
     - _EmissionMapSliceCount: 4
-    - _EnvironmentReflections: 1
     - _FlowIntensity: 1
     - _FlowIntensityCoord: 0
     - _FlowMapChannelsX: 0
@@ -273,9 +216,6 @@ Material:
     - _FlowMapRotation: 0
     - _FlowMapRotationCoord: 0
     - _FlowMapTarget: 1
-    - _GlossMapScale: 0
-    - _Glossiness: 0
-    - _GlossyReflections: 0
     - _InverseLuminanceTransparency: 0
     - _InverseRimTransparency: 1
     - _InverseTintRim: 0
@@ -285,9 +225,6 @@ Material:
     - _LuminanceTransparencyProgressCoord: 0
     - _LuminanceTransparencySharpness: 0.5
     - _LuminanceTransparencySharpnessCoord: 0
-    - _Metallic: 0
-    - _OcclusionStrength: 1
-    - _Parallax: 0.005
     - _ParallaxMapChannel: 0
     - _ParallaxMapMode: 0
     - _ParallaxMapOffsetXCoord: 0
@@ -301,7 +238,6 @@ Material:
     - _ParallaxMapTarget: 1
     - _ParallaxStrength: 0.3
     - _QueueOffset: 0
-    - _ReceiveShadows: 1
     - _RenderType: 2
     - _RimTransparencyEnabled: 1
     - _RimTransparencyProgress: 0.4
@@ -316,14 +252,8 @@ Material:
     - _ShadowCasterAlphaTestEnabled: 0
     - _ShadowCasterApplyVertexDeformation: 0
     - _ShadowCasterEnabled: 0
-    - _Smoothness: 0.5
-    - _SmoothnessTextureChannel: 0
     - _SoftParticlesEnabled: 1
     - _SoftParticlesIntensity: 1
-    - _SpecularHighlights: 1
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
     - _TintAreaMode: 1
     - _TintBlendRate: 1
     - _TintBlendRateCoord: 0
@@ -353,25 +283,21 @@ Material:
     - _VertexDeformationMapChannel: 0
     - _VertexDeformationMapOffsetXCoord: 0
     - _VertexDeformationMapOffsetYCoord: 0
-    - _WorkflowMode: 1
     - _ZTest: 4
     - _ZWrite: 0
     - _ZWriteOverride: -1
     m_Colors:
     - _AlphaTransitionMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _AlphaTransitionMapSecondTextureRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _BaseMapToneBrightsColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
     - _BaseMapToneDarktonesColor: {r: 0.24999997, g: 0.24999997, b: 0.24999997, a: 1}
     - _BaseMapToneHighlightsColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseMapToneMidtonesColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _BaseMapToneShadowsColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _FlowMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
-    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _TintColor: {r: 8, g: 8, b: 8, a: 1}
     - _TintMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
