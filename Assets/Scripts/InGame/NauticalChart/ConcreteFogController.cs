@@ -27,8 +27,12 @@ public class ConcreteFogController : MonoBehaviour, IFogController
     [Header("雷の設定")]
     [SerializeField] private float _thunderLifeTime = 5.0f;
     [Tooltip("落下範囲")]
-    [SerializeField] private float _minRadius; // 雷の落下範囲の最小値(船の範囲より大きい)
-    [SerializeField] private float _maxRadius; // 雷の落下範囲の最大値
+    [SerializeField] private float _minValueX;
+    [SerializeField] private float _maxValueX;
+    [SerializeField] private float _minValueY;
+    [SerializeField] private float _maxValueY;
+    [SerializeField] private float _minValueZ;
+    [SerializeField] private float _maxValueZ;
 
     CancellationTokenSource _cts;
 
@@ -49,8 +53,8 @@ public class ConcreteFogController : MonoBehaviour, IFogController
     {
         GameObject thunderInstance = Instantiate(_thunderPrefab);
 
-        //thunderInstance.transform.position.x = Random.Range(-_maxRadius, _maxRadius);
-        //thunderInstance.transform.position.z = Random.Range(-_maxRadius, _maxRadius);
+        thunderInstance.transform.position = new Vector3
+            (Random.Range(_minValueX, _maxValueX),Random.Range(_minValueY, _maxValueY),Random.Range(_minValueZ, _maxValueZ));
 
         Destroy(thunderInstance, _thunderLifeTime);
     }
@@ -94,9 +98,6 @@ public class ConcreteFogController : MonoBehaviour, IFogController
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _minRadius);
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _maxRadius);
     }
 }
