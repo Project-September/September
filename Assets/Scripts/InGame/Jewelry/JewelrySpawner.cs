@@ -18,6 +18,7 @@ namespace InGame.Jewelry
         [SerializeField] private Transform _spawnPredictionRange;
         [SerializeField] private float _predictionVisibleDuration;
         [SerializeField] private float[] _spawnTime;
+        [SerializeField] private float _spawnHeight;
 
         private int _nextTime = 0;
 
@@ -108,6 +109,8 @@ namespace InGame.Jewelry
 
         private void SpawnJewelryGroup(Vector3 centerPosition)
         {
+            centerPosition.y += _spawnHeight;
+
             for (int i = 0; i < _spawnCount; i++)
             {
                 Vector2 randomOffset = Random.insideUnitCircle * _spawnRange;
