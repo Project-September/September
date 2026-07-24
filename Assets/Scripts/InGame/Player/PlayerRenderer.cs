@@ -15,6 +15,8 @@ namespace InGame.Player
 
         private readonly Dictionary<Renderer, Material[]> _equipmentMaterials = new();
 
+        private bool _isCamouflageEnabled;
+
         public void Awake()
         {
             _defaultMaterials = new Material[_renderers.Length][];
@@ -22,6 +24,13 @@ namespace InGame.Player
             {
                 _defaultMaterials[i] = _renderers[i].materials;
             }
+
+            _playerEquipmentManager.Equipped += equipment =>
+            {
+                if (_isCamouflageEnabled) AttachCamouflageMaterial(equipment);
+            };
+
+            _playerEquipmentManager.Unequipped += equipment => Debug.Log($"Detached {equipment.Prefab.name}");
         }
 
         [Rpc]
@@ -38,6 +47,8 @@ namespace InGame.Player
             {
                 AttachCamouflageMaterial(_renderers[i]);
             }
+
+            _isCamouflageEnabled = true;
         }
 
         [Rpc]
@@ -57,6 +68,7 @@ namespace InGame.Player
             }
 
             _equipmentMaterials.Clear();
+            _isCamouflageEnabled = false;
         }
 
         private void AttachCamouflageMaterial(Renderer rend)
