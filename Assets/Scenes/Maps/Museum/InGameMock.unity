@@ -6347,6 +6347,22 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: _descriptionDictionary.keys.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: _descriptionDictionary.values.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: '_descriptionDictionary.keys.Array.data[6]'
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6524674074025605059, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
+      propertyPath: '_descriptionDictionary.values.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: b5ee60d83e4fb3d43a5b522e3cce890d, type: 2}
     - target: {fileID: 8375941926255285459, guid: aea3ee96d9aafdc44987d473e0f5d27d, type: 3}
       propertyPath: m_Name
       value: UI
@@ -13354,6 +13370,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 500e43c2bb15933488430c23a7279b87, type: 2}
+    - target: {fileID: 3688485294182597585, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
+      propertyPath: _maxHealth
+      value: 80
+      objectReference: {fileID: 0}
     - target: {fileID: 3732242790369884021, guid: 8cbb241ad1baabb41a7ab28470709e40, type: 3}
       propertyPath: SortKey
       value: 2683630927

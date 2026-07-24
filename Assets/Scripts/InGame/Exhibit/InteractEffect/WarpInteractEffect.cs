@@ -82,17 +82,21 @@ namespace InGame.Exhibit
             FormationManager formationManager = player.GetComponent<FormationManager>();
             formationManager?.WarpFriendNearPlayer(targetPos, targetRot);
 
-            // 少し待ってから移動予約
-            await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration), cancellationToken: _cts.Token);
-
-            // ゴール側エフェクトの再生
-            PlayEffect(EffectType.WarpOut, targetPos, Quaternion.identity);
-            SetPlayerVisible(player, true);
-            _interactableBase.ForceSetInteractable = true;
-
-            if (_audioBroadcaster != null)
+            try
             {
-                _audioBroadcaster.RPC_PlaySoundFromCode(_warpOutSoundName, SoundTrackingType.Spot, player.Id, default); // 発音元を一旦Playerに
+                // 少し待ってから移動予約
+                await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration), cancellationToken: _cts.Token);
+            }
+            finally
+            {
+                PlayEffect(EffectType.WarpOut, targetPos, Quaternion.identity);
+                SetPlayerVisible(player, true);
+                _interactableBase.ForceSetInteractable = true;
+
+                if (_audioBroadcaster != null)
+                {
+                    _audioBroadcaster.RPC_PlaySoundFromCode(_warpOutSoundName, SoundTrackingType.Spot, player.Id, default); // 発音元を一旦Playerに
+                }
             }
         }
 
