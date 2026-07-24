@@ -26,22 +26,22 @@ namespace InGame.Player
                 _defaultMaterials[i] = _renderers[i].materials;
             }
 
-            _playerEquipmentManager.Equipped += equipment =>
+            if (_playerEquipmentManager != null)
             {
-                if (_isCamouflageEnabled) AttachCamouflageMaterial(equipment);
-            };
+                _playerEquipmentManager.Equipped += equipment =>
+                {
+                    if (_isCamouflageEnabled) AttachCamouflageMaterial(equipment);
+                };
 
-            _playerEquipmentManager.Unequipped += equipment => Debug.Log($"Detached {equipment.Prefab.name}");
+                _playerEquipmentManager.Unequipped += equipment => Debug.Log($"Detached {equipment.Prefab.name}");
+            }
         }
 
         [Rpc]
         public void Rpc_StartOpticalCamouflage()
         {
             // 装備中アイテムのマテリアルを取得
-            foreach (Equipment equipment in _playerEquipmentManager.CurrentEquipments.Values)
-            {
-                AttachCamouflageMaterial(equipment);
-            }
+            AttachCamouflageMaterial(_playerEquipmentManager);
 
             //  光学迷彩用のマテリアルに変更
             for (int i = 0; i < _renderers.Length; i++)
@@ -65,10 +65,7 @@ namespace InGame.Player
             }
 
             //  装備中のアイテムのマテリアルを戻す
-            foreach (Equipment equipment in _playerEquipmentManager.CurrentEquipments.Values)
-            {
-                DetachCamouflageMaterial(equipment);
-            }
+            DetachCamouflageMaterial(_playerEquipmentManager);
 
             SetObjectsActive(true);
 
@@ -85,6 +82,34 @@ namespace InGame.Player
             }
             rend.materials = mats;
             rend.shadowCastingMode = ShadowCastingMode.Off;
+        }
+
+        private void AttachCamouflageMaterial(PlayerEquipmentManager playerEquipmentManager)
+        {
+            if (playerEquipmentManager == null)
+            {
+                Debug.LogWarning("Player Equipment Manager is null");
+                return;
+            }
+
+            foreach (Equipment equipment in playerEquipmentManager.CurrentEquipments.Values)
+            {
+                AttachCamouflageMaterial(equipment);
+            }
+        }
+
+        private void DetachCamouflageMaterial(PlayerEquipmentManager playerEquipmentManager)
+        {
+            if (playerEquipmentManager == null)
+            {
+                Debug.LogWarning("Player Equipment Manager is null");
+                return;
+            }
+
+            foreach (Equipment equipment in playerEquipmentManager.CurrentEquipments.Values)
+            {
+                DetachCamouflageMaterial(equipment);
+            }
         }
 
         private void AttachCamouflageMaterial(Equipment equipment)
