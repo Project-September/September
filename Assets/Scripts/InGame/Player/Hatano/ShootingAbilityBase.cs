@@ -1,8 +1,8 @@
 using System;
 using InGame.Common;
 using September.Common;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Fusion;
 
 namespace InGame.Player.Ability.Effect.Shooting
 {
@@ -23,10 +23,14 @@ namespace InGame.Player.Ability.Effect.Shooting
         
         private PlayerManager _playerManager;
 
+        private NetworkBool _isShootingAnimation; // 射撃アニメーションを再生済みか
+        
         protected override void OnStart()
         {
             if(_playerManager == null)
                 _playerManager = Parameter.Owner.GetComponent<PlayerManager>();
+            
+            _animationClipPlayer.PlayClip(_stanceAnimationClip);
         }
 
         /// <summary>
@@ -34,7 +38,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// </summary>
         protected void ShootingInputJudgment()
         {
-            //_playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             //射撃ステートが構えの場合、射撃入力を受け付ける
             if (_shootingType == ShootingStateType.Stance)
             {
@@ -42,12 +46,19 @@ namespace InGame.Player.Ability.Effect.Shooting
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
                     OnShooting();
-                    _animationClipPlayer.PlayClip(_shootAnimationClip);
+                    if (!_isShootingAnimation)
+                    {
+                        _isShootingAnimation = true;
+                        _animationClipPlayer.StopClip(_stanceAnimationClip);
+                        _animationClipPlayer.PlayClip(_shootAnimationClip);
+                        _animationClipPlayer.PlayClip(_stanceAnimationClip);
+                    }
+                   
                 }
                 else //射撃入力がされていないときに行う処理
                 {
                     OnNoShooting();
-                    PlayStanceAnimation().Forget();
+                    _isShootingAnimation = false;
                 }
             }
 
@@ -112,6 +123,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         protected override void OnEndAbility()
         {
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            EndAnimation();
         }
 
         /// <summary>
@@ -130,26 +142,11 @@ namespace InGame.Player.Ability.Effect.Shooting
         protected virtual void OnStopTheStance(){}
 
         /// <summary>
-        /// 構えアニメーションを再生
-        /// </summary>
-        private async UniTask PlayStanceAnimation()
-        {
-            var endType = await _animationClipPlayer.PlayClipAndWait(_stanceAnimationClip);
-            if (endType == EndClipType.Complete)
-            {
-                _animationClipPlayer.PlayClip(_stanceAnimationClip);
-            }
-            else
-            {
-                _animationClipPlayer.StopClip(_stanceAnimationClip);
-            }
-        }
-
-        /// <summary>
         /// アニメーションを停止
         /// </summary>
         private void EndAnimation()
         {
+            _isShootingAnimation = false;
             _animationClipPlayer.StopClip(_stanceAnimationClip);
             _animationClipPlayer.StopClip(_shootAnimationClip);
         }

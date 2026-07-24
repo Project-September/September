@@ -79,8 +79,7 @@ namespace InGame.Player.Hatano
             return _abilityStatus switch
             {
                 HatanoAbilityStatus.DoubleBarreledGun => HatanoAbilityStatus.LaserGun,
-                HatanoAbilityStatus.LaserGun => HatanoAbilityStatus.RocketLauncher,
-                HatanoAbilityStatus.RocketLauncher => HatanoAbilityStatus.DoubleBarreledGun
+                HatanoAbilityStatus.LaserGun => HatanoAbilityStatus.DoubleBarreledGun
             };
         }
 

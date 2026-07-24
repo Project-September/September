@@ -51,6 +51,8 @@ namespace InGame.Common
         public LayerInfo.LayerType TargetLayer;
         public bool IsAdditive;
 
+        public bool _loop;
+
         public AnimationMontageStruct(float playSpeed = 1)
         {
             AnimClip = null;
@@ -59,6 +61,8 @@ namespace InGame.Common
             BlendOut = new LayerInfo.Blend();
             TargetLayer = LayerInfo.LayerType.Base;
             IsAdditive = false;
+            
+            _loop = false;
         }
     }
 }

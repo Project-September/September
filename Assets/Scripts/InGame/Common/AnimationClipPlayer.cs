@@ -246,7 +246,7 @@ namespace InGame.Common
         {
             var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
             return PlayAsync(montage.AnimClip, montage.TargetLayer, 1f, montage.BlendIn, montage.BlendOut,
-                montage.IsAdditive, montage.PlaySpeed);
+                montage.IsAdditive, montage.PlaySpeed, montage._loop);
         }
 
         /// <summary>
@@ -269,6 +269,7 @@ namespace InGame.Common
             LayerInfo.Blend outBlend,
             bool additive = false,
             float playSpeed = 1f,
+            bool loop = false,
             CancellationToken external = default)
         {
             if (!clip) return EndClipType.Failed;
@@ -321,7 +322,22 @@ namespace InGame.Common
 
             try
             {
-                await WaitClipEndAsync(played, token);
+                if (!loop) // ループしないアニメーションの場合
+                {
+                    // 再生時間が終了するまで待機する
+                    await WaitClipEndAsync(played, token);
+                }
+                else // ループするアニメーションの場合
+                {
+                    // 構えなどの継続するアニメーション用
+                    // 再生時間の終了を待たずに、StopClipが呼ばれるまで待機する
+                    while (!token.IsCancellationRequested)
+                    {
+                        await UniTask.Yield(PlayerLoopTiming.Update);
+                    }
+
+                    return EndClipType.Interrupted;
+                }
             }
             catch (OperationCanceledException)
             {
@@ -698,7 +714,7 @@ namespace InGame.Common
                 } // 破棄レース保険
 
                 if (!valid) break;
-
+                
                 double dur = 0, tim = 0;
                 try
                 {
