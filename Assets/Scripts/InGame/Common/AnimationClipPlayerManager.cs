@@ -148,13 +148,13 @@ namespace InGame.Common
 
             var speed = _playerMovement.GetSpeedOnPlane();
             // 速度を歩き〜走りの割合に変換
-            var runBlend = Mathf.InverseLerp(walkSpeed, maxSpeed, speed);
+            var speedRate = Mathf.InverseLerp(walkSpeed, maxSpeed, speed);
 
             // その割合でアニメーション基準速度を補間
             var baseSpeed = Mathf.Lerp(
                 _walkAnimSpeed,
                 _runAnimSpeed,
-                runBlend);
+                speedRate);
             
             var playbackRate = baseSpeed > 0f ? speed / baseSpeed : 0f;
             
