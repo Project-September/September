@@ -1,6 +1,7 @@
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 public enum EffectType
 {
+    None = -1,
     Test,
     Warp,
     Tutankhamen,
