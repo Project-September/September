@@ -10,15 +10,11 @@ namespace InGame.Jewelry
 {
     public class JewelrySpawner : NetworkBehaviour
     {
-        [SerializeField] private Transform[] _randomSpawnPositions;
+        [SerializeField] private Transform[] _spawnPositions;
         [SerializeField] private GameTimerData _timerData;
-        [SerializeField] private float _spawnRange;
-        [SerializeField] private int _spawnCount;
-        [SerializeField] private NetworkObject _jewelryPrefab;
         [SerializeField] private Transform _spawnPredictionRange;
         [SerializeField] private float _predictionVisibleDuration;
-        [SerializeField] private float[] _spawnTime;
-        [SerializeField] private float _spawnHeight;
+        [SerializeField] private JewelrySpawnData _jewelrySpawnData;
 
         private int _nextTime = 0;
 
@@ -29,7 +25,7 @@ namespace InGame.Jewelry
             if (!HasStateAuthority)
                 return;
 
-            Array.Sort(_spawnTime, (a, b) => b.CompareTo(a));
+            Array.Sort(_jewelrySpawnData.SpawnSettings, (a, b) => b.SpawnTime.CompareTo(a.SpawnTime));
 
             WaitSpawnAsync().Forget();
         }
@@ -65,12 +61,12 @@ namespace InGame.Jewelry
                 int remaining = gameEndTick - Runner.Tick;
                 int seconds = Mathf.CeilToInt(remaining / (float)tickRate);
 
-                if (_nextTime >= _spawnTime.Length)
+                if (_nextTime >= _jewelrySpawnData.SpawnSettings.Length)
                     return;
 
-                if (seconds <= _spawnTime[_nextTime])
+                if (seconds <= _jewelrySpawnData.SpawnSettings[_nextTime].SpawnTime)
                 {
-                    StartSpawnSequenceAsync().Forget();
+                    StartSpawnSequenceAsync(_jewelrySpawnData.SpawnSettings[_nextTime]).Forget();
                     _nextTime++;
                 }
 
@@ -78,20 +74,38 @@ namespace InGame.Jewelry
             }
         }
 
-        private async UniTask StartSpawnSequenceAsync()
+        private async UniTask StartSpawnSequenceAsync(JewelrySpawnSetting spawnSetting)
         {
-            if (_randomSpawnPositions == null || _randomSpawnPositions.Length == 0)
+            if (_spawnPositions == null || _spawnPositions.Length == 0)
             {
-                Debug.LogError("JewelrySpawner : �X�|�[���ʒu���ݒ肳��Ă��܂���B");
+                Debug.LogError("JewelrySpawner :X|[ʒuݒ肳Ă܂B");
                 return;
             }
 
-            Vector3 randomPosition = _randomSpawnPositions[Random.Range(0, _randomSpawnPositions.Length)].position;
+            Transform spawnTransform;
 
-            RPC_SetSpawnPrediction(true,randomPosition);
+            if (spawnSetting.PositionIndex < 0)
+            {
+                int randomIndex = Random.Range(0, _spawnPositions.Length);
+                Transform randomTransform = _spawnPositions[randomIndex];
+                spawnTransform = randomTransform;
+            }
+            else
+            {
+                if (spawnSetting.PositionIndex >= 0 && spawnSetting.PositionIndex < _spawnPositions.Length)
+                {
+                    spawnTransform = _spawnPositions[spawnSetting.PositionIndex];
+                }
+                else
+                {
+                    Debug.LogError("JewelrySpawner : 存在しないインデックス番号です");
+                    return;
+                }
+            }
+            RPC_SetSpawnPrediction(true, spawnTransform.position);
 
             await UniTask.WaitForSeconds(_predictionVisibleDuration, cancellationToken: _cts.Token);
-            SpawnJewelryGroup(randomPosition);
+            SpawnJewelryGroup(spawnTransform.position, spawnSetting);
             RPC_SetSpawnPrediction(false);
         }
 
@@ -107,20 +121,34 @@ namespace InGame.Jewelry
             }
         }
 
-        private void SpawnJewelryGroup(Vector3 centerPosition)
+        private void SpawnJewelryGroup(Vector3 centerPosition, JewelrySpawnSetting spawnSetting)
         {
-            centerPosition.y += _spawnHeight;
+            centerPosition.y += spawnSetting.Height;
 
-            for (int i = 0; i < _spawnCount; i++)
+            for (int i = 0; i < spawnSetting.Items.Length; i++)
             {
-                Vector2 randomOffset = Random.insideUnitCircle * _spawnRange;
+                int count = spawnSetting.Items[i].Count;
+                for (int j = 0; j < count; j++)
+                {
+                    Vector2 randomOffset = Random.insideUnitCircle * spawnSetting.SpawnRange;
 
-                Vector3 spawnPosition = centerPosition;
-                spawnPosition.x += randomOffset.x;
-                spawnPosition.z += randomOffset.y;
+                    Vector3 spawnPosition = centerPosition;
+                    spawnPosition.x += randomOffset.x;
+                    spawnPosition.z += randomOffset.y;
 
-                Runner.Spawn(_jewelryPrefab, spawnPosition, Quaternion.identity);
+                    var prefab = _jewelrySpawnData.GetPrefab(spawnSetting.Items[i].JewelryType);
+
+                    if (prefab == null)
+                    {
+                        Debug.LogError($"JewelrySpawner : 宝石のPrefabが設定されていません。宝石の種類: {spawnSetting.Items[i].JewelryType}");
+                        continue;
+                    }
+
+                    Runner.Spawn(prefab, spawnPosition, Quaternion.identity);
+                }
             }
+
+
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)

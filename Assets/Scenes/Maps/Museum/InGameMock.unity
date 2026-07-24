@@ -7174,7 +7174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2049593f57d292b40abd30b87b6c343d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _randomSpawnPositions:
+  _spawnPositions:
   - {fileID: 1052938549}
   - {fileID: 357570320}
   - {fileID: 1768383150}
@@ -7185,16 +7185,9 @@ MonoBehaviour:
   - {fileID: 1156786818}
   - {fileID: 1360451310}
   _timerData: {fileID: 11400000, guid: e2ca3e11eb6f46047839bebd36fd3c24, type: 2}
-  _spawnRange: 3
-  _spawnCount: 5
-  _jewelryPrefab: {fileID: 5589114008520084412, guid: e14ea0caa74491347a5d59bc76798f5c, type: 3}
   _spawnPredictionRange: {fileID: 384331753}
   _predictionVisibleDuration: 15
-  _spawnTime:
-  - 120
-  - 45
-  - 170
-  _spawnHeight: 1
+  _jewelrySpawnData: {fileID: 11400000, guid: 97f0809e86de915419aa3419fabdd0b9, type: 2}
 --- !u!4 &820406214
 Transform:
   m_ObjectHideFlags: 0
@@ -13693,8 +13686,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1285741891474971311}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13052626, y: 0, z: 0, w: 0.9914449}
-  m_LocalPosition: {x: 0, y: 2.7644432, z: -4.8806267}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.498638, y: -38.57946, z: 39.23011}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
