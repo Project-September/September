@@ -69,7 +69,8 @@ namespace InGame.Player.Sarutobi
 
                 _alreadyHits.Add(_hits[i]);
 
-                if (!_hits[i].TryGetComponent(out IDamageable damageable)) continue;
+                IDamageable damageable = _hits[i].GetComponentInParent<IDamageable>();
+                if (damageable == null) continue;
 
                 HitData hitData = new(HitActionType.Damage, _damage, Object.InputAuthority, damageable.OwnerPlayerRef);
                 damageable.TakeHit(ref hitData);
@@ -78,13 +79,13 @@ namespace InGame.Player.Sarutobi
 
         public override void FixedUpdateNetwork()
         {
-            if (!_hitStartTimer.IsRunning && !_isHitChecked)
+            if (_hitStartTimer.Expired(Runner) && !_isHitChecked)
             {
                 // 最低一回はヒット検出を行う
                 HitCheck();
                 _isHitChecked = true;
             }
-            else if (_hitEndTimer.IsRunning && !_hitStartTimer.IsRunning)
+            else if (_hitEndTimer.Expired(Runner) && !_hitStartTimer.Expired(Runner))
             {
                 HitCheck();
             }
