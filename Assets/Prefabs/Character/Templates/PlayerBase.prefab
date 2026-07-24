@@ -5564,6 +5564,7 @@ MonoBehaviour:
   - {fileID: 2779401866583128900}
   - {fileID: 3570017578186338863}
   - {fileID: 2447315062394318487}
+  - {fileID: 9111916553959908344}
   - {fileID: 2166852217564369763}
   - {fileID: 7020943087661863767}
   - {fileID: 8782963132285940316}
@@ -5841,6 +5842,11 @@ MonoBehaviour:
   - {fileID: 4421077557014044086}
   - {fileID: 1057085153343749984}
   - {fileID: 5582140088514353255}
+  _playerEquipmentManager: {fileID: 9111916553959908344}
+  _hideObjects:
+  - {fileID: 8790283326073112851}
+  - {fileID: 3212911333276444919}
+  - {fileID: 6281404718688616734}
 --- !u!114 &2779401866583128900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7395,3 +7401,8 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6281404718688616734 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4150957951215439681, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
+  m_PrefabInstance: {fileID: 7977882700853956191}
+  m_PrefabAsset: {fileID: 0}
