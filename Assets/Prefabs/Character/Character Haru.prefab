@@ -4291,6 +4291,14 @@ PrefabInstance:
       propertyPath: _jumpOver
       value: 
       objectReference: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _runAnimSpeed
+      value: 5.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _walkAnimSpeed
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: SortKey
       value: 1783927999
