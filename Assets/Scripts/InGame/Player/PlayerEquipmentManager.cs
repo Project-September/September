@@ -12,6 +12,8 @@ namespace InGame.Player
 
         private readonly Dictionary<HumanBodyBones, Equipment> _currentEquipments = new();
 
+        public IReadOnlyDictionary<HumanBodyBones, Equipment> CurrentEquipments => _currentEquipments;
+
         private void Start()
         {
             foreach (var equipment in _equipmentData)
