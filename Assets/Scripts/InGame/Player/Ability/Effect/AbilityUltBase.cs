@@ -8,6 +8,8 @@ namespace InGame.Player.Ability.Effect
     [Serializable]
     public abstract class AbilityUltBase : AbilityBase
     {
+        [SerializeField] private float _startEffectTime;
+
         private CutInAnimatorBase _cutInAnimator;
         private PlayerHealth _playerHealth;
         private PlayerManager _playerManager;
@@ -17,8 +19,14 @@ namespace InGame.Player.Ability.Effect
         /// </summary>
         private TickTimer _cutInEndTimer;
 
+        /// <summary>
+        /// 効果発動まで待機するタイマー
+        /// </summary>
+        private TickTimer _startEffectTimer;
+
         private bool _isCutInEnd;
-        
+        private bool _isEffectTriggered;
+
         /// <summary>
         /// 直近のカットイン終了からの経過時間
         /// </summary>
@@ -59,6 +67,7 @@ namespace InGame.Player.Ability.Effect
             {
                 _cutInAnimator.RequestPlayCutInAnimation();
                 _cutInEndTimer = TickTimer.CreateFromSeconds(Runner, (float)_cutInAnimator.Duration);
+                _startEffectTimer = TickTimer.CreateFromSeconds(Runner, _startEffectTime);
             }
             else
             {
@@ -69,9 +78,19 @@ namespace InGame.Player.Ability.Effect
 
         protected sealed override void OnUpdate(float deltaTime)
         {
+            Debug.Log($"{_startEffectTimer.RemainingTicks(Runner)} {_startEffectTimer.Expired(Runner)} {_startEffectTimer.IsRunning}");
+
+            if (!_isEffectTriggered && _startEffectTimer.Expired(Runner))
+            {
+                Debug.Log("<color=yellow>[AbilityUlt]</color> Start Effect");
+
+                OnStartEffect();
+                _isEffectTriggered = true;
+            }
+
             // カットイン終了待ち
             if (!_cutInEndTimer.Expired(Runner)) return;
-            
+
             // カットインが終了したフレームだけ処理する
             if (!_isCutInEnd)
             {
@@ -94,6 +113,7 @@ namespace InGame.Player.Ability.Effect
         {
             Debug.Log($"<color=yellow>[AbilityUlt]</color> End {StartTick} {Runner.Tick} {Runner.Tick - StartTick} {(Runner.Tick - StartTick) * Runner.DeltaTime}", Parameter.Owner);
             _isCutInEnd = false;
+            _isEffectTriggered = false;
             OnEndUlt();
         }
 
@@ -105,5 +125,7 @@ namespace InGame.Player.Ability.Effect
         
         /// <summary> 必殺技終了時の処理 </summary>
         protected virtual void OnEndUlt() { }
+
+        protected virtual void OnStartEffect() { }
     }
 }

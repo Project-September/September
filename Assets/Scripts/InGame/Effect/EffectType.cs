@@ -29,5 +29,6 @@ public enum EffectType
     CooldownPartition,
     CarDash,
     JewelPickUp,
+    HulkUltImpact,
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
