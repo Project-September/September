@@ -63,6 +63,8 @@ namespace InGame.Player.Ability.Effect
             if (_playerHealth) _playerHealth.IsInvincible = true;
             if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.InputLocked);
 
+            OnCutInStart();
+
             if (_cutInAnimator)
             {
                 _cutInAnimator.RequestPlayCutInAnimation();
@@ -116,6 +118,8 @@ namespace InGame.Player.Ability.Effect
             _isEffectTriggered = false;
             OnEndUlt();
         }
+
+        protected virtual void OnCutInStart() { }
 
         /// <summary> カットインが終了した瞬間の処理 </summary>
         protected abstract void OnCutInEnd();
