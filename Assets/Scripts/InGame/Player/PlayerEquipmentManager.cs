@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace InGame.Player
 {
-    public class PlayerEquipmentManager : MonoBehaviour
+    public class PlayerEquipmentManager : NetworkBehaviour
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private Equipment[] _equipmentData;
