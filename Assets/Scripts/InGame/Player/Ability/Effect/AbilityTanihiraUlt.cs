@@ -39,7 +39,7 @@ namespace InGame.Player.Ability.Effect
             _firstPenguin.Agent.enabled = false;
 
             // Timelineに動的バインド
-            PlayableBinding binding = _playableDirector.playableAsset.outputs.First(c => c.streamName == _penguinAnimationTrackName);
+            PlayableBinding binding = _playableDirector.playableAsset.outputs.FirstOrDefault(c => c.streamName == _penguinAnimationTrackName);
             if (binding.streamName != _penguinAnimationTrackName)
             {
                 Debug.Log($"{_penguinAnimationTrackName}トラックが見つかりませんでした");

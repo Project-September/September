@@ -66,7 +66,7 @@ namespace InGame.Player.Ult
         private async UniTask PlayLocal()
         {
             // フィールド上にあるCinemachine Brainを動的バインド
-            PlayableBinding binding = _playableDirector.playableAsset.outputs.First(c => c.streamName == "Cinemachine Track");
+            PlayableBinding binding = _playableDirector.playableAsset.outputs.FirstOrDefault(c => c.streamName == "Cinemachine Track");
             if (binding.streamName == "Cinemachine Track")
             {
                 _playableDirector.SetGenericBinding(binding.sourceObject, FindFirstObjectByType<CinemachineBrain>());
