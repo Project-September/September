@@ -39,6 +39,15 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _weightBlendCts = new();
 
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
+        
+        // BaseMixerに接続されている各移動アニメーション
+        private AnimationClipPlayable _waitClipPlayable;
+        private AnimationClipPlayable _walkClipPlayable;
+        private AnimationClipPlayable _runClipPlayable;
+        // 入力ポート
+        private int _waitPort;
+        private int _walkPort;
+        private int _runPort;
 
         public AnimationMixerPlayable BaseMixer => _baseMixer;
 
@@ -103,22 +112,25 @@ namespace InGame.Common
             var port = 0;
             if (_wait)
             {
-                var p = AnimationClipPlayable.Create(_graph, _wait);
-                _baseMixer.ConnectInput(port++, p, 0);
+                _waitPort = port;
+                _waitClipPlayable = AnimationClipPlayable.Create(_graph, _wait);
+                _baseMixer.ConnectInput(port++, _waitClipPlayable, 0);
             }
             else _baseMixer.SetInputWeight(port++, 0f);
 
             if (_walk)
             {
-                var p = AnimationClipPlayable.Create(_graph, _walk);
-                _baseMixer.ConnectInput(port++, p, 0);
+                _walkPort = port;
+                _walkClipPlayable = AnimationClipPlayable.Create(_graph, _walk);
+                _baseMixer.ConnectInput(port++, _walkClipPlayable, 0);
             }
             else _baseMixer.SetInputWeight(port++, 0f);
 
             if (_run)
             {
-                var p = AnimationClipPlayable.Create(_graph, _run);
-                _baseMixer.ConnectInput(port, p, 0);
+                _runPort = port;
+                _runClipPlayable = AnimationClipPlayable.Create(_graph, _run);
+                _baseMixer.ConnectInput(port, _runClipPlayable, 0);
             }
             else _baseMixer.SetInputWeight(port, 0f);
 
@@ -888,6 +900,51 @@ namespace InGame.Common
                 player.Disconnect(layerType, playable, slot);
             }
         }
+        #endregion
+
+        #region ChangeAnimationClip
+
+        /// <summary>
+        /// 待機アニメーションを別のアニメーションに変更する
+        /// </summary>
+        /// <param name="clip">変更後のアニメーション</param>
+        public void ChangeWaitAnimationClip(AnimationClip clip)
+        {
+            // 現在の待機アニメーションを切断
+            _baseMixer.DisconnectInput(_waitPort);
+            
+            // 古いアニメーションを破棄し、変更後のアニメーションを作成し接続
+            _waitClipPlayable.Destroy();
+            _waitClipPlayable = AnimationClipPlayable.Create(_graph, clip);
+            _baseMixer.ConnectInput(_waitPort, _waitClipPlayable, 0);
+        }
+
+        /// <summary>
+        /// 歩きアニメーションを別のアニメーションに変更する
+        /// </summary>
+        /// <param name="clip">変更後のアニメーション</param>
+        public void ChangeWalkAnimationClip(AnimationClip clip)
+        {
+            _baseMixer.DisconnectInput(_walkPort);
+            
+            _walkClipPlayable.Destroy();
+            _walkClipPlayable = AnimationClipPlayable.Create(_graph, clip);
+            _baseMixer.ConnectInput(_walkPort, _walkClipPlayable, 0);
+        }
+
+        /// <summary>
+        /// 走りアニメーションを別のアニメーションに変更する
+        /// </summary>
+        /// <param name="clip">変更後のアニメーション</param>
+        public void ChangeRunAnimationClip(AnimationClip clip)
+        {
+            _baseMixer.DisconnectInput(_runPort);
+            
+            _runClipPlayable.Destroy();
+            _runClipPlayable = AnimationClipPlayable.Create(_graph, clip);
+            _baseMixer.ConnectInput(_runPort, _runClipPlayable, 0);
+        }
+
         #endregion
     }
 
