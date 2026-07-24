@@ -1386,7 +1386,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0.2
+      BlendTime: 0.3
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -1505,18 +1505,18 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 0
           value: 1
-          inSlope: -1
-          outSlope: -1
-          tangentMode: 34
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
           time: 1
           value: 0
-          inSlope: -1
-          outSlope: -1
-          tangentMode: 34
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
           outWeight: 0
