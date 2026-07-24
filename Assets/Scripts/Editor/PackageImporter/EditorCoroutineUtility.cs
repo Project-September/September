@@ -9,7 +9,7 @@ namespace September.Editor.PackageImporter
     /// EditorWindowはMonoBehaviourではない＝標準のStartCoroutineは使わない
     /// EditorApplication.updateを使って自前でMoveNextを回す
     /// ネストしたyield return（子コルーチン）には対応していない
-    /// 呼び出し側→while(!op.isDone) yield return null; のような単純な待機のみで使う
+    /// 呼び出し側→while(!op.isDone) yield return null; みたいに単純な待機のみで使う
     /// </summary>
     internal static class EditorCoroutineUtility
     {
