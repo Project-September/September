@@ -32,5 +32,6 @@ public enum EffectType
     JewelPickUp,
     HulkUltImpact,
     PenguinHuge,
+    KunaiUlt,
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

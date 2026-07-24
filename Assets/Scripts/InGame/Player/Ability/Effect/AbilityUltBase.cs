@@ -28,6 +28,12 @@ namespace InGame.Player.Ability.Effect
         private bool _isEffectTriggered;
 
         /// <summary>
+        /// カットインの終了を継承側で行う
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool ManualCutInEnd => false;
+
+        /// <summary>
         /// 直近のカットイン終了からの経過時間
         /// </summary>
         public float TimeSinceCutInEnd
@@ -90,25 +96,36 @@ namespace InGame.Player.Ability.Effect
                 _isEffectTriggered = true;
             }
 
+            if (_isCutInEnd)
+            {
+                // カットイン終了済みなら必殺技効果の更新処理
+                OnUpdateUlt(deltaTime);
+                return;
+            }
+            else
+            {
+                OnCutInUpdate(deltaTime);
+            }
+
+            // 手動終了がオンならカットイン終了判定を取らない
+            if (ManualCutInEnd) return;
+
             // カットイン終了待ち
             if (!_cutInEndTimer.Expired(Runner)) return;
 
-            // カットインが終了したフレームだけ処理する
-            if (!_isCutInEnd)
-            {
-                Debug.Log("<color=yellow>[AbilityUlt]</color> CutIn End", Parameter.Owner);
-                // 無敵解除と入力ロック解除
-                if (_playerHealth) _playerHealth.IsInvincible = false;
-                if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
+            // カットイン終了（終了したフレームだけ処理する）
+            EndCutIn();
+        }
 
-                _isCutInEnd = true;
-                OnCutInEnd();
-                
-                return;
-            }
-            
-            // カットイン終了済みなら必殺技効果の更新処理
-            OnUpdateUlt(deltaTime);
+        protected void EndCutIn()
+        {
+            Debug.Log("<color=yellow>[AbilityUlt]</color> CutIn End", Parameter.Owner);
+            // 無敵解除と入力ロック解除
+            if (_playerHealth) _playerHealth.IsInvincible = false;
+            if (_playerManager) _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
+
+            _isCutInEnd = true;
+            OnCutInEnd();
         }
 
         protected sealed override void OnEndAbility()
@@ -121,8 +138,10 @@ namespace InGame.Player.Ability.Effect
 
         protected virtual void OnCutInStart() { }
 
+        protected virtual void OnCutInUpdate(float deltaTime) { }
+
         /// <summary> カットインが終了した瞬間の処理 </summary>
-        protected abstract void OnCutInEnd();
+        protected virtual void OnCutInEnd() { }
         
         /// <summary> カットイン終了後の更新処理 </summary>
         protected virtual void OnUpdateUlt(float deltaTime) { }
