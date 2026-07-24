@@ -32,8 +32,6 @@ namespace InGame.Player
                 {
                     if (_isCamouflageEnabled) AttachCamouflageMaterial(equipment);
                 };
-
-                _playerEquipmentManager.Unequipped += equipment => Debug.Log($"Detached {equipment.Prefab.name}");
             }
         }
 
