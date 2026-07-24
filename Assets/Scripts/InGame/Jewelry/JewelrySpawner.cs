@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -16,7 +17,9 @@ namespace InGame.Jewelry
         [SerializeField] private NetworkObject _jewelryPrefab;
         [SerializeField] private Transform _spawnPredictionRange;
         [SerializeField] private float _predictionVisibleDuration;
-        [SerializeField] private float _spawnTime;
+        [SerializeField] private float[] _spawnTime;
+
+        private int _nextTime = 0;
 
         private CancellationTokenSource _cts;
 
@@ -25,15 +28,17 @@ namespace InGame.Jewelry
             if (!HasStateAuthority)
                 return;
 
+            Array.Sort(_spawnTime, (a, b) => b.CompareTo(a));
+
             WaitSpawnAsync().Forget();
         }
 
         private async UniTask WaitSpawnAsync()
         {
             _cts = new CancellationTokenSource();
+            _nextTime = 0;
 
             await WaitForSpawnTimingAsync();
-            await StartSpawnSequenceAsync();
         }
 
         private async UniTask WaitForSpawnTimingAsync()
@@ -58,9 +63,14 @@ namespace InGame.Jewelry
 
                 int remaining = gameEndTick - Runner.Tick;
                 int seconds = Mathf.CeilToInt(remaining / (float)tickRate);
-                if (seconds <= _spawnTime)
-                {
+
+                if (_nextTime >= _spawnTime.Length)
                     return;
+
+                if (seconds <= _spawnTime[_nextTime])
+                {
+                    StartSpawnSequenceAsync().Forget();
+                    _nextTime++;
                 }
 
                 await UniTask.Yield(PlayerLoopTiming.Update, _cts.Token);
