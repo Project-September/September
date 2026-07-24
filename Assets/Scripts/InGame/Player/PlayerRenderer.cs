@@ -10,6 +10,7 @@ namespace InGame.Player
         [SerializeField] private Material _opticalCamouflageMaterial;
         [SerializeField] private Renderer[] _renderers;
         [SerializeField] private PlayerEquipmentManager _playerEquipmentManager;
+        [SerializeField] private GameObject[] _hideObjects;
 
         private Material[][] _defaultMaterials;
 
@@ -48,6 +49,8 @@ namespace InGame.Player
                 AttachCamouflageMaterial(_renderers[i]);
             }
 
+            SetObjectsActive(false);
+
             _isCamouflageEnabled = true;
         }
 
@@ -67,6 +70,8 @@ namespace InGame.Player
                 DetachCamouflageMaterial(equipment);
             }
 
+            SetObjectsActive(true);
+
             _equipmentMaterials.Clear();
             _isCamouflageEnabled = false;
         }
@@ -84,6 +89,8 @@ namespace InGame.Player
 
         private void AttachCamouflageMaterial(Equipment equipment)
         {
+            if (equipment.ClonedObject == null) return;
+
             foreach (Renderer rend in equipment.ClonedObject.GetComponentsInChildren<Renderer>())
             {
                 _equipmentMaterials.Add(rend, rend.materials);
@@ -93,11 +100,21 @@ namespace InGame.Player
 
         private void DetachCamouflageMaterial(Equipment equipment)
         {
+            if (equipment.ClonedObject == null) return;
+
             foreach (Renderer rend in equipment.ClonedObject.GetComponentsInChildren<Renderer>())
             {
                 if (!_equipmentMaterials.TryGetValue(rend, out Material[] defaultMaterials)) continue;
 
                 rend.materials = defaultMaterials;
+            }
+        }
+
+        private void SetObjectsActive(bool active)
+        {
+            foreach (GameObject obj in _hideObjects)
+            {
+                obj.SetActive(active);
             }
         }
     }
