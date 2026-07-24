@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using Fusion;
 using InGame.Common;
 using InGame.Health;
@@ -17,6 +18,7 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private EffectType _kunaiEffect;
         [SerializeField] private Transform _aimEffect;
         [SerializeField] private Vector3 _aimEffectOffset = new(0f, 0.01f, 0f);
+        [SerializeField] private Transform _meshRoot;
 
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         [SerializeField] private AnimationClip _idleClip;
@@ -40,12 +42,21 @@ namespace InGame.Player.Sarutobi
         private readonly List<Collider> _alreadyHits = new();
         private bool _isHitChecked;
 
+        private const float MeshRotateDuration = 0.3f;
+
         public void StartEffect()
         {
             _alreadyHits.Clear();
             _isAiming = true;
             _isHitChecked = false;
             RPC_ShowAimTarget();
+
+
+            DOTween.To(() => new Vector3(0f, 0, 0f), _ =>
+            {
+                float angle = Quaternion.LookRotation(_aimEffect.position - _meshRoot.position).eulerAngles.y;
+                _meshRoot.rotation = Quaternion.Euler(0f, angle, 0f);
+            }, Vector3.zero, MeshRotateDuration);
         }
 
         private void HitCheck()
@@ -87,12 +98,16 @@ namespace InGame.Player.Sarutobi
 
             if (GetInput(out PlayerInput input))
             {
+                float angle = Quaternion.LookRotation(_aimEffect.position - _meshRoot.position).eulerAngles.y;
+                _meshRoot.rotation = Quaternion.Euler(new Vector3(0f, angle, 0f));
+
                 Vector3 pos = GetThrowPos();
                 RPC_SendTargetPosition(pos);
                 if (input.Buttons.IsSet(_throwButton))
                 {
                     RPC_HideAimTarget();
                     RPC_Throw(pos);
+                    _meshRoot.DOLocalRotate(Vector3.zero, MeshRotateDuration);
                     HitboxDebugUtility.DrawWireSphere(pos, _hitRadius, Color.red, 10f);
                     _isAiming = false;
                 }
