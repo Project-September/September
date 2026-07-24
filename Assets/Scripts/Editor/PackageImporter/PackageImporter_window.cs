@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental;
 using UnityEngine;
 
 namespace September.Editor.PackageImporter
@@ -109,8 +110,8 @@ namespace September.Editor.PackageImporter
             }
 
             EditorGUILayout.HelpBox(
-                "AppsScript/Code.gs をGoogle Apps Scriptプロジェクトとしてデプロイし、" + 
-                "発行されたWebアプリのURLを入力して下さい（APIキーや請求先アカウントの設定は不要です",
+                "指定の Apps Script Web App URL と " + 
+                "DriveフォルダID を入力して、リフレッシュしてください",
                 MessageType.None);
         }
 
@@ -220,7 +221,6 @@ namespace September.Editor.PackageImporter
                     _driveFiles = files.OrderBy(f => f.name).ToList();
                     _isBusy = false;
                     _statusMessage = $"{_driveFiles.Count}件のパッケージを取得しました";
-
                     Repaint();
                 },
                 onError: error =>
@@ -240,10 +240,14 @@ namespace September.Editor.PackageImporter
 
             string tempPath = Path.Combine(Path.GetTempPath(), $"{file.id}_{SanitizeFileName(file.name)}");
 
-            EditorCoroutineUtility.Start(AppsScriptClient.DownloadFile(
-                _webAppUrl,
+            EditorCoroutineUtility.Start(DriveDirectDownloader.Download(
                 file,
                 tempPath,
+                onProgress: progress =>
+                {
+                    _statusMessage = $"{file.name} をダウンロードしています... {progress * 100f:0}%";
+                    Repaint();
+                },
                 onSuccess: savedPath =>
                 {
                     _statusMessage = $"{file.name} をImportしています...";
@@ -283,15 +287,20 @@ namespace September.Editor.PackageImporter
             }
 
             var file = _bulkQueue.Dequeue();
-            _statusMessage = $"{file.name} をダウンロードしています...(残り{_bulkQueue.Count + 1}件) ";
+            int remaining = _bulkQueue.Count + 1;
+            _statusMessage = $"{file.name} をダウンロードしています...(残り{remaining}件) ";
             Repaint();
 
             string tempPath = Path.Combine(Path.GetTempPath(), $"{file.id}_{SanitizeFileName(file.name)}");
 
-            EditorCoroutineUtility.Start(AppsScriptClient.DownloadFile(
-                _webAppUrl,
+            EditorCoroutineUtility.Start(DriveDirectDownloader.Download(
                 file,
                 tempPath,
+                onProgress: progress =>
+                {
+                    _statusMessage = $"{file.name} をダウンロードしています... {progress * 100f:0}% (残り{remaining}件";
+                    Repaint();
+                },
                 onSuccess: savedPath =>
                 {
                     _pendingImports[Path.GetFileNameWithoutExtension(savedPath)] = file;
