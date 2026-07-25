@@ -27,7 +27,6 @@ namespace InGame.Jewelry
             if (_hideLocal && Object.InputAuthority == Runner.LocalPlayer)
             {
                 gameObject.SetActive(false);
-                // TODO : ローカルの時は左上に表示する
             }
         }
 
