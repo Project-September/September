@@ -57,8 +57,16 @@ namespace InGame.Player.Sarutobi
 
             _hitStartTimer = default;
             _hitEndTimer = default;
+        }
 
-            DOTween.To(() => 0f, v => MeshRotationRatio = v, 1f, MeshRotateDuration);
+        public void StartLook()
+        {
+            DOTween.To(() => MeshRotationRatio, v => MeshRotationRatio = v, 1f, MeshRotateDuration);
+        }
+
+        public void EndLook()
+        {
+            DOTween.To(() => MeshRotationRatio, x => MeshRotationRatio = x, 0f, MeshRotateDuration);
         }
 
         private void HitCheck()
@@ -115,7 +123,7 @@ namespace InGame.Player.Sarutobi
                     HitboxDebugUtility.DrawWireSphere(pos, _hitRadius, Color.red, 10f);
                     _meshRoot.DOLocalRotate(Vector3.zero, MeshRotateDuration);
                     IsAiming = false;
-                    DOTween.To(() => MeshRotationRatio, x => MeshRotationRatio = x, 0f, MeshRotateDuration);
+                    EndLook();
                     if (HasInputAuthority) RPC_Throw(pos);
                 }
             }
