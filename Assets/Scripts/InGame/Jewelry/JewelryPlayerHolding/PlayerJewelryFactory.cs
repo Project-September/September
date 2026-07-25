@@ -1,6 +1,7 @@
+using Cysharp.Threading.Tasks;
 using Fusion;
-using September.Common;
 using September.InGame.UI;
+using System.Threading;
 using UnityEngine;
 
 namespace InGame.Jewelry.Common
@@ -14,25 +15,34 @@ namespace InGame.Jewelry.Common
         [SerializeField] PlayerJewelryView _playerJewelryView;
         [SerializeField] PlayerJewelryContainer _playerJewelryContainer;
         PlayerJewelryPresenter _playerJewelryPresenter;
-
-        readonly ActionDisposable _actionDisposable = new();
+        CancellationTokenSource _cts;
 
         public override void Spawned()
         {
+            _cts = new CancellationTokenSource();
+            Init(_cts.Token).Forget();
+        }
+
+        async UniTask Init(CancellationToken token)
+        {
             if (Object.InputAuthority == Runner.LocalPlayer)
             {
-                PlayerJewelryView view = UIController.I.UIRootRefs.JewelryView;
-                _actionDisposable.AddActionDisposing(_playerJewelryRuntime.OnInitialize(view.Init));
-                _actionDisposable.AddActionDisposing(_playerJewelryRuntime.OnUpdateJewelryQuantity(view.UpdateJewelryCount));
+                // ローカル用のUIを確実に取得する
+                do
+                {
+                    _playerJewelryView = UIController.I.UIRootRefs.JewelryView;
+                    await UniTask.DelayFrame(1, cancellationToken: token);
+                } while (_playerJewelryView == null);
             }
 
+            await UniTask.DelayFrame(1, cancellationToken: token);
             _playerJewelryPresenter = new(_playerJewelryDefinition, _playerJewelryRuntime, _playerJewelryView, _playerJewelryContainer);
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
+            _cts.Cancel();
             _playerJewelryPresenter?.Dispose();
-            _actionDisposable.Dispose();
         }
     }
 }
