@@ -37,7 +37,7 @@ namespace InGame.Common.Timeline
 
                 if (!_clipPlayer.TryGetPlayableInfo(_clip, out _info))
                 {
-                    Debug.LogWarning("AnimationClipPlayerPlayable: AnimationClipPlayable is not found");
+                    Debug.LogWarning($"AnimationClipPlayerPlayable: AnimationClipPlayable is not found (clip:{_clip.name}, _clipPlayer:{_clipPlayer})");
                     return;
                 }
                     
