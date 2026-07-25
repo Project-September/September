@@ -1,6 +1,7 @@
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 public enum EffectType
 {
+    None = -1,
     Test,
     Warp,
     Tutankhamen,
@@ -29,5 +30,8 @@ public enum EffectType
     CooldownPartition,
     CarDash,
     JewelPickUp,
+    HulkUltImpact,
+    PenguinHuge,
+    KunaiUlt,
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

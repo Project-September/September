@@ -55,6 +55,8 @@ namespace September.InGame.Effect
         /// </summary>
         public void RequestPlayOneShotEffect(EffectType effectType, Vector3 position, Quaternion rotation)
         {
+            if (effectType == EffectType.None) return;
+
             RPC_PlayEffect(effectType, position, rotation, false, string.Empty, default(NetworkId));
         }
 
@@ -63,6 +65,8 @@ namespace September.InGame.Effect
         /// </summary>
         public void RequestPlayOneShotEffect(EffectType effectType, Vector3 position, Quaternion rotation, Transform parent)
         {
+            if (effectType == EffectType.None) return;
+
             NetworkId parentNetworkId = default(NetworkId);
             if (parent != null)
             {
@@ -84,6 +88,8 @@ namespace September.InGame.Effect
         /// <param name="effectId">ユーザー名＋タイムスタンプ推奨</param>
         public void RequestPlayLoopEffect(string effectId, EffectType effectType, Vector3 position, Quaternion rotation)
         {
+            if (effectType == EffectType.None) return;
+
             RPC_PlayEffect(effectType, position, rotation, true, effectId, default(NetworkId));
         }
 
@@ -92,6 +98,8 @@ namespace September.InGame.Effect
         /// </summary>
         public void RequestPlayLoopEffect(string effectId, EffectType effectType, Vector3 position, Quaternion rotation, Vector3 scale)
         {
+            if (effectType == EffectType.None) return;
+
             RPC_PlayEffectWithScale(effectType, position, rotation, scale, true, effectId, default(NetworkId));
         }
 
@@ -101,6 +109,8 @@ namespace September.InGame.Effect
         /// <param name="effectId">ユーザー名＋タイムスタンプ推奨</param>
         public void RequestPlayLoopEffect(string effectId, EffectType effectType, Vector3 position, Quaternion rotation, Transform parent)
         {
+            if (effectType == EffectType.None) return;
+
             NetworkId parentNetworkId = default(NetworkId);
             if (parent != null)
             {

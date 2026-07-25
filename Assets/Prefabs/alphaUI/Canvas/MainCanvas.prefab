@@ -183,14 +183,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _finishAnimation: {fileID: 1368587738737192783}
   _sceneTransitionEffect: {fileID: 11400000, guid: 22b0754ead133274e868eaaf968644d2, type: 2}
-  _rankingPolicy:
-    rid: 7765555097832521853
-  references:
-    version: 2
-    RefIds:
-    - rid: 7765555097832521853
-      type: {class: TagRuleRankingPolicy, ns: September.NewResult, asm: Scripts}
-      data: 
 --- !u!114 &1368587738737192783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,7 +220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5745597649211064877
 RectTransform:
   m_ObjectHideFlags: 0

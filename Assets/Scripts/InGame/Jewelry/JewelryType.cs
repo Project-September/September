@@ -8,8 +8,8 @@ namespace InGame.Jewelry.Common
         // ====================================================
         // 配列の要素指定に使用するため内部番号を編集しないこと
         // ====================================================
-        [InspectorName("デカい宝石")] BigGem,
         [InspectorName("普通の宝石")] NormalGem,
+        [InspectorName("デカい宝石")] BigGem,
 
         [InspectorName("Inspectorから選択禁止項目")] JewelryTypeCount   // 配列の要素数用の列挙子
     }
