@@ -24,7 +24,11 @@ namespace InGame.Jewelry
 
         public override void Spawned()
         {
-            if (_hideLocal && Object.InputAuthority == Runner.LocalPlayer) gameObject.SetActive(false);
+            if (_hideLocal && Object.InputAuthority == Runner.LocalPlayer)
+            {
+                gameObject.SetActive(false);
+                // TODO : ローカルの時は左上に表示する
+            }
         }
 
         /// <summary>
@@ -36,13 +40,13 @@ namespace InGame.Jewelry
         {
             // 宝石の所持情報を満足に表示できない場合はreturn
             if (_jewelryUIArray == null
-                || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount)
+                || _jewelryUIArray.Length <= 0)
             {
                 Debug.LogWarning("宝石UIが不足しています");
                 return;
             }
 
+            if (_jewelryUIArray.Length <= (int)jewelryType) return;
             var image = _jewelryUIArray[(int)jewelryType].JewelryImage;
             if (image == null)
             {
@@ -61,13 +65,13 @@ namespace InGame.Jewelry
         {
             // 宝石の所持情報を満足に表示できない場合はreturn
             if (_jewelryUIArray == null
-                || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount)
+                || _jewelryUIArray.Length <= 0)
             {
                 Debug.LogWarning("宝石UIが不足しています");
                 return;
             }
 
+            if (_jewelryUIArray.Length <= (int)jewelryType) return;
             var text = _jewelryUIArray[(int)jewelryType].JewelryCountText;
             if (text == null)
             {
