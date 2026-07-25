@@ -19,6 +19,7 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private Transform _aimEffect;
         [SerializeField] private Vector3 _aimEffectOffset = new(0f, 0.01f, 0f);
         [SerializeField] private Transform _meshRoot;
+        [SerializeField] private PlayerMovement _playerMovement;
 
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         [SerializeField] private AnimationClip _idleClip;
@@ -43,7 +44,9 @@ namespace InGame.Player.Sarutobi
         private readonly List<Collider> _alreadyHits = new();
         private bool _isHitChecked;
 
-        private const float MeshRotateDuration = 0.3f;
+        private const float RotateDuration = 0.3f;
+
+        [Networked] public float RotationRatio { get; set; }
 
         public void StartEffect()
         {
@@ -54,12 +57,16 @@ namespace InGame.Player.Sarutobi
 
             _hitStartTimer = default;
             _hitEndTimer = default;
+        }
 
-            DOTween.To(() => new Vector3(0f, 0, 0f), _ =>
-            {
-                float angle = Quaternion.LookRotation(_aimEffect.position - _meshRoot.position).eulerAngles.y;
-                _meshRoot.rotation = Quaternion.Euler(0f, angle, 0f);
-            }, Vector3.zero, MeshRotateDuration);
+        public void StartLook()
+        {
+            DOTween.To(() => RotationRatio, v => RotationRatio = v, 1f, RotateDuration);
+        }
+
+        public void EndLook()
+        {
+            DOTween.To(() => RotationRatio, x => RotationRatio = x, 0f, RotateDuration);
         }
 
         private void HitCheck()
@@ -96,42 +103,45 @@ namespace InGame.Player.Sarutobi
                 }
             }
 
-            if (!IsAiming) return;
-
-            if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
-            {
-                _animationClipPlayer.PlayClip(_idleClip);
-            }
-
             if (GetInput(out PlayerInput input))
             {
-                float angle = Quaternion.LookRotation(_aimEffect.position - _meshRoot.position).eulerAngles.y;
-                _meshRoot.rotation = Quaternion.Euler(new Vector3(0f, angle, 0f));
+                if (RotationRatio > 0f) RotatePlayer(input.DesiredLookDirection);
 
-                Vector3 pos = GetThrowPos();
-                if (HasInputAuthority) RPC_SendTargetPosition(pos);
+                if (!IsAiming) return;
+
+                Vector3 pos = GetThrowPos(input.CameraPosition, input.DesiredLookDirection);
+                var aimPosition = pos + _aimEffectOffset;
+                _aimEffect.transform.position = aimPosition;
+
+                if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
+                {
+                    _animationClipPlayer.PlayClip(_idleClip);
+                }
 
                 if (input.Buttons.IsSet(_throwButton))
                 {
                     HitboxDebugUtility.DrawWireSphere(pos, _hitRadius, Color.red, 10f);
-                    _meshRoot.DOLocalRotate(Vector3.zero, MeshRotateDuration);
+                    _meshRoot.DOLocalRotate(Vector3.zero, RotateDuration);
                     IsAiming = false;
-                    if (HasInputAuthority) RPC_Throw(pos);
+                    EndLook();
+                    if (HasStateAuthority) RPC_Throw(pos);
                 }
             }
         }
 
-        private Vector3 GetThrowPos()
+        private void RotatePlayer(Vector3 desiredLookDirection)
         {
-            var cam = Camera.main;
-            if (cam == null) return Vector3.zero;
+            _playerMovement.SetRotationDirection(desiredLookDirection);
+        }
 
-            var ray = new Ray(cam.transform.position, cam.transform.forward);
-            Physics.Raycast(ray, out RaycastHit hit, _groundLayerMask);
+        private Vector3 GetThrowPos(Vector3 cameraPosition, Vector3 lookDirection)
+        {
+            var ray = new Ray(cameraPosition, lookDirection);
+            Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, _groundLayerMask);
             return hit.point;
         }
 
-        [Rpc]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_Throw(Vector3 targetPosition)
         {
             OnThrow?.Invoke();
@@ -150,16 +160,10 @@ namespace InGame.Player.Sarutobi
             }
         }
 
-        [Rpc]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_ShowAimTarget()
         {
             _aimEffect.gameObject.SetActive(true);
-        }
-
-        [Rpc]
-        private void RPC_SendTargetPosition(Vector3 position)
-        {
-            _aimEffect.transform.position = position + _aimEffectOffset;
         }
     }
 }
