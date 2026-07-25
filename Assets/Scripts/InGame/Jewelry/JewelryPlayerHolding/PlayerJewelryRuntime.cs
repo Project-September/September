@@ -85,6 +85,8 @@ namespace InGame.Jewelry
 
                 if (current == _preJewelryQuantities[i]) continue;
 
+                _preJewelryQuantities[i] = current;
+
                 var score = CalculateJewelryScore();
 
                 _onUpdateJewelryQuantity?.Invoke(JewelryType.NormalGem, score);
