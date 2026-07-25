@@ -86,8 +86,6 @@ namespace InGame.Player.Ability.Effect
 
         protected sealed override void OnUpdate(float deltaTime)
         {
-            Debug.Log($"{_startEffectTimer.RemainingTicks(Runner)} {_startEffectTimer.Expired(Runner)} {_startEffectTimer.IsRunning}");
-
             if (!_isEffectTriggered && _startEffectTimer.Expired(Runner))
             {
                 Debug.Log("<color=yellow>[AbilityUlt]</color> Start Effect");
