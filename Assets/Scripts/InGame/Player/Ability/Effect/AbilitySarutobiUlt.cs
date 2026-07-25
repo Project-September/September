@@ -29,6 +29,7 @@ namespace InGame.Player.Ability.Effect
         [SerializeField] private PlayableDirector _playableDirector;
         [SerializeField] private PlayableAsset _endSequence;
         [SerializeField] private PlayerManager _playerManager;
+        [SerializeField] private AbilitySarutobiUltRPCInvoker _rpcInvoker;
 
         private ThrowKunai _throwKunai;
 
@@ -36,7 +37,6 @@ namespace InGame.Player.Ability.Effect
         private Vector3 _endPosition;
 
         private bool _isLanding;
-        private PlayableAsset _originalAsset;
 
         protected override bool ManualCutInEnd => true;
 
@@ -56,11 +56,12 @@ namespace InGame.Player.Ability.Effect
         protected override void OnCutInStart()
         {
             NetworkObject player = Parameter.Owner;
-            _playerManager.RPC_SetPositionLock(true);
+            _playerManager.RPC_SetUseGrav(false);
             _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _originalPosition = player.transform.position;
             _endPosition = player.transform.position + Vector3.up * _jumpHeight;
             _cameraController.ChangeOffset(_cameraOffset, 0f);
+            _rpcInvoker.RPC_ChangeCameraOffset(_cameraOffset);
         }
 
         protected override void OnCutInUpdate(float deltaTime)
@@ -69,7 +70,7 @@ namespace InGame.Player.Ability.Effect
             {
                 if (!_isLanding) return;
 
-                _playableDirector.playableAsset = _originalAsset;
+                _rpcInvoker.RPC_SetStartTimeline();
                 EndCutIn();
                 return;
             }
@@ -97,17 +98,15 @@ namespace InGame.Player.Ability.Effect
         {
             _ultKunai.OnThrow -= StartLanding;
 
-            _originalAsset = _playableDirector.playableAsset;
-            _playableDirector.playableAsset = _endSequence;
-            _playableDirector.Play();
+            _rpcInvoker.RPC_SetEndTimeline();
             _isLanding = true;
         }
 
         protected override void OnCutInEnd()
         {
-            _cameraController.ResetOffset(_cameraResetDuration);
-            _playerManager.RPC_SetPositionLock(false);
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _rpcInvoker.RPC_ResetCameraOffset();
+            _playerManager.RPC_SetUseGrav(true);
+            _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
             _isLanding = false;
         }
 

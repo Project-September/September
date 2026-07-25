@@ -30,9 +30,10 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private LayerMask _groundLayerMask;
         [SerializeField] private int _damage;
 
+        [Networked] private bool IsAiming {get; set;}
+
         public event Action OnThrow;
 
-        private bool _isAiming;
         private Vector3 _targetPosition;
 
         private TickTimer _hitStartTimer;
@@ -47,10 +48,12 @@ namespace InGame.Player.Sarutobi
         public void StartEffect()
         {
             _alreadyHits.Clear();
-            _isAiming = true;
+            IsAiming = true;
             _isHitChecked = false;
             RPC_ShowAimTarget();
 
+            _hitStartTimer = default;
+            _hitEndTimer = default;
 
             DOTween.To(() => new Vector3(0f, 0, 0f), _ =>
             {
@@ -79,18 +82,21 @@ namespace InGame.Player.Sarutobi
 
         public override void FixedUpdateNetwork()
         {
-            if (_hitStartTimer.Expired(Runner) && !_isHitChecked)
+            if (HasStateAuthority)
             {
-                // 最低一回はヒット検出を行う
-                HitCheck();
-                _isHitChecked = true;
-            }
-            else if (_hitEndTimer.Expired(Runner) && !_hitStartTimer.Expired(Runner))
-            {
-                HitCheck();
+                if (_hitStartTimer.Expired(Runner) && !_isHitChecked)
+                {
+                    // 最低一回はヒット検出を行う
+                    HitCheck();
+                    _isHitChecked = true;
+                }
+                else if (_hitEndTimer.Expired(Runner) && !_hitStartTimer.Expired(Runner))
+                {
+                    HitCheck();
+                }
             }
 
-            if (!HasInputAuthority || !_isAiming) return;
+            if (!IsAiming) return;
 
             if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
             {
@@ -103,14 +109,14 @@ namespace InGame.Player.Sarutobi
                 _meshRoot.rotation = Quaternion.Euler(new Vector3(0f, angle, 0f));
 
                 Vector3 pos = GetThrowPos();
-                RPC_SendTargetPosition(pos);
+                if (HasInputAuthority) RPC_SendTargetPosition(pos);
+
                 if (input.Buttons.IsSet(_throwButton))
                 {
-                    RPC_HideAimTarget();
-                    RPC_Throw(pos);
-                    _meshRoot.DOLocalRotate(Vector3.zero, MeshRotateDuration);
                     HitboxDebugUtility.DrawWireSphere(pos, _hitRadius, Color.red, 10f);
-                    _isAiming = false;
+                    _meshRoot.DOLocalRotate(Vector3.zero, MeshRotateDuration);
+                    IsAiming = false;
+                    if (HasInputAuthority) RPC_Throw(pos);
                 }
             }
         }
@@ -130,6 +136,8 @@ namespace InGame.Player.Sarutobi
         {
             OnThrow?.Invoke();
 
+            _aimEffect.gameObject.SetActive(false);
+
             if (HasStateAuthority)
             {
                 _targetPosition = targetPosition;
@@ -140,12 +148,6 @@ namespace InGame.Player.Sarutobi
                 StaticServiceLocator.Instance.Get<EffectSpawner>()
                     .RequestPlayOneShotEffect(_kunaiEffect, targetPosition, quaternion.identity);
             }
-        }
-
-        [Rpc]
-        private void RPC_HideAimTarget()
-        {
-            _aimEffect.gameObject.SetActive(false);
         }
 
         [Rpc]
