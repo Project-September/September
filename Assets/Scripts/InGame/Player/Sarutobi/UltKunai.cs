@@ -124,7 +124,7 @@ namespace InGame.Player.Sarutobi
                     _meshRoot.DOLocalRotate(Vector3.zero, RotateDuration);
                     IsAiming = false;
                     EndLook();
-                    if (HasInputAuthority) RPC_Throw(pos);
+                    if (HasStateAuthority) RPC_Throw(pos);
                 }
             }
         }
@@ -141,7 +141,7 @@ namespace InGame.Player.Sarutobi
             return hit.point;
         }
 
-        [Rpc]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_Throw(Vector3 targetPosition)
         {
             OnThrow?.Invoke();
@@ -160,7 +160,7 @@ namespace InGame.Player.Sarutobi
             }
         }
 
-        [Rpc]
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_ShowAimTarget()
         {
             _aimEffect.gameObject.SetActive(true);
