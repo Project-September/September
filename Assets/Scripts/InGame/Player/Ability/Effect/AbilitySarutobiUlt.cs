@@ -51,7 +51,7 @@ namespace InGame.Player.Ability.Effect
 
             _throwKunai.SetBulletCount(1 + _addProjectileCount);
 
-            _ultKunai.StartEffect();
+            _ultKunai.StartStance();
             _ultKunai.OnThrow += StartLanding;
         }
 
