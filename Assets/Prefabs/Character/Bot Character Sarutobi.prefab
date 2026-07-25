@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 96146424916511875, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
+      propertyPath: _reachDistance
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 501615985649712554, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: SortKey
       value: 3032458956

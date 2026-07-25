@@ -146,7 +146,9 @@ namespace InGame.Common
             _locoWeight = Mathf.Abs(_locoWeight - wishWeight) <= deltaWeight ? wishWeight : _locoWeight < wishWeight ? _locoWeight + deltaWeight : _locoWeight - deltaWeight;
             _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
 
-            var speed = _playerMovement.GetSpeedOnPlane();
+            var velocity = _playerMovement.NetworkVelocity;
+            velocity.y = 0;
+            var speed = velocity.magnitude;
             // 速度を歩き〜走りの割合に変換
             var speedRate = Mathf.InverseLerp(walkSpeed, maxSpeed, speed);
 
@@ -155,9 +157,9 @@ namespace InGame.Common
                 _walkAnimSpeed,
                 _runAnimSpeed,
                 speedRate);
-            
+
             var playbackRate = baseSpeed > 0f ? speed / baseSpeed : 0f;
-            
+
             _animationClipPlayer.SetLocoPlaybackRate(playbackRate);
             // TopLayerで何も再生していないときはWeightを0にする
             if (!HasActiveTopLayerClip())
