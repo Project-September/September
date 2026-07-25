@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -228,7 +228,6 @@ namespace InGame.Common
         {
             if (!TryGetMontageIndex(clip, out int clipIndex))
             {
-                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
                 return;
             }
 
@@ -756,9 +755,15 @@ namespace InGame.Common
             }
 
             index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
-                x => x.AnimClip && x.AnimClip.name == clip.name);
+                x => x.AnimClip && (x.AnimClip == clip || x.AnimClip.name == clip.name));
 
-            return index >= 0;
+            if (index < 0)
+            {
+                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer", AnimationClipsContainer.Instance);
+                return false;
+            }
+
+            return true;
         }
         #endregion
 
@@ -826,16 +831,29 @@ namespace InGame.Common
         public bool TryGetPlayableInfo(AnimationClip clip, out PlayableInfo info)
         {
             info = default;
-            if (!TryGetMontageIndex(clip, out int index)) return false;
+            if (!TryGetMontageIndex(clip, out int index))
+            {
+                Debug.LogWarning($"AnimationClipPlayer: AnimationClip {clip.name} is not found in AnimationClipsContainer");
+                return false;
+            }
             var montage = AnimationClipsContainer.Instance.AnimationMontages[index];
             _runtimeClips.TryGetValue(montage.TargetLayer, out var playable);
-            if (playable.IsValid() && playable.GetAnimationClip() == clip)
+
+            if (!playable.IsValid())
             {
-                info = new PlayableInfo(this, playable, montage, montage.AnimClip, montage.TargetLayer, _slotOf[montage.TargetLayer]);
-                return true;
+                Debug.LogWarning($"AnimationClipPlayer: playable is not valid");
+                return false;
             }
 
-            return false;
+            var playableClip = playable.GetAnimationClip();
+            if (playableClip != clip && playableClip.name != clip.name)
+            {
+                Debug.LogWarning($"AnimationClipPlayer: playable is not clip (playable:{playableClip?.name}, clip:{clip?.name})");
+                return false;
+            }
+
+            info = new PlayableInfo(this, playable, montage, montage.AnimClip, montage.TargetLayer, _slotOf[montage.TargetLayer]);
+            return true;
         }
 
         /// <summary>

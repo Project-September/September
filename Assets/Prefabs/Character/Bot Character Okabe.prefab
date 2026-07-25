@@ -162,7 +162,7 @@ PrefabInstance:
       objectReference: {fileID: 3406663241541497472}
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 22
+      value: 23
       objectReference: {fileID: 0}
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[2]'
@@ -227,23 +227,43 @@ PrefabInstance:
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[17]'
       value: 
-      objectReference: {fileID: 3756915935459013970}
+      objectReference: {fileID: 7493716217912256341}
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[18]'
       value: 
-      objectReference: {fileID: 2105394848532203748}
+      objectReference: {fileID: 3756915935459013970}
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[19]'
       value: 
-      objectReference: {fileID: 2878394974925864928}
+      objectReference: {fileID: 2105394848532203748}
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[20]'
       value: 
-      objectReference: {fileID: 8693856495495344929}
+      objectReference: {fileID: 2878394974925864928}
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[21]'
       value: 
+      objectReference: {fileID: 8693856495495344929}
+    - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[22]'
+      value: 
       objectReference: {fileID: 5696257112750821596}
+    - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[23]'
+      value: 
+      objectReference: {fileID: 5696257112750821596}
+    - target: {fileID: 5124606982482603319, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'okb_ReJoint:test__Spine'\n\tTransform 'okb_ReJoint:test__L_UpLeg'\n\tTransform
+        'okb_ReJoint:test__R_UpLeg'\n\tTransform 'okb_ReJoint:test_okb_Reference2'\n\tTransform
+        'okb_ReJoint:test__Hips'\n\tTransform 'okb_ReJoint:test__L_Foot'\n\tTransform
+        'okb_ReJoint:test__R_ToeBase'\n\tTransform 'okb_ReJoint:test__R_HandThumb1'\n\tTransform
+        'okb_ReJoint:test__R_HandMiddle1'\n\tTransform 'okb_ReJoint:test__R_HandMiddle2'\n\tand
+        more ...\n\tFrom animation clip 'fall'\n\tFrom animation clip 'wait'\n\tFrom
+        animation clip 'walk'\n\tFrom animation clip 'run'"
+      objectReference: {fileID: 0}
     - target: {fileID: 5670284259379751550, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: SortKey
       value: 2327456004
@@ -595,6 +615,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0dbe2b9699eb99a4196b57d0c4b40c1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7493716217912256341 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7412114326972787105, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+  m_PrefabInstance: {fileID: 81655814983880436}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240666927383703174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5ef1d32218444f58429b4faddd7c1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &8287456213719297536 stripped

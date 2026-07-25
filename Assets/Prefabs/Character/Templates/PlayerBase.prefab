@@ -5472,6 +5472,7 @@ GameObject:
   - component: {fileID: 918520937756284502}
   - component: {fileID: 6992982918667310570}
   - component: {fileID: 8026515877087289600}
+  - component: {fileID: 202504370253565435}
   m_Layer: 6
   m_Name: PlayerBase
   m_TagString: Player
@@ -5571,6 +5572,7 @@ MonoBehaviour:
   - {fileID: 918520937756284502}
   - {fileID: 6992982918667310570}
   - {fileID: 8026515877087289600}
+  - {fileID: 202504370253565435}
   - {fileID: 4810525472409146702}
   - {fileID: 2132102575819528591}
   - {fileID: 3043690341386287730}
@@ -6043,7 +6045,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bf0feaffd3a44cbbc9c8f3292f0c948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredScore: 2147483647
+  _requiredScore: 1000
 --- !u!114 &8782963132285940316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6126,6 +6128,20 @@ MonoBehaviour:
   _pickUpSoundCueName: SE_Jewel_PickUp
   _interactEffectType: 27
   _interactEffectOffset: {x: 0, y: 0.6, z: 0}
+--- !u!114 &202504370253565435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5ef1d32218444f58429b4faddd7c1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+  _audioBroadcaster: {fileID: 2132102575819528591}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

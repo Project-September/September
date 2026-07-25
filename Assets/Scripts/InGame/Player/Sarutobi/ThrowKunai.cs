@@ -101,12 +101,15 @@ namespace InGame.Player.Sarutobi
         {
             if (!GetInput<PlayerInput>(out var input)) return;
 
-            if (State == KunaiStateType.Idol && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability2)
-                                             && _grapplingHook && _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active)
+            if (State == KunaiStateType.Idol &&
+                _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal &&
+                input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability2) &&
+                _grapplingHook && _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active)
             {
                 StartStance().Forget();
             }
-            if (input.Buttons.WasReleased(PreviousButtons, PlayerButtons.Ability2))
+
+            if (State != KunaiStateType.Idol && input.Buttons.WasReleased(PreviousButtons, PlayerButtons.Ability2))
             {
                 EndStance();
             }
