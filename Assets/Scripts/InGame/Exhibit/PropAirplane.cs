@@ -365,7 +365,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
-            RPC_ChangeDescriptionUI(ownerPlayerRef, ControlDescriptionType.Exhibit);
+            RPC_ChangeDescriptionUI(ownerPlayerRef, ControlDescriptionType.AirPlane);
             RPC_SetIsKinematic(false);
             // 乗った時刻を記録
             GetOnTime = Runner.SimulationTime;

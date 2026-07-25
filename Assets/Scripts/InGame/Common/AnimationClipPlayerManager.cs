@@ -30,7 +30,9 @@ namespace InGame.Common
         [SerializeField] private AnimationCurve _fallInCurve = null;   // null の場合は線形扱い
         [SerializeField, Range(0f, 1f)] private float _landOutTime = 0.12f;
         [SerializeField] private AnimationCurve _landOutCurve = null;
-        
+        [SerializeField] private float _walkAnimSpeed = 1f;
+        [SerializeField] private float _runAnimSpeed = 2f;
+
         [Header("被ダメ")]
         [SerializeField] private AnimationClip _hitReactionClip = null;
         [Header("気絶")]
@@ -39,7 +41,7 @@ namespace InGame.Common
         [SerializeField, Range(0f, 1f)] private float _overrideOutTime = 0.10f;
         [SerializeField] private AnimationCurve _overrideOutCurve = null;
         private bool _hardOverride = false;
-        
+
         private bool _isFadingOutFall = false;       // 着地フェード多重起動防止
         private CancellationTokenSource _overrideCts;
         private bool _isFainting = false;          // 気絶中フラグ（多重起動防止）
@@ -61,7 +63,7 @@ namespace InGame.Common
                         _isFainting = false;
                     }
                 }).AddTo(this);
-            
+
             _playerHealth.OnHitTaken += (hitData) =>
             {
                 if (!_playerManager.IsStun && hitData.HitActionType == HitActionType.Damage)
@@ -70,7 +72,7 @@ namespace InGame.Common
                     _animationClipPlayer.PlayClip(_hitReactionClip);
                 }
             };
-            
+
             _playerMovement.OnStartVault += () =>
             {
                 if (!_hardOverride)
@@ -78,7 +80,7 @@ namespace InGame.Common
                     RPC_TriggerVault();
                 }
             };
-            
+
             _playerMovement.UpdateAsObservable()
                 .Select(_ => _playerMovement.IsGroundNet)
                 .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(this);
@@ -96,7 +98,8 @@ namespace InGame.Common
                 _animationClipPlayer.BlendLayerWeight(
                     LayerInfo.LayerType.TopLayer,
                     1f,
-                    new LayerInfo.Blend {
+                    new LayerInfo.Blend
+                    {
                         BlendTime = _fallInTime,
                         BlendCurve = _fallInCurve
                     }
@@ -136,13 +139,26 @@ namespace InGame.Common
             var moveSpeed = _playerMovement.NetworkVelocity.magnitude;
             var wishWeight = (moveSpeed <= walkSpeed)
                 ? Mathf.InverseLerp(0f, walkSpeed, moveSpeed)         // 0..1
-                : Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed)+1f; // 1..2
+                : Mathf.InverseLerp(walkSpeed, maxSpeed, moveSpeed) + 1f; // 1..2
             if (Mathf.Abs(wishWeight) < 1e-3f) wishWeight = 0f;
             // weight を遷移させる
             float deltaWeight = _locoBlendSpeed * Time.deltaTime;
             _locoWeight = Mathf.Abs(_locoWeight - wishWeight) <= deltaWeight ? wishWeight : _locoWeight < wishWeight ? _locoWeight + deltaWeight : _locoWeight - deltaWeight;
             _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
 
+            var speed = _playerMovement.GetSpeedOnPlane();
+            // 速度を歩き〜走りの割合に変換
+            var speedRate = Mathf.InverseLerp(walkSpeed, maxSpeed, speed);
+
+            // その割合でアニメーション基準速度を補間
+            var baseSpeed = Mathf.Lerp(
+                _walkAnimSpeed,
+                _runAnimSpeed,
+                speedRate);
+            
+            var playbackRate = baseSpeed > 0f ? speed / baseSpeed : 0f;
+            
+            _animationClipPlayer.SetLocoPlaybackRate(playbackRate);
             // TopLayerで何も再生していないときはWeightを0にする
             if (!HasActiveTopLayerClip())
             {
@@ -155,7 +171,7 @@ namespace InGame.Common
             //     SetFallAnim(true);
             // }
         }
-        
+
         public void TriggerFaint()
         {
             // すでに実行中なら差し替え（再発動）
@@ -171,17 +187,17 @@ namespace InGame.Common
                 _ = TriggerVault();
             }
         }
-        
+
         public async UniTask TriggerVault()
         {
-            
+
             if (_jumpOverTokenSrc != null)
             {
                 _jumpOverTokenSrc.Cancel();
                 _jumpOverTokenSrc.Dispose();
             }
             _animationClipPlayer.PlayOnTopLayer(_jumpOver);
-            
+
             _jumpOverTokenSrc = new CancellationTokenSource();
             // ジャンプオーバークリップの長さだけ待機（速度変更を考慮しない場合は length をそのまま使用）
             if (_jumpOver && _jumpOver.length > 0f)
@@ -198,7 +214,7 @@ namespace InGame.Common
             _animationClipPlayer.PlayOnTopLayer(null);
             if (!_playerMovement.IsGroundNet) SetFallAnim(false);
         }
-        
+
         /// <summary>強制解除（リスポーン等）</summary>
         public void ForceClearOverride()
         {
@@ -211,7 +227,7 @@ namespace InGame.Common
 
 
 
-          private async UniTaskVoid PlayFaintSequenceAsync()
+        private async UniTaskVoid PlayFaintSequenceAsync()
         {
             _hardOverride = true;
 
@@ -276,7 +292,7 @@ namespace InGame.Common
                 cts.Dispose();
             }
         }
-        
+
 
         // 1→0へブレンド完了後にTopLayerを外す
         private async UniTaskVoid FadeOutAndClearFall()

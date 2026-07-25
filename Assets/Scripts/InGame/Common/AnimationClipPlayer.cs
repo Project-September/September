@@ -19,7 +19,7 @@ namespace InGame.Common
     {
         [SerializeField] private List<LayerInfo> _layerInfo;
         [SerializeField, Range(0f, 10f)] private float _graphSpeed = 1f;
-        [Header("移動アニメーション")] 
+        [Header("移動アニメーション")]
         [SerializeField] private AnimationClip _wait;
         [SerializeField] private AnimationClip _walk;
         [SerializeField] private AnimationClip _run;
@@ -54,7 +54,7 @@ namespace InGame.Common
         {
             if (!_animator && !TryGetComponent(out _animator))
                 Debug.LogError("[AnimationClipPlayer] Animator がありません。");
-                        
+
             if (_layerInfo == null || _layerInfo.Count == 0)
             {
                 Debug.LogError("LayerInfo を設定してください。（Base 含む）");
@@ -133,7 +133,7 @@ namespace InGame.Common
             {
                 Initialize();
             }
-            
+
             UpdateLocoBlend(_locoWeight);
             // レイヤー重み（Base以外）
             foreach (var kv in _slotOf)
@@ -149,7 +149,7 @@ namespace InGame.Common
             _graph.Evaluate(Time.deltaTime * _graphSpeed);
         }
         #endregion
-        
+
         #region Play
         /// <summary>
         /// AnimationClipsContainerに登録されているMontageを再生します。
@@ -164,11 +164,11 @@ namespace InGame.Common
                 Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
                 return;
             }
-            
+
             RPC_PlayAsync(index);
             PlayAsync(index);
         }
-        
+
         /// <summary> 再生したClipが終了または中断されるまで待機 </summary>
         public async UniTask<EndClipType> PlayClipAndWait(AnimationClip clip)
         {
@@ -178,11 +178,11 @@ namespace InGame.Common
                 Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
                 return EndClipType.Failed;
             }
-            
+
             RPC_PlayAsync(index);
             return await PlayAsync(index);
         }
-        
+
         /// <summary> TopLayerでアニメーションを再生 </summary>
         public void PlayOnTopLayer(AnimationClip clip)
         {
@@ -223,14 +223,14 @@ namespace InGame.Common
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
             _layerInfo[slot] = li;
         }
-        
+
         public void Play(AnimationClip clip, bool forcePlay = false)
         {
             if (!TryGetMontageIndex(clip, out int clipIndex))
             {
                 return;
             }
-            
+
             if (Application.isPlaying) RPC_Play(clipIndex, forcePlay);
             Play(clipIndex, forcePlay);
         }
@@ -376,16 +376,16 @@ namespace InGame.Common
             var clip = montage.AnimClip;
             var playSpeed = montage.PlaySpeed;
             var additive = montage.IsAdditive;
-            
+
             if (!forcePlay &&
-                _runtimeClips.TryGetValue(layerType, out var playable) && 
+                _runtimeClips.TryGetValue(layerType, out var playable) &&
                 playable.IsValid() &&
                 playable.GetAnimationClip() == clip)
             {
                 playable.SetSpeed(playSpeed);
                 return;
             }
-            
+
             if (!_slotOf.TryGetValue(layerType, out int slot))
             {
                 Debug.LogWarning($"未定義のレイヤー {layerType}");
@@ -393,7 +393,7 @@ namespace InGame.Common
             }
 
             RenewLayerCts(layerType);
-            
+
             Play(clip, layerType, 1, additive, playSpeed);
         }
 
@@ -402,7 +402,7 @@ namespace InGame.Common
         {
             Play(index, forcePlay);
         }
-        
+
         private void Play(AnimationClip clip, LayerInfo.LayerType layerType, float weight, bool additive = false, float playSpeed = 1f)
         {
             if (!clip) return;
@@ -425,7 +425,7 @@ namespace InGame.Common
                 _layerMixer.DisconnectInput(slot);
                 prev.Destroy();
             }
-            
+
             _clipOf[layerType] = clip;
 
             var p = AnimationClipPlayable.Create(_graph, clip);
@@ -441,10 +441,24 @@ namespace InGame.Common
             _runtimeClips[layerType] = p;
         }
         #endregion
-        
+
         #region Weight
         public void SetLocoWeight(float w) => _locoWeight = w;
-        
+
+        public void SetLocoPlaybackRate(float rate)
+        {
+            rate = Mathf.Max(0f, rate);
+
+            // 0番は待機、1番が歩き、2番が走り
+            for (int i = 1; i < _baseMixer.GetInputCount(); i++)
+            {
+                var input = _baseMixer.GetInput(i);
+
+                if (input.IsValid())
+                    input.SetSpeed(rate);
+            }
+        }
+
         private void UpdateLocoBlend(float w)
         {
             w = Mathf.Clamp(w, 0f, 2f);
@@ -466,7 +480,7 @@ namespace InGame.Common
             _baseMixer.SetInputWeight(1, wWalk);
             _baseMixer.SetInputWeight(2, wRun);
         }
-        
+
         public float GetTargetLayerWeight(LayerInfo.LayerType layer)
         {
             if (!_slotOf.TryGetValue(layer, out int slot))
@@ -482,7 +496,7 @@ namespace InGame.Common
         {
             LayerInfo.Blend blend;
             float startTime;
-            
+
             {
                 // イン
                 if (time < blendIn.BlendTime)
@@ -512,7 +526,7 @@ namespace InGame.Common
 
             var blendDuration = Mathf.Max(blend.BlendTime, 1e-6f);
             var t = Mathf.Clamp01((time - startTime) / blendDuration);
-            
+
             var weight = blend.BlendCurve.Evaluate(t);
 
             SetLayerWeight(layerType, weight);
@@ -539,7 +553,7 @@ namespace InGame.Common
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
-        
+
         public async UniTask BlendLayerWeight(
             LayerInfo.LayerType layer,
             float toWeight,
@@ -570,7 +584,7 @@ namespace InGame.Common
             var token = linked.Token;
 
             float from = Mathf.Clamp01(_layerInfo[slot].Weight);
-            float to   = Mathf.Clamp01(toWeight);
+            float to = Mathf.Clamp01(toWeight);
 
             if (Mathf.Approximately(blend.BlendTime, 0f))
             {
@@ -601,7 +615,7 @@ namespace InGame.Common
 
             SetLayerWeight(layer, to);
         }
-        
+
         public void SetLayerWeight(LayerInfo.LayerType layer, float weight)
         {
             if (layer == LayerInfo.LayerType.Base)
@@ -639,7 +653,7 @@ namespace InGame.Common
             _graph.Destroy();
         }
         #endregion
-        
+
         #region Utility
         public bool IsPlayingTargetClip(AnimationClip clip)
         {
@@ -660,7 +674,7 @@ namespace InGame.Common
             }
             return false;
         }
-        
+
         /// <summary>
         /// 以前使っていたレイヤーの処理が残っていればキャンセル
         /// </summary>
@@ -716,7 +730,7 @@ namespace InGame.Common
                 if (token.IsCancellationRequested) break;
             }
         }
-        
+
         /// <summary>
         /// 指定のPlayableが再生中であれば、Mixerとの接続を解除したのち破棄する
         /// </summary>
@@ -730,7 +744,7 @@ namespace InGame.Common
                 _clipOf.Remove(layerType);
             }
         }
-        
+
         private bool TryGetMontageIndex(AnimationClip clip, out int index)
         {
             index = -1;
@@ -739,7 +753,7 @@ namespace InGame.Common
                 Debug.LogWarning("AnimationClipsContainer Instance is null");
                 return false;
             }
-            
+
             index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
                 x => x.AnimClip && (x.AnimClip == clip || x.AnimClip.name == clip.name));
 
@@ -812,7 +826,7 @@ namespace InGame.Common
             return false;
         }
         #endregion
-        
+
         #region Outside Controls
         public bool TryGetPlayableInfo(AnimationClip clip, out PlayableInfo info)
         {
@@ -841,7 +855,7 @@ namespace InGame.Common
             info = new PlayableInfo(this, playable, montage, montage.AnimClip, montage.TargetLayer, _slotOf[montage.TargetLayer]);
             return true;
         }
-        
+
         /// <summary>
         /// AnimationClipPlayerで管理しているPlayableを外部から操作するための型
         /// </summary>
@@ -853,7 +867,7 @@ namespace InGame.Common
             public readonly AnimationClip clip;
             public readonly LayerInfo.LayerType layerType;
             public readonly int slot;
-            
+
             public PlayableInfo(AnimationClipPlayer player, AnimationClipPlayable playable, AnimationMontageStruct montage, AnimationClip clip, LayerInfo.LayerType layerType, int slot)
             {
                 this.player = player;
@@ -868,7 +882,7 @@ namespace InGame.Common
             {
                 playable.SetTime(time);
                 playable.SetSpeed(0);
-                
+
                 if (updateBlendWeight)
                 {
                     player.UpdateLayerBlendWeight(layerType, montage.BlendIn, montage.BlendOut, clip.length, time);
