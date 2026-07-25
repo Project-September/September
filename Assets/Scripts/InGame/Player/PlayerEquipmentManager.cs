@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
@@ -5,12 +6,17 @@ using UnityEngine;
 
 namespace InGame.Player
 {
-    public class PlayerEquipmentManager : MonoBehaviour
+    public class PlayerEquipmentManager : NetworkBehaviour
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private Equipment[] _equipmentData;
 
         private readonly Dictionary<HumanBodyBones, Equipment> _currentEquipments = new();
+
+        public IReadOnlyDictionary<HumanBodyBones, Equipment> CurrentEquipments => _currentEquipments;
+
+        public event Action<Equipment> Equipped;
+        public event Action<Equipment> Unequipped;
 
         private void Start()
         {
@@ -47,6 +53,8 @@ namespace InGame.Player
             InstanceEquipment(targetEquipment);
 
             _currentEquipments[targetEquipment.HumanBodyBones] = targetEquipment;
+
+            Equipped?.Invoke(targetEquipment);
         }
 
         private void InstanceEquipment(Equipment targetEquipment)
@@ -68,6 +76,8 @@ namespace InGame.Player
 
             Destroy(equipment.ClonedObject);
             equipment.ClonedObject = null;
+
+            Unequipped?.Invoke(equipment);
         }
     }
     [System.Serializable]

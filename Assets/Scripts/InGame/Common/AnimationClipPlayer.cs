@@ -228,7 +228,6 @@ namespace InGame.Common
         {
             if (!TryGetMontageIndex(clip, out int clipIndex))
             {
-                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer");
                 return;
             }
             
@@ -743,8 +742,14 @@ namespace InGame.Common
             
             index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
                 x => x.AnimClip && x.AnimClip.name == clip.name);
-            
-            return index >= 0;
+
+            if (index < 0)
+            {
+                Debug.LogWarning($"AnimationClip {clip.name} is not found in AnimationClipsContainer", AnimationClipsContainer.Instance);
+                return false;
+            }
+
+            return true;
         }
         #endregion
 

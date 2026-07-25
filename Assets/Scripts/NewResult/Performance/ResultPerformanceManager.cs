@@ -25,7 +25,7 @@ namespace September.NewResult
         {
             var loadSceneTask = UniTask.Create(gameResultInfo.StageSceneName, async stageSceneName =>
             {
-                var loadSceneName = "Result_" + stageSceneName;
+                var loadSceneName = "Result_Field"; // 仮置き
                 await SceneManager.LoadSceneAsync(loadSceneName, LoadSceneMode.Additive);
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName(loadSceneName));
             });
