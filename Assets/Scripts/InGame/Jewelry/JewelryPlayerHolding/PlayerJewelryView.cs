@@ -62,7 +62,7 @@ namespace InGame.Jewelry
             // 宝石の所持情報を満足に表示できない場合はreturn
             if (_jewelryUIArray == null || _jewelryUIArray.Length <= (int)jewelryType)
             {
-                Debug.LogWarning($"宝石UIが不足しています。{(int)jewelryType}個のUIが必要です: {gameObject.GetHierarchyPath()}", this);
+                Debug.LogWarning($"宝石UIが不足しています。{(int)jewelryType + 1}個のUIが必要です: {gameObject.GetHierarchyPath()}", this);
                 return false;
             }
 
