@@ -29,22 +29,22 @@ namespace September.InGame.Player.Tanihira
         {
             foreach (FriendBase friend in _formationManager.CurrentFriendsList)
             {
-                friend.transform.localScale = Vector3.one;
+                friend.Scale = 1f;
                 friend.StopBuff();
             }
         }
 
         private async UniTaskVoid HugeSequence(FriendBase friend)
         {
-            friend.gameObject.SetActive(false);
-            friend.transform.localScale = Vector3.one * _effectEndScale;
+            friend.IsVisible = false;
+            friend.Scale = _effectEndScale;
             StaticServiceLocator.Instance.Get<EffectSpawner>().RequestPlayOneShotEffect(
                 _scaleEffect,
                 friend.transform.position,
                 friend.transform.rotation
                 );
             await UniTask.WaitForSeconds(_effectDuration);
-            friend.gameObject.SetActive(true);
+            friend.IsVisible = true;
             friend.StartBuff(_buffRate);
         }
     }

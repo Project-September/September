@@ -40,6 +40,8 @@ namespace Ingame.Tanihira
         [SerializeField] private Transform _attackEffectPos;
         [SerializeField] private GameObject _runEffectObject;
         [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
+        [SerializeField] private GameObject _meshObject;
+
         [Networked] private NetworkBool HasMask { get; set; }
         [Networked] private NetworkBool HasRunEffect { get; set; }
         [Header("攻撃指示")]
@@ -48,6 +50,9 @@ namespace Ingame.Tanihira
         [Networked] public NetworkBool IsCanAttack { get; private set; }
         [Header("規定の攻撃量（超えたら指示があるまで攻撃はしない）")] 
         [SerializeField] private int _regulationAttackAmount;
+
+        [Networked, OnChangedRender(nameof(OnChangeVisible))] public NetworkBool IsVisible { get; set; } = true;
+        [Networked, OnChangedRender(nameof(OnChangeScale))] public float Scale { get; set; } = 1f;
         
         protected NavMeshAgent _agent;
         protected NetworkRunner _networkRunner;
@@ -62,6 +67,7 @@ namespace Ingame.Tanihira
         /// 現在の攻撃量
         /// </summary>
         private int _currentAttackAmount;
+        private int _originalRegulationAttackAmount;
 
         private static int _spawnCount;
         public bool IsAttack;
@@ -96,6 +102,8 @@ namespace Ingame.Tanihira
             _friendStateMappings[FriendState.None] = new FriendNoneState();
             _agent = GetComponent<NavMeshAgent>();
             _mecanimAnimator = GetComponent<NetworkMecanimAnimator>();
+
+            _originalRegulationAttackAmount = _regulationAttackAmount;
             
             InitializeStates();
             ChangeState(_initialState);
@@ -358,6 +366,8 @@ namespace Ingame.Tanihira
         {
             _currentStatus.FriendFormationSpeed *= buffRate;
             _currentStatus.FriendChaseSpeed *= buffRate;
+            _currentStatus.FriendRotateSpeed *= buffRate;
+            _regulationAttackAmount = Mathf.FloorToInt(buffRate * _regulationAttackAmount);
             _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * buffRate);
             ApplyStatus();
         }
@@ -367,6 +377,7 @@ namespace Ingame.Tanihira
             _currentStatus.FriendFormationSpeed = _friendStatus.FriendFormationSpeed;
             _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
             _currentStatus.AttackPower = _friendStatus.AttackPower;
+            _regulationAttackAmount = _originalRegulationAttackAmount;
             ApplyStatus();
         }
 
@@ -403,6 +414,17 @@ namespace Ingame.Tanihira
         public void SetAttackOrdered(bool isOrdered)
         {
             IsAttackOrdered = isOrdered;
+        }
+
+        private void OnChangeVisible()
+        {
+            _agent.enabled = IsVisible;
+            _meshObject.SetActive(IsVisible);
+        }
+
+        private void OnChangeScale()
+        {
+            transform.localScale = Vector3.one * Scale;
         }
     }
 }
