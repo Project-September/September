@@ -14105,6 +14105,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7020943087661863767, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _requiredScore
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7325268686366126974, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_PlayableAsset
       value: 
@@ -14777,6 +14781,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6821731523155062005}
   m_SourcePrefab: {fileID: 100100000, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+--- !u!114 &96146424916511875 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3242880713039265549, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 3194339089641452430}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6364534128585291686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587e83a63041ba6409720410fb73af1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &462127241365867004 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3043690341386287730, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -15025,6 +15040,7 @@ MonoBehaviour:
   _aimEffect: {fileID: 4634014064422691006}
   _aimEffectOffset: {x: 0, y: 0.01, z: 0}
   _meshRoot: {fileID: 3959057664669718629}
+  _playerMovement: {fileID: 96146424916511875}
   _animationClipPlayer: {fileID: 2152670494775263649}
   _idleClip: {fileID: 1827226128182048838, guid: 08895a5dbf2916b41809255262b69893, type: 3}
   _hitStartTime: 0.7667
@@ -15037,6 +15053,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 129
   _damage: 200
+  _MeshRotationRatio: 0
 --- !u!114 &6821731523155062005
 MonoBehaviour:
   m_ObjectHideFlags: 0
