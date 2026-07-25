@@ -127,7 +127,7 @@ namespace InGame.Player.Sarutobi
             if (cam == null) return Vector3.zero;
 
             var ray = new Ray(cam.transform.position, cam.transform.forward);
-            Physics.Raycast(ray, out RaycastHit hit, _groundLayerMask);
+            Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, _groundLayerMask);
             return hit.point;
         }
 
