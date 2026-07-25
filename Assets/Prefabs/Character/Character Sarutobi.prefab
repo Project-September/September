@@ -8528,6 +8528,7 @@ Transform:
   - {fileID: 1341896697879972715}
   - {fileID: 3593055086298636627}
   - {fileID: 2448639466794666698}
+  - {fileID: 1663593619810408819}
   m_Father: {fileID: 5872314376901516703}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6217509036417279715
@@ -10241,6 +10242,37 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.07870999, y: 0.06428211, z: 0.009302236}
     m_Extent: {x: 0.006446719, y: 0.0049555283, z: 0.007057696}
   m_DirtyAABB: 0
+--- !u!1 &7244065366176513486
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1663593619810408819}
+  m_Layer: 0
+  m_Name: Tutan
+  m_TagString: Head
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1663593619810408819
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7244065366176513486}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.5000002, y: 0.49999982, z: 0.49999958, w: 0.5000005}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2952734542852183625}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 90}
 --- !u!1 &7263459585769558687
 GameObject:
   m_ObjectHideFlags: 0
