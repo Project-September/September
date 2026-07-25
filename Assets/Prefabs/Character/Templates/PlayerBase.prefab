@@ -5974,6 +5974,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _walkAnimSpeed: 1
+  _runAnimSpeed: 2
   _hitReactionClip: {fileID: 7400000, guid: dc52e77d074bc11469d9ad6d72bb5654, type: 2}
   _overrideInTime: 0.08
   _overrideInCurve:
@@ -5989,7 +5991,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  EnableFallMotion: 1
+  _EnableFallMotion: 1
 --- !u!114 &9111916553959908344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7288,6 +7290,10 @@ PrefabInstance:
     - target: {fileID: 3057433584865446383, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
       propertyPath: SortKey
       value: 963172361
+      objectReference: {fileID: 0}
+    - target: {fileID: 7030438142900011129, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7278236405501402711, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
       propertyPath: m_AnchorMax.y

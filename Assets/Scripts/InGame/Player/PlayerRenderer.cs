@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Common.Extensions;
 using Fusion;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -86,7 +87,7 @@ namespace InGame.Player
         {
             if (playerEquipmentManager == null)
             {
-                Debug.LogWarning("Player Equipment Manager is null");
+                Debug.LogWarning($"Player Equipment Manager is null: {gameObject.GetHierarchyPath()}");
                 return;
             }
 

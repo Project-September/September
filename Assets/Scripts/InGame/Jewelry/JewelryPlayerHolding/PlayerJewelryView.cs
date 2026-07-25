@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using Fusion;
 using System;
+using Common.Extensions;
 using UnityEngine.UI;
 using InGame.Jewelry.Common;
 
@@ -37,21 +38,9 @@ namespace InGame.Jewelry
         /// <param name="sprite">アイコン</param>
         public void Init(JewelryType jewelryType, Sprite sprite)
         {
-            // 宝石の所持情報を満足に表示できない場合はreturn
-            if (_jewelryUIArray == null
-                || _jewelryUIArray.Length <= 0)
-            {
-                Debug.LogWarning("宝石UIが不足しています");
-                return;
-            }
+            if (!Validate(jewelryType)) return;
 
-            if (_jewelryUIArray.Length <= (int)jewelryType) return;
             var image = _jewelryUIArray[(int)jewelryType].JewelryImage;
-            if (image == null)
-            {
-                Debug.LogWarning("Imageコンポーネントが見つかりませんでした");
-                return;
-            }
             image.sprite = sprite;
         }
 
@@ -62,22 +51,34 @@ namespace InGame.Jewelry
         /// <param name="count">宝石の数</param>
         public void UpdateJewelryCount(JewelryType jewelryType, int count)
         {
+            if (!Validate(jewelryType)) return;
+
+            var text = _jewelryUIArray[(int)jewelryType].JewelryCountText;
+            text.text = count.ToString();
+        }
+
+        private bool Validate(JewelryType jewelryType)
+        {
             // 宝石の所持情報を満足に表示できない場合はreturn
-            if (_jewelryUIArray == null
-                || _jewelryUIArray.Length <= 0)
+            if (_jewelryUIArray == null || _jewelryUIArray.Length <= (int)jewelryType)
             {
-                Debug.LogWarning("宝石UIが不足しています");
-                return;
+                Debug.LogWarning($"宝石UIが不足しています。{(int)jewelryType}個のUIが必要です: {gameObject.GetHierarchyPath()}", this);
+                return false;
             }
 
-            if (_jewelryUIArray.Length <= (int)jewelryType) return;
-            var text = _jewelryUIArray[(int)jewelryType].JewelryCountText;
-            if (text == null)
+            if (_jewelryUIArray[(int)jewelryType].JewelryCountText == null)
             {
-                Debug.LogWarning("テキストコンポーネントが見つかりませんでした");
-                return;
+                Debug.LogWarning($"テキストコンポーネントが見つかりませんでした: {gameObject.GetHierarchyPath()}", this);
+                return false;
             }
-            text.text = count.ToString();
+
+            if (_jewelryUIArray[(int)jewelryType].JewelryImage == null)
+            {
+                Debug.LogWarning($"Imageコンポーネントが見つかりませんでした: {gameObject.GetHierarchyPath()}", this);
+                return false;
+            }
+
+            return true;
         }
     }
 }
