@@ -5373,6 +5373,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
+--- !u!114 &639522504073893310 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6751860095228096695, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
+  m_PrefabInstance: {fileID: 6148370820579583241}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dbe2b9699eb99a4196b57d0c4b40c1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &3357854975992492082 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8919970465301828923, guid: 1b7c90ad8e32a7c46b8172627e8fd6fe, type: 3}
@@ -5744,7 +5755,7 @@ PrefabInstance:
     - target: {fileID: 3839639129466349583, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _playerJewelryView
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 639522504073893310}
     - target: {fileID: 4102293410906870200, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: SortKey
       value: 1349920742
