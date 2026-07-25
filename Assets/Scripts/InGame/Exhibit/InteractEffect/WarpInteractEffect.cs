@@ -69,7 +69,7 @@ namespace InGame.Exhibit
             PlayEffect(EffectType.WarpIn, effectPos, Quaternion.identity);
 
             // Playerを初期化
-            SetPlayerVisible(player, false);
+            //SetPlayerVisible(player, false);
             Vector3 targetPos = _warpPosition.transform.position;
             Vector3 backward = _warpDestination.transform.forward;
             Quaternion targetRot = Quaternion.LookRotation(backward, Vector3.up);
@@ -90,7 +90,7 @@ namespace InGame.Exhibit
             finally
             {
                 PlayEffect(EffectType.WarpOut, targetPos, Quaternion.identity);
-                SetPlayerVisible(player, true);
+                //SetPlayerVisible(player, true);
                 _interactableBase.ForceSetInteractable = true;
 
                 if (_audioBroadcaster != null)
