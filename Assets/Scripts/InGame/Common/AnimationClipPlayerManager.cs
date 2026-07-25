@@ -125,7 +125,7 @@ namespace InGame.Common
                    _animationClipPlayer.IsPlayingTargetClip(_getUp);
         }
 
-        public bool EnableFallMotion = true;
+        [Networked] public bool EnableFallMotion { get; set; } = true;
 
         private void LateUpdate()
         {

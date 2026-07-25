@@ -13942,6 +13942,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883943]._animationClipPlayerManager
+      value: 
+      objectReference: {fileID: 982363540658642201}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883942]._attackFrames.Array.data[0].End
       value: 12
       objectReference: {fileID: 0}
@@ -14782,6 +14786,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7256c04836003a040b94cf9c96d573e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &982363540658642201 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2447315062394318487, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 3194339089641452430}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6364534128585291686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a120739eaa41989479cb040e1558abce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1397205008550058865 stripped
