@@ -77,7 +77,7 @@ namespace InGame.Jewelry
                 Debug.LogWarning("テキストコンポーネントが見つかりませんでした");
                 return;
             }
-            text.text = "× " + count;
+            text.text = count.ToString();
         }
     }
 }
