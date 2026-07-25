@@ -44,9 +44,9 @@ namespace InGame.Player.Sarutobi
         private readonly List<Collider> _alreadyHits = new();
         private bool _isHitChecked;
 
-        private const float MeshRotateDuration = 0.3f;
+        private const float RotateDuration = 0.3f;
 
-        [Networked] public float MeshRotationRatio { get; set; }
+        [Networked] public float RotationRatio { get; set; }
 
         public void StartEffect()
         {
@@ -61,12 +61,12 @@ namespace InGame.Player.Sarutobi
 
         public void StartLook()
         {
-            DOTween.To(() => MeshRotationRatio, v => MeshRotationRatio = v, 1f, MeshRotateDuration);
+            DOTween.To(() => RotationRatio, v => RotationRatio = v, 1f, RotateDuration);
         }
 
         public void EndLook()
         {
-            DOTween.To(() => MeshRotationRatio, x => MeshRotationRatio = x, 0f, MeshRotateDuration);
+            DOTween.To(() => RotationRatio, x => RotationRatio = x, 0f, RotateDuration);
         }
 
         private void HitCheck()
@@ -105,7 +105,7 @@ namespace InGame.Player.Sarutobi
 
             if (GetInput(out PlayerInput input))
             {
-                if (MeshRotationRatio > 0f) RotatePlayer(input.DesiredLookDirection);
+                if (RotationRatio > 0f) RotatePlayer(input.DesiredLookDirection);
 
                 if (!IsAiming) return;
 
@@ -121,7 +121,7 @@ namespace InGame.Player.Sarutobi
                 if (input.Buttons.IsSet(_throwButton))
                 {
                     HitboxDebugUtility.DrawWireSphere(pos, _hitRadius, Color.red, 10f);
-                    _meshRoot.DOLocalRotate(Vector3.zero, MeshRotateDuration);
+                    _meshRoot.DOLocalRotate(Vector3.zero, RotateDuration);
                     IsAiming = false;
                     EndLook();
                     if (HasInputAuthority) RPC_Throw(pos);
