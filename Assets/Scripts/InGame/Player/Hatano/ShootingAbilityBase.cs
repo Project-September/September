@@ -30,7 +30,8 @@ namespace InGame.Player.Ability.Effect.Shooting
             if(_playerManager == null)
                 _playerManager = Parameter.Owner.GetComponent<PlayerManager>();
             
-            _animationClipPlayer.PlayClip(_stanceAnimationClip);
+            _animationClipPlayer.SetAim(true);
+            _animationClipPlayer.PlayOnUpperBody(_stanceAnimationClip);
         }
 
         /// <summary>
@@ -49,9 +50,7 @@ namespace InGame.Player.Ability.Effect.Shooting
                     if (!_isShootingAnimation)
                     {
                         _isShootingAnimation = true;
-                        _animationClipPlayer.StopClip(_stanceAnimationClip);
-                        _animationClipPlayer.PlayClip(_shootAnimationClip);
-                        _animationClipPlayer.PlayClip(_stanceAnimationClip);
+                        _animationClipPlayer.PlayOnUpperBody(_shootAnimationClip);
                     }
                    
                 }
@@ -147,8 +146,8 @@ namespace InGame.Player.Ability.Effect.Shooting
         private void EndAnimation()
         {
             _isShootingAnimation = false;
-            _animationClipPlayer.StopClip(_stanceAnimationClip);
-            _animationClipPlayer.StopClip(_shootAnimationClip);
+            _animationClipPlayer.PlayOnUpperBody(null);
+            _animationClipPlayer.SetAim(false);
         }
     }
 }

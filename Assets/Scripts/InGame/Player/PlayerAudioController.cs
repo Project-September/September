@@ -70,8 +70,8 @@ namespace September.InGame
         // 現在の優勢クリップを判定 Walk or Run
         private MoveType GetDominantAnimation()
         {
-            float weightWalk = _clipPlayer.BaseMixer.GetInputWeight((int)MoveType.Walk);
-            float weightRun = _clipPlayer.BaseMixer.GetInputWeight((int)MoveType.Run);
+            float weightWalk = _clipPlayer.NormalMixer.GetInputWeight((int)MoveType.Walk);
+            float weightRun = _clipPlayer.NormalMixer.GetInputWeight((int)MoveType.Run);
 
             if (_lastDominant == MoveType.Walk)
             {
