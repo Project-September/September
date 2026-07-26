@@ -31,8 +31,6 @@ namespace InGame.Player.Ability
         
         private string _idPredictedLocation = "HatanoUltPredictedLocation";
         
-        // TODO：クライアント側で着弾エフェクトと弾が表示されない
-        
         protected override void OnCutInEnd()
         {
             // 構えアニメーションを再生
