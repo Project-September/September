@@ -25,11 +25,12 @@ namespace InGame.Common
         #else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         #endif
-        static async void Init()
+        static void Init()
         {
             try
             {
-                Instance = await Addressables.LoadAssetAsync<AnimationClipsContainer>(AssetPath);
+                var handle = Addressables.LoadAssetAsync<AnimationClipsContainer>(AssetPath);
+                Instance = handle.WaitForCompletion();
             }
             catch (Exception e)
             {

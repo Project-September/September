@@ -1,3 +1,4 @@
+using CRISound;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -12,8 +13,10 @@ namespace September.NewResult
     public class AudioMarker : Marker, INotification
     {
         [SerializeField] private string _cueName;
+        [SerializeField] private SoundTrackingType _trackingType;
         
         public string CueName => _cueName;
+        public SoundTrackingType TrackingType => _trackingType;
         public PropertyName id { get; }
     }
 }

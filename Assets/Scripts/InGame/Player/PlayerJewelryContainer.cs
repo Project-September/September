@@ -1,8 +1,13 @@
 using Fusion;
-using September.InGame.Jewelry;
+using InGame.Jewelry.Common;
+using System;
+using CRISound;
+using September.Common;
+using September.InGame;
+using September.InGame.Effect;
 using UnityEngine;
 
-namespace InGame.Player
+namespace InGame.Jewelry
 {
     public class PlayerJewelryContainer : NetworkBehaviour, IJewelryContainer
     {
@@ -11,10 +16,27 @@ namespace InGame.Player
         [SerializeField] private float _horizontalThrowForce = 5f;
         [SerializeField] private float _upwardThrowForce = 3f;
         [SerializeField] private float _heightOffset;
+        [Header("Sound")]
+        [SerializeField] private AudioBroadcaster _audioBroadcaster;
+        [SerializeField] private string _pickUpSoundCueName;
+        [Header("Effect")]
+        [SerializeField] private EffectType _interactEffectType;
+        [SerializeField] private Vector3 _interactEffectOffset;
+
+        event Action<JewelryType> _onGetJewelry;
+        event Action<JewelryType> _onDropJewelry;
+        public Action OnGetJewelry(Action<JewelryType> act)
+        {
+            _onGetJewelry += act;
+            return () => _onGetJewelry -= act;
+        }
+        public Action OnDropJewelry(Action<JewelryType> act)
+        {
+            _onDropJewelry += act;
+            return () => _onDropJewelry -= act;
+        }
 
         private const string JewelryTag = "Jewelry";
-
-        [Networked] public int JewelryCount { get; private set; }
 
         /// <summary>
         /// 触れた宝石を拾う処理
@@ -34,20 +56,19 @@ namespace InGame.Player
         {
             Vector3 spawnCenter = transform.position + Vector3.up * _heightOffset;
 
-            // 現在の所持数より多くの宝石はドロップしない
-            dropAmount = Mathf.Min(dropAmount, JewelryCount);
-            JewelryCount -= dropAmount;
-
             int result = 0;
             for (int i = 0; i < dropAmount; i++)
             {
                 NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefab, spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
 
+                if (!jewelryObj.TryGetComponent<IJewelry>(out var jewelry)) continue;
+                _onDropJewelry?.Invoke(jewelry.JewelryParams.JewelryType);
+
                 if (resultDropped == null) continue;
 
                 if (resultDropped.Length > i)
                 {
-                    resultDropped[i] = jewelryObj.GetComponent<IJewelry>();
+                    resultDropped[i] = jewelry;
                     result = i;
                 }
                 else
@@ -69,7 +90,8 @@ namespace InGame.Player
 
         public void PickUp(IJewelry jewelry)
         {
-            JewelryCount++;
+            // 宝石を取得したことを知らせる
+            _onGetJewelry(jewelry.JewelryParams.JewelryType);
 
             if (!HasStateAuthority) return;
 
@@ -83,7 +105,12 @@ namespace InGame.Player
                 {
                     Destroy(jewelComponent.gameObject);
                 }
+
+                var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+                effectSpawner.RequestPlayOneShotEffect(_interactEffectType, jewelComponent.transform.position + _interactEffectOffset, transform.rotation);
             }
+
+            _audioBroadcaster.RPC_PlaySoundFromCode(_pickUpSoundCueName, SoundTrackingType.Spot, Object, Object.InputAuthority);
         }
     }
 }
