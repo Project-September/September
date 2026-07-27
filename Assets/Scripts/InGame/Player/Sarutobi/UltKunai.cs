@@ -13,16 +13,15 @@ namespace InGame.Player.Sarutobi
 {
     public class UltKunai : NetworkBehaviour
     {
+        [Header("基本設定")]
         [SerializeField] private PlayerButtons _throwButton = PlayerButtons.Attack;
-        [SerializeField] private CameraController _cameraController;
-        [SerializeField] private EffectType _kunaiEffect;
-        [SerializeField] private Transform _aimEffect;
-        [SerializeField] private Vector3 _aimEffectOffset = new(0f, 0.01f, 0f);
         [SerializeField] private PlayerMovement _playerMovement;
 
+        [Header("エイムアニメーション設定")]
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         [SerializeField] private AnimationClip _idleClip;
 
+        [Header("攻撃設定")]
         [SerializeField] private float _hitStartTime;
         [SerializeField] private float _hitEndTime;
         [SerializeField] private float _hitRadius;
@@ -30,8 +29,19 @@ namespace InGame.Player.Sarutobi
         [SerializeField] private LayerMask _groundLayerMask;
         [SerializeField] private int _damage;
 
-        [Networked, OnChangedRender(nameof(OnRunningStateChanged))] private NetworkBool IsRunning { get; set; }
-        [Networked, OnChangedRender(nameof(OnAttackingStateChanged))] private NetworkBool IsAttacking { get; set; }
+        [Header("エフェクト")]
+        [SerializeField] private EffectType _kunaiEffect;
+        [SerializeField] private Transform _aimEffect;
+        [SerializeField] private Vector3 _aimEffectOffset = new(0f, 0.01f, 0f);
+
+        private enum UltState
+        {
+            InActive,
+            Aiming,
+            Attacking,
+        }
+
+        [Networked, OnChangedRender(nameof(OnStateChanged))] private UltState State { get; set; }
         [Networked] public float RotationRatio { get; set; }
 
         private const float RotateDuration = 0.3f;
@@ -50,7 +60,7 @@ namespace InGame.Player.Sarutobi
 
         public void StartStance()
         {
-            IsRunning = true;
+            State = UltState.Aiming;
 
             _alreadyHits.Clear();
             _isHitChecked = false;
@@ -61,7 +71,7 @@ namespace InGame.Player.Sarutobi
 
         public override void FixedUpdateNetwork()
         {
-            if (IsRunning)
+            if (State == UltState.Aiming)
             {
                 if (!GetInput(out PlayerInput input)) return;
 
@@ -72,11 +82,11 @@ namespace InGame.Player.Sarutobi
                 if (input.Buttons.IsSet(_throwButton))
                 {
                     Fire(throwTarget);
-                    IsRunning = false;
+                    State = UltState.Attacking;
                 }
             }
 
-            if (IsAttacking && HasStateAuthority)
+            if (State == UltState.Attacking && HasStateAuthority)
             {
                 UpdateHit();
             }
@@ -84,25 +94,23 @@ namespace InGame.Player.Sarutobi
 
         public override void Render()
         {
-            AimAnimationLoop();
+            if (State == UltState.Aiming)
+            {
+                AimAnimationLoop();
+            }
         }
 
-        private void OnRunningStateChanged()
+        private void OnStateChanged()
         {
-            _aimEffect.gameObject.SetActive(IsRunning);
-            Debug.Log($"[{nameof(UltKunai)}] OnRunningStateChanged: {IsRunning}");
-        }
-
-        private void OnAttackingStateChanged()
-        {
-            Debug.Log($"[{nameof(UltKunai)}] OnAttackingStateChanged: {IsAttacking}");
+            _aimEffect.gameObject.SetActive(State == UltState.Aiming);
+            Debug.Log($"[{nameof(UltKunai)}] OnStateChanged: {State}");
         }
 
         private void Fire(Vector3 targetPosition)
         {
             EndLook();
             Throw(targetPosition);
-            IsAttacking = true;
+            State = UltState.Attacking;
             HitboxDebugUtility.DrawWireSphere(targetPosition, _hitRadius, Color.red, 10f);
         }
 
@@ -147,7 +155,7 @@ namespace InGame.Player.Sarutobi
 
             if (_hitEndTimer.Expired(Runner))
             {
-                IsAttacking = false;
+                State = UltState.InActive;
             }
         }
 
@@ -177,8 +185,6 @@ namespace InGame.Player.Sarutobi
 
         private void AimAnimationLoop()
         {
-            if (!IsRunning) return;
-
             if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
             {
                 _animationClipPlayer.PlayClip(_idleClip);
