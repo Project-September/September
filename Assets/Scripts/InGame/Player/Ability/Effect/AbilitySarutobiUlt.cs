@@ -62,7 +62,6 @@ namespace InGame.Player.Ability.Effect
             _playerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _originalPosition = player.transform.position;
             _endPosition = player.transform.position + Vector3.up * _jumpHeight;
-            _cameraController.ChangeOffset(_cameraOffset, 0f);
             _rpcInvoker.RPC_ChangeCameraOffset(_cameraOffset);
             _animationClipPlayerManager.EnableFallMotion = false;
         }
