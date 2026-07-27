@@ -61,11 +61,6 @@ namespace InGame.Player.Sarutobi
 
         public override void FixedUpdateNetwork()
         {
-            if (IsAttacking && HasStateAuthority)
-            {
-                UpdateHit();
-            }
-
             if (IsRunning)
             {
                 if (!GetInput(out PlayerInput input)) return;
@@ -79,6 +74,11 @@ namespace InGame.Player.Sarutobi
                     Fire(throwTarget);
                     IsRunning = false;
                 }
+            }
+
+            if (IsAttacking && HasStateAuthority)
+            {
+                UpdateHit();
             }
         }
 
