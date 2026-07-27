@@ -1,18 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-5479646650806225004
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 9
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -20,18 +7,15 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: mat_eff_Koinuma_Ult_Monitor02
+  m_Name: mat_eff_Balista_Muzzle_02
   m_Shader: {fileID: 4800000, guid: 1bc5c6a70411243779ce486a98012125, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ALPHA_TRANSITION_BLEND_SECOND_TEX_MULTIPLY
   - _ALPHA_TRANSITION_MAP_MODE_2D
   - _BASE_MAP_MODE_2D
-  - _DISSOLVE_TRANSITION_ENABLED
   - _EMISSION_COLOR_COLOR
   - _EMISSION_MAP_MODE_2D
-  - _FLOW_MAP_TARGET_BASE
   - _PARALLAX_MAP_MODE_2D
   - _TINT_AREA_ALL
   - _TINT_COLOR_ENABLED
@@ -50,8 +34,8 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlphaTransitionMap:
-        m_Texture: {fileID: 2800000, guid: f45f3b901f246694e9290e4a37534ab1, type: 3}
-        m_Scale: {x: 1, y: 0.2}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AlphaTransitionMap2DArray:
         m_Texture: {fileID: 0}
@@ -62,7 +46,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AlphaTransitionMapSecondTexture:
-        m_Texture: {fileID: 2800000, guid: f45f3b901f246694e9290e4a37534ab1, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AlphaTransitionMapSecondTexture2DArray:
@@ -74,7 +58,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 745d7d258b7ae3340a7b7188a943b226, type: 3}
+        m_Texture: {fileID: 2800000, guid: 3ecbbe84d8be01049959501332f79676, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap2DArray:
@@ -118,8 +102,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FlowMap:
-        m_Texture: {fileID: 2800000, guid: f45f3b901f246694e9290e4a37534ab1, type: 3}
-        m_Scale: {x: 1, y: 2}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GradientMap:
         m_Texture: {fileID: 0}
@@ -189,7 +173,7 @@ Material:
     - _AlphaTransitionMapChannelsX: 0
     - _AlphaTransitionMapMode: 0
     - _AlphaTransitionMapOffsetXCoord: 0
-    - _AlphaTransitionMapOffsetYCoord: 11
+    - _AlphaTransitionMapOffsetYCoord: 0
     - _AlphaTransitionMapProgress: 0
     - _AlphaTransitionMapProgressCoord: 0
     - _AlphaTransitionMapRandomRowCoord: 0
@@ -209,12 +193,12 @@ Material:
     - _AlphaTransitionMapSecondTextureRowCount: 1
     - _AlphaTransitionMapSecondTextureSliceCount: 4
     - _AlphaTransitionMapSliceCount: 4
-    - _AlphaTransitionMode: 2
+    - _AlphaTransitionMode: 0
     - _AlphaTransitionProgress: 0
     - _AlphaTransitionProgressCoord: 0
-    - _AlphaTransitionProgressCoordSecondTexture: 21
+    - _AlphaTransitionProgressCoordSecondTexture: 0
     - _AlphaTransitionProgressSecondTexture: 0
-    - _AlphaTransitionSecondTextureBlendMode: 2
+    - _AlphaTransitionSecondTextureBlendMode: 0
     - _BaseMapChannel: 0
     - _BaseMapMirrorSampling: 0
     - _BaseMapMode: 0
@@ -256,13 +240,13 @@ Material:
     - _DepthFadeWidth: 1
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DissolveSharpness: 1
+    - _DissolveSharpness: 0.5
     - _DissolveSharpnessSecondTexture: 0.5
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EmissionAreaType: 0
     - _EmissionColorType: 0
-    - _EmissionIntensity: 0
+    - _EmissionIntensity: 1
     - _EmissionIntensityCoord: 0
     - _EmissionMapChannelsX: 0
     - _EmissionMapMode: 0
@@ -277,12 +261,12 @@ Material:
     - _EmissionMapRowCount: 1
     - _EmissionMapSliceCount: 4
     - _EnvironmentReflections: 1
-    - _FlowIntensity: 0.015
+    - _FlowIntensity: 1
     - _FlowIntensityCoord: 0
     - _FlowMapChannelsX: 0
     - _FlowMapChannelsY: 1
     - _FlowMapOffsetXCoord: 0
-    - _FlowMapOffsetYCoord: 11
+    - _FlowMapOffsetYCoord: 0
     - _FlowMapRotation: 0
     - _FlowMapRotationCoord: 0
     - _FlowMapTarget: 1
@@ -317,9 +301,9 @@ Material:
     - _ReceiveShadows: 1
     - _RenderType: 2
     - _RimTransparencyEnabled: 0
-    - _RimTransparencyProgress: 0.5
+    - _RimTransparencyProgress: 0.91
     - _RimTransparencyProgressCoord: 0
-    - _RimTransparencySharpness: 0.5
+    - _RimTransparencySharpness: 0.393
     - _RimTransparencySharpnessCoord: 0
     - _ShadowCasterAlphaAffectedByAlphaTransitionMap: 0
     - _ShadowCasterAlphaAffectedByFlowMap: 0
@@ -381,11 +365,24 @@ Material:
     - _BaseMapToneMidtonesColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _BaseMapToneShadowsColor: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 1.612565, b: 1.9999999, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _FlowMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _TintColor: {r: 0, g: 2.9527636, b: 14.03509, a: 1}
+    - _TintColor: {r: 2, g: 1.6915259, b: 1.3867924, a: 1}
     - _TintMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &4589819981134696905
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9
