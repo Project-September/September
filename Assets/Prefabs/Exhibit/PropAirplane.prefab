@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 7572378393327729410}
   - component: {fileID: 4200780594601291185}
   - component: {fileID: 5916104638410838153}
-  m_Layer: 11
+  m_Layer: 3
   m_Name: Wheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -714,7 +714,7 @@ GameObject:
   - component: {fileID: 7494316538794269785}
   - component: {fileID: 8473515391512153635}
   - component: {fileID: 1367492198867136899}
-  m_Layer: 11
+  m_Layer: 3
   m_Name: MoveCol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1284,7 +1284,7 @@ MonoBehaviour:
   _camera: {fileID: 3659471650815562422}
   _collideAgainst:
     serializedVersion: 2
-    m_Bits: 4095
+    m_Bits: 4087
   _cameraRadius: 0.1
   _motionDuration: 1
   _motionEase: 9
@@ -1324,7 +1324,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 58593279513329935}
-  m_Layer: 11
+  m_Layer: 3
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}

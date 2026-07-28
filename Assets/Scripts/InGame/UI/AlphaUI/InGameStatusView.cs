@@ -299,7 +299,7 @@ namespace September.InGame.UI
                 case StatusUpType.BokeBoke:
                 {
                     var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
-                    ui.GetComponentInChildren<TextMeshProUGUI>().text = "モアイ：スコアが増えた";
+                    ui.GetComponentInChildren<TextMeshProUGUI>().text = "モアイ：必殺技ゲージがたまった";
                     UpdateLayOutGroup();
                     await ui.DOFade(1, 0.5f);
                     await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));

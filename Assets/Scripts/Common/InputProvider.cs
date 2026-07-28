@@ -32,6 +32,7 @@ namespace September.Common
         public Vector2 LookDirection;
         public float CameraYaw;
         public Vector3 DesiredLookDirection;
+        public Vector3 CameraPosition;
     }
     /// <summary>
     /// ネットワークの入力管理クラス
@@ -133,6 +134,9 @@ namespace September.Common
             playerInput.CameraYaw = _mainCamera.transform.rotation.eulerAngles.y;
             Vector3 cameraForward = _mainCamera.transform.forward;
             playerInput.DesiredLookDirection = cameraForward.normalized;
+
+            playerInput.CameraPosition = _mainCamera.transform.position;
+
             input.Set(playerInput);
         }
 

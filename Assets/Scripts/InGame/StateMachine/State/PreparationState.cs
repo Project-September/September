@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Cinemachine;
 using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -13,6 +12,7 @@ using September.InGame.Common.Stats;
 using September.InGame.Performances;
 using September.InGame.Rules;
 using September.InGame.UI;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;

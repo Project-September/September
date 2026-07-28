@@ -52,7 +52,7 @@ namespace InGame.Bot
             }
             if (startNode == null || endNode == null || nodeDatas == null)
             {
-                Debug.LogError("Œo˜H’Tõ¸”s");
+                Debug.Log("Œo˜H’Tõ¸”s");
                 _isFinding = false;
                 return new List<NodeData>();
             }

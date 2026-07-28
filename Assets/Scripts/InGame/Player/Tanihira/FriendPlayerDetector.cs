@@ -51,7 +51,7 @@ namespace Ingame.Tanihira
             }
             
             //終わりか動かをチェックする
-            if (_inGameManager.CurrentStateName == "EndingState" && !_isEnd)
+            if (_inGameManager?.CurrentStateName == "EndingState" && !_isEnd)
             {
                 _isEnd = true;
                 if (_formationManager)
