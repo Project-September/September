@@ -13,7 +13,8 @@ namespace InGame.Player.Hatano
     {
         [SerializeField] private AnimationClipPlayer _animClipPlayer;
         [SerializeField] private HatanoChangeAnimationController _changeAnimation;
-        [Header("切替アニメーション"), SerializeField] private AnimationClip _changeClip;
+        [Header("切替アニメーション（D→L）"), SerializeField] private AnimationClip _changeDLClip;
+        [Header("切替アニメーション（L→D）"), SerializeField] private AnimationClip _changeLDClip;
         [Header("レーザー銃"), SerializeField] private GameObject _laser;
         [Header("二丁拳銃"), SerializeField] private List<GameObject> _doubles;
         [Header("現在の選択中のAbility")]
@@ -58,7 +59,6 @@ namespace InGame.Player.Hatano
                 if (HasStateAuthority)
                 {
                     _abilityStatus = next;
-                    _animClipPlayer.PlayClip(_changeClip);
                     ChangeAbility(next);
                 }
                 else
@@ -107,11 +107,13 @@ namespace InGame.Player.Hatano
                 case HatanoAbilityStatus.LaserGun:
                     _laser.SetActive(true);
                     foreach (var d in _doubles) d.SetActive(false);
+                    _animClipPlayer.PlayClip(_changeDLClip);
                     _changeAnimation.ChangeMoveAnimation(status);
                     break;
                 case HatanoAbilityStatus.DoubleBarreledGun:
                     _laser.SetActive(false);
                     foreach (var d in _doubles) d.SetActive(true);
+                    _animClipPlayer.PlayClip(_changeLDClip);
                     _changeAnimation.ChangeMoveAnimation(status);
                     break;
             }
