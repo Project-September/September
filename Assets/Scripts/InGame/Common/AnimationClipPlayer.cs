@@ -25,7 +25,10 @@ namespace InGame.Common
         [SerializeField] private AnimationClip _run;
         [Header("Aimアニメーション")]
         [SerializeField] private AnimationClip _aimWait;
-        [SerializeField] private AnimationClip _aimWalk;
+        [SerializeField] private AnimationClip _aimFrontWalk;
+        [SerializeField] private AnimationClip _aimBackWalk;
+        [SerializeField] private AnimationClip _aimRightWalk;
+        [SerializeField] private AnimationClip _aimLeftWalk;
         [SerializeField, Range(0f, 2f)] private float _locoWeight = 0f;
         [SerializeField] protected Animator _animator;
 
@@ -51,14 +54,14 @@ namespace InGame.Common
         private AnimationClipPlayable _runClipPlayable;
         // AimMixerに接続されている各Aimアニメーション
         private AnimationClipPlayable _aimWaitClipPlayable;
-        private AnimationClipPlayable _aimWalkClipPlayable;
+        private AnimationClipPlayable _aimFrontWalkClipPlayable;
+        private AnimationClipPlayable _aimBackWalkClipPlayable;
+        private AnimationClipPlayable _aimRightWalkClipPlayable;
+        private AnimationClipPlayable _aimLeftWalkClipPlayable;
         // 入力ポート（通常）
         private int _waitPort;
         private int _walkPort;
         private int _runPort;
-        // 入力ポート（Aim）
-        private int _aimWaitPort;
-        private int _aimWalkPort;
 
         public AnimationMixerPlayable BaseMixer => _baseMixer;
         public AnimationMixerPlayable NormalMixer => _normalMixer;
@@ -178,22 +181,41 @@ namespace InGame.Common
         /// </summary>
         private void AimMixerInitialize()
         {
-            _aimMixer = AnimationMixerPlayable.Create(_graph, 2);
+            _aimMixer = AnimationMixerPlayable.Create(_graph, 5);
             
             var port = 0;
             if (_aimWait)
             {
-                _aimWaitPort = port;
                 _aimWaitClipPlayable = AnimationClipPlayable.Create(_graph, _aimWait);
                 _aimMixer.ConnectInput(port++, _aimWaitClipPlayable, 0);
             }
             else _aimMixer.SetInputWeight(port++, 0f);
 
-            if (_aimWalk)
+            if (_aimFrontWalk)
             {
-                _aimWalkPort = port;
-                _aimWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimWalk);
-                _aimMixer.ConnectInput(port, _aimWalkClipPlayable, 0);
+                _aimFrontWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimFrontWalk);
+                _aimMixer.ConnectInput(port++, _aimFrontWalkClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port++, 0f);
+
+            if (_aimBackWalk)
+            {
+                _aimBackWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimBackWalk);
+                _aimMixer.ConnectInput(port++, _aimBackWalkClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port++, 0f);
+            
+            if (_aimRightWalk)
+            {
+                _aimRightWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimRightWalk);
+                _aimMixer.ConnectInput(port++, _aimRightWalkClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port++, 0f);
+            
+            if (_aimLeftWalk)
+            {
+                _aimLeftWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimLeftWalk);
+                _aimMixer.ConnectInput(port, _aimLeftWalkClipPlayable, 0);
             }
             else _aimMixer.SetInputWeight(port, 0f);
         }
@@ -630,7 +652,6 @@ namespace InGame.Common
             }
             
             SetLocoBlendWeight(_normalMixer, wWait, wWalk, wRun);
-            SetLocoBlendWeight(_aimMixer, wWait, wWalk, 0);
         }
 
         /// <summary>
@@ -644,8 +665,41 @@ namespace InGame.Common
         {
             mixer.SetInputWeight(0, wait);
             mixer.SetInputWeight(1, walk);
-            if(run == 0) return;
             mixer.SetInputWeight(2, run);
+        }
+
+        /// <summary>
+        /// AimMixerに接続されている各AimアニメーションのWeightを設定
+        /// </summary>
+        /// <param name="move">入力</param>
+        public void SetAimLocoBlendWeight(Vector2 move)
+        {
+            move = Vector2.ClampMagnitude(move, 1f);
+
+            var front = Mathf.Max(0, move.y);
+            var back = Mathf.Max(0, -move.y);
+            var right =  Mathf.Max(0, move.x);
+            var left =  Mathf.Max(0, -move.x);
+            // 移動量によって減少
+            var wait = Mathf.Clamp01(1 - Mathf.Max(Mathf.Abs(move.x), Mathf.Abs(move.y)));
+            
+            // 合計値で割って、割合を求める
+            float total = wait + front + back + right + left;
+            if(total > 0)
+            {
+                wait   /= total;
+                front  /= total;
+                back   /= total;
+                right  /= total;
+                left   /= total;
+            }
+            
+            // Weight設定
+            _aimMixer.SetInputWeight(0, wait);
+            _aimMixer.SetInputWeight(1, front);
+            _aimMixer.SetInputWeight(2, back);
+            _aimMixer.SetInputWeight(3, right);
+            _aimMixer.SetInputWeight(4, left);
         }
 
         /// <summary>

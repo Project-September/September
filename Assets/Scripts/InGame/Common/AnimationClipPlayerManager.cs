@@ -161,6 +161,8 @@ namespace InGame.Common
             var playbackRate = baseSpeed > 0f ? speed / baseSpeed : 0f;
 
             _animationClipPlayer.SetLocoPlaybackRate(playbackRate);
+            _animationClipPlayer.SetAimLocoBlendWeight(_playerMovement.MoveInput);
+            
             // TopLayerで何も再生していないときはWeightを0にする
             if (!HasActiveTopLayerClip())
             {
