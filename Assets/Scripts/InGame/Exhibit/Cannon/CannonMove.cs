@@ -16,7 +16,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] private float _playerOffset = 3f;
 		private Quaternion _baseDefaultRotation;
 		private Quaternion _barrelDefaultRotation;
-		private NetworkObject _player;
+		[Networked] private NetworkObject Player { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 
@@ -29,7 +29,7 @@ namespace September.InGame.Exhibit
 
 		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
 		{
-			_player = playerObject;
+			Player = playerObject;
 		}
 
 		public void MoveUpdate(PlayerInput input)
@@ -53,8 +53,8 @@ namespace September.InGame.Exhibit
 		private void UpdatePlayerPos()
 		{
 			var quaternion = BaseRotation;
-			_player.transform.rotation = quaternion;
-			_player.transform.position = _cannonBase.position + quaternion * (Vector3.back * _playerOffset);
+			Player.transform.rotation = quaternion;
+			Player.transform.position = _cannonBase.position + quaternion * (Vector3.back * _playerOffset);
 		}
 
 		private void CannonRotate(float baseRotateInput, float barrelRotateInput)

@@ -42,6 +42,15 @@ namespace September.InGame.Exhibit
 			_launcher.EffectRender();
 		}
 
+		public override void FixedUpdateNetwork()
+		{
+			base.FixedUpdateNetwork();
+			if(CurrentUsePlayerRef.IsNone) return;
+			
+			GetInput(out PlayerInput input);
+			_move.MoveUpdate(input);
+		}
+
 		/// <summary>
 		///     Hostのみで実行されるインタラクト開始時の初期化処理
 		/// </summary>
@@ -59,7 +68,7 @@ namespace September.InGame.Exhibit
 			Object.AssignInputAuthority(CurrentUsePlayerRef);
 			_currentAmmo = _maxAmmo;
 
-			// 使用中のプレイヤークライアントのみの処理
+			// 使用中のプレイヤーに対する処理
 			if (!_usingPlayer) return;
 			_usingPlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 			PlayerActive(false);
@@ -79,8 +88,6 @@ namespace September.InGame.Exhibit
 		public virtual void InteractFixedNetworkUpdate(PlayerInput input)
 		{
 			base.FixedUpdateNetwork();
-
-			_move.MoveUpdate(input);
 			
 			// 射撃処理
 			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTimer.ExpiredOrNotRunning(Runner) &&
