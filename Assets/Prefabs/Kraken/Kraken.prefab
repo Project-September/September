@@ -114,7 +114,7 @@ MonoBehaviour:
   _radius: 5
   _layerMask:
     serializedVersion: 2
-    m_Bits: 12288
+    m_Bits: 8192
   _maxBendingAngle: 90
   _maxRotationSpeed: 360
   _pbdIterations: 1
@@ -147,15 +147,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4096
   _constraintSolver: {fileID: 6020658144248467311}
-  _subPointCount: 4
+  _subPointCount: 3
   _maxDistanceList: []
   _defaultRotations: []
-  _debugFabrikPoints: 0
+  _debugFabrikPoints: 1
   _debugFabrikAxis: 0
-  _debugSolvedPoints: 0
+  _debugSolvedPoints: 1
   _debugSolvedAxis: 0
   _debugSolvedSpline: 0
-  _debugSolvedResamplingPoints: 0
+  _debugSolvedResamplingPoints: 1
   _debugSolvedResamplingAxis: 0
   _debugSolvedResamplingSpline: 0
 --- !u!114 &4436696800319557530
@@ -1026,7 +1026,7 @@ MonoBehaviour:
   _radius: 5
   _layerMask:
     serializedVersion: 2
-    m_Bits: 12288
+    m_Bits: 8192
   _maxBendingAngle: 90
   _maxRotationSpeed: 360
   _pbdIterations: 1
@@ -1059,15 +1059,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4096
   _constraintSolver: {fileID: 2237555503341122454}
-  _subPointCount: 4
+  _subPointCount: 3
   _maxDistanceList: []
   _defaultRotations: []
-  _debugFabrikPoints: 0
+  _debugFabrikPoints: 1
   _debugFabrikAxis: 0
-  _debugSolvedPoints: 0
+  _debugSolvedPoints: 1
   _debugSolvedAxis: 0
   _debugSolvedSpline: 0
-  _debugSolvedResamplingPoints: 0
+  _debugSolvedResamplingPoints: 1
   _debugSolvedResamplingAxis: 0
   _debugSolvedResamplingSpline: 0
 --- !u!114 &5819620003105908620
@@ -1269,8 +1269,6 @@ MonoBehaviour:
   _cameraRadius: 0.1
   _motionDuration: 0.3
   _motionEase: 9
-  _enablePitchRotate: 0
-  _enableYawRotate: 1
 --- !u!114 &4601619918044447809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6294,7 +6292,7 @@ MonoBehaviour:
   _radius: 5
   _layerMask:
     serializedVersion: 2
-    m_Bits: 12288
+    m_Bits: 8192
   _maxBendingAngle: 90
   _maxRotationSpeed: 360
   _pbdIterations: 1
@@ -6327,15 +6325,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4096
   _constraintSolver: {fileID: 4491648271868886489}
-  _subPointCount: 4
+  _subPointCount: 3
   _maxDistanceList: []
   _defaultRotations: []
-  _debugFabrikPoints: 0
+  _debugFabrikPoints: 1
   _debugFabrikAxis: 0
-  _debugSolvedPoints: 0
+  _debugSolvedPoints: 1
   _debugSolvedAxis: 0
   _debugSolvedSpline: 0
-  _debugSolvedResamplingPoints: 0
+  _debugSolvedResamplingPoints: 1
   _debugSolvedResamplingAxis: 0
   _debugSolvedResamplingSpline: 0
 --- !u!114 &4293175133399063176
@@ -7667,6 +7665,54 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7662050586125853599}
     m_Modifications:
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
     - target: {fileID: 2258478030959726749, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.9983485
@@ -7701,15 +7747,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -7732,8 +7778,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_Lens.FieldOfView
       value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
       objectReference: {fileID: 0}
     - target: {fileID: 6297285441075323246, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_Name

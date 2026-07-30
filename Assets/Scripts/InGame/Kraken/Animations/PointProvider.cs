@@ -9,7 +9,7 @@ namespace September.InGame.Kraken.Animations
         public IKFollower.Point[] GetPoints();
     }
 
-    public class IKSolverPointProvider : IPointProvider
+    public readonly struct IKSolverPointProvider : IPointProvider
     {
         private readonly IKFollower.Point[] _points;
 

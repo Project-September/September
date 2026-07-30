@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace September.InGame.Kraken.Animations
 {
@@ -21,47 +23,54 @@ namespace September.InGame.Kraken.Animations
         [SerializeField] private int _pbdSubsteps = 5;
 
         private float[] _segmentLengths;
-        private IKFollower.Point[] _prevSolvedPoints;
+        private Collider[] _colliders;
 
         /// <summary>
         /// Resets the solver's state (e.g. if the tentacle is re-spawned or reset).
         /// </summary>
         public void Reset()
         {
-            _prevSolvedPoints = null;
             _segmentLengths = null;
+            _colliders = new Collider[10];
         }
 
         /// <summary>
         /// Solves constraints for the given input points.
         /// </summary>
-        public IKFollower.Point[] Solve(IKFollower.Point[] inputPoints, float deltaTime)
+        public void Solve(ref Span<IKFollower.Point> inputPoints, float deltaTime)
         {
-            if (inputPoints == null || inputPoints.Length == 0)
-                return inputPoints;
+            Profiler.BeginSample("Initialize");
+            if (inputPoints == null || inputPoints.Length == 0) return;
 
             int count = inputPoints.Length;
 
             // 1. Initialize segment lengths and cache buffers on first run or when bone count changes
             InitializeBuffers(inputPoints);
+            
+            Span<IKFollower.Point> prevSolvedPoints = inputPoints;
+            Profiler.EndSample();
 
             // 2. Prepare predicted positions
-            var solvedPositions = new Vector3[count];
-            var solvedRotations = new Quaternion[count];
+            Profiler.BeginSample("Prepare predictions");
+            Span<Vector3> solvedPositions = stackalloc Vector3[count];
+            Span<Quaternion> solvedRotations = stackalloc Quaternion[count];
             for (int i = 0; i < count; i++)
             {
-                solvedPositions[i] = _prevSolvedPoints[i].Position;
+                solvedPositions[i] = prevSolvedPoints[i].Position;
                 solvedRotations[i] = inputPoints[i].Rotation;
             }
+            Profiler.EndSample();
 
             // 3. Update stay timer and state machine
             // UpdateStateMachine(inputPoints, solvedPositions, deltaTime);
 
             // 4. Run PBD Iterative Solver to satisfy constraints
+            Profiler.BeginSample("Iterate");
             for (int iter = 0; iter < _pbdIterations; iter++)
             {
                 for (int step = 0; step < _pbdSubsteps; step++)
                 {
+                    Profiler.BeginSample("Non-penetration Constraint");
                     // A. Non-penetration Constraint (非侵入拘束)
                     for (int i = 0; i < count; i++)
                     {
@@ -70,7 +79,9 @@ namespace September.InGame.Kraken.Animations
 
                         solvedPositions[i] = ResolveCollisions(i, p, _radius, _layerMask);
                     }
+                    Profiler.EndSample();
 
+                    Profiler.BeginSample("Distance Constraint");
                     // B. Distance Constraint (距離拘束) - standard PBD with mass weights
                     for (int i = 1; i < count; i++)
                     {
@@ -88,7 +99,9 @@ namespace September.InGame.Kraken.Animations
                             solvedPositions[i] -= correction;
                         }
                     }
+                    Profiler.EndSample();
 
+                    Profiler.BeginSample("Bending Constraint");
                     // C. Bending / Rotation Constraint (回転拘束)
                     // Restricts the angle between consecutive bone segments
                     for (int i = 2; i < count; i++)
@@ -109,9 +122,12 @@ namespace September.InGame.Kraken.Animations
                             solvedPositions[i] = solvedPositions[i - 1] + constrainedV2.normalized * _segmentLengths[i];
                         }
                     }
+                    Profiler.EndSample();
                 }
             }
+            Profiler.EndSample();
 
+            Profiler.BeginSample("Compute Orientations");
             // 5. Compute Orientations (Rotations)
             // Align bone rotations with the solved bone segment directions
             for (int i = 0; i < count; i++)
@@ -127,10 +143,10 @@ namespace September.InGame.Kraken.Animations
                         Quaternion targetRot = deltaRot * inputPoints[i].Rotation;
 
                         // Apply temporal damping to satisfy the rotational velocity constraint
-                        if (_prevSolvedPoints != null && _prevSolvedPoints.Length == count)
+                        if (prevSolvedPoints != null && prevSolvedPoints.Length == count)
                         {
                             float maxAngleChange = _maxRotationSpeed * deltaTime;
-                            solvedRotations[i] = Quaternion.RotateTowards(_prevSolvedPoints[i].Rotation, targetRot, maxAngleChange);
+                            solvedRotations[i] = Quaternion.RotateTowards(prevSolvedPoints[i].Rotation, targetRot, maxAngleChange);
                         }
                         else
                         {
@@ -155,21 +171,18 @@ namespace September.InGame.Kraken.Animations
                     }
                 }
             }
+            Profiler.EndSample();
 
+            Profiler.BeginSample("Build Resolved Points");
             // 6. Build the final resolved Points
-            var solvedPoints = new IKFollower.Point[count];
             for (int i = 0; i < count; i++)
             {
-                solvedPoints[i] = new IKFollower.Point(solvedPositions[i], solvedRotations[i]);
+                inputPoints[i] = new IKFollower.Point(solvedPositions[i], solvedRotations[i]);
             }
-
-            // Cache for next frame
-            _prevSolvedPoints = solvedPoints;
-
-            return solvedPoints;
+            Profiler.EndSample();
         }
 
-        private void InitializeBuffers(IKFollower.Point[] inputPoints)
+        private void InitializeBuffers(Span<IKFollower.Point> inputPoints)
         {
             int count = inputPoints.Length;
             if (_segmentLengths == null || _segmentLengths.Length != count)
@@ -180,9 +193,9 @@ namespace September.InGame.Kraken.Animations
                 {
                     _segmentLengths[i] = Vector3.Distance(inputPoints[i - 1].Position, inputPoints[i].Position);
                 }
-
-                _prevSolvedPoints = inputPoints;
             }
+
+            _colliders ??= new Collider[10];
         }
 
         /// <summary>
@@ -192,12 +205,14 @@ namespace September.InGame.Kraken.Animations
         /// </summary>
         private Vector3 ResolveCollisions(int i, Vector3 position, float radius, LayerMask layerMask)
         {
-            Collider[] colliders = Physics.OverlapSphere(position, radius, layerMask);
-            if (colliders == null || colliders.Length == 0)
+            int size = Physics.OverlapSphereNonAlloc(position, radius, _colliders, layerMask);
+
+            if (_colliders == null || _colliders.Length == 0)
                 return position;
 
-            foreach (Collider col in colliders)
+            for (int index = 0; index < size; index++)
             {
+                Collider col = _colliders[index];
                 // Standard fallback closest point resolution for other types of colliders
                 Vector3 closestPoint = col.ClosestPoint(position);
                 float dist = Vector3.Distance(position, closestPoint);

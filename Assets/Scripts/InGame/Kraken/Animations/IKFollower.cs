@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RootMotion.FinalIK;
 using September.InGame.Kraken.Animations;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace September.InGame.Kraken
 {
@@ -41,12 +43,19 @@ namespace September.InGame.Kraken
 
                 return Quaternion.Slerp(p0.Rotation, p1.Rotation, ratio);
             }
+
+            public static Point Slerp(Point p0, Point p1, float t)
+            {
+                return new Point(
+                    Vector3.Slerp(p0.Position, p1.Position, t),
+                    Quaternion.Slerp(p0.Rotation, p1.Rotation, t)
+                    );
+            }
         }
 
         [SerializeField] private IK _ik;
         [SerializeField] private Transform[] _followers;
         [SerializeField] private float _radius = .55f;
-        [SerializeField] private LayerMask _layerMask;
         [SerializeField] private TentacleConstraintSolver _constraintSolver;
         [SerializeField] private int _subPointCount = 3;
 
@@ -96,30 +105,53 @@ namespace September.InGame.Kraken
         // Todo: 船に沿わせるための処理
         private void Update()
         {
+            Profiler.BeginSample("GetPoints");
             // FABRIKで障害物がない時のボーン位置を計算
-            IPointProvider provider = new IKSolverPointProvider(_ik.GetIKSolver());
+            IKSolverPointProvider provider = new(_ik.GetIKSolver());
             Point[] points = provider.GetPoints();
+            Profiler.EndSample();
 
             IKFollowerDebug.DebugDraw(points, _radius * .2f, Color.yellow, _debugFabrikPoints, _debugFabrikPoints, _debugFabrikAxis);
 
-            IPointInterpolator spline = new SplinePointInterpolator(points);
-            Point[] subdividedPoints = spline.Evaluate(points.Length * _subPointCount);
+            Profiler.BeginSample("EvaluateSpline SubPoints");
+            Span<float> maxDistanceList = stackalloc float[_maxDistanceList.Count];
+            for (int i = 0; i < _maxDistanceList.Count; i++)
+            {
+                maxDistanceList[i] = _maxDistanceList[i];
+            }
+            SlerpInterpolator spline = new(points, maxDistanceList);
+            Span<Point> subdividedPoints = stackalloc Point[points.Length * _subPointCount];
+            spline.Evaluate(points.Length * _subPointCount, ref subdividedPoints);
+            Profiler.EndSample();
 
-            Point[] solvedPoints = _constraintSolver.Solve(subdividedPoints, Time.deltaTime);
+            Profiler.BeginSample("SolveCollision");
+            _constraintSolver.Solve(ref subdividedPoints, Time.deltaTime);
+            Span<Point> solvedPoints = subdividedPoints;
+            Profiler.EndSample();
 
-            IKFollowerDebug.DebugDraw(solvedPoints, 6f, Color.red, _debugSolvedPoints, _debugSolvedPoints, _debugSolvedAxis);
-            if (_debugSolvedSpline) spline.DebugDraw(Color.red);
+            IKFollowerDebug.DebugDraw(solvedPoints.ToArray(), 6f, Color.red, _debugSolvedPoints, _debugSolvedPoints, _debugSolvedAxis);
 
-            IPointInterpolator solvedSpline = new SplinePointInterpolator(solvedPoints);
-            Point[] solvedResamplingPoints = solvedSpline.Evaluate(_maxDistanceList);
+            Profiler.BeginSample("Resampling");
+            Span<float> solvedDistances = stackalloc float[solvedPoints.Length];
+            for (int i = 1; i < solvedDistances.Length; i++)
+            {
+                solvedDistances[i] =
+                    solvedDistances[i - 1] +
+                    (solvedPoints[i].Position - solvedPoints[i - 1].Position).magnitude;
+            }
+            SlerpInterpolator solvedSpline = new(solvedPoints, solvedDistances);
+            Span<Point> solvedResamplingPoints = stackalloc Point[_maxDistanceList.Count];
+            solvedSpline.Evaluate(_maxDistanceList, ref solvedResamplingPoints);
+            Profiler.EndSample();
 
-            IKFollowerDebug.DebugDraw(solvedResamplingPoints, 6f, Color.magenta, _debugSolvedResamplingPoints, _debugSolvedResamplingPoints, _debugSolvedResamplingAxis);
-            if (_debugSolvedResamplingSpline) solvedSpline.DebugDraw(Color.magenta);
+            IKFollowerDebug.DebugDraw(solvedResamplingPoints.ToArray(), 6f, Color.magenta, _debugSolvedResamplingPoints, _debugSolvedResamplingPoints, _debugSolvedResamplingAxis);
 
+            Profiler.BeginSample("UpdatePoints");
             UpdatePosition(solvedResamplingPoints);
+            Profiler.EndSample();
         }
 
-        private void UpdatePosition(Point[] points)
+        private void UpdatePosition(Span<Point> points)
         {
             for (int i = 0; i < _followers.Length; i++)
             {
