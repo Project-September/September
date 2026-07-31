@@ -72,6 +72,8 @@ namespace September.InGame.Kraken
         [SerializeField] private bool _debugSolvedResamplingAxis;
         [SerializeField] private bool _debugSolvedResamplingSpline;
 
+        private IKSolverPointProvider _pointProvider;
+
         private void Start()
         {
             // ボーンの長さをキャッシュ
@@ -91,6 +93,8 @@ namespace September.InGame.Kraken
             // ボーンの回転をキャッシュ
             _defaultRotations = _followers.Select(x => x.rotation).ToArray();
 
+            _pointProvider = new IKSolverPointProvider(_ik.GetIKSolver());
+
             Validate();
         }
 
@@ -107,11 +111,10 @@ namespace September.InGame.Kraken
         {
             Profiler.BeginSample("GetPoints");
             // FABRIKで障害物がない時のボーン位置を計算
-            IKSolverPointProvider provider = new(_ik.GetIKSolver());
-            Point[] points = provider.GetPoints();
+            Point[] points = _pointProvider.GetPoints();
             Profiler.EndSample();
 
-            IKFollowerDebug.DebugDraw(points, _radius * .2f, Color.yellow, _debugFabrikPoints, _debugFabrikPoints, _debugFabrikAxis);
+            IKFollowerDebug.DebugDraw(points.ToArray(), _radius * .2f, Color.yellow, _debugFabrikPoints, _debugFabrikPoints, _debugFabrikAxis);
 
             Profiler.BeginSample("EvaluateSpline SubPoints");
             Span<float> maxDistanceList = stackalloc float[_maxDistanceList.Count];
