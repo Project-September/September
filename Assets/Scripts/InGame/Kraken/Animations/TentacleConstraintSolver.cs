@@ -25,14 +25,7 @@ namespace September.InGame.Kraken.Animations
         private float[] _segmentLengths;
         private Collider[] _colliders;
 
-        /// <summary>
-        /// Resets the solver's state (e.g. if the tentacle is re-spawned or reset).
-        /// </summary>
-        public void Reset()
-        {
-            _segmentLengths = null;
-            _colliders = new Collider[10];
-        }
+        private IKFollower.Point[] _prevSolvedPoints;
 
         /// <summary>
         /// Solves constraints for the given input points.
@@ -47,7 +40,6 @@ namespace September.InGame.Kraken.Animations
             // 1. Initialize segment lengths and cache buffers on first run or when bone count changes
             InitializeBuffers(inputPoints);
             
-            Span<IKFollower.Point> prevSolvedPoints = inputPoints;
             Profiler.EndSample();
 
             // 2. Prepare predicted positions
@@ -56,7 +48,7 @@ namespace September.InGame.Kraken.Animations
             Span<Quaternion> solvedRotations = stackalloc Quaternion[count];
             for (int i = 0; i < count; i++)
             {
-                solvedPositions[i] = prevSolvedPoints[i].Position;
+                solvedPositions[i] = _prevSolvedPoints[i].Position;
                 solvedRotations[i] = inputPoints[i].Rotation;
             }
             Profiler.EndSample();
@@ -78,6 +70,7 @@ namespace September.InGame.Kraken.Animations
                         Vector3 p = solvedPositions[i] + h;
 
                         solvedPositions[i] = ResolveCollisions(i, p, _radius, _layerMask);
+                        // DebugDrawUtility.DrawWireSphere(solvedPositions[i], _radius, Color.yellow);
                     }
                     Profiler.EndSample();
 
@@ -143,10 +136,10 @@ namespace September.InGame.Kraken.Animations
                         Quaternion targetRot = deltaRot * inputPoints[i].Rotation;
 
                         // Apply temporal damping to satisfy the rotational velocity constraint
-                        if (prevSolvedPoints != null && prevSolvedPoints.Length == count)
+                        if (_prevSolvedPoints != null && _prevSolvedPoints.Length == count)
                         {
                             float maxAngleChange = _maxRotationSpeed * deltaTime;
-                            solvedRotations[i] = Quaternion.RotateTowards(prevSolvedPoints[i].Rotation, targetRot, maxAngleChange);
+                            solvedRotations[i] = Quaternion.RotateTowards(_prevSolvedPoints[i].Rotation, targetRot, maxAngleChange);
                         }
                         else
                         {
@@ -178,6 +171,7 @@ namespace September.InGame.Kraken.Animations
             for (int i = 0; i < count; i++)
             {
                 inputPoints[i] = new IKFollower.Point(solvedPositions[i], solvedRotations[i]);
+                if (_prevSolvedPoints != null) _prevSolvedPoints[i] = inputPoints[i];
             }
             Profiler.EndSample();
         }
@@ -193,6 +187,11 @@ namespace September.InGame.Kraken.Animations
                 {
                     _segmentLengths[i] = Vector3.Distance(inputPoints[i - 1].Position, inputPoints[i].Position);
                 }
+            }
+
+            if (_prevSolvedPoints == null || _prevSolvedPoints.Length != count)
+            {
+                _prevSolvedPoints = inputPoints.ToArray();
             }
 
             _colliders ??= new Collider[10];
