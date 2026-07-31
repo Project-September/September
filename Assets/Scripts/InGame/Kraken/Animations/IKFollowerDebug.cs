@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace September.InGame.Kraken
 {
     public static class IKFollowerDebug
     {
-        public static void DebugDrawLine(IReadOnlyList<Vector3> points, Color color)
+        private static void DebugDrawLine(IReadOnlyList<Vector3> points, Color color)
         {
             for (int i = 0; i < points.Count - 1; i++)
             {
@@ -15,12 +17,12 @@ namespace September.InGame.Kraken
             }
         }
 
-        public static void DebugDrawLine(IReadOnlyList<IKFollower.Point> points, Color color)
+        private static void DebugDrawLine(IReadOnlyList<IKFollower.Point> points, Color color)
         {
             DebugDrawLine(IKFollower.Point.ConvertToVector(points), color);
         }
 
-        public static void DebugDrawSpheres(IReadOnlyList<Vector3> points, float radius, Color color)
+        private static void DebugDrawSpheres(IReadOnlyList<Vector3> points, float radius, Color color)
         {
             foreach (var p in points)
             {
@@ -28,12 +30,13 @@ namespace September.InGame.Kraken
             }
         }
 
-        public static void DebugDrawSpheres(IReadOnlyList<IKFollower.Point> points, float radius, Color color)
+        private static void DebugDrawSpheres(IReadOnlyList<IKFollower.Point> points, float radius, Color color)
         {
             DebugDrawSpheres(IKFollower.Point.ConvertToVector(points), radius, color);
         }
 
-        public static void DebugDrawAxis(IReadOnlyList<IKFollower.Point> points)
+
+        private static void DebugDrawAxis(IReadOnlyList<IKFollower.Point> points)
         {
             foreach (var p in points)
             {
@@ -43,6 +46,7 @@ namespace September.InGame.Kraken
             }
         }
 
+        [Conditional("UNITY_EDITOR")]
         public static void DebugDraw(IReadOnlyList<IKFollower.Point> points, float radius, Color color,
             bool drawLine, bool drawSpheres, bool drawAxis)
         {
