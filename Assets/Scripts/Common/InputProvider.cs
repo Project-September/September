@@ -18,6 +18,7 @@ namespace September.Common
         Ability1,
         Ability2,
         Ability3,
+        Ultimate,
         Warp,
         AirplaneForward,
         AirPlaneBack,
@@ -28,8 +29,10 @@ namespace September.Common
     {
         public NetworkButtons Buttons;
         public Vector2 MoveDirection;
+        public Vector2 LookDirection;
         public float CameraYaw;
         public Vector3 DesiredLookDirection;
+        public Vector3 CameraPosition;
     }
     /// <summary>
     /// ネットワークの入力管理クラス
@@ -78,6 +81,7 @@ namespace September.Common
                 if (playerActions.Move.enabled)
                 {
                     playerInput.MoveDirection = playerActions.Move.ReadValue<Vector2>();
+                    playerInput.LookDirection = playerActions.Look.ReadValue<Vector2>();
                     playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
@@ -85,6 +89,7 @@ namespace September.Common
                 else
                 {
                     playerInput.MoveDirection = Vector2.zero;
+                    playerInput.LookDirection = Vector2.zero;
                     playerInput.Buttons.Set(PlayerButtons.Jump, false);
                     playerInput.Buttons.Set(PlayerButtons.Dash, false);
                     playerInput.Buttons.Set(PlayerButtons.Aim, false);
@@ -114,6 +119,7 @@ namespace September.Common
                 playerInput.Buttons.Set(PlayerButtons.Warp, playerActions.Warp.IsPressed());
                 playerInput.Buttons.Set(PlayerButtons.AirplaneForward, playerActions.AirplaneForward.IsPressed());
                 playerInput.Buttons.Set(PlayerButtons.AirPlaneBack, playerActions.AirPlaneBack.IsPressed());
+                playerInput.Buttons.Set(PlayerButtons.Ultimate, playerActions.Ultimate.IsPressed());
             }
             
             if (_mainCamera == null)
@@ -128,6 +134,9 @@ namespace September.Common
             playerInput.CameraYaw = _mainCamera.transform.rotation.eulerAngles.y;
             Vector3 cameraForward = _mainCamera.transform.forward;
             playerInput.DesiredLookDirection = cameraForward.normalized;
+
+            playerInput.CameraPosition = _mainCamera.transform.position;
+
             input.Set(playerInput);
         }
 

@@ -44,6 +44,7 @@ namespace September.Editor.InGameDebug
 			}
 
 			GUI.enabled = !Application.isPlaying;
+			_lobbyData.MapType = (MapType)EditorGUILayout.EnumPopup("Map Type", _lobbyData.MapType);
 			_lobbyData.LobbyName = EditorGUILayout.TextField("Lobby Name", _lobbyData.LobbyName);
 			_lobbyData.Nickname = EditorGUILayout.TextField("Nickname", _lobbyData.Nickname);
 			_scroll = EditorGUILayout.BeginScrollView(_scroll);

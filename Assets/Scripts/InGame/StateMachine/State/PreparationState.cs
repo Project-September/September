@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Linq;
-using Cinemachine;
 using CRISound;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Fusion;
 using GameEvent;
 using InGame.Player;
+using NaughtyAttributes;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
 using September.InGame.Performances;
 using September.InGame.Rules;
 using September.InGame.UI;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -26,19 +27,24 @@ namespace September.Common
         [SerializeField] private CinemachineVirtualCamera _startCamera;
         [SerializeField] private Vector3 _cameraOffset;
         [SerializeField] private SetIcon _setIcon;
+        [SerializeField, Scene] private string[] _additiveLoadScenes;
         [SerializeField, Tooltip("開始時のPlayerの位置をランダム化する")] private bool _isRandomSpawn = false;
         [SerializeReference, SubclassSelector] private IGameStartPerformance[] _gameStartPerformances;
         private bool _hasRecordedPlayerSelection = false;
         public bool IsRandomSpawn { get => _isRandomSpawn; set => _isRandomSpawn = value; }
 
         private IGameStartStrategy GameStartStrategy => Context.GameRule.GameStartStrategy;
-        private IPlayerKilledUseCase PlayerKilledUseCase => Context.GameRule.PlayerKilledUseCase;
+        private IPlayerKilledStrategy PlayerKilledStrategy => Context.GameRule.PlayerKilledStrategy;
+
+        private PlayerKillUseCase _playerKillUseCase;
 
         protected internal override void OnEnter()
         {
             if (_fadeImage) _fadeImage.gameObject.SetActive(true);
             HideCursor();
             UIController.I.SetUpStartUI();
+
+            _playerKillUseCase = new PlayerKillUseCase(PlayerKilledStrategy);
 
             if (PlayerDatabase.Instance.PlayerDataDic.TryGet(Context.Runner.LocalPlayer, out SessionPlayerData localData))
             {
@@ -57,7 +63,9 @@ namespace September.Common
 
         private async UniTask Initialize()
         {
-            await Runner.LoadScene("Field", LoadSceneMode.Additive);
+            await UniTask.WhenAll(
+                _additiveLoadScenes.Select(scene => Runner.LoadScene(scene, LoadSceneMode.Additive).ToUniTask())
+            );
             await SpawnPlayers();
 
             // プレイヤーのキャラクター選択を一度だけ記録
@@ -127,7 +135,7 @@ namespace September.Common
                     PlayerRef killer = hitData.ExecutorRef;
                     PlayerRef victim = hitData.TargetRef;
                     Context.PlayerKilled?.Invoke(killer, victim);
-                    PlayerKilledUseCase.ProcessKillEvent(killer, victim);
+                    _playerKillUseCase.Execute(hitData);
                 };
 
                 var spd = pair.Value;

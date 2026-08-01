@@ -26,7 +26,6 @@ namespace InGame.Player
         PlayerMovement _playerMovement;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
-        PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
         PlayerEffectController _playerEffectController;
         Rigidbody _rigidbody;
@@ -34,7 +33,9 @@ namespace InGame.Player
         private Vector3 _targetPosition;
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
-        public PlayerControlState CurrentPlayerControlState => _playerControlState;
+        private RigidbodyConstraints _defaultConstraints;
+
+        [Networked] public PlayerControlState CurrentPlayerControlState { get; private set; } = PlayerControlState.Normal;
 
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
         {
@@ -50,12 +51,13 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-
+        
         public override void Spawned()
         {
             InitComponents();
 
             _respawnPosition = transform.position;
+            _defaultConstraints = _rigidbody.constraints;
         }
 
         /// <summary> Player関連コンポーネントの初期化 </summary>
@@ -142,7 +144,7 @@ namespace InGame.Player
             // プレイヤーの入力の管理
             if (_playerInputManager != null && _playerInputManager.GetPlayerInput(out var input))
             {
-                if (!IsStun && _playerControlState == PlayerControlState.Normal)
+                if (!IsStun && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する_playerInputManager
                     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
@@ -194,9 +196,9 @@ namespace InGame.Player
 
         public void SetControlState(PlayerControlState controlState)
         {
-            _playerControlState = controlState;
+            CurrentPlayerControlState = controlState;
 
-            if (_playerControlState == PlayerControlState.ForcedControl)
+            if (CurrentPlayerControlState == PlayerControlState.ForcedControl)
             {
                 _playerMovement.Stop();
             }
@@ -208,12 +210,6 @@ namespace InGame.Player
             if (_attackWeapon == null) return;
 
             _attackWeapon.SetActive(visible);
-        }
-
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_SetControlState(PlayerControlState controlState)
-        {
-            SetControlState(controlState);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -232,6 +228,14 @@ namespace InGame.Player
         public void RPC_SetUseGrav(NetworkBool active)
         {
             _rigidbody.useGravity = active;
+        }
+        
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetPositionLock(NetworkBool isLocked)
+        {
+            _rigidbody.constraints = isLocked ?
+                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
+                _defaultConstraints;
         }
 
         /// <summary> 非常用リスポーン </summary>

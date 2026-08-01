@@ -792,7 +792,7 @@ MonoBehaviour:
   _camera: {fileID: 7413664590401350041}
   _collideAgainst:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4095
   _cameraRadius: 0.1
   _motionDuration: 0.6
   _motionEase: 9
@@ -815,7 +815,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4096
   m_ImplicitCom: 1
   m_ImplicitTensor: 0
   m_UseGravity: 0
@@ -903,6 +903,9 @@ MonoBehaviour:
   _playerHitMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  _bulletHitMask:
+    serializedVersion: 2
+    m_Bits: 4095
   _fireCooldown: 2
   _radius: 3
   _hitEffect: {fileID: 3681082649069878751, guid: 390cb52694a61f341bfe58d99efcaf7e, type: 3}
@@ -940,6 +943,7 @@ MonoBehaviour:
   _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: -0.3, z: 0}
   _cooldownEffectRotation: {x: 0, y: 90, z: 0}
+  _cooldownEffectScale: {x: 1, y: 1, z: 1}
   _interactEffectType: 9
   _cooldownEffectType: 24
   _spawnCooldownEffectOnStart: 0
@@ -949,6 +953,7 @@ MonoBehaviour:
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
+  _debug: 0
   references:
     version: 2
     RefIds:
