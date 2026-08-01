@@ -170,16 +170,20 @@ MonoBehaviour:
       data:
         _characterType: 5
         _addAbility:
-          rid: 4418194648007966878
+          rid: 8775181435814281314
         _addAbilityCondition:
           rid: 4418194648007966879
         _overrideDisabledAbilities:
         - AbilityNormalAttack
         - AbilityHammerAttack
         - AbilityMultiHitAttack
-        _duration: 5
-    - rid: 4418194648007966878
-      type: {class: AbilityMultiHitAttack, ns: InGame.Player.Ability, asm: Scripts}
+        _duration: 30
+    - rid: 4418194648007966879
+      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
+      data:
+        _targetAbilityName: AbilityExcaliburAttack
+    - rid: 8775181435814281314
+      type: {class: AbilityExcaliburAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
         _cooldown: 0
         _phase: 0
@@ -190,7 +194,7 @@ MonoBehaviour:
         _endHitCheckFrame: 21
         _endAttackFrame: 22
         _hitEffect: 18
-        _normalAttackAnimationClip: {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
+        _normalAttackAnimationClip: {fileID: 7400000, guid: b41afecb0e282f14b9d4119f780bf3c6, type: 2}
         _animationClipPlayer: {fileID: 0}
         _enableAutoAim: 1
         _moveForwardSpeed: 2
@@ -206,15 +210,6 @@ MonoBehaviour:
         _debugDrawDuration: 1
         _buildGenerator: {fileID: 0}
         _playerStatus: {fileID: 0}
-        _attackFrames:
-        - Start: 8
-          End: 12
-        - Start: 18
-          End: 20
-    - rid: 4418194648007966879
-      type: {class: AbilityNormalAttackExecuteCondition, ns: InGame.Player.Ability, asm: Scripts}
-      data:
-        _targetAbilityName: AbilityMultiHitAttack
 --- !u!114 &5346824491244401101
 MonoBehaviour:
   m_ObjectHideFlags: 0
