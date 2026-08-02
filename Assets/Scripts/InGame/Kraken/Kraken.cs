@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -10,6 +9,8 @@ using September.InGame.Kraken.Animations;
 using September.InGame.Kraken.Attack;
 using September.InGame.Mountable;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 namespace September.InGame.Kraken
 {
@@ -35,6 +36,11 @@ namespace September.InGame.Kraken
 
         [Header("ダメージ設定")]
         [SerializeField] private int _dealScore = 10;
+
+        [Header("アニメーション設定")]
+        [SerializeField] private PlayableDirector _playableDirector;
+        [SerializeField] private TimelineAsset _inTimeline;
+        [SerializeField] private TimelineAsset _outTimeline;
 
         private InputWrapper _attack;
 
@@ -147,6 +153,8 @@ namespace September.InGame.Kraken
             Object.RemoveInputAuthority();
 
             OwnerPlayerRef = default;
+
+            _playableDirector.Play(_outTimeline);
         }
 
         public override void FixedUpdateNetwork()
@@ -173,6 +181,11 @@ namespace September.InGame.Kraken
                     }
                 }
             }
+        }
+
+        public override void Spawned()
+        {
+            _playableDirector.Play(_inTimeline);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
