@@ -12,14 +12,8 @@ namespace InGame.Player
         [SerializeField, Tooltip("フォーカス時のカメラの位置")] Vector3 _focusPosition = new(0.5f, 1, -2);
         [SerializeField, Tooltip("カメラの移動時間")] float _cameraMoveDuration = 0.2f;
         [Header("カメラスキャンの有効領域についてのパラメータ")]
-        [SerializeField, Tooltip("OverlapBoxの中心の位置")] Vector3 _centerOffset = new Vector3(0, 0, 5);
-        [SerializeField, Tooltip("OverlapBoxの半分の長さ")] Vector3 _halfExtents = new Vector3(5, 2.5f, 2.5f);
-        [SerializeField, Tooltip("スキャン対象のレイヤー")] LayerMask _exhibitLayer;
-        [SerializeField, Tooltip("同時に判定をとれる最大数")] int _maxHitDetectionCount = 8;
         [SerializeField, Tooltip("擬態対象の候補にできる最大距離")] float _scannableMaxDistance = 10f;
         [SerializeField, Tooltip("演出用キャンバス")] ScannerCanvas _scannerCanvas;
-        Collider[] _scanedColliders;
-        Collider _currentScanedObject;
         /// <summary>シーン上にある展示物の配列</summary>
         InteractableBase[] _interactables;
         /// <summary>現在擬態対象としているオブジェクト</summary>
@@ -32,7 +26,6 @@ namespace InGame.Player
         {
             _cameraController = GetComponent<CameraController>();
             _camera = Camera.main;
-            _scanedColliders = new Collider[_maxHitDetectionCount];
             _interactables = FindObjectsByType<InteractableBase>(FindObjectsSortMode.None);
             _scannerCanvas.gameObject.SetActive(true);
         }
@@ -61,7 +54,7 @@ namespace InGame.Player
         /// </summary>
         void FocusEndEffective()
         {
-            _currentScanedObject = null;
+            _currentScanedInteractable = null;
             _cameraController.ResetOffset(_cameraMoveDuration);
         }
 
@@ -70,44 +63,19 @@ namespace InGame.Player
         /// </summary>
         void UpdateNearestExhibit()
         {
-            //var count = Physics.OverlapBoxNonAlloc(_camera.transform.TransformPoint(_centerOffset)
-            //    , _halfExtents
-            //    , _scanedColliders
-            //    , _camera.transform.rotation
-            //    , _exhibitLayer);
-            //var minDistance = float.MaxValue;
-            //_currentScanedObject = null;
-            //for (int i = 0; i < count; i++)
-            //{
-            //    if (_scanedColliders[i] == null) continue;
-            //    var objectPoint = _scanedColliders[i].bounds.center;
-            //    var viewportPoint = _camera.WorldToViewportPoint(objectPoint);
-            //    // カメラに写っているものだけをスキャン対象にする
-            //    if (0 <= viewportPoint.x && viewportPoint.x <= 1
-            //        && 0 <= viewportPoint.y && viewportPoint.y <= 1
-            //        && 0 <= viewportPoint.z)
-            //    {
-            //        Debug.Log(viewportPoint);
-            //        // ターゲットとの距離を計算
-            //        var distance = Vector3.SqrMagnitude(objectPoint - _camera.transform.position);
-            //        // より近いオブジェクトをスキャン対象にする
-            //        if (minDistance > distance)
-            //        {
-            //            _currentScanedObject = _scanedColliders[i];
-            //            minDistance = distance;
-            //        }
-            //    }
-            //}
-
             var minDistance = float.MaxValue;
+            _currentScanedInteractable = null;
             foreach (var interactable in _interactables)
             {
                 if (interactable == null) continue;
                 if (!interactable.gameObject.activeSelf) continue;
-                if (!interactable.TryGetComponent<Collider>(out var col)) continue;
+
+                // 展示物の座標を取得
+                Vector3 pos = interactable.TryGetComponent<Collider>(out var col)
+                    ? col.bounds.center
+                    : interactable.transform.position;
 
                 // カメラに写っているかを確認
-                var pos = col.bounds.center;
                 var viewportPoint = _camera.WorldToViewportPoint(pos);
                 if (0 <= viewportPoint.x && viewportPoint.x <= 1
                     && 0 <= viewportPoint.y && viewportPoint.y <= 1
@@ -134,11 +102,13 @@ namespace InGame.Player
         void FocusExhibit()
         {
             // 展示物かどうかの最終確認ができたら描画処理
-            if (_currentScanedInteractable != null
-                && _currentScanedInteractable.TryGetComponent<Collider>(out var col))
+            if (_currentScanedInteractable != null)
             {
-                // 展示物のワールド座標をスクリーン座標に変換
-                var pos = _camera.WorldToScreenPoint(col.bounds.center);
+                // 展示物の座標をスクリーン座標に変換
+                var pos = _camera.WorldToScreenPoint(
+                    _currentScanedInteractable.TryGetComponent<Collider>(out var col)
+                    ? col.bounds.center
+                    : _currentScanedInteractable.transform.position);
 
                 // 擬態対象であることを示すImageを展示物の位置へ移動
                 _scannerCanvas.SetImagePosition(pos);
@@ -150,13 +120,6 @@ namespace InGame.Player
         /// </summary>
         void DrawScanArea()
         {
-            //Gizmos.color = Color.green;
-            //// OverlapBoxの中心位置を計算
-            //var center = _virtualCamera.transform.TransformPoint(_centerOffset);
-
-            //Gizmos.matrix = Matrix4x4.TRS(center, _virtualCamera.transform.rotation, Vector3.one);
-            //Gizmos.DrawWireCube(Vector3.zero, _halfExtents * 2);
-
             if (_camera == null) return;
 
             Gizmos.color = Color.green;
