@@ -82,7 +82,6 @@ Transform:
   - {fileID: 1662583640852781692}
   - {fileID: 66782349313988417}
   - {fileID: 388907184708714298}
-  - {fileID: 4918511904861062555}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2752540558097259762
@@ -150,68 +149,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2801167760671787955, guid: b0c7b44dcca29944fb594e45783cd36a, type: 3}
   m_PrefabInstance: {fileID: 2752540558097259762}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &3652374910681473000
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 3786701965843191928}
-    m_Modifications:
-    - target: {fileID: 1492289251425139689, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_Name
-      value: KrakenEventHandler
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: b2530122cda23be469ee85467a28b059, type: 3}
---- !u!4 &4918511904861062555 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8569724631734409843, guid: b2530122cda23be469ee85467a28b059, type: 3}
-  m_PrefabInstance: {fileID: 3652374910681473000}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4607386003236237253
 PrefabInstance:
@@ -283,6 +220,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3786701965843191928}
     m_Modifications:
+    - target: {fileID: 1329500297884584287, guid: 21fb911f9a4906a4bb89430765bd3dd1, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329500297884584287, guid: 21fb911f9a4906a4bb89430765bd3dd1, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329500297884584287, guid: 21fb911f9a4906a4bb89430765bd3dd1, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329500297884584287, guid: 21fb911f9a4906a4bb89430765bd3dd1, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
     - target: {fileID: 4887739435321058081, guid: 21fb911f9a4906a4bb89430765bd3dd1, type: 3}
       propertyPath: m_Name
       value: InGameManager
