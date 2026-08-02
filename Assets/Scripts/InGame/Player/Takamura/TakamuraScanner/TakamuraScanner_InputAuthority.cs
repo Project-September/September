@@ -28,6 +28,7 @@ namespace InGame.Player
             _camera = Camera.main;
             _interactables = FindObjectsByType<InteractableBase>(FindObjectsSortMode.None);
             _scannerCanvas.gameObject.SetActive(true);
+            _scannerCanvas.ChangeImageVisibility(false);
         }
 
         /// <summary>
@@ -56,6 +57,7 @@ namespace InGame.Player
         {
             _currentScanedInteractable = null;
             _cameraController.ResetOffset(_cameraMoveDuration);
+            _scannerCanvas.ChangeImageVisibility(false);
         }
 
         /// <summary>
@@ -101,8 +103,11 @@ namespace InGame.Player
         /// </summary>
         void FocusExhibit()
         {
+            var scanned = _currentScanedInteractable != null;
+            _scannerCanvas.ChangeImageVisibility(scanned);
+
             // 展示物かどうかの最終確認ができたら描画処理
-            if (_currentScanedInteractable != null)
+            if (scanned)
             {
                 // 展示物の座標をスクリーン座標に変換
                 var pos = _camera.WorldToScreenPoint(
@@ -111,7 +116,7 @@ namespace InGame.Player
                     : _currentScanedInteractable.transform.position);
 
                 // 擬態対象であることを示すImageを展示物の位置へ移動
-                _scannerCanvas.SetImagePosition(pos);
+                _scannerCanvas.SetImageOverExhibit(pos);
             }
         }
 
