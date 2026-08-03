@@ -257,7 +257,7 @@ namespace InGame.Player
         {
             if (!HasStateAuthority) return;
 
-            _playerMovement.Teleport(_respawnPosition);
+            _playerMovement.TeleportImmediate(_respawnPosition);
 
             //タニヒラ用の処理を追記
             if (this.gameObject.TryGetComponent<FormationManager>(out FormationManager formationManager))

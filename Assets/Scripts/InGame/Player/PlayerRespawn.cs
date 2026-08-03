@@ -11,43 +11,43 @@ namespace InGame.Player
         [SerializeField] private float _coolTime;
         [SerializeField] private float _outFieldHeight;
 
-        private bool _isOutField = false;
+        [Networked, OnChangedRender(nameof(OnOutFieldStateChanged))]
+        private bool IsOutField { get; set; }
 
         public event Action OnOutFieldEvent;
         public event Action OnRevivalFieldEvent;
 
-        private void Update()
+        public override void FixedUpdateNetwork()
         {
-            if (_isOutField) return;
+            if (!HasStateAuthority) return;
+
+            if (IsOutField) return;
+
             if (this.transform.position.y <= _outFieldHeight)
             {
-                OnOutField();
+                IsOutField = true;
             }
         }
 
-        private async void OnOutField()
+        private void OnOutFieldStateChanged()
         {
-            OnOutFieldEvent?.Invoke();
-            _isOutField = true;
-
             if (HasInputAuthority)
             {
-                UIController.I.ShowOutFieldUI(true);
+                UIController.I.ShowOutFieldUI(IsOutField);
             }
 
+            if (IsOutField)
+            {
+                OnOutFieldEvent?.Invoke();
+                RespawnAsync().Forget();
+            }
+        }
+
+        private async UniTaskVoid RespawnAsync()
+        {
             await UniTask.WaitForSeconds(_coolTime);
-
-            OnRevive();
-        }
-
-        private void OnRevive()
-        {
-            if (HasInputAuthority)
-            {
-                UIController.I.ShowOutFieldUI(false);
-            }
             OnRevivalFieldEvent?.Invoke();
-            _isOutField = false;
+            IsOutField = false;
         }
     }
 }
