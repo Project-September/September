@@ -28,88 +28,48 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 843966978322878472, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 843966978322878472, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 843966978322878472, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1844372417076586983, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: SortKey
       value: 3443271396
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 25
+      value: 26
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[17]
+      propertyPath: 'NetworkedBehaviours.Array.data[17]'
       value: 
       objectReference: {fileID: 106332801248519403}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[18]
+      propertyPath: 'NetworkedBehaviours.Array.data[18]'
       value: 
       objectReference: {fileID: 1087122732203364353}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[19]
+      propertyPath: 'NetworkedBehaviours.Array.data[19]'
       value: 
       objectReference: {fileID: 7114180334392212730}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[20]
-      value: 
-      objectReference: {fileID: 4846790478350507398}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[21]
-      value: 
-      objectReference: {fileID: 3166189176791333026}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[22]
-      value: 
-      objectReference: {fileID: 2501677688809563215}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[23]
-      value: 
-      objectReference: {fileID: 9071210672574097550}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[24]
-      value: 
-      objectReference: {fileID: 5352679656891091827}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 24
-      objectReference: {fileID: 0}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[18]
+      propertyPath: 'NetworkedBehaviours.Array.data[20]'
       value: 
       objectReference: {fileID: 7767279481967244635}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[19]
+      propertyPath: 'NetworkedBehaviours.Array.data[21]'
       value: 
       objectReference: {fileID: 4846790478350507398}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[20]
+      propertyPath: 'NetworkedBehaviours.Array.data[22]'
       value: 
       objectReference: {fileID: 3166189176791333026}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[21]
+      propertyPath: 'NetworkedBehaviours.Array.data[23]'
       value: 
       objectReference: {fileID: 2501677688809563215}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[22]
+      propertyPath: 'NetworkedBehaviours.Array.data[24]'
       value: 
       objectReference: {fileID: 9071210672574097550}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[23]
+      propertyPath: 'NetworkedBehaviours.Array.data[25]'
       value: 
       objectReference: {fileID: 5352679656891091827}
     - target: {fileID: 2800256691130121504, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -131,18 +91,6 @@ PrefabInstance:
     - target: {fileID: 5365636257783601198, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: SortKey
       value: 892293618
-      objectReference: {fileID: 0}
-    - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -262,6 +210,7 @@ MonoBehaviour:
   _attackWeapon: {fileID: 0}
   _buildGenerator: {fileID: 3789720849090292403}
   _playerStatus: {fileID: 3006585129494599243}
+  _CurrentPlayerControlState: 0
   _IsStun:
     _value: 0
   _IsMovable:
