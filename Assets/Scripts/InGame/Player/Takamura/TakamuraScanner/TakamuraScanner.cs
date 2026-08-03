@@ -46,6 +46,8 @@ namespace InGame.Player
         /// <param name="input">このオブジェクトに対する入力権限を持つプレイヤーからの入力</param>
         void Ability2Flow(PlayerInput input)
         {
+            if (_tkmrMovement.CurrentMimicryState != MimicryState.Default) return;
+
             // フォーカスをあてる
             if (input.Buttons.WasPressed(_preInput, PlayerButtons.Ability2))
             {
@@ -78,6 +80,20 @@ namespace InGame.Player
                 if (HasStateAuthority)
                 {
                     FocusEndStateChange();
+                }
+            }
+
+            // 擬態する
+            if (_currentScanedInteractable != null
+                && input.Buttons.WasPressed(_preInput, PlayerButtons.Attack))
+            {
+                if (HasInputAuthority)
+                {
+                    Mimic();
+                }
+                if (HasStateAuthority)
+                {
+                    MimicStateChange();
                 }
             }
         }

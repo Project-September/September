@@ -121,6 +121,16 @@ namespace InGame.Player
         }
 
         /// <summary>
+        /// 擬態するメソッド
+        /// </summary>
+        void Mimic()
+        {
+            // ガワを変える
+            FocusEndEffective();
+        }
+
+        #region Gizmos
+        /// <summary>
         /// スキャン領域を描画するメソッド
         /// </summary>
         void DrawScanArea()
@@ -164,5 +174,6 @@ namespace InGame.Player
                 Gizmos.DrawLine(cameraPos + leftUpLineElement3, cameraPos + leftUpLineElement4);
             }
         }
+        #endregion
     }
 }

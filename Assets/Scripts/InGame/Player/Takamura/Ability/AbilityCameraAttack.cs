@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace InGame.Player.Ability
 {
+    /// <summary>通常攻撃の処理を持つクラス</summary>
     public class AbilityCameraAttack : AbilityNormalAttack
     {
         [Header("上方向にどれくらいの角度をつけて飛ばすか"), SerializeField] float _upDegree = 30;

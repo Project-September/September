@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace InGame.Player.Ability
 {
+    /// <summary>擬態解除時の攻撃の処理を持つクラス</summary>
     public class AbilityRevealAttack : AbilityBase
     {
         [Header("通常攻撃")]
@@ -77,6 +78,13 @@ namespace InGame.Player.Ability
 
             _startHitTick = FrameToTick(_startHitCheckFrame);
             _playerMovement.IgnoreMoveInput = true;
+
+            // 擬態解除
+            if (_playerMovement is TakamuraMovement typed
+                && typed.CurrentMimicryState == MimicryState.MimicExhibit)
+            {
+                typed.CurrentMimicryState = MimicryState.Default;
+            }
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)

@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace InGame.Player
 {
     // 状態変更についての処理をまとめたファイル
@@ -19,6 +17,7 @@ namespace InGame.Player
         void FocusStartStateChange()
         {
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            _tkmrMovement.CurrentAbilityPhase = ScanAbilityPhase.Scanning;
         }
 
         /// <summary>
@@ -27,6 +26,16 @@ namespace InGame.Player
         void FocusEndStateChange()
         {
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _tkmrMovement.CurrentAbilityPhase = ScanAbilityPhase.Default;
+        }
+
+        /// <summary>
+        /// 擬態するときに呼ばれるメソッド
+        /// </summary>
+        void MimicStateChange()
+        {
+            _tkmrMovement.CurrentMimicryState = MimicryState.MimicExhibit;
+            FocusEndStateChange();
         }
     }
 }

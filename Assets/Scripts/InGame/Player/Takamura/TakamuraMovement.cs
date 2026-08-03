@@ -1,12 +1,15 @@
+using Fusion;
 using UnityEngine;
 
 namespace InGame.Player
 {
     public class TakamuraMovement : PlayerMovement
     {
-        [Header("初期状態"), SerializeField] MimicryState _currentMimicryState = MimicryState.Default;
+        [Header("擬態状態"), SerializeField] MimicryState _currentMimicryState = MimicryState.Default;
+        [Header("アビリティ発動状態"), SerializeField] ScanAbilityPhase _phase = ScanAbilityPhase.Default;
         [SerializeField] MimickingParams _mimickingParams;
 
+        [Networked]
         public MimicryState CurrentMimicryState
         {
             get => _currentMimicryState;
@@ -14,6 +17,17 @@ namespace InGame.Player
             {
                 if (_currentMimicryState != value)
                     _currentMimicryState = value;
+            }
+        }
+
+        [Networked]
+        public ScanAbilityPhase CurrentAbilityPhase
+        {
+            get => _phase;
+            set
+            {
+                if (_phase != value)
+                    _phase = value;
             }
         }
 
