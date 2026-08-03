@@ -41,6 +41,7 @@ namespace Ingame.Tanihira
         [SerializeField] private GameObject _runEffectObject;
         [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
         [SerializeField] private GameObject _meshObject;
+        [SerializeField] private float _movementBuffScale = 0.3f;
 
         [Networked] private NetworkBool HasMask { get; set; }
         [Networked] private NetworkBool HasRunEffect { get; set; }
@@ -354,14 +355,14 @@ namespace Ingame.Tanihira
             }
         }
 
-        public void StartBuff(float buffRate)
+        public void StartBuff(float speedBuffRate)
         {
-            _currentStatus.FriendFormationSpeed *= buffRate;
-            _currentStatus.FriendChaseSpeed *= buffRate;
-            _currentStatus.FriendRotateSpeed *= buffRate;
-            _currentStatus.FriendAcceleration *= buffRate;
-            _regulationAttackAmount = Mathf.FloorToInt(buffRate * _regulationAttackAmount);
-            _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * buffRate);
+            _currentStatus.FriendFormationSpeed *= speedBuffRate * _movementBuffScale;
+            _currentStatus.FriendChaseSpeed *= speedBuffRate * _movementBuffScale;
+            _currentStatus.FriendRotateSpeed *= speedBuffRate * _movementBuffScale;
+            _currentStatus.FriendAcceleration *= speedBuffRate * _movementBuffScale;
+            _regulationAttackAmount = Mathf.FloorToInt(speedBuffRate * _regulationAttackAmount);
+            _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * speedBuffRate);
             ApplyStatus();
         }
 
