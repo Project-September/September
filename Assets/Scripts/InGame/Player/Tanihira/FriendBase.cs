@@ -359,7 +359,7 @@ namespace Ingame.Tanihira
             _currentStatus.FriendFormationSpeed *= buffRate;
             _currentStatus.FriendChaseSpeed *= buffRate;
             _currentStatus.FriendRotateSpeed *= buffRate;
-            _currentStatus.FriendAccleration *= buffRate;
+            _currentStatus.FriendAcceleration *= buffRate;
             _regulationAttackAmount = Mathf.FloorToInt(buffRate * _regulationAttackAmount);
             _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * buffRate);
             ApplyStatus();
@@ -370,7 +370,7 @@ namespace Ingame.Tanihira
             _currentStatus.FriendFormationSpeed = _friendStatus.FriendFormationSpeed;
             _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
             _currentStatus.FriendRotateSpeed = _friendStatus.FriendRotateSpeed;
-            _currentStatus.FriendAccleration = _friendStatus.FriendAccleration;
+            _currentStatus.FriendAcceleration = _friendStatus.FriendAcceleration;
             _regulationAttackAmount = _originalRegulationAttackAmount;
             _currentStatus.AttackPower = _friendStatus.AttackPower;
             ApplyStatus();
@@ -393,7 +393,7 @@ namespace Ingame.Tanihira
             }
 
             _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
-            _agent.acceleration = _currentStatus.FriendAccleration;
+            _agent.acceleration = _currentStatus.FriendAcceleration;
         }
 
         /// <summary>
