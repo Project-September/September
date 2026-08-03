@@ -145,15 +145,7 @@ namespace Ingame.Tanihira
             //Agentでの移動を無効かする
             _agent.updatePosition = false;
             _agent.updateRotation = false;
-            InitializeAgent();
-        }
-
-        //ステータスをnavmeshに反映
-        private void InitializeAgent()
-        {
-            _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
-            _agent.speed = _currentStatus.FriendFormationSpeed;
-            _agent.acceleration = _currentStatus.FriendAccleration;
+            ApplyStatus();
         }
 
         /// <summary>
@@ -367,7 +359,6 @@ namespace Ingame.Tanihira
             _currentStatus.FriendFormationSpeed *= buffRate;
             _currentStatus.FriendChaseSpeed *= buffRate;
             _currentStatus.FriendRotateSpeed *= buffRate;
-            _currentStatus.FriendChaseDistance *= buffRate;
             _currentStatus.FriendAccleration *= buffRate;
             _regulationAttackAmount = Mathf.FloorToInt(buffRate * _regulationAttackAmount);
             _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * buffRate);
@@ -378,28 +369,31 @@ namespace Ingame.Tanihira
         {
             _currentStatus.FriendFormationSpeed = _friendStatus.FriendFormationSpeed;
             _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
-            _currentStatus.FriendRotateSpeed *= _friendStatus.FriendRotateSpeed;
-            _currentStatus.FriendChaseDistance *= _friendStatus.FriendChaseDistance;
-            _currentStatus.FriendAccleration *= _friendStatus.FriendAccleration;
+            _currentStatus.FriendRotateSpeed = _friendStatus.FriendRotateSpeed;
+            _currentStatus.FriendAccleration = _friendStatus.FriendAccleration;
             _regulationAttackAmount = _originalRegulationAttackAmount;
             _currentStatus.AttackPower = _friendStatus.AttackPower;
             ApplyStatus();
         }
 
+        /// <summary>
+        /// 現在のステータスをAgentに反映する
+        /// </summary>
         private void ApplyStatus()
         {
             //現在のステートによってスピードを反映する
             switch (_currentState)
             {
-                case FriendState.Move:
-                    _agent.speed = _currentStatus.FriendFormationSpeed;
-                    break;
                 case FriendState.Chase:
                     _agent.speed = _currentStatus.FriendChaseSpeed;
                     break;
                 default:
+                    _agent.speed = _currentStatus.FriendFormationSpeed;
                     break;
             }
+
+            _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
+            _agent.acceleration = _currentStatus.FriendAccleration;
         }
 
         /// <summary>
