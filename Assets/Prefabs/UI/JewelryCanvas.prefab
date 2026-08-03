@@ -28,14 +28,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3276090460272753077}
   - {fileID: 4880903357447921619}
+  - {fileID: 3276090460272753077}
   m_Father: {fileID: 8588264421980284856}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0.01, y: 0.01}
+  m_SizeDelta: {x: 0, y: 0.2}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &1109022226917107273
 GameObject:
@@ -51,6 +51,7 @@ GameObject:
   - component: {fileID: 7116631268190812810}
   - component: {fileID: 6751860095228096695}
   - component: {fileID: 3057433584865446383}
+  - component: {fileID: 1816284877353110220}
   m_Layer: 5
   m_Name: JewelryCanvas
   m_TagString: Untagged
@@ -123,7 +124,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &7116631268190812810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,10 +155,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _jewelryUIArray:
-  - _jewelryImage: {fileID: 2162065098195742444}
-    _jewelryCountText: {fileID: 7713571824949355470}
   - _jewelryImage: {fileID: 4789616942701487072}
     _jewelryCountText: {fileID: 7933155151833248051}
+  _hideLocal: 1
 --- !u!114 &3057433584865446383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,6 +177,18 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6751860095228096695}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &1816284877353110220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1109022226917107273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e02a21efcfbf42859d811dd21cd2f321, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4150957951215439681
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,7 +200,6 @@ GameObject:
   - component: {fileID: 8588264421980284856}
   - component: {fileID: 2293982945844473215}
   - component: {fileID: 4019898180518094863}
-  - component: {fileID: 3387773483825673665}
   m_Layer: 0
   m_Name: JewelryInfo
   m_TagString: Untagged
@@ -214,8 +225,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 2.392}
-  m_SizeDelta: {x: 0.01, y: 0}
+  m_AnchoredPosition: {x: 0, y: 3}
+  m_SizeDelta: {x: 0.7, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2293982945844473215
 CanvasGroup:
@@ -246,29 +257,15 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: 0.3
+  m_ChildAlignment: 7
+  m_Spacing: 0.04
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &3387773483825673665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4150957951215439681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!1 &4452648753301181840
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,7 +300,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.16201973, y: 0}
+  m_AnchoredPosition: {x: 0.1620205, y: 0}
   m_SizeDelta: {x: 0.2, y: 0.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &531668344684068387
@@ -359,7 +356,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4258424295523176086
 RectTransform:
   m_ObjectHideFlags: 0
@@ -379,7 +376,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0.01, y: 0.01}
+  m_SizeDelta: {x: 0.7178, y: 0.2}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &7234807913866340132
 GameObject:
@@ -415,7 +412,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 179.918, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.11599922, y: 0.034000397}
+  m_AnchoredPosition: {x: -0.116, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6005037671063370171
@@ -551,7 +548,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 179.918, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.116, y: 0.034}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2318611682767472449
@@ -582,7 +579,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\xD7 n"
+  m_text: 5
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9941c74e122f5a04ab4662f35f9f538c, type: 2}
   m_sharedMaterial: {fileID: 7861837254164249420, guid: 9941c74e122f5a04ab4662f35f9f538c, type: 2}
@@ -609,13 +606,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.15
-  m_fontSizeBase: 0.15
+  m_fontSize: 1
+  m_fontSizeBase: 1
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -687,8 +684,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.1620205, y: 0}
-  m_SizeDelta: {x: 0.2, y: 0.2}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1.2, y: 1.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8607080360795802953
 CanvasRenderer:
@@ -711,14 +708,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.77254903, g: 0.77254903, b: 0.77254903, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 119f6bfea544228468947da275eeba5c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

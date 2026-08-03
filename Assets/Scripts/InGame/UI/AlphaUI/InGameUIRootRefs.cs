@@ -1,4 +1,5 @@
 using TMPro;
+using InGame.Jewelry;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,7 @@ namespace September.InGame.UI
         public TextMeshProUGUI ScoreText;
         public Image IconImage;
         public CanvasGroup FieldOutUI;
+        public PlayerJewelryView JewelryView;
 
         [Header("Bars")]
         public Slider HpBar;

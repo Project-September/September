@@ -17,13 +17,12 @@ MonoBehaviour:
   _playerKilledStrategy:
     rid: 7765555185143251033
   _rankingPolicy:
-    rid: 7765555097832521866
+    rid: 7765555374150910062
+  _gameResultScorePolicy:
+    rid: 7765555374150910065
   references:
     version: 2
     RefIds:
-    - rid: 7765555097832521866
-      type: {class: TagRuleRankingPolicy, ns: September.NewResult, asm: Scripts}
-      data: 
     - rid: 7765555185143251033
       type: {class: JewelPlayerKilledStrategy, ns: September.InGame.Rules, asm: Scripts}
       data:
@@ -33,3 +32,12 @@ MonoBehaviour:
     - rid: 7765555185143251047
       type: {class: NullGameStartStrategy, ns: September.InGame.Rules, asm: Scripts}
       data: 
+    - rid: 7765555374150910062
+      type: {class: JewelryRankingPolicy, ns: September.NewResult.RankingPolicy, asm: Scripts}
+      data: 
+    - rid: 7765555374150910065
+      type: {class: JewelryScorePolicy, ns: September.InGame.Rules.ScorePolicy, asm: Scripts}
+      data:
+        _jewelryInfos:
+        - {fileID: 11400000, guid: 0b3623d5239e4044394a1c13d1bbea00, type: 2}
+        - {fileID: 11400000, guid: 2147f865256d8764db1a7238cf3e0212, type: 2}

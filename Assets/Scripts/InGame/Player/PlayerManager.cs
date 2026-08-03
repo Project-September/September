@@ -27,7 +27,6 @@ namespace InGame.Player
         PlayerMovement _playerMovement;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
-        PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
         PlayerEffectController _playerEffectController;
         Rigidbody _rigidbody;
@@ -36,7 +35,8 @@ namespace InGame.Player
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
         private RigidbodyConstraints _defaultConstraints;
-        public PlayerControlState CurrentPlayerControlState => _playerControlState;
+
+        [Networked] public PlayerControlState CurrentPlayerControlState { get; private set; } = PlayerControlState.Normal;
 
         public void Start()
         {
@@ -159,7 +159,7 @@ namespace InGame.Player
             // プレイヤーの入力の管理
             if (_playerInputManager != null && _playerInputManager.GetPlayerInput(out var input))
             {
-                if (!IsStun && IsMovable && _playerControlState == PlayerControlState.Normal)
+                if (!IsStun && IsMovable && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する_playerInputManager
                     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
@@ -193,7 +193,7 @@ namespace InGame.Player
         /// <summary> 気絶が終わったとき </summary>
         void Restart()
         {
-            _playerHealth.IsInvincible = false; 
+            _playerHealth.IsInvincible = false;
             IsStun = false;
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
@@ -210,9 +210,9 @@ namespace InGame.Player
 
         public void SetControlState(PlayerControlState controlState)
         {
-            _playerControlState = controlState;
+            CurrentPlayerControlState = controlState;
 
-            if (_playerControlState == PlayerControlState.ForcedControl)
+            if (CurrentPlayerControlState == PlayerControlState.ForcedControl)
             {
                 _playerMovement.Stop();
             }
@@ -224,12 +224,6 @@ namespace InGame.Player
             if (_attackWeapon == null) return;
 
             _attackWeapon.SetActive(visible);
-        }
-
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_SetControlState(PlayerControlState controlState)
-        {
-            SetControlState(controlState);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]

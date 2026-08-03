@@ -1,6 +1,10 @@
 using Fusion;
 using InGame.Jewelry.Common;
 using System;
+using CRISound;
+using September.Common;
+using September.InGame;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Jewelry
@@ -12,6 +16,12 @@ namespace InGame.Jewelry
         [SerializeField] private float _horizontalThrowForce = 5f;
         [SerializeField] private float _upwardThrowForce = 3f;
         [SerializeField] private float _heightOffset;
+        [Header("Sound")]
+        [SerializeField] private AudioBroadcaster _audioBroadcaster;
+        [SerializeField] private string _pickUpSoundCueName;
+        [Header("Effect")]
+        [SerializeField] private EffectType _interactEffectType;
+        [SerializeField] private Vector3 _interactEffectOffset;
 
         event Action<JewelryType> _onGetJewelry;
         event Action<JewelryType> _onDropJewelry;
@@ -95,7 +105,12 @@ namespace InGame.Jewelry
                 {
                     Destroy(jewelComponent.gameObject);
                 }
+
+                var effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+                effectSpawner.RequestPlayOneShotEffect(_interactEffectType, jewelComponent.transform.position + _interactEffectOffset, transform.rotation);
             }
+
+            _audioBroadcaster.RPC_PlaySoundFromCode(_pickUpSoundCueName, SoundTrackingType.Spot, Object, Object.InputAuthority);
         }
     }
 }

@@ -101,12 +101,15 @@ namespace InGame.Player.Sarutobi
         {
             if (!GetInput<PlayerInput>(out var input)) return;
 
-            if (State == KunaiStateType.Idol && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability2)
-                                             && _grapplingHook && _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active)
+            if (State == KunaiStateType.Idol &&
+                _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal &&
+                input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Ability2) &&
+                _grapplingHook && _grapplingHook.AbilityState != AbilityGrapplingHook.AbilityStateType.Active)
             {
                 StartStance().Forget();
             }
-            if (input.Buttons.WasReleased(PreviousButtons, PlayerButtons.Ability2))
+
+            if (State != KunaiStateType.Idol && input.Buttons.WasReleased(PreviousButtons, PlayerButtons.Ability2))
             {
                 EndStance();
             }
@@ -147,11 +150,13 @@ namespace InGame.Player.Sarutobi
                 _cameraController.ChangeOffset(_stanceCameraOffset, _changeOffsetDuration);
                 _crosshair.SetActive(true);
             }
+
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+
             if (!HasStateAuthority) return;
 
             RPC_ChangeDescriptionUI(ControlDescriptionType.SarutobiAiming);
             State = KunaiStateType.Stance;
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             var endType = await _clipPlayer.PlayClipAndWait(_stance);
 
             if (endType == EndClipType.Complete)

@@ -11,8 +11,9 @@ namespace InGame.Jewelry
         [SerializeField] private float _groundCheckDistance = 0.2f;
         [SerializeField] private float _getCoolTime = 3f;
         [SerializeField] private Collider _collider;
+        [SerializeField] private Rigidbody _rigidbody;
 
-        private Vector3 _velocity;
+        private Vector3 Velocity { get => _rigidbody.linearVelocity; set => _rigidbody.linearVelocity = value; }
         private bool _isGrounded;
 
         public void Start()
@@ -39,7 +40,7 @@ namespace InGame.Jewelry
 
         public void Throw(Vector3 velocity)
         {
-            _velocity = velocity;
+            Velocity = velocity;
         }
 
         public override void FixedUpdateNetwork()
@@ -47,31 +48,24 @@ namespace InGame.Jewelry
             if (!HasStateAuthority || _isGrounded)
                 return;
 
-            _velocity += Vector3.down * _gravity * Runner.DeltaTime;
+            Velocity += Vector3.down * _gravity * Runner.DeltaTime;
 
-            Vector3 nextPos = this.transform.position + _velocity * Runner.DeltaTime;
-
-            if (IsGrounded(out var hitPos))
+            if (IsGrounded())
             {
                 _collider.enabled = true;
-                nextPos.y = hitPos.y + _collider.bounds.extents.y;
-                _velocity = Vector3.zero;
+                _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
                 _isGrounded = true;
             }
-
-            this.transform.position = nextPos;
         }
 
-        private bool IsGrounded(out Vector3 hitPos)
+        private bool IsGrounded()
         {
             Vector3 origin = transform.position + Vector3.up * 0.1f;
 
-            if (Physics.Raycast(origin, Vector3.down, out var hit, _groundCheckDistance, _groundLayer))
+            if (Physics.Raycast(origin, Vector3.down, out var _, _groundCheckDistance + .1f, _groundLayer))
             {
-                hitPos = hit.point;
                 return true;
             }
-            hitPos = Vector3.zero;
             return false;
         }
     }
