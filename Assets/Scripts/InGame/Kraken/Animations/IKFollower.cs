@@ -6,6 +6,10 @@ using September.InGame.Kraken.Animations;
 using UnityEngine;
 using UnityEngine.Profiling;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace September.InGame.Kraken
 {
     public class IKFollower : MonoBehaviour
@@ -157,5 +161,36 @@ namespace September.InGame.Kraken
                 _followers[i].transform.rotation = points[i].Rotation;
             }
         }
+
+        /// <summary>
+        /// エディタ用。設定項目の自動アサイン処理
+        /// </summary>
+#if UNITY_EDITOR
+        [ContextMenu("SetObjects")]
+        private void SetObjects()
+        {
+            Undo.RecordObject(this, "SetObjects");
+
+            _followers = GetChildFlat().ToArray();
+            _constraintSolver = GetComponent<TentacleConstraintSolver>();
+
+            var hitChecker = GetComponent<HitChecker>();
+            hitChecker.HitPoint.Clear();
+            hitChecker.HitPoint.Add(transform);
+            hitChecker.HitPoint.AddRange(_followers);
+
+            return;
+
+            IEnumerable<Transform> GetChildFlat()
+            {
+                Transform parent = transform;
+                while (parent.childCount > 0)
+                {
+                    parent = parent.GetChild(0);
+                    yield return parent;
+                }
+            }
+        }
+#endif
     }
 }

@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
+using September.InGame.Kraken.Attack;
 using UnityEngine;
 
 namespace September.InGame.Kraken.Animations
@@ -18,10 +19,11 @@ namespace September.InGame.Kraken.Animations
 
         [Header("攻撃設定")]
         [SerializeField] private float _hitRayCastHeight;
-        [SerializeField] private float _hitStartTime;
-        [SerializeField] private float _hitEndTime;
+        [SerializeField] private float _areaHitDuration;
+        [SerializeField] private float _areaHitRadius;
         [SerializeField] private int _damage;
         [SerializeField] private LayerMask _hitGroundLayer;
+        [SerializeField] private LayerMask _attackTargetLayer;
         [SerializeField] private float _armStartTime;
         [SerializeField] private float _armEndTime;
 
@@ -34,25 +36,50 @@ namespace September.InGame.Kraken.Animations
             foreach (ArmSettings arm in _tentacle.Arms)
             {
                 arm.ArmHitChecker.OnHit += col => OnHitAction(arm.AlreadyHits, col);
-                arm.AreaHitChecker.OnHit += col => OnHitAction(arm.AlreadyHits, col);
             }
         }
 
-        public async UniTask Attack(Vector3 target)
+        public bool TryGetArm(out ArmSettings arm)
+        {
+            return _tentacle.TryGetUnusedArm(out arm);
+        }
+
+        public async UniTask Attack(ArmSettings arm, Vector3 target)
         {
             Debug.Log("Start Attack");
-            if (!_tentacle.TryGetUnusedArm(out ArmSettings arm)) return;
             _tentacle.StartUseArm(arm);
             LatestArmRootPosition = arm.ArmRoot.position;
             _tentacle.LookAt(arm, target);
 
             await UniTask.WhenAll(
                 _tentacle.PlayAnimation(arm, destroyCancellationToken),
-                HitCheck(arm.ArmHitChecker, _hitStartTime, _hitEndTime, destroyCancellationToken),
-                HitCheck(arm.AreaHitChecker, _armStartTime, _armEndTime, destroyCancellationToken));
+                HitCheck(arm.ArmHitChecker, _armStartTime, _armEndTime, destroyCancellationToken));
 
             _tentacle.ReleaseUsingArm(arm);
             Debug.Log("End Attack");
+        }
+
+        public void StartAreaAttack(ArmSettings arm, PredictionParticle particle)
+        {
+            arm.AreaHitCapsule =
+                HitCapsule.Create(
+                    Runner,
+                    new CapsuleShape(particle.ForwardEndPos, particle.BackEndPos, _areaHitRadius),
+                    _areaHitDuration,
+                    _attackTargetLayer,
+                    col => OnHitAction(arm.AlreadyHits, col)
+                );
+        }
+
+        public void TickAreaAttack()
+        {
+            foreach (ArmSettings arm in _tentacle.Arms)
+            {
+                if (!arm.AreaHitCapsule.ExpiredOrNotRunning(Runner))
+                {
+                    arm.AreaHitCapsule.Cast();
+                }
+            }
         }
 
         private static async UniTask HitCheck(HitChecker hitChecker, float startTime, float endTime, CancellationToken token = default)
@@ -99,16 +126,15 @@ namespace September.InGame.Kraken.Animations
         {
             [SerializeField] private Animator _animator;
             [SerializeField] private Transform _armRoot;
-            [SerializeField] private HitChecker _areaHitChecker;
             [SerializeField] private HitChecker _armHitChecker;
 
             public Quaternion StartRotation;
+            public HitCapsule AreaHitCapsule;
 
             public Animator Animator => _animator;
             public Transform ArmRoot => _armRoot;
-            public HitChecker AreaHitChecker => _areaHitChecker;
             public HitChecker ArmHitChecker => _armHitChecker;
-            public HashSet<Collider> AlreadyHits => new();
+            public HashSet<Collider> AlreadyHits { get; } = new();
         }
 
         /// <summary>

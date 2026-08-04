@@ -20,7 +20,7 @@ namespace September.InGame.Kraken.Attack
             predictionParticle.transform.position = shape.Position;
             predictionParticle.transform.rotation = shape.Rotation;
             predictionParticle.transform.localScale = shape.HalfExtents;
-            return new PredictionParticle(predictionParticle);
+            return new PredictionParticle(predictionParticle, shape);
         }
     }
 
@@ -47,10 +47,18 @@ namespace September.InGame.Kraken.Attack
     public readonly struct PredictionParticle
     {
         private readonly GameObject _predictionParticle;
+        private readonly AttackPredictionShape _shape;
 
-        public PredictionParticle(GameObject predictionParticle)
+        public Vector3 ForwardEndPos => _shape.Position +
+                                        _shape.Rotation * Vector3.forward * _shape.HalfExtents.z;
+
+        public Vector3 BackEndPos => _shape.Position +
+                                     _shape.Rotation * Vector3.back * _shape.HalfExtents.z;
+
+        public PredictionParticle(GameObject predictionParticle, AttackPredictionShape shape)
         {
             _predictionParticle = predictionParticle;
+            _shape = shape;
         }
 
         public void Destroy()

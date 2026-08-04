@@ -93,6 +93,8 @@ namespace September.InGame.Kraken
 
         public override void FixedUpdateNetwork()
         {
+            _attackHandler.TickAreaAttack();
+
             if (!HasInputAuthority) return;
 
             if (GetInput<PlayerInput>(out var input))
@@ -231,15 +233,25 @@ namespace September.InGame.Kraken
 
             if (!_attackHandler.IsReady) return;
 
-            _attackHandler.Attack(targetPosition).Forget();
+            if (!_attackHandler.TryGetArm(out var arm)) return;
 
-            {
-                Vector3 dir = targetPosition - _attackHandler.LatestArmRootPosition;
-                dir.y = 0;
-                Quaternion lookRotation = Quaternion.LookRotation(dir);
-                PredictionParticle particle = _attackPredictionFactory.Create(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
-                UniTask.WaitForSeconds(_predictionEndTime).ContinueWith(() => particle.Destroy());
-            }
+            _attackHandler.Attack(arm, targetPosition).Forget();
+
+            Vector3 dir = targetPosition - _attackHandler.LatestArmRootPosition;
+            dir.y = 0;
+            Quaternion lookRotation = Quaternion.LookRotation(dir);
+            PredictionParticle particle = _attackPredictionFactory.Create(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
+            DestroyPredictionAreaAsync(arm, particle).Forget();
+        }
+
+        /// <summary>
+        /// 腕を叩きつけた際に攻撃予測表示を非表示にし、攻撃予測範囲に攻撃判定を配置する
+        /// </summary>
+        private async UniTaskVoid DestroyPredictionAreaAsync(KrakenAttackHandler.ArmSettings arm, PredictionParticle particle)
+        {
+            await UniTask.WaitForSeconds(_predictionEndTime);
+            _attackHandler.StartAreaAttack(arm, particle);
+            particle.Destroy();
         }
 
         public void TakeHit(ref HitData hitData)
