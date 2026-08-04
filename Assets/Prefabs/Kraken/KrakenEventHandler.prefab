@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8569724631734409843}
   - component: {fileID: -8126669936626134578}
-  - component: {fileID: 57703824717442806}
   - component: {fileID: 6981456847712927014}
   m_Layer: 0
   m_Name: KrakenEventHandler
@@ -84,22 +83,8 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 57703824717442806}
   - {fileID: 6981456847712927014}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &57703824717442806
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1492289251425139689}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 008d48b655ef4e428fbf96c28baca452, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _krakenPrefab: {fileID: 3135717980165409898, guid: 4ac16120ce2de86408a67392858584f5, type: 3}
 --- !u!114 &6981456847712927014
 MonoBehaviour:
   m_ObjectHideFlags: 0

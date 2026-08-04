@@ -22,5 +22,19 @@ namespace Common.Extensions
                 playableDirector.Stop();
             }
         }
+
+        public static async UniTask PlayAsync(this PlayableDirector playableDirector, PlayableAsset asset, CancellationToken token = default)
+        {
+            playableDirector.Play(asset);
+
+            try
+            {
+                await playableDirector.WaitUntilEnd(token);
+            }
+            finally
+            {
+                playableDirector.Stop();
+            }
+        }
     }
 }

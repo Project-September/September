@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -37,6 +38,10 @@ namespace September.InGame.Kraken
         [Header("ダメージ設定")]
         [SerializeField] private int _dealScore = 10;
 
+        [Header("出現時間設定")]
+        [Tooltip("誰にもインタラクトされなかった場合に自動的に退場するまでの時間")]
+        [SerializeField] private float _stayDuration = 20f;
+
         [Header("アニメーション設定")]
         [SerializeField] private PlayableDirector _playableDirector;
         [SerializeField] private TimelineAsset _inTimeline;
@@ -49,6 +54,9 @@ namespace September.InGame.Kraken
 
         private Vector3 _originalPlayerPosition;
         private Quaternion _originalPlayerRotation;
+
+        [Networked] private TickTimer _disappearTimer { get; set; }
+        private KrakenAppearanceState _appearanceState;
 
         private void Start()
         {
@@ -154,7 +162,7 @@ namespace September.InGame.Kraken
 
             OwnerPlayerRef = default;
 
-            _playableDirector.Play(_outTimeline);
+            Disappear().Forget();
         }
 
         public override void FixedUpdateNetwork()
@@ -183,9 +191,35 @@ namespace September.InGame.Kraken
             }
         }
 
+        public override void Render()
+        {
+            // 誰か乗ってたら退場しない
+            if (Object.InputAuthority != default) return;
+
+            if (_disappearTimer.Expired(Runner) && _appearanceState == KrakenAppearanceState.Staying)
+            {
+                Disappear().Forget();
+            }
+        }
+
         public override void Spawned()
         {
-            _playableDirector.Play(_inTimeline);
+            Appear().Forget();
+        }
+
+        private async UniTaskVoid Appear()
+        {
+            _appearanceState = KrakenAppearanceState.Appear;
+            await _playableDirector.PlayAsync(_inTimeline);
+            _disappearTimer = TickTimer.CreateFromSeconds(Runner, _stayDuration);
+            _appearanceState = KrakenAppearanceState.Staying;
+        }
+
+        private async UniTaskVoid Disappear()
+        {
+            _appearanceState = KrakenAppearanceState.Disappear;
+            await _playableDirector.PlayAsync(_outTimeline);
+            if (HasStateAuthority) Runner.Despawn(Object);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -226,6 +260,13 @@ namespace September.InGame.Kraken
             if (player != Runner.LocalPlayer) return;
 
             _cameraController.SetCameraPriority(priority);
+        }
+
+        private enum KrakenAppearanceState
+        {
+            Appear,
+            Staying,
+            Disappear,
         }
     }
 }
