@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using NaughtyAttributes;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ namespace September.InGame.Kraken.Test
         [Button(enabledMode: EButtonEnableMode.Playmode)]
         public void RunTest()
         {
-            _kraken.Attack(_target.position).Forget();
+            _kraken.Attack(_target.position);
         }
     }
 }

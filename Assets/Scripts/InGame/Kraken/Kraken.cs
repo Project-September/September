@@ -55,8 +55,13 @@ namespace September.InGame.Kraken
         private Vector3 _originalPlayerPosition;
         private Quaternion _originalPlayerRotation;
 
-        [Networked] private TickTimer _disappearTimer { get; set; }
         private KrakenAppearanceState _appearanceState;
+
+        [Networked] private TickTimer DisappearTimer { get; set; }
+
+        // === IDamageable実装 ===
+        public bool IsAlive => true; // ダメージを受けるだけで死亡しない
+        public PlayerRef OwnerPlayerRef { get; private set; }
 
         private void Start()
         {
@@ -78,17 +83,49 @@ namespace September.InGame.Kraken
                 _cameraController.CameraReset();
             }
 
-            _cameraController.RotateCamera(new Vector2(GameInput.I.Player.Look.ReadValue<Vector2>().x, 0), Runner.DeltaTime);
+            _cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Runner.DeltaTime);
         }
 
-        public bool IsAlive { get; } = true;
-        public PlayerRef OwnerPlayerRef { get; private set; }
-
-        public void TakeHit(ref HitData hitData)
+        public override void Spawned()
         {
-            if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
+            Appear().Forget();
+        }
+
+        public override void FixedUpdateNetwork()
+        {
+            if (!HasInputAuthority) return;
+
+            if (GetInput<PlayerInput>(out var input))
             {
-                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, _dealScore);
+                _attack.SetInput(input.Buttons.IsSet(PlayerButtons.Attack));
+
+                if (_attack.IsJustPressed)
+                {
+                    Camera mainCamera = Camera.main;
+                    if (mainCamera == null) return;
+                    Vector3 origin = mainCamera.transform.position;
+                    Vector3 forward = mainCamera.transform.forward;
+                    if (Physics.Raycast(origin, forward, out RaycastHit hit, Mathf.Infinity))
+                    {
+                        RPC_Attack(hit.point);
+                    }
+                    else
+                    {
+                        RPC_Attack(forward * 20f);
+                    }
+                }
+            }
+        }
+
+        public override void Render()
+        {
+            // 誰かに操作されている最中であれば自動退場しない
+            if (Object.InputAuthority != default) return;
+
+            // 一定時間放置されたら自動的に退場する
+            if (DisappearTimer.Expired(Runner) && _appearanceState == KrakenAppearanceState.Staying)
+            {
+                Disappear().Forget();
             }
         }
 
@@ -165,53 +202,11 @@ namespace September.InGame.Kraken
             Disappear().Forget();
         }
 
-        public override void FixedUpdateNetwork()
-        {
-            if (!HasInputAuthority) return;
-
-            if (GetInput<PlayerInput>(out var input))
-            {
-                _attack.SetInput(input.Buttons.IsSet(PlayerButtons.Attack));
-
-                if (_attack.IsJustPressed)
-                {
-                    Camera mainCamera = Camera.main;
-                    if (mainCamera == null) return;
-                    Vector3 origin = mainCamera.transform.position;
-                    Vector3 forward = mainCamera.transform.forward;
-                    if (Physics.Raycast(origin, forward, out RaycastHit hit, Mathf.Infinity))
-                    {
-                        RPC_Attack(hit.point);
-                    }
-                    else
-                    {
-                        RPC_Attack(forward * 20f);
-                    }
-                }
-            }
-        }
-
-        public override void Render()
-        {
-            // 誰か乗ってたら退場しない
-            if (Object.InputAuthority != default) return;
-
-            if (_disappearTimer.Expired(Runner) && _appearanceState == KrakenAppearanceState.Staying)
-            {
-                Disappear().Forget();
-            }
-        }
-
-        public override void Spawned()
-        {
-            Appear().Forget();
-        }
-
         private async UniTaskVoid Appear()
         {
             _appearanceState = KrakenAppearanceState.Appear;
             await _playableDirector.PlayAsync(_inTimeline);
-            _disappearTimer = TickTimer.CreateFromSeconds(Runner, _stayDuration);
+            DisappearTimer = TickTimer.CreateFromSeconds(Runner, _stayDuration);
             _appearanceState = KrakenAppearanceState.Staying;
         }
 
@@ -225,10 +220,10 @@ namespace September.InGame.Kraken
         [Rpc(RpcSources.All, RpcTargets.All)]
         private void RPC_Attack(Vector3 targetPosition)
         {
-            Attack(targetPosition).Forget();
+            Attack(targetPosition);
         }
 
-        public async UniTask Attack(Vector3 targetPosition)
+        public void Attack(Vector3 targetPosition)
         {
             Debug.DrawLine(transform.position, targetPosition, Color.green, 10f);
             DebugDrawUtility.DrawWireSphere(targetPosition, 3f, Color.green, 10f);
@@ -243,6 +238,14 @@ namespace September.InGame.Kraken
                 Quaternion lookRotation = Quaternion.LookRotation(dir);
                 PredictionParticle particle = _attackPredictionFactory.Create(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
                 UniTask.WaitForSeconds(_predictionEndTime).ContinueWith(() => particle.Destroy());
+            }
+        }
+
+        public void TakeHit(ref HitData hitData)
+        {
+            if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
+            {
+                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, _dealScore);
             }
         }
 
