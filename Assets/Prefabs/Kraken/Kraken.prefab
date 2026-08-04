@@ -3242,7 +3242,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 30.75
   m_Center: {x: 0, y: 40.63, z: -12}
@@ -3263,7 +3263,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 28.6
   m_Center: {x: 0, y: 3.61, z: 3.78}
@@ -3417,14 +3417,14 @@ MonoBehaviour:
     - 5
   _characterEffects:
   - rid: 5799214060048744533
-  _type: 0
+  _type: 16
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectRotation: {x: 0, y: 0, z: 0}
   _cooldownEffectScale: {x: 1, y: 1, z: 1}
   _interactEffectType: 9
-  _cooldownEffectType: 11
+  _cooldownEffectType: -1
   _spawnCooldownEffectOnStart: 0
   _audioBroadcaster: {fileID: 0}
   _interactSoundCueName: 
