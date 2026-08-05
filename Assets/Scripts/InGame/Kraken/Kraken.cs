@@ -247,7 +247,7 @@ namespace September.InGame.Kraken
         /// <summary>
         /// 腕を叩きつけた際に攻撃予測表示を非表示にし、攻撃予測範囲に攻撃判定を配置する
         /// </summary>
-        private async UniTaskVoid DestroyPredictionAreaAsync(KrakenAttackHandler.ArmSettings arm, PredictionParticle particle)
+        private async UniTaskVoid DestroyPredictionAreaAsync(ArmSettings arm, PredictionParticle particle)
         {
             await UniTask.WaitForSeconds(_predictionEndTime);
             _attackHandler.StartAreaAttack(arm, particle);

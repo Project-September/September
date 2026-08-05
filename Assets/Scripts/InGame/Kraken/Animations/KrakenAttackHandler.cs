@@ -116,25 +116,6 @@ namespace September.InGame.Kraken.Animations
         }
 
         /// <summary>
-        /// 触手ごとに持たせるデータ
-        /// </summary>
-        [Serializable]
-        public class ArmSettings
-        {
-            [SerializeField] private Animator _animator;
-            [SerializeField] private Transform _armRoot;
-            [SerializeField] private HitChecker _armHitChecker;
-
-            public Quaternion StartRotation;
-            public HitCapsule AreaHitCapsule;
-
-            public Animator Animator => _animator;
-            public Transform ArmRoot => _armRoot;
-            public HitChecker ArmHitChecker => _armHitChecker;
-            public HashSet<Collider> AlreadyHits { get; } = new();
-        }
-
-        /// <summary>
         /// 触手リポジトリ兼アニメーター
         /// </summary>
         [Serializable]

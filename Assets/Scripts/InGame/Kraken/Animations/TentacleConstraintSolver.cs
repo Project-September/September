@@ -27,6 +27,8 @@ namespace September.InGame.Kraken.Animations
 
         private IKFollower.Point[] _prevSolvedPoints;
 
+        [NonSerialized] public bool EnablePhysicsConstraint = true;
+
         /// <summary>
         /// Solves constraints for the given input points.
         /// </summary>
@@ -69,8 +71,14 @@ namespace September.InGame.Kraken.Animations
                         Vector3 h = (inputPoints[i].Position - solvedPositions[i]) * (1f / _pbdSubsteps);
                         Vector3 p = solvedPositions[i] + h;
 
-                        solvedPositions[i] = ResolveCollisions(i, p, _radius, _layerMask);
-                        // DebugDrawUtility.DrawWireSphere(solvedPositions[i], _radius, Color.yellow);
+                        if (EnablePhysicsConstraint)
+                        {
+                            solvedPositions[i] = ResolveCollisions(i, p, _radius, _layerMask);
+                        }
+                        else
+                        {
+                            solvedPositions[i] = p;
+                        }
                     }
                     Profiler.EndSample();
 
