@@ -24,7 +24,7 @@ namespace September.InGame.Kraken.Animations
                 return IKFollower.Point.Slerp(_points[i], _points[i + 1], t);
             }
 
-            return default;
+            return _points[^1];
         }
 
         public void Evaluate(IReadOnlyList<float> distances, ref Span<IKFollower.Point> points)
