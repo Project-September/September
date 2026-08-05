@@ -237,7 +237,7 @@ namespace September.InGame.Kraken
 
             _attackHandler.Attack(arm, targetPosition).Forget();
 
-            Vector3 dir = targetPosition - _attackHandler.LatestArmRootPosition;
+            Vector3 dir = targetPosition - arm.ArmRoot.position;
             dir.y = 0;
             Quaternion lookRotation = Quaternion.LookRotation(dir);
             PredictionParticle particle = _attackPredictionFactory.Create(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));

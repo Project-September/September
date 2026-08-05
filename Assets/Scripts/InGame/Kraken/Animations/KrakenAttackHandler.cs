@@ -27,8 +27,6 @@ namespace September.InGame.Kraken.Animations
         [SerializeField] private float _armStartTime;
         [SerializeField] private float _armEndTime;
 
-        public Vector3 LatestArmRootPosition { get; private set; }
-
         public bool IsReady => _tentacle.TryGetUnusedArm(out _);
 
         private void Start()
@@ -48,7 +46,6 @@ namespace September.InGame.Kraken.Animations
         {
             Debug.Log("Start Attack");
             _tentacle.StartUseArm(arm);
-            LatestArmRootPosition = arm.ArmRoot.position;
             _tentacle.LookAt(arm, target);
 
             await UniTask.WhenAll(
