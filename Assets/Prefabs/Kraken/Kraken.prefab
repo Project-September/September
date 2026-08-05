@@ -1569,13 +1569,56 @@ MonoBehaviour:
   _attackPredictionFactory: {fileID: 4147116127351708076}
   _predictionSize: {x: 4, y: 3, z: 30}
   _predictionEndTime: 6
-  _attackHandler: {fileID: 6014455148580474590}
   _interactable: {fileID: 4783785741626355923}
   _dealScore: 10
   _stayDuration: 20
   _playableDirector: {fileID: 9108252503074913503}
   _inTimeline: {fileID: 11400000, guid: c1316e32a455a584398323e3b2f2c3ed, type: 2}
   _outTimeline: {fileID: 11400000, guid: d025a579f509fd0428168fcd47fb3414, type: 2}
+  _tentacles:
+    _arms:
+    - _animator: {fileID: 5402723530809029941}
+      _armRoot: {fileID: 6051664828323406195}
+      _armHitChecker: {fileID: 4293175133399063176}
+      _tentacleConstraintSolver: {fileID: 4491648271868886489}
+    - _animator: {fileID: 2200965726805320485}
+      _armRoot: {fileID: 7870288283105514993}
+      _armHitChecker: {fileID: 5819620003105908620}
+      _tentacleConstraintSolver: {fileID: 2237555503341122454}
+    - _animator: {fileID: 2108177975550309764}
+      _armRoot: {fileID: 2226006307759962561}
+      _armHitChecker: {fileID: 5243330838550750614}
+      _tentacleConstraintSolver: {fileID: 1950768665666715168}
+    - _animator: {fileID: 8222649708303070050}
+      _armRoot: {fileID: 9143086744839608106}
+      _armHitChecker: {fileID: 4436696800319557530}
+      _tentacleConstraintSolver: {fileID: 6020658144248467311}
+    - _animator: {fileID: 4399383479773290079}
+      _armRoot: {fileID: 8276738632782577979}
+      _armHitChecker: {fileID: 6733110457592308960}
+      _tentacleConstraintSolver: {fileID: 2541277194117127440}
+    - _animator: {fileID: 2229594512785412787}
+      _armRoot: {fileID: 9045475759015380596}
+      _armHitChecker: {fileID: 5262102280462560655}
+      _tentacleConstraintSolver: {fileID: 1354480424378912968}
+  _attackHandler: {fileID: 6014455148580474590}
+  _settings:
+    Root: {fileID: 1498564787072541733}
+    TentacleEnablePhysicsTime: 4
+    HitRayCastHeight: 20
+    AreaHitDuration: 0.5
+    AreaHitRadius: 2
+    Damage: 50
+    HitGroundLayer:
+      serializedVersion: 2
+      m_Bits: 128
+    AttackTargetLayer:
+      serializedVersion: 2
+      m_Bits: 2121
+    ArmStartTime: 4
+    ArmEndTime: 6
+    AnimationName: KrakenAttack
+    EndStateName: Idle
 --- !u!114 &872495872056710133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1669,46 +1712,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ba41261a44579be39deb24f9e263f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tentacle:
-    _arms:
-    - _animator: {fileID: 5402723530809029941}
-      _armRoot: {fileID: 6051664828323406195}
-      _armHitChecker: {fileID: 5819620003105908620}
-      StartRotation: {x: 0, y: 0, z: 0, w: 0}
-    - _animator: {fileID: 2200965726805320485}
-      _armRoot: {fileID: 7870288283105514993}
-      _armHitChecker: {fileID: 5819620003105908620}
-      StartRotation: {x: 0, y: 0, z: 0, w: 0}
-    - _animator: {fileID: 2108177975550309764}
-      _armRoot: {fileID: 2226006307759962561}
-      _armHitChecker: {fileID: 5243330838550750614}
-      StartRotation: {x: 0, y: 0, z: 0, w: 0}
-    - _animator: {fileID: 8222649708303070050}
-      _armRoot: {fileID: 9143086744839608106}
-      _armHitChecker: {fileID: 4436696800319557530}
-      StartRotation: {x: 0, y: 0, z: 0, w: 0}
-    - _animator: {fileID: 4399383479773290079}
-      _armRoot: {fileID: 8276738632782577979}
-      _armHitChecker: {fileID: 6733110457592308960}
-      StartRotation: {x: 0, y: 0, z: 0, w: 0}
-    - _animator: {fileID: 2229594512785412787}
-      _armRoot: {fileID: 9045475759015380596}
-      _armHitChecker: {fileID: 5262102280462560655}
-      StartRotation: {x: 0, y: 0, z: 0, w: 0}
-    _animationName: KrakenAttack
-    _endStateName: Idle
-  _hitRayCastHeight: 20
-  _areaHitDuration: 0.5
-  _areaHitRadius: 2
-  _damage: 50
-  _hitGroundLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  _attackTargetLayer:
-    serializedVersion: 2
-    m_Bits: 2121
-  _armStartTime: 4
-  _armEndTime: 6
 --- !u!114 &4147116127351708076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4200,7 +4203,7 @@ MonoBehaviour:
       data:
         _characterType: 5
         _targetMountable: {fileID: 3135717980165409898}
-        _duration: 30
+        _duration: 1000
     - rid: 5799214060048744533
       type: {class: CompositeInteractEffect, ns: September.InGame.Interact, asm: Scripts}
       data:

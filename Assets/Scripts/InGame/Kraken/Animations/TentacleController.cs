@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
 using September.InGame.Kraken.Attack;
@@ -11,6 +13,9 @@ namespace September.InGame.Kraken.Animations
     {
         private readonly ArmSettings _armSettings;
         private readonly KrakenSettings _krakenSettings;
+
+        public bool IsAttacking => _armSettings.IsAttacking;
+        public Transform ArmRoot => _armSettings.ArmRoot;
 
         public TentacleController(ArmSettings armSettings, KrakenSettings krakenSettings)
         {
@@ -24,6 +29,7 @@ namespace September.InGame.Kraken.Animations
         {
             _armSettings.IsAttacking = true;
             _armSettings.StartAttackTick = runner.Tick;
+            _armSettings.EnablePhysics = false;
         }
 
         public void StartAreaAttack(NetworkRunner runner, PredictionParticle particle)
@@ -47,9 +53,9 @@ namespace September.InGame.Kraken.Animations
 
         private void UpdatePhysicsState(NetworkRunner runner)
         {
-            int targetTick = (int)(_krakenSettings.TentacleEnablePhysicsTime * runner.Tick);
+            int targetTick = (int)(_krakenSettings.TentacleEnablePhysicsTime * runner.TickRate);
             int elapsedTick = runner.Tick - _armSettings.StartAttackTick;
-            if (elapsedTick > targetTick)
+            if (_armSettings.IsAttacking && elapsedTick > targetTick)
             {
                 _armSettings.EnablePhysics = true;
             }
@@ -59,8 +65,9 @@ namespace September.InGame.Kraken.Animations
         {
             int armStartTick = (int)(_krakenSettings.ArmStartTime * runner.TickRate);
             int armEndTick = (int)(_krakenSettings.ArmEndTime * runner.TickRate);
+            int elapsedTick = runner.Tick - _armSettings.StartAttackTick;
 
-            if (armStartTick < runner.Tick && runner.Tick < armEndTick)
+            if (_armSettings.IsAttacking && armStartTick < elapsedTick && elapsedTick < armEndTick)
             {
                 if (!_armSettings.ArmHitChecker.IsActive) _armSettings.ArmHitChecker.StartHitCheck();
             }
@@ -109,6 +116,38 @@ namespace September.InGame.Kraken.Animations
                 damageable.TakeHit(ref hitData);
             }
         }
+
+        public void LookAt(Vector3 target)
+        {
+            var root = _armSettings.ArmRoot;
+
+            _armSettings.StartRotation = root.rotation;
+
+            var forward = -root.transform.right;
+            forward.y = 0;
+            var dir = Vector3.ProjectOnPlane(target - root.position, Vector3.up).normalized;
+            Debug.DrawRay(root.position, dir * 100f, Color.red, 3f);
+
+            var rot = Quaternion.FromToRotation(forward, dir);
+            Debug.Log($"{target} {forward} {dir} {rot.eulerAngles}", _armSettings.ArmRoot);
+
+            root.rotation *= rot;
+        }
+
+        public async UniTask PlayAnimation(CancellationToken token = default)
+        {
+            await _armSettings.Animator.PlayAsync(_krakenSettings.AnimationName, 0, 0f, cancellationToken: token);
+            await _armSettings.Animator.WaitState(_krakenSettings.EndStateName, cancellationToken: token);
+            _armSettings.Animator.transform.rotation = _armSettings.StartRotation;
+            Debug.Log($"{_krakenSettings.AnimationName} {_armSettings.StartRotation.eulerAngles}", _armSettings.ArmRoot);
+        }
+
+        public void ResetState()
+        {
+            _armSettings.AlreadyHits.Clear();
+            _armSettings.IsAttacking = false;
+            _armSettings.EnablePhysics = false;
+        }
     }
 
     /// <summary>
@@ -155,6 +194,17 @@ namespace September.InGame.Kraken.Animations
         public float ArmStartTime;
         public float ArmEndTime;
 
+        [Header("アニメーション設定")]
+        public string AnimationName;
+        public string EndStateName;
+
         [NonSerialized] public PlayerRef OwnerPlayerRef;
+    }
+
+    [Serializable]
+    public class KrakenTentacles
+    {
+        [SerializeField] private ArmSettings[] _arms;
+        public IReadOnlyList<ArmSettings> Arms => _arms;
     }
 }

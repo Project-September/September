@@ -29,9 +29,6 @@ namespace September.InGame.Kraken
         [SerializeField] private Vector3 _predictionSize;
         [SerializeField] private float _predictionEndTime;
 
-        [Header("攻撃設定")]
-        [SerializeField] private KrakenAttackHandler _attackHandler;
-
         [Header("インタラクト設定")]
         [SerializeField] private InteractableBase _interactable;
 
@@ -46,6 +43,13 @@ namespace September.InGame.Kraken
         [SerializeField] private PlayableDirector _playableDirector;
         [SerializeField] private TimelineAsset _inTimeline;
         [SerializeField] private TimelineAsset _outTimeline;
+
+        [Header("触手設定")]
+        [SerializeField] private KrakenTentacles _tentacles;
+
+        [Header("攻撃設定")]
+        [SerializeField] private KrakenAttackHandler _attackHandler;
+        [SerializeField] private KrakenSettings _settings;
 
         private InputWrapper _attack;
 
@@ -89,12 +93,11 @@ namespace September.InGame.Kraken
         public override void Spawned()
         {
             Appear().Forget();
+            _attackHandler.Initialize(_tentacles.Arms, _settings);
         }
 
         public override void FixedUpdateNetwork()
         {
-            _attackHandler.TickAreaAttack();
-
             if (!HasInputAuthority) return;
 
             if (GetInput<PlayerInput>(out var input))
@@ -167,6 +170,7 @@ namespace September.InGame.Kraken
             _interactable.ForceSetInteractable = false;
 
             OwnerPlayerRef = owner;
+            _settings.OwnerPlayerRef = owner;
         }
 
         /// <summary>
@@ -200,6 +204,7 @@ namespace September.InGame.Kraken
             Object.RemoveInputAuthority();
 
             OwnerPlayerRef = default;
+            _settings.OwnerPlayerRef = default;
 
             Disappear().Forget();
         }
@@ -233,24 +238,24 @@ namespace September.InGame.Kraken
 
             if (!_attackHandler.IsReady) return;
 
-            if (!_attackHandler.TryGetArm(out var arm)) return;
+            if (!_attackHandler.TryGetTentacle(out var tentacle)) return;
 
-            _attackHandler.Attack(arm, targetPosition).Forget();
+            _attackHandler.Attack(tentacle, targetPosition).Forget();
 
-            Vector3 dir = targetPosition - arm.ArmRoot.position;
+            Vector3 dir = targetPosition - tentacle.ArmRoot.position;
             dir.y = 0;
             Quaternion lookRotation = Quaternion.LookRotation(dir);
             PredictionParticle particle = _attackPredictionFactory.Create(new AttackPredictionShape(targetPosition, _predictionSize, lookRotation));
-            DestroyPredictionAreaAsync(arm, particle).Forget();
+            DestroyPredictionAreaAsync(tentacle, particle).Forget();
         }
 
         /// <summary>
         /// 腕を叩きつけた際に攻撃予測表示を非表示にし、攻撃予測範囲に攻撃判定を配置する
         /// </summary>
-        private async UniTaskVoid DestroyPredictionAreaAsync(ArmSettings arm, PredictionParticle particle)
+        private async UniTaskVoid DestroyPredictionAreaAsync(TentacleController tentacle, PredictionParticle particle)
         {
             await UniTask.WaitForSeconds(_predictionEndTime);
-            _attackHandler.StartAreaAttack(arm, particle);
+            _attackHandler.StartAreaAttack(tentacle, particle);
             particle.Destroy();
         }
 
