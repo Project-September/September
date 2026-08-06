@@ -73,7 +73,7 @@ namespace September.InGame.Kraken.Animations
 
                         if (EnablePhysicsConstraint)
                         {
-                            solvedPositions[i] = ResolveCollisions(i, p, _radius, _layerMask);
+                            solvedPositions[i] = ResolveCollisions(p, _radius, _layerMask);
                         }
                         else
                         {
