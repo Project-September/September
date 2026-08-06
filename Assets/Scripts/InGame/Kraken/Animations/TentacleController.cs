@@ -131,7 +131,7 @@ namespace September.InGame.Kraken.Animations
             var rot = Quaternion.FromToRotation(forward, dir);
             Debug.Log($"{target} {forward} {dir} {rot.eulerAngles}", _armSettings.ArmRoot);
 
-            root.rotation *= rot;
+            root.rotation = rot * root.rotation;
         }
 
         public async UniTask PlayAnimation(CancellationToken token = default)
