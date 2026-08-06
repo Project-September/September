@@ -23,6 +23,7 @@ namespace September.InGame.Kraken.Animations
             _krakenSettings = krakenSettings;
 
             armSettings.ArmHitChecker.OnHit += col => OnHitAction(armSettings.AlreadyHits, col);
+            armSettings.EnablePhysics = false;
         }
 
         public void StartAttack(NetworkRunner runner)
