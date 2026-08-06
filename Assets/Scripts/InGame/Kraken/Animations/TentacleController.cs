@@ -169,7 +169,7 @@ namespace September.InGame.Kraken.Animations
 
         [NonSerialized] public Quaternion StartRotation;
         [NonSerialized] public HitCapsule AreaHitCapsule;
-        [NonSerialized] public int StartAttackTick; // Todo: 攻撃開始から数秒間は物理衝突を判定しないようにする
+        [NonSerialized] public int StartAttackTick;
         [NonSerialized] public bool IsAttacking;
 
         public bool EnablePhysics
