@@ -71,7 +71,7 @@ namespace September.InGame.Kraken.Animations
                         Vector3 h = (inputPoints[i].Position - solvedPositions[i]) * (1f / _pbdSubsteps);
                         Vector3 p = solvedPositions[i] + h;
 
-                        if (EnablePhysicsConstraint)
+                        if (EnablePhysicsConstraint && i != 0)
                         {
                             solvedPositions[i] = ResolveCollisions(p, _radius, _layerMask);
                         }
@@ -89,6 +89,16 @@ namespace September.InGame.Kraken.Animations
                         float targetDist = _segmentLengths[i];
                         Vector3 diff = solvedPositions[i] - solvedPositions[i - 1];
                         float currentDist = diff.magnitude;
+
+                        if (i == 1)
+                        {
+                            Vector3 dir = diff / currentDist;
+                            float error = currentDist - targetDist;
+                            Vector3 correction = dir * error;
+
+                            solvedPositions[i] -= correction;
+                            continue;
+                        }
 
                         if (currentDist > 0.0001f)
                         {
