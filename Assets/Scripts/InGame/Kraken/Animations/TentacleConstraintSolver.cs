@@ -210,29 +210,112 @@ namespace September.InGame.Kraken.Animations
         /// Transforms sphere coordinates to local BoxCollider space to handle deep penetrations
         /// and compute accurate contact surface normals and points.
         /// </summary>
-        private Vector3 ResolveCollisions(int i, Vector3 position, float radius, LayerMask layerMask)
+        private Vector3 ResolveCollisions(Vector3 position, float radius, LayerMask layerMask)
         {
             int size = Physics.OverlapSphereNonAlloc(position, radius, _colliders, layerMask);
 
             if (_colliders == null || _colliders.Length == 0)
                 return position;
 
-            for (int index = 0; index < size; index++)
+            for (int i = 0; i < size; i++)
             {
-                Collider col = _colliders[index];
-                // Standard fallback closest point resolution for other types of colliders
-                Vector3 closestPoint = col.ClosestPoint(position);
-                float dist = Vector3.Distance(position, closestPoint);
-                if (dist < radius)
+                Collider col = _colliders[i];
+                if (col is MeshCollider) continue;
+                if (col is BoxCollider box)
                 {
-                    Vector3 dir = (position - closestPoint).normalized;
-                    if (dir == Vector3.zero)
-                        dir = Vector3.up;
-                    position = closestPoint + dir * radius;
+                    Vector3 closestPoint = ResolveSphereBoxCollision(position, radius, box);
+                    DebugDrawUtility.DrawWireSphere(closestPoint, 1f, Color.magenta);
+                    DebugDrawUtility.DrawWireSphere(position, radius, Color.cyan);
+                    Debug.DrawLine(position, closestPoint, Color.yellow);
+                    position = closestPoint;
+                    DebugDrawUtility.DrawWireSphere(position, radius, Color.yellow);
+                }
+                else
+                {
+                    // Standard fallback closest point resolution for other types of colliders
+                    Vector3 closestPoint = col.ClosestPoint(position);
+                    DebugDrawUtility.DrawWireSphere(closestPoint, 1f, Color.magenta);
+                    DebugDrawUtility.DrawWireSphere(position, radius, Color.cyan);
+                    Debug.DrawLine(position, closestPoint, Color.yellow);
+                    float dist = Vector3.Distance(position, closestPoint);
+                    if (dist < radius)
+                    {
+                        Vector3 dir = (position - closestPoint).normalized;
+                        if (dir == Vector3.zero)
+                            dir = Vector3.up;
+                        position = closestPoint + dir * radius;
+                    }
+                    DebugDrawUtility.DrawWireSphere(position, radius, Color.yellow);
                 }
             }
 
             return position;
+        }
+
+        private Vector3 ResolveSphereBoxCollision(Vector3 sphereCenter, float radius, BoxCollider box)
+        {
+            // Transform sphere center to box local space
+            Vector3 localCenter = box.transform.InverseTransformPoint(sphereCenter);
+
+            Vector3 center = box.center;
+            Vector3 extents = box.size * 0.5f;
+
+            // Clamped coordinates to find closest point inside or on box in local space
+            Vector3 closestLocal = new Vector3(
+                Mathf.Clamp(localCenter.x, center.x - extents.x, center.x + extents.x),
+                Mathf.Clamp(localCenter.y, center.y - extents.y, center.y + extents.y),
+                Mathf.Clamp(localCenter.z, center.z - extents.z, center.z + extents.z)
+            );
+
+            // Distance in local space
+            if (closestLocal == localCenter)
+            {
+                // Sphere center is INSIDE the box. Push it out to the nearest face.
+                float dx1 = localCenter.x - (center.x - extents.x);
+                float dx2 = (center.x + extents.x) - localCenter.x;
+                float dy1 = localCenter.y - (center.y - extents.y);
+                float dy2 = (center.y + extents.y) - localCenter.y;
+                float dz1 = localCenter.z - (center.z - extents.z);
+                float dz2 = (center.z + extents.z) - localCenter.z;
+
+                float minDist = Mathf.Min(dx1, Mathf.Min(dx2, Mathf.Min(dy1, Mathf.Min(dy2, Mathf.Min(dz1, dz2)))));
+
+                if (minDist == dx1) closestLocal.x = center.x - extents.x;
+                else if (minDist == dx2) closestLocal.x = center.x + extents.x;
+                else if (minDist == dy1) closestLocal.y = center.y - extents.y;
+                else if (minDist == dy2) closestLocal.y = center.y + extents.y;
+                else if (minDist == dz1) closestLocal.z = center.z - extents.z;
+                else closestLocal.z = center.z + extents.z;
+
+                Vector3 closestWorld = box.transform.TransformPoint(closestLocal);
+                Vector3 normal = box.transform.up; // Standard fallback (deck top face)
+
+                // Better normal calculation from the face we projected onto
+                if (minDist == dx1) normal = -box.transform.right;
+                else if (minDist == dx2) normal = box.transform.right;
+                else if (minDist == dy1) normal = -box.transform.up;
+                else if (minDist == dy2) normal = box.transform.up;
+                else if (minDist == dz1) normal = -box.transform.forward;
+                else normal = box.transform.forward;
+
+                return closestWorld + normal * radius;
+            }
+            else
+            {
+                // Sphere center is OUTSIDE the box. Push out if overlapping.
+                Vector3 closestWorld = box.transform.TransformPoint(closestLocal);
+                float distToSurface = Vector3.Distance(sphereCenter, closestWorld);
+
+                if (distToSurface < radius)
+                {
+                    Vector3 normal = (sphereCenter - closestWorld).normalized;
+                    if (normal == Vector3.zero)
+                        normal = box.transform.up;
+                    return closestWorld + normal * radius;
+                }
+            }
+
+            return sphereCenter;
         }
     }
 }
