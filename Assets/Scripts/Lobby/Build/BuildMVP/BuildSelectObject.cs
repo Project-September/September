@@ -9,11 +9,14 @@ namespace September.Lobby
     {
         [Header("アイコンなどの画像表示")]
         [SerializeField] Button _icon;
-        [SerializeField, Tooltip("チェックアイコンなど")] Image _selectedIcon;
+        [SerializeField] Image _iconImage;
+        [SerializeField] Image _selectedframe;
+        [SerializeField] Image _check;
 
         public void Init()
         {
-            _selectedIcon.enabled = false;
+            _selectedframe.enabled = false;
+            _check.enabled = false;
         }
 
         /// <summary>
@@ -26,11 +29,21 @@ namespace September.Lobby
         }
 
         /// <summary>
+        /// アイコンを設定するメソッド
+        /// </summary>
+        /// <param name="sprite">アイコン画像</param>
+        public void SetIconImage(Sprite sprite)
+        {
+            _iconImage.sprite = sprite;
+        }
+
+        /// <summary>
         /// 選択時のメソッド
         /// </summary>
         public void Select()
         {
             EventSystem.current.SetSelectedGameObject(_icon.gameObject);
+            _check.enabled = true;
         }
 
         /// <summary>
@@ -38,7 +51,7 @@ namespace September.Lobby
         /// </summary>
         public void Unselect()
         {
-
+            _check.enabled = false;
         }
 
         /// <summary>
@@ -46,7 +59,7 @@ namespace September.Lobby
         /// </summary>
         public void Decision()
         {
-            _selectedIcon.enabled = true;
+            _selectedframe.enabled = true;
         }
 
         /// <summary>
@@ -54,7 +67,7 @@ namespace September.Lobby
         /// </summary>
         public void Cancel()
         {
-            _selectedIcon.enabled = false;
+            _selectedframe.enabled = false;
         }
     }
 }

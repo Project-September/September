@@ -384,7 +384,16 @@ MonoBehaviour:
   _attackEffectPos: {fileID: 3005691076101400526}
   _runEffectObject: {fileID: 8043574276842796753}
   _maxRunBlendTreeCount: 5
+  _meshObject: {fileID: 6757945271084448658}
+  _movementBuffScale: 0.3
+  _IsAttackOrdered:
+    _value: 0
+  _IsCanAttack:
+    _value: 0
   _regulationAttackAmount: 20
+  _IsVisible:
+    _value: 1
+  _Scale: 1
   IsAttack: 0
   IsWarp: 0
 --- !u!65 &4605572418024795219
@@ -423,6 +432,8 @@ MonoBehaviour:
   _opticalCamouflageMaterial: {fileID: 2100000, guid: 9c38977772e2e4240ac333399ae5edb9, type: 2}
   _renderers:
   - {fileID: 7754587058459683000}
+  _playerEquipmentManager: {fileID: 0}
+  _hideObjects: []
 --- !u!114 &2909109515873043706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -436,6 +447,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: -1932163837093564576}
+--- !u!1 &6757945271084448658 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7553918611734944331, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}
+  m_PrefabInstance: {fileID: 3827465531517608409}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7561604877310642220 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6768298971197532661, guid: 838491713cf89b7438ba3ef18ccffd8b, type: 3}

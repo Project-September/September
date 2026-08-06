@@ -126,12 +126,20 @@ namespace September.Common
             _networkRunner = Instantiate(_runnerPrefab);
         }
 
-        public async UniTaskVoid StartGame()
+        public async UniTaskVoid StartGame(GameStartContext startContext)
         {
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
 
-            await _networkRunner.LoadScene(_gameSceneName);
+            if (MapSceneContainer.TryGetInstance(out var mapSceneContainer))
+            {
+                string gameSceneName = mapSceneContainer.GetMapSceneName(startContext.MapType);
+                await _networkRunner.LoadScene(gameSceneName);
+            }
+            else
+            {
+                Debug.LogError("MapSceneContainer not found");
+            }
         }
 
         public async UniTaskVoid LoadTutorialScene()
@@ -172,6 +180,15 @@ namespace September.Common
 
             await _networkRunner.UnloadScene("Field");
             await _networkRunner.LoadScene(_resultSceneName);
+        }
+    }
+
+    public struct GameStartContext
+    {
+        public MapType MapType;
+        public GameStartContext(MapType mapType)
+        {
+            MapType = mapType;
         }
     }
 }

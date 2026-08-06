@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cinemachine;
 using Fusion;
 using Fusion.Addons.Physics;
 using InGame.Health;

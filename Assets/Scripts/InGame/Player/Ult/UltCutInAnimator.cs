@@ -1,8 +1,9 @@
-using Cinemachine;
+using System.Linq;
 using Common.Extensions;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -64,6 +65,13 @@ namespace InGame.Player.Ult
         /// </summary>
         private async UniTask PlayLocal()
         {
+            // フィールド上にあるCinemachine Brainを動的バインド
+            PlayableBinding binding = _playableDirector.playableAsset.outputs.FirstOrDefault(c => c.streamName == "Cinemachine Track");
+            if (binding.streamName == "Cinemachine Track")
+            {
+                _playableDirector.SetGenericBinding(binding.sourceObject, FindFirstObjectByType<CinemachineBrain>());
+            }
+
             if (_camera) _camera.gameObject.SetActive(true);
             
             await _playableDirector.PlayAsync();
