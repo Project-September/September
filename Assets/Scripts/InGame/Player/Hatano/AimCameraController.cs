@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class AimCameraController : NetworkBehaviour
 {
-    [Header("通常のカメラ")]
-    [SerializeField] private CinemachineVirtualCamera _normalCamera;
-    [Header("AIM用のカメラ")]
-    [SerializeField] private CinemachineVirtualCamera _aimCamera;
-    
+    [Header("通常のカメラ"), SerializeField] private CinemachineVirtualCamera _normalCamera;
+    [Header("AIM用のカメラ"), SerializeField] private CinemachineVirtualCamera _aimCamera;
+    [Header("ULT用のカメラ"), SerializeField] private CinemachineVirtualCamera _ultCamera;
     [Header("CrosshairPrefab(照準のUI)")]
     [SerializeField] private GameObject _crosshairPrefab;
     private GameObject _crosshair;
@@ -67,6 +65,7 @@ public class AimCameraController : NetworkBehaviour
         IsAim = false;
         _normalCamera.gameObject.SetActive(true);
         _aimCamera.gameObject.SetActive(false);
+        _ultCamera.gameObject.SetActive(false);
     }
     
     /// <summary>
@@ -81,7 +80,27 @@ public class AimCameraController : NetworkBehaviour
         {
             _normalCamera.gameObject.SetActive(false);
             _aimCamera.gameObject.SetActive(true);
+            _ultCamera.gameObject.SetActive(false);
         }
+        var camForward = AimDirection;
+        camForward.y = 0;
+        gameObject.transform.forward = camForward;
+    }
+
+    /// <summary>
+    /// ULTカメラに変更する
+    /// </summary>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_ULTCamera()
+    {
+        IsAim = true;
+        if (HasInputAuthority)
+        {
+            _normalCamera.gameObject.SetActive(false);
+            _aimCamera.gameObject.SetActive(false);
+            _ultCamera.gameObject.SetActive(true);
+        }
+        
         var camForward = AimDirection;
         camForward.y = 0;
         gameObject.transform.forward = camForward;

@@ -1834,7 +1834,7 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 0
-    TargetLayer: 1
+    TargetLayer: 2
     IsAdditive: 0
     _loop: 0
   - AnimClip: {fileID: 7400000, guid: 1ed051a7af0913242a1ef6b3fa081012, type: 2}
@@ -1891,7 +1891,7 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 0
-    TargetLayer: 1
+    TargetLayer: 2
     IsAdditive: 0
     _loop: 0
   - AnimClip: {fileID: 7400000, guid: a545c1bf94a5b1e40bc86818442aee22, type: 2}
@@ -1950,7 +1950,7 @@ MonoBehaviour:
         m_RotationOrder: 0
     TargetLayer: 2
     IsAdditive: 0
-    _loop: 1
+    _loop: 0
   - AnimClip: {fileID: 7400000, guid: f873d9d6687c1374597f97ec6056085d, type: 2}
     PlaySpeed: 1
     BlendIn:
@@ -2007,7 +2007,7 @@ MonoBehaviour:
         m_RotationOrder: 0
     TargetLayer: 2
     IsAdditive: 0
-    _loop: 1
+    _loop: 0
   - AnimClip: {fileID: 7400000, guid: ff597405338ae7a4aaca152be0403cee, type: 2}
     PlaySpeed: 1
     BlendIn:
@@ -2037,7 +2037,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0.3
+      BlendTime: 0
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -2094,7 +2094,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0.3
+      BlendTime: 0
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -2122,7 +2122,7 @@ MonoBehaviour:
     TargetLayer: 1
     IsAdditive: 0
     _loop: 0
-  - AnimClip: {fileID: 7400000, guid: 78bb99e5d30f73047af5004f38256a45, type: 2}
+  - AnimClip: {fileID: 7400000, guid: feeb3c8384c813f43be16980447a2c1f, type: 2}
     PlaySpeed: 1
     BlendIn:
       BlendTime: 0.2
@@ -2151,7 +2151,121 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0.3
+      BlendTime: 0
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0.918316
+          outSlope: 0.918316
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0.08950277
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    TargetLayer: 1
+    IsAdditive: 0
+    _loop: 0
+  - AnimClip: {fileID: 7400000, guid: 96de2cf5e57cb734caf3cc8fcfdfa75f, type: 2}
+    PlaySpeed: 1
+    BlendIn:
+      BlendTime: 0
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    BlendOut:
+      BlendTime: 0
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0.918316
+          outSlope: 0.918316
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0.08950277
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    TargetLayer: 1
+    IsAdditive: 0
+    _loop: 0
+  - AnimClip: {fileID: 7400000, guid: aa50431afd06bd649bef846e52aacde0, type: 2}
+    PlaySpeed: 1
+    BlendIn:
+      BlendTime: 0
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    BlendOut:
+      BlendTime: 0
       BlendCurve:
         serializedVersion: 2
         m_Curve:

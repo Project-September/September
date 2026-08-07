@@ -118,5 +118,27 @@ namespace InGame.Player.Hatano
                     break;
             }
         }
+
+        public void DisplayToggle(bool flag)
+        {
+            if (!flag)
+            {
+                _laser.SetActive(false);
+                foreach (var d in _doubles) d.SetActive(false);
+            }
+            else
+            {
+                switch (_abilityStatus)
+                {
+                    case HatanoAbilityStatus.LaserGun:
+                        _laser.SetActive(true);
+                        break;
+                    
+                    case HatanoAbilityStatus.DoubleBarreledGun:
+                        foreach (var d in _doubles) d.SetActive(true);
+                        break;
+                }
+            }
+        }
     }
 }

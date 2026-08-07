@@ -2,6 +2,7 @@ using Fusion;
 using InGame.Common;
 using InGame.Health;
 using InGame.Player.Ability.Effect;
+using InGame.Player.Hatano;
 using September.Common;
 using September.InGame.Effect;
 using UnityEngine;
@@ -10,13 +11,16 @@ namespace InGame.Player.Ability
 {
     public class HatanoUlt : AbilityUltBase
     {
+        [SerializeField] private PlayerManager _playerManager;
         [SerializeField] private AimCameraController _aimCameraController;
+        [SerializeField] private HatanoSequenceManager _hatanoSequenceManager;
+        [SerializeField] private HatanoAbilityStatusManagement _hatanoAbilityStatusManagement;
+        [Header("待機"), SerializeField] private AnimationClip _idleClip;
         [Header("必殺技終了時間"), SerializeField] private float _duration;
         [Header("ロケランの弾"), SerializeField] private GameObject _bulletPrefab;
         [Header("弾の速さ"), SerializeField] private float _bulletSpeed;
         [SerializeField] private EffectType _predictedLocation;
         [SerializeField] private EffectType _impact;
-        [Header("構えアニメーション"), SerializeField] private AnimationClip _stanceAnimationClip;
         [Header("必殺技の効果設定")]
         [Header("攻撃範囲"), SerializeField] private float _rocketLauncherRadius;
         [Header("射程距離"), SerializeField] private float _shootingDistance;
@@ -31,42 +35,68 @@ namespace InGame.Player.Ability
         
         private string _idPredictedLocation = "HatanoUltPredictedLocation";
         
+        protected override bool ManualCutInEnd => true;
+
+        protected override void OnCutInStart()
+        {
+            _hatanoAbilityStatusManagement.DisplayToggle(false);
+        }
+
         protected override void OnCutInEnd()
         {
-            // 構えアニメーションを再生
-            if(_animationClipPlayer == null) _animationClipPlayer = Parameter.Owner.GetComponent<AnimationClipPlayer>();
-            _animationClipPlayer.PlayClip(_stanceAnimationClip);
-            
-            // カメラの方向にプレイヤーを向ける
-            _aimCameraController.RPC_AimCamera();
-            
+            if (_animationClipPlayer == null)
+                _animationClipPlayer = Parameter.Owner.GetComponent<AnimationClipPlayer>();
             // エフェクト生成
             _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             _effectSpawner?.RequestPlayLoopEffect(_idPredictedLocation, _predictedLocation, Vector3.zero, Quaternion.identity);
+            
+            _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.InputLocked);
+        }
+
+        protected override void OnCutInUpdate(float deltaTime)
+        {
+            if (!_hatanoSequenceManager.IsSequencePlaying())
+            {
+                EndCutIn();
+                _aimCameraController.RPC_ULTCamera();
+            }
         }
 
         protected override void OnUpdateUlt(float deltaTime)
         {
-            if (TimeSinceCutInEnd > _duration)
+            if (_isShoot)
             {
-                RequestEndAbility();
+                if (!_hatanoSequenceManager.IsSequencePlaying())
+                {
+                    RequestEndAbility();
+                }
+                
+                return;
+            }
+            
+            if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
+            {
+                _animationClipPlayer.PlayClip(_idleClip);
+            }
+            
+            if (_playerInput.Buttons.IsSet(PlayerButtons.Attack))
+            {
+                _isShoot = true;
+                _effectSpawner?.StopEffect(_idPredictedLocation);
+                _aimCameraController.RPC_NormalCamera();
+                _hatanoSequenceManager.RPC_SetEndTimeline();
+                RPC_Shooting();
             }
             
             UpdateEffectPosition();
-            // アニメーション終了後
-            if (!_isShoot && TimeSinceCutInEnd >= _stanceAnimationClip.length)
-            {
-                _isShoot = true;
-                RPC_Shooting();
-            }
         }
 
         protected override void OnEndUlt()
         {
-            _animationClipPlayer.StopClip(_stanceAnimationClip);
-            _aimCameraController.RPC_NormalCamera();
-            _effectSpawner?.StopEffect(_idPredictedLocation);
             _isShoot = false;
+            _hatanoSequenceManager.RPC_SetStartTimeline();
+            _hatanoAbilityStatusManagement.DisplayToggle(true);
+            _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
         }
         
         [Rpc(RpcSources.All, RpcTargets.All)]

@@ -1119,6 +1119,8 @@ namespace InGame.Common
 
             public void SetTime(float time, bool updateBlendWeight = true)
             {
+                if(!playable.IsValid()) return;
+                
                 playable.SetTime(time);
                 playable.SetSpeed(0);
 
