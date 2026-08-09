@@ -1,4 +1,5 @@
 using System;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -54,9 +55,6 @@ namespace September.InGame.Kraken.Animations
                 solvedRotations[i] = inputPoints[i].Rotation;
             }
             Profiler.EndSample();
-
-            // 3. Update stay timer and state machine
-            // UpdateStateMachine(inputPoints, solvedPositions, deltaTime);
 
             // 4. Run PBD Iterative Solver to satisfy constraints
             Profiler.BeginSample("Iterate");
@@ -222,10 +220,10 @@ namespace September.InGame.Kraken.Animations
         /// </summary>
         private Vector3 ResolveCollisions(Vector3 position, float radius, LayerMask layerMask)
         {
-            int size = Physics.OverlapSphereNonAlloc(position, radius, _colliders, layerMask);
-
             if (_colliders == null || _colliders.Length == 0)
                 return position;
+
+            int size = Physics.OverlapSphereNonAlloc(position, radius, _colliders, layerMask);
 
             for (int i = 0; i < size; i++)
             {
@@ -233,29 +231,18 @@ namespace September.InGame.Kraken.Animations
                 if (col is MeshCollider) continue;
                 if (col is BoxCollider box)
                 {
-                    Vector3 closestPoint = ResolveSphereBoxCollision(position, radius, box);
-                    DebugDrawUtility.DrawWireSphere(closestPoint, 1f, Color.magenta);
-                    DebugDrawUtility.DrawWireSphere(position, radius, Color.cyan);
-                    Debug.DrawLine(position, closestPoint, Color.yellow);
-                    position = closestPoint;
-                    DebugDrawUtility.DrawWireSphere(position, radius, Color.yellow);
+                    position = ResolveSphereBoxCollision(position, radius, box);
                 }
                 else
                 {
-                    // Standard fallback closest point resolution for other types of colliders
-                    Vector3 closestPoint = col.ClosestPoint(position);
-                    DebugDrawUtility.DrawWireSphere(closestPoint, 1f, Color.magenta);
-                    DebugDrawUtility.DrawWireSphere(position, radius, Color.cyan);
-                    Debug.DrawLine(position, closestPoint, Color.yellow);
-                    float dist = Vector3.Distance(position, closestPoint);
+                    // Standard fallback the closest point resolution for other types of colliders
+                    Vector3 closest = col.ClosestPoint(position);
+                    float dist = Vector3.Distance(position, closest);
                     if (dist < radius)
                     {
-                        Vector3 dir = (position - closestPoint).normalized;
-                        if (dir == Vector3.zero)
-                            dir = Vector3.up;
-                        position = closestPoint + dir * radius;
+                        Vector3 correct = (position - closest) * (radius / dist);
+                        position = closest + correct;
                     }
-                    DebugDrawUtility.DrawWireSphere(position, radius, Color.yellow);
                 }
             }
 
@@ -267,46 +254,47 @@ namespace September.InGame.Kraken.Animations
             // Transform sphere center to box local space
             Vector3 localCenter = box.transform.InverseTransformPoint(sphereCenter);
 
-            Vector3 center = box.center;
-            Vector3 extents = box.size * 0.5f;
+            MinMaxAABB aabb = MinMaxAABB.CreateFromCenterAndExtents(box.center, box.size);
 
             // Clamped coordinates to find closest point inside or on box in local space
-            Vector3 closestLocal = new Vector3(
-                Mathf.Clamp(localCenter.x, center.x - extents.x, center.x + extents.x),
-                Mathf.Clamp(localCenter.y, center.y - extents.y, center.y + extents.y),
-                Mathf.Clamp(localCenter.z, center.z - extents.z, center.z + extents.z)
+            Vector3 closestLocal = new(
+                Mathf.Clamp(localCenter.x, aabb.Min.x, aabb.Max.x),
+                Mathf.Clamp(localCenter.y, aabb.Min.y, aabb.Max.y),
+                Mathf.Clamp(localCenter.z, aabb.Min.z, aabb.Max.z)
             );
 
             // Distance in local space
             if (closestLocal == localCenter)
             {
                 // Sphere center is INSIDE the box. Push it out to the nearest face.
-                float dx1 = localCenter.x - (center.x - extents.x);
-                float dx2 = (center.x + extents.x) - localCenter.x;
-                float dy1 = localCenter.y - (center.y - extents.y);
-                float dy2 = (center.y + extents.y) - localCenter.y;
-                float dz1 = localCenter.z - (center.z - extents.z);
-                float dz2 = (center.z + extents.z) - localCenter.z;
+                float dx1 = localCenter.x - aabb.Min.x;
+                float dx2 = aabb.Max.x - localCenter.x;
+                float dy1 = localCenter.y - aabb.Min.y;
+                float dy2 = aabb.Max.y - localCenter.y;
+                float dz1 = localCenter.z - aabb.Min.z;
+                float dz2 = aabb.Max.z - localCenter.z;
 
                 float minDist = Mathf.Min(dx1, Mathf.Min(dx2, Mathf.Min(dy1, Mathf.Min(dy2, Mathf.Min(dz1, dz2)))));
 
-                if (minDist == dx1) closestLocal.x = center.x - extents.x;
-                else if (minDist == dx2) closestLocal.x = center.x + extents.x;
-                else if (minDist == dy1) closestLocal.y = center.y - extents.y;
-                else if (minDist == dy2) closestLocal.y = center.y + extents.y;
-                else if (minDist == dz1) closestLocal.z = center.z - extents.z;
-                else closestLocal.z = center.z + extents.z;
+                if (minDist == dx1) closestLocal.x = aabb.Min.x;
+                else if (minDist == dx2) closestLocal.x = aabb.Max.x;
+                else if (minDist == dy1) closestLocal.y = aabb.Min.y;
+                else if (minDist == dy2) closestLocal.y = aabb.Max.y;
+                else if (minDist == dz1) closestLocal.z = aabb.Min.z;
+                else closestLocal.z = aabb.Max.z;
 
                 Vector3 closestWorld = box.transform.TransformPoint(closestLocal);
-                Vector3 normal = box.transform.up; // Standard fallback (deck top face)
+                Vector3 localNormal;
 
                 // Better normal calculation from the face we projected onto
-                if (minDist == dx1) normal = -box.transform.right;
-                else if (minDist == dx2) normal = box.transform.right;
-                else if (minDist == dy1) normal = -box.transform.up;
-                else if (minDist == dy2) normal = box.transform.up;
-                else if (minDist == dz1) normal = -box.transform.forward;
-                else normal = box.transform.forward;
+                if (minDist == dx1) localNormal = Vector3.left;
+                else if (minDist == dx2) localNormal = Vector3.right;
+                else if (minDist == dy1) localNormal = Vector3.down;
+                else if (minDist == dy2) localNormal = Vector3.up;
+                else if (minDist == dz1) localNormal = Vector3.back;
+                else localNormal = Vector3.forward;
+
+                Vector3 normal = box.transform.TransformDirection(localNormal);
 
                 return closestWorld + normal * radius;
             }
