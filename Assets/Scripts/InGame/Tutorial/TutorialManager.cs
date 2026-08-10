@@ -1,8 +1,11 @@
-﻿using Fusion;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using Fusion;
 using InGame.Player;
+using September.Common;
+using System;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace September.InGame.Tutorial
@@ -20,9 +23,20 @@ namespace September.InGame.Tutorial
         [Header("アクションを完了する条件表示")]
         [SerializeField] private TextMeshProUGUI _actionConditionText;
         private int _currentActionIndex = 0;
+        [Header("次のアクションに移るまでの待機時間（秒）" +
+            "小数第一位まで")]
+        [SerializeField] private float _waitTime = 0;
+        [SerializeField] private GameObject _endPanel;
 
+        private bool _isWaitingForNextAction = false;
         private bool _isTutorialCompleted = false;
         private TutorialActionData _actionData;
+
+        private void OnValidate()
+        {
+            // _waitTimeを小数点第一位までの値に丸める
+            _waitTime = Mathf.Round(_waitTime * 10f) / 10f;
+        }
 
         public override void Spawned()
         {
@@ -55,26 +69,44 @@ namespace September.InGame.Tutorial
 
         private void Update()
         {
-            if (_isTutorialCompleted) return;
+            if (_isTutorialCompleted || _isWaitingForNextAction) return;
             _tutorialActions[_currentActionIndex].OnUpdate();
         }
 
         private void OnCompleteCurrentAction()
         {
+            CompleteCurrentActionAsync().Forget();
+        }
+
+        private async UniTask CompleteCurrentActionAsync()
+        {
             // 現在のアクションを終了する
             _tutorialActions[_currentActionIndex].OnEndAction();
+
             _currentActionIndex++;
+            _isWaitingForNextAction = true;
+            // 次のアクションまで待つ
+            await WaitForNextActionAsync();
+
             // 次のアクションがあれば開始する
             if (_currentActionIndex < _tutorialActions.Count)
             {
                 _tutorialActions[_currentActionIndex].OnStart(_actionData);
+                _isWaitingForNextAction = false;
             }
-            // すべてのアクションが完了した場合の処理
             else
             {
                 Debug.Log("チュートリアルが完了しました！");
                 _isTutorialCompleted = true;
+                _endPanel.SetActive(true);
+                GameInput.I.IsInputBlockedByUI = true;
+                CursorStateManager.ShowCursor();
             }
+        }
+
+        private async UniTask WaitForNextActionAsync()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(_waitTime));
         }
     }
 }

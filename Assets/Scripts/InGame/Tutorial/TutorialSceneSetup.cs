@@ -27,7 +27,7 @@ namespace September.InGame.Tutorial
         private void Awake()
         {
             _runner = FindObjectOfType<NetworkRunner>();
-
+            GameInput.I.IsInputBlockedByUI = true;
             Initialized();
         }
 
