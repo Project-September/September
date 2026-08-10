@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -47,12 +48,16 @@ namespace September.InGame.Kraken
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void DebugDraw(IReadOnlyList<IKFollower.Point> points, float radius, Color color,
+        public static void DebugDraw(Span<IKFollower.Point> points, float radius, Color color,
             bool drawLine, bool drawSpheres, bool drawAxis)
         {
-            if (drawLine) DebugDrawSpheres(points, radius, color);
-            if (drawSpheres) DebugDrawLine(points, color);
-            if (drawAxis) DebugDrawAxis(points);
+            if (!(drawLine || drawSpheres || drawAxis)) return;
+
+            IKFollower.Point[] p = points.ToArray();
+
+            if (drawLine) DebugDrawSpheres(p, radius, color);
+            if (drawSpheres) DebugDrawLine(p, color);
+            if (drawAxis) DebugDrawAxis(p);
         }
     }
 }

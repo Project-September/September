@@ -233,9 +233,6 @@ namespace September.InGame.Kraken
 
         public void Attack(Vector3 targetPosition)
         {
-            Debug.DrawLine(transform.position, targetPosition, Color.green, 10f);
-            DebugDrawUtility.DrawWireSphere(targetPosition, 3f, Color.green, 10f);
-
             if (!_attackHandler.IsReady) return;
 
             if (!_attackHandler.TryGetTentacle(out var tentacle)) return;

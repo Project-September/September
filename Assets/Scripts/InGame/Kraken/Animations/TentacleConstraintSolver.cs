@@ -28,7 +28,7 @@ namespace September.InGame.Kraken.Animations
 
         private IKFollower.Point[] _prevSolvedPoints;
 
-        [NonSerialized] public bool EnablePhysicsConstraint = true;
+        [NonSerialized] public bool EnablePhysicsConstraint;
 
         /// <summary>
         /// Solves constraints for the given input points.

@@ -71,10 +71,8 @@ namespace September.InGame.Kraken
         [SerializeField] private bool _debugFabrikAxis;
         [SerializeField] private bool _debugSolvedPoints;
         [SerializeField] private bool _debugSolvedAxis;
-        [SerializeField] private bool _debugSolvedSpline;
         [SerializeField] private bool _debugSolvedResamplingPoints;
         [SerializeField] private bool _debugSolvedResamplingAxis;
-        [SerializeField] private bool _debugSolvedResamplingSpline;
 
         private IKSolverPointProvider _pointProvider;
 
@@ -88,8 +86,6 @@ namespace September.InGame.Kraken
                 var p1 = _followers[i].position;
 
                 _maxDistances[i] += (p1 - p0).magnitude + _maxDistances[i - 1];
-
-                Debug.Log($"p0:{p0} p1:{p1} distance:{(p1 - p0).magnitude} sum:{_maxDistances[i]}");
             }
 
             // ボーンの回転をキャッシュ
@@ -108,7 +104,6 @@ namespace September.InGame.Kraken
             Debug.Assert(_defaultRotations.Length > 0, "Default rotation array is empty");
         }
 
-        // Todo: 船に沿わせるための処理
         private void Update()
         {
             Profiler.BeginSample("GetPoints");
@@ -116,20 +111,20 @@ namespace September.InGame.Kraken
             Point[] points = _pointProvider.GetPoints();
             Profiler.EndSample();
 
-            IKFollowerDebug.DebugDraw(points.ToArray(), _radius * .2f, Color.yellow, _debugFabrikPoints, _debugFabrikPoints, _debugFabrikAxis);
+            IKFollowerDebug.DebugDraw(points, _radius * .2f, Color.yellow, _debugFabrikPoints, _debugFabrikPoints, _debugFabrikAxis);
 
-            Profiler.BeginSample("EvaluateSpline SubPoints");
+            Profiler.BeginSample("EvaluateSubPoints");
             SlerpInterpolator interpolator = new(points, _maxDistances);
             Span<Point> subdividedPoints = stackalloc Point[points.Length * _subPointCount];
             interpolator.Evaluate(points.Length * _subPointCount, ref subdividedPoints);
             Profiler.EndSample();
 
-            Profiler.BeginSample("SolveCollision");
+            Profiler.BeginSample("SolveConstraints");
             _constraintSolver.Solve(ref subdividedPoints, Time.deltaTime);
             Span<Point> solvedPoints = subdividedPoints;
             Profiler.EndSample();
 
-            IKFollowerDebug.DebugDraw(solvedPoints.ToArray(), 6f, Color.red, _debugSolvedPoints, _debugSolvedPoints, _debugSolvedAxis);
+            IKFollowerDebug.DebugDraw(solvedPoints, 6f, Color.red, _debugSolvedPoints, _debugSolvedPoints, _debugSolvedAxis);
 
             Profiler.BeginSample("Resampling");
             Span<float> solvedDistances = stackalloc float[solvedPoints.Length];
@@ -144,7 +139,7 @@ namespace September.InGame.Kraken
             solvedInterpolator.Evaluate(_maxDistances, ref solvedResamplingPoints);
             Profiler.EndSample();
 
-            IKFollowerDebug.DebugDraw(solvedResamplingPoints.ToArray(), 6f, Color.magenta, _debugSolvedResamplingPoints, _debugSolvedResamplingPoints, _debugSolvedResamplingAxis);
+            IKFollowerDebug.DebugDraw(solvedResamplingPoints, 6f, Color.magenta, _debugSolvedResamplingPoints, _debugSolvedResamplingPoints, _debugSolvedResamplingAxis);
 
             Profiler.BeginSample("UpdatePoints");
             UpdatePosition(solvedResamplingPoints);
@@ -162,10 +157,10 @@ namespace September.InGame.Kraken
             }
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// エディタ用。設定項目の自動アサイン処理
         /// </summary>
-#if UNITY_EDITOR
         [ContextMenu("SetObjects")]
         private void SetObjects()
         {
