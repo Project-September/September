@@ -29,6 +29,14 @@ namespace September.InGame.Kraken.Animations
         public void StartAttack(NetworkRunner runner)
         {
             _armSettings.IsAttacking = true;
+
+            // ローカルテスト用。実際のゲーム中では処理されない想定
+            if (runner == null)
+            {
+                _armSettings.EnablePhysics = true;
+                return;
+            }
+
             _armSettings.StartAttackTick = runner.Tick;
             _armSettings.EnablePhysics = false;
         }

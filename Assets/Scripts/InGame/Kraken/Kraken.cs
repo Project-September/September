@@ -73,6 +73,7 @@ namespace September.InGame.Kraken
             _initialRotation = transform.rotation;
 
             _cameraController.Init(true);
+            _attackHandler.Initialize(_tentacles.Arms, _settings);
         }
 
         /// <summary>
@@ -93,7 +94,6 @@ namespace September.InGame.Kraken
         public override void Spawned()
         {
             Appear().Forget();
-            _attackHandler.Initialize(_tentacles.Arms, _settings);
         }
 
         public override void FixedUpdateNetwork()
