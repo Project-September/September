@@ -40,7 +40,7 @@ namespace September.InGame.Kraken.Animations
                     runner,
                     new CapsuleShape(particle.ForwardEndPos, particle.BackEndPos, _krakenSettings.AreaHitRadius),
                     _krakenSettings.AreaHitDuration,
-                    _krakenSettings.AttackTargetLayer,
+                    _krakenSettings.AreaAttackHitLayer,
                     col => OnHitAction(_armSettings.AlreadyHits, col)
                 );
         }
@@ -95,7 +95,7 @@ namespace September.InGame.Kraken.Animations
             Vector3 rayOrigin = new(hitPos.x, rayWorldHeight, hitPos.z);
             float distance = rayWorldHeight - hitPos.y;
 
-            if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, distance, _krakenSettings.HitGroundLayer))
+            if (Physics.Raycast(rayOrigin, Vector3.down, out _, distance, _krakenSettings.CeilingLayer))
             {
                 Debug.DrawRay(rayOrigin, Vector3.down * distance, Color.red, 100f);
                 return;
@@ -190,8 +190,9 @@ namespace September.InGame.Kraken.Animations
         public float AreaHitDuration;
         public float AreaHitRadius;
         public int Damage;
-        public LayerMask HitGroundLayer;
-        public LayerMask AttackTargetLayer;
+        public LayerMask CeilingLayer;
+        public LayerMask AttackPointRayHitLayer;
+        public LayerMask AreaAttackHitLayer;
         public float ArmStartTime;
         public float ArmEndTime;
 

@@ -494,7 +494,7 @@ Animator:
   m_GameObject: {fileID: 332474137592395234}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35ce6ad29484be5418a9c32adc42156d, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0a32dde27719bdd4c91039b48a5c283f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1604,15 +1604,18 @@ MonoBehaviour:
   _attackHandler: {fileID: 6014455148580474590}
   _settings:
     Root: {fileID: 1498564787072541733}
-    TentacleEnablePhysicsTime: 4
+    TentacleEnablePhysicsTime: 2
     HitRayCastHeight: 20
     AreaHitDuration: 0.5
     AreaHitRadius: 2
     Damage: 50
-    HitGroundLayer:
+    CeilingLayer:
       serializedVersion: 2
       m_Bits: 128
-    AttackTargetLayer:
+    AttackPointRayHitLayer:
+      serializedVersion: 2
+      m_Bits: 128
+    AreaAttackHitLayer:
       serializedVersion: 2
       m_Bits: 2121
     ArmStartTime: 4
@@ -1961,7 +1964,7 @@ Animator:
   m_GameObject: {fileID: 1264577755782464373}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35ce6ad29484be5418a9c32adc42156d, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0a32dde27719bdd4c91039b48a5c283f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2402,7 +2405,7 @@ Animator:
   m_GameObject: {fileID: 1721993035932253138}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35ce6ad29484be5418a9c32adc42156d, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0a32dde27719bdd4c91039b48a5c283f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2933,7 +2936,7 @@ Animator:
   m_GameObject: {fileID: 2550080915458062777}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35ce6ad29484be5418a9c32adc42156d, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0a32dde27719bdd4c91039b48a5c283f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -6529,7 +6532,7 @@ Animator:
   m_GameObject: {fileID: 5601403680263687298}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35ce6ad29484be5418a9c32adc42156d, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0a32dde27719bdd4c91039b48a5c283f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -7602,7 +7605,7 @@ Animator:
   m_GameObject: {fileID: 6511011018782903058}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35ce6ad29484be5418a9c32adc42156d, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0a32dde27719bdd4c91039b48a5c283f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

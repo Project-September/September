@@ -110,7 +110,7 @@ namespace September.InGame.Kraken
                     if (mainCamera == null) return;
                     Vector3 origin = mainCamera.transform.position;
                     Vector3 forward = mainCamera.transform.forward;
-                    if (Physics.Raycast(origin, forward, out RaycastHit hit, Mathf.Infinity))
+                    if (Physics.Raycast(origin, forward, out RaycastHit hit, Mathf.Infinity, _settings.AttackPointRayHitLayer))
                     {
                         RPC_Attack(hit.point);
                     }
