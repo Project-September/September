@@ -315,7 +315,7 @@ namespace September.InGame.UI
                         var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
                         TextMeshProUGUI text = ui.GetComponentInChildren<TextMeshProUGUI>();
                         text.text = "宝石がスポーンします";
-                        text.color = Color.red;
+                        text.color = new Color(1f, 0.8f, 0.47f);
                         UpdateLayOutGroup();
                         await ui.DOFade(1, 0.5f);
                         await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
