@@ -310,6 +310,20 @@ namespace September.InGame.UI
                         UpdateLayOutGroup();
                         break;
                     }
+                case StatusUpType.JewelrySpawn:
+                    {
+                        var ui = Instantiate(_statusUpUI, _statusUpLayout.transform);
+                        TextMeshProUGUI text = ui.GetComponentInChildren<TextMeshProUGUI>();
+                        text.text = "宝石がスポーンします";
+                        text.color = Color.red;
+                        UpdateLayOutGroup();
+                        await ui.DOFade(1, 0.5f);
+                        await UniTask.Delay(TimeSpan.FromSeconds(seconds - 1f));
+                        await ui.DOFade(0, 0.5f);
+                        Destroy(ui?.gameObject);
+                        UpdateLayOutGroup();
+                        break;
+                    }
                 case StatusUpType.None:
                     {
                         Destroy(_ogreGroup?.gameObject);
