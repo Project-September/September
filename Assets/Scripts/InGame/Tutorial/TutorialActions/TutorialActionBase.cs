@@ -35,7 +35,6 @@ namespace September.InGame.Tutorial
             actionData.TutorialUI.SetActive(true);
             actionData.TutorialUI.GetComponent<Image>().sprite = _explanationPicture;
             _isActionStarted = true;
-            CursorStateManager.ShowCursor();
             GameInput.I.IsInputBlockedByUI = true;
             actionData.CloseButton.onClick.AddListener(OnCloseButtonClicked);
         }
@@ -47,7 +46,6 @@ namespace September.InGame.Tutorial
 
         public virtual void OnCloseButtonClicked()
         {
-            CursorStateManager.HideCursor();
             GameInput.I.IsInputBlockedByUI = false;
         }
 
