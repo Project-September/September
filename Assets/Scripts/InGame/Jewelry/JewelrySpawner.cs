@@ -78,7 +78,7 @@ namespace InGame.Jewelry
         {
             if (_spawnPositions == null || _spawnPositions.Length == 0)
             {
-                Debug.LogError("JewelrySpawner :X|[ʒuݒ肳Ă܂B");
+                Debug.LogError("JewelrySpawner : スポーン位置が設定されていません。");
                 return;
             }
 
@@ -104,6 +104,10 @@ namespace InGame.Jewelry
             }
             RPC_SetSpawnPrediction(true, spawnTransform.position);
 
+            //スポーン予告メッセージを出す
+            if (spawnSetting.ShowSpawnMessage)
+                RPC_ShowSpawnMessage(_predictionVisibleDuration);
+
             await UniTask.WaitForSeconds(_predictionVisibleDuration, cancellationToken: _cts.Token);
             SpawnJewelryGroup(spawnTransform.position, spawnSetting);
             RPC_SetSpawnPrediction(false);
@@ -119,6 +123,12 @@ namespace InGame.Jewelry
             {
                 _spawnPredictionRange.position = position;
             }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_ShowSpawnMessage(float second)
+        {
+            UIController.I.ShowStatusUpUI(second, Exhibit.StatusUpType.JewelrySpawn);
         }
 
         private void SpawnJewelryGroup(Vector3 centerPosition, JewelrySpawnSetting spawnSetting)
