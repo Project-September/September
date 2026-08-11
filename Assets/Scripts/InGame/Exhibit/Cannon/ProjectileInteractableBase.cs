@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cinemachine;
 using Fusion;
@@ -15,9 +16,10 @@ namespace September.InGame.Exhibit
 		[SerializeField] protected Transform _waitCharacterTransform;
 		[SerializeField] protected CinemachineVirtualCamera _cameraController;
 		[SerializeField] protected InteractableBase _interactable;
+		[SerializeField] protected Animator _animator;
 		
-		[Header("reload設定")] [SerializeField] protected int _maxAmmo;
-		[SerializeField] protected float _reloadTime;
+		[Header("reload設定")] 
+		[SerializeReference, SubclassSelector] IFireController _fireBullerController;
 
 		protected ProjectileLauncher _launcher;
 		protected IProjectileMovement _move;
@@ -66,13 +68,14 @@ namespace September.InGame.Exhibit
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 15);
 			RPC_EffectActive(CurrentUsePlayerRef, true);
 			Object.AssignInputAuthority(CurrentUsePlayerRef);
-			_currentAmmo = _maxAmmo;
 
 			// 使用中のプレイヤーに対する処理
 			if (!_usingPlayer) return;
 			_usingPlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 			PlayerActive(false);
 			_move.Initialize(_usingPlayer.Object, playerRef);
+			_fireBullerController.Init();
+			StartAnimation(true);
 
 			// Playerがダメージを受けた際にInteractを終了する
 			_usingPlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
@@ -90,8 +93,7 @@ namespace September.InGame.Exhibit
 			base.FixedUpdateNetwork();
 			
 			// 射撃処理
-			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTimer.ExpiredOrNotRunning(Runner) &&
-			    _currentAmmo > 0)
+			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTimer.ExpiredOrNotRunning(Runner))
 			{
 				Fire();
 			}
@@ -104,11 +106,19 @@ namespace September.InGame.Exhibit
 		protected virtual void Fire()
 		{
 			_launcher.Fire(CurrentUsePlayerRef);
-			LastFireTimer = TickTimer.CreateFromSeconds(Runner, _reloadTime);
+			_fireBullerController.Fire();
+			PlayFireAnimation();
+			
 			_currentAmmo -= 1;
-			if (_currentAmmo <= 0)
+			if (!_fireBullerController.IsUsable())
 			{
-				WaitExitTimer = TickTimer.CreateFromSeconds(Runner, 1f);
+				var timer = TickTimer.CreateFromSeconds(Runner, 1f);
+				WaitExitTimer = timer;
+				LastFireTimer = timer;
+			}
+			else
+			{
+				LastFireTimer = _fireBullerController.GetNextFireTimer(Runner);
 			}
 		}
 
@@ -133,10 +143,11 @@ namespace September.InGame.Exhibit
 		{
 			SetCooldown();
 			_move.Refresh();
+			StartAnimation(false);
 			Object.RemoveInputAuthority();
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 
-			// 使用中のプレイヤークライアント限定処理
+			// 使用中のプレイヤークライアントに対しての
 			if (!_usingPlayer) return;
 			PlayerActive(true);
 			RPC_EffectActive(CurrentUsePlayerRef, false);
@@ -206,6 +217,16 @@ namespace September.InGame.Exhibit
 			InteractEnd();
 		}
 
+		private void StartAnimation(bool isActive)
+		{
+			_animator.SetBool("IsStart", isActive);
+		}
+
+		private void PlayFireAnimation()
+		{
+			_animator?.SetTrigger("Fire");
+		}
+
 		#region Helper
 
 		[Rpc(RpcSources.All, RpcTargets.All)]
@@ -224,5 +245,83 @@ namespace September.InGame.Exhibit
 		public void Initialize(NetworkObject playerObject, PlayerRef playerRef);
 		public void MoveUpdate(PlayerInput input);
 		public void Refresh();
+	}
+
+	public interface IFireController
+	{
+		void Init();
+		void Fire();
+		bool IsUsable();
+		TickTimer GetNextFireTimer(NetworkRunner runner);
+	}
+
+	[Serializable]
+	public class UseReload : IFireController
+	{
+		[SerializeField] int _maxAmmo;
+		[SerializeField] private float _fireRate;
+		[SerializeField] float _reloadTime;
+		private int _currentAmmo;
+		private bool _isReloading;
+
+
+		public void Init()
+		{
+			_currentAmmo = _maxAmmo;
+			_isReloading = false;
+		}
+
+		public void Fire()
+		{
+			_currentAmmo--;
+			if (_currentAmmo == 0)
+			{
+				_isReloading = true;
+			}
+		}
+
+		public bool IsUsable()
+		{
+			return true;
+		}
+
+		public TickTimer GetNextFireTimer(NetworkRunner runner)
+		{
+			if (_isReloading)
+			{
+				Init();
+				return TickTimer.CreateFromSeconds(runner, _reloadTime);
+			}
+			
+			return TickTimer.CreateFromSeconds(runner, _fireRate);
+		}
+	}
+	
+	[Serializable]
+	public class UseNoReload : IFireController
+	{
+		[SerializeField] int _maxAmmo;
+		[SerializeField] private float _fireRate;
+		private int _currentAmmo;
+
+		public void Init()
+		{
+			_currentAmmo = _maxAmmo;	
+		}
+
+		public void Fire()
+		{
+			_currentAmmo--;
+		}
+
+		public bool IsUsable()
+		{
+			return 0 < _currentAmmo;
+		}
+
+		public TickTimer GetNextFireTimer(NetworkRunner runner)
+		{
+			return TickTimer.CreateFromSeconds(runner, _fireRate);
+		}
 	}
 }
