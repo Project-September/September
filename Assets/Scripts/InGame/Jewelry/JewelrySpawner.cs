@@ -78,7 +78,7 @@ namespace InGame.Jewelry
         {
             if (_spawnPositions == null || _spawnPositions.Length == 0)
             {
-                Debug.LogError("JewelrySpawner :X|[ʒuݒ肳Ă܂B");
+                Debug.LogError("JewelrySpawner : スポーン位置が設定されていません。");
                 return;
             }
 
