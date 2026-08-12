@@ -19,7 +19,10 @@ namespace September.InGame.Exhibit
 		[SerializeField] protected Animator _animator;
 		
 		[Header("reload設定")] 
-		[SerializeReference, SubclassSelector] IFireController _fireBullerController;
+		[SerializeReference, SubclassSelector] IFireController _fireBulletController;
+		
+		[Header("レティクル設定")]
+		[SerializeReference, SubclassSelector] IReticuleEffect _reticuleEffect;
 
 		protected ProjectileLauncher _launcher;
 		protected IProjectileMovement _move;
@@ -36,6 +39,7 @@ namespace September.InGame.Exhibit
 			base.Spawned();
 			_launcher = GetComponent<ProjectileLauncher>();
 			_move = GetComponent<IProjectileMovement>();
+			_reticuleEffect?.Init();
 		}
 		
 		public override void Render()
@@ -74,7 +78,7 @@ namespace September.InGame.Exhibit
 			_usingPlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 			PlayerActive(false);
 			_move.Initialize(_usingPlayer.Object, playerRef);
-			_fireBullerController.Init();
+			_fireBulletController.Init();
 			StartAnimation(true);
 
 			// Playerがダメージを受けた際にInteractを終了する
@@ -106,11 +110,11 @@ namespace September.InGame.Exhibit
 		protected virtual void Fire()
 		{
 			_launcher.Fire(CurrentUsePlayerRef);
-			_fireBullerController.Fire();
+			_fireBulletController.Fire();
 			PlayFireAnimation();
 			
 			_currentAmmo -= 1;
-			if (!_fireBullerController.IsUsable())
+			if (!_fireBulletController.IsUsable())
 			{
 				var timer = TickTimer.CreateFromSeconds(Runner, 1f);
 				WaitExitTimer = timer;
@@ -118,7 +122,7 @@ namespace September.InGame.Exhibit
 			}
 			else
 			{
-				LastFireTimer = _fireBullerController.GetNextFireTimer(Runner);
+				LastFireTimer = _fireBulletController.GetNextFireTimer(Runner);
 			}
 		}
 
@@ -208,6 +212,7 @@ namespace September.InGame.Exhibit
 		{
 			if(Runner.LocalPlayer == currentPlayer)
 			{
+				_reticuleEffect?.SetActive(isActive);
 				_launcher.IsRenderLine = isActive;
 			}
 		}
@@ -253,6 +258,12 @@ namespace September.InGame.Exhibit
 		void Fire();
 		bool IsUsable();
 		TickTimer GetNextFireTimer(NetworkRunner runner);
+	}
+
+	public interface IReticuleEffect
+	{
+		void Init();
+		void SetActive(bool isActive);
 	}
 
 	[Serializable]

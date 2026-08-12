@@ -37,6 +37,7 @@ namespace September.InGame.Exhibit
 		{
 			_baseDefaultLocalRotation = _rotateBase.rotation;
 			_baseYaw = _barrel.rotation.eulerAngles.y;
+			_basePitch = _barrel.rotation.eulerAngles.x;
 
 			_barrelDefaultLocalRotation = _barrel.localRotation;
 
@@ -45,13 +46,22 @@ namespace September.InGame.Exhibit
 			_basePitch = _cameraController.CameraPitch;
 
 			Debug.Log($"pitch: {_cameraController.CameraPitch} yaw: {_cameraController.CameraYaw}");
+
+			_baseYaw = Vector3.SignedAngle(
+				Vector3.forward,
+				_cameraController.transform.forward,
+				_baseUp);
+			
+			Yaw = _baseYaw;
 		}
 
 		public override void Render()
 		{
 			ModelRotate();
 			if (HasInputAuthority)
-				_cameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
+			{
+				RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
+			}
 		}
 
 		private void ModelRotate()
@@ -92,13 +102,11 @@ namespace September.InGame.Exhibit
 		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
 		{
 			PlayerObject = playerObject;
-			_cameraController.SetCameraRotate(0, 0);
+			_cameraController.CameraReset();
 		}
 
 		public void MoveUpdate(PlayerInput input)
 		{
-			RotateCamera(input);
-
 			var cameraForward = input.DesiredLookDirection;
 
 			if (Physics.Raycast(input.CameraPosition, cameraForward, out var hit, 100, _layerMask))
@@ -107,30 +115,27 @@ namespace September.InGame.Exhibit
 			}
 			else
 			{
-				Debug.Log($"No hit, using camera forward: {cameraForward}");
 				CameraForward = cameraForward;
 			}
 
 			var lookRotation = Quaternion.LookRotation(CameraForward);
-			var euler = lookRotation;
-			Yaw = euler.eulerAngles.y;
-			Pitch = Mathf.DeltaAngle(0f, euler.eulerAngles.x);
+			Yaw = lookRotation.eulerAngles.y;
+			Pitch = Mathf.DeltaAngle(0f, lookRotation.eulerAngles.x);
 
 			UpdatePlayerPosition();
-
-			Debug.Log(
-				$"aimDirection: {CameraForward}, lookRotation: {lookRotation.eulerAngles}, pitch: {Pitch}, yaw: {Yaw}");
 		}
 
-		private void RotateCamera(PlayerInput input)
+		private void RotateCamera(Vector2 input, float deltaTime)
 		{
-			_cameraController.RotateCamera(input.LookDirection, Runner.DeltaTime);
-			var pitch = _cameraController.CameraPitch;
-			var yaw = Mathf.DeltaAngle(0, _cameraController.CameraYaw);
+			_cameraController.RotateCamera(input, deltaTime);
+			// 角度を-180~180に変換してclampする
+			var yaw = Mathf.DeltaAngle(_baseYaw, _cameraController.CameraYaw);
+			var pitch = Mathf.DeltaAngle(0, _cameraController.CameraPitch);
+			Debug.Log($"pitch: {pitch} yaw: {yaw} baseYaw: {_baseYaw} basePitch: {_basePitch}");
 			pitch = Mathf.Clamp(pitch, _pitchLimit.x, _pitchLimit.y);
-			yaw = Mathf.Clamp(yaw, _yawLimit.x, _yawLimit.y);
-			Debug.Log($"RotateCamera: pitch: {pitch}, yaw: {yaw}");
-			//_cameraController.SetCameraRotate(pitch, yaw);
+			yaw = Mathf.Clamp(yaw, _yawLimit.x, _yawLimit.y) + _baseYaw;
+			
+			_cameraController.SetCameraRotate(pitch, yaw);
 		}
 
 		private void UpdatePlayerPosition()
@@ -143,11 +148,6 @@ namespace September.InGame.Exhibit
 		public void Refresh()
 		{
 			_cameraController.CameraReset();
-			// TODO:
-		}
-
-		private void RotateTo(Quaternion newRotation, Vector3 useAngles)
-		{
 		}
 	}
 }

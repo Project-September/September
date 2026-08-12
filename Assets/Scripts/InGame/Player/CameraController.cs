@@ -79,10 +79,8 @@ namespace InGame.Player
 
         public void SetCameraRotate(float pitch, float yaw)
         {
-            _cameraPitch = pitch;
             _cameraPitch = Mathf.Clamp(_cameraPitch, -90 + _defaultPitch, 90 - _defaultPitch);
-            _cameraYaw = yaw;
-            _cameraYaw = ToAngle(_cameraYaw);
+            _cameraYaw = ToAngle(yaw);
             _cameraPivot.rotation = Quaternion.Euler(_cameraPitch, _cameraYaw, 0);
         }
         

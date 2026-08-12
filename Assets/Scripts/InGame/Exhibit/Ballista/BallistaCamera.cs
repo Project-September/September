@@ -1,4 +1,3 @@
-using System;
 using Cinemachine;
 using Common.UserSettings;
 using Fusion;

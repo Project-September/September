@@ -1,0 +1,21 @@
+using System;
+using UnityEngine;
+
+namespace September.InGame.Exhibit
+{
+	[Serializable]
+	public class BallistaReticule: IReticuleEffect
+	{
+		[SerializeField] private GameObject _reticuleUIGameObject;
+
+		public void Init()
+		{
+			_reticuleUIGameObject?.SetActive(false);
+		}
+
+		public void SetActive(bool isActive)
+		{
+			_reticuleUIGameObject?.SetActive(isActive);
+		}
+	}
+}
