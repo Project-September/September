@@ -147,7 +147,7 @@ namespace September.InGame.Kraken.Animations
         {
             await _armSettings.Animator.PlayAsync(_krakenSettings.AnimationName, 0, 0f, cancellationToken: token);
             await _armSettings.Animator.WaitState(_krakenSettings.EndStateName, cancellationToken: token);
-            _armSettings.Animator.transform.rotation = _armSettings.StartRotation;
+            _armSettings.ArmRoot.rotation = _armSettings.StartRotation;
             Debug.Log($"{_krakenSettings.AnimationName} {_armSettings.StartRotation.eulerAngles}", _armSettings.ArmRoot);
         }
 
