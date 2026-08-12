@@ -14,6 +14,8 @@ namespace September.InGame.Common
     {
         [Header("Timer Settings"), SerializeField, Label("TimerData")]
         private GameTimerData _timerData;
+        [Header("Game Settings"), SerializeField]
+        private GameRule _gameRule;
 
         [SerializeField] private bool _isTutorialMode = false;
         private readonly Dictionary<PlayerRef, NetworkObject> _playerDataDic = new();
@@ -31,7 +33,7 @@ namespace September.InGame.Common
         /// 現在のゲーム状態名を取得する
         /// </summary>
         public string CurrentStateName => _stateMachine?.CurrentStateName ?? "";
-        
+
         public Action GameEnded { get; set; }
 
         private void Start()
