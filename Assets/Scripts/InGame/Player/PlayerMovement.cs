@@ -37,6 +37,8 @@ namespace InGame.Player
         [SerializeField] private float _hookPower = 10f;
         [Header("Bomb")]
         [SerializeField] private float _flyingDamping = 8f;
+        [Header("Roll")]
+        [SerializeField] private EvasionData _evasionData;
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
@@ -67,7 +69,8 @@ namespace InGame.Player
         private bool _isDash;
         // vault
         private bool _doingVault;
-
+        // Roll
+        private PlayerEvasion _playerEvasion;
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
@@ -112,10 +115,12 @@ namespace InGame.Player
                 Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerMovement.csを確認してください", this);
 #endif
             _prePos = transform.position;
+
+            _playerEvasion = new(_evasionData);
         }
 
 
-        public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
+        public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, bool isEvasion, float deltaTime)
         {
             CheckGroundManual();
 
@@ -134,6 +139,12 @@ namespace InGame.Player
 
             // set velocity
             if (isJump && HasStateAuthority) TryVault(moveDirection);
+            
+            if (isEvasion && HasStateAuthority)
+            {
+                _playerEvasion.OnEvasionStart(moveDirection, transform.forward, deltaTime, null);
+            }
+            
             if (!DoingVault)
             {
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
@@ -145,6 +156,12 @@ namespace InGame.Player
         public virtual void MoveTick(float deltaTime)
         {
             CheckGroundManual();
+
+            if (_playerEvasion.IsEvasion)
+            {
+                transform.position = _playerEvasion.Move(transform.position,deltaTime);
+                return;
+            }
 
             if (DoingVault && HasStateAuthority) UpdateVault(deltaTime);
 
