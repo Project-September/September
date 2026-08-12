@@ -38,11 +38,11 @@ namespace September.InGame.Kraken
                 float d0 = v0.magnitude;
                 float d1 = v1.magnitude;
 
+                float m = Mathf.Max(d0, d1);
+
                 // d0 = 0 => 0
                 // d1 = 0 => 1
                 // d0 = d1 => .5
-                float m = Mathf.Max(d0, d1);
-
                 float ratio = ((d0 - d1) / m + 1f) * 0.5f;
 
                 return Quaternion.Slerp(p0.Rotation, p1.Rotation, ratio);
