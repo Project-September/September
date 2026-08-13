@@ -27,9 +27,14 @@ namespace September.InGame.Exhibit
 			_cannonBarrel.localRotation = BarrelRotation;
 		}
 
-		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
+		public void InitializeStateAuthority(NetworkObject playerObject, PlayerRef playerRef)
 		{
 			Player = playerObject;
+		}
+
+		public void Initialize()
+		{
+			
 		}
 
 		void IProjectileMovement.Update(PlayerInput input)

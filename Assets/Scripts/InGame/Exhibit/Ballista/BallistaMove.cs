@@ -48,10 +48,18 @@ namespace September.InGame.Exhibit
 			}
 		}
 
-		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
+		public void InitializeStateAuthority(NetworkObject playerObject, PlayerRef playerRef)
 		{
 			PlayerObject = playerObject;
-			_cameraController.SetCameraRotate(_basePitch, _baseYaw);
+		}
+
+		public void Initialize()
+		{
+			
+			if(HasInputAuthority)
+			{
+				_cameraController.SetCameraRotate(_basePitch, _baseYaw);
+			}
 		}
 
 		private void ModelRotate()
@@ -113,7 +121,8 @@ namespace September.InGame.Exhibit
 
 		public void Reset()
 		{
-			_cameraController.CameraReset();
+			Yaw = _baseYaw;
+			Pitch = _basePitch;
 		}
 	}
 }
