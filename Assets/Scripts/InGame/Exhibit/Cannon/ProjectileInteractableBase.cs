@@ -13,10 +13,10 @@ namespace September.InGame.Exhibit
 	[DefaultExecutionOrder(100)] // 他のNetworkBehaviourより遅く実行する
 	public class ProjectileInteractableBase : NetworkBehaviour
 	{
-		[SerializeField] protected Transform _waitCharacterTransform;
 		[SerializeField] protected CinemachineVirtualCamera _cameraController;
 		[SerializeField] protected InteractableBase _interactable;
 		[SerializeField] protected Animator _animator;
+		[SerializeField] protected NetworkMecanimAnimator _networkMecanimAnimator;
 		
 		[Header("reload設定")] 
 		[SerializeReference, SubclassSelector] IFireController _fireBulletController;
@@ -40,12 +40,17 @@ namespace September.InGame.Exhibit
 			_launcher = GetComponent<ProjectileLauncher>();
 			_move = GetComponent<IProjectileMovement>();
 			_reticuleEffect?.Init();
+
+			if (HasStateAuthority)
+			{
+				StartAnimation(true);
+			}
 		}
 		
 		public override void Render()
 		{
 			base.Render();
-			_launcher.EffectRender();
+			_reticuleEffect?.Render();
 		}
 
 		public override void FixedUpdateNetwork()
@@ -73,20 +78,20 @@ namespace September.InGame.Exhibit
 			RPC_EffectActive(CurrentUsePlayerRef, true);
 			Object.AssignInputAuthority(CurrentUsePlayerRef);
 
+			StartAnimation(true);
+
 			// 使用中のプレイヤーに対する処理
 			if (!_usingPlayer) return;
-			_usingPlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
+			//_usingPlayer.SetWarpTarget(_waitCharacterTransform.position, _waitCharacterTransform.rotation);
 			PlayerActive(false);
 			_move.Initialize(_usingPlayer.Object, playerRef);
 			_fireBulletController.Init();
-			StartAnimation(true);
 
 			// Playerがダメージを受けた際にInteractを終了する
 			_usingPlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
 			
 			// インタラクトして1秒後からインタラクト解除可能にする
 			InteractEndLockTimer = TickTimer.CreateFromSeconds(Runner, 1f);
-			OnInteractStart();
 		}
 
 		/// <summary>
@@ -103,8 +108,6 @@ namespace September.InGame.Exhibit
 			}
 
 			CheckInteractEnd(input);
-			
-			OnInteractFixedUpdate();
 		}
 
 		protected virtual void Fire()
@@ -157,26 +160,9 @@ namespace September.InGame.Exhibit
 			RPC_EffectActive(CurrentUsePlayerRef, false);
 			_usingPlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
 			
-			OnInteractEnd();
-			
 			_usingPlayer = null;
 			CurrentUsePlayerRef = default;
 			_interactable.EndInteract();
-		}
-
-		protected virtual void OnInteractStart()
-		{
-			
-		}
-
-		protected virtual void OnInteractFixedUpdate()
-		{
-			
-		}
-
-		protected virtual void OnInteractEnd()
-		{
-			
 		}
 
 		private void PlayerActive(bool isActive)
@@ -213,7 +199,6 @@ namespace September.InGame.Exhibit
 			if(Runner.LocalPlayer == currentPlayer)
 			{
 				_reticuleEffect?.SetActive(isActive);
-				_launcher.IsRenderLine = isActive;
 			}
 		}
 
@@ -224,12 +209,14 @@ namespace September.InGame.Exhibit
 
 		private void StartAnimation(bool isActive)
 		{
-			_animator.SetBool("IsStart", isActive);
+			if(!_animator) return;
+			_animator?.SetBool("IsStart", isActive);
 		}
 
 		private void PlayFireAnimation()
 		{
-			_animator?.SetTrigger("Fire");
+			if(!_networkMecanimAnimator) return;
+			_networkMecanimAnimator?.SetTrigger("Fire");
 		}
 
 		#region Helper
@@ -263,7 +250,8 @@ namespace September.InGame.Exhibit
 	public interface IReticuleEffect
 	{
 		void Init();
-		void SetActive(bool isActive);
+		void Render();
+		void SetActive(bool active);
 	}
 
 	[Serializable]
@@ -309,7 +297,7 @@ namespace September.InGame.Exhibit
 	}
 	
 	[Serializable]
-	public class UseNoReload : IFireController
+	public class NoReload : IFireController
 	{
 		[SerializeField] int _maxAmmo;
 		[SerializeField] private float _fireRate;
