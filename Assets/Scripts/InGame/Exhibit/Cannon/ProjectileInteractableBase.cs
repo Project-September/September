@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace September.InGame.Exhibit
 {
-	[DefaultExecutionOrder(100)] // 他のNetworkBehaviourより遅く実行する
+	// 他のNetworkBehaviourより遅く実行する
 	public class ProjectileInteractableBase : NetworkBehaviour
 	{
 		[SerializeField] protected CinemachineVirtualCamera _cameraController;
@@ -27,7 +27,6 @@ namespace September.InGame.Exhibit
 		protected ProjectileLauncher _launcher;
 		protected IProjectileMovement _move;
 		protected PlayerManager _usingPlayer;
-		protected int _currentAmmo;
 
  		[Networked] protected PlayerRef CurrentUsePlayerRef { get; set; }
 		[Networked] protected TickTimer LastFireTimer { get; set; }
@@ -40,11 +39,6 @@ namespace September.InGame.Exhibit
 			_launcher = GetComponent<ProjectileLauncher>();
 			_move = GetComponent<IProjectileMovement>();
 			_reticuleEffect?.Init();
-
-			if (HasStateAuthority)
-			{
-				StartAnimation(true);
-			}
 		}
 		
 		public override void Render()
@@ -59,7 +53,21 @@ namespace September.InGame.Exhibit
 			if(CurrentUsePlayerRef.IsNone) return;
 			
 			GetInput(out PlayerInput input);
-			_move.MoveUpdate(input);
+			
+			_move.Update(input);
+			
+			// 射撃処理
+			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTimer.ExpiredOrNotRunning(Runner))
+			{
+				Fire();
+				if(IsProxy || !Runner.IsForward)
+				{
+					PlayFireAnimation();
+					return;
+				}
+			}
+
+			CheckInteractEnd(input);
 		}
 
 		/// <summary>
@@ -76,9 +84,9 @@ namespace September.InGame.Exhibit
 
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 15);
 			RPC_EffectActive(CurrentUsePlayerRef, true);
-			Object.AssignInputAuthority(CurrentUsePlayerRef);
+			RPC_StartAnimation(true);
 
-			StartAnimation(true);
+			Object.AssignInputAuthority(CurrentUsePlayerRef);
 
 			// 使用中のプレイヤーに対する処理
 			if (!_usingPlayer) return;
@@ -94,29 +102,14 @@ namespace September.InGame.Exhibit
 			InteractEndLockTimer = TickTimer.CreateFromSeconds(Runner, 1f);
 		}
 
-		/// <summary>
-		///     インタラクト中の処理(Hostのみ)
-		/// </summary>
-		public virtual void InteractFixedNetworkUpdate(PlayerInput input)
-		{
-			base.FixedUpdateNetwork();
-			
-			// 射撃処理
-			if (input.Buttons.IsSet(PlayerButtons.Attack) && LastFireTimer.ExpiredOrNotRunning(Runner))
-			{
-				Fire();
-			}
-
-			CheckInteractEnd(input);
-		}
-
 		protected virtual void Fire()
 		{
-			_launcher.Fire(CurrentUsePlayerRef);
+			if (HasStateAuthority)
+			{
+				_launcher.Fire(CurrentUsePlayerRef);
+			}
 			_fireBulletController.Fire();
-			PlayFireAnimation();
-			
-			_currentAmmo -= 1;
+
 			if (!_fireBulletController.IsUsable())
 			{
 				var timer = TickTimer.CreateFromSeconds(Runner, 1f);
@@ -131,6 +124,8 @@ namespace September.InGame.Exhibit
 
 		protected virtual void CheckInteractEnd(PlayerInput input)
 		{
+			if(!HasStateAuthority) return;
+			
 			if (input.Buttons.IsSet(PlayerButtons.Interact) && InteractEndLockTimer.ExpiredOrNotRunning(Runner))
 			{
 				InteractEnd();
@@ -149,8 +144,8 @@ namespace September.InGame.Exhibit
 		public void InteractEnd()
 		{
 			SetCooldown();
-			_move.Refresh();
-			StartAnimation(false);
+			_move.Reset();
+			RPC_StartAnimation(false); 
 			Object.RemoveInputAuthority();
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 
@@ -196,6 +191,7 @@ namespace September.InGame.Exhibit
 
 		protected virtual void EffectActive(PlayerRef currentPlayer, bool isActive)
 		{
+			_reticuleEffect.AllClientEffectActive(isActive);
 			if(Runner.LocalPlayer == currentPlayer)
 			{
 				_reticuleEffect?.SetActive(isActive);
@@ -207,7 +203,8 @@ namespace September.InGame.Exhibit
 			InteractEnd();
 		}
 
-		private void StartAnimation(bool isActive)
+		[Rpc]
+		private void RPC_StartAnimation(bool isActive)
 		{
 			if(!_animator) return;
 			_animator?.SetBool("IsStart", isActive);
@@ -216,7 +213,8 @@ namespace September.InGame.Exhibit
 		private void PlayFireAnimation()
 		{
 			if(!_networkMecanimAnimator) return;
-			_networkMecanimAnimator?.SetTrigger("Fire");
+			_networkMecanimAnimator?.SetTrigger("Fire", true);
+			Debug.Log("StartAnimation	");
 		}
 
 		#region Helper
@@ -233,10 +231,10 @@ namespace September.InGame.Exhibit
 	}
 
 	public interface IProjectileMovement
-	{
+	{ 
 		public void Initialize(NetworkObject playerObject, PlayerRef playerRef);
-		public void MoveUpdate(PlayerInput input);
-		public void Refresh();
+		public void Update(PlayerInput input);
+		public void Reset();
 	}
 
 	public interface IFireController
@@ -252,6 +250,7 @@ namespace September.InGame.Exhibit
 		void Init();
 		void Render();
 		void SetActive(bool active);
+		void AllClientEffectActive(bool active);
 	}
 
 	[Serializable]

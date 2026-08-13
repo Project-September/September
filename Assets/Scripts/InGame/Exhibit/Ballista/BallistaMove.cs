@@ -23,7 +23,8 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Vector2 _yawLimit = new(-90f, 90f);
 		[SerializeField] private Vector3 _baseUp;
 		[SerializeField] private Vector3 _barrelRight;
-		[SerializeField] private float _baseYaw;
+		private float _baseYaw;
+		private float _basePitch;
 		
 		[Networked] private NetworkObject PlayerObject { get; set; }
 		[Networked] private float Pitch { get; set; }
@@ -34,6 +35,8 @@ namespace September.InGame.Exhibit
 			_cameraController.Init(true);
 			_baseYaw = _barrel.rotation.eulerAngles.y;
 			Yaw = _baseYaw;
+			_basePitch = _barrel.rotation.eulerAngles.x;
+			Pitch = _basePitch;
 		}
 
 		public override void Render()
@@ -48,7 +51,7 @@ namespace September.InGame.Exhibit
 		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
 		{
 			PlayerObject = playerObject;
-			_cameraController.CameraReset();
+			_cameraController.SetCameraRotate(_basePitch, _baseYaw);
 		}
 
 		private void ModelRotate()
@@ -65,7 +68,7 @@ namespace September.InGame.Exhibit
 
 		void IProjectileMovement.Update(PlayerInput input)
 		{
-			var cameraForward = !HasStateAuthority ? input.DesiredLookDirection : _cameraController.GetCameraForward();
+			var cameraForward = input.DesiredLookDirection;
 			Debug.DrawRay(_cameraController.GetCameraPosition(), cameraForward * 100, Color.green);
 			Debug.DrawRay(_barrel.position, _barrel.forward * 100, Color.red);
 			
@@ -95,7 +98,6 @@ namespace September.InGame.Exhibit
 			// 角度を-180~180に変換してclampする
 			var yaw = Mathf.DeltaAngle(_baseYaw, _cameraController.CameraYaw);
 			var pitch = Mathf.DeltaAngle(0, _cameraController.CameraPitch);
-			Debug.Log(pitch);
 			pitch = Mathf.Clamp(pitch, _pitchLimit.x, _pitchLimit.y);
 			yaw = Mathf.Clamp(yaw, _yawLimit.x, _yawLimit.y) + _baseYaw;
 			

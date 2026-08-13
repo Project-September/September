@@ -21,7 +21,7 @@ namespace September.InGame.Exhibit
 		[Networked] private Quaternion BarrelRotation { get; set; }
 
 		public override void Render()
-		{
+		{ 
 			base.Render();
 			_cannonBase.localRotation = BaseRotation;
 			_cannonBarrel.localRotation = BarrelRotation;
@@ -32,13 +32,13 @@ namespace September.InGame.Exhibit
 			Player = playerObject;
 		}
 
-		public void MoveUpdate(PlayerInput input)
+		void IProjectileMovement.Update(PlayerInput input)
 		{
 			CannonRotate(input.MoveDirection.x, input.LookDirection.y);
 			UpdatePlayerPos();
 		}
 
-		public void Refresh()
+		public void Reset()
 		{
 			RPC_Refresh();
 		}
@@ -73,7 +73,7 @@ namespace September.InGame.Exhibit
 			var currentBarrelAxis = _cannonBarrel.localEulerAngles.x +
 			                        _barrelRotateSpeed * barrelRotateInput;
 			currentBarrelAxis = WrapAngle(currentBarrelAxis);
-			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(// TODO:ここ計算おかしい
+			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(
 				Mathf.Clamp(currentBarrelAxis, _barrelRotateAngleLimit.x, _barrelRotateAngleLimit.y), 0, 0);
 		}
 		

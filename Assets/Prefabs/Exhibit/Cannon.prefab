@@ -388,10 +388,10 @@ MonoBehaviour:
       type: {class: CannonReticule, ns: September.InGame.Exhibit, asm: Scripts}
       data:
         _projectileLauncher: {fileID: 6913141626139494975}
-        _hitReticuleRadius: 3
-        AimPositionEffectPrefab: {fileID: 1481952551229307314, guid: 2f63568dd852db8408a6c5838dbffb8b, type: 3}
+        _aimPositionEffectPrefab: {fileID: 1481952551229307314, guid: 2f63568dd852db8408a6c5838dbffb8b, type: 3}
         _lineRenderer: {fileID: 7931722243513256251}
-        AimPositionOffset: 0.2
+        _hitReticuleRadius: 3
+        _aimPositionOffset: 0.2
 --- !u!1 &5739046775815335181
 GameObject:
   m_ObjectHideFlags: 0

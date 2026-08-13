@@ -26,12 +26,6 @@ namespace September.InGame.Exhibit
             _projectileInteractableBase.InteractStart(playerRef);
         }
 
-        public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
-        {
-            base.OnInteractFixedNetworkUpdate(playerInput);
-            _projectileInteractableBase.InteractFixedNetworkUpdate(playerInput);
-        }
-
         public override CharacterInteractEffectBase Clone()
         {
             return new ProjectileInteractEffect(_projectileInteractableBase);

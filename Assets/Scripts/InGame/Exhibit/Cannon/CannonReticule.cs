@@ -7,46 +7,58 @@ namespace September.InGame.Exhibit
 	public class CannonReticule : IReticuleEffect
 	{
 		[SerializeField] private ProjectileLauncher _projectileLauncher;
-		[SerializeField] private float _hitReticuleRadius;
-		[SerializeField] private GameObject AimPositionEffectPrefab;
+		[SerializeField] private GameObject _aimPositionEffectPrefab;
 		[SerializeField] private LineRenderer _lineRenderer;
-		[SerializeField] private float AimPositionOffset = 0.2f;
-		private GameObject AimPositionEffect;
-		private bool isActive = false;
+		[SerializeField] private float _hitReticuleRadius;
+		[SerializeField] private float _aimPositionOffset = 0.2f;
+		private GameObject _aimPositionEffect;
+		private bool _lineActive = false;
+		private bool _aimObjectActive = false;
+		
 		public void Init()
 		{
 			var size = _hitReticuleRadius * 2;
-			if(!AimPositionEffect)
+			if(!_aimPositionEffect)
 			{
-				AimPositionEffect = GameObject.Instantiate(AimPositionEffectPrefab);
-				AimPositionEffect.SetActive(false);
+				_aimPositionEffect = GameObject.Instantiate(_aimPositionEffectPrefab);
+				_aimPositionEffect.SetActive(false);
 			}
-			AimPositionEffect.transform.localScale = new Vector3(size, size, size);
-			AimPositionEffect.SetActive(false);
+			_aimPositionEffect.transform.localScale = new Vector3(size, size, size);
+			_aimPositionEffect.SetActive(false);
 			
 			LineReset();
 		}
 
 		public void Render()
 		{
-			if(!isActive) return;
-			AimPositionEffect.transform.position =
-				_projectileLauncher.HitPosition + _projectileLauncher.HitNormal * AimPositionOffset;
-			AimPositionEffect.transform.up = _projectileLauncher.HitNormal;
-
-			var span = _projectileLauncher.LinePositions;
-			_lineRenderer.positionCount = span.Length;
-			_lineRenderer.SetPositions(span.ToArray());
+			if(_aimObjectActive)
+			{
+				_aimPositionEffect.transform.position =
+					_projectileLauncher.HitPosition + _projectileLauncher.HitNormal * _aimPositionOffset;
+				_aimPositionEffect.transform.up = _projectileLauncher.HitNormal;
+			}
+			
+			if(_lineActive)
+			{
+				var span = _projectileLauncher.LinePositions;
+				_lineRenderer.positionCount = span.Length;
+				_lineRenderer.SetPositions(span.ToArray());
+			}
 		}
 
 		public void SetActive(bool active)
 		{
-			AimPositionEffect?.SetActive(active);
-			isActive = active;
+			_lineActive = active;
 			if(!active)
 			{
 				LineReset();
 			}
+		}
+
+		public void AllClientEffectActive(bool active)
+		{
+			_aimObjectActive = active;
+			_aimPositionEffect?.SetActive(active);
 		}
 
 		public void LineReset()

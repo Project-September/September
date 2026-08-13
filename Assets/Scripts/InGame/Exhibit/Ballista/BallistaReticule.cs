@@ -18,6 +18,11 @@ namespace September.InGame.Exhibit
 			
 		}
 
+		public void AllClientEffectActive(bool active)
+		{
+			
+		}
+
 		public void SetActive(bool active)
 		{
 			_reticuleUIGameObject?.SetActive(active);
