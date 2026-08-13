@@ -8,7 +8,6 @@ namespace September.InGame.Exhibit
 	[System.Serializable]
 	public class CannonHitEffect : IProjectileHitEffect
 	{
-		[SerializeField] private CannonAimRenderer _cannonAimRenderer;
 		[SerializeField] private ParticleSystem _explosionParticlePrefab;
 		[SerializeField] private float _radius;
 		[SerializeField] private int _damage;
@@ -19,7 +18,6 @@ namespace September.InGame.Exhibit
 		{
 			_explosionParticle = Object.Instantiate(_explosionParticlePrefab);
 			_explosionParticle.Stop();
-			_cannonAimRenderer.Initialize(_radius * 2);// 半径からObjectScaleに
 		}
 		
 		public void PlayEffect(Vector3 position, Vector3 normal)

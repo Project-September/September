@@ -13,9 +13,14 @@ namespace September.InGame.Exhibit
 			_reticuleUIGameObject?.SetActive(false);
 		}
 
-		public void SetActive(bool isActive)
+		public void Render()
 		{
-			_reticuleUIGameObject?.SetActive(isActive);
+			
+		}
+
+		public void SetActive(bool active)
+		{
+			_reticuleUIGameObject?.SetActive(active);
 		}
 	}
 }
