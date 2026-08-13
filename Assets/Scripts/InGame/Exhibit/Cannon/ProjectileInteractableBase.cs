@@ -16,7 +16,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] protected CinemachineVirtualCamera _cameraController;
 		[SerializeField] protected InteractableBase _interactable;
 		[SerializeField] protected Animator _animator;
-		[SerializeField] protected NetworkMecanimAnimator _networkMecanimAnimator;
+		[SerializeField] protected NetworkMecanimAnimator _networkAnimator;
 
 		[Header("reload設定")] [SerializeReference] [SubclassSelector]
 		private IFireController _fireBulletController;
@@ -203,12 +203,14 @@ namespace September.InGame.Exhibit
 		[Rpc]
 		private void RPC_StartAnimation(bool isActive)
 		{
-			_animator?.SetBool("IsStart", isActive);
+			if(!_animator) return;
+			_animator.SetBool("IsStart", isActive);
 		}
 
 		private void PlayFireAnimation()
 		{
-			_networkMecanimAnimator?.SetTrigger("Fire", true);
+			if(!_networkAnimator) return;
+			_networkAnimator?.SetTrigger("Fire", true);
 		}
 
 		#region Helper
