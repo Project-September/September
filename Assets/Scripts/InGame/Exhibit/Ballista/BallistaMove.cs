@@ -7,7 +7,7 @@ using UnityEngine;
 namespace September.InGame.Exhibit
 {
 	public class BallistaMove : NetworkBehaviour, IProjectileMovement
-	{
+	{ 
 		[SerializeField] private Transform _barrel;
 		[SerializeField] private Transform _rotateBase;
 		[SerializeField] private Transform _shootPos;
@@ -24,34 +24,15 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Vector3 _baseUp;
 		[SerializeField] private Vector3 _barrelRight;
 		[SerializeField] private float _baseYaw;
-		[SerializeField] private float _basePitch;
-
-		private Quaternion _barrelDefaultLocalRotation;
-		private Quaternion _baseDefaultLocalRotation;
+		
 		[Networked] private NetworkObject PlayerObject { get; set; }
 		[Networked] private float Pitch { get; set; }
 		[Networked] private float Yaw { get; set; }
-		[Networked] private Vector3 CameraForward { get; set; }
 
 		public override void Spawned()
 		{
-			_baseDefaultLocalRotation = _rotateBase.rotation;
-			_baseYaw = _barrel.rotation.eulerAngles.y;
-			_basePitch = _barrel.rotation.eulerAngles.x;
-
-			_barrelDefaultLocalRotation = _barrel.localRotation;
-
 			_cameraController.Init(true);
-			Debug.Log($"baseYaw: {_baseYaw} yaw: {_cameraController.CameraYaw}");
-			_basePitch = _cameraController.CameraPitch;
-
-			Debug.Log($"pitch: {_cameraController.CameraPitch} yaw: {_cameraController.CameraYaw}");
-
-			_baseYaw = Vector3.SignedAngle(
-				Vector3.forward,
-				_cameraController.transform.forward,
-				_baseUp);
-			
+			_baseYaw = _barrel.rotation.eulerAngles.y;
 			Yaw = _baseYaw;
 		}
 
@@ -64,63 +45,46 @@ namespace September.InGame.Exhibit
 			}
 		}
 
-		private void ModelRotate()
-		{
-			Debug.Log(
-				$"base Default {_baseDefaultLocalRotation.eulerAngles} yaw: {Quaternion.AngleAxis(Yaw, _baseUp).eulerAngles} " +
-				$"rotate: {(_baseDefaultLocalRotation * Quaternion.AngleAxis(Yaw, _baseUp)).eulerAngles}");
-			// worldのrotationでやりたい場合も全く同じ関数でOK
-			var _rotate = ReplaceTwist(transform.rotation, _baseUp, Yaw);
-			transform.rotation = _rotate;
-
-			//_rotateBase.localRotation = _baseDefaultLocalRotation *  Quaternion.AngleAxis(Yaw - _baseYaw, _baseUp);
-			_barrel.localRotation = _barrelDefaultLocalRotation * Quaternion.AngleAxis(Pitch, _barrelRight);
-			Debug.DrawRay(_rotateBase.position, _rotateBase.forward * 100, Color.cyan);
-		}
-
-		// 一軸の回転のみを新しい角度に置き換える
-		private static Quaternion ReplaceTwist(Quaternion q, Vector3 axis, float newAngleDeg)
-		{
-			// --- q を swing * twist に分解 ---
-			var r = new Vector3(q.x, q.y, q.z);
-			var p = Vector3.Project(r, axis); // axis成分だけ取り出す
-			var twist = new Quaternion(p.x, p.y, p.z, q.w);
-
-			// 分解が退化するケース(180度回転など)のケア
-			if (twist.x == 0f && twist.y == 0f && twist.z == 0f && twist.w == 0f)
-				twist = Quaternion.identity;
-			else
-				twist = twist.normalized;
-
-			var swing = q * Quaternion.Inverse(twist);
-
-			// --- twist だけを新しい角度に差し替えて再合成 ---
-			var newTwist = Quaternion.AngleAxis(newAngleDeg, axis);
-			return swing * newTwist;
-		}
-
 		public void Initialize(NetworkObject playerObject, PlayerRef playerRef)
 		{
 			PlayerObject = playerObject;
 			_cameraController.CameraReset();
 		}
 
-		public void MoveUpdate(PlayerInput input)
+		private void ModelRotate()
 		{
-			var cameraForward = input.DesiredLookDirection;
+			// 軸をYawに置き換える
+			var _baseAngle = _rotateBase.eulerAngles;
+			_baseAngle.y = Yaw;
+			_rotateBase.rotation = Quaternion.Euler(_baseAngle);
+			
+			var currentBarrelAngles = _barrel.eulerAngles;
+			currentBarrelAngles.x = Pitch;
+			_barrel.rotation = Quaternion.Euler(currentBarrelAngles);
+		}
 
+		void IProjectileMovement.Update(PlayerInput input)
+		{
+			var cameraForward = !HasStateAuthority ? input.DesiredLookDirection : _cameraController.GetCameraForward();
+			Debug.DrawRay(_cameraController.GetCameraPosition(), cameraForward * 100, Color.green);
+			Debug.DrawRay(_barrel.position, _barrel.forward * 100, Color.red);
+			
 			if (Physics.Raycast(input.CameraPosition, cameraForward, out var hit, 100, _layerMask))
 			{
-				CameraForward = (hit.point - _rotateBase.position).normalized;
+				var baseDir = (hit.point - _rotateBase.position).normalized;
+				var lookRotation = Quaternion.LookRotation(baseDir);
+				Yaw = lookRotation.eulerAngles.y;
+				
+				var barrelDir = (hit.point - _barrel.position).normalized;
+				var barrelRotation = Quaternion.LookRotation(barrelDir);
+				Pitch = barrelRotation.eulerAngles.x;
 			}
 			else
 			{
-				CameraForward = cameraForward;
+				var lookRotation = Quaternion.LookRotation(cameraForward);
+				Yaw = lookRotation.eulerAngles.y;
+				Pitch = lookRotation.eulerAngles.x;
 			}
-
-			var lookRotation = Quaternion.LookRotation(CameraForward);
-			Yaw = lookRotation.eulerAngles.y;
-			Pitch = Mathf.DeltaAngle(0f, lookRotation.eulerAngles.x);
 
 			UpdatePlayerPosition();
 		}
@@ -131,7 +95,7 @@ namespace September.InGame.Exhibit
 			// 角度を-180~180に変換してclampする
 			var yaw = Mathf.DeltaAngle(_baseYaw, _cameraController.CameraYaw);
 			var pitch = Mathf.DeltaAngle(0, _cameraController.CameraPitch);
-			Debug.Log($"pitch: {pitch} yaw: {yaw} baseYaw: {_baseYaw} basePitch: {_basePitch}");
+			Debug.Log(pitch);
 			pitch = Mathf.Clamp(pitch, _pitchLimit.x, _pitchLimit.y);
 			yaw = Mathf.Clamp(yaw, _yawLimit.x, _yawLimit.y) + _baseYaw;
 			
@@ -140,12 +104,12 @@ namespace September.InGame.Exhibit
 
 		private void UpdatePlayerPosition()
 		{
-			var quaternion = Quaternion.AngleAxis(Yaw + _baseYaw, Vector3.up);
+			var quaternion = Quaternion.AngleAxis(Yaw, Vector3.up);
 			PlayerObject.transform.rotation = quaternion;
 			PlayerObject.transform.position = _rotateBase.position + quaternion * (Vector3.back * _playerOffset);
 		}
 
-		public void Refresh()
+		public void Reset()
 		{
 			_cameraController.CameraReset();
 		}
