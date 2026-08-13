@@ -1,6 +1,6 @@
-using Cinemachine;
 using Common.UserSettings;
 using DG.Tweening;
+using Unity.Cinemachine;
 using Unity.Mathematics;
 using UnityEngine;
 

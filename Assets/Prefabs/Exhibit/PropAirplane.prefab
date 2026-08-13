@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 7572378393327729410}
   - component: {fileID: 4200780594601291185}
   - component: {fileID: 5916104638410838153}
-  m_Layer: 11
+  m_Layer: 3
   m_Name: Wheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -714,7 +714,7 @@ GameObject:
   - component: {fileID: 7494316538794269785}
   - component: {fileID: 8473515391512153635}
   - component: {fileID: 1367492198867136899}
-  m_Layer: 11
+  m_Layer: 3
   m_Name: MoveCol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1121,7 +1121,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4096
   m_ImplicitCom: 1
   m_ImplicitTensor: 0
   m_UseGravity: 0
@@ -1210,6 +1210,7 @@ MonoBehaviour:
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
+  _debug: 0
   _getOffPoint: {fileID: 4664626561920155601}
   _grav: 6
   _drag: {x: 0.3, y: 0.3, z: 0.1}
@@ -1241,9 +1242,12 @@ MonoBehaviour:
   _bulletMark: {fileID: 7762581465889203969, guid: 052631cb43762b9479c2428dc1d6ca4d, type: 3}
   _damageAmount: 10
   _gunMaxDistance: 1000
-  _gunLayerMask:
+  _shootingTargetLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  _bulletHitLayerMask:
+    serializedVersion: 2
+    m_Bits: 4095
   _castRadius: 3
   _velocityText: {fileID: 1464172462217974093}
   _forwardSpeedText: {fileID: 793880936398018537}
@@ -1280,7 +1284,7 @@ MonoBehaviour:
   _camera: {fileID: 3659471650815562422}
   _collideAgainst:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4087
   _cameraRadius: 0.1
   _motionDuration: 1
   _motionEase: 9
@@ -1320,7 +1324,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 58593279513329935}
-  m_Layer: 11
+  m_Layer: 3
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}

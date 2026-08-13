@@ -31,8 +31,8 @@ namespace InGame.Exhibit
         [SerializeField] private float _fireSpeed = 20f;
         [SerializeField] private float _rayDistance = 100f;
 
-        [FormerlySerializedAs("_fireHitMask")] [SerializeField]
-        private LayerMask _playerHitMask;
+        [SerializeField] private LayerMask _playerHitMask;
+        [SerializeField] private LayerMask _bulletHitMask;
 
         [SerializeField] private float _fireCooldown = 2f;
         [SerializeField, Label("爆撃の有効範囲")] private float _radius = 1f;
@@ -178,7 +178,7 @@ namespace InGame.Exhibit
         {
             Vector3 angleForward = Quaternion.AngleAxis(_downwardAngle, _muzzle.right) * _muzzle.forward;
 
-            var count = Physics.RaycastNonAlloc(_muzzle.position, angleForward, _aimHits, _rayDistance);
+            var count = Physics.RaycastNonAlloc(_muzzle.position, angleForward, _aimHits, _rayDistance, _bulletHitMask);
             var closestDistance = float.MaxValue;
             var closestHit = new RaycastHit();
             var hasHit = false;

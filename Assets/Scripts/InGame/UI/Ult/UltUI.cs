@@ -1,3 +1,4 @@
+using DG.Tweening;
 using InGame.Player.Ult;
 using September.Common;
 using September.InGame.Common;
@@ -9,9 +10,12 @@ namespace September.InGame.Ult
     public class UltUI : MonoBehaviour
     {
         [SerializeField] private Slider _gauge;
+        [SerializeField] private float _easeDuration = 0.2f;
 
         private void Start()
         {
+            _gauge.value = 0f;
+
             var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
             
             // プレイヤーがスポーンされた後に処理を行う
@@ -43,7 +47,7 @@ namespace September.InGame.Ult
 
         private void SetGaugeProgress(float ratio)
         {
-            _gauge.value = ratio;
+            _gauge.DOValue(ratio, _easeDuration);
         }
     }
 }

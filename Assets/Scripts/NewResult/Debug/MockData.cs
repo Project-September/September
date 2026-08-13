@@ -24,9 +24,6 @@ namespace September.NewResult
 
         public GameResultInfo Create(ExhibitScoreConfig config, IRankingPolicy rankingPolicy)
         {
-            var builder = new GameResultInfoBuilder(rankingPolicy);
-            builder.SetStageName("Field");
-
             var playerCount = _data.Length;
             var ogrePlayerIndex = playerCount - 1;
             var localPlayerIndex = Random.Range(0, playerCount);
@@ -49,25 +46,25 @@ namespace September.NewResult
             );
             var ordered = db.OrderByDescending(x => x.score).ToArray();
             var ranking = ordered.Where(x => !x.isOgre).Concat(ordered.Where(x => x.isOgre)).ToArray();
-            
+
+            var players = new PlayerResultEntry[ranking.Length];
             for (var i = 0; i < ranking.Length; i++)
             {
                 var data = ranking[i];
-                var player = new PlayerResultInfoBuilder();
-                player.SetPlayerName(_data[i]._playerName);
-                player.SetCharacterType(_data[i]._characterType);
-                player.SetTotalScore(data.score);
-                player.SetScoreConfig(config.Entries);
-                player.SetIsOgre(data.isOgre);
-                player.SetIsSelf(data.isSelf);
-                player.SetExhibitInteractCounts(data.exhibitInteractCounts);
-                player.SetDamage(Random.Range(0, 1000), Random.Range(0, 1000));
-                player.SetTotalInteractCount(data.exhibitInteractCounts.Values.Sum());
-                player.SetOgreCount(Random.Range(0, 10));
-                builder.AddPlayer(player.BuildInstance());
+                players[i] = new PlayerResultEntry(
+                    _data[i]._playerName,
+                    _data[i]._characterType,
+                    ResultExhibitScoreEntryUtility.CalcScoreEntries(config, data.exhibitInteractCounts),
+                    data.score,
+                    data.isOgre,
+                    data.isSelf,
+                    Random.Range(0, 1000), Random.Range(0, 1000),
+                    data.exhibitInteractCounts.Values.Sum(),
+                    Random.Range(0, 10)
+                    );
             }
 
-            var gameResultInfo = builder.BuildInstance();
+            var gameResultInfo = new GameResultInfo("Field", players);
             return gameResultInfo;
         }
     }

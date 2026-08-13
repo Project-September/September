@@ -164,7 +164,7 @@ namespace September.InGame.Exhibit
 			if (Runner.IsServer)
 			{
 				RPC_SetCameraPriority(CurrentUsePlayerRef, isActive ? 0 : 15);
-				_usingPlayer.RPC_SetControlState(isActive
+				_usingPlayer.SetControlState(isActive
 					? PlayerManager.PlayerControlState.Normal
 					: PlayerManager.PlayerControlState.ForcedControl);
 				_usingPlayer.RPC_SetUseGrav(isActive);
