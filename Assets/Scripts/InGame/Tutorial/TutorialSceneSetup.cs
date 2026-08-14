@@ -3,6 +3,7 @@ using DG.Tweening;
 using Fusion;
 using InGame.Player;
 using September.Common;
+using September.InGame.Common;
 using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -101,19 +102,24 @@ namespace September.InGame.Tutorial
         /// </summary>
         private async UniTaskVoid SpawnPlayer(NetworkRunner runner, PlayerRef player)
         {
-            // PlayerDatabase をスポーン
             var db = await runner.SpawnAsync(_playerDatabasePrefab);
             await UniTask.WaitUntil(() => PlayerDatabase.Instance != null);
             PlayerDatabase.Instance.AddPlayerData(player);
 
-            // PlayerDatabase の同期を待つ
             await UniTask.WaitUntil(() =>
                 PlayerDatabase.Instance.PlayerDataDic.ContainsKey(player));
 
             Debug.Log("[Tutorial] PlayerDatabase ready");
 
-            // プレイヤーをスポーン
             var playerNetworkObject = await runner.SpawnAsync(_playerPrefab, _spawnPoint.position, Quaternion.identity, player);
+
+            var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+            if (inGameManager != null && !inGameManager.PlayerDataDic.ContainsKey(player))
+            {
+                inGameManager.AddPlayerObject(player, playerNetworkObject);
+            }
+
+            runner.SetPlayerObject(player, playerNetworkObject);
 
             Debug.Log("[Tutorial] Player spawned");
             FadeOut(playerNetworkObject).Forget();
