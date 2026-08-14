@@ -14,6 +14,7 @@ namespace InGame.Player
     public class PlayerManager : NetworkBehaviour, IAfterTick
     {
         [SerializeField] private PlayerInputManager _playerInputManager;
+        [SerializeField] private PlayerRespawn _playerRespawn;
         [SerializeField] GameObject _colliderObj;
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
@@ -37,6 +38,19 @@ namespace InGame.Player
 
         [Networked] public PlayerControlState CurrentPlayerControlState { get; private set; } = PlayerControlState.Normal;
 
+        public void Start()
+        {
+            _playerRespawn.OnOutFieldEvent += () =>
+            {
+                IsMovable = false;
+            };
+            _playerRespawn.OnRevivalFieldEvent += () =>
+            {
+                IsMovable = true;
+            };
+            _playerRespawn.OnRevivalFieldEvent += () => Respawn();
+        }
+
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
         {
             if (!HasStateAuthority)
@@ -51,7 +65,8 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-        
+        [Networked, HideInInspector] public NetworkBool IsMovable { get; private set; } = true;
+
         public override void Spawned()
         {
             InitComponents();
@@ -144,7 +159,7 @@ namespace InGame.Player
             // プレイヤーの入力の管理
             if (_playerInputManager != null && _playerInputManager.GetPlayerInput(out var input))
             {
-                if (!IsStun && CurrentPlayerControlState == PlayerControlState.Normal)
+                if (!IsStun && IsMovable && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する_playerInputManager
                     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
@@ -178,19 +193,18 @@ namespace InGame.Player
         /// <summary> 気絶が終わったとき </summary>
         void Restart()
         {
-            IsStun = false;
             _playerHealth.IsInvincible = false;
+            IsStun = false;
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
 
         void OnDeath(HitData lastHitData)
         {
+            _playerHealth.IsInvincible = true;
             IsStun = true;
-
             // ビルドの減衰分を乗算
             _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
-            _playerHealth.IsInvincible = true;
             _playerEffectController.PlayStunEffect();
         }
 
@@ -229,12 +243,12 @@ namespace InGame.Player
         {
             _rigidbody.useGravity = active;
         }
-        
+
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetPositionLock(NetworkBool isLocked)
         {
             _rigidbody.constraints = isLocked ?
-                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
+                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
         }
 
@@ -243,7 +257,7 @@ namespace InGame.Player
         {
             if (!HasStateAuthority) return;
 
-            _playerMovement.Teleport(_respawnPosition);
+            _playerMovement.TeleportImmediate(_respawnPosition);
 
             //タニヒラ用の処理を追記
             if (this.gameObject.TryGetComponent<FormationManager>(out FormationManager formationManager))

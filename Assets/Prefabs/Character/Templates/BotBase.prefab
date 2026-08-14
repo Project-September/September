@@ -34,16 +34,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-<<<<<<< Updated upstream
-      value: 25
-=======
-      value: 23
->>>>>>> Stashed changes
+      value: 26
       objectReference: {fileID: 0}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[17]'
       value: 
-<<<<<<< Updated upstream
       objectReference: {fileID: 106332801248519403}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[18]'
@@ -56,50 +51,27 @@ PrefabInstance:
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[20]'
       value: 
-      objectReference: {fileID: 4846790478350507398}
+      objectReference: {fileID: 7767279481967244635}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[21]'
       value: 
-      objectReference: {fileID: 3166189176791333026}
+      objectReference: {fileID: 4846790478350507398}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[22]'
       value: 
-      objectReference: {fileID: 2501677688809563215}
+      objectReference: {fileID: 3166189176791333026}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[23]'
       value: 
-      objectReference: {fileID: 9071210672574097550}
+      objectReference: {fileID: 2501677688809563215}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[24]'
       value: 
-      objectReference: {fileID: 5352679656891091827}
-=======
-      objectReference: {fileID: 1087122732203364353}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[18]'
-      value: 
-      objectReference: {fileID: 4846790478350507398}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[19]'
-      value: 
-      objectReference: {fileID: 3166189176791333026}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[20]'
-      value: 
-      objectReference: {fileID: 2501677688809563215}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[21]'
-      value: 
       objectReference: {fileID: 9071210672574097550}
     - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[22]'
+      propertyPath: 'NetworkedBehaviours.Array.data[25]'
       value: 
       objectReference: {fileID: 5352679656891091827}
-    - target: {fileID: 2463801933549895597, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: 'NetworkedBehaviours.Array.data[23]'
-      value: 
-      objectReference: {fileID: 6012757416397967337}
->>>>>>> Stashed changes
     - target: {fileID: 2800256691130121504, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: SortKey
       value: 164290560
@@ -190,7 +162,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3166189176791333026}
   m_SourcePrefab: {fileID: 100100000, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-<<<<<<< Updated upstream
 --- !u!114 &106332801248519403 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6992982918667310570, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -202,8 +173,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf640fa3ae3d804c810471a975e0d8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-=======
->>>>>>> Stashed changes
 --- !u!114 &1087122732203364353 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8026515877087289600, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -233,6 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerInputManager: {fileID: 3166189176791333026}
+  _playerRespawn: {fileID: 7767279481967244635}
   _colliderObj: {fileID: 1473268200689759529}
   _meshObj: {fileID: 1473268200689759529}
   _stunTime: 8
@@ -240,8 +210,11 @@ MonoBehaviour:
   _attackWeapon: {fileID: 0}
   _buildGenerator: {fileID: 3789720849090292403}
   _playerStatus: {fileID: 3006585129494599243}
+  _CurrentPlayerControlState: 0
   _IsStun:
     _value: 0
+  _IsMovable:
+    _value: 1
 --- !u!114 &3523054048734839531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,7 +309,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 587e83a63041ba6409720410fb73af1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< Updated upstream
 --- !u!114 &7114180334392212730 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 202504370253565435, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -346,17 +318,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5ef1d32218444f58429b4faddd7c1d1, type: 3}
-=======
---- !u!114 &6012757416397967337 stripped
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7767279481967244635 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3676150022515654376, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_CorrespondingSourceObject: {fileID: 846463964584838234, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
   m_PrefabInstance: {fileID: 6950696846245884161}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1473268200689759529}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0dbe2b9699eb99a4196b57d0c4b40c1a, type: 3}
->>>>>>> Stashed changes
+  m_Script: {fileID: 11500000, guid: 52d05ab585b5d0e4987193858b7b76ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &9071210672574097550 stripped

@@ -450,6 +450,12 @@ namespace InGame.Player
             _teleportTarget = position;
         }
 
+        public void TeleportImmediate(Vector3 position)
+        {
+            transform.position = position;
+            _moveVelocity = Vector3.zero;
+        }
+
         public float GetSpeedOnPlane()
         {
             Quaternion normalRot = Quaternion.FromToRotation(_groundNormal, Vector3.up);
