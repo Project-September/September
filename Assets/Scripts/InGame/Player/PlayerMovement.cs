@@ -142,7 +142,7 @@ namespace InGame.Player
             
             if (isEvasion && HasStateAuthority)
             {
-                _playerEvasion.OnEvasionStart(moveDirection, transform.forward, Runner.SimulationTime, null);
+                _playerEvasion.OnEvasionStart(MoveDirection, transform.forward, Runner.SimulationTime, null);
             }
             
             if (!DoingVault)

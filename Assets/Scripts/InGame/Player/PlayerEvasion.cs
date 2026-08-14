@@ -39,15 +39,25 @@ namespace InGame.Player
 
             //‰ñ”ð•ûŒü‚ðŒˆ‚ß‚é
             var targetDirection = new Vector2(targetForward.x, targetForward.z);
-            var dot = Vector2.Dot(inputDirection, targetDirection);
+            var dot = Vector2.SignedAngle(inputDirection, targetDirection);
             var clampedDot = Mathf.Clamp(dot, -_evasionData.InputAngle, _evasionData.InputAngle);
             _rollDirection = Quaternion.Euler(0, clampedDot, 0) * targetForward;
+
+            Debug.Log(
+    $"[Evasion Direction]\n" +
+    $"inputDirection : {inputDirection}\n" +
+    $"targetForward  : {targetForward}\n" +
+    $"targetDirection: {targetDirection}\n" +
+    $"dot            : {dot}\n" +
+    $"InputAngle     : {_evasionData.InputAngle}\n" +
+    $"clampedDot     : {clampedDot}\n" +
+    $"rollDirection  : {_rollDirection}\n" +
+    $"rollMagnitude  : {_rollDirection.magnitude}"
+);
 
             _startTime = runnerTime;
             _endTime = runnerTime + _evasionData.RollDuration;
             _previousDistance = 0f;
-
-            Debug.Log(_startTime + ":" + _endTime);
         }
 
         public Vector3 Move(Vector3 targetPosition, float runnerTime)
@@ -69,41 +79,9 @@ namespace InGame.Player
             float currentDistance = _evasionData.RollDistance * speedT;
             float deltaDistance = currentDistance - _previousDistance;
 
-            Debug.Log(
-    $"[Evasion]\n" +
-    $"runnerTime      : {runnerTime} | valid:{IsValid(runnerTime)}\n" +
-    $"startTime       : {_startTime} | valid:{IsValid(_startTime)}\n" +
-    $"endTime         : {_endTime} | valid:{IsValid(_endTime)}\n" +
-    $"t               : {t} | valid:{IsValid(t)}\n" +
-    $"speedT          : {speedT} | valid:{IsValid(speedT)}\n" +
-    $"rollDistance    : {_evasionData.RollDistance} | valid:{IsValid(_evasionData.RollDistance)}\n" +
-    $"currentDistance : {currentDistance} | valid:{IsValid(currentDistance)}\n" +
-    $"previousDistance: {_previousDistance} | valid:{IsValid(_previousDistance)}\n" +
-    $"deltaDistance   : {deltaDistance} | valid:{IsValid(deltaDistance)}\n" +
-    $"rollDirection   : {_rollDirection} | valid:{IsValid(_rollDirection)}\n" +
-    $"targetPosition  : {targetPosition} | valid:{IsValid(targetPosition)}"
-);
-
-
             _previousDistance = currentDistance;
 
             return targetPosition + _rollDirection * deltaDistance;
-        }
-
-        public void IsIgnoreAttack()
-        {
-
-        }
-        static bool IsValid(float value)
-        {
-            return !float.IsNaN(value) && !float.IsInfinity(value);
-        }
-
-        static bool IsValid(Vector3 value)
-        {
-            return IsValid(value.x) &&
-                   IsValid(value.y) &&
-                   IsValid(value.z);
         }
     }
 }
