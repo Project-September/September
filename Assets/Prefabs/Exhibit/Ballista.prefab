@@ -64,7 +64,7 @@ MonoBehaviour:
   _projectileVelocity: 40
   _hitLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 192
   _projectileHitEffect:
     rid: 8536392112056828011
   references:
@@ -183,7 +183,6 @@ MonoBehaviour:
   _yawLimit: {x: -90, y: 90}
   _baseUp: {x: 0, y: 1, z: 0}
   _barrelRight: {x: 0, y: 0, z: 1}
-  _baseYaw: -90
 --- !u!114 &5101475634166198175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,7 +198,7 @@ MonoBehaviour:
   _cameraController: {fileID: 1576128460117959270}
   _interactable: {fileID: 863474155446293771}
   _animator: {fileID: 3347792911139992729}
-  _networkMecanimAnimator: {fileID: 7121241315461993331}
+  _networkAnimator: {fileID: 7121241315461993331}
   _fireBulletController:
     rid: 3743209533285072983
   _reticuleEffect:
@@ -571,6 +570,54 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3813922952977508952}
     m_Modifications:
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
     - target: {fileID: 4638991148023797111, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_Layer
       value: 11
@@ -614,6 +661,22 @@ PrefabInstance:
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
       objectReference: {fileID: 0}
     - target: {fileID: 5790922885440071402, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_Layer

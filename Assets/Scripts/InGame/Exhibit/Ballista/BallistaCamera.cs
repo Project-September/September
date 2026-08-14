@@ -1,6 +1,6 @@
-using Cinemachine;
 using Common.UserSettings;
 using Fusion;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace September.InGame.Exhibit

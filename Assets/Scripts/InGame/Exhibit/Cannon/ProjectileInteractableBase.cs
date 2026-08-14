@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using Cinemachine;
 using Fusion;
 using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
 using September.Common;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace September.InGame.Exhibit
 {
-	// 他のNetworkBehaviourより遅く実行する
 	public class ProjectileInteractableBase : NetworkBehaviour
 	{
 		[SerializeField] protected CinemachineVirtualCamera _cameraController;
@@ -148,7 +147,6 @@ namespace September.InGame.Exhibit
 			Object.RemoveInputAuthority();
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 
-			// 使用中のプレイヤークライアントに対しての
 			if (!_usingPlayer) return;
 			PlayerActive(true);
 			RPC_AllClientInit(CurrentUsePlayerRef, false);
