@@ -10,8 +10,10 @@ namespace InGame.Player
         private Action _endAction;
         private Vector3 _rollDirection;
         private float _startTime;
-        private float _endTime;
+        private float _rollEndTime;
+        private float _turnEndTime;
         private float _previousDistance;
+        private Vector3 _previousDirection;
         private bool _isEvasion = false;
 
         public bool IsEvasion => _isEvasion;
@@ -43,21 +45,12 @@ namespace InGame.Player
             var clampedDot = Mathf.Clamp(dot, -_evasionData.InputAngle, _evasionData.InputAngle);
             _rollDirection = Quaternion.Euler(0, clampedDot, 0) * targetForward;
 
-            Debug.Log(
-    $"[Evasion Direction]\n" +
-    $"inputDirection : {inputDirection}\n" +
-    $"targetForward  : {targetForward}\n" +
-    $"targetDirection: {targetDirection}\n" +
-    $"dot            : {dot}\n" +
-    $"InputAngle     : {_evasionData.InputAngle}\n" +
-    $"clampedDot     : {clampedDot}\n" +
-    $"rollDirection  : {_rollDirection}\n" +
-    $"rollMagnitude  : {_rollDirection.magnitude}"
-);
-
             _startTime = runnerTime;
-            _endTime = runnerTime + _evasionData.RollDuration;
+            _rollEndTime = runnerTime + _evasionData.RollDuration;
+            var turnAngelT = Mathf.InverseLerp(0, _evasionData.InputAngle, Mathf.Abs(clampedDot));
+            _turnEndTime = runnerTime + _evasionData.MaxTurnDuration * turnAngelT;
             _previousDistance = 0f;
+            _previousDirection = targetDirection;
         }
 
         public Vector3 Move(Vector3 targetPosition, float runnerTime)
@@ -65,16 +58,12 @@ namespace InGame.Player
             if (!_isEvasion)
                 return targetPosition;
 
-            if (runnerTime >= _endTime)
-            {
-                _isEvasion = false;
-                _endAction?.Invoke();
+            if (EndCheck(runnerTime))
                 return targetPosition;
-            }
 
-            float t = Mathf.InverseLerp(_startTime, _endTime, runnerTime);
+            float t = Mathf.InverseLerp(_startTime, _rollEndTime, runnerTime);
 
-            float speedT = _evasionData.RollSpeed.Evaluate(t);
+            float speedT = _evasionData.RollSpeedCurve.Evaluate(t);
 
             float currentDistance = _evasionData.RollDistance * speedT;
             float deltaDistance = currentDistance - _previousDistance;
@@ -82,6 +71,52 @@ namespace InGame.Player
             _previousDistance = currentDistance;
 
             return targetPosition + _rollDirection * deltaDistance;
+
+
+        }
+
+        public Vector3 Turn(Vector3 forward, float runnerTime)
+        {
+            if (!_isEvasion)
+                return forward;
+
+            if (EndCheck(runnerTime))
+                return forward;
+
+            float t = Mathf.InverseLerp(
+                _startTime,
+                _turnEndTime,
+                runnerTime
+            );
+            Debug.Log(t);
+
+            float speedT = _evasionData.TurnSpeedCurve.Evaluate(t);
+
+            Vector3 currentDirection = Vector3.Slerp(_previousDirection, _rollDirection, speedT);
+
+            // Y‚ðŒÅ’è
+            currentDirection.y = 0f;
+
+            Vector3 deltaDirection = currentDirection - _previousDirection;
+
+            // ‘O‰ñ•ûŒü‚ÌY‚à0‚Æ‚µ‚Ä•ÛŽ
+            _previousDirection = currentDirection;
+
+            Vector3 result = forward + deltaDirection;
+            result.y = forward.y;
+
+            return result;
+        }
+
+        private bool EndCheck(float runnerTime)
+        {
+            bool isEnd = runnerTime >= _rollEndTime;
+            if (isEnd)
+            {
+                _isEvasion = false;
+                _endAction?.Invoke();
+            }
+            return isEnd;
         }
     }
 }

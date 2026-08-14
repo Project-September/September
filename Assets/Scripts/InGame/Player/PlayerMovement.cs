@@ -159,7 +159,8 @@ namespace InGame.Player
 
             if (_playerEvasion.IsEvasion)
             {
-                transform.position = _playerEvasion.Move(transform.position,Runner.SimulationTime);
+                transform.position = _playerEvasion.Move( transform.position,Runner.SimulationTime);
+                transform.forward = _playerEvasion.Turn(transform.forward, Runner.SimulationTime);
                 return;
             }
 
