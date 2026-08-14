@@ -22,6 +22,7 @@ namespace September.InGame.Kraken.Animations
         [SerializeField] private float _maxRotationSpeed = 180f; // Max rotation change (degrees/second) for stability
         [SerializeField] private int _pbdIterations = 5;
         [SerializeField] private int _pbdSubsteps = 5;
+        [SerializeField] private ChainAimConstraint _chainAimConstraint;
 
         private float[] _segmentLengths;
         private Collider[] _colliders;
@@ -180,6 +181,22 @@ namespace September.InGame.Kraken.Animations
                     }
                 }
             }
+
+            if (_chainAimConstraint)
+            {
+                Span<IKFollower.Point> solvedPoints = stackalloc IKFollower.Point[count];
+                for (int i = 0; i < count; i++)
+                {
+                    solvedPoints[i] = new IKFollower.Point(solvedPositions[i], solvedRotations[i]);
+                }
+                _chainAimConstraint.Solve(solvedPoints, ref solvedPoints);
+                for (int i = 0; i < count; i++)
+                {
+                    solvedPositions[i] = solvedPoints[i].Position;
+                    solvedRotations[i] = solvedPoints[i].Rotation;
+                }
+            }
+
             Profiler.EndSample();
 
             Profiler.BeginSample("Build Resolved Points");
