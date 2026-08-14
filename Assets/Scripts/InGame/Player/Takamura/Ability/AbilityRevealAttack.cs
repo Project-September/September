@@ -78,13 +78,6 @@ namespace InGame.Player.Ability
 
             _startHitTick = FrameToTick(_startHitCheckFrame);
             _playerMovement.IgnoreMoveInput = true;
-
-            // 擬態解除
-            if (_playerMovement is TakamuraMovement typed
-                && typed.CurrentMimicryState == MimicryState.MimicExhibit)
-            {
-                typed.CurrentMimicryState = MimicryState.Default;
-            }
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)

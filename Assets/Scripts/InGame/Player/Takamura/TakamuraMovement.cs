@@ -5,31 +5,13 @@ namespace InGame.Player
 {
     public class TakamuraMovement : PlayerMovement
     {
-        [Header("擬態状態"), SerializeField] MimicryState _currentMimicryState = MimicryState.Default;
-        [Header("アビリティ発動状態"), SerializeField] ScanAbilityPhase _phase = ScanAbilityPhase.Default;
         [SerializeField] MimickingParams _mimickingParams;
 
-        [Networked]
-        public MimicryState CurrentMimicryState
-        {
-            get => _currentMimicryState;
-            set
-            {
-                if (_currentMimicryState != value)
-                    _currentMimicryState = value;
-            }
-        }
+        [Networked, HideInInspector]
+        public MimicryState CurrentMimicryState{ get; set; }
 
-        [Networked]
-        public ScanAbilityPhase CurrentAbilityPhase
-        {
-            get => _phase;
-            set
-            {
-                if (_phase != value)
-                    _phase = value;
-            }
-        }
+        [Networked, HideInInspector]
+        public ScanAbilityPhase CurrentAbilityPhase {  get; set; }
 
         protected override float GetMoveMagnification()
         {
@@ -37,7 +19,7 @@ namespace InGame.Player
             var result = base.GetMoveMagnification();
 
             // 現在の"擬態状態"に応じた移動速度倍率を取得し乗算
-            result *= _mimickingParams.TryGetParams(_currentMimicryState, out var param)
+            result *= _mimickingParams.TryGetParams(CurrentMimicryState, out var param)
                 && param != null                // パラメータクラスを正常に取得できたか
                 ? param.SpeedMagnification      // パラメータクラスに定義されている移動速度倍率
                 : 1;                            // 倍率なし

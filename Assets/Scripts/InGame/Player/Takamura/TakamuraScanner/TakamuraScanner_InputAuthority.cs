@@ -1,10 +1,13 @@
 using Unity.Cinemachine;
 using InGame.Interact;
 using UnityEngine;
+using Result;
+using September.Common;
+using System;
 
 namespace InGame.Player
 {
-    // 入力についての処理をまとめたファイル
+    // 操作主の画面でだけ表示したい処理をまとめたファイル
     public partial class TakamuraScanner
     {
         [Header("カメラ制御")]
@@ -14,10 +17,13 @@ namespace InGame.Player
         [Header("カメラスキャンの有効領域についてのパラメータ")]
         [SerializeField, Tooltip("擬態対象の候補にできる最大距離")] float _scannableMaxDistance = 10f;
         [SerializeField, Tooltip("演出用キャンバス")] ScannerCanvas _scannerCanvas;
+        [Header("ガワ")]
+        [SerializeField] TakamuraVisual _visual;
         /// <summary>シーン上にある展示物の配列</summary>
-        InteractableBase[] _interactables;
-        /// <summary>現在擬態対象としているオブジェクト</summary>
-        InteractableBase _currentScanedInteractable;
+        TakamuraScanTarget[] _interactables;
+        readonly UniqueID _irregularId = new UniqueID(ExhibitType.None, 255);
+
+        public TakamuraVisual Visual => _visual;
 
         /// <summary>
         /// 入力権限がある場合の初期化メソッド
@@ -26,7 +32,6 @@ namespace InGame.Player
         {
             _cameraController = GetComponent<CameraController>();
             _camera = Camera.main;
-            _interactables = FindObjectsByType<InteractableBase>(FindObjectsSortMode.None);
             _scannerCanvas.gameObject.SetActive(true);
             _scannerCanvas.ChangeImageVisibility(false);
         }
@@ -45,7 +50,6 @@ namespace InGame.Player
         void FocusEffective()
         {
             _tkmrMovement.SetRotationDirection(_virtualCamera.transform.forward);
-
             UpdateNearestExhibit();
             FocusExhibit();
         }
@@ -55,9 +59,9 @@ namespace InGame.Player
         /// </summary>
         void FocusEndEffective()
         {
-            _currentScanedInteractable = null;
             _cameraController.ResetOffset(_cameraMoveDuration);
             _scannerCanvas.ChangeImageVisibility(false);
+            Index = -1;
         }
 
         /// <summary>
@@ -66,14 +70,15 @@ namespace InGame.Player
         void UpdateNearestExhibit()
         {
             var minDistance = float.MaxValue;
-            _currentScanedInteractable = null;
+            Index = -1;
             foreach (var interactable in _interactables)
             {
                 if (interactable == null) continue;
                 if (!interactable.gameObject.activeSelf) continue;
 
                 // 展示物の座標を取得
-                Vector3 pos = interactable.TryGetComponent<Collider>(out var col)
+                var col = interactable.GetComponentInChildren<Collider>();
+                Vector3 pos = col != null
                     ? col.bounds.center
                     : interactable.transform.position;
 
@@ -90,8 +95,8 @@ namespace InGame.Player
                         if (distance < minDistance)
                         {
                             // 判定距離内かつより近いオブジェクトであれば擬態対象にする
-                            _currentScanedInteractable = interactable;
                             minDistance = distance;
+                            Index = Array.IndexOf(_interactables, interactable);
                         }
                     }
                 }
@@ -103,17 +108,20 @@ namespace InGame.Player
         /// </summary>
         void FocusExhibit()
         {
-            var scanned = _currentScanedInteractable != null;
+            var scanned = Index != -1;
             _scannerCanvas.ChangeImageVisibility(scanned);
 
             // 展示物かどうかの最終確認ができたら描画処理
             if (scanned)
             {
                 // 展示物の座標をスクリーン座標に変換
+                var target = _interactables[Index];
+                if (target == null) return;
+                var col = target.GetComponentInChildren<Collider>();
                 var pos = _camera.WorldToScreenPoint(
-                    _currentScanedInteractable.TryGetComponent<Collider>(out var col)
+                    col != null
                     ? col.bounds.center
-                    : _currentScanedInteractable.transform.position);
+                    : target.transform.position);
 
                 // 擬態対象であることを示すImageを展示物の位置へ移動
                 _scannerCanvas.SetImageOverExhibit(pos);
@@ -125,7 +133,6 @@ namespace InGame.Player
         /// </summary>
         void Mimic()
         {
-            // ガワを変える
             FocusEndEffective();
         }
 

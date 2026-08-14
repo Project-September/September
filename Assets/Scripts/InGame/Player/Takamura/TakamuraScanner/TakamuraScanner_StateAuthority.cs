@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace InGame.Player
 {
     // 状態変更についての処理をまとめたファイル
@@ -34,8 +36,16 @@ namespace InGame.Player
         /// </summary>
         void MimicStateChange()
         {
-            _tkmrMovement.CurrentMimicryState = MimicryState.MimicExhibit;
             FocusEndStateChange();
+            _tkmrMovement.CurrentMimicryState = MimicryState.MimicExhibit;
+        }
+
+        /// <summary>
+        /// 擬態解除するときに呼ばれるメソッド
+        /// </summary>
+        void RevealStateChange()
+        {
+            _tkmrMovement.CurrentMimicryState = MimicryState.Default;
         }
     }
 }

@@ -1,6 +1,7 @@
-using UnityEngine;
 using Fusion;
+using InGame.Interact;
 using September.Common;
+using UnityEngine;
 
 namespace InGame.Player
 {
@@ -13,12 +14,14 @@ namespace InGame.Player
         CameraController _cameraController;
         Camera _camera;
         NetworkButtons _preInput;
+        [Networked] int Index { get; set; } = -1;
 
         public override void Spawned()
         {
             _playerManager = GetComponent<PlayerManager>();
             _tkmrMovement = GetComponent<TakamuraMovement>();
             _scannerCanvas.gameObject.SetActive(false);
+            _interactables = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
             if (HasInputAuthority) InitInputAuthority();
             if (HasStateAuthority) InitStateAuthority();
         }
@@ -46,54 +49,78 @@ namespace InGame.Player
         /// <param name="input">このオブジェクトに対する入力権限を持つプレイヤーからの入力</param>
         void Ability2Flow(PlayerInput input)
         {
-            if (_tkmrMovement.CurrentMimicryState != MimicryState.Default) return;
-
-            // フォーカスをあてる
-            if (input.Buttons.WasPressed(_preInput, PlayerButtons.Ability2))
+            if (_tkmrMovement.CurrentMimicryState == MimicryState.Default)
             {
-                if (HasInputAuthority)
+                // フォーカスをあてる
+                if (input.Buttons.WasPressed(_preInput, PlayerButtons.Ability2))
                 {
-                    FocusStartEffective();
+                    if (HasInputAuthority)
+                    {
+                        FocusStartEffective();
+                    }
+                    if (HasStateAuthority)
+                    {
+                        FocusStartStateChange();
+                    }
                 }
-                if (HasStateAuthority)
+
+                // フォーカス中
+                if (input.Buttons.IsSet(PlayerButtons.Ability2))
                 {
-                    FocusStartStateChange();
+                    if (HasInputAuthority)
+                    {
+                        FocusEffective();
+                    }
+
+                    // 擬態する
+                    if (input.Buttons.WasPressed(_preInput, PlayerButtons.Attack))
+                    {
+                        if (Index == -1) return;
+
+                        // コライダーの不都合を考えて少し上に移動
+                        transform.position += Vector3.up;
+                        // ガワを変える
+                        var scanned = _interactables[Index];
+                        _visual.Mimic(scanned);
+
+                        if (HasInputAuthority)
+                        {
+                            Mimic();
+                        }
+                        if (HasStateAuthority)
+                        {
+                            MimicStateChange();
+                        }
+                    }
+                }
+
+                // フォーカス解除
+                if (input.Buttons.WasReleased(_preInput, PlayerButtons.Ability2))
+                {
+                    if (HasInputAuthority)
+                    {
+                        FocusEndEffective();
+                    }
+                    if (HasStateAuthority)
+                    {
+                        FocusEndStateChange();
+                    }
                 }
             }
-
-            // フォーカス中
-            if (input.Buttons.IsSet(PlayerButtons.Ability2))
+            else if (_tkmrMovement.CurrentMimicryState == MimicryState.MimicExhibit)
             {
-                if (HasInputAuthority)
+                // 擬態する
+                if (input.Buttons.WasPressed(_preInput, PlayerButtons.Attack))
                 {
-                    FocusEffective();
-                }
-            }
+                    // コライダーの不都合を考えて少し上に移動
+                    transform.position += Vector3.up;
+                    // ガワを変える
+                    _visual.Reveal();
 
-            // フォーカス解除
-            if (input.Buttons.WasReleased(_preInput, PlayerButtons.Ability2))
-            {
-                if (HasInputAuthority)
-                {
-                    FocusEndEffective();
-                }
-                if (HasStateAuthority)
-                {
-                    FocusEndStateChange();
-                }
-            }
-
-            // 擬態する
-            if (_currentScanedInteractable != null
-                && input.Buttons.WasPressed(_preInput, PlayerButtons.Attack))
-            {
-                if (HasInputAuthority)
-                {
-                    Mimic();
-                }
-                if (HasStateAuthority)
-                {
-                    MimicStateChange();
+                    if (HasStateAuthority)
+                    {
+                        RevealStateChange();
+                    }
                 }
             }
         }
