@@ -188,8 +188,8 @@ MonoBehaviour:
         _cooldown: 0
         _phase: 0
         IsEnabled: 1
-        _attackDamage: 10
-        _ogreAttackDamage: 15
+        _attackDamage: 50
+        _ogreAttackDamage: 60
         _startHitCheckFrame: 17
         _endHitCheckFrame: 21
         _endAttackFrame: 40
@@ -199,8 +199,8 @@ MonoBehaviour:
         _enableAutoAim: 1
         _moveForwardSpeed: 2
         _searchRadius: 2
-        _boxHalfExtents: {x: 0.45, y: 0.85, z: 0.45}
-        _boxLocalOffset: {x: 0, y: 0.9, z: 0.6}
+        _boxHalfExtents: {x: 1.2, y: 0.85, z: 0.6}
+        _boxLocalOffset: {x: 0, y: 0.9, z: 0.3}
         _boxCastDistance: 1
         _hitLayer:
           serializedVersion: 2
