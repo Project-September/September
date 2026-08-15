@@ -19,7 +19,8 @@ namespace InGame.Player.Ability.Condition
 
             // 展示物に擬態しているかどうかを判定
             var isMimicking = _playerMovement is TakamuraMovement typed
-                && typed.CurrentMimicryState == MimicryState.MimicExhibit;
+                && typed.CurrentMimicryState == MimicryState.MimicExhibit
+                && typed.CurrentAbilityPhase == ScanAbilityPhase.Default;
 
             //Available状態でAttackボタンが押されたら条件を満たす
             return _playerMovement.IsGround && !_playerManager.IsStun && !IsGameEnded() &&

@@ -456,8 +456,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _character: {fileID: 6419492589774123438}
-  _characterCollider: {fileID: 3128034714514688337}
-  _targetList: {fileID: 11400000, guid: 9a1415da9aaa9ba4a8ab63f436b40699, type: 2}
 --- !u!1 &1314334536714435523
 GameObject:
   m_ObjectHideFlags: 0
@@ -5634,7 +5632,7 @@ GameObject:
   - component: {fileID: 8299193541871035024}
   - component: {fileID: 4943096902174970823}
   - component: {fileID: -2683674171361356128}
-  - component: {fileID: 4118106638073247509}
+  - component: {fileID: 159015748857009280}
   m_Layer: 6
   m_Name: Takamura
   m_TagString: Player
@@ -5728,7 +5726,7 @@ MonoBehaviour:
   - {fileID: -7886593714486123081}
   - {fileID: 4943096902174970823}
   - {fileID: -2683674171361356128}
-  - {fileID: 4118106638073247509}
+  - {fileID: 159015748857009280}
   - {fileID: 4810525472409146702}
   - {fileID: 504783062325590936}
   - {fileID: 6329918266438203417}
@@ -6332,7 +6330,7 @@ MonoBehaviour:
   _textOffsetY: 1.5
   _randomOffsetRadius: 60
   _textDestroyTime: 1.3
---- !u!114 &4118106638073247509
+--- !u!114 &159015748857009280
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6341,11 +6339,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8360875997416129576}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 901d34be8d8e36846b2c19325054ec61, type: 3}
+  m_Script: {fileID: 11500000, guid: ccb4dc5b90f5e7d428d90cec59147410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _virtualCamera: {fileID: 1140998407376993141}
-  _focusPosition: {x: 0, y: 0.5, z: -1}
+  _focusPosition: {x: 0.5, y: 1, z: -2}
   _cameraMoveDuration: 0.2
   _scannableMaxDistance: 10
   _scannerCanvas: {fileID: 6784881876964557959}
