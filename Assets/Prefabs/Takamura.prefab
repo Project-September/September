@@ -5875,8 +5875,11 @@ MonoBehaviour:
       _speedMagnification: 0.5
     - _mimicryState: 2
       _speedMagnification: 0.8
+  _attackParams: {fileID: 11400000, guid: 1aba3bd8f10d0324bb3b9693a8786de2, type: 2}
+  _previewExhibitType: 0
   _CurrentMimicryState: 0
   _CurrentAbilityPhase: 0
+  _CurrentExhibitType: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6084,8 +6087,6 @@ MonoBehaviour:
         _hitEffect: 18
         _revealAttackAnimationClip: {fileID: 0}
         _animationClipPlayer: {fileID: 0}
-        _currentExhibitType: 2
-        _attackParams: {fileID: 11400000, guid: 1aba3bd8f10d0324bb3b9693a8786de2, type: 2}
         _hitLayer:
           serializedVersion: 2
           m_Bits: 64
@@ -6342,7 +6343,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccb4dc5b90f5e7d428d90cec59147410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _virtualCamera: {fileID: 1140998407376993141}
   _focusPosition: {x: 0.5, y: 1, z: -2}
   _cameraMoveDuration: 0.2
   _scannableMaxDistance: 10
