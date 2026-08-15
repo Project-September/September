@@ -11,6 +11,19 @@ namespace InGame.Player.Ability
         [SerializeField] ExhibitRadius[] _radiusArray;
         Dictionary<ExhibitType, float> _radiusDict;
 
+        private void OnEnable()
+        {
+            _radiusDict = null;
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            // Inspectorで配列が変更されたら検索用Dictionaryを作り直す
+            _radiusDict = null;
+        }
+#endif
+
         /// <summary>
         /// 展示物に応じた攻撃範囲を取得するメソッド
         /// </summary>
@@ -21,8 +34,11 @@ namespace InGame.Player.Ability
             if (_radiusDict == null)
             {
                 _radiusDict = new();
+                if (_radiusArray == null) return _defaultRadius;
+
                 foreach (var data in _radiusArray)
                 {
+                    if (data == null) continue;
                     _radiusDict[data.ExhibitType] = data.Radius;
                 }
             }

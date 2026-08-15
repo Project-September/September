@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Fusion;
 using InGame.Interact;
 using September.Common;
@@ -29,10 +30,10 @@ namespace InGame.Player
 
         /// <summary>シーン上にある展示物の配列</summary>
         TakamuraScanTarget[] _interactables;
+        /// <summary>NetworkIDごとの展示物</summary>
+        readonly Dictionary<NetworkId, TakamuraScanTarget> _targetByNetworkId = new();
         /// <summary>入力権限側で選択中の展示物のIndex</summary>
         int _focusIndex = -1;
-        /// <summary>擬態要求後にフォーカスが再表示されることを防ぐためのフラグ</summary>
-        bool _isMimicRequested;
 
         /// <summary>次のTickで行う擬態状態の変更</summary>
         StateChangeType _pendingStateChange = StateChangeType.None;
@@ -52,6 +53,7 @@ namespace InGame.Player
             _playerManager = GetComponent<PlayerManager>();
             _tkmrMovement = GetComponent<TakamuraMovement>();
             _interactables = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
+            CreateTargetDictionary();
             if (_scannerCanvas != null) _scannerCanvas.gameObject.SetActive(false);
             if (HasInputAuthority) InitInputAuthority();
             if (HasStateAuthority) InitStateAuthority();
@@ -59,16 +61,37 @@ namespace InGame.Player
             ChangeVisual();
         }
 
+        /// <summary>
+        /// NetworkIDから展示物を取得するためのDictionaryを作るメソッド
+        /// </summary>
+        void CreateTargetDictionary()
+        {
+            _targetByNetworkId.Clear();
+
+            foreach (var target in _interactables)
+            {
+                if (target == null) continue;
+
+                var networkObject = target.GetComponentInParent<NetworkObject>();
+                if (networkObject == null)
+                {
+                    Debug.LogError($"{target.name}にNetworkObjectがありません");
+                    continue;
+                }
+
+                if (_targetByNetworkId.ContainsKey(networkObject.Id))
+                {
+                    Debug.LogError($"{networkObject.name}のNetworkIDが重複しています");
+                    continue;
+                }
+
+                _targetByNetworkId.Add(networkObject.Id, target);
+            }
+        }
+
         public override void FixedUpdateNetwork()
         {
             if (HasStateAuthority) ApplyPendingStateChange();
-
-            // 状態同期が完了したら擬態要求中の状態を解除する
-            if (HasInputAuthority
-                && _tkmrMovement.CurrentMimicryState == MimicryState.MimicExhibit)
-            {
-                _isMimicRequested = false;
-            }
 
             // inputにはこのオブジェクトに対する入力権限があるプレイヤーからの入力が入る
             if (!GetInput<PlayerInput>(out var input)) return;
@@ -104,12 +127,11 @@ namespace InGame.Player
                 // フォーカス中
                 if (input.Buttons.IsSet(PlayerButtons.Ability2))
                 {
-                    if (HasInputAuthority && !_isMimicRequested) FocusEffective(input);
+                    if (HasInputAuthority && _scannerCanvas.gameObject.activeSelf) FocusEffective(input);
 
                     // 擬態する
                     if (input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
-                        && HasInputAuthority
-                        && !_isMimicRequested)
+                        && HasInputAuthority)
                     {
                         if (_focusIndex == -1) return;
 
@@ -118,7 +140,6 @@ namespace InGame.Player
                         var networkObject = target.GetComponentInParent<NetworkObject>();
                         if (networkObject == null) return;
 
-                        _isMimicRequested = true;
                         RPC_Mimic(networkObject.Id);
                         Mimic();
                     }
@@ -130,7 +151,6 @@ namespace InGame.Player
                     if (HasInputAuthority)
                     {
                         FocusEndEffective();
-                        _isMimicRequested = false;
                     }
                     if (HasStateAuthority) FocusEndStateChange();
                 }
@@ -163,6 +183,8 @@ namespace InGame.Player
         /// </summary>
         void FocusStartEffective()
         {
+            _scannerCanvas.gameObject.SetActive(true);
+            _scannerCanvas.ChangeImageVisibility(false);
             _cameraController.ChangeOffset(_focusPosition, _cameraMoveDuration);
         }
 
@@ -186,6 +208,7 @@ namespace InGame.Player
         {
             _cameraController.ResetOffset(_cameraMoveDuration);
             _scannerCanvas.ChangeImageVisibility(false);
+            _scannerCanvas.gameObject.SetActive(false);
             _focusIndex = -1;
         }
 
@@ -315,15 +338,19 @@ namespace InGame.Player
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
         void RPC_Mimic(NetworkId targetId)
         {
-            if (!Runner.TryFindObject(targetId, out var networkObject)) return;
-            if (networkObject.GetComponentInChildren<TakamuraScanTarget>(true) == null) return;
+            if (!_targetByNetworkId.TryGetValue(targetId, out var target)) return;
+            var interactable = target.GetComponentInParent<InteractableBase>();
+            if (interactable == null) return;
             if (_tkmrMovement.CurrentMimicryState != MimicryState.Default) return;
 
             // コライダーの不都合を考えて少し上に移動
             transform.position += Vector3.up;
 
-            // このTickのAttack入力を攻撃条件が判定してから擬態状態を変更する
+            // 擬態対象の情報を状態変更権限側で確定する
             MimicTargetId = targetId;
+            _tkmrMovement.CurrentExhibitType = interactable.ExhibitType;
+
+            // このTickのAttack入力を攻撃条件が判定してから擬態状態を変更する
             ReserveStateChange(StateChangeType.Mimic);
         }
 
@@ -396,9 +423,7 @@ namespace InGame.Player
                 return;
             }
 
-            if (!Runner.TryFindObject(MimicTargetId, out var networkObject)) return;
-            var target = networkObject.GetComponentInChildren<TakamuraScanTarget>(true);
-            if (target == null) return;
+            if (!_targetByNetworkId.TryGetValue(MimicTargetId, out var target)) return;
 
             // ガワを変える
             _visual.Mimic(target);

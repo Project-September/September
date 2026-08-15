@@ -31,8 +31,6 @@ namespace InGame.Player.Ability
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
 
         [Header("Hit Sphere 設定")]
-        [SerializeField] ExhibitType _currentExhibitType;
-        [SerializeField] RevealAttackParams _attackParams;
         [SerializeField] private LayerMask _hitLayer = ~0;
         [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Ignore;
         private readonly RaycastHit[] _hitBuffer = new RaycastHit[16];
@@ -84,9 +82,11 @@ namespace InGame.Player.Ability
         {
             if (HitboxDebugUtility.IsDebugModeEnabled)
             {
+                if (_playerMovement is not TakamuraMovement typed) return;
+
                 HitboxDebugUtility.DrawWireSphere(
                     Parameter.Owner.transform.position,
-                    _attackParams.GetRadius(_currentExhibitType),
+                    typed.GetRevealAttackRadius(),
                     _debugHitBoxColor   // 好きな色に
                 );
             }
@@ -159,12 +159,14 @@ namespace InGame.Player.Ability
 
         protected void CastAndApplyHits()
         {
+            if (_playerMovement is not TakamuraMovement typed) return;
+
             var t = Parameter.Owner.transform;
 
             // SphereCast の原点と向き
             var origin = t.position;
             var dir = t.forward;
-            var radius = _attackParams.GetRadius(_currentExhibitType);
+            var radius = typed.GetRevealAttackRadius();
 
             // 掃引（NonAlloc で GC しない）
             int hitCount = Physics.SphereCastNonAlloc(
