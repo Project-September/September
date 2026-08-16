@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
 using September.InGame.Kraken.Attack;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace September.InGame.Kraken.Animations
 {
@@ -23,12 +25,17 @@ namespace September.InGame.Kraken.Animations
             _krakenSettings = krakenSettings;
 
             armSettings.ArmHitChecker.OnHit += col => OnHitAction(armSettings.AlreadyHits, col);
+
+            armSettings.TentacleConstraintSolver.OnCollided += OnPhysicalCollision;
+
             armSettings.EnablePhysics = false;
         }
 
         public void StartAttack(NetworkRunner runner)
         {
+            _armSettings.TentacleConstraintSolver.ResetState();
             _armSettings.IsAttacking = true;
+            _armSettings.CollidedPoints.Clear();
 
             // ローカルテスト用。実際のゲーム中では処理されない想定
             if (runner == null)
@@ -157,6 +164,28 @@ namespace September.InGame.Kraken.Animations
             _armSettings.IsAttacking = false;
             _armSettings.EnablePhysics = false;
         }
+
+        private void OnPhysicalCollision(Vector3 hitPos)
+        {
+            if (_krakenSettings.SlamEffect == null) return;
+
+            bool tooNear = _armSettings.CollidedPoints
+                .Select(p => (hitPos - p).sqrMagnitude < _krakenSettings.EffectDistance.Sqr())
+                .Any(b => b);
+
+            Debug.Log(tooNear);
+
+            if (tooNear) return;
+
+            _armSettings.CollidedPoints.Add(hitPos);
+            var obj = Object.Instantiate(_krakenSettings.SlamEffect, hitPos, Quaternion.identity);
+            Object.Destroy(obj, obj.GetComponent<ParticleSystem>().main.duration);
+        }
+    }
+
+    public static class NumberExtensions
+    {
+        public static float Sqr(this float num) => num * num;
     }
 
     /// <summary>
@@ -173,12 +202,14 @@ namespace September.InGame.Kraken.Animations
         public Animator Animator => _animator;
         public Transform ArmRoot => _armRoot;
         public HitChecker ArmHitChecker => _armHitChecker;
+        public TentacleConstraintSolver TentacleConstraintSolver => _tentacleConstraintSolver;
         public HashSet<Collider> AlreadyHits { get; } = new();
 
         [NonSerialized] public Quaternion StartRotation;
         [NonSerialized] public HitCapsule AreaHitCapsule;
         [NonSerialized] public int StartAttackTick;
         [NonSerialized] public bool IsAttacking;
+        [NonSerialized] public List<Vector3> CollidedPoints = new();
 
         public bool EnablePhysics
         {
@@ -207,6 +238,10 @@ namespace September.InGame.Kraken.Animations
         [Header("アニメーション設定")]
         public string AnimationName;
         public string EndStateName;
+
+        [Header("エフェクト設定")]
+        public GameObject SlamEffect;
+        public float EffectDistance = 5f;
 
         [NonSerialized] public PlayerRef OwnerPlayerRef;
     }

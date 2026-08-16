@@ -23,12 +23,18 @@ namespace September.InGame.Kraken.Animations
         [SerializeField] private int _pbdIterations = 5;
         [SerializeField] private int _pbdSubsteps = 5;
 
+        public event Action<Vector3> OnCollided;
+
         private float[] _segmentLengths;
         private Collider[] _colliders;
 
         private IKFollower.Point[] _prevSolvedPoints;
 
         [NonSerialized] public bool EnablePhysicsConstraint;
+
+        private bool[] _isCollidingThisFrame;
+        private bool[] _wasCollided;
+        private Vector3[] _hitPoints;
 
         /// <summary>
         /// Solves constraints for the given input points.
@@ -42,7 +48,8 @@ namespace September.InGame.Kraken.Animations
 
             // 1. Initialize segment lengths and cache buffers on first run or when bone count changes
             InitializeBuffers(inputPoints);
-            
+            InitializeCollisionBuffers(count);
+
             Profiler.EndSample();
 
             // 2. Prepare predicted positions
@@ -71,7 +78,12 @@ namespace September.InGame.Kraken.Animations
 
                         if (EnablePhysicsConstraint && i != 0)
                         {
-                            solvedPositions[i] = ResolveCollisions(p, _radius, _layerMask);
+                            solvedPositions[i] = ResolveCollisions(p, _radius, _layerMask, out bool collided, out Vector3 hitPoint);
+                            if (collided)
+                            {
+                                _isCollidingThisFrame[i] = true;
+                                _hitPoints[i] = hitPoint;
+                            }
                         }
                         else
                         {
@@ -191,6 +203,24 @@ namespace September.InGame.Kraken.Animations
                 if (_prevSolvedPoints != null) _prevSolvedPoints[i] = inputPoints[i];
             }
             Profiler.EndSample();
+
+            Profiler.BeginSample("Check Collisions Trigger");
+            // 7. Check for new collisions and trigger events
+            for (int i = 0; i < count; i++)
+            {
+                if (_isCollidingThisFrame[i] && !_wasCollided[i])
+                {
+                    OnCollided?.Invoke(_hitPoints[i]);
+                    Debug.Log("OnCollide");
+                }
+                _wasCollided[i] = _isCollidingThisFrame[i];
+            }
+            Profiler.EndSample();
+        }
+
+        public void ResetState()
+        {
+            Array.Clear(_wasCollided, 0, _wasCollided.Length);
         }
 
         private void InitializeBuffers(Span<IKFollower.Point> inputPoints)
@@ -214,13 +244,36 @@ namespace September.InGame.Kraken.Animations
             _colliders ??= new Collider[10];
         }
 
+        private void InitializeCollisionBuffers(int count)
+        {
+            if (_isCollidingThisFrame == null || _isCollidingThisFrame.Length != count)
+            {
+                _isCollidingThisFrame = new bool[count];
+            }
+
+            if (_wasCollided == null || _wasCollided.Length != count)
+            {
+                _wasCollided = new bool[count];
+            }
+
+            if (_hitPoints == null || _hitPoints.Length != count)
+            {
+                _hitPoints = new Vector3[count];
+            }
+
+            Array.Clear(_isCollidingThisFrame, 0, _isCollidingThisFrame.Length);
+        }
+
         /// <summary>
         /// Precision sphere-to-box collision solver.
         /// Transforms sphere coordinates to local BoxCollider space to handle deep penetrations
         /// and compute accurate contact surface normals and points.
         /// </summary>
-        private Vector3 ResolveCollisions(Vector3 position, float radius, LayerMask layerMask)
+        private Vector3 ResolveCollisions(Vector3 position, float radius, LayerMask layerMask, out bool collided, out Vector3 hitPoint)
         {
+            collided = false;
+            hitPoint = Vector3.zero;
+
             if (_colliders == null || _colliders.Length == 0)
                 return position;
 
@@ -230,9 +283,13 @@ namespace September.InGame.Kraken.Animations
             {
                 Collider col = _colliders[i];
                 if (col is MeshCollider) continue;
+
+                collided = true;
                 if (col is BoxCollider box)
                 {
                     position = ResolveSphereBoxCollision(position, radius, box);
+
+                    hitPoint = box.ClosestPoint(position);
                 }
                 else
                 {
@@ -243,6 +300,7 @@ namespace September.InGame.Kraken.Animations
                     {
                         Vector3 correct = (position - closest) * (radius / dist);
                         position = closest + correct;
+                        hitPoint = closest;
                     }
                 }
             }
