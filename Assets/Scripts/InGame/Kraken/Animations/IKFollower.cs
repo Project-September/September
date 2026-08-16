@@ -63,6 +63,8 @@ namespace September.InGame.Kraken
         [SerializeField] private TentacleConstraintSolver _constraintSolver;
         [SerializeField] private int _subPointCount = 3;
 
+        [SerializeField] private ConstraintManager _constraints;
+
         [SerializeField, HideInInspector] private float[] _maxDistances;
         [SerializeField, HideInInspector] private Quaternion[] _defaultRotations;
 
@@ -144,6 +146,8 @@ namespace September.InGame.Kraken
             Profiler.BeginSample("UpdatePoints");
             UpdatePosition(solvedResamplingPoints);
             Profiler.EndSample();
+
+            if (_constraints) _constraints.Solve();
         }
 
         private void UpdatePosition(Span<Point> points)

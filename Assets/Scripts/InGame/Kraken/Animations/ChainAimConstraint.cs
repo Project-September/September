@@ -4,7 +4,7 @@ using UnityEngine.Animations.Rigging;
 
 namespace September.InGame.Kraken.Animations
 {
-    public class ChainAimConstraint : MonoBehaviour
+    public class ChainAimConstraint : ConstraintBase
     {
         public Transform Root;
         public Transform Tip;
@@ -15,6 +15,8 @@ namespace September.InGame.Kraken.Animations
 
         private Transform[] _chain;
 
+        private IKFollower.Point[] _originalPoints;
+
         private void Start()
         {
             Initialize();
@@ -24,32 +26,42 @@ namespace September.InGame.Kraken.Animations
         {
             if (UpdateMode != UpdateMode.Update) return;
 
+            ManualUpdate();
+        }
+
+        public void Initialize()
+        {
+            _chain = ConstraintsUtils.ExtractChain(Root, Tip);
+            _originalPoints = new IKFollower.Point[_chain.Length];
+        }
+
+        public override void PreSolve()
+        {
             int count = _chain.Length;
 
-            Span<IKFollower.Point> points = stackalloc IKFollower.Point[count];
             for (int i = 0; i < count; i++)
             {
-                points[i] = new IKFollower.Point(_chain[i].position, _chain[i].rotation);
+                _originalPoints[i] = new IKFollower.Point(_chain[i].position, _chain[i].rotation);
             }
+        }
+
+        public override void PostSolve()
+        {
+
+        }
+
+        public override void ManualUpdate()
+        {
+            int count = _chain.Length;
 
             Span<IKFollower.Point> results = stackalloc IKFollower.Point[count];
-            Solve(points, ref results);
+            Solve(_originalPoints, ref results);
 
             for (int i = 0; i < count; i++)
             {
                 _chain[i].position = results[i].Position;
                 _chain[i].rotation = results[i].Rotation;
             }
-        }
-
-        public void Initialize()
-        {
-            _chain = ConstraintsUtils.ExtractChain(Root, Tip);
-        }
-
-        public void ManualUpdate()
-        {
-            Update();
         }
 
         public void Solve(ReadOnlySpan<IKFollower.Point> points, ref Span<IKFollower.Point> resolvedPoints)
