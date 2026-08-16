@@ -3,101 +3,74 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using DG.Tweening;
 using UnityEngine.UI;
-using UnityEngine.Pool;
 using System.Collections.Generic;
 
 /// <summary> 具体的な霧の処理するクラス </summary>
-public class ConcreteFogController : MonoBehaviour, IFogController
+public class ConcreteFogController : IFogController
 {
     [Header("Prefab参照")]
-    [SerializeField] private Material _stormSkyboxMaterial;
     [SerializeField] private GameObject[] _fogPrefab;
-    [SerializeField] private GameObject _thunderPrefab;
+    [SerializeField] private ThunderFactory _thunderFactory;
 
     [Header("霧の設定")]
-    [Tooltip("霧のアニメーション開始までの遅延時間")]
-    [SerializeField] private float _fogAnimInterval = 2.0f;
-    [Tooltip("霧のフェードアウト時間")]
-    [SerializeField] private float _fogFadeOutTime = 1.0f;
-    [Tooltip("霧のY座標移動")]
-    [SerializeField] private float _fogMoveY = -3.0f;
-    [Tooltip("霧が消滅してから次の霧が表示されるまでの遅延時間")]
-    [SerializeField] private float _nextFogInterval = 1.0f;
+    [Tooltip("霧のアニメーション開始までの遅延時間"), SerializeField] private float _fogAnimInterval = 3.0f;
+    [Tooltip("霧のフェードイン時間"), SerializeField] private float _fogFadeInTime = 0.4f;
+    [Tooltip("霧のフェードアウト時間"), SerializeField] private float _fogFadeOutTime = 0.4f;
+    [Tooltip("霧のY座標FadeIn位置"), SerializeField] private float _fogFadeInY = 1.0f;
+    [Tooltip("霧のY座標FadeOut位置"), SerializeField] private float _fogFadeOutY = -2.5f;
+    [Tooltip("次の霧が表示されるまでの遅延時間"), SerializeField] private float _nextFogInterval = 0.08f;
 
-    [Header("雷の設定")]
-    [SerializeField] private float _thunderLifeTime = 5.0f;
-    [Tooltip("落下範囲")]
-    [SerializeField] private float _minValueX;
-    [SerializeField] private float _maxValueX;
-    [SerializeField] private float _minValueY;
-    [SerializeField] private float _maxValueY;
-    [SerializeField] private float _minValueZ;
-    [SerializeField] private float _maxValueZ;
+    CancellationTokenSource _cts = new CancellationTokenSource();
 
-    CancellationTokenSource _cts;
+    private List<GameObject> _fogInstances = new List<GameObject>();
 
-    private void Start()
-    {
-        _cts = new CancellationTokenSource();
-    }
-
-
-    /// <summary> Skyboxを変更する </summary>
-    public void SkyBoxChange()
-    {
-        RenderSettings.skybox = _stormSkyboxMaterial;
-    }
-
-    /// <summary> 雷エフェクトを生成する </summary>
-    private void SpawnThunder()
-    {
-        GameObject thunderInstance = Instantiate(_thunderPrefab);
-
-        thunderInstance.transform.position = new Vector3
-            (Random.Range(_minValueX, _maxValueX),Random.Range(_minValueY, _maxValueY),Random.Range(_minValueZ, _maxValueZ));
-
-        Destroy(thunderInstance, _thunderLifeTime);
-    }
-
-    /// <summary> 霧のアニメーションを実行する </summary>
-    private void FogAnim()
+    /// <summary> 霧のFadeInアニメーション </summary>
+    private async UniTaskVoid FogFadeIn()
     {
         for (int i = 0; i < _fogPrefab.Length; i++)
         {
-            GameObject fogInstance = Instantiate(_fogPrefab[i]);
-            fogInstance.GetComponent<Image>().DOFade(0, _fogFadeOutTime).SetDelay(_fogAnimInterval);
-            fogInstance.transform.DOMoveY(_fogMoveY, _fogFadeOutTime).SetDelay(_fogAnimInterval);
-            Destroy(fogInstance, _fogAnimInterval + _fogFadeOutTime);
+            var instanceFog = Object.Instantiate(_fogPrefab[i]);
+            _fogInstances.Add(instanceFog);
+            await DOTween.Sequence()
+                .Insert(_nextFogInterval * i, instanceFog.GetComponent<Image>().DOFade(1, _fogFadeInTime)) 
+                .SetTarget(instanceFog);
+            await instanceFog.GetComponent<RectTransform>().DOLocalMoveY(_fogFadeInY, _fogFadeInTime);
         }
     }
 
-    /// <summary> 霧のエフェクトを生成する </summary>
-    private async UniTaskVoid PlayFogAsync()
+    /// <summary> 霧のFadeOutアニメーション </summary>
+    private async UniTaskVoid FogFadeOut()
     {
-        FogAnim();
-        await UniTask.WaitForSeconds(_nextFogInterval, cancellationToken: _cts.Token);
+       for (int i = 0; i < _fogInstances.Count; i++)
+        {
+            await DOTween.Sequence()
+                .Insert(_nextFogInterval * i, _fogInstances[i].GetComponent<Image>().DOFade(0, _fogFadeOutTime))
+                .SetTarget(_fogInstances[i]);
+            await _fogInstances[i].GetComponent<RectTransform>().DOLocalMoveY(_fogFadeOutY, _fogFadeOutTime);
+            Object.Destroy(_fogInstances[i], _fogAnimInterval + _fogFadeOutTime + _fogFadeInTime);
+        }
+    }
+
+    private async UniTaskVoid PlayFogFadeIn()
+    {
+        FogFadeIn().Forget();
+        await UniTask.Delay(System.TimeSpan.FromSeconds(_fogAnimInterval), cancellationToken: _cts.Token);
     }
 
     public void ShowFog()
     {
-        SkyBoxChange();
-        SpawnThunder();
-        PlayFogAsync().Forget();
+        PlayFogFadeIn().Forget();
+        _thunderFactory.ThunderSpawener();
     }
 
     public void HideFog()
     {
-        // TODO：霧の効果を消す処理を実装する
+        FogFadeOut().Forget();
     }
 
-    private void OnDestroy()
+    ~ConcreteFogController()
     {
-        _cts?.Cancel();
-        _cts?.Dispose();
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
+        _cts.Cancel();
+        _cts.Dispose();
     }
 }

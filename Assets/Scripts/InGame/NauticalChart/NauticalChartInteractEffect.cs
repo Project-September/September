@@ -1,5 +1,5 @@
 using Fusion;
-using InGame.Interact;
+using September;
 using UnityEngine;
 
 namespace InGame.Exhibit
@@ -8,20 +8,21 @@ namespace InGame.Exhibit
     public class NauticalChartInteractEffect : NetworkBehaviour
     {
         [SerializeReference, SubclassSelector] private IFogController _fogController;
+        [SerializeField] private StormManager _stormManager;
 
-        public void OnInterractStart(IInteractableContext context, InteractableBase target)
-        {
-            var playerRef = PlayerRef.FromEncoded(context.Interactor);
-            RPC_IsRestrictedPlayer(playerRef);
-        }
-
-        /// <summary> RPCで制限されたプレイヤーかどうかを判定する </summary>
+        /// <summary> RPCでインタラクト時に霧と嵐を表示する </summary>
         /// <param name="interactPlayerRef"></param>
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_IsRestrictedPlayer(PlayerRef interactPlayerRef)
+        public void RPC_OnInteractStart(PlayerRef interactPlayerRef)
         {
-            if (Runner.LocalPlayer == interactPlayerRef) return;
-            _fogController.ShowFog();
+            if (Runner.LocalPlayer != interactPlayerRef) _fogController.ShowFog(); // 自分以外のプレイヤーに霧を表示
+            _stormManager.StartStorm(); // 全員に嵐の表示
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            base.Despawned(runner, hasState);
+            _fogController.HideFog();
         }
     }
 }
