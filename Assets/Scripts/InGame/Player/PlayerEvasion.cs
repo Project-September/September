@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 namespace InGame.Player
@@ -30,6 +31,10 @@ namespace InGame.Player
         public void OnEvasionStart(Vector2 inputDirection, Vector3 targetForward, float runnerTime,int JewelryCount)
         {
             if (_isEvasion)
+                return;
+
+            //クールダウン中
+            if (_rollEndTime + _evasionData.Cooldown > runnerTime)
                 return;
 
             _isEvasion = true;
