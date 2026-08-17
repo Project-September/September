@@ -1,5 +1,4 @@
 using System;
-using TMPro;
 using UnityEngine;
 
 namespace InGame.Player
@@ -14,30 +13,30 @@ namespace InGame.Player
         private float _turnEndTime;
         private float _previousDistance;
         private Vector3 _previousDirection;
-        private bool _isEvasion = false;
+        private bool _isEvading = false;
 
-        public bool IsEvasion => _isEvasion;
+        public bool IsEvading => _isEvading;
 
-        public event Action EndEvent;
+        public event Action EvasionEnded;
         public PlayerEvasion(EvasionData evasionData)
         {
             if (evasionData == null)
             {
-                Debug.LogError("");
+                Debug.LogError("[PlayerEvasion] EvasionData is null");
             }
             _evasionData = evasionData;
         }
 
-        public void OnEvasionStart(Vector2 inputDirection, Vector3 targetForward, float runnerTime,int JewelryCount)
+        public void StartEvasion(Vector2 inputDirection, Vector3 targetForward, float runnerTime, int jewelryCount)
         {
-            if (_isEvasion)
+            if (_isEvading)
                 return;
 
             //クールダウン中
             if (_rollEndTime + _evasionData.Cooldown > runnerTime)
                 return;
 
-            _isEvasion = true;
+            _isEvading = true;
 
             //入力がないならプレイヤーの方向にする
             if (inputDirection.magnitude < Mathf.Epsilon)
@@ -45,24 +44,24 @@ namespace InGame.Player
 
             //回避方向を決める
             var targetDirection = new Vector2(targetForward.x, targetForward.z);
-            var dot = Vector2.SignedAngle(inputDirection, targetDirection);
-            var clampedDot = Mathf.Clamp(dot, -_evasionData.InputAngle, _evasionData.InputAngle);
-            _rollDirection = Quaternion.Euler(0, clampedDot, 0) * targetForward;
+            var angle = Vector2.SignedAngle(inputDirection, targetDirection);
+            var clampedAngle = Mathf.Clamp(angle, -_evasionData.InputAngle, _evasionData.InputAngle);
+            _rollDirection = Quaternion.Euler(0, clampedAngle, 0) * targetForward;
 
-            float weightCoefficient = GetWeightCoefficient(JewelryCount);
+            float weightCoefficient = CalculateWeightCoefficient(jewelryCount);
 
             _startTime = runnerTime;
             _rollEndTime = runnerTime + _evasionData.RollDuration * weightCoefficient;
             _rollDistance = _evasionData.RollDistance * weightCoefficient;
-            var turnAngelT = Mathf.InverseLerp(0, _evasionData.InputAngle, Mathf.Abs(clampedDot));
-            _turnEndTime = runnerTime + _evasionData.MaxTurnDuration * turnAngelT * weightCoefficient;
+            var turnProgress = Mathf.InverseLerp(0, _evasionData.InputAngle, Mathf.Abs(clampedAngle));
+            _turnEndTime = runnerTime + _evasionData.MaxTurnDuration * turnProgress * weightCoefficient;
             _previousDistance = 0f;
             _previousDirection = targetDirection;
         }
 
         public Vector3 Move(Vector3 targetPosition, float runnerTime)
         {
-            if (!_isEvasion)
+            if (!_isEvading)
                 return targetPosition;
 
             if (EndCheck(runnerTime))
@@ -70,19 +69,19 @@ namespace InGame.Player
 
             float t = Mathf.InverseLerp(_startTime, _rollEndTime, runnerTime);
 
-            float speedT = _evasionData.RollSpeedCurve.Evaluate(t);
+            float speedProgress = _evasionData.RollSpeedCurve.Evaluate(t);
 
-            float currentDistance = _rollDistance * speedT;
-            float deltaDistance = currentDistance - _previousDistance;
+            float currentDistance = _rollDistance * speedProgress;
+            float distanceDelta = currentDistance - _previousDistance;
 
             _previousDistance = currentDistance;
 
-            return targetPosition + _rollDirection * deltaDistance;
+            return targetPosition + _rollDirection * distanceDelta;
         }
 
         public Vector3 Turn(Vector3 forward, float runnerTime)
         {
-            if (!_isEvasion)
+            if (!_isEvading)
                 return forward;
 
             if (EndCheck(runnerTime))
@@ -115,21 +114,21 @@ namespace InGame.Player
 
         private bool EndCheck(float runnerTime)
         {
-            bool isEnd = runnerTime >= _rollEndTime;
+            bool hasEnded = runnerTime >= _rollEndTime;
 
-            if (isEnd)
+            if (hasEnded)
             {
-                _isEvasion = false;
-                EndEvent?.Invoke();
+                _isEvading = false;
+                EvasionEnded?.Invoke();
             }
 
-            return isEnd;
+            return hasEnded;
         }
 
         /// <summary>
         /// 重み係数計算
         /// </summary>
-        private float GetWeightCoefficient(int JewelryCount)
+        private float CalculateWeightCoefficient(int JewelryCount)
         {
             return 1f - (JewelryCount * _evasionData.WeightDecay);
         }

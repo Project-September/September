@@ -119,7 +119,7 @@ namespace InGame.Player
             _prePos = transform.position;
 
             _playerEvasion = new(_evasionData);
-            _playerEvasion.EndEvent += () =>
+            _playerEvasion.EvasionEnded += () =>
             {
                 _playerHealth.IsInvincible = false;
             };
@@ -139,7 +139,7 @@ namespace InGame.Player
                 _moveVelocity = followDirection * _hookPower;
             }
 
-            if (IgnoreMoveInput || IsHookLocked || _playerEvasion.IsEvasion) moveInput = Vector2.zero;
+            if (IgnoreMoveInput || IsHookLocked || _playerEvasion.IsEvading) moveInput = Vector2.zero;
 
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
@@ -150,7 +150,7 @@ namespace InGame.Player
             if (isEvasion && HasStateAuthority)
             {
                 int jewelryCount = PlayerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
-                _playerEvasion.OnEvasionStart(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount);
+                _playerEvasion.StartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount);
             }
             
             if (!DoingVault)
@@ -166,7 +166,7 @@ namespace InGame.Player
             CheckGroundManual();
 
             //回避
-            if (_playerEvasion.IsEvasion)
+            if (_playerEvasion.IsEvading)
             {
                 transform.position = _playerEvasion.Move( transform.position,Runner.SimulationTime);
                 transform.forward = _playerEvasion.Turn(transform.forward, Runner.SimulationTime);
