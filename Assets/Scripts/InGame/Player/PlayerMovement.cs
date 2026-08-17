@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Jewelry;
 using September.Common;
 using September.InGame.Common.Stats;
 using UniRx;
@@ -39,6 +40,7 @@ namespace InGame.Player
         [SerializeField] private float _flyingDamping = 8f;
         [Header("Roll")]
         [SerializeField] private EvasionData _evasionData;
+        [SerializeField] private PlayerHealth _playerHealth;
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
@@ -117,6 +119,10 @@ namespace InGame.Player
             _prePos = transform.position;
 
             _playerEvasion = new(_evasionData);
+            _playerEvasion.EndEvent += () =>
+            {
+                _playerHealth.IsInvincible = false;
+            };
         }
 
 
@@ -133,16 +139,18 @@ namespace InGame.Player
                 _moveVelocity = followDirection * _hookPower;
             }
 
-            if (IgnoreMoveInput || IsHookLocked) moveInput = Vector2.zero;
+            if (IgnoreMoveInput || IsHookLocked || _playerEvasion.IsEvasion) moveInput = Vector2.zero;
 
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             // set velocity
             if (isJump && HasStateAuthority) TryVault(moveDirection);
             
+            //回避
             if (isEvasion && HasStateAuthority)
             {
-                _playerEvasion.OnEvasionStart(MoveDirection, transform.forward, Runner.SimulationTime, null);
+                int jewelryCount = PlayerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
+                _playerEvasion.OnEvasionStart(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount);
             }
             
             if (!DoingVault)
@@ -157,10 +165,18 @@ namespace InGame.Player
         {
             CheckGroundManual();
 
+            //回避
             if (_playerEvasion.IsEvasion)
             {
                 transform.position = _playerEvasion.Move( transform.position,Runner.SimulationTime);
                 transform.forward = _playerEvasion.Turn(transform.forward, Runner.SimulationTime);
+
+                //無敵状態更新
+                bool isInvincible = _playerEvasion.IsInvincible(Runner.SimulationTime);
+
+                if(isInvincible != _playerHealth.IsInvincible)
+                    _playerHealth.IsInvincible = isInvincible;
+
                 return;
             }
 
