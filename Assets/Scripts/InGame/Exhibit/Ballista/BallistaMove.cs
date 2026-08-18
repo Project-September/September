@@ -11,6 +11,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Transform _barrel;
 		[SerializeField] private Transform _rotateBase;
 		[SerializeField] private Transform _shootPos;
+		[SerializeField] private Transform _playerPos;
 		[SerializeField] private CameraController _cameraController;
 		[SerializeField] private LayerMask _layerMask;
 		[SerializeField] private float _playerOffset = 3;
@@ -18,7 +19,6 @@ namespace September.InGame.Exhibit
 
 		[Header("CameraAngleLimit")] [SerializeField]
 		private bool _useYawLimit;
-
 		[SerializeField] private Vector2 _pitchLimit = new(-90f, 90f);
 		[SerializeField] private Vector2 _yawLimit = new(-90f, 90f);
 		[SerializeField] private Vector3 _baseUp;
@@ -42,6 +42,7 @@ namespace September.InGame.Exhibit
 		public override void Render()
 		{
 			ModelRotate();
+			UpdatePlayerPosition();
 			if (HasInputAuthority)
 			{
 				RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Time.deltaTime);
@@ -103,26 +104,33 @@ namespace September.InGame.Exhibit
 		private void RotateCamera(Vector2 input, float deltaTime)
 		{
 			_cameraController.RotateCamera(input, deltaTime);
+
 			// 角度を-180~180に変換してclampする
-			var yaw = Mathf.DeltaAngle(_baseYaw, _cameraController.CameraYaw);
 			var pitch = Mathf.DeltaAngle(0, _cameraController.CameraPitch);
 			pitch = Mathf.Clamp(pitch, _pitchLimit.x, _pitchLimit.y);
-			yaw = Mathf.Clamp(yaw, _yawLimit.x, _yawLimit.y) + _baseYaw;
+			
+			float yaw = _cameraController.CameraYaw;
+			if (_useYawLimit)
+			{
+				yaw = Mathf.DeltaAngle(_baseYaw, _cameraController.CameraYaw);
+				yaw = Mathf.Clamp(yaw, _yawLimit.x, _yawLimit.y) + _baseYaw;
+			}
 			
 			_cameraController.SetCameraRotate(pitch, yaw);
 		}
 
 		private void UpdatePlayerPosition()
 		{
-			var quaternion = Quaternion.AngleAxis(Yaw, Vector3.up);
-			PlayerObject.transform.rotation = quaternion;
-			PlayerObject.transform.position = _rotateBase.position + quaternion * (Vector3.back * _playerOffset);
+			if(!PlayerObject) return;
+			PlayerObject.transform.position = _playerPos.position;
+			PlayerObject.transform.rotation = _playerPos.rotation;
 		}
 
 		public void Reset()
 		{
 			Yaw = _baseYaw;
 			Pitch = _basePitch;
+			PlayerObject = null;
 		}
 	}
 }

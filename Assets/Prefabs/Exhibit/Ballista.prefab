@@ -173,6 +173,7 @@ MonoBehaviour:
   _barrel: {fileID: 35184158926346350}
   _rotateBase: {fileID: 75781090592926219}
   _shootPos: {fileID: 2395836882729158038}
+  _playerPos: {fileID: 5934778217435767824}
   _cameraController: {fileID: 4565694175186777013}
   _layerMask:
     serializedVersion: 2
@@ -200,10 +201,12 @@ MonoBehaviour:
   _interactable: {fileID: 863474155446293771}
   _animator: {fileID: 3347792911139992729}
   _networkAnimator: {fileID: 7121241315461993331}
+  _playerUseAnimationClip: {fileID: 1827226128182048838, guid: c9a8671d0de06d044a812b22b9b09719, type: 3}
   FireBulletController:
     rid: 3743209666480701525
   _reticleEffect:
     rid: 3743209666480701524
+  _CurrentAmmo: 0
   references:
     version: 2
     RefIds:
@@ -358,6 +361,37 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.0358553, y: 2.9989634, z: 3.7665243}
   m_Center: {x: 0, y: 1.89, z: 0}
+--- !u!1 &8164787961263025595
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5934778217435767824}
+  m_Layer: 0
+  m_Name: PlayerPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5934778217435767824
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8164787961263025595}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.34, y: 0, z: -1.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 75781090592926219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8667147679873082732
 GameObject:
   m_ObjectHideFlags: 0
@@ -539,6 +573,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4652473321651836419, guid: 0abb40b6e29eccb4f8abb6271429583e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5934778217435767824}
     - targetCorrespondingSourceObject: {fileID: -4476258516923374490, guid: 0abb40b6e29eccb4f8abb6271429583e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2395836882729158038}
