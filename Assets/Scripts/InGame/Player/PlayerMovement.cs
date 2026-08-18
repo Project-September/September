@@ -149,16 +149,20 @@ namespace InGame.Player
 
             //回避
             if (isEvasion && HasStateAuthority)
-            {
-                int jewelryCount = PlayerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
-                _playerEvasion.StartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount);
-            }
+                StartEvasion();
 
-            if (!DoingVault)
-            {
-                Move(moveDirection, isDash, cameraYaw, deltaTime);
-                AdsorptionOnGround();
-            }
+            if (DoingVault || _playerEvasion.IsEvading)
+                return;
+
+            Move(moveDirection, isDash, cameraYaw, deltaTime);
+            AdsorptionOnGround();
+        }
+
+        private void StartEvasion()
+        {
+            int jewelryCount = PlayerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
+            _playerEvasion.StartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount);
+            Stop();
         }
 
         /// <summary> 入力無関係のTick UpdateMovementとの呼び出し順序を確定させるためにManagerから呼ばれる </summary>
