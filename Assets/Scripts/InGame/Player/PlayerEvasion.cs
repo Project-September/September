@@ -12,7 +12,7 @@ namespace InGame.Player
         private float _rollEndTime;
         private float _turnEndTime;
         private float _previousDistance;
-        private Vector3 _previousDirection;
+        private Vector3 _startDirection;
         private bool _isEvading = false;
 
         public bool IsEvading => _isEvading;
@@ -56,7 +56,7 @@ namespace InGame.Player
             var turnProgress = Mathf.InverseLerp(0, _evasionData.InputAngle, Mathf.Abs(clampedAngle));
             _turnEndTime = runnerTime + _evasionData.MaxTurnDuration * turnProgress * weightCoefficient;
             _previousDistance = 0f;
-            _previousDirection = targetDirection;
+            _startDirection = targetForward;
         }
 
         public Vector3 Move(Vector3 targetPosition, float runnerTime)
@@ -88,23 +88,12 @@ namespace InGame.Player
                 return forward;
 
             float t = Mathf.InverseLerp(_startTime, _turnEndTime, runnerTime);
-
             float speedT = _evasionData.TurnSpeedCurve.Evaluate(t);
 
-            Vector3 currentDirection = Vector3.Slerp(_previousDirection, _rollDirection, speedT);
+            Vector3 currentDirection = Vector3.Slerp(_startDirection, _rollDirection, speedT);
 
-            // YÇå≈íË
             currentDirection.y = 0f;
-
-            Vector3 deltaDirection = currentDirection - _previousDirection;
-
-            // ëOâÒï˚å¸ÇÃYÇ‡0Ç∆ÇµÇƒï€éù
-            _previousDirection = currentDirection;
-
-            Vector3 result = forward + deltaDirection;
-            result.y = forward.y;
-
-            return result;
+            return currentDirection.normalized;
         }
 
         public bool IsInvincible(float runnerTime)

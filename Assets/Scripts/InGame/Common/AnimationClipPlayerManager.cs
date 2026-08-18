@@ -90,9 +90,9 @@ namespace InGame.Common
 
             _playerMovement.UpdateAsObservable()
                 .Select(_ => _playerMovement.IsEvading)
-                .DistinctUntilChanged() 
+                .DistinctUntilChanged()
                 .Where(x => x)
-                .Subscribe(_ =>RPC_TriggerEvasion())
+                .Subscribe(_ => RPC_TriggerEvasion())
                 .AddTo(this);
         }
 
@@ -199,6 +199,7 @@ namespace InGame.Common
                 _ = TriggerVault();
             }
         }
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RPC_TriggerEvasion()
         {

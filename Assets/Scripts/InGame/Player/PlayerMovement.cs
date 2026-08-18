@@ -146,14 +146,14 @@ namespace InGame.Player
 
             // set velocity
             if (isJump && HasStateAuthority) TryVault(moveDirection);
-            
+
             //回避
             if (isEvasion && HasStateAuthority)
             {
                 int jewelryCount = PlayerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
                 _playerEvasion.StartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount);
             }
-            
+
             if (!DoingVault)
             {
                 Move(moveDirection, isDash, cameraYaw, deltaTime);
@@ -169,13 +169,13 @@ namespace InGame.Player
             //回避
             if (_playerEvasion.IsEvading)
             {
-                transform.position = _playerEvasion.Move( transform.position,Runner.SimulationTime);
+                transform.position = _playerEvasion.Move(transform.position, Runner.SimulationTime);
                 transform.forward = _playerEvasion.Turn(transform.forward, Runner.SimulationTime);
 
                 //無敵状態更新
                 bool isInvincible = _playerEvasion.IsInvincible(Runner.SimulationTime);
 
-                if(isInvincible != _playerHealth.IsInvincible)
+                if (isInvincible != _playerHealth.IsInvincible)
                     _playerHealth.IsInvincible = isInvincible;
 
                 return;
