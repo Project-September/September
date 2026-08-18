@@ -22,7 +22,8 @@ namespace InGame.Exhibit
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             base.Despawned(runner, hasState);
-            _fogController.HideFog();
+            PlayerRef interactPlayerRef = Runner.LocalPlayer;
+            if (Runner.LocalPlayer != interactPlayerRef) _fogController.HideFog();
         }
     }
 }
