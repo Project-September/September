@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
 using InGame.Interact;
@@ -18,33 +19,35 @@ namespace September.InGame.Exhibit
 		[SerializeField] protected NetworkMecanimAnimator _networkAnimator;
 
 		[Header("reload設定")] [SerializeReference] [SubclassSelector]
-		private IFireController _fireBulletController;
+		public IFireController FireBulletController;
 
 		[Header("レティクル設定")] [SerializeReference] [SubclassSelector]
-		private IReticuleEffect _reticuleEffect;
+		private IReticleEffect _reticleEffect;
 
 		protected ProjectileLauncher _launcher;
 		protected IProjectileMovement _move;
 		protected PlayerManager _usingPlayer;
+		public event Action<int> OnAmmoChanged;
 
 		[Networked] private NetworkButtons _attackButton { get; set; }
 		[Networked] protected PlayerRef CurrentUsePlayerRef { get; set; }
 		[Networked] protected TickTimer LastFireTimer { get; set; }
 		[Networked] protected TickTimer WaitExitTimer { get; set; }
 		[Networked] private TickTimer InteractEndLockTimer { get; set; }
+		[Networked, OnChangedRender(nameof(AmmoChanged))] public int CurrentAmmo { get; set; }
 
 		public override void Spawned()
 		{
 			base.Spawned();
 			_launcher = GetComponent<ProjectileLauncher>();
 			_move = GetComponent<IProjectileMovement>();
-			_reticuleEffect?.Init();
+			_reticleEffect?.Init();
 		}
 
 		public override void Render()
 		{
 			base.Render();
-			_reticuleEffect?.Render();
+			_reticleEffect?.Render();
 		}
 
 		public override void FixedUpdateNetwork()
@@ -56,6 +59,9 @@ namespace September.InGame.Exhibit
 				return;
 			_move.Update(input);
 
+			if(LastFireTimer.Expired(Runner))
+				FireBulletController.OnFireTimerExpired();
+			
 			// 射撃処理
 			if (input.Buttons.WasPressed(_attackButton, PlayerButtons.Attack) &&
 			    LastFireTimer.ExpiredOrNotRunning(Runner))
@@ -63,6 +69,9 @@ namespace September.InGame.Exhibit
 				Fire();
 				if (Runner.IsForward) PlayFireAnimation();
 			}
+			
+			if(HasStateAuthority)
+				CurrentAmmo = FireBulletController.CurrentAmmo;
 
 			_attackButton = input.Buttons;
 
@@ -90,7 +99,8 @@ namespace September.InGame.Exhibit
 			if (!_usingPlayer) return;
 			PlayerActive(false);
 			_move.InitializeStateAuthority(_usingPlayer.Object, playerRef);
-			_fireBulletController.Init();
+			FireBulletController.Init();
+			CurrentAmmo = FireBulletController.CurrentAmmo;
 
 			// Playerがダメージを受けた際にInteractを終了する
 			_usingPlayer.GetComponent<PlayerHealth>().OnHitTaken += PlayerHitTaken;
@@ -107,18 +117,18 @@ namespace September.InGame.Exhibit
 			if (!HasStateAuthority) return;
 			// 発射処理はHostが扱う
 			_launcher.Fire(CurrentUsePlayerRef);
+			FireBulletController.Fire();
 
-			_fireBulletController.Fire();
-
-			if (!_fireBulletController.IsUsable())
+			if (!FireBulletController.IsUsable())
 			{
+				// IsUsableがfalseだった場合は終了処理に飛ばす
 				var timer = TickTimer.CreateFromSeconds(Runner, 1f);
 				WaitExitTimer = timer;
 				LastFireTimer = timer;
 			}
 			else
 			{
-				LastFireTimer = _fireBulletController.GetNextFireTimer(Runner);
+				LastFireTimer = FireBulletController.GetNextFireTimer(Runner);
 			}
 		}
 
@@ -189,8 +199,8 @@ namespace September.InGame.Exhibit
 
 		protected virtual void EffectActive(PlayerRef currentPlayer, bool isActive)
 		{
-			_reticuleEffect.AllClientEffectActive(isActive);
-			if (Runner.LocalPlayer == currentPlayer) _reticuleEffect?.SetActive(isActive);
+			_reticleEffect.AllClientEffectActive(isActive);
+			if (Runner.LocalPlayer == currentPlayer) _reticleEffect?.SetActive(isActive);
 		}
 
 		private void PlayerHitTaken(HitData hitData)
@@ -210,6 +220,11 @@ namespace September.InGame.Exhibit
 			if(!_networkAnimator) return;
 			_networkAnimator?.SetTrigger("Fire", true);
 		}
+
+		private void AmmoChanged()
+		{
+			OnAmmoChanged?.Invoke(CurrentAmmo);
+		} 
 
 		#region Helper
 
@@ -234,13 +249,15 @@ namespace September.InGame.Exhibit
 
 	public interface IFireController
 	{
+		int CurrentAmmo { get; }
 		void Init();
 		void Fire();
 		bool IsUsable();
 		TickTimer GetNextFireTimer(NetworkRunner runner);
+		void OnFireTimerExpired();
 	}
 
-	public interface IReticuleEffect
+	public interface IReticleEffect
 	{
 		void Init();
 		void Render();
@@ -257,6 +274,7 @@ namespace September.InGame.Exhibit
 		private int _currentAmmo;
 		private bool _isReloading;
 
+		public int CurrentAmmo => _currentAmmo;
 
 		public void Init()
 		{
@@ -279,11 +297,16 @@ namespace September.InGame.Exhibit
 		{
 			if (_isReloading)
 			{
-				Init();
 				return TickTimer.CreateFromSeconds(runner, _reloadTime);
 			}
 
 			return TickTimer.CreateFromSeconds(runner, _fireRate);
+		}
+
+		public void OnFireTimerExpired()
+		{
+			if(_isReloading)
+				Init();
 		}
 	}
 
@@ -293,6 +316,8 @@ namespace September.InGame.Exhibit
 		[SerializeField] private int _maxAmmo;
 		[SerializeField] private float _fireRate;
 		private int _currentAmmo;
+
+		public int CurrentAmmo => _currentAmmo;
 
 		public void Init()
 		{
@@ -312,6 +337,11 @@ namespace September.InGame.Exhibit
 		public TickTimer GetNextFireTimer(NetworkRunner runner)
 		{
 			return TickTimer.CreateFromSeconds(runner, _fireRate);
+		}
+
+		public void OnFireTimerExpired()
+		{
+			
 		}
 	}
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace September.InGame.Exhibit
 {
 	[Serializable]
-	public class BallistaReticule: IReticuleEffect
+	public class BallistaReticle: IReticleEffect
 	{
 		[SerializeField] private GameObject _reticuleUIGameObject;
 

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace September.InGame.Exhibit
 {
 	[Serializable]
-	public class CannonReticle : IReticuleEffect
+	public class CannonReticle : IReticleEffect
 	{
 		[SerializeField] private ProjectileLauncher _projectileLauncher;
 		[SerializeField] private GameObject _aimPositionEffectPrefab;

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 863474155446293771}
   - component: {fileID: -4283116534182985741}
   - component: {fileID: 5101475634166198175}
+  - component: {fileID: 5164051856049195047}
   - component: {fileID: 4565694175186777013}
   - component: {fileID: 7121241315461993331}
   m_Layer: 0
@@ -199,23 +200,38 @@ MonoBehaviour:
   _interactable: {fileID: 863474155446293771}
   _animator: {fileID: 3347792911139992729}
   _networkAnimator: {fileID: 7121241315461993331}
-  _fireBulletController:
-    rid: 3743209533285072983
-  _reticuleEffect:
-    rid: 3743209533285072981
+  FireBulletController:
+    rid: 3743209666480701525
+  _reticleEffect:
+    rid: 3743209666480701524
   references:
     version: 2
     RefIds:
-    - rid: 3743209533285072981
-      type: {class: BallistaReticule, ns: September.InGame.Exhibit, asm: Scripts}
+    - rid: 3743209666480701524
+      type: {class: BallistaReticle, ns: September.InGame.Exhibit, asm: Scripts}
       data:
         _reticuleUIGameObject: {fileID: 624090781761430366}
-    - rid: 3743209533285072983
+    - rid: 3743209666480701525
       type: {class: UseReload, ns: September.InGame.Exhibit, asm: Scripts}
       data:
         _maxAmmo: 5
         _fireRate: 0.5
         _reloadTime: 3
+--- !u!114 &5164051856049195047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518364684307869088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 592564865aa626643978a213e5d24545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectile: {fileID: 5101475634166198175}
+  _projectileText: {fileID: 4922782252763583060}
+  _reloadText: "\u30EA\u30ED\u30FC\u30C9\u4E2D\u30FB\u30FB\u30FB"
 --- !u!114 &4565694175186777013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,6 +497,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1832458914817281278, guid: 6113a865c60f20c4da37639ba4628e7c, type: 3}
   m_PrefabInstance: {fileID: 3165084215387103864}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4922782252763583060 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8051766752025653292, guid: 6113a865c60f20c4da37639ba4628e7c, type: 3}
+  m_PrefabInstance: {fileID: 3165084215387103864}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4728178545404263432
 PrefabInstance:
   m_ObjectHideFlags: 0
