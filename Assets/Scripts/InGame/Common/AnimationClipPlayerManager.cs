@@ -16,6 +16,8 @@ namespace InGame.Common
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private AnimationClip _jumpOver;
         [SerializeField] private float _jumpOverDuration = 0.2f;
+        [SerializeField] private AnimationClip _rollEvasion;
+        [SerializeField] private EvasionData _evasionData;
         [SerializeField] private AnimationClip _fallDown;
         [SerializeField] private AnimationClip _faint;  // 追加: 気絶アニメーション
         [SerializeField] private AnimationClip _getUp;   // 追加: 起き上がりアニメーション
@@ -47,6 +49,7 @@ namespace InGame.Common
         private bool _isFainting = false;          // 気絶中フラグ（多重起動防止）
         private float _locoWeight;
         private CancellationTokenSource _jumpOverTokenSrc;
+        private CancellationTokenSource _rollEvasionTokenSrc;
 
         private void Start()
         {
@@ -84,6 +87,13 @@ namespace InGame.Common
             _playerMovement.UpdateAsObservable()
                 .Select(_ => _playerMovement.IsGroundNet)
                 .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(this);
+
+            _playerMovement.UpdateAsObservable()
+                .Select(_ => _playerMovement.IsEvading)
+                .DistinctUntilChanged() 
+                .Where(x => x)
+                .Subscribe(_ =>RPC_TriggerEvasion())
+                .AddTo(this);
         }
 
         private void SetFallAnim(bool isGround)
@@ -189,6 +199,14 @@ namespace InGame.Common
                 _ = TriggerVault();
             }
         }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_TriggerEvasion()
+        {
+            if (!_hardOverride)
+            {
+                _ = TriggerEvasion();
+            }
+        }
 
         public async UniTask TriggerVault()
         {
@@ -215,6 +233,31 @@ namespace InGame.Common
             }
             _animationClipPlayer.PlayOnTopLayer(null);
             if (!_playerMovement.IsGroundNet) SetFallAnim(false);
+        }
+
+        public async UniTask TriggerEvasion()
+        {
+            if (_rollEvasionTokenSrc != null)
+            {
+                _rollEvasionTokenSrc.Cancel();
+                _rollEvasionTokenSrc.Dispose();
+            }
+            _animationClipPlayer.PlayOnTopLayer(_rollEvasion);
+
+            _rollEvasionTokenSrc = new CancellationTokenSource();
+            // ジャンプオーバークリップの長さだけ待機（速度変更を考慮しない場合は length をそのまま使用）
+            if (_rollEvasion && _rollEvasion.length > 0f)
+            {
+                try
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(_evasionData.RollDuration), cancellationToken: _rollEvasionTokenSrc.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+            }
+            _animationClipPlayer.PlayOnTopLayer(null);
         }
 
         /// <summary>強制解除（リスポーン等）</summary>

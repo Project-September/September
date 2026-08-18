@@ -99,6 +99,7 @@ namespace InGame.Player
         public bool InfiniteStamina { get; set; } = false;
         public CapsuleCollider MoveCapsuleCollider => _moveCapsuleCollider;
         public LayerMask GroundLayer => _groundLayer;
+        public bool IsEvading => _playerEvasion.IsEvading;
         [Networked] public bool IgnoreMoveInput { get; set; }
         [Networked] public bool IsHookLocked { get; set; }
 
