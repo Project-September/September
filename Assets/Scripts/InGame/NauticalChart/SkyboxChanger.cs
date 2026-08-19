@@ -9,7 +9,7 @@ public class SkyboxChanger : NetworkBehaviour
     [SerializeField] private Material _stormSkyboxMaterial;
 
     [Header("時間")]
-    [SerializeField] private float _changeSkyTime = 15.0f;
+    [SerializeField] private float _changeSkyTime = 10.0f;
     public float changeSkyTime => _changeSkyTime;
 
     /// <summary> Skyboxを変更する </summary>

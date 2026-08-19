@@ -8,6 +8,8 @@ public class NauticalChartBaseInteractEffect : CharacterInteractEffectBase
 {
     [SerializeField] private NauticalChartInteractEffect _nauticalChartInteractEffect;
 
+    private PlayerRef _interactPlayerRef;
+
     /// <summary> NauticalChartInteractEffectを複製して返す </summary>
     public override CharacterInteractEffectBase Clone()
     {
@@ -19,7 +21,8 @@ public class NauticalChartBaseInteractEffect : CharacterInteractEffectBase
 
     public override void OnInteractStart(IInteractableContext context, InteractableBase target)
     {
-        var playerRef = PlayerRef.FromEncoded(context.Interactor);
-        _nauticalChartInteractEffect.RPC_OnInteractStart(playerRef);
+        _interactPlayerRef = PlayerRef.FromEncoded(context.Interactor);
+        _nauticalChartInteractEffect.RPC_OnInteractStart(_interactPlayerRef);
+        _nauticalChartInteractEffect.FixedUpdateNetwork();
     }
 }

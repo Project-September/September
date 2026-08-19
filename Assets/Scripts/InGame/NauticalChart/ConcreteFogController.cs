@@ -14,12 +14,11 @@ public class ConcreteFogController : IFogController
     [SerializeField] private GameObject _canvas;
 
     [Header("霧の設定")]
-    [Tooltip("FadeInからFadeOutまでの霧の持続時間"), SerializeField] private float _fogAnimInterval = 2.2f;
     [Tooltip("霧のフェードイン時間"), SerializeField] private float _fogFadeInTime = 0.4f;
     [Tooltip("霧のフェードアウト時間"), SerializeField] private float _fogFadeOutTime = 0.4f;
     [Tooltip("次の霧が表示されるまでの遅延時間"), SerializeField] private float _nextFogInterval = 0.08f;
-    [Tooltip("霧のY座標FadeIn位置"), SerializeField] private float _fogFadeInY = 1.0f;
-    [Tooltip("霧のY座標FadeOut位置"), SerializeField] private float _fogFadeOutY = -2.5f;
+    [Tooltip("霧のY座標FadeIn位置"), SerializeField] private float _fogFadeInY = 20.0f;
+    [Tooltip("霧のY座標FadeOut位置"), SerializeField] private float _fogFadeOutY = -20.5f;
 
     CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -30,10 +29,14 @@ public class ConcreteFogController : IFogController
     {
         for (int i = 0; i < _fogPrefab.Length; i++)
         {
-            _fogInstances.Add(Object.Instantiate(_fogPrefab[i], _canvas.transform));
-            _fogInstances[i].GetComponent<Image>().DOFade(1, _fogFadeInTime);
-            _fogInstances[i].GetComponent<RectTransform>().DOAnchorPosY(_fogFadeInY, _fogFadeInTime);
-            await UniTask.WaitForSeconds(_fogFadeInTime, cancellationToken: _cts.Token);
+            GameObject obj = Object.Instantiate(_fogPrefab[i], _canvas.transform);
+            _fogInstances.Add(obj);
+            Image image = obj.GetComponent<Image>();
+            RectTransform rect = obj.GetComponent<RectTransform>();
+            image.DOFade(1, _fogFadeInTime);
+            rect.DOAnchorPosY(rect.anchoredPosition.y, _fogFadeInTime)
+                .From(new Vector2(rect.anchoredPosition.x, _fogFadeInY));
+            await UniTask.WaitForSeconds(_nextFogInterval, cancellationToken: _cts.Token);
         }
     }
 
@@ -42,21 +45,18 @@ public class ConcreteFogController : IFogController
     {
        for (int i = 0; i < _fogInstances.Count; i++)
         {
-            _fogInstances[i].GetComponent<Image>().DOFade(0, _fogFadeOutTime);
-            _fogInstances[i].GetComponent<RectTransform>().DOAnchorPosY(0, _fogFadeOutTime);
-            await UniTask.WaitForSeconds(_fogFadeOutTime, cancellationToken: _cts.Token);
+            GameObject obj = _fogInstances[i];
+            Image image = obj.GetComponent<Image>();
+            RectTransform rect = obj.GetComponent<RectTransform>();
+            image.DOFade(0, _fogFadeOutTime);
+            rect.DOAnchorPosY(_fogFadeOutY + rect.anchoredPosition.y, _fogFadeOutTime);
+            await UniTask.WaitForSeconds(_nextFogInterval, cancellationToken: _cts.Token);
         }
-    }
-
-    private async UniTaskVoid PlayFogFadeIn()
-    {
-        FogFadeIn().Forget();
-        await UniTask.WaitForSeconds(_fogAnimInterval, cancellationToken: _cts.Token);
     }
 
     public void ShowFog()
     {
-        PlayFogFadeIn().Forget();
+        FogFadeIn().Forget();
         _thunderFactory.ThunderSpawener();
     }
 
