@@ -40,7 +40,7 @@ namespace September.InGame.Exhibit
 
 		[Networked]
 		[OnChangedRender(nameof(AmmoChanged))]
-		public int CurrentAmmo { get; set; }
+		private int CurrentAmmo { get; set; }
 
 		public override void Spawned()
 		{
