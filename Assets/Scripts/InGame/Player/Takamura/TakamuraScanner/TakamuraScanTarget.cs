@@ -6,6 +6,8 @@ namespace InGame.Interact
     public class TakamuraScanTarget : MonoBehaviour
     {
         [SerializeField] Transform _pivot;
+        [SerializeField] Transform _scanPos;
+        public Transform ScanPos => _scanPos;
 
         /// <summary>
         /// PivotからMeshまでのワールド座標上の差分を返すメソッド

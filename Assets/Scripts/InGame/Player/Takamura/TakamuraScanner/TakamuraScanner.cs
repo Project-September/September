@@ -24,6 +24,7 @@ namespace InGame.Player
         [SerializeField, Tooltip("カメラの移動時間")] float _cameraMoveDuration = 0.2f;
         [Header("カメラスキャンの有効領域についてのパラメータ")]
         [SerializeField, Tooltip("擬態対象の候補にできる最大距離")] float _scannableMaxDistance = 10f;
+        [SerializeField, Tooltip("コライダーの対象として無視するもののレイヤー")] LayerMask _ignoreLayer;
         [SerializeField, Tooltip("演出用キャンバス")] ScannerCanvas _scannerCanvas;
         [Header("ガワ")]
         [SerializeField] TakamuraVisual _visual;
@@ -217,7 +218,7 @@ namespace InGame.Player
         /// </summary>
         void UpdateNearestExhibit()
         {
-            var minDistance = float.MaxValue;
+            var moreCenter = float.MaxValue;
             _focusIndex = -1;
             foreach (var interactable in _interactables)
             {
@@ -225,10 +226,8 @@ namespace InGame.Player
                 if (!interactable.gameObject.activeSelf) continue;
 
                 // 展示物の座標を取得
-                var col = interactable.GetComponentInChildren<Collider>();
-                Vector3 pos = col != null
-                    ? col.bounds.center
-                    : interactable.transform.position;
+                var pivot = interactable.ScanPos;
+                Vector3 pos = pivot ? pivot.position : interactable.transform.position;
 
                 // カメラに写っているかを確認
                 var viewportPoint = _camera.WorldToViewportPoint(pos);
@@ -236,19 +235,71 @@ namespace InGame.Player
                     && 0 <= viewportPoint.y && viewportPoint.y <= 1
                     && 0 <= viewportPoint.z)
                 {
-                    // カメラに写っていたら距離を計算
                     var distance = Vector3.SqrMagnitude(pos - transform.position);
+                    // 判定距離内にいるか判定
                     if (distance <= _scannableMaxDistance * _scannableMaxDistance)
                     {
-                        if (distance < minDistance)
+                        // 画面のどのあたりに移っているかを計算
+                        var center = (0.5f - viewportPoint.x) * (0.5f - viewportPoint.x)
+                            + (0.5f - viewportPoint.y) * (0.5f - viewportPoint.y);
+                        // より中心に映っているか
+                        if (center < moreCenter)
                         {
-                            // 判定距離内かつより近いオブジェクトであれば擬態対象にする
-                            minDistance = distance;
-                            _focusIndex = Array.IndexOf(_interactables, interactable);
+                            // カメラから見て壁越しじゃないか
+                            var rayOrigin = _camera.transform.position;
+                            var rayDirection = pos - rayOrigin;
+                            var rayDistance = rayDirection.magnitude;
+                            var hasHit = Physics.Raycast(
+                                rayOrigin,
+                                rayDirection.normalized,
+                                out var hit,
+                                rayDistance,
+                                ~_ignoreLayer,
+                                QueryTriggerInteraction.Ignore);
+
+                            if (!hasHit)
+                            {
+                                // 何にも当たらなかった
+                                Debug.DrawLine(rayOrigin, pos, Color.yellow);
+                            }
+                            else if (!IsHitScanTarget(hit.collider, interactable))
+                            {
+                                // 何かには当たったが、現在の候補ではなかった
+                                Debug.DrawLine(rayOrigin, hit.point, Color.red);
+                            }
+                            else
+                            {
+                                // 現在の候補自身に当たった
+                                Debug.DrawLine(rayOrigin, hit.point, Color.green);
+
+                                moreCenter = center;
+                                _focusIndex = Array.IndexOf(_interactables, interactable);
+                            }
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Raycastが対象の展示物に当たったかを確認するメソッド
+        /// </summary>
+        /// <param name="hitCollider">Raycastが当たったCollider</param>
+        /// <param name="target">判定対象の展示物</param>
+        /// <returns>同じNetworkObjectに属していればtrue</returns>
+        bool IsHitScanTarget(Collider hitCollider, TakamuraScanTarget target)
+        {
+            if (hitCollider == null || target == null) return false;
+
+            var hitNetworkObject = hitCollider.GetComponent<InteractableBase>();
+            if (hitNetworkObject == null)
+                hitNetworkObject = hitCollider.GetComponentInParent<InteractableBase>();
+            var targetNetworkObject = target.GetComponent<InteractableBase>();
+            if (targetNetworkObject == null)
+                targetNetworkObject = target.GetComponentInParent<InteractableBase>();
+            return hitNetworkObject != null
+                && targetNetworkObject != null
+                && hitNetworkObject == targetNetworkObject;
         }
 
         /// <summary>
@@ -265,11 +316,8 @@ namespace InGame.Player
                 // 展示物の座標をスクリーン座標に変換
                 var target = _interactables[_focusIndex];
                 if (target == null) return;
-                var col = target.GetComponentInChildren<Collider>();
-                var pos = _camera.WorldToScreenPoint(
-                    col != null
-                    ? col.bounds.center
-                    : target.transform.position);
+                var pivot = target.ScanPos;
+                var pos = _camera.WorldToScreenPoint(pivot ? pivot.position : target.transform.position);
 
                 // 擬態対象であることを示すImageを展示物の位置へ移動
                 _scannerCanvas.SetImageOverExhibit(pos);
