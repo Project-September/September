@@ -1199,9 +1199,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccb4dc5b90f5e7d428d90cec59147410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _focusPosition: {x: 0, y: 1, z: -1.5}
+  _focusPosition: {x: 0.5, y: 0.5, z: -1}
   _cameraMoveDuration: 0.2
   _scannableMaxDistance: 10
+  _ignoreLayer:
+    serializedVersion: 2
+    m_Bits: 4160
   _scannerCanvas: {fileID: 7310910699517085291}
   _visual: {fileID: 5851093174879335224}
 --- !u!114 &3505574817478847412 stripped
