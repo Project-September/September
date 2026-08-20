@@ -22,7 +22,8 @@ namespace September.Common
         Warp,
         AirplaneForward,
         AirPlaneBack,
-        Shooting
+        Shooting,
+        Evasion
     }
 
     public struct PlayerInput : INetworkInput
@@ -85,6 +86,7 @@ namespace September.Common
                     playerInput.Buttons.Set(PlayerButtons.Jump, playerActions.Jump.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Dash, playerActions.Dash.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Aim, playerActions.Aim.IsPressed());
+                    playerInput.Buttons.Set(PlayerButtons.Evasion, playerActions.Ability2.IsPressed());
                 }
                 else
                 {

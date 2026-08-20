@@ -1686,12 +1686,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ExcludedPropertiesInInspector:
-  - m_Script
-  m_LockStageInInspector: 
+  Priority:
+    Enabled: 0
+    m_Value: 0
+  OutputChannel: 1
+  StandbyUpdate: 2
   m_StreamingVersion: 20170927
-  m_Priority: 100
-  m_StandbyUpdate: 2
+  m_LegacyPriority: 100
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
   m_Lens:
@@ -1701,17 +1702,30 @@ MonoBehaviour:
     FarClipPlane: 5000
     Dutch: 0
     ModeOverride: 0
-    LensShift: {x: 0, y: 0}
     GateFit: 2
-    FocusDistance: 10
     m_SensorSize: {x: 1, y: 1}
-  m_Transitions:
+    LensShift: {x: 0, y: 0}
+    FocusDistance: 10
+    Iso: 200
+    ShutterSpeed: 0.005
+    Aperture: 16
+    BladeCount: 5
+    Curvature: {x: 2, y: 11}
+    BarrelClipping: 0.25
+    Anamorphism: 0
+  BlendHint: 0
+  m_OnCameraLiveEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ExcludedPropertiesInInspector:
+  - m_Script
+  m_LockStageInInspector: 
+  m_LegacyTransitions:
     m_BlendHint: 0
     m_InheritPosition: 0
     m_OnCameraLive:
       m_PersistentCalls:
         m_Calls: []
-  m_LegacyBlendHint: 0
   m_ComponentOwner: {fileID: 4484651251502279200}
 --- !u!1 &3275749819414075280
 GameObject:
@@ -5650,6 +5664,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   _hookPower: 10
   _flyingDamping: 8
+  _evasionData: {fileID: 11400000, guid: a5096594ea23bc742976e6998f7765a8, type: 2}
+  _playerHealth: {fileID: 5358505061852357365}
+  _playerJewelryRuntime: {fileID: 1599483826122540206}
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
@@ -5661,6 +5678,7 @@ MonoBehaviour:
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
+  _IgnoreEvasionInput: 0
   _IsHookLocked: 0
 --- !u!114 &8355274600117350697
 MonoBehaviour:
@@ -5873,6 +5891,8 @@ MonoBehaviour:
   _playerMovement: {fileID: 3242880713039265549}
   _jumpOver: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
   _jumpOverDuration: 0.6
+  _rollEvasion: {fileID: 7400000, guid: 6651d47ff3cea744da151f1144aa5df5, type: 2}
+  _evasionData: {fileID: 11400000, guid: a5096594ea23bc742976e6998f7765a8, type: 2}
   _fallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
   _faint: {fileID: 7400000, guid: 00a8b652748ed8f4ea8e54c508f4eb58, type: 2}
   _getUp: {fileID: 7400000, guid: 185b7a4f581769045a34df560bf6ab0c, type: 2}
@@ -6751,6 +6771,54 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8156254438002643843}
     m_Modifications:
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3369059348246026865, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1210379603937110379, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702538540989974102, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6790,6 +6858,22 @@ PrefabInstance:
     - target: {fileID: 4789464629759807630, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266250214856041978, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
       objectReference: {fileID: 0}
     - target: {fileID: 6297285441075323246, guid: d176495b4f968bf46837d10d26dfa0ba, type: 3}
       propertyPath: m_Name
@@ -7126,11 +7210,11 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2344147704445828848, guid: 3771ddbdeab830345bcc3d7d541da713, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[0]
+      propertyPath: 'NetworkedBehaviours.Array.data[0]'
       value: 
       objectReference: {fileID: 1599483826122540206}
     - target: {fileID: 2344147704445828848, guid: 3771ddbdeab830345bcc3d7d541da713, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[1]
+      propertyPath: 'NetworkedBehaviours.Array.data[1]'
       value: 
       objectReference: {fileID: 3839639129466349583}
     - target: {fileID: 4069368468996903185, guid: 3771ddbdeab830345bcc3d7d541da713, type: 3}
@@ -7190,7 +7274,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5485954763178056702, guid: 3771ddbdeab830345bcc3d7d541da713, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[0]
+      propertyPath: 'NetworkedBehaviours.Array.data[0]'
       value: 
       objectReference: {fileID: 1599483826122540206}
     - target: {fileID: 6897165130390802129, guid: 3771ddbdeab830345bcc3d7d541da713, type: 3}
