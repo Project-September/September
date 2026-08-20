@@ -228,6 +228,7 @@ namespace September.InGame.Exhibit
 
 		private void AnimationEnd()
 		{
+			_animationClipPlayer.StopClip(_playerUseAnimationClip);
 			_animationClipPlayer = null;
 		}
 

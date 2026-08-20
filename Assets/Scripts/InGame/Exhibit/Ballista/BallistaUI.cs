@@ -8,8 +8,7 @@ namespace  September.InGame.Exhibit.UI
     public class BallistaUI : MonoBehaviour
     {
         [SerializeField] ProjectileInteractableBase _projectile;
-        [SerializeField] TMP_Text _projectileText;
-        [SerializeField] string _reloadText = "リロード中・・・";
+        [SerializeField] BallistaAmmoView _ammoView;
         private void Start()
         {
             _projectile.OnAmmoChanged += UpdateAmmo;
@@ -22,13 +21,7 @@ namespace  September.InGame.Exhibit.UI
 
         private void UpdateAmmo(int ammo)
         {
-            var text = ammo.ToString();
-            if (ammo == 0)
-            {
-                text = _reloadText;
-            }
-
-            _projectileText.text = text;
+            _ammoView.UpdateAmmo(ammo);
         }
     }
 }
