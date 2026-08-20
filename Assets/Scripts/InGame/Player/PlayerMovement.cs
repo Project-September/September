@@ -165,7 +165,7 @@ namespace InGame.Player
 
         private void StartEvasion()
         {
-            int jewelryCount = _playerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
+            int jewelryCount = _playerJewelryRuntime.JewelryCount;
             var succeeded = _playerEvasion.TryStartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount, out var weightCoefficient);
 
             if (succeeded)
