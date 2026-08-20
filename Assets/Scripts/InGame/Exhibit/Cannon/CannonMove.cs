@@ -39,6 +39,7 @@ namespace September.InGame.Exhibit
 
 		void IProjectileMovement.Update(PlayerInput input)
 		{
+			if(!HasStateAuthority) return;
 			CannonRotate(input.MoveDirection.x, input.LookDirection.y);
 			UpdatePlayerPos();
 		}
