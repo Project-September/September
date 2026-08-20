@@ -23,8 +23,7 @@ namespace InGame.Jewelry
         event Action<JewelryType, Sprite> _onInitialize;
         event Action<JewelryType, int> _onUpdateJewelryQuantity;
 
-        //TODO:仮の取得方法
-        public static Func<int> GetJewelryCount;
+        public Func<int> GetJewelryCount;
 
         private void Awake()
         {

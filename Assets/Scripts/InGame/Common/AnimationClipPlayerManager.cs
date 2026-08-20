@@ -88,11 +88,8 @@ namespace InGame.Common
                 .Select(_ => _playerMovement.IsGroundNet)
                 .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(this);
 
-            _playerMovement.UpdateAsObservable()
-                .Select(_ => _playerMovement.IsEvading)
-                .DistinctUntilChanged()
-                .Where(x => x)
-                .Subscribe(_ => RPC_TriggerEvasion())
+            _playerMovement.OnEvasion
+                .Subscribe(x => RPC_TriggerEvasion(x))
                 .AddTo(this);
         }
 
@@ -201,11 +198,11 @@ namespace InGame.Common
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_TriggerEvasion()
+        public void RPC_TriggerEvasion(float weightCoefficient)
         {
             if (!_hardOverride)
             {
-                _ = TriggerEvasion();
+                _ = TriggerEvasion(weightCoefficient);
             }
         }
 
@@ -236,22 +233,25 @@ namespace InGame.Common
             if (!_playerMovement.IsGroundNet) SetFallAnim(false);
         }
 
-        public async UniTask TriggerEvasion()
+        public async UniTask TriggerEvasion(float weightCoefficient)
         {
+            if (weightCoefficient <= 0f)
+                return;
+
             if (_rollEvasionTokenSrc != null)
             {
                 _rollEvasionTokenSrc.Cancel();
                 _rollEvasionTokenSrc.Dispose();
             }
-            _animationClipPlayer.PlayOnTopLayer(_rollEvasion);
+            _animationClipPlayer.PlayOnTopLayer(_rollEvasion, 1 / weightCoefficient);
 
             _rollEvasionTokenSrc = new CancellationTokenSource();
-            // ジャンプオーバークリップの長さだけ待機（速度変更を考慮しない場合は length をそのまま使用）
+
             if (_rollEvasion && _rollEvasion.length > 0f)
             {
                 try
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_evasionData.RollDuration), cancellationToken: _rollEvasionTokenSrc.Token);
+                    await UniTask.Delay(TimeSpan.FromSeconds(_evasionData.RollDuration * weightCoefficient), cancellationToken: _rollEvasionTokenSrc.Token);
                 }
                 catch (OperationCanceledException)
                 {

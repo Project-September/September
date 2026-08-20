@@ -6,7 +6,7 @@ namespace InGame.Player
     public class PlayerEvasion
     {
         private EvasionData _evasionData;
-        private Vector3 _rollDirection;
+        private Vector3 _moveDirection;
         private float _rollDistance;
         private float _startTime;
         private float _rollEndTime;
@@ -27,28 +27,30 @@ namespace InGame.Player
             _evasionData = evasionData;
         }
 
-        public void StartEvasion(Vector2 inputDirection, Vector3 targetForward, float runnerTime, int jewelryCount)
+        public bool TryStartEvasion(Vector2 inputDirection, Vector3 currentForward, float runnerTime, int playerWeight, out float weightCoefficient)
         {
+            weightCoefficient = 0;
+
             if (_isEvading)
-                return;
+                return false;
 
             //クールダウン中
             if (_rollEndTime + _evasionData.Cooldown > runnerTime)
-                return;
+                return false;
 
             _isEvading = true;
 
             //入力がないならプレイヤーの方向にする
             if (inputDirection.magnitude < Mathf.Epsilon)
-                inputDirection = targetForward;
+                inputDirection = new Vector2(currentForward.x, currentForward.z);
 
             //回避方向を決める
-            var targetDirection = new Vector2(targetForward.x, targetForward.z);
+            var targetDirection = new Vector2(currentForward.x, currentForward.z);
             var angle = Vector2.SignedAngle(inputDirection, targetDirection);
             var clampedAngle = Mathf.Clamp(angle, -_evasionData.InputAngle, _evasionData.InputAngle);
-            _rollDirection = Quaternion.Euler(0, clampedAngle, 0) * targetForward;
+            _moveDirection = Quaternion.Euler(0, clampedAngle, 0) * currentForward;
 
-            float weightCoefficient = CalculateWeightCoefficient(jewelryCount);
+            weightCoefficient = CalculateWeightCoefficient(playerWeight);
 
             _startTime = runnerTime;
             _rollEndTime = runnerTime + _evasionData.RollDuration * weightCoefficient;
@@ -56,7 +58,9 @@ namespace InGame.Player
             var turnProgress = Mathf.InverseLerp(0, _evasionData.InputAngle, Mathf.Abs(clampedAngle));
             _turnEndTime = runnerTime + _evasionData.MaxTurnDuration * turnProgress * weightCoefficient;
             _previousDistance = 0f;
-            _startDirection = targetForward;
+            _startDirection = currentForward;
+
+            return true;
         }
 
         public Vector3 Move(Vector3 targetPosition, float runnerTime)
@@ -76,7 +80,7 @@ namespace InGame.Player
 
             _previousDistance = currentDistance;
 
-            return targetPosition + _rollDirection * distanceDelta;
+            return targetPosition + _moveDirection * distanceDelta;
         }
 
         public Vector3 Turn(Vector3 forward, float runnerTime)
@@ -90,7 +94,7 @@ namespace InGame.Player
             float t = Mathf.InverseLerp(_startTime, _turnEndTime, runnerTime);
             float speedT = _evasionData.TurnSpeedCurve.Evaluate(t);
 
-            Vector3 currentDirection = Vector3.Slerp(_startDirection, _rollDirection, speedT);
+            Vector3 currentDirection = Vector3.Slerp(_startDirection, _moveDirection, speedT);
 
             currentDirection.y = 0f;
             return currentDirection.normalized;
@@ -98,7 +102,8 @@ namespace InGame.Player
 
         public bool IsInvincible(float runnerTime)
         {
-            return runnerTime - _startTime <= _evasionData.InvincibleTime;
+            float evasionTime = runnerTime - _startTime;
+            return evasionTime >= _evasionData.StartInvincibleTime && evasionTime <= _evasionData.InvincibleTime;
         }
 
         private bool EndCheck(float runnerTime)

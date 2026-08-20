@@ -41,6 +41,7 @@ namespace InGame.Player
         [Header("Roll")]
         [SerializeField] private EvasionData _evasionData;
         [SerializeField] private PlayerHealth _playerHealth;
+        [SerializeField] private PlayerJewelryRuntime _playerJewelryRuntime;
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
@@ -101,7 +102,11 @@ namespace InGame.Player
         public LayerMask GroundLayer => _groundLayer;
         public bool IsEvading => _playerEvasion.IsEvading;
         [Networked] public bool IgnoreMoveInput { get; set; }
+        [Networked] public bool IgnoreEvasionInput { get; set; }
         [Networked] public bool IsHookLocked { get; set; }
+
+        private readonly Subject<float> _onEvasion = new();
+        public IObservable<float> OnEvasion => _onEvasion;
 
         private void Awake()
         {
@@ -145,10 +150,10 @@ namespace InGame.Player
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             // set velocity
-            if (isJump && HasStateAuthority) TryVault(moveDirection);
+            if (!_playerEvasion.IsEvading && isJump && HasStateAuthority) TryVault(moveDirection);
 
             //回避
-            if (isEvasion && HasStateAuthority)
+            if (!IgnoreEvasionInput && IsGround && !DoingVault && isEvasion && HasStateAuthority)
                 StartEvasion();
 
             if (DoingVault || _playerEvasion.IsEvading)
@@ -160,9 +165,14 @@ namespace InGame.Player
 
         private void StartEvasion()
         {
-            int jewelryCount = PlayerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
-            _playerEvasion.StartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount);
-            Stop();
+            int jewelryCount = _playerJewelryRuntime.GetJewelryCount?.Invoke() ?? 0;
+            var succeeded = _playerEvasion.TryStartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount, out var weightCoefficient);
+
+            if (succeeded)
+            {
+                Stop();
+                _onEvasion.OnNext(weightCoefficient);
+            }
         }
 
         /// <summary> 入力無関係のTick UpdateMovementとの呼び出し順序を確定させるためにManagerから呼ばれる </summary>

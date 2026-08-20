@@ -163,7 +163,7 @@ namespace InGame.Player
                 {
                     // player movement に入力を与えて更新する_playerInputManager
                     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
-                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), input.Buttons.IsSet(PlayerButtons.Evasion), Runner.DeltaTime);
+                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
                 }
 
                 _playerMovement.MoveTick(Runner.DeltaTime);
