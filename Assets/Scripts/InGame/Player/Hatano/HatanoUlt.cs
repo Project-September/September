@@ -40,6 +40,8 @@ namespace InGame.Player.Ability
         protected override void OnCutInStart()
         {
             _hatanoAbilityStatusManagement.DisplayToggle(false);
+            _hatanoSequenceManager.RPC_WeaponFBXDisplayToggle(true);
+            _hatanoSequenceManager.RPC_WeaponPrefabHidden();
         }
 
         protected override void OnCutInEnd()
@@ -95,6 +97,7 @@ namespace InGame.Player.Ability
         {
             _isShoot = false;
             _hatanoSequenceManager.RPC_SetStartTimeline();
+            _hatanoSequenceManager.RPC_WeaponFBXDisplayToggle(false);
             _hatanoAbilityStatusManagement.DisplayToggle(true);
             _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
         }
