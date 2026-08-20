@@ -57,7 +57,6 @@ namespace September.InGame.Exhibit
 
 			if (_animationClipPlayer && !_animationClipPlayer.IsPlayingTargetClip(_playerUseAnimationClip))
 			{
-				Debug.Log("PlayAnim");
 				_animationClipPlayer.PlayClip(_playerUseAnimationClip);
 			}
 		}
@@ -109,6 +108,7 @@ namespace September.InGame.Exhibit
 
 			// 使用中のプレイヤーに対する処理
 			if (!_usingPlayer) return;
+			GetPlayerAnimatorClipPlayer(_usingPlayer);
 			PlayerActive(false);
 			_move.InitializeStateAuthority(_usingPlayer.Object, playerRef);
 			FireBulletController.Init();
@@ -119,8 +119,6 @@ namespace September.InGame.Exhibit
 
 			// インタラクトして1秒後からインタラクト解除可能にする
 			InteractEndLockTimer = TickTimer.CreateFromSeconds(Runner, 1f);
-
-			GetPlayerAnimatorClipPlayer(_usingPlayer);
 
 			// 全てのクライアントで必要な初期化処理を行う
 			RPC_AllClientInit(CurrentUsePlayerRef, true);
@@ -192,6 +190,12 @@ namespace September.InGame.Exhibit
 					? PlayerManager.PlayerControlState.Normal
 					: PlayerManager.PlayerControlState.ForcedControl);
 				_usingPlayer.RPC_SetUseGrav(isActive);
+
+				if (_usingPlayer.TryGetComponent(out AnimationClipPlayerManager animationClipPlayerManager))
+				{
+					animationClipPlayerManager.EnableFallMotion = isActive;
+				}
+				
 			}
 		}
 
@@ -217,7 +221,6 @@ namespace September.InGame.Exhibit
 		{
 			// Playerのアニメーション適応
 			if (_playerUseAnimationClip == null) return;
-			Debug.Log($"playerManager {playerManager}");
 			if (playerManager.TryGetComponent(out AnimationClipPlayer playerManagerAnimationClipPlayer))
 			{
 				_animationClipPlayer = playerManagerAnimationClipPlayer;
