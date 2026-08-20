@@ -1,7 +1,6 @@
 using Fusion;
 using InGame.Common;
 using InGame.Health;
-using Result;
 using September.Common;
 using September.InGame.Effect;
 using System;
@@ -76,6 +75,7 @@ namespace InGame.Player.Ability
 
             _startHitTick = FrameToTick(_startHitCheckFrame);
             _playerMovement.IgnoreMoveInput = true;
+
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)

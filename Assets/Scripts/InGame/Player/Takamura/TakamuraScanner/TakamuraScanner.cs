@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace InGame.Player
 {
-    /// <summary>タカムラキャラのスキャンスキルを管理するテストクラス</summary>
+    /// <summary>スキャンに関する処理を持つクラス</summary>
     public class TakamuraScanner : NetworkBehaviour, IAfterTick
     {
         PlayerManager _playerManager;
-        TakamuraMovement _tkmrMovement;
+        TakamuraMovement _movement;
         CameraController _cameraController;
         Camera _camera;
         NetworkButtons _preInput;
@@ -20,23 +20,30 @@ namespace InGame.Player
         NetworkId MimicTargetId { get; set; }
 
         [Header("カメラ制御")]
-        [SerializeField, Tooltip("フォーカス時のカメラの位置")] Vector3 _focusPosition = new(0.5f, 1, -2);
-        [SerializeField, Tooltip("カメラの移動時間")] float _cameraMoveDuration = 0.2f;
-        [Header("カメラスキャンの有効領域についてのパラメータ")]
-        [SerializeField, Tooltip("擬態対象の候補にできる最大距離")] float _scannableMaxDistance = 10f;
-        [SerializeField, Tooltip("コライダーの対象として無視するもののレイヤー")] LayerMask _ignoreLayer;
-        [SerializeField, Tooltip("演出用キャンバス")] ScannerCanvas _scannerCanvas;
-        [Header("ガワ")]
-        [SerializeField] TakamuraVisual _visual;
+        [SerializeField, Tooltip("フォーカス時のカメラの位置")]
+        Vector3 _focusPosition = new(0.5f, 1f, -2f);
 
-        /// <summary>シーン上にある展示物の配列</summary>
-        TakamuraScanTarget[] _interactables;
-        /// <summary>NetworkIDごとの展示物</summary>
+        [SerializeField, Tooltip("カメラの移動時間")]
+        float _cameraMoveDuration = 0.2f;
+
+        [Header("カメラスキャンの有効領域")]
+        [SerializeField, Tooltip("擬態対象の候補にできる最大距離")]
+        float _scannableMaxDistance = 10f;
+
+        [SerializeField, Tooltip("コライダーの対象として無視するレイヤー")]
+        LayerMask _ignoreLayer;
+
+        [SerializeField, Tooltip("演出用キャンバス")]
+        ScannerCanvas _scannerCanvas;
+
+        [Header("ガワ")]
+        [SerializeField]
+        TakamuraVisual _visual;
+
+        TakamuraScanTarget[] _interactables = Array.Empty<TakamuraScanTarget>();
         readonly Dictionary<NetworkId, TakamuraScanTarget> _targetByNetworkId = new();
-        /// <summary>入力権限側で選択中の展示物のIndex</summary>
         int _focusIndex = -1;
 
-        /// <summary>次のTickで行う擬態状態の変更</summary>
         StateChangeType _pendingStateChange = StateChangeType.None;
         int _stateChangeTick = -1;
 
@@ -52,42 +59,18 @@ namespace InGame.Player
         public override void Spawned()
         {
             _playerManager = GetComponent<PlayerManager>();
-            _tkmrMovement = GetComponent<TakamuraMovement>();
+            _movement = GetComponent<TakamuraMovement>();
             _interactables = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
             CreateTargetDictionary();
-            if (_scannerCanvas != null) _scannerCanvas.gameObject.SetActive(false);
-            if (HasInputAuthority) InitInputAuthority();
-            if (HasStateAuthority) InitStateAuthority();
 
-            ChangeVisual();
-        }
-
-        /// <summary>
-        /// NetworkIDから展示物を取得するためのDictionaryを作るメソッド
-        /// </summary>
-        void CreateTargetDictionary()
-        {
-            _targetByNetworkId.Clear();
-
-            foreach (var target in _interactables)
+            if (HasInputAuthority)
             {
-                if (target == null) continue;
-
-                var networkObject = target.GetComponentInParent<NetworkObject>();
-                if (networkObject == null)
-                {
-                    Debug.LogError($"{target.name}にNetworkObjectがありません");
-                    continue;
-                }
-
-                if (_targetByNetworkId.ContainsKey(networkObject.Id))
-                {
-                    Debug.LogError($"{networkObject.name}のNetworkIDが重複しています");
-                    continue;
-                }
-
-                _targetByNetworkId.Add(networkObject.Id, target);
+                _cameraController = GetComponent<CameraController>();
+                _camera = Camera.main;
             }
+
+            _scannerCanvas.gameObject.SetActive(false);
+            ChangeVisual();
         }
 
         public override void FixedUpdateNetwork()
@@ -114,9 +97,9 @@ namespace InGame.Player
         /// <param name="input">このオブジェクトに対する入力権限を持つプレイヤーからの入力</param>
         void Ability2Flow(PlayerInput input)
         {
-            if (!_tkmrMovement.IsGround) return;
+            if (!_movement.IsGround) return;
 
-            if (_tkmrMovement.CurrentMimicryState == MimicryState.Default)
+            if (_movement.CurrentMimicryState == MimicryState.Default)
             {
                 // フォーカスをあてる
                 if (input.Buttons.WasPressed(_preInput, PlayerButtons.Ability2))
@@ -142,7 +125,7 @@ namespace InGame.Player
                         if (networkObject == null) return;
 
                         RPC_Mimic(networkObject.Id);
-                        Mimic();
+                        FocusEndEffective();
                     }
                 }
 
@@ -156,7 +139,7 @@ namespace InGame.Player
                     if (HasStateAuthority) FocusEndStateChange();
                 }
             }
-            else if (_tkmrMovement.CurrentMimicryState == MimicryState.MimicExhibit)
+            else if (_movement.CurrentMimicryState == MimicryState.MimicExhibit)
             {
                 // 擬態解除する
                 if (input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
@@ -167,20 +150,77 @@ namespace InGame.Player
             }
         }
 
-        #region InputAuthority
         /// <summary>
-        /// 入力権限がある場合の初期化メソッド
+        /// 全端末で擬態するためのメソッド
         /// </summary>
-        void InitInputAuthority()
+        /// <param name="targetId">擬態対象のNetworkId</param>
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        void RPC_Mimic(NetworkId targetId)
         {
-            _cameraController = GetComponent<CameraController>();
-            _camera = Camera.main;
-            _scannerCanvas.gameObject.SetActive(true);
-            _scannerCanvas.ChangeImageVisibility(false);
+            if (!_targetByNetworkId.TryGetValue(targetId, out var target)) return;
+            var interactable = target.GetComponentInParent<InteractableBase>();
+            if (!interactable || _movement.CurrentMimicryState != MimicryState.Default) return;
+
+            transform.position += Vector3.up;
+            MimicTargetId = targetId;
+            _movement.CurrentExhibitType = interactable.ExhibitType;
+            ReserveStateChange(StateChangeType.Mimic);
         }
 
         /// <summary>
-        /// フォーカスを当て始めた時の演出メソッド
+        /// 全端末で擬態解除するためのメソッド
+        /// </summary>
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
+        void RPC_Reveal()
+        {
+            ReserveReveal();
+        }
+
+        /// <summary>
+        /// 擬態解除メソッド
+        /// </summary>
+        void ReserveReveal()
+        {
+            if (_movement.CurrentMimicryState != MimicryState.MimicExhibit) return;
+            transform.position += Vector3.up;
+            ReserveStateChange(StateChangeType.Reveal);
+        }
+
+        /// <summary>
+        /// 状態変更の予約メソッド
+        /// </summary>
+        /// <param name="stateChange"></param>
+        void ReserveStateChange(StateChangeType stateChange)
+        {
+            _pendingStateChange = stateChange;
+            _stateChangeTick = Runner.Tick + 1;
+        }
+
+        /// <summary>
+        /// 状態変更を適用するメソッド
+        /// </summary>
+        void ApplyPendingStateChange()
+        {
+            if (_pendingStateChange == StateChangeType.None || Runner.Tick < _stateChangeTick) return;
+
+            switch (_pendingStateChange)
+            {
+                case StateChangeType.Mimic:
+                    _movement.CurrentMimicryState = MimicryState.MimicExhibit;
+                    FocusEndStateChange();
+                    break;
+                case StateChangeType.Reveal:
+                    MimicTargetId = default;
+                    _movement.CurrentMimicryState = MimicryState.Default;
+                    break;
+            }
+
+            _pendingStateChange = StateChangeType.None;
+            _stateChangeTick = -1;
+        }
+
+        /// <summary>
+        /// フォーカスを開始した時の演出メソッド
         /// </summary>
         void FocusStartEffective()
         {
@@ -192,18 +232,16 @@ namespace InGame.Player
         /// <summary>
         /// フォーカス中の演出メソッド
         /// </summary>
-        /// <param name="input">このTickで同期されているプレイヤー入力</param>
+        /// <param name="input">プレイヤーが向く方向</param>
         void FocusEffective(PlayerInput input)
         {
-            // Cinemachineの描画結果をFixedUpdateNetworkで直接参照すると、
-            // プレイヤー回転との追従が循環してカメラが揺れるため入力値を使用する
-            _tkmrMovement.SetRotationDirection(input.DesiredLookDirection);
+            _movement.SetRotationDirection(input.DesiredLookDirection);
             UpdateNearestExhibit();
             FocusExhibit();
         }
 
         /// <summary>
-        /// フォーカスを解除した時の演出メソッド
+        /// フォーカス終了時の演出メソッド
         /// </summary>
         void FocusEndEffective()
         {
@@ -214,244 +252,142 @@ namespace InGame.Player
         }
 
         /// <summary>
-        /// より近い展示物を計算して取得するメソッド
+        /// フォーカス開始時の状態変更メソッド
+        /// </summary>
+        void FocusStartStateChange()
+        {
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            _movement.CurrentAbilityPhase = ScanAbilityPhase.Scanning;
+        }
+
+        /// <summary>
+        /// フォーカス終了時の状態変更メソッド
+        /// </summary>
+        void FocusEndStateChange()
+        {
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            _movement.CurrentAbilityPhase = ScanAbilityPhase.Default;
+        }
+
+        /// <summary>
+        /// 条件に合った擬態対象を計算して取得するメソッド
         /// </summary>
         void UpdateNearestExhibit()
         {
             var moreCenter = float.MaxValue;
             _focusIndex = -1;
+
             foreach (var interactable in _interactables)
             {
-                if (interactable == null) continue;
-                if (!interactable.gameObject.activeSelf) continue;
+                if (!interactable || !interactable.gameObject.activeSelf) continue;
 
-                // 展示物の座標を取得
+                // 画面上の位置
                 var pivot = interactable.ScanPos;
-                Vector3 pos = pivot ? pivot.position : interactable.transform.position;
+                var position = pivot ? pivot.position : interactable.transform.position;
+                var viewportPoint = _camera.WorldToViewportPoint(position);
 
-                // カメラに写っているかを確認
-                var viewportPoint = _camera.WorldToViewportPoint(pos);
-                if (0 <= viewportPoint.x && viewportPoint.x <= 1
-                    && 0 <= viewportPoint.y && viewportPoint.y <= 1
-                    && 0 <= viewportPoint.z)
+                // 画面内にいなければスキップ
+                if (viewportPoint.x < 0f || viewportPoint.x > 1f
+                    || viewportPoint.y < 0f || viewportPoint.y > 1f
+                    || viewportPoint.z < 0f)
+                    continue;
+
+                // 判定距離内かどうか
+                var distance = Vector3.SqrMagnitude(position - transform.position);
+                if (distance > _scannableMaxDistance * _scannableMaxDistance) continue;
+
+                // より画面の中心にいるかどうか
+                var center = (0.5f - viewportPoint.x) * (0.5f - viewportPoint.x)
+                             + (0.5f - viewportPoint.y) * (0.5f - viewportPoint.y);
+                if (center >= moreCenter) continue;
+
+                // 壁越しかどうか判定
+                var rayOrigin = _camera.transform.position;
+                var rayDirection = position - rayOrigin;
+                var rayDistance = rayDirection.magnitude;
+                var hasHit = Physics.Raycast(
+                    rayOrigin,
+                    rayDirection.normalized,
+                    out var hit,
+                    rayDistance,
+                    ~_ignoreLayer,
+                    QueryTriggerInteraction.Ignore);
+
+                if (!hasHit)
                 {
-                    var distance = Vector3.SqrMagnitude(pos - transform.position);
-                    // 判定距離内にいるか判定
-                    if (distance <= _scannableMaxDistance * _scannableMaxDistance)
-                    {
-                        // 画面のどのあたりに移っているかを計算
-                        var center = (0.5f - viewportPoint.x) * (0.5f - viewportPoint.x)
-                            + (0.5f - viewportPoint.y) * (0.5f - viewportPoint.y);
-                        // より中心に映っているか
-                        if (center < moreCenter)
-                        {
-                            // カメラから見て壁越しじゃないか
-                            var rayOrigin = _camera.transform.position;
-                            var rayDirection = pos - rayOrigin;
-                            var rayDistance = rayDirection.magnitude;
-                            var hasHit = Physics.Raycast(
-                                rayOrigin,
-                                rayDirection.normalized,
-                                out var hit,
-                                rayDistance,
-                                ~_ignoreLayer,
-                                QueryTriggerInteraction.Ignore);
-
-                            if (!hasHit)
-                            {
-                                // 何にも当たらなかった
-                                Debug.DrawLine(rayOrigin, pos, Color.yellow);
-                            }
-                            else if (!IsHitScanTarget(hit.collider, interactable))
-                            {
-                                // 何かには当たったが、現在の候補ではなかった
-                                Debug.DrawLine(rayOrigin, hit.point, Color.red);
-                            }
-                            else
-                            {
-                                // 現在の候補自身に当たった
-                                Debug.DrawLine(rayOrigin, hit.point, Color.green);
-
-                                moreCenter = center;
-                                _focusIndex = Array.IndexOf(_interactables, interactable);
-                            }
-                        }
-                    }
+                    Debug.DrawLine(rayOrigin, position, Color.yellow);
+                }
+                else if (!IsHitScanTarget(hit.collider, interactable))
+                {
+                    Debug.DrawLine(rayOrigin, hit.point, Color.red);
+                }
+                else
+                {
+                    // 条件に合致した
+                    Debug.DrawLine(rayOrigin, hit.point, Color.green);
+                    moreCenter = center;
+                    _focusIndex = Array.IndexOf(_interactables, interactable);
                 }
             }
         }
 
         /// <summary>
-        /// Raycastが対象の展示物に当たったかを確認するメソッド
+        /// 壁越し判定メソッド
         /// </summary>
-        /// <param name="hitCollider">Raycastが当たったCollider</param>
-        /// <param name="target">判定対象の展示物</param>
-        /// <returns>同じNetworkObjectに属していればtrue</returns>
+        /// <param name="hitCollider">Rayが当たったオブジェクト</param>
+        /// <param name="target">想定している擬態対象</param>
+        /// <returns>壁が間にないか</returns>
         bool IsHitScanTarget(Collider hitCollider, TakamuraScanTarget target)
         {
-            if (hitCollider == null || target == null) return false;
+            if (!hitCollider || !target) return false;
 
             var hitNetworkObject = hitCollider.GetComponent<InteractableBase>();
-            if (hitNetworkObject == null)
+            if (!hitNetworkObject)
                 hitNetworkObject = hitCollider.GetComponentInParent<InteractableBase>();
+
             var targetNetworkObject = target.GetComponent<InteractableBase>();
-            if (targetNetworkObject == null)
+            if (!targetNetworkObject)
                 targetNetworkObject = target.GetComponentInParent<InteractableBase>();
-            return hitNetworkObject != null
-                && targetNetworkObject != null
-                && hitNetworkObject == targetNetworkObject;
+
+            return hitNetworkObject && targetNetworkObject && hitNetworkObject == targetNetworkObject;
         }
 
         /// <summary>
-        /// 擬態対象の位置を計算して描画指示を出すメソッド
+        /// 擬態対象にフォーカスを合わせる演出メソッド
         /// </summary>
         void FocusExhibit()
         {
             var scanned = _focusIndex != -1;
             _scannerCanvas.ChangeImageVisibility(scanned);
+            if (!scanned) return;
 
-            // 展示物かどうかの最終確認ができたら描画処理
-            if (scanned)
+            var target = _interactables[_focusIndex];
+            if (!target) return;
+
+            var pivot = target.ScanPos;
+            var position = _camera.WorldToScreenPoint(pivot ? pivot.position : target.transform.position);
+            _scannerCanvas.SetImageOverExhibit(position);
+        }
+
+        /// <summary>
+        /// 擬態対象のNetworkIdをキャッシュするメソッド
+        /// </summary>
+        void CreateTargetDictionary()
+        {
+            _targetByNetworkId.Clear();
+
+            foreach (var target in _interactables)
             {
-                // 展示物の座標をスクリーン座標に変換
-                var target = _interactables[_focusIndex];
-                if (target == null) return;
-                var pivot = target.ScanPos;
-                var pos = _camera.WorldToScreenPoint(pivot ? pivot.position : target.transform.position);
+                if (!target) continue;
 
-                // 擬態対象であることを示すImageを展示物の位置へ移動
-                _scannerCanvas.SetImageOverExhibit(pos);
+                var networkObject = target.GetComponentInParent<NetworkObject>();
+                if (!networkObject || _targetByNetworkId.ContainsKey(networkObject.Id)) continue;
+                _targetByNetworkId.Add(networkObject.Id, target);
             }
         }
 
         /// <summary>
-        /// 擬態するメソッド
-        /// </summary>
-        void Mimic()
-        {
-            FocusEndEffective();
-        }
-        #endregion
-
-        #region StateAuthority
-        /// <summary>
-        /// 状態変更権限がある場合の初期化メソッド
-        /// </summary>
-        void InitStateAuthority()
-        {
-            // いらないかも
-        }
-
-        /// <summary>
-        /// フォーカスを当て始めた時に呼ばれるメソッド
-        /// </summary>
-        void FocusStartStateChange()
-        {
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
-            _tkmrMovement.CurrentAbilityPhase = ScanAbilityPhase.Scanning;
-        }
-
-        /// <summary>
-        /// フォーカスを解除した時に呼ばれるメソッド
-        /// </summary>
-        void FocusEndStateChange()
-        {
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
-            _tkmrMovement.CurrentAbilityPhase = ScanAbilityPhase.Default;
-        }
-
-        /// <summary>
-        /// 擬態するときに呼ばれるメソッド
-        /// </summary>
-        void MimicStateChange()
-        {
-            _tkmrMovement.CurrentMimicryState = MimicryState.MimicExhibit;
-            FocusEndStateChange();
-        }
-
-        /// <summary>
-        /// 擬態解除するときに呼ばれるメソッド
-        /// </summary>
-        void RevealStateChange()
-        {
-            _tkmrMovement.CurrentMimicryState = MimicryState.Default;
-        }
-        #endregion
-
-        #region Network
-        /// <summary>
-        /// 入力権限側で決定した擬態対象を状態変更権限側へ送るメソッド
-        /// </summary>
-        /// <param name="targetId">擬態対象のNetworkID</param>
-        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-        void RPC_Mimic(NetworkId targetId)
-        {
-            if (!_targetByNetworkId.TryGetValue(targetId, out var target)) return;
-            var interactable = target.GetComponentInParent<InteractableBase>();
-            if (interactable == null) return;
-            if (_tkmrMovement.CurrentMimicryState != MimicryState.Default) return;
-
-            // コライダーの不都合を考えて少し上に移動
-            transform.position += Vector3.up;
-
-            // 擬態対象の情報を状態変更権限側で確定する
-            MimicTargetId = targetId;
-            _tkmrMovement.CurrentExhibitType = interactable.ExhibitType;
-
-            // このTickのAttack入力を攻撃条件が判定してから擬態状態を変更する
-            ReserveStateChange(StateChangeType.Mimic);
-        }
-
-        /// <summary>
-        /// 擬態解除を状態変更権限側へ要求するメソッド
-        /// </summary>
-        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, Channel = RpcChannel.Reliable)]
-        void RPC_Reveal()
-        {
-            if (_tkmrMovement.CurrentMimicryState != MimicryState.MimicExhibit) return;
-
-            // コライダーの不都合を考えて少し上に移動
-            transform.position += Vector3.up;
-
-            // このTickのAttack入力を擬態解除攻撃として判定してから状態を戻す
-            ReserveStateChange(StateChangeType.Reveal);
-        }
-
-        /// <summary>
-        /// 擬態状態の変更を次のTickに予約するメソッド
-        /// </summary>
-        /// <param name="stateChange">予約する状態変更</param>
-        void ReserveStateChange(StateChangeType stateChange)
-        {
-            _pendingStateChange = stateChange;
-            _stateChangeTick = Runner.Tick + 1;
-        }
-
-        /// <summary>
-        /// 予約されている擬態状態の変更を行うメソッド
-        /// </summary>
-        void ApplyPendingStateChange()
-        {
-            if (_pendingStateChange == StateChangeType.None) return;
-            if (Runner.Tick < _stateChangeTick) return;
-
-            switch (_pendingStateChange)
-            {
-                case StateChangeType.Mimic:
-                    MimicStateChange();
-                    break;
-                case StateChangeType.Reveal:
-                    MimicTargetId = default;
-                    RevealStateChange();
-                    break;
-            }
-
-            _pendingStateChange = StateChangeType.None;
-            _stateChangeTick = -1;
-        }
-
-        /// <summary>
-        /// 擬態対象が変更された時に見た目を変更するメソッド
+        /// 擬態対象のIdが変わった時に呼ばれるメソッド
         /// </summary>
         void OnMimicTargetChanged()
         {
@@ -459,11 +395,11 @@ namespace InGame.Player
         }
 
         /// <summary>
-        /// 現在の擬態対象に合わせて見た目を変更するメソッド
+        /// ガワを変更するメソッド
         /// </summary>
         void ChangeVisual()
         {
-            if (_visual == null) return;
+            if (!_visual) return;
 
             if (MimicTargetId == default)
             {
@@ -471,63 +407,10 @@ namespace InGame.Player
                 return;
             }
 
-            if (!_targetByNetworkId.TryGetValue(MimicTargetId, out var target)) return;
-
-            // ガワを変える
-            _visual.Mimic(target);
-        }
-        #endregion
-
-        private void OnDrawGizmosSelected()
-        {
-            DrawScanArea();
-        }
-
-        #region Gizmos
-        /// <summary>
-        /// スキャン領域を描画するメソッド
-        /// </summary>
-        void DrawScanArea()
-        {
-            if (_camera == null) return;
-
-            Gizmos.color = Color.green;
-            // カメラの描画範囲の四隅かつ最大スキャン距離
-            Vector3 bl = _camera.ViewportToWorldPoint(new Vector3(0, 0, _scannableMaxDistance));
-            Vector3 br = _camera.ViewportToWorldPoint(new Vector3(1, 0, _scannableMaxDistance));
-            Vector3 tr = _camera.ViewportToWorldPoint(new Vector3(1, 1, _scannableMaxDistance));
-            Vector3 tl = _camera.ViewportToWorldPoint(new Vector3(0, 1, _scannableMaxDistance));
-
-            // カメラと同じような線を描く
-            var cameraPos = _camera.transform.position;
-            var blCameraPos = cameraPos + (bl - cameraPos).normalized * _scannableMaxDistance;
-            var brCameraPos = cameraPos + (br - cameraPos).normalized * _scannableMaxDistance;
-            var trCameraPos = cameraPos + (tr - cameraPos).normalized * _scannableMaxDistance;
-            var tlCameraPos = cameraPos + (tl - cameraPos).normalized * _scannableMaxDistance;
-            Gizmos.DrawLine(blCameraPos, brCameraPos);
-            Gizmos.DrawLine(brCameraPos, trCameraPos);
-            Gizmos.DrawLine(trCameraPos, tlCameraPos);
-            Gizmos.DrawLine(tlCameraPos, blCameraPos);
-            Gizmos.DrawLine(blCameraPos, cameraPos);
-            Gizmos.DrawLine(brCameraPos, cameraPos);
-            Gizmos.DrawLine(trCameraPos, cameraPos);
-            Gizmos.DrawLine(tlCameraPos, cameraPos);
-
-            // スキャン範囲の先端部分を描画
-            var segments = 36;
-            var rightUpLine = tr - bl;
-            var leftUpLine = br - tl;
-            for (int i = 0; i < segments; i++)
+            if (_targetByNetworkId.TryGetValue(MimicTargetId, out var target) && target)
             {
-                var rightUpLineElement1 = ((bl + rightUpLine * i / segments) - cameraPos).normalized * _scannableMaxDistance;
-                var rightUpLineElement2 = ((bl + rightUpLine * (i + 1) / segments) - cameraPos).normalized * _scannableMaxDistance;
-                var leftUpLineElement3 = ((tl + leftUpLine * i / segments) - cameraPos).normalized * _scannableMaxDistance;
-                var leftUpLineElement4 = ((tl + leftUpLine * (i + 1) / segments) - cameraPos).normalized * _scannableMaxDistance;
-
-                Gizmos.DrawLine(cameraPos + rightUpLineElement1, cameraPos + rightUpLineElement2);
-                Gizmos.DrawLine(cameraPos + leftUpLineElement3, cameraPos + leftUpLineElement4);
+                _visual.Mimic(target);
             }
         }
-        #endregion
     }
 }
