@@ -195,7 +195,6 @@ namespace September.InGame.Exhibit
 				{
 					animationClipPlayerManager.EnableFallMotion = isActive;
 				}
-				
 			}
 		}
 
