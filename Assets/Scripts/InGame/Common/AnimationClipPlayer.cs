@@ -777,7 +777,7 @@ namespace InGame.Common
 
             // AnimationClipsContainer から探してRPCで停止を全クライアントに通知
             var index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
-                x => x.AnimClip.name == clip.name);
+                x => x.AnimClip && x.AnimClip.name == clip.name);
 
             if (index >= 0)
             {
