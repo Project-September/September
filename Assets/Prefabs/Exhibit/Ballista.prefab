@@ -206,7 +206,6 @@ MonoBehaviour:
     rid: 3743209666480701525
   _reticleEffect:
     rid: 3743209666480701524
-  _CurrentAmmo: 0
   references:
     version: 2
     RefIds:
@@ -233,8 +232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _projectile: {fileID: 5101475634166198175}
-  _projectileText: {fileID: 4922782252763583060}
-  _reloadText: "\u30EA\u30ED\u30FC\u30C9\u4E2D\u30FB\u30FB\u30FB"
+  _ammoView: {fileID: 8106772621757500372}
 --- !u!114 &4565694175186777013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,15 +529,15 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1832458914817281278, guid: 6113a865c60f20c4da37639ba4628e7c, type: 3}
   m_PrefabInstance: {fileID: 3165084215387103864}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4922782252763583060 stripped
+--- !u!114 &8106772621757500372 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8051766752025653292, guid: 6113a865c60f20c4da37639ba4628e7c, type: 3}
+  m_CorrespondingSourceObject: {fileID: 6588108662817941932, guid: 6113a865c60f20c4da37639ba4628e7c, type: 3}
   m_PrefabInstance: {fileID: 3165084215387103864}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a88f32d41249464ea51a7ed2f9ea4e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &4728178545404263432
