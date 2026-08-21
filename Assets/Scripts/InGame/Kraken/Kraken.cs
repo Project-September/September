@@ -63,6 +63,8 @@ namespace September.InGame.Kraken
 
         [Networked] private TickTimer DisappearTimer { get; set; }
 
+        public KrakenTentacles Tentacles => _tentacles;
+
         // === IDamageable実装 ===
         public bool IsAlive => true; // ダメージを受けるだけで死亡しない
         public PlayerRef OwnerPlayerRef { get; private set; }

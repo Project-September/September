@@ -148,6 +148,10 @@ namespace September.InGame.Kraken.Animations
             Debug.Log($"{target} {forward} {dir} {rot.eulerAngles}", _armSettings.ArmRoot);
 
             root.rotation = rot * root.rotation;
+
+            _armSettings.TargetPosition = target;
+            _armSettings.TargetDirection = dir;
+            _armSettings.TargetDirectionPlaneNormal = root.transform.forward;
         }
 
         public async UniTask PlayAnimation(CancellationToken token = default)
@@ -210,6 +214,9 @@ namespace September.InGame.Kraken.Animations
         [NonSerialized] public int StartAttackTick;
         [NonSerialized] public bool IsAttacking;
         [NonSerialized] public List<Vector3> CollidedPoints = new();
+        [NonSerialized] public Vector3 TargetPosition;
+        [NonSerialized] public Vector3 TargetDirection;
+        [NonSerialized] public Vector3 TargetDirectionPlaneNormal;
 
         public bool EnablePhysics
         {

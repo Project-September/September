@@ -23,6 +23,10 @@ namespace September.InGame.Kraken.Animations
         [SerializeField] private int _pbdIterations = 5;
         [SerializeField] private int _pbdSubsteps = 5;
 
+        [Header("Tentacle Settings")]
+        [SerializeField] private Kraken _kraken;
+        [SerializeField] private int _tentacleIndex;
+
         public event Action<Vector3> OnCollided;
 
         private float[] _segmentLengths;
@@ -35,6 +39,8 @@ namespace September.InGame.Kraken.Animations
         private bool[] _isCollidingThisFrame;
         private bool[] _wasCollided;
         private Vector3[] _hitPoints;
+
+        private ArmSettings ArmSettings => _kraken.Tentacles.Arms[_tentacleIndex];
 
         /// <summary>
         /// Solves constraints for the given input points.
@@ -78,12 +84,23 @@ namespace September.InGame.Kraken.Animations
 
                         if (EnablePhysicsConstraint && i != 0)
                         {
-                            solvedPositions[i] = ResolveCollisions(p, _radius, _layerMask, out bool collided, out Vector3 hitPoint);
+                            Vector3 pos = ResolveCollisions(p, _radius, _layerMask, out bool collided, out Vector3 hitPoint);
+
                             if (collided)
                             {
+                                // 接触情報を保存
                                 _isCollidingThisFrame[i] = true;
                                 _hitPoints[i] = hitPoint;
                             }
+
+                            if (i > 3)
+                            {
+                                // 攻撃予測からズレないよう補正する
+                                Vector3 delta = pos - p;
+                                pos = p + Vector3.ProjectOnPlane(delta, ArmSettings.TargetDirectionPlaneNormal);
+                            }
+
+                            solvedPositions[i] = pos;
                         }
                         else
                         {
