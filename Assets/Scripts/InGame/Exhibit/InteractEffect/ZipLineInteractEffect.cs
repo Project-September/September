@@ -15,7 +15,9 @@ namespace September
         public GameObject Trolley;
         public float Duration = 5f;
         public float ReturnDuration = 5f;
-        [Tooltip("横軸:経過時間の割合(0〜1) 縦軸:スプライン上の位置の割合(0〜1)")]
+        [Header("横軸:経過時間の割合(0〜1) 縦軸:スプライン上の位置の割合(0〜1)" +
+            "\n始点(t=0)は必ず0、終点(t=1)は必ず1に設定してください")]
+        
         public AnimationCurve SpeedCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         [Tooltip("Trolleyからプレイヤーへの相対オフセット(ぶら下がる位置調整用)")]
         public Vector3 PlayerOffset = new Vector3(0f, -1.5f, 0f);
