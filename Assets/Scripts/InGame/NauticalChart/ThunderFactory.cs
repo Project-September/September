@@ -5,25 +5,27 @@ using September.Common;
 using September.InGame.Effect;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Timers;
 using UnityEngine;
 
 public class ThunderFactory : NetworkBehaviour
 {
     [Header("Prefab参照")]
-    [SerializeField] private BoxCollider _spawnArea;
+    [Tooltip("雷の生成領域"), SerializeField] private BoxCollider _spawnArea;
     [SerializeField] private SkyboxChanger _skyboxChanger;
 
     [Header("時間")]
-    [SerializeField] private float _thunderLifeTime = 2.5f;
-    [SerializeField] private float _thunderSpawnIntervalTime = 2.0f;
+    [Tooltip("雷の生存時間"), SerializeField] private float _thunderLifeTime = 2.5f;
+    [Tooltip("雷の生成間隔"), SerializeField] private float _thunderSpawnIntervalTime = 2.0f;
 
     [Header("個数制限")]
-    private int _thunderSpawnCapacity = 5;
+    [Tooltip("雷の生成個数制限"), SerializeField] private int _thunderSpawnCapacity = 5;
 
     private EffectSpawner _effectSpawner;
     CancellationTokenSource _cts;
 
-    [Networked] public float Timer { get; private set; }
+    [Networked] public TickTimer _tickTimer { get; private set; }
 
     public override void Spawned()
     {
@@ -33,34 +35,22 @@ public class ThunderFactory : NetworkBehaviour
     }
 
     /// <summary> 雷の生成処理 </summary>
-    public void ThunderSpawener()
+    public async UniTaskVoid ThunderSpawener()
     {
+        _tickTimer = TickTimer.CreateFromSeconds(Runner, _skyboxChanger.changeSkyTime - _thunderLifeTime);
+
+        // エフェクトIDを生成して、雷のエフェクトを生成
         for (int i = 0; i < _thunderSpawnCapacity; i++)
         {
+            // 経過時間が総スカイボックス変更時間を超えたらループを終了
+            if (_tickTimer.Expired(Runner)) break;
+
             var id = GenerateEffectId();
             _effectSpawner.RequestPlayLoopEffect
                (id, EffectType.Thunder, SpawnTransform(), Quaternion.identity, transform);
             ThunderDestroyAsync(id).Forget();
-        }
+            await UniTask.WaitForSeconds(_thunderSpawnIntervalTime, cancellationToken: _cts.Token);
 
-        while( _skyboxChanger.changeSkyTime - _thunderLifeTime >= Timer)
-        {
-            Timer += Runner.DeltaTime;
-            ThunderAsync().Forget();
-        }
-    }
-
-    /// <summary> 雷の生成処理を非同期で行う </summary>
-    private async UniTaskVoid ThunderAsync()
-    {
-        await UniTask.WaitForSeconds(_thunderSpawnIntervalTime, cancellationToken: _cts.Token);
-
-        for (int i = 0; i < _thunderSpawnCapacity; i++)
-        {
-            var id = GenerateEffectId();
-            _effectSpawner.RequestPlayLoopEffect
-               (id, EffectType.Thunder, SpawnTransform(), Quaternion.identity, transform);
-            ThunderDestroyAsync(id).Forget();
         }
     }
 
