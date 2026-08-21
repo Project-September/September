@@ -184,7 +184,7 @@ namespace InGame.Common
         }
 
         /// <summary> TopLayerでアニメーションを再生 </summary>
-        public void PlayOnTopLayer(AnimationClip clip)
+        public void PlayOnTopLayer(AnimationClip clip,float speed = 1f)
         {
             if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
             {
@@ -217,7 +217,7 @@ namespace InGame.Common
                 _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
             }
 
-            Play(clip, LayerInfo.LayerType.TopLayer, 1f, additive: false);
+            Play(clip, LayerInfo.LayerType.TopLayer, 1f,playSpeed: speed, additive: false);
 
             var li = _layerInfo[slot];
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
@@ -777,7 +777,7 @@ namespace InGame.Common
 
             // AnimationClipsContainer から探してRPCで停止を全クライアントに通知
             var index = Array.FindIndex(AnimationClipsContainer.Instance.AnimationMontages,
-                x => x.AnimClip.name == clip.name);
+                x => x.AnimClip && x.AnimClip.name == clip.name);
 
             if (index >= 0)
             {

@@ -41,6 +41,7 @@ namespace Ingame.Tanihira
         [SerializeField] private GameObject _runEffectObject;
         [SerializeField] private float _maxRunBlendTreeCount = 5.0f;
         [SerializeField] private GameObject _meshObject;
+        [SerializeField] private float _movementBuffScale = 0.3f;
 
         [Networked] private NetworkBool HasMask { get; set; }
         [Networked] private NetworkBool HasRunEffect { get; set; }
@@ -145,15 +146,7 @@ namespace Ingame.Tanihira
             //Agentでの移動を無効かする
             _agent.updatePosition = false;
             _agent.updateRotation = false;
-            InitializeAgent();
-        }
-
-        //ステータスをnavmeshに反映
-        private void InitializeAgent()
-        {
-            _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
-            _agent.speed = _currentStatus.FriendFormationSpeed;
-            _agent.acceleration = _currentStatus.FriendAccleration;
+            ApplyStatus();
         }
 
         /// <summary>
@@ -362,15 +355,14 @@ namespace Ingame.Tanihira
             }
         }
 
-        public void StartBuff(float buffRate)
+        public void StartBuff(float speedBuffRate)
         {
-            _currentStatus.FriendFormationSpeed *= buffRate;
-            _currentStatus.FriendChaseSpeed *= buffRate;
-            _currentStatus.FriendRotateSpeed *= buffRate;
-            _currentStatus.FriendChaseDistance *= buffRate;
-            _currentStatus.FriendAccleration *= buffRate;
-            _regulationAttackAmount = Mathf.FloorToInt(buffRate * _regulationAttackAmount);
-            _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * buffRate);
+            _currentStatus.FriendFormationSpeed *= speedBuffRate * _movementBuffScale;
+            _currentStatus.FriendChaseSpeed *= speedBuffRate * _movementBuffScale;
+            _currentStatus.FriendRotateSpeed *= speedBuffRate * _movementBuffScale;
+            _currentStatus.FriendAcceleration *= speedBuffRate * _movementBuffScale;
+            _regulationAttackAmount = Mathf.FloorToInt(speedBuffRate * _regulationAttackAmount);
+            _currentStatus.AttackPower = (int)(_currentStatus.AttackPower * speedBuffRate);
             ApplyStatus();
         }
 
@@ -378,28 +370,31 @@ namespace Ingame.Tanihira
         {
             _currentStatus.FriendFormationSpeed = _friendStatus.FriendFormationSpeed;
             _currentStatus.FriendChaseSpeed = _friendStatus.FriendChaseSpeed;
-            _currentStatus.FriendRotateSpeed *= _friendStatus.FriendRotateSpeed;
-            _currentStatus.FriendChaseDistance *= _friendStatus.FriendChaseDistance;
-            _currentStatus.FriendAccleration *= _friendStatus.FriendAccleration;
+            _currentStatus.FriendRotateSpeed = _friendStatus.FriendRotateSpeed;
+            _currentStatus.FriendAcceleration = _friendStatus.FriendAcceleration;
             _regulationAttackAmount = _originalRegulationAttackAmount;
             _currentStatus.AttackPower = _friendStatus.AttackPower;
             ApplyStatus();
         }
 
+        /// <summary>
+        /// 現在のステータスをAgentに反映する
+        /// </summary>
         private void ApplyStatus()
         {
             //現在のステートによってスピードを反映する
             switch (_currentState)
             {
-                case FriendState.Move:
-                    _agent.speed = _currentStatus.FriendFormationSpeed;
-                    break;
                 case FriendState.Chase:
                     _agent.speed = _currentStatus.FriendChaseSpeed;
                     break;
                 default:
+                    _agent.speed = _currentStatus.FriendFormationSpeed;
                     break;
             }
+
+            _agent.angularSpeed = _currentStatus.FriendRotateSpeed;
+            _agent.acceleration = _currentStatus.FriendAcceleration;
         }
 
         /// <summary>

@@ -22,6 +22,9 @@ namespace InGame.Jewelry
 
         event Action<JewelryType, Sprite> _onInitialize;
         event Action<JewelryType, int> _onUpdateJewelryQuantity;
+
+        public int JewelryCount => CalculateJewelryScore();
+
         public Action OnInitialize(Action<JewelryType, Sprite> act)
         {
             _onInitialize += act;
