@@ -25,6 +25,8 @@ public class SharkMovementProcessing : NetworkBehaviour
     /// </summary>
     public Vector3 PositionBeforeWaterFall { get; private set; }
 
+    public float CurrentSpeedRatio { get; private set; }
+
     private Vector3 _currentGroundNormal; // 現在、接触している地面の法線
     private bool _isGrounded; // プレイヤーが地面に接地しているか
     float _keepMovingTime;
@@ -97,16 +99,13 @@ public class SharkMovementProcessing : NetworkBehaviour
             _keepMovingTime += deltaTime;
         }
         // アニメーションカーブで速度取得
-        moveVelocity *= _speedCurve.Evaluate(_keepMovingTime);
+        float t = _speedCurve.Evaluate(_keepMovingTime);
+        float baseSpeed = playerInput.Buttons.IsSet(PlayerButtons.Dash) ? _dashSpeed : _walkSpeed;
+        float speed = baseSpeed * t;
 
-        if (playerInput.Buttons.IsSet(PlayerButtons.Dash))
-        {
-            rb.linearVelocity = moveVelocity * _dashSpeed;
-        }
-        else
-        {
-            rb.linearVelocity = moveVelocity * _walkSpeed;
-        }
+        rb.linearVelocity = moveVelocity * speed;
+
+        CurrentSpeedRatio = speed / _dashSpeed;
     }
 
     /// <summary>

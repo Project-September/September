@@ -7,8 +7,17 @@ using September.InGame.Common;
 
 public class SharkInteractable : MountableExhibitBase
 {
+    private static readonly int Attack = Animator.StringToHash("Attack");
+    private static readonly int Speed = Animator.StringToHash("Speed");
+    private static readonly int IsMoving = Animator.StringToHash("IsMoving");
+
     [Header("SharkMovementProcessing"), SerializeField] private SharkMovementProcessing _movementProcessing;
     [Header("攻撃のクールダウンタイム"), SerializeField] private float _cooldownTime;
+
+    [Header("アニメーション")]
+    [SerializeField] Animator _animator;
+    [SerializeField] float _idleSpeedThreshold = 0.1f;
+
     [SerializeField] Transform _cameraTransform;
 
     /// <summary>
@@ -20,16 +29,28 @@ public class SharkInteractable : MountableExhibitBase
     /// 攻撃中か
     /// <para>true：攻撃中　false：待機中</para>
     /// </summary>
-    [Networked] private bool IsAttacking { get; set; }
+    [Networked, OnChangedRender(nameof(IsAttackingChanged))] private bool IsAttacking { get; set; }
 
     private InteractableBase _interactableBase;
     private float _cooldownTimer; // 攻撃のクールダウンタイマー
     private float _attackAnimationFrame; // 攻撃アニメーションの現在のフレーム
 
+    private void IsAttackingChanged()
+    {
+        if (IsAttacking) _animator.SetTrigger(Attack);
+    }
+
+    public override void Render()
+    {
+        _animator.SetFloat(Speed, _movementProcessing.CurrentSpeedRatio);
+        _animator.SetBool(IsMoving, _movementProcessing.CurrentSpeedRatio > _idleSpeedThreshold);
+    }
+
     public override void Spawned()
     {
         base.Spawned();
         _interactableBase = GetComponent<InteractableBase>();
+        _animator.enabled = false;
     }
 
     public override void GetOn(PlayerRef playerRef)
@@ -41,6 +62,7 @@ public class SharkInteractable : MountableExhibitBase
         _cooldownTimer = _cooldownTime;
         _attackAnimationFrame = 0;
         _movementProcessing.UpdatePositionBeforeWaterFall(transform.position);
+        _animator.enabled = true;
     }
 
     public override void GetOff(PlayerRef playerRef)
@@ -52,6 +74,7 @@ public class SharkInteractable : MountableExhibitBase
         var obj = StaticServiceLocator.Instance.Get<InGameManager>()
             .PlayerDataDic[playerRef];
         obj.transform.position = _movementProcessing.PositionBeforeWaterFall;
+        _animator.enabled = false;
     }
 
     public override void FixedUpdateNetwork()
