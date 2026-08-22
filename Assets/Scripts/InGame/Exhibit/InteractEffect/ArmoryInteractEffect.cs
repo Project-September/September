@@ -18,10 +18,10 @@ namespace InGame.Exhibit
 
         public override CharacterInteractEffectBase Clone()
         {
-            return new ArmoryInteractEffect()
+            return new ArmoryInteractEffect
             {
-                _addAbility = _addAbility,
-                _addAbilityCondition = _addAbilityCondition,
+                _addAbility = Common.CloneUtility.CloneObject(_addAbility),
+                _addAbilityCondition = Common.CloneUtility.CloneObject(_addAbilityCondition),
                 _overrideDisabledAbilities = _overrideDisabledAbilities,
                 _duration = _duration
             };
@@ -29,11 +29,11 @@ namespace InGame.Exhibit
 
         public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            //ƒRƒ“ƒ|[ƒlƒ“ƒgæ“¾
+            //ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆå–å¾—
             var player = PlayerRef.FromEncoded(context.Interactor);
             if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(player, out var playerObject))
             {
-                Debug.LogError($"ƒCƒ“ƒ^ƒ‰ƒNƒg‚µ‚½ƒvƒŒƒCƒ„[‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB{player}");
+                Debug.LogError($"ã‚¤ãƒ³ã‚¿ãƒ©ã‚¯ãƒˆã—ãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚{player}");
                 return;
             }
 
@@ -45,10 +45,10 @@ namespace InGame.Exhibit
 
             _addAbility.SetPlayerComponent(playerObject.gameObject);
 
-            //ã‘‚«‚·‚éAbility‚ğ–³Œø‰»
+            //ä¸Šæ›¸ãã™ã‚‹Abilityã‚’ç„¡åŠ¹åŒ–
             playerAbility.SetAbilityEnabled(false, _overrideDisabledAbilities);
 
-            //Ability‚ğ’Ç‰Á‚·‚é
+            //Abilityã‚’è¿½åŠ ã™ã‚‹
             playerAbility.AddAbility(_addAbility, _addAbilityCondition);
 
             equipmentManager.RPC_ChangeEquipment(EquipmentType.Armory);
@@ -60,13 +60,13 @@ namespace InGame.Exhibit
         {
             await UniTask.WaitForSeconds(_duration, cancellationToken: token);
 
-            //–³Œø‰»‚µ‚Ä‚¢‚½Ability‚ğ—LŒø‰»
+            //ç„¡åŠ¹åŒ–ã—ã¦ã„ãŸAbilityã‚’æœ‰åŠ¹åŒ–
             abilityManager.SetAbilityEnabled(true, _overrideDisabledAbilities);
 
-            //’Ç‰Á‚µ‚½Ability‚ğÁ‚·
+            //è¿½åŠ ã—ãŸAbilityã‚’æ¶ˆã™
             abilityManager.RemoveAbility(_addAbility.GetType().Name);
 
-            //•Ší‚ğŒ³‚É–ß‚·
+            //æ­¦å™¨ã‚’å…ƒã«æˆ»ã™
             equipmentManager.RPC_ChangeEquipment(EquipmentType.NormalAttack);
         }
     }
