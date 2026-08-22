@@ -68,6 +68,8 @@ namespace September.InGame.Kraken
         [SerializeField, HideInInspector] private float[] _maxDistances;
         [SerializeField, HideInInspector] private Quaternion[] _defaultRotations;
 
+        private float[] _followerMaxDistances;
+
         [Header("Debug Settings")]
         [SerializeField] private bool _debugFabrikPoints;
         [SerializeField] private bool _debugFabrikAxis;
@@ -80,20 +82,31 @@ namespace September.InGame.Kraken
 
         private void Start()
         {
+            _pointProvider = new IKSolverPointProvider(_ik.GetIKSolver());
+
+            // IKの長さをキャッシュ
+            var points = _pointProvider.GetPoints();
+            _maxDistances = new float[points.Length];
+            for (int i = 1; i < points.Length; i++)
+            {
+                var p0 = points[i - 1].Position;
+                var p1 = points[i].Position;
+
+                _maxDistances[i] += (p1 - p0).magnitude + _maxDistances[i - 1];
+            }
+
             // ボーンの長さをキャッシュ
-            _maxDistances = new float[_followers.Length];
+            _followerMaxDistances = new float[_followers.Length];
             for (int i = 1; i < _followers.Length; i++)
             {
                 var p0 = _followers[i - 1].position;
                 var p1 = _followers[i].position;
 
-                _maxDistances[i] += (p1 - p0).magnitude + _maxDistances[i - 1];
+                _followerMaxDistances[i] += (p1 - p0).magnitude + _followerMaxDistances[i - 1];
             }
-
+            
             // ボーンの回転をキャッシュ
             _defaultRotations = _followers.Select(x => x.rotation).ToArray();
-
-            _pointProvider = new IKSolverPointProvider(_ik.GetIKSolver());
 
             Validate();
         }
@@ -137,8 +150,8 @@ namespace September.InGame.Kraken
                     (solvedPoints[i].Position - solvedPoints[i - 1].Position).magnitude;
             }
             SlerpInterpolator solvedInterpolator = new(solvedPoints, solvedDistances);
-            Span<Point> solvedResamplingPoints = stackalloc Point[_maxDistances.Length];
-            solvedInterpolator.Evaluate(_maxDistances, ref solvedResamplingPoints);
+            Span<Point> solvedResamplingPoints = stackalloc Point[_followerMaxDistances.Length];
+            solvedInterpolator.Evaluate(_followerMaxDistances, ref solvedResamplingPoints);
             Profiler.EndSample();
 
             IKFollowerDebug.DebugDraw(solvedResamplingPoints, 6f, Color.magenta, _debugSolvedResamplingPoints, _debugSolvedResamplingPoints, _debugSolvedResamplingAxis);
