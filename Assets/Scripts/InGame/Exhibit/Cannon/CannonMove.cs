@@ -10,28 +10,41 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Transform _cannonBarrel;
 		[SerializeField] private float _baseRotateSpeed;
 		[SerializeField] private float _barrelRotateSpeed;
-
 		// minをxとして、maxをyとして扱う
 		[SerializeField] private Vector2 _baseRotateAngleLimit = new(-90, 90);
 		[SerializeField] private Vector2 _barrelRotateAngleLimit = new(-90, 90);
+		[SerializeField] private float _playerOffset = 3f;
 		private Quaternion _baseDefaultRotation;
 		private Quaternion _barrelDefaultRotation;
+		[Networked] private NetworkObject Player { get; set; }
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 
 		public override void Render()
-		{
+		{ 
 			base.Render();
 			_cannonBase.localRotation = BaseRotation;
 			_cannonBarrel.localRotation = BarrelRotation;
 		}
 
-		public void MoveUpdate(PlayerInput input)
+		public void InitializeStateAuthority(NetworkObject playerObject, PlayerRef playerRef)
 		{
-			CannonRotate(input.MoveDirection.x, input.LookDirection.y);
+			Player = playerObject;
 		}
 
-		public void Refresh()
+		public void Initialize()
+		{
+			
+		}
+
+		void IProjectileMovement.Update(PlayerInput input)
+		{
+			if(!HasStateAuthority) return;
+			CannonRotate(input.MoveDirection.x, input.LookDirection.y);
+			UpdatePlayerPos();
+		}
+
+		public void Reset()
 		{
 			RPC_Refresh();
 		}
@@ -41,6 +54,13 @@ namespace September.InGame.Exhibit
 		{
 			BarrelRotation = _barrelDefaultRotation;
 			BaseRotation = _baseDefaultRotation;
+		}
+
+		private void UpdatePlayerPos()
+		{
+			var quaternion = BaseRotation;
+			Player.transform.rotation = quaternion;
+			Player.transform.position = _cannonBase.position + quaternion * (Vector3.back * _playerOffset);
 		}
 
 		private void CannonRotate(float baseRotateInput, float barrelRotateInput)
@@ -59,7 +79,7 @@ namespace September.InGame.Exhibit
 			var currentBarrelAxis = _cannonBarrel.localEulerAngles.x +
 			                        _barrelRotateSpeed * barrelRotateInput;
 			currentBarrelAxis = WrapAngle(currentBarrelAxis);
-			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(// TODO:ここ計算おかしい
+			BarrelRotation = _cannonBase.localRotation * Quaternion.Euler(
 				Mathf.Clamp(currentBarrelAxis, _barrelRotateAngleLimit.x, _barrelRotateAngleLimit.y), 0, 0);
 		}
 		
