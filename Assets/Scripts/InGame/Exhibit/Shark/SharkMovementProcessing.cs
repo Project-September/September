@@ -9,11 +9,16 @@ public class SharkMovementProcessing : NetworkBehaviour
 {
     [Header("移動設定"), SerializeField] private float _walkSpeed;
     [SerializeField] private float _dashSpeed;
+    [SerializeField] AnimationCurve _speedCurve;
     [SerializeField] private float _rayDistance;
     [SerializeField] private float _groundMaximumAngle;
     [SerializeField] private Vector3 _fallGravity;
     [SerializeField] private float _maxRotateValue;
     [SerializeField] private float _groundAdsorptionSpeed;
+
+    [Header("正面衝突判定")]
+    [SerializeField] float _forwardRayDistance = 1;
+    [SerializeField, Range(0, 90)] float _wallAngle = 90;
 
     /// <summary>
     /// 海に落ちる直前の位置
@@ -22,18 +27,21 @@ public class SharkMovementProcessing : NetworkBehaviour
 
     private Vector3 _currentGroundNormal; // 現在、接触している地面の法線
     private bool _isGrounded; // プレイヤーが地面に接地しているか
+    float _keepMovingTime;
 
     /// <summary>
     /// 移動処理
     /// </summary>
     /// <param name="playerInput">プレイヤーの入力</param>
-    /// <param name="deltaTime"></param>
+    /// <param name="deltaTime">フレーム時間</param>
     /// <param name="rb">プレイヤーのRigidbody</param>
-    public void UpdateMovement(PlayerInput playerInput, float deltaTime, Rigidbody rb)
+    /// <param name="forward">正面方向</param>
+    public void UpdateMovement(PlayerInput playerInput, float deltaTime, Rigidbody rb, Vector3 forward)
     {
         CheckGroundManual(rb);
-        var moveDirection = GetMoveDirection(playerInput.MoveDirection, playerInput.CameraYaw);
-        Move(moveDirection, playerInput, rb);
+        // 渡されたベクトルをxz平面に射影
+        var moveDirection = Vector3.ProjectOnPlane(forward, Vector3.up).normalized;
+        Move(moveDirection, playerInput, rb, deltaTime);
         Rotate(deltaTime, moveDirection);
         AdsorptionOnGround(deltaTime, rb);
         UpdatePositionBeforeWaterFall(transform.position);
@@ -62,18 +70,35 @@ public class SharkMovementProcessing : NetworkBehaviour
             rb.AddForce(_fallGravity, ForceMode.Acceleration);
         }
     }
-    
+
     /// <summary>
     /// サメの移動処理
     /// </summary>
     /// <param name="moveDirection">プレイヤーの移動方向</param>
     /// <param name="playerInput">プレイヤーの入力</param>
     /// <param name="rb">プレイヤーのRigidbody</param>
-    private void Move(Vector3 moveDirection, PlayerInput playerInput,Rigidbody rb)
+    private void Move(Vector3 moveDirection, PlayerInput playerInput, Rigidbody rb, float deltaTime)
     {
-        if(moveDirection == Vector3.zero) return;
-        
+        if (moveDirection == Vector3.zero) return;
+
         var moveVelocity = Vector3.ProjectOnPlane(moveDirection, _currentGroundNormal).normalized;　//坂に沿った動きに
+
+        // 前方に壁があるか判定
+        var ray = new Ray(transform.position, moveDirection);
+        // Rayを飛ばす
+        if (Physics.Raycast(ray, out var hit, _forwardRayDistance)
+            && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
+        {
+            // 坂などは判定しないように内積で壁判定
+            _keepMovingTime = 0;
+        }
+        else
+        {
+            _keepMovingTime += deltaTime;
+        }
+        // アニメーションカーブで速度取得
+        moveVelocity *= _speedCurve.Evaluate(_keepMovingTime);
+
         if (playerInput.Buttons.IsSet(PlayerButtons.Dash))
         {
             rb.linearVelocity = moveVelocity * _dashSpeed;
@@ -82,20 +107,6 @@ public class SharkMovementProcessing : NetworkBehaviour
         {
             rb.linearVelocity = moveVelocity * _walkSpeed;
         }
-    }
-
-    /// <summary>
-    /// カメラを考慮した移動方向を取得
-    /// </summary>
-    private Vector3 GetMoveDirection(Vector2 moveInput, float cameraYaw)
-    {
-        float radYaw = -cameraYaw * Mathf.Deg2Rad; 
-        var camDir = new Vector2(
-            moveInput.x * Mathf.Cos(radYaw) - moveInput.y * Mathf.Sin(radYaw),
-            moveInput.x * Mathf.Sin(radYaw) + moveInput.y * Mathf.Cos(radYaw)
-        );
-        
-        return new Vector3(camDir.x, 0, camDir.y);
     }
 
     /// <summary>
