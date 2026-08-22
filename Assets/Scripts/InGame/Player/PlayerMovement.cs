@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Jewelry;
 using September.Common;
 using September.InGame.Common.Stats;
 using UniRx;
@@ -37,6 +38,10 @@ namespace InGame.Player
         [SerializeField] private float _hookPower = 10f;
         [Header("Bomb")]
         [SerializeField] private float _flyingDamping = 8f;
+        [Header("Roll")]
+        [SerializeField] private EvasionData _evasionData;
+        [SerializeField] private PlayerHealth _playerHealth;
+        [SerializeField] private PlayerJewelryRuntime _playerJewelryRuntime;
         [Header("Debug")]
         [SerializeField] private bool _printVaultFailedLog;
         [SerializeField] private bool _visibleGizmos;
@@ -67,7 +72,8 @@ namespace InGame.Player
         private bool _isDash;
         // vault
         private bool _doingVault;
-
+        // Roll
+        private PlayerEvasion _playerEvasion;
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
@@ -94,8 +100,13 @@ namespace InGame.Player
         public bool InfiniteStamina { get; set; } = false;
         public CapsuleCollider MoveCapsuleCollider => _moveCapsuleCollider;
         public LayerMask GroundLayer => _groundLayer;
+        public bool IsEvading => _playerEvasion.IsEvading;
         [Networked] public bool IgnoreMoveInput { get; set; }
+        [Networked] public bool IgnoreEvasionInput { get; set; }
         [Networked] public bool IsHookLocked { get; set; }
+
+        private readonly Subject<float> _onEvasion = new();
+        public IObservable<float> OnEvasion => _onEvasion;
 
         private void Awake()
         {
@@ -112,10 +123,16 @@ namespace InGame.Player
                 Debug.LogWarning("ビルドに関する参照がないためビルドシステムが正常に動作しません\nPlayerMovement.csを確認してください", this);
 #endif
             _prePos = transform.position;
+
+            _playerEvasion = new(_evasionData);
+            _playerEvasion.EvasionEnded += () =>
+            {
+                _playerHealth.IsInvincible = false;
+            };
         }
 
 
-        public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, float deltaTime)
+        public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, bool isEvasion, float deltaTime)
         {
             CheckGroundManual();
 
@@ -128,16 +145,33 @@ namespace InGame.Player
                 _moveVelocity = followDirection * _hookPower;
             }
 
-            if (IgnoreMoveInput || IsHookLocked) moveInput = Vector2.zero;
+            if (IgnoreMoveInput || IsHookLocked || _playerEvasion.IsEvading) moveInput = Vector2.zero;
 
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             // set velocity
-            if (isJump && HasStateAuthority) TryVault(moveDirection);
-            if (!DoingVault)
+            if (!_playerEvasion.IsEvading && isJump && HasStateAuthority) TryVault(moveDirection);
+
+            //回避
+            if (!IgnoreEvasionInput && IsGround && !DoingVault && isEvasion && HasStateAuthority)
+                StartEvasion();
+
+            if (DoingVault || _playerEvasion.IsEvading)
+                return;
+
+            Move(moveDirection, isDash, cameraYaw, deltaTime);
+            AdsorptionOnGround();
+        }
+
+        private void StartEvasion()
+        {
+            int jewelryCount = _playerJewelryRuntime.JewelryCount;
+            var succeeded = _playerEvasion.TryStartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount, out var weightCoefficient);
+
+            if (succeeded)
             {
-                Move(moveDirection, isDash, cameraYaw, deltaTime);
-                AdsorptionOnGround();
+                Stop();
+                _onEvasion.OnNext(weightCoefficient);
             }
         }
 
@@ -145,6 +179,21 @@ namespace InGame.Player
         public virtual void MoveTick(float deltaTime)
         {
             CheckGroundManual();
+
+            //回避
+            if (_playerEvasion.IsEvading)
+            {
+                transform.position = _playerEvasion.Move(transform.position, Runner.SimulationTime);
+                transform.forward = _playerEvasion.Turn(transform.forward, Runner.SimulationTime);
+
+                //無敵状態更新
+                bool isInvincible = _playerEvasion.IsInvincible(Runner.SimulationTime);
+
+                if (isInvincible != _playerHealth.IsInvincible)
+                    _playerHealth.IsInvincible = isInvincible;
+
+                return;
+            }
 
             if (DoingVault && HasStateAuthority) UpdateVault(deltaTime);
 
