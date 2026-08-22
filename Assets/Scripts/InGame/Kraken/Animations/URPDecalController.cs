@@ -16,7 +16,7 @@ namespace September.InGame.Kraken.Animations
         private float _startTime;
         private float _lifeTimeScale;
 
-        private void Start()
+        private void OnEnable()
         {
             _startTime = Time.time;
             _lifeTimeScale = 1f / Mathf.Lerp(_randomLifeTimeScale.Min, _randomLifeTimeScale.Max, Random.value);

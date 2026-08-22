@@ -1624,8 +1624,9 @@ MonoBehaviour:
     ArmEndTime: 3.5
     AnimationName: KrakenAttack
     EndStateName: Idle
-    SlamEffect: {fileID: 3490257097048068750, guid: fa5746bd92107ca4b8b5f59d29d6aecf, type: 3}
+    SlamEffect: {fileID: 6003807184151868501, guid: fa5746bd92107ca4b8b5f59d29d6aecf, type: 3}
     EffectDistance: 5
+    DefaultParticlePoolCapacity: 100
 --- !u!114 &872495872056710133
 MonoBehaviour:
   m_ObjectHideFlags: 0

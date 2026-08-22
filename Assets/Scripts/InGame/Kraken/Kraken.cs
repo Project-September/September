@@ -11,6 +11,7 @@ using September.InGame.Kraken.Attack;
 using September.InGame.Mountable;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Pool;
 using UnityEngine.Timeline;
 
 namespace September.InGame.Kraken
@@ -64,6 +65,7 @@ namespace September.InGame.Kraken
         [Networked] private TickTimer DisappearTimer { get; set; }
 
         public KrakenTentacles Tentacles => _tentacles;
+        public ObjectPool<ParticleSystem> SlamParticlePool { get; private set; }
 
         // === IDamageable実装 ===
         public bool IsAlive => true; // ダメージを受けるだけで死亡しない
@@ -75,7 +77,14 @@ namespace September.InGame.Kraken
             _initialRotation = transform.rotation;
 
             _cameraController.Init(true);
-            _attackHandler.Initialize(_tentacles.Arms, _settings);
+            _attackHandler.Initialize(_tentacles.Arms, _settings, this);
+
+            SlamParticlePool = new ObjectPool<ParticleSystem>(
+                () => Instantiate(_settings.SlamEffect),
+                actionOnGet: particle => particle.gameObject.SetActive(true),
+                actionOnRelease: particle => particle.gameObject.SetActive(false),
+                defaultCapacity: _settings.DefaultParticlePoolCapacity
+            );
         }
 
         /// <summary>

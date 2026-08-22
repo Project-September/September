@@ -228,7 +228,6 @@ namespace September.InGame.Kraken.Animations
                 if (_isCollidingThisFrame[i] && !_wasCollided[i])
                 {
                     OnCollided?.Invoke(_hitPoints[i]);
-                    Debug.Log("OnCollide");
                 }
                 _wasCollided[i] = _isCollidingThisFrame[i];
             }

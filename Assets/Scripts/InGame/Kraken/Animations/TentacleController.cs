@@ -19,14 +19,14 @@ namespace September.InGame.Kraken.Animations
         public bool IsAttacking => _armSettings.IsAttacking;
         public Transform ArmRoot => _armSettings.ArmRoot;
 
-        public TentacleController(ArmSettings armSettings, KrakenSettings krakenSettings)
+        public TentacleController(ArmSettings armSettings, KrakenSettings krakenSettings, Kraken kraken)
         {
             _armSettings = armSettings;
             _krakenSettings = krakenSettings;
 
             armSettings.ArmHitChecker.OnHit += col => OnHitAction(armSettings.AlreadyHits, col);
 
-            armSettings.TentacleConstraintSolver.OnCollided += OnPhysicalCollision;
+            armSettings.TentacleConstraintSolver.OnCollided += hitPos => OnPhysicalCollision(hitPos, _armSettings, _krakenSettings, kraken);
 
             armSettings.EnablePhysics = false;
         }
@@ -169,21 +169,34 @@ namespace September.InGame.Kraken.Animations
             _armSettings.EnablePhysics = false;
         }
 
-        private void OnPhysicalCollision(Vector3 hitPos)
+        private static void OnPhysicalCollision(Vector3 hitPos, ArmSettings armSettings, KrakenSettings krakenSettings, Kraken kraken)
         {
-            if (_krakenSettings.SlamEffect == null) return;
+            if (krakenSettings.SlamEffect == null) return;
 
-            bool tooNear = _armSettings.CollidedPoints
-                .Select(p => (hitPos - p).sqrMagnitude < _krakenSettings.EffectDistance.Sqr())
-                .Any(b => b);
-
-            Debug.Log(tooNear);
+            bool tooNear = false;
+            foreach (Vector3 p in armSettings.CollidedPoints)
+            {
+                if ((hitPos - p).sqrMagnitude < krakenSettings.EffectDistance.Sqr())
+                {
+                    tooNear = true;
+                    break;
+                }
+            }
 
             if (tooNear) return;
 
-            _armSettings.CollidedPoints.Add(hitPos);
-            var obj = Object.Instantiate(_krakenSettings.SlamEffect, hitPos, Quaternion.identity);
-            Object.Destroy(obj, obj.GetComponent<ParticleSystem>().main.duration);
+            armSettings.CollidedPoints.Add(hitPos);
+            ParticleSystem particle = kraken.SlamParticlePool.Get();
+            particle.transform.position = hitPos;
+            Release().Forget();
+
+            return;
+
+            async UniTaskVoid Release()
+            {
+                await UniTask.WaitForSeconds(particle.main.duration);
+                kraken.SlamParticlePool.Release(particle);
+            }
         }
     }
 
@@ -247,8 +260,9 @@ namespace September.InGame.Kraken.Animations
         public string EndStateName;
 
         [Header("エフェクト設定")]
-        public GameObject SlamEffect;
+        public ParticleSystem SlamEffect;
         public float EffectDistance = 5f;
+        public int DefaultParticlePoolCapacity = 20;
 
         [NonSerialized] public PlayerRef OwnerPlayerRef;
     }

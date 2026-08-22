@@ -15,12 +15,12 @@ namespace September.InGame.Kraken.Animations
 
         public bool IsReady => TryGetTentacle(out _);
 
-        public void Initialize(IReadOnlyList<ArmSettings> arms, KrakenSettings krakenSettings)
+        public void Initialize(IReadOnlyList<ArmSettings> arms, KrakenSettings krakenSettings, Kraken kraken)
         {
             _tentacles = new TentacleController[arms.Count];
             for (int i = 0; i < arms.Count; i++)
             {
-                _tentacles[i] = new TentacleController(arms[i], krakenSettings);
+                _tentacles[i] = new TentacleController(arms[i], krakenSettings, kraken);
             }
         }
 
