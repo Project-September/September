@@ -79,6 +79,7 @@ namespace September
                 {
                     normalUp = Mathf.Abs(Vector3.Dot(forward, Vector3.up)) > 0.9f ? Vector3.forward : Vector3.up;
                 }
+
                 // 接線と上方向から右方向を計算
                 Vector3 right = Vector3.Cross(normalUp, forward).normalized;
                 // 右方向の向きを前のフレームと比較して反転させることで、チューブがねじれないようにする
@@ -112,12 +113,12 @@ namespace September
                     int next = current + vertCountPerRing;
 
                     triangles[triIndex++] = current;
-                    triangles[triIndex++] = next;
                     triangles[triIndex++] = current + 1;
+                    triangles[triIndex++] = next;
 
                     triangles[triIndex++] = current + 1;
-                    triangles[triIndex++] = next;
                     triangles[triIndex++] = next + 1;
+                    triangles[triIndex++] = next;
                 }
             }
             // メッシュに頂点、法線、UV、三角形を設定
