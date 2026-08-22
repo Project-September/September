@@ -94,6 +94,7 @@ namespace InGame.Player.Ability
 
             _startHitTick = FrameToTick(_startHitCheckFrame);
             _playerMovement.IgnoreMoveInput = true;
+            _playerMovement.IgnoreEvasionInput = true;
 
 #if UNITY_EDITOR
             if (_buildGenerator & _playerStatus)
@@ -270,6 +271,7 @@ namespace InGame.Player.Ability
             if (elapsed >= _endAttackTick)
             {
                 _playerMovement.IgnoreMoveInput = false;
+                _playerMovement.IgnoreEvasionInput = false;
                 RequestEndAbility();
             }
         }
