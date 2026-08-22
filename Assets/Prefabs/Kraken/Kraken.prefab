@@ -1569,8 +1569,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cameraController: {fileID: 872495872056710133}
   _attackPredictionFactory: {fileID: 4147116127351708076}
-  _predictionSize: {x: 4, y: 3, z: 60}
-  _predictionEndTime: 6
+  _predictionSize: {x: 4, y: 10, z: 60}
+  _predictionEndTime: 4
   _interactable: {fileID: 4783785741626355923}
   _dealScore: 10
   _stayDuration: 20
