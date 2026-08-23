@@ -3,9 +3,9 @@ using InGame.Common;
 using InGame.Interact;
 using September.Common;
 using System;
+using InGame.Player;
 using UnityEngine;
 using UnityEngine.Splines;
-using UnityEngine.UIElements;
 
 namespace September
 {
@@ -62,20 +62,20 @@ namespace September
             }
             _activeEffect = target;
             _activeEffect.ForceSetInteractable = false;
-            GameInput.I.ToggleMoveInput(false);
-            GameInput.I.ToggleActionInput(false);
-
 
             _animator = _targetPlayerObject.GetComponentInChildren<Animator>();
             Trolley.transform.position = Spline.EvaluatePosition(0f);
             _timer = 0f;
             _currentState = State.Moving;
             MovePlayerToTrolley();
+
+            var playerManager = _targetPlayerObject.GetComponent<PlayerManager>();
+            playerManager.RPC_SetUseGrav(false);
+            playerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
         }
 
         public override void OnInteractUpdate(float deltaTime)
         {
-            Debug.Log($"[ZiplineAnim]{_animator.GetCurrentAnimatorClipInfo(0)[0].clip.name.ToString()}");
             switch (_currentState)
             {
                 case State.Moving:
@@ -100,8 +100,9 @@ namespace September
             if (t >= 1f)
             {
                 // プレイヤーをここで降ろす
-                GameInput.I.ToggleMoveInput(true);
-                GameInput.I.ToggleActionInput(true);
+                var playerManager = _targetPlayerObject.GetComponent<PlayerManager>();
+                playerManager.RPC_SetUseGrav(true);
+                playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
 
                 // プレイヤーのアニメーションを停止する
                 if (_targetPlayerObject.TryGetComponent(out AnimationClipPlayer animationClipPlayer))
@@ -154,9 +155,6 @@ namespace September
                 _activeEffect.ForceSetInteractable = true; // ここで初めて使用可能に戻す
                 _activeEffect = null;
             }
-
-
-
         }
 
         public override CharacterInteractEffectBase Clone()
