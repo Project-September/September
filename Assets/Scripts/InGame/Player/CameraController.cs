@@ -48,6 +48,8 @@ namespace InGame.Player
             _defaultPitch = _defaultRotation.eulerAngles.x;
             _currentOffset = _cameraTf.localPosition;
             _defaultOffset = _cameraTf.localPosition;
+            _cameraPitch = _characterTf.rotation.eulerAngles.x;
+            _cameraYaw = _characterTf.rotation.eulerAngles.y;
         }
 
         private void LateUpdate()

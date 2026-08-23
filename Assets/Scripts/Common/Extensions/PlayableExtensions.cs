@@ -14,12 +14,34 @@ namespace Common.Extensions
         public static async UniTask PlayAsync(this PlayableDirector playableDirector, CancellationToken token = default)
         {
             playableDirector.Play();
-        
-            await playableDirector.WaitUntilEnd(token);
-        
-            if (token.IsCancellationRequested)
+
+            try
             {
-                playableDirector.Stop();
+                await playableDirector.WaitUntilEnd(token);
+            }
+            finally
+            {
+                if (token.IsCancellationRequested && playableDirector)
+                {
+                    playableDirector.Stop();
+                }
+            }
+        }
+
+        public static async UniTask PlayAsync(this PlayableDirector playableDirector, PlayableAsset asset, CancellationToken token = default)
+        {
+            playableDirector.Play(asset);
+
+            try
+            {
+                await playableDirector.WaitUntilEnd(token);
+            }
+            finally
+            {
+                if (token.IsCancellationRequested && playableDirector)
+                {
+                    playableDirector.Stop();
+                }
             }
         }
     }

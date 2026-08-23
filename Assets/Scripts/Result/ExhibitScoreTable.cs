@@ -36,7 +36,9 @@ namespace Result
         [DisplayName("武器庫")]
         Armory,
         [DisplayName("サメ")]
-        Shark
+        Shark,
+        [DisplayName("クラーケン")]
+        Kraken,
     }
 
     [Serializable]
