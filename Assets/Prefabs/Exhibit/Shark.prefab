@@ -113,6 +113,7 @@ GameObject:
   - component: {fileID: 5624172255545513684}
   - component: {fileID: 7332413252645484968}
   - component: {fileID: -6263480614593985820}
+  - component: {fileID: 4711930171390678857}
   m_Layer: 11
   m_Name: Shark
   m_TagString: Untagged
@@ -212,6 +213,7 @@ MonoBehaviour:
   - {fileID: 5624172255545513684}
   - {fileID: 7332413252645484968}
   - {fileID: -6263480614593985820}
+  - {fileID: 4711930171390678857}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3466500518305658904
 MonoBehaviour:
@@ -388,6 +390,7 @@ MonoBehaviour:
   _cooldownTime: 3
   _animator: {fileID: 583818805343970227}
   _idleSpeedThreshold: 0.01
+  _networkAnimator: {fileID: 4711930171390678857}
   _cameraTransform: {fileID: 914298458122404144}
   _IsSharkInteracting: 0
 --- !u!114 &-6263480614593985820
@@ -441,6 +444,24 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2249
   _wallAngle: 85
+--- !u!114 &4711930171390678857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922303140376795393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 583818805343970227}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 0000000046980c4f14c27366ee11e593cda1e6353049d8e9950d3f56
+  TriggerHashes: 000000000d286c40
+  TotalWords: 2
 --- !u!1 &7717640968328691010
 GameObject:
   m_ObjectHideFlags: 0

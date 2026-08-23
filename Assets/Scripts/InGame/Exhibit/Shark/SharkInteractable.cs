@@ -24,20 +24,26 @@ public class SharkInteractable : MountableExhibitBase
     /// インタラクション中か
     /// <para>true：インタラクション中　false：インタラクション中でない</para>
     /// </summary>
-    [Networked] public bool IsSharkInteracting { get; private set; }
+    [Networked, OnChangedRender(nameof(OnInteractingStateChanged))] public bool IsSharkInteracting { get; private set; }
+
     /// <summary>
     /// 攻撃中か
     /// <para>true：攻撃中　false：待機中</para>
     /// </summary>
-    [Networked, OnChangedRender(nameof(IsAttackingChanged))] private bool IsAttacking { get; set; }
+    [Networked, OnChangedRender(nameof(OnAttackStateChanged))] private bool IsAttacking { get; set; }
 
     private InteractableBase _interactableBase;
     private float _cooldownTimer; // 攻撃のクールダウンタイマー
     private float _attackAnimationFrame; // 攻撃アニメーションの現在のフレーム
 
-    private void IsAttackingChanged()
+    private void OnAttackStateChanged()
     {
         if (IsAttacking) _animator.SetTrigger(Attack);
+    }
+
+    private void OnInteractingStateChanged()
+    {
+        _animator.enabled = IsSharkInteracting;
     }
 
     public override void Render()
@@ -62,25 +68,24 @@ public class SharkInteractable : MountableExhibitBase
         _cooldownTimer = _cooldownTime;
         _attackAnimationFrame = 0;
         _movementProcessing.UpdatePositionBeforeWaterFall(transform.position);
-        _animator.enabled = true;
     }
 
     public override void GetOff(PlayerRef playerRef)
     {
         base.GetOff(playerRef);
+        IsSharkInteracting = false;
         _interactableBase.ForceSetInteractable = true;
 
         // インタラクトしていたプレイヤーを取得し、海に落ちる直前の位置に移動させる
         var obj = StaticServiceLocator.Instance.Get<InGameManager>()
             .PlayerDataDic[playerRef];
         obj.transform.position = _movementProcessing.PositionBeforeWaterFall;
-        _animator.enabled = false;
     }
 
     public override void FixedUpdateNetwork()
     {
         if (!GetInput<PlayerInput>(out var playerInput)) return;
-        _movementProcessing.UpdateMovement(playerInput, Runner.DeltaTime, Rigidbody, _cameraTransform.forward);
+        _movementProcessing.UpdateMovement(playerInput, Runner.DeltaTime, Rigidbody, playerInput.DesiredLookDirection);
     }
 
     public override void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
