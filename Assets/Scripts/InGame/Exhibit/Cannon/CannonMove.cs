@@ -1,4 +1,5 @@
 using Fusion;
+using InGame.Player;
 using September.Common;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace September.InGame.Exhibit
 	public class CannonMove : NetworkBehaviour, IProjectileMovement
 	{
 		[Header("移動関連")] [SerializeField] private Transform _cannonBase;
+		[SerializeField] private CameraController _cameraController;
 		[SerializeField] private Transform _cannonBarrel;
 		[SerializeField] private Transform _waitPlayerPos;
 		[SerializeField] private float _baseRotateSpeed;
@@ -22,12 +24,19 @@ namespace September.InGame.Exhibit
 		[Networked] private Quaternion BaseRotation { get; set; }
 		[Networked] private Quaternion BarrelRotation { get; set; }
 
+		public override void Spawned()
+		{
+			base.Spawned();
+			_cameraController.Init(true);
+		}
+
 		public override void Render()
 		{
 			base.Render();
 			_cannonBase.localRotation = BaseRotation;
 			_cannonBarrel.localRotation = BarrelRotation;
 			UpdatePlayerPos();
+			CameraRotate(BaseRotation);
 		}
 
 		public void InitializeStateAuthority(NetworkObject playerObject, PlayerRef playerRef)
@@ -37,6 +46,7 @@ namespace September.InGame.Exhibit
 
 		public void Initialize()
 		{
+			if(!HasInputAuthority) return;
 		}
 
 		void IProjectileMovement.Update(PlayerInput input)
@@ -88,6 +98,11 @@ namespace September.InGame.Exhibit
 				Mathf.Clamp(currentBarrelAxis, _barrelRotateAngleLimit.x, _barrelRotateAngleLimit.y), 0, 0);
 		}
 
+		private void CameraRotate(Quaternion rotation)
+		{
+			_cameraController.SmoothRotateCameraTo(rotation);
+		}
+		
 		/// <summary>
 		///     角度を-180~180に変換する
 		/// </summary>

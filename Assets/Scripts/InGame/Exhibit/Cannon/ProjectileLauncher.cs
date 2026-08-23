@@ -103,7 +103,7 @@ namespace September.InGame.Exhibit
 				var ray = new Ray(_linePositions[i - 1], _linePositions[i] - _linePositions[i - 1]);
 
 				// 障害物が存在した場合、その地点を最終地点とする。
-				if (Physics.Raycast(ray, out var hit, Vector3.Distance(_linePositions[i - 1], _linePositions[i])))
+				if (Physics.Raycast(ray, out var hit, Vector3.Distance(_linePositions[i - 1], _linePositions[i]), _hitLayer))
 				{
 					_linePositions[i] = hit.point;
 					_lastPositionIndex = i;
