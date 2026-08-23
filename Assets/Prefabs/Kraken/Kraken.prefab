@@ -3897,7 +3897,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5561349426305759274, guid: 183b565879ae57b48826e9a385e9a7ba, type: 3}
+  - {fileID: 2100000, guid: aa8ba9e7d6cc57b4ab9b6158eb6515aa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4378,7 +4378,7 @@ MonoBehaviour:
       data:
         _characterType: 5
         _targetMountable: {fileID: 3135717980165409898}
-        _duration: 1000
+        _duration: 15
     - rid: 5799214060048744533
       type: {class: CompositeInteractEffect, ns: September.InGame.Interact, asm: Scripts}
       data:
