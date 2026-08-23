@@ -93,7 +93,7 @@ MonoBehaviour:
   _splineContainer: {fileID: 363866046024761354}
   _lengthSegments: 100
   _radialSegments: 12
-  _radius: 0.1
+  _radius: 0.04
 --- !u!114 &7449230902063392013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,7 +158,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8771166627424403242, guid: 14a4d10950cbdb04c897ae025cac52ab, type: 3}
+  - {fileID: 2100000, guid: 3e33a38e2349f447d9fb9ae62269009c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -211,7 +211,7 @@ Transform:
   m_GameObject: {fileID: 5316400206272108416}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.605, y: 0.254, z: -0.486}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.33, y: 0.33, z: 0.33}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -326,7 +326,7 @@ MonoBehaviour:
     values:
     - 1
   _characterEffects:
-  - rid: 7617813890929000532
+  - rid: 7603375219423314073
   _type: 0
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectTransform: {fileID: 911753468616708066}
@@ -346,13 +346,14 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 7617813890929000532
+    - rid: 7603375219423314073
       type: {class: ZipLineInteractEffect, ns: September, asm: Scripts}
       data:
         _characterType: 5
+        Anim: {fileID: 0}
         Spline: {fileID: 363866046024761354}
         Trolley: {fileID: 5316400206272108416}
-        Duration: 5
+        Duration: 3
         ReturnDuration: 5
         SpeedCurve:
           serializedVersion: 2
