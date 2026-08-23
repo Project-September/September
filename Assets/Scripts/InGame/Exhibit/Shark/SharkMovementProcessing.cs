@@ -15,9 +15,11 @@ public class SharkMovementProcessing : NetworkBehaviour
     [SerializeField] private Vector3 _fallGravity;
     [SerializeField] private float _maxRotateValue;
     [SerializeField] private float _groundAdsorptionSpeed;
+    [SerializeField] private LayerMask _groundLayerMask;
 
     [Header("正面衝突判定")]
     [SerializeField] float _forwardRayDistance = 1;
+    [SerializeField] LayerMask _wallLayerMask;
     [SerializeField, Range(0, 90)] float _wallAngle = 90;
 
     /// <summary>
@@ -56,7 +58,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     private void CheckGroundManual(Rigidbody rb)
     {
         bool ray = Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, out RaycastHit hit,
-            _rayDistance);
+            _rayDistance, _groundLayerMask);
         var normal = hit.normal;
         if (ray && Vector3.Angle(normal, Vector3.up) < _groundMaximumAngle)
         {
@@ -88,7 +90,7 @@ public class SharkMovementProcessing : NetworkBehaviour
         // 前方に壁があるか判定
         var ray = new Ray(transform.position, moveDirection);
         // Rayを飛ばす
-        if (Physics.Raycast(ray, out var hit, _forwardRayDistance)
+        if (Physics.Raycast(ray, out var hit, _forwardRayDistance, _wallLayerMask)
             && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
         {
             // 坂などは判定しないように内積で壁判定
@@ -131,7 +133,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     {
         if (_isGrounded) return;
         var ray = Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, out RaycastHit hit,
-            1.5f);
+            1.5f, _groundLayerMask);
         if (ray && hit.distance > 0)
         {
             var targetPos = new Vector3(transform.position.x, hit.point.y, transform.position.z);
