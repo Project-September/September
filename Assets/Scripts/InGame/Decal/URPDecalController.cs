@@ -3,7 +3,7 @@ using September.Common;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace September.InGame.Kraken.Animations
+namespace September.InGame.Decal
 {
     [RequireComponent(typeof(DecalProjector))]
     public class URPDecalController : MonoBehaviour

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace September.InGame.Kraken.Animations
+namespace September.InGame.Decal
 {
     /// <summary>
     /// ScaleMode を InheritFromHierarchy にしたときに AngleFade の動作が不安定になるので、
