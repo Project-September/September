@@ -39,7 +39,7 @@ namespace September.InGame.Exhibit
 			Pitch = _basePitch;
 		}
 
-		public override void Render()
+		public void Render()
 		{
 			ModelRotate();
 			UpdatePlayerPosition();

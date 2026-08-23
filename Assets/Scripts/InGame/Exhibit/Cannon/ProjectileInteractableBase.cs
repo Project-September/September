@@ -53,6 +53,7 @@ namespace September.InGame.Exhibit
 		public override void Render()
 		{
 			base.Render();
+			_move?.Render();
 			_reticleEffect?.Render();
 
 			if (_animationClipPlayer && !_animationClipPlayer.IsPlayingTargetClip(_playerUseAnimationClip))
@@ -278,6 +279,7 @@ namespace September.InGame.Exhibit
 	{
 		public void InitializeStateAuthority(NetworkObject playerObject, PlayerRef playerRef);
 		public void Initialize();
+		public void Render();
 		public void Update(PlayerInput input);
 		public void Reset();
 	}

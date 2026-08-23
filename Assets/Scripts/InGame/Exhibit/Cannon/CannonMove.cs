@@ -30,7 +30,7 @@ namespace September.InGame.Exhibit
 			_cameraController.Init(true);
 		}
 
-		public override void Render()
+		public void Render()
 		{
 			base.Render();
 			_cannonBase.localRotation = BaseRotation;
@@ -46,7 +46,7 @@ namespace September.InGame.Exhibit
 
 		public void Initialize()
 		{
-			if(!HasInputAuthority) return;
+			
 		}
 
 		void IProjectileMovement.Update(PlayerInput input)
