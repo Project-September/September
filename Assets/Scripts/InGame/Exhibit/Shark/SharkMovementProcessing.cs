@@ -16,6 +16,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     [SerializeField] private float _maxRotateValue;
     [SerializeField] private float _groundAdsorptionSpeed;
     [SerializeField] private LayerMask _groundLayerMask;
+    [SerializeField] private Vector3 _checkGroundRayOriginOffset;
 
     [Header("正面衝突判定")]
     [SerializeField] float _forwardRayDistance = 1;
@@ -57,7 +58,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     /// <param name="rb">プレイヤーのRigidbody</param>
     private void CheckGroundManual(Rigidbody rb)
     {
-        bool ray = Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, out RaycastHit hit,
+        bool ray = Physics.Raycast(transform.TransformPoint(_checkGroundRayOriginOffset), Vector3.down, out RaycastHit hit,
             _rayDistance, _groundLayerMask);
         var normal = hit.normal;
         if (ray && Vector3.Angle(normal, Vector3.up) < _groundMaximumAngle)
@@ -149,5 +150,11 @@ public class SharkMovementProcessing : NetworkBehaviour
     {
         // 地面についていれば、位置を更新
         if (_isGrounded) PositionBeforeWaterFall = position;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.TransformPoint(_checkGroundRayOriginOffset), Vector3.down * _rayDistance);
     }
 }
