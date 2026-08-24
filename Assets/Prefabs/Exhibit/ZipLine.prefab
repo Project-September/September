@@ -31,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 2013704485942339051}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19.86359, y: 7.6018066, z: -21.76169}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -350,7 +350,7 @@ MonoBehaviour:
       type: {class: ZipLineInteractEffect, ns: September, asm: Scripts}
       data:
         _characterType: 5
-        Anim: {fileID: 0}
+        Anim: {fileID: 1827226128182048838, guid: 4d055a1c7278aa84bbf7b655cd46106b, type: 3}
         Spline: {fileID: 363866046024761354}
         Trolley: {fileID: 5316400206272108416}
         Duration: 3

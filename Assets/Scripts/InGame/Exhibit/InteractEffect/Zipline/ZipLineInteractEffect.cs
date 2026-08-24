@@ -44,7 +44,7 @@ namespace September
             {
                 _targetPlayerObject = playerNetworkObject;
 
-                // プライヤーの落下アニメーションを停止する
+                // プレイヤーの落下アニメーションを停止する
                 if (_targetPlayerObject.TryGetComponent(out AnimationClipPlayerManager animManager))
                 {
                     animManager.EnableFallMotion = false;
@@ -53,7 +53,7 @@ namespace September
                 // プレイヤーのジップラインに掴まるアニメーションを再生する
                 if (_targetPlayerObject.TryGetComponent(out AnimationClipPlayer animationClipPlayer))
                 {
-                    animationClipPlayer.PlayOnTopLayer(Anim);
+                    animationClipPlayer.PlayClipLoop(Anim);
                 }
             }
             else
@@ -107,7 +107,7 @@ namespace September
                 // プレイヤーのアニメーションを停止する
                 if (_targetPlayerObject.TryGetComponent(out AnimationClipPlayer animationClipPlayer))
                 {
-                    animationClipPlayer.PlayOnTopLayer(null);
+                    animationClipPlayer.StopClip(Anim);
                 }
 
                 // プレイヤーの落下アニメーションを再度有効にする
