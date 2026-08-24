@@ -148,7 +148,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2922303140376795393}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 64d84d3edc2acd747bbb0413825fa2ef, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -161,9 +161,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.8
-  m_Height: 5
+  m_Height: 4.93
   m_Direction: 1
-  m_Center: {x: 0, y: -0.34, z: 0.75}
+  m_Center: {x: 0, y: -0.89, z: 0.75}
 --- !u!54 &4484201000652167640
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -438,8 +438,8 @@ MonoBehaviour:
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 2249
-  _forwardGroundRayOriginOffset: {x: 0, y: -2.42, z: 0.5}
-  _backGroundRayOriginOffset: {x: 0, y: 2.14, z: 0.5}
+  _forwardGroundRayOriginOffset: {x: 0, y: -3.23, z: 0.5}
+  _backGroundRayOriginOffset: {x: 0, y: 1.55, z: 0.5}
   _rayDivideCount: 2
   _forwardRayDistance: 1
   _wallLayerMask:
