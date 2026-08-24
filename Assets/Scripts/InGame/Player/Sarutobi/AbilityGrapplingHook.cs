@@ -229,7 +229,7 @@ namespace InGame.Player.Sarutobi
             }
             
             _grappleState = GrappleStateType.Jumping;
-            _clipPlayer.PlayClip(_animMoveLoop);
+            _clipPlayer.PlayClipLoop(_animMoveLoop);
         }
 
         void JumpingTick()
