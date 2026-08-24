@@ -73,6 +73,7 @@ public class SharkMovementProcessing : NetworkBehaviour
             // 下向きの加速度を加える
             _isGrounded = false;
             rb.AddForce(_fallGravity, ForceMode.Acceleration);
+            _currentGroundNormal = Vector3.up;
         }
     }
 
