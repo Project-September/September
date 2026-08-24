@@ -40,6 +40,9 @@ namespace InGame.Common
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _layerCts = new();
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _weightBlendCts = new();
 
+        /// <summary>
+        /// 現在再生中のクリップ情報
+        /// </summary>
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
 
         public AnimationMixerPlayable BaseMixer => _baseMixer;
@@ -360,10 +363,7 @@ namespace InGame.Common
             }
 
             // Out 完了時の最終スナップ → 0
-            _layerMixer.SetInputWeight(slot, 0f);
-            var liOut = _layerInfo[slot];
-            liOut.Weight = 0f;
-            _layerInfo[slot] = liOut;
+            SetInputWeight(slot, 0f);
 
             // 0 になったら “まだ自分が current なら” 接続解除＆破棄
             DisconnectAndDestroy(layerType, played, slot);
@@ -894,40 +894,52 @@ namespace InGame.Common
                 RPC_StopClip(index);
             }
 
-            return StopClipLocal(clip);
+            return StopClipLocal(index);
         }
 
-        [Rpc(RpcSources.All, RpcTargets.All)]
+        [Rpc(RpcSources.All, RpcTargets.All, InvokeLocal = false)]
         private void RPC_StopClip(int clipIndex)
         {
-            var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
-            StopClipLocal(montage.AnimClip);
+            StopClipLocal(clipIndex);
         }
 
-        private bool StopClipLocal(AnimationClip clip)
+        private bool StopClipLocal(int clipIndex)
         {
-            foreach (var kv in _clipOf)
+            var montage = AnimationClipsContainer.Instance.AnimationMontages[clipIndex];
+            return StopClipLocal(montage.AnimClip, montage.BlendOut, destroyCancellationToken);
+        }
+
+        private bool StopClipLocal(AnimationClip clip, LayerInfo.Blend outBlend = default, CancellationToken token = default)
+        {
+            foreach ((LayerInfo.LayerType layer, AnimationClip playingClip) in _clipOf)
             {
-                if (kv.Value == clip && _runtimeClips.TryGetValue(kv.Key, out var p) && p.IsValid())
+                if (playingClip == clip && _runtimeClips.TryGetValue(layer, out var p) && p.IsValid())
                 {
-                    RenewLayerCts(kv.Key);
+                    RenewLayerCts(layer);
 
-                    _slotOf.TryGetValue(kv.Key, out int slot);
+                    _slotOf.TryGetValue(layer, out int slot);
 
-                    // レイヤーウェイトを0にリセット
-                    _layerMixer.SetInputWeight(slot, 0f);
-                    var li = _layerInfo[slot];
-                    li.Weight = 0f;
-                    _layerInfo[slot] = li;
-
-                    if (_runtimeClips.TryGetValue(kv.Key, out var prev) && prev.IsValid())
+                    if (outBlend.BlendTime > 0f)
                     {
-                        _layerMixer.DisconnectInput(slot);
-                        prev.Destroy();
+                        try
+                        {
+                            StopClipAsync(slot, layer, outBlend, token).Forget();
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return false;
+                        }
                     }
+                    else
+                    {
+                        // レイヤーウェイトを0にリセット
+                        SetInputWeight(slot, 0f);
 
-                    _clipOf.Remove(kv.Key);
-                    _runtimeClips.Remove(kv.Key);
+                        if (_runtimeClips.TryGetValue(layer, out AnimationClipPlayable prev) && prev.IsValid())
+                        {
+                            DisconnectAndDestroy(layer, prev, slot);
+                        }
+                    }
 
                     return true;
                 }
@@ -935,6 +947,30 @@ namespace InGame.Common
 
             return false;
         }
+
+        private async UniTaskVoid StopClipAsync(int slot, LayerInfo.LayerType layer,
+            LayerInfo.Blend outBlend = default, CancellationToken token = default)
+        {
+            float from = Mathf.Clamp01(_layerInfo[slot].Weight);
+            await BlendWeightAsync(outBlend, token, from, 0, slot);
+
+            // 確実に0にする
+            SetInputWeight(slot, 0f);
+
+            if (_runtimeClips.TryGetValue(layer, out AnimationClipPlayable prev) && prev.IsValid())
+            {
+                DisconnectAndDestroy(layer, prev, slot);
+            }
+        }
+
+        private void SetInputWeight(int slot, float weight)
+        {
+            _layerMixer.SetInputWeight(slot, weight);
+            LayerInfo li = _layerInfo[slot];
+            li.Weight = weight;
+            _layerInfo[slot] = li;
+        }
+
         #endregion
 
         #region Outside Controls
