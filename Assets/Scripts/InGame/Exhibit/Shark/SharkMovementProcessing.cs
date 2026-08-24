@@ -86,7 +86,12 @@ public class SharkMovementProcessing : NetworkBehaviour
     {
         if (moveDirection == Vector3.zero) return;
 
-        var moveVelocity = Vector3.ProjectOnPlane(moveDirection, _currentGroundNormal).normalized;　//坂に沿った動きに
+        var moveVelocity = Vector3.ProjectOnPlane(moveDirection, _currentGroundNormal);　//坂に沿った動きに
+        if (moveVelocity.y < 0) moveVelocity.y = 0; // 下りの場合は無視（頭側で判定しているので上りとして扱う、下りが必要な場合は尾側で判定する）
+        moveVelocity = moveVelocity.normalized;
+
+        Debug.DrawRay(transform.position, _currentGroundNormal * 2, Color.yellow);
+        Debug.DrawRay(transform.position, moveVelocity * 5f, Color.cyan);
 
         // 前方に壁があるか判定
         var ray = new Ray(transform.position, moveDirection);
