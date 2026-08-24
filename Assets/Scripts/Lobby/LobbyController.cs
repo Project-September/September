@@ -22,6 +22,8 @@ namespace September.Lobby
         [SerializeField] private TextMeshProUGUI _roomNameText;
         [SerializeField] private Image _fadePanel;
         [SerializeField] private Transform _contentTransform;
+        [SerializeField] private MapType _mapType = MapType.Museum;
+
         readonly Dictionary<PlayerRef, PlayerConditionView> _lobbyPlayerUIDic = new();
         [Networked, OnChangedRender(nameof(OnChangedIsReady)), Capacity(8), HideInInspector]
         public NetworkDictionary<PlayerRef, NetworkBool> PlayerIsReadyDic => default;
@@ -92,7 +94,7 @@ namespace September.Lobby
             if (_isStartingGame) return;
             _isStartingGame = true;
             await UniTask.WaitForSeconds(delay);
-            NetworkManager.Instance.StartGame(new GameStartContext(MapType.Museum)).Forget();
+            NetworkManager.Instance.StartGame(new GameStartContext(_mapType)).Forget();
         }
 
         void AddContents(PlayerRef playerRef)
