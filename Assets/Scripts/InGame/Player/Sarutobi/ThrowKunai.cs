@@ -320,7 +320,7 @@ namespace InGame.Player.Sarutobi
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         void Rpc_KunaiBulletDetection(Vector3 targetPos)
         {
-            var muzzleHit = Physics.Raycast(_muzzleTf.position, targetPos - _muzzleTf.position, out var muzzleHitInfo, _maxDistance, _hitLayer);
+            var muzzleHit = Physics.Raycast(_muzzleTf.position, targetPos - _muzzleTf.position, out var muzzleHitInfo, _maxDistance, _hitLayer, QueryTriggerInteraction.Ignore);
 
             if (muzzleHit)
             {

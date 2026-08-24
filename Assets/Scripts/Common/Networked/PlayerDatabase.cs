@@ -100,6 +100,18 @@ namespace September.Common
             UpdatePlayerScore(actor, tracker);
         }
 
+        public void Server_AddKrakenDamageScore(PlayerRef actor, int damage)
+        {
+            if (!Object.HasStateAuthority)
+                return;
+
+            if (!_serverTrackers.TryGetValue(actor, out ScoreTracker tracker))
+                _serverTrackers[actor] = tracker = new ScoreTracker(_config);
+
+            tracker.AddKrakenDamage(damage);
+            UpdatePlayerScore(actor, tracker);
+        }
+
         // 合計スコア取得
         public int Server_GetTotal(PlayerRef actor)
         {
@@ -215,6 +227,7 @@ namespace September.Common
             }
             sb.Append("|G:").Append(tracker.GrapplingHookCount);
             sb.Append("|F:").Append(tracker.FriendExhibitCount);
+            sb.Append("|K:").Append(tracker.KrakenDamageScore);
             return sb.ToString();
         }
 
