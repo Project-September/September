@@ -55,7 +55,6 @@ public class SharkMovementProcessing : NetworkBehaviour
         Move(moveDirection, playerInput, rb, deltaTime);
         Rotate(deltaTime, moveDirection);
         AdsorptionOnGround(deltaTime, rb);
-        UpdatePositionBeforeWaterFall(transform.position);
     }
 
     /// <summary>
@@ -76,6 +75,7 @@ public class SharkMovementProcessing : NetworkBehaviour
             {
                 _isGrounded = true;
                 _currentGroundNormal = groundHit.normal;　// 最初に見つかった地面の法線を保存
+                PositionBeforeWaterFall = groundHit.point; // 最後に接していた地面の位置を保存
                 return;
             }
         }
@@ -162,19 +162,10 @@ public class SharkMovementProcessing : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// 海に落ちる直前の位置を更新
-    /// </summary>
-    /// <param name="position">プレイヤーの位置</param>
-    public void UpdatePositionBeforeWaterFall(Vector3 position)
-    {
-        // 地面についていれば、位置を更新
-        if (_isGrounded) PositionBeforeWaterFall = position;
-    }
-
     public void OnInteractStart()
     {
         LastGroundedTime = Runner.SimulationTime;
+        PositionBeforeWaterFall = transform.position;
     }
 
     private void OnDrawGizmosSelected()
