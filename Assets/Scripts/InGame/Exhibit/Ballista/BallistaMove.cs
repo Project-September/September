@@ -56,7 +56,6 @@ namespace September.InGame.Exhibit
 
 		public void Initialize()
 		{
-			
 			if(HasInputAuthority)
 			{
 				_cameraController.SetCameraRotate(_basePitch, _baseYaw);

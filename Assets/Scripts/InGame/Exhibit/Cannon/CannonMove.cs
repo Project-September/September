@@ -32,7 +32,6 @@ namespace September.InGame.Exhibit
 
 		public void Render()
 		{
-			base.Render();
 			_cannonBase.localRotation = BaseRotation;
 			_cannonBarrel.localRotation = BarrelRotation;
 			UpdatePlayerPos();
