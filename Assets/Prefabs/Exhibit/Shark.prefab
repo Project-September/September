@@ -432,13 +432,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   _rayDistance: 1.5
   _groundMaximumAngle: 90
-  _fallGravity: {x: 0, y: -200, z: 0}
+  _fallGravity: {x: 0, y: -9.81, z: 0}
   _maxRotateValue: 250
   _groundAdsorptionSpeed: 10
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 2249
-  _checkGroundRayOriginOffset: {x: 0, y: -2.4, z: 1}
+  _forwardGroundRayOriginOffset: {x: 0, y: -2.42, z: 0.5}
+  _backGroundRayOriginOffset: {x: 0, y: 2.14, z: 0.5}
+  _rayDivideCount: 2
   _forwardRayDistance: 1
   _wallLayerMask:
     serializedVersion: 2

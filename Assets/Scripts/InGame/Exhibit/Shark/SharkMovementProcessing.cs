@@ -16,7 +16,9 @@ public class SharkMovementProcessing : NetworkBehaviour
     [SerializeField] private float _maxRotateValue;
     [SerializeField] private float _groundAdsorptionSpeed;
     [SerializeField] private LayerMask _groundLayerMask;
-    [SerializeField] private Vector3 _checkGroundRayOriginOffset;
+    [SerializeField] private Vector3 _forwardGroundRayOriginOffset;
+    [SerializeField] private Vector3 _backGroundRayOriginOffset;
+    [SerializeField, Min(0)] private int _rayDivideCount;
 
     [Header("正面衝突判定")]
     [SerializeField] float _forwardRayDistance = 1;
@@ -33,6 +35,10 @@ public class SharkMovementProcessing : NetworkBehaviour
     private Vector3 _currentGroundNormal; // 現在、接触している地面の法線
     private bool _isGrounded; // プレイヤーが地面に接地しているか
     float _keepMovingTime;
+
+    [Networked] private float LastGroundedTime { get; set; }
+
+    private Vector3 FallVelocity => !_isGrounded ? _fallGravity * (Runner.SimulationTime - LastGroundedTime) : Vector3.zero;
 
     /// <summary>
     /// 移動処理
@@ -58,23 +64,31 @@ public class SharkMovementProcessing : NetworkBehaviour
     /// <param name="rb">プレイヤーのRigidbody</param>
     private void CheckGroundManual(Rigidbody rb)
     {
-        bool ray = Physics.Raycast(transform.TransformPoint(_checkGroundRayOriginOffset), Vector3.down, out RaycastHit hit,
-            _rayDistance, _groundLayerMask);
-        var normal = hit.normal;
-        if (ray && Vector3.Angle(normal, Vector3.up) < _groundMaximumAngle)
+        var forwardRayOrigin = transform.TransformPoint(_forwardGroundRayOriginOffset);
+        var backRayOrigin = transform.TransformPoint(_backGroundRayOriginOffset);
+
+        // 地面判定
+        for (int i = 0; i < _rayDivideCount + 2; ++i)
         {
-            _isGrounded = true;
-            _currentGroundNormal = normal;
-            return;
+            var rayOrigin = Vector3.Lerp(forwardRayOrigin, backRayOrigin, i / (_rayDivideCount + 1f));
+            bool isHit = Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit groundHit, _rayDistance, _groundLayerMask);
+            if (isHit && Vector3.Angle(groundHit.normal, Vector3.up) < _groundMaximumAngle)
+            {
+                _isGrounded = true;
+                _currentGroundNormal = groundHit.normal;　// 最初に見つかった地面の法線を保存
+                return;
+            }
         }
 
-        if (!ray || Vector3.Angle(normal, Vector3.up) >= _groundMaximumAngle)
+        // 地面から離れた瞬間に、最後の接地時間を保存
+        if (_isGrounded)
         {
-            // 下向きの加速度を加える
-            _isGrounded = false;
-            rb.AddForce(_fallGravity, ForceMode.Acceleration);
-            _currentGroundNormal = Vector3.up;
+            LastGroundedTime = Runner.SimulationTime;
         }
+
+        // 地面が見つからなかった
+        _isGrounded = false;
+        _currentGroundNormal = Vector3.up;
     }
 
     /// <summary>
@@ -112,7 +126,7 @@ public class SharkMovementProcessing : NetworkBehaviour
         float baseSpeed = playerInput.Buttons.IsSet(PlayerButtons.Dash) ? _dashSpeed : _walkSpeed;
         float speed = baseSpeed * t;
 
-        rb.linearVelocity = moveVelocity * speed;
+        rb.linearVelocity = moveVelocity * speed + FallVelocity;
 
         CurrentSpeedRatio = speed / _dashSpeed;
     }
@@ -161,6 +175,14 @@ public class SharkMovementProcessing : NetworkBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.TransformPoint(_checkGroundRayOriginOffset), Vector3.down * _rayDistance);
+
+        var forwardRayOrigin = transform.TransformPoint(_forwardGroundRayOriginOffset);
+        var backRayOrigin = transform.TransformPoint(_backGroundRayOriginOffset);
+
+        for (int i = 0; i < _rayDivideCount + 2; ++i)
+        {
+            var rayOrigin = Vector3.Lerp(forwardRayOrigin, backRayOrigin, i / (_rayDivideCount + 1f));
+            Gizmos.DrawRay(rayOrigin, Vector3.down * _rayDistance);
+        }
     }
 }
