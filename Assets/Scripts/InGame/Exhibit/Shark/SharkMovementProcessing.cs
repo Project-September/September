@@ -172,6 +172,11 @@ public class SharkMovementProcessing : NetworkBehaviour
         if (_isGrounded) PositionBeforeWaterFall = position;
     }
 
+    public void OnInteractStart()
+    {
+        LastGroundedTime = Runner.SimulationTime;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

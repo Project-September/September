@@ -68,6 +68,7 @@ public class SharkInteractable : MountableExhibitBase
         _cooldownTimer = _cooldownTime;
         _attackAnimationFrame = 0;
         _movementProcessing.UpdatePositionBeforeWaterFall(transform.position);
+        _movementProcessing.OnInteractStart();
     }
 
     public override void GetOff(PlayerRef playerRef)
