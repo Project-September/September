@@ -35,7 +35,7 @@ namespace September.InGame.Exhibit
 			_cannonBase.localRotation = BaseRotation;
 			_cannonBarrel.localRotation = BarrelRotation;
 			UpdatePlayerPos();
-			CameraRotate(BaseRotation);
+			CameraRotate(_cannonBase.rotation);
 		}
 
 		public void InitializeStateAuthority(NetworkObject playerObject, PlayerRef playerRef)
