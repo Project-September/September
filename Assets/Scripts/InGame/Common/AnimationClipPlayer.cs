@@ -446,6 +446,10 @@ namespace InGame.Common
         #endregion
 
         #region PlayLoop
+        /// <summary>
+        /// <see cref="AnimationClipsContainer"/>に登録されているMontageをループ再生します。
+        /// 停止する場合は<see cref="StopClip"/>を使用してください。
+        /// </summary>
         public void PlayClipLoop(AnimationClip clip)
         {
             if (!TryGetMontageIndex(clip, out int index))
