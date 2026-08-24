@@ -92,18 +92,15 @@ namespace InGame.Player.Sarutobi
             }
         }
 
-        public override void Render()
-        {
-            if (State == UltState.Aiming)
-            {
-                AimAnimationLoop();
-            }
-        }
-
         private void OnStateChanged()
         {
-            _aimEffect.gameObject.SetActive(State == UltState.Aiming);
             Debug.Log($"[{nameof(UltKunai)}] OnStateChanged: {State}");
+            _aimEffect.gameObject.SetActive(State == UltState.Aiming);
+
+            if (State == UltState.Aiming)
+            {
+                _animationClipPlayer.PlayClipLoop(_idleClip);
+            }
         }
 
         private void Fire(Vector3 targetPosition)
@@ -181,14 +178,6 @@ namespace InGame.Player.Sarutobi
         {
             if (RotationRatio > 0f)
                 _playerMovement.SetRotationDirection(desiredLookDirection);
-        }
-
-        private void AimAnimationLoop()
-        {
-            if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
-            {
-                _animationClipPlayer.PlayClip(_idleClip);
-            }
         }
 
         public void StartLook()
