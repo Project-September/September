@@ -204,9 +204,7 @@ namespace InGame.Common
 
                 if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var current) && current.IsValid())
                 {
-                    _layerMixer.DisconnectInput(slot);
-                    current.Destroy();
-                    _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
+                    DisconnectAndDestroy(LayerInfo.LayerType.TopLayer, current, slot);
                 }
 
                 var li0 = _layerInfo[slot];
@@ -217,9 +215,7 @@ namespace InGame.Common
 
             if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var prev) && prev.IsValid())
             {
-                _layerMixer.DisconnectInput(slot);
-                prev.Destroy();
-                _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
+                DisconnectAndDestroy(LayerInfo.LayerType.TopLayer, prev, slot);
             }
 
             Play(clip, LayerInfo.LayerType.TopLayer, 1f,playSpeed: speed, additive: false);
@@ -334,14 +330,8 @@ namespace InGame.Common
                                  && _runtimeClips.TryGetValue(layerType, out var stillCurrent)
                                  && stillCurrent.Equals(played) && stillCurrent.IsValid())
                 {
-                    _layerMixer.SetInputWeight(slot, 0f);
-                    _layerMixer.DisconnectInput(slot);
-                    stillCurrent.Destroy();
-                    _runtimeClips.Remove(layerType);
-
-                    var li = _layerInfo[slot];
-                    li.Weight = 0f;
-                    _layerInfo[slot] = li;
+                    SetInputWeight(slot, 0f);
+                    DisconnectAndDestroy(layerType, stillCurrent, slot);
                 }
 
                 return EndClipType.Interrupted;
@@ -424,8 +414,7 @@ namespace InGame.Common
             // 既存接続の後片付け
             if (_runtimeClips.TryGetValue(layerType, out var prev) && prev.IsValid())
             {
-                _layerMixer.DisconnectInput(slot);
-                prev.Destroy();
+                DisconnectAndDestroy(layerType, prev, slot);
             }
 
             _clipOf[layerType] = clip;
