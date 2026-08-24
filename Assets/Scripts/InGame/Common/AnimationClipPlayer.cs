@@ -457,7 +457,7 @@ namespace InGame.Common
         #endregion
 
         #region PlayLoop
-        public void PlayClipLoop(AnimationClip clip, float speed = 1f)
+        public void PlayClipLoop(AnimationClip clip)
         {
             if (!TryGetMontageIndex(clip, out int index))
             {
