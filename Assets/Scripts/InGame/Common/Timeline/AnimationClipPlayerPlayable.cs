@@ -43,7 +43,10 @@ namespace InGame.Common.Timeline
                     
                 _isPlayed = true;
             }
-            
+
+            // Playableが既に破棄されているかチェック
+            if (!_info.playable.IsValid()) return;
+
             var time = playable.GetTime();
             
             _info.SetTime(Mathf.Clamp((float)time, 0f, _clip.length), false);
