@@ -1,86 +1,86 @@
-using Cysharp.Threading.Tasks;
-using Fusion;
-using September;
-using September.Common;
-using September.InGame.Effect;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
+using Cysharp.Threading.Tasks;
+using Fusion;
+using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
-public class ThunderFactory : NetworkBehaviour
+namespace September.InGame.NauticalChart
 {
-    [Header("Prefab参照")]
-    [Tooltip("雷の生成領域"), SerializeField] private BoxCollider _spawnArea;
-    [SerializeField] private SkyboxChanger _skyboxChanger;
-
-    [Header("時間")]
-    [Tooltip("雷の生存時間"), SerializeField] private float _thunderLifeTime = 2.5f;
-    [Tooltip("雷の生成間隔"), SerializeField] private float _thunderSpawnIntervalTime = 2.0f;
-
-    [Header("個数制限")]
-    [Tooltip("雷の生成個数制限"), SerializeField] private int _thunderSpawnCapacity = 5;
-
-    private EffectSpawner _effectSpawner;
-    CancellationTokenSource _cts;
-
-    [Networked] public TickTimer _tickTimer { get; private set; }
-
-    public override void Spawned()
+    public class ThunderFactory : NetworkBehaviour
     {
-        base.Spawned();
-        _cts = new CancellationTokenSource();
-        _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
-    }
+        [Header("Prefab参照")]
+        [Tooltip("雷の生成領域"), SerializeField] private BoxCollider _spawnArea;
+        [SerializeField] private SkyboxChanger _skyboxChanger;
 
-    /// <summary> 雷の生成処理 </summary>
-    public async UniTaskVoid ThunderSpawener()
-    {
-        _tickTimer = TickTimer.CreateFromSeconds(Runner, _skyboxChanger.changeSkyTime - _thunderLifeTime);
+        [Header("時間")]
+        [Tooltip("雷の生存時間"), SerializeField] private float _thunderLifeTime = 2.5f;
+        [Tooltip("雷の生成間隔"), SerializeField] private float _thunderSpawnIntervalTime = 2.0f;
 
-        // エフェクトIDを生成して、雷のエフェクトを生成
-        for (int i = 0; i < _thunderSpawnCapacity; i++)
+        [Header("個数制限")]
+        [Tooltip("雷の生成個数制限"), SerializeField] private int _thunderSpawnCapacity = 5;
+
+        private EffectSpawner _effectSpawner;
+        CancellationTokenSource _cts;
+
+        [Networked] public TickTimer _tickTimer { get; private set; }
+
+        public override void Spawned()
         {
-            // 経過時間が総スカイボックス変更時間を超えたらループを終了
-            if (_tickTimer.Expired(Runner)) break;
-
-            var id = GenerateEffectId();
-            _effectSpawner.RequestPlayLoopEffect
-               (id, EffectType.Thunder, SpawnTransform(), Quaternion.identity, transform);
-            ThunderDestroyAsync(id).Forget();
-            await UniTask.WaitForSeconds(_thunderSpawnIntervalTime, cancellationToken: _cts.Token);
-
+            base.Spawned();
+            _cts = new CancellationTokenSource();
+            _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
         }
-    }
 
-    /// <summary> 雷のエフェクトを一定時間後に停止する非同期処理 </summary>
-    /// <param name="effectId"> 停止するエフェクトのID </param>
-    private async UniTaskVoid ThunderDestroyAsync(string effectId)
-    {
-        await UniTask.WaitForSeconds(_thunderLifeTime, cancellationToken: _cts.Token);
-        _effectSpawner.StopEffect(effectId);
-    }
+        /// <summary> 雷の生成処理 </summary>
+        public async UniTaskVoid ThunderSpawn(float duration)
+        {
+            _tickTimer = TickTimer.CreateFromSeconds(Runner, duration - _thunderLifeTime);
 
-    /// <summary> エフェクトIDを生成する </summary>
-    private static string GenerateEffectId()
-    {
-        return Guid.NewGuid().ToString();
-    }
+            // エフェクトIDを生成して、雷のエフェクトを生成
+            for (int i = 0; i < _thunderSpawnCapacity; i++)
+            {
+                // 経過時間が総スカイボックス変更時間を超えたらループを終了
+                if (_tickTimer.Expired(Runner)) break;
 
-    /// <summary> 雷の生成位置をランダムに決定する </summary>
-    private Vector3 SpawnTransform()
-    {
-       return new Vector3
+                var id = GenerateEffectId();
+                _effectSpawner.RequestPlayLoopEffect
+                    (id, EffectType.Thunder, SpawnTransform(), Quaternion.identity, transform);
+                ThunderDestroyAsync(id).Forget();
+                await UniTask.WaitForSeconds(_thunderSpawnIntervalTime, cancellationToken: _cts.Token);
+
+            }
+        }
+
+        /// <summary> 雷のエフェクトを一定時間後に停止する非同期処理 </summary>
+        /// <param name="effectId"> 停止するエフェクトのID </param>
+        private async UniTaskVoid ThunderDestroyAsync(string effectId)
+        {
+            await UniTask.WaitForSeconds(_thunderLifeTime, cancellationToken: _cts.Token);
+            _effectSpawner.StopEffect(effectId);
+        }
+
+        /// <summary> エフェクトIDを生成する </summary>
+        private static string GenerateEffectId()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
+        /// <summary> 雷の生成位置をランダムに決定する </summary>
+        private Vector3 SpawnTransform()
+        {
+            return new Vector3
             (UnityEngine.Random.Range(_spawnArea.bounds.min.x, _spawnArea.bounds.max.x),
-             _spawnArea.bounds.max.y,
-             UnityEngine.Random.Range(_spawnArea.bounds.min.z, _spawnArea.bounds.max.z));
-    }
+                _spawnArea.bounds.max.y,
+                UnityEngine.Random.Range(_spawnArea.bounds.min.z, _spawnArea.bounds.max.z));
+        }
 
-    public override void Despawned(NetworkRunner runner, bool hasState)
-    {
-        base.Despawned(runner, hasState);
-        _cts.Cancel();
-        _cts.Dispose();
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            base.Despawned(runner, hasState);
+            _cts.Cancel();
+            _cts.Dispose();
+        }
     }
 }

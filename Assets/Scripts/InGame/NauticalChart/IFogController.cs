@@ -1,8 +1,9 @@
-using UnityEngine;
-
-/// <summary> 霧の制御を行うインターフェース </summary>
-public interface IFogController
+namespace September.InGame.NauticalChart
 {
-    public void ShowFog();
-    public void HideFog();
+    /// <summary> 霧の制御を行うインターフェース </summary>
+    public interface IFogController
+    {
+        public void ShowFog();
+        public void HideFog();
+    }
 }

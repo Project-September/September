@@ -1,18 +1,32 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using UnityEngine;
 
-/// <summary> 嵐の管理を行うクラス </summary>
-namespace September
+namespace September.InGame.NauticalChart
 {
+    /// <summary> 嵐の管理を行うクラス </summary>
     public class StormManager : NetworkBehaviour
     { 
         [SerializeField] private SkyboxChanger _skyboxChanger;
         [SerializeField] private ThunderFactory _thunderFactory;
 
-        public void StartStorm()
+        public void StartStorm(float stormDuration, float thunderDuration)
         {
-            _skyboxChanger.SkyBoxChange().Forget();
-            _thunderFactory.ThunderSpawener();
+            StartStorm(stormDuration, destroyCancellationToken).Forget();
+            StartThunder(thunderDuration);
+        }
+
+        private void StartThunder(float duration)
+        {
+            _thunderFactory.ThunderSpawn(duration).Forget();
+        }
+
+        private async UniTask StartStorm(float duration, CancellationToken token)
+        {
+            _skyboxChanger.SkyBoxChangeStorm();
+            await UniTask.WaitForSeconds(duration, cancellationToken: token);
+            _skyboxChanger.RestoreSkyBox();
         }
     }
 }
