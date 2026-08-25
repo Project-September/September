@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using Fusion;
 using System;
+using Common.Extensions;
 using UnityEngine.UI;
 using InGame.Jewelry.Common;
 
@@ -24,7 +25,10 @@ namespace InGame.Jewelry
 
         public override void Spawned()
         {
-            if (_hideLocal && Object.InputAuthority == Runner.LocalPlayer) gameObject.SetActive(false);
+            if (_hideLocal && Object.InputAuthority == Runner.LocalPlayer)
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -34,21 +38,9 @@ namespace InGame.Jewelry
         /// <param name="sprite">アイコン</param>
         public void Init(JewelryType jewelryType, Sprite sprite)
         {
-            // 宝石の所持情報を満足に表示できない場合はreturn
-            if (_jewelryUIArray == null
-                || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount)
-            {
-                Debug.LogWarning("宝石UIが不足しています");
-                return;
-            }
+            if (!Validate(jewelryType)) return;
 
             var image = _jewelryUIArray[(int)jewelryType].JewelryImage;
-            if (image == null)
-            {
-                Debug.LogWarning("Imageコンポーネントが見つかりませんでした");
-                return;
-            }
             image.sprite = sprite;
         }
 
@@ -59,22 +51,34 @@ namespace InGame.Jewelry
         /// <param name="count">宝石の数</param>
         public void UpdateJewelryCount(JewelryType jewelryType, int count)
         {
-            // 宝石の所持情報を満足に表示できない場合はreturn
-            if (_jewelryUIArray == null
-                || _jewelryUIArray.Length <= 0
-                || _jewelryUIArray.Length < (int)JewelryType.JewelryTypeCount)
-            {
-                Debug.LogWarning("宝石UIが不足しています");
-                return;
-            }
+            if (!Validate(jewelryType)) return;
 
             var text = _jewelryUIArray[(int)jewelryType].JewelryCountText;
-            if (text == null)
+            text.text = count.ToString();
+        }
+
+        private bool Validate(JewelryType jewelryType)
+        {
+            // 宝石の所持情報を満足に表示できない場合はreturn
+            if (_jewelryUIArray == null || _jewelryUIArray.Length <= (int)jewelryType)
             {
-                Debug.LogWarning("テキストコンポーネントが見つかりませんでした");
-                return;
+                Debug.LogWarning($"宝石UIが不足しています。{(int)jewelryType + 1}個のUIが必要です: {gameObject.GetHierarchyPath()}", this);
+                return false;
             }
-            text.text = "× " + count;
+
+            if (_jewelryUIArray[(int)jewelryType].JewelryCountText == null)
+            {
+                Debug.LogWarning($"テキストコンポーネントが見つかりませんでした: {gameObject.GetHierarchyPath()}", this);
+                return false;
+            }
+
+            if (_jewelryUIArray[(int)jewelryType].JewelryImage == null)
+            {
+                Debug.LogWarning($"Imageコンポーネントが見つかりませんでした: {gameObject.GetHierarchyPath()}", this);
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -17,10 +17,14 @@ namespace InGame.Jewelry
 
         /// <summary>直前の宝石の数を保存する配列</summary>
         int[] _preJewelryQuantities;
+        JewelryInfo[] _jewelryInfos;
         bool _initialized;
 
         event Action<JewelryType, Sprite> _onInitialize;
         event Action<JewelryType, int> _onUpdateJewelryQuantity;
+
+        public int JewelryCount => CalculateJewelryScore();
+
         public Action OnInitialize(Action<JewelryType, Sprite> act)
         {
             _onInitialize += act;
@@ -39,8 +43,17 @@ namespace InGame.Jewelry
                 throw new InvalidOperationException();
             }
 
+            var jewelryInfos = definition.HoldingJewelryInfos;
+
+            // 宝石情報を保存
+            _jewelryInfos = new JewelryInfo[(int)JewelryType.JewelryTypeCount];
+            for (int i = 0; i < (int)JewelryType.JewelryTypeCount; i++)
+            {
+                _jewelryInfos[i] = jewelryInfos[i].JewelryInfo;
+            }
+
             // 対応表の作成
-            foreach (var info in definition.HoldingJewelryInfos)
+            foreach (var info in jewelryInfos)
             {
                 var jewelryType = info.JewelryInfo.JewelryType;
                 var quantity = info.JewelryCount;
@@ -51,8 +64,10 @@ namespace InGame.Jewelry
                 }
 
                 _onInitialize?.Invoke(jewelryType, info.JewelryInfo.JewelrySprite);
-                _onUpdateJewelryQuantity?.Invoke(jewelryType, quantity);
             }
+
+            var score = CalculateJewelryScore();
+            _onUpdateJewelryQuantity?.Invoke(JewelryType.NormalGem, score);
 
             // 直前の宝石の数を保存する配列の作成
             _preJewelryQuantities = new int[(int)JewelryType.JewelryTypeCount];
@@ -66,7 +81,7 @@ namespace InGame.Jewelry
         public override void Render()
         {
             if (!_initialized) return;
-            // 値の同期が行われたタイミングで描画更新通知
+            // 値の同期・変更が行われたタイミングで描画更新通知
             for (int i = 0; i < (int)JewelryType.JewelryTypeCount; i++)
             {
                 var current = _jewelryQuantities.Get(i);
@@ -75,8 +90,29 @@ namespace InGame.Jewelry
 
                 _preJewelryQuantities[i] = current;
 
-                _onUpdateJewelryQuantity?.Invoke((JewelryType)i, current);
+                var score = CalculateJewelryScore();
+
+                _onUpdateJewelryQuantity?.Invoke(JewelryType.NormalGem, score);
             }
+        }
+
+        /// <summary>
+        /// 現在のスコアを計算するメソッド
+        /// </summary>
+        /// <returns>現在のスコア</returns>
+        int CalculateJewelryScore()
+        {
+            int result = 0;
+
+            for (int i = 0; i < (int)JewelryType.JewelryTypeCount; i++)
+            {
+                var current = _jewelryQuantities.Get(i);
+
+                // 所持数 * スコアを計算
+                result += _jewelryInfos[i].Score * current;
+            }
+
+            return result;
         }
 
         /// <summary>

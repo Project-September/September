@@ -19,6 +19,7 @@ public enum ControlDescriptionType
     Tanihira,
     SarutobiAiming,
     TanihiraAiming,
+    AirPlane,
 }
 
 /// <summary>

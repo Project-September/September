@@ -150,11 +150,13 @@ namespace InGame.Player.Sarutobi
                 _cameraController.ChangeOffset(_stanceCameraOffset, _changeOffsetDuration);
                 _crosshair.SetActive(true);
             }
+
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+
             if (!HasStateAuthority) return;
 
             RPC_ChangeDescriptionUI(ControlDescriptionType.SarutobiAiming);
             State = KunaiStateType.Stance;
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             var endType = await _clipPlayer.PlayClipAndWait(_stance);
 
             if (endType == EndClipType.Complete)
@@ -318,7 +320,7 @@ namespace InGame.Player.Sarutobi
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         void Rpc_KunaiBulletDetection(Vector3 targetPos)
         {
-            var muzzleHit = Physics.Raycast(_muzzleTf.position, targetPos - _muzzleTf.position, out var muzzleHitInfo, _maxDistance, _hitLayer);
+            var muzzleHit = Physics.Raycast(_muzzleTf.position, targetPos - _muzzleTf.position, out var muzzleHitInfo, _maxDistance, _hitLayer, QueryTriggerInteraction.Ignore);
 
             if (muzzleHit)
             {

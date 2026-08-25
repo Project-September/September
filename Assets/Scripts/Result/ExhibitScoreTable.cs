@@ -37,8 +37,10 @@ namespace Result
         Armory,
         [DisplayName("サメ")]
         Shark,
+        [DisplayName("クラーケン")]
+        Kraken,
         [DisplayName("海図")]
-        NauticalChart
+        NauticalChart,
     }
 
     [Serializable]

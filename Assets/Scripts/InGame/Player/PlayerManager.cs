@@ -14,6 +14,7 @@ namespace InGame.Player
     public class PlayerManager : NetworkBehaviour, IAfterTick
     {
         [SerializeField] private PlayerInputManager _playerInputManager;
+        [SerializeField] private PlayerRespawn _playerRespawn;
         [SerializeField] GameObject _colliderObj;
         [SerializeField] GameObject _meshObj;
         [SerializeField] private float _stunTime; // PlayerParameter に入れるべきか
@@ -26,7 +27,6 @@ namespace InGame.Player
         PlayerMovement _playerMovement;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
-        PlayerControlState _playerControlState = PlayerControlState.Normal;
         TickTimer _stunTickTimer;
         PlayerEffectController _playerEffectController;
         Rigidbody _rigidbody;
@@ -35,7 +35,21 @@ namespace InGame.Player
         private Quaternion _targetRotation;
         private bool _isVaultingLastFrame = false;
         private RigidbodyConstraints _defaultConstraints;
-        public PlayerControlState CurrentPlayerControlState => _playerControlState;
+
+        [Networked] public PlayerControlState CurrentPlayerControlState { get; private set; } = PlayerControlState.Normal;
+
+        public void Start()
+        {
+            _playerRespawn.OnOutFieldEvent += () =>
+            {
+                IsMovable = false;
+            };
+            _playerRespawn.OnRevivalFieldEvent += () =>
+            {
+                IsMovable = true;
+            };
+            _playerRespawn.OnRevivalFieldEvent += () => Respawn();
+        }
 
         public void SetWarpTarget(Vector3 targetPosition, Quaternion targetRotation)
         {
@@ -51,7 +65,8 @@ namespace InGame.Player
 
         [Networked] private NetworkButtons PreviousButtons { get; set; }
         [Networked, HideInInspector] public NetworkBool IsStun { get; private set; }
-        
+        [Networked, HideInInspector] public NetworkBool IsMovable { get; private set; } = true;
+
         public override void Spawned()
         {
             InitComponents();
@@ -144,11 +159,11 @@ namespace InGame.Player
             // プレイヤーの入力の管理
             if (_playerInputManager != null && _playerInputManager.GetPlayerInput(out var input))
             {
-                if (!IsStun && _playerControlState == PlayerControlState.Normal)
+                if (!IsStun && IsMovable && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する_playerInputManager
                     _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
-                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), Runner.DeltaTime);
+                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
                 }
 
                 _playerMovement.MoveTick(Runner.DeltaTime);
@@ -178,27 +193,26 @@ namespace InGame.Player
         /// <summary> 気絶が終わったとき </summary>
         void Restart()
         {
-            IsStun = false;
             _playerHealth.IsInvincible = false;
+            IsStun = false;
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
 
         void OnDeath(HitData lastHitData)
         {
+            _playerHealth.IsInvincible = true;
             IsStun = true;
-
             // ビルドの減衰分を乗算
             _stunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
-            _playerHealth.IsInvincible = true;
             _playerEffectController.PlayStunEffect();
         }
 
         public void SetControlState(PlayerControlState controlState)
         {
-            _playerControlState = controlState;
+            CurrentPlayerControlState = controlState;
 
-            if (_playerControlState == PlayerControlState.ForcedControl)
+            if (CurrentPlayerControlState == PlayerControlState.ForcedControl)
             {
                 _playerMovement.Stop();
             }
@@ -210,12 +224,6 @@ namespace InGame.Player
             if (_attackWeapon == null) return;
 
             _attackWeapon.SetActive(visible);
-        }
-
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_SetControlState(PlayerControlState controlState)
-        {
-            SetControlState(controlState);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -235,13 +243,22 @@ namespace InGame.Player
         {
             _rigidbody.useGravity = active;
         }
-        
+
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetPositionLock(NetworkBool isLocked)
         {
             _rigidbody.constraints = isLocked ?
-                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation : 
+                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetInvisible(NetworkBool active)
+        {
+            SetControlState(active ? PlayerControlState.ForcedControl : PlayerControlState.Normal);
+            _colliderObj.SetActive(!active);
+            _meshObj.SetActive(!active);
+            _rigidbody.useGravity = !active;
         }
 
         /// <summary> 非常用リスポーン </summary>
@@ -249,7 +266,7 @@ namespace InGame.Player
         {
             if (!HasStateAuthority) return;
 
-            _playerMovement.Teleport(_respawnPosition);
+            _playerMovement.TeleportImmediate(_respawnPosition);
 
             //タニヒラ用の処理を追記
             if (this.gameObject.TryGetComponent<FormationManager>(out FormationManager formationManager))
