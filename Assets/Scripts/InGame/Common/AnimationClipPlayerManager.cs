@@ -132,7 +132,8 @@ namespace InGame.Common
             return _animationClipPlayer.IsPlayingTargetClip(_jumpOver) ||
                    _animationClipPlayer.IsPlayingTargetClip(_fallDown) ||
                    _animationClipPlayer.IsPlayingTargetClip(_faint) ||
-                   _animationClipPlayer.IsPlayingTargetClip(_getUp);
+                   _animationClipPlayer.IsPlayingTargetClip(_getUp) ||
+                   _animationClipPlayer.IsPlayingTargetClip(_rollEvasion);
         }
 
         [Networked] public bool EnableFallMotion { get; set; } = true;
