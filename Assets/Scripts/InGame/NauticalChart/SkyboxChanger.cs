@@ -10,13 +10,16 @@ namespace September.InGame.NauticalChart
         private Material _originalSkyboxMaterial;
 
         /// <summary> Skyboxを変更する </summary>
-        public void SkyBoxChangeStorm()
+        public void SkyboxChangeStorm()
         {
             _originalSkyboxMaterial = RenderSettings.skybox;
             RenderSettings.skybox = _stormSkyboxMaterial;
         }
 
-        public void RestoreSkyBox()
+        /// <summary>
+        /// 元のSkyboxに戻す
+        /// </summary>
+        public void RestoreSkybox()
         {
             RenderSettings.skybox = _originalSkyboxMaterial;
         }

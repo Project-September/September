@@ -24,9 +24,9 @@ namespace September.InGame.NauticalChart
 
         private async UniTask StartStorm(float duration, CancellationToken token)
         {
-            _skyboxChanger.SkyBoxChangeStorm();
+            _skyboxChanger.SkyboxChangeStorm();
             await UniTask.WaitForSeconds(duration, cancellationToken: token);
-            _skyboxChanger.RestoreSkyBox();
+            _skyboxChanger.RestoreSkybox();
         }
     }
 }
