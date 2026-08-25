@@ -350,7 +350,7 @@ MonoBehaviour:
     TargetLayer: 2
     IsAdditive: 0
   - AnimClip: {fileID: 7400000, guid: 820cd81769cd03141b2ae912ecf0d479, type: 2}
-    PlaySpeed: 0
+    PlaySpeed: 1
     BlendIn:
       BlendTime: 0
       BlendCurve:
@@ -378,7 +378,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0
+      BlendTime: 0.3
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -464,7 +464,7 @@ MonoBehaviour:
   - AnimClip: {fileID: 7400000, guid: 08ec66ed4679d824c9bb6bb9e78c77b2, type: 2}
     PlaySpeed: 1
     BlendIn:
-      BlendTime: 0
+      BlendTime: 0.2
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -576,7 +576,7 @@ MonoBehaviour:
   - AnimClip: {fileID: 7400000, guid: b90f297de879f8e439375618de427c2d, type: 2}
     PlaySpeed: 1
     BlendIn:
-      BlendTime: 0
+      BlendTime: 0.2
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -602,7 +602,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 0
     BlendOut:
-      BlendTime: 0
+      BlendTime: 0.2
       BlendCurve:
         serializedVersion: 2
         m_Curve:
@@ -1738,6 +1738,118 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    TargetLayer: 1
+    IsAdditive: 0
+  - AnimClip: {fileID: 1827226128182048838, guid: 4d055a1c7278aa84bbf7b655cd46106b, type: 3}
+    PlaySpeed: 1
+    BlendIn:
+      BlendTime: 0.3
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    BlendOut:
+      BlendTime: 0.3
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    TargetLayer: 1
+    IsAdditive: 0
+  - AnimClip: {fileID: 1827226128182048838, guid: 2408b1d8c471eb04182b2e74ec875a15, type: 3}
+    PlaySpeed: 0.4
+    BlendIn:
+      BlendTime: 0.1
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
+    BlendOut:
+      BlendTime: 0.2
+      BlendCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
           inSlope: 0
           outSlope: 0
           tangentMode: 0

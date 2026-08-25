@@ -252,6 +252,15 @@ namespace InGame.Player
                 _defaultConstraints;
         }
 
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RPC_SetInvisible(NetworkBool active)
+        {
+            SetControlState(active ? PlayerControlState.ForcedControl : PlayerControlState.Normal);
+            _colliderObj.SetActive(!active);
+            _meshObj.SetActive(!active);
+            _rigidbody.useGravity = !active;
+        }
+
         /// <summary> 非常用リスポーン </summary>
         void Respawn()
         {
