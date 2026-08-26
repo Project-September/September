@@ -65,9 +65,18 @@ namespace InGame.Jewelry
                 if (_nextTime >= _jewelrySpawnData.SpawnSettings.Length)
                     return;
 
-                if (seconds <= _jewelrySpawnData.SpawnSettings[_nextTime].SpawnTime)
+                var next = _jewelrySpawnData.SpawnSettings[_nextTime];
+                if (seconds <= next.SpawnTime)
                 {
-                    StartSpawnSequenceAsync(_jewelrySpawnData.SpawnSettings[_nextTime]).Forget();
+                    // ゲーム開始前に生成される場合
+                    if (next.SpawnTime > _timerData.GameTime)
+                    {
+                        SpawnJewelryGroup(next);
+                    }
+                    else
+                    {
+                        StartSpawnSequenceAsync(next).Forget();
+                    }
                     _nextTime++;
                 }
 
@@ -83,8 +92,29 @@ namespace InGame.Jewelry
                 return;
             }
 
-            Transform spawnTransform;
+            if (!TryGetSpawnTransform(spawnSetting, out Transform spawnTransform)) return;
 
+            RPC_SetSpawnPrediction(true, spawnTransform.position);
+
+            //スポーン予告メッセージを出す
+            if (spawnSetting.ShowSpawnMessage)
+                RPC_ShowSpawnMessage(_predictionVisibleDuration);
+
+            await UniTask.WaitForSeconds(_predictionVisibleDuration, cancellationToken: _cts.Token);
+            SpawnJewelryGroup(spawnTransform.position, spawnSetting);
+            RPC_SetSpawnPrediction(false);
+        }
+
+        private void SpawnJewelryGroup(JewelrySpawnSetting spawnSetting)
+        {
+            if (TryGetSpawnTransform(spawnSetting, out Transform spawnTransform))
+            {
+                SpawnJewelryGroup(spawnTransform.position, spawnSetting);
+            }
+        }
+
+        private bool TryGetSpawnTransform(JewelrySpawnSetting spawnSetting, out Transform spawnTransform)
+        {
             if (spawnSetting.PositionIndex < 0)
             {
                 int randomIndex = Random.Range(0, _spawnPositions.Length);
@@ -100,18 +130,12 @@ namespace InGame.Jewelry
                 else
                 {
                     Debug.LogError("JewelrySpawner : 存在しないインデックス番号です");
-                    return;
+                    spawnTransform = null;
+                    return false;
                 }
             }
-            RPC_SetSpawnPrediction(true, spawnTransform.position);
 
-            //スポーン予告メッセージを出す
-            if (spawnSetting.ShowSpawnMessage)
-                RPC_ShowSpawnMessage(_predictionVisibleDuration);
-
-            await UniTask.WaitForSeconds(_predictionVisibleDuration, cancellationToken: _cts.Token);
-            SpawnJewelryGroup(spawnTransform.position, spawnSetting);
-            RPC_SetSpawnPrediction(false);
+            return true;
         }
 
 
