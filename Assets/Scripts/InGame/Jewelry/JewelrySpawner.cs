@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using September.Common;
 using September.InGame.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -166,6 +167,37 @@ namespace InGame.Jewelry
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            foreach (JewelrySpawnSetting setting in _jewelrySpawnData.SpawnSettings)
+            {
+                if (setting.PositionIndex >= _spawnPositions.Length) continue;
+
+                if (setting.PositionIndex < 0)
+                {
+                    Gizmos.color = Color.yellow;
+                    foreach (Transform spawnPoint in _spawnPositions)
+                    {
+                        DrawSpawnArea(spawnPoint.position, setting);
+                    }
+                }
+                else
+                {
+                    Gizmos.color = Color.cyan;
+                    Transform spawnPoint = _spawnPositions[setting.PositionIndex];
+                    DrawSpawnArea(spawnPoint.position, setting);
+                }
+            }
+
+            return;
+
+            void DrawSpawnArea(Vector3 spawnPosition, JewelrySpawnSetting setting)
+            {
+                Vector3 center = spawnPosition + Vector3.up * setting.Height;
+                GizmosUtility.DrawCircle(center, Vector3.up, setting.SpawnRange);
+            }
         }
     }
 }
