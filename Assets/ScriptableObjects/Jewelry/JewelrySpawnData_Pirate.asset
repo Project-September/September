@@ -28,6 +28,14 @@ MonoBehaviour:
     - _jewelryType: 0
       _count: 1
     _spawnRange: 1
+    _positionIndex: 5
+    _height: 1
+    _showSpawnMessage: 0
+  - _spawnTime: 190
+    _items:
+    - _jewelryType: 0
+      _count: 1
+    _spawnRange: 1
     _positionIndex: 1
     _height: 1
     _showSpawnMessage: 0
@@ -44,14 +52,6 @@ MonoBehaviour:
     - _jewelryType: 0
       _count: 1
     _spawnRange: 1
-    _positionIndex: 3
-    _height: 1
-    _showSpawnMessage: 0
-  - _spawnTime: 190
-    _items:
-    - _jewelryType: 0
-      _count: 1
-    _spawnRange: 1
     _positionIndex: 4
     _height: 1
     _showSpawnMessage: 0
@@ -60,7 +60,7 @@ MonoBehaviour:
     - _jewelryType: 0
       _count: 1
     _spawnRange: 1
-    _positionIndex: 5
+    _positionIndex: 8
     _height: 1
     _showSpawnMessage: 0
   - _spawnTime: 190
@@ -68,7 +68,7 @@ MonoBehaviour:
     - _jewelryType: 0
       _count: 1
     _spawnRange: 1
-    _positionIndex: 6
+    _positionIndex: 3
     _height: 1
     _showSpawnMessage: 0
   - _spawnTime: 190
@@ -77,14 +77,6 @@ MonoBehaviour:
       _count: 1
     _spawnRange: 1
     _positionIndex: 7
-    _height: 1
-    _showSpawnMessage: 0
-  - _spawnTime: 190
-    _items:
-    - _jewelryType: 0
-      _count: 1
-    _spawnRange: 1
-    _positionIndex: 8
     _height: 1
     _showSpawnMessage: 0
   - _spawnTime: 190
@@ -117,11 +109,19 @@ MonoBehaviour:
     _positionIndex: 11
     _height: 1
     _showSpawnMessage: 0
+  - _spawnTime: 190
+    _items:
+    - _jewelryType: 0
+      _count: 1
+    _spawnRange: 1
+    _positionIndex: 6
+    _height: 1
+    _showSpawnMessage: 0
   - _spawnTime: 150
     _items:
     - _jewelryType: 0
       _count: 5
-    _spawnRange: 5
+    _spawnRange: 4
     _positionIndex: 3
     _height: 1
     _showSpawnMessage: 1
@@ -141,7 +141,7 @@ MonoBehaviour:
       _count: 6
     - _jewelryType: 1
       _count: 1
-    _spawnRange: 4
+    _spawnRange: 3
     _positionIndex: 8
     _height: 1
     _showSpawnMessage: 1
@@ -161,7 +161,7 @@ MonoBehaviour:
       _count: 5
     - _jewelryType: 1
       _count: 1
-    _spawnRange: 5
+    _spawnRange: 4
     _positionIndex: 7
     _height: 1
     _showSpawnMessage: 1
