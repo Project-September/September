@@ -107,12 +107,22 @@ MonoBehaviour:
     _positionIndex: 10
     _height: 1
     _showSpawnMessage: 0
+  - _spawnTime: 190
+    _items:
+    - _jewelryType: 0
+      _count: 3
+    - _jewelryType: 1
+      _count: 1
+    _spawnRange: 1
+    _positionIndex: 11
+    _height: 1
+    _showSpawnMessage: 0
   - _spawnTime: 150
     _items:
     - _jewelryType: 0
       _count: 5
     _spawnRange: 5
-    _positionIndex: -1
+    _positionIndex: 3
     _height: 1
     _showSpawnMessage: 1
   - _spawnTime: 120
@@ -121,7 +131,7 @@ MonoBehaviour:
       _count: 2
     - _jewelryType: 1
       _count: 1
-    _spawnRange: 5
+    _spawnRange: 2
     _positionIndex: -1
     _height: 1
     _showSpawnMessage: 1
@@ -131,8 +141,8 @@ MonoBehaviour:
       _count: 6
     - _jewelryType: 1
       _count: 1
-    _spawnRange: 5
-    _positionIndex: -1
+    _spawnRange: 4
+    _positionIndex: 8
     _height: 1
     _showSpawnMessage: 1
   - _spawnTime: 45
@@ -141,7 +151,7 @@ MonoBehaviour:
       _count: 3
     - _jewelryType: 1
       _count: 1
-    _spawnRange: 5
+    _spawnRange: 2
     _positionIndex: -1
     _height: 1
     _showSpawnMessage: 1
@@ -152,7 +162,7 @@ MonoBehaviour:
     - _jewelryType: 1
       _count: 1
     _spawnRange: 5
-    _positionIndex: -1
+    _positionIndex: 7
     _height: 1
     _showSpawnMessage: 1
   _prefabs:
