@@ -105,14 +105,6 @@ namespace InGame.Jewelry
             RPC_SetSpawnPrediction(false);
         }
 
-        private void SpawnJewelryGroup(JewelrySpawnSetting spawnSetting)
-        {
-            if (TryGetSpawnTransform(spawnSetting, out Transform spawnTransform))
-            {
-                SpawnJewelryGroup(spawnTransform.position, spawnSetting);
-            }
-        }
-
         private bool TryGetSpawnTransform(JewelrySpawnSetting spawnSetting, out Transform spawnTransform)
         {
             if (spawnSetting.PositionIndex < 0)
@@ -154,6 +146,14 @@ namespace InGame.Jewelry
         private void RPC_ShowSpawnMessage(float second)
         {
             UIController.I.ShowStatusUpUI(second, Exhibit.StatusUpType.JewelrySpawn);
+        }
+
+        private void SpawnJewelryGroup(JewelrySpawnSetting spawnSetting)
+        {
+            if (TryGetSpawnTransform(spawnSetting, out Transform spawnTransform))
+            {
+                SpawnJewelryGroup(spawnTransform.position, spawnSetting);
+            }
         }
 
         private void SpawnJewelryGroup(Vector3 centerPosition, JewelrySpawnSetting spawnSetting)
