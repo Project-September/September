@@ -124,9 +124,6 @@ PrefabInstance:
       addedObject: {fileID: 6675958784025676327}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1941025314924722290}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1029180789908668499}
   m_SourcePrefab: {fileID: 100100000, guid: 4b2f7cca9f16b374983d8501c1f3018d, type: 3}
 --- !u!1 &7382225231107150572 stripped
@@ -196,6 +193,7 @@ MonoBehaviour:
   _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectRotation: {x: 0, y: 0, z: 0}
+  _cooldownEffectScale: {x: 1, y: 1, z: 1}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
@@ -205,6 +203,7 @@ MonoBehaviour:
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
+  _debug: 0
   references:
     version: 2
     RefIds:
@@ -234,20 +233,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8297157, y: 2.007451, z: 0.8869896}
   m_Center: {x: -0.002817154, y: 0.9833107, z: -0.01614952}
---- !u!114 &1941025314924722290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7382225231107150572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 2101273202392379923}
 --- !u!114 &1029180789908668499
 MonoBehaviour:
   m_ObjectHideFlags: 0

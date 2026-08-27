@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 7519097605473453328}
   - component: {fileID: -881610955048844292}
   - component: {fileID: 884689928168090516}
-  - component: {fileID: -5957367846671423442}
   m_Layer: 11
   m_Name: Muramasa
   m_TagString: Untagged
@@ -103,6 +102,7 @@ MonoBehaviour:
   _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectRotation: {x: 0, y: 0, z: 0}
+  _cooldownEffectScale: {x: 1, y: 1, z: 1}
   _interactEffectType: 9
   _cooldownEffectType: 11
   _spawnCooldownEffectOnStart: 1
@@ -112,6 +112,7 @@ MonoBehaviour:
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
+  _debug: 0
   references:
     version: 2
     RefIds:
@@ -154,20 +155,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cueSheet: ALLCue
---- !u!114 &-5957367846671423442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5764894245619052002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 7519097605473453328}
 --- !u!1001 &5566077545412629392
 PrefabInstance:
   m_ObjectHideFlags: 0

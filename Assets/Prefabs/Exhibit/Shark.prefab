@@ -109,7 +109,6 @@ GameObject:
   - component: {fileID: 3466500518305658904}
   - component: {fileID: 1490673361395146691}
   - component: {fileID: 6716616855924409591}
-  - component: {fileID: 6268622650917794893}
   - component: {fileID: 5624172255545513684}
   - component: {fileID: 7332413252645484968}
   - component: {fileID: -6263480614593985820}
@@ -330,20 +329,6 @@ MonoBehaviour:
   _cameraRadius: 0.1
   _motionDuration: 0.3
   _motionEase: 0
---- !u!114 &6268622650917794893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2922303140376795393}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 1490673361395146691}
 --- !u!114 &5624172255545513684
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -113,9 +113,6 @@ PrefabInstance:
       addedObject: {fileID: 2735281992233445846}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4999911576838577376}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 4788509961417128256}
   m_SourcePrefab: {fileID: 100100000, guid: c392efa6fa9bdf24a9f876e57353bb54, type: 3}
 --- !u!4 &343203895494176651 stripped
@@ -206,6 +203,7 @@ MonoBehaviour:
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
   _ForceSetInteractable: 1
+  _debug: 0
   references:
     version: 2
     RefIds:
@@ -219,20 +217,6 @@ MonoBehaviour:
         _warpInSoundName: SE_Painting_Warp_In
         _warpOutSoundName: SE_Painting_Warp_Out
         _audioBroadcaster: {fileID: 4788509961417128256}
---- !u!114 &4999911576838577376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1119319001164789041}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 2735281992233445846}
 --- !u!114 &4788509961417128256
 MonoBehaviour:
   m_ObjectHideFlags: 0
