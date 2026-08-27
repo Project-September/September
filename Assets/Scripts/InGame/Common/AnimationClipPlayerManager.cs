@@ -16,13 +16,19 @@ namespace InGame.Common
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private AnimationClip _jumpOver;
         [SerializeField] private float _jumpOverDuration = 0.2f;
-        [SerializeField] private AnimationClip _rollEvasion;
-        [SerializeField] private EvasionData _evasionData;
         [SerializeField] private AnimationClip _fallDown;
         [SerializeField] private AnimationClip _faint;  // 追加: 気絶アニメーション
         [SerializeField] private AnimationClip _getUp;   // 追加: 起き上がりアニメーション
         [SerializeField] private PlayerManager _playerManager; // 追加: PlayerManager参照
         [SerializeField] private PlayerHealth _playerHealth;
+
+        [Header("Roll Evasion")]
+        [SerializeField] private AnimationClip _rollEvasion;
+        [SerializeField, Range(0f, 1f)] private float _evasionInTime = 0.08f;
+        [SerializeField] private AnimationCurve _evasionInCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+        [SerializeField, Range(0f, 1f)] private float _evasionOutTime = 0.10f;
+        [SerializeField] private AnimationCurve _evasionOutCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+        [SerializeField] private EvasionData _evasionData;
 
         // ▼ 追加: ブレンド設定
         [Header("Loco Blend")]
@@ -252,13 +258,26 @@ namespace InGame.Common
             {
                 try
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(rollDurationScale), cancellationToken: _rollEvasionTokenSrc.Token);
+                    await _animationClipPlayer.BlendLayerWeight(
+                        LayerInfo.LayerType.TopLayer,
+                        1f,
+                        new LayerInfo.Blend { BlendTime = _evasionInTime, BlendCurve = _evasionInCurve }
+                    );
+
+                    await UniTask.Delay(TimeSpan.FromSeconds(rollDurationScale - (_evasionInTime + _evasionOutTime)), cancellationToken: _rollEvasionTokenSrc.Token);
+
+                    await _animationClipPlayer.BlendLayerWeight(
+                        LayerInfo.LayerType.TopLayer,
+                        0f,
+                        new LayerInfo.Blend { BlendTime = _evasionOutTime, BlendCurve = _evasionOutCurve }
+                    );
                 }
                 catch (OperationCanceledException)
                 {
                     return;
                 }
             }
+
             _animationClipPlayer.PlayOnTopLayer(null);
         }
 
