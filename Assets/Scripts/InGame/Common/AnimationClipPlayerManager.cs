@@ -261,7 +261,8 @@ namespace InGame.Common
                     await _animationClipPlayer.BlendLayerWeight(
                         LayerInfo.LayerType.TopLayer,
                         1f,
-                        new LayerInfo.Blend { BlendTime = _evasionInTime, BlendCurve = _evasionInCurve }
+                        new LayerInfo.Blend { BlendTime = _evasionInTime, BlendCurve = _evasionInCurve },
+                        _rollEvasionTokenSrc.Token
                     );
 
                     await UniTask.Delay(TimeSpan.FromSeconds(rollDurationScale - (_evasionInTime + _evasionOutTime)), cancellationToken: _rollEvasionTokenSrc.Token);
@@ -269,7 +270,8 @@ namespace InGame.Common
                     await _animationClipPlayer.BlendLayerWeight(
                         LayerInfo.LayerType.TopLayer,
                         0f,
-                        new LayerInfo.Blend { BlendTime = _evasionOutTime, BlendCurve = _evasionOutCurve }
+                        new LayerInfo.Blend { BlendTime = _evasionOutTime, BlendCurve = _evasionOutCurve },
+                        _rollEvasionTokenSrc.Token
                     );
                 }
                 catch (OperationCanceledException)
