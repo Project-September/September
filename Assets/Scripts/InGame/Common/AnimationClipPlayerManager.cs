@@ -199,11 +199,11 @@ namespace InGame.Common
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_TriggerEvasion(float weightCoefficient)
+        public void RPC_TriggerEvasion(float rollDurationScale)
         {
             if (!_hardOverride)
             {
-                _ = TriggerEvasion(weightCoefficient);
+                _ = TriggerEvasion(rollDurationScale);
             }
         }
 
@@ -234,9 +234,9 @@ namespace InGame.Common
             if (!_playerMovement.IsGroundNet) SetFallAnim(false);
         }
 
-        public async UniTask TriggerEvasion(float weightCoefficient)
+        public async UniTask TriggerEvasion(float rollDurationScale)
         {
-            if (weightCoefficient <= 0f)
+            if (rollDurationScale <= 0f)
                 return;
 
             if (_rollEvasionTokenSrc != null)
@@ -244,7 +244,7 @@ namespace InGame.Common
                 _rollEvasionTokenSrc.Cancel();
                 _rollEvasionTokenSrc.Dispose();
             }
-            _animationClipPlayer.PlayOnTopLayer(_rollEvasion, 1 / weightCoefficient);
+            _animationClipPlayer.PlayOnTopLayer(_rollEvasion, 1 / rollDurationScale);
 
             _rollEvasionTokenSrc = new CancellationTokenSource();
 
@@ -252,7 +252,7 @@ namespace InGame.Common
             {
                 try
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_evasionData.RollDuration * weightCoefficient), cancellationToken: _rollEvasionTokenSrc.Token);
+                    await UniTask.Delay(TimeSpan.FromSeconds(rollDurationScale), cancellationToken: _rollEvasionTokenSrc.Token);
                 }
                 catch (OperationCanceledException)
                 {
