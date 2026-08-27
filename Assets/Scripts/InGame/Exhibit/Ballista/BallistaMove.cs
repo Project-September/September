@@ -39,7 +39,7 @@ namespace September.InGame.Exhibit
 			Pitch = _basePitch;
 		}
 
-		public override void Render()
+		public void Render()
 		{
 			ModelRotate();
 			UpdatePlayerPosition();
@@ -56,7 +56,6 @@ namespace September.InGame.Exhibit
 
 		public void Initialize()
 		{
-			
 			if(HasInputAuthority)
 			{
 				_cameraController.SetCameraRotate(_basePitch, _baseYaw);
