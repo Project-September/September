@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using September.Common;
 using September.InGame.UI;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -64,9 +65,18 @@ namespace InGame.Jewelry
                 if (_nextTime >= _jewelrySpawnData.SpawnSettings.Length)
                     return;
 
-                if (seconds <= _jewelrySpawnData.SpawnSettings[_nextTime].SpawnTime)
+                var next = _jewelrySpawnData.SpawnSettings[_nextTime];
+                if (seconds <= next.SpawnTime)
                 {
-                    StartSpawnSequenceAsync(_jewelrySpawnData.SpawnSettings[_nextTime]).Forget();
+                    // ゲーム開始前に生成される場合
+                    if (next.SpawnTime > _timerData.GameTime)
+                    {
+                        SpawnJewelryGroup(next);
+                    }
+                    else
+                    {
+                        StartSpawnSequenceAsync(next).Forget();
+                    }
                     _nextTime++;
                 }
 
@@ -82,8 +92,21 @@ namespace InGame.Jewelry
                 return;
             }
 
-            Transform spawnTransform;
+            if (!TryGetSpawnTransform(spawnSetting, out Transform spawnTransform)) return;
 
+            RPC_SetSpawnPrediction(true, spawnTransform.position);
+
+            //スポーン予告メッセージを出す
+            if (spawnSetting.ShowSpawnMessage)
+                RPC_ShowSpawnMessage(_predictionVisibleDuration);
+
+            await UniTask.WaitForSeconds(_predictionVisibleDuration, cancellationToken: _cts.Token);
+            SpawnJewelryGroup(spawnTransform.position, spawnSetting);
+            RPC_SetSpawnPrediction(false);
+        }
+
+        private bool TryGetSpawnTransform(JewelrySpawnSetting spawnSetting, out Transform spawnTransform)
+        {
             if (spawnSetting.PositionIndex < 0)
             {
                 int randomIndex = Random.Range(0, _spawnPositions.Length);
@@ -99,18 +122,12 @@ namespace InGame.Jewelry
                 else
                 {
                     Debug.LogError("JewelrySpawner : 存在しないインデックス番号です");
-                    return;
+                    spawnTransform = null;
+                    return false;
                 }
             }
-            RPC_SetSpawnPrediction(true, spawnTransform.position);
 
-            //スポーン予告メッセージを出す
-            if (spawnSetting.ShowSpawnMessage)
-                RPC_ShowSpawnMessage(_predictionVisibleDuration);
-
-            await UniTask.WaitForSeconds(_predictionVisibleDuration, cancellationToken: _cts.Token);
-            SpawnJewelryGroup(spawnTransform.position, spawnSetting);
-            RPC_SetSpawnPrediction(false);
+            return true;
         }
 
 
@@ -129,6 +146,14 @@ namespace InGame.Jewelry
         private void RPC_ShowSpawnMessage(float second)
         {
             UIController.I.ShowStatusUpUI(second, Exhibit.StatusUpType.JewelrySpawn);
+        }
+
+        private void SpawnJewelryGroup(JewelrySpawnSetting spawnSetting)
+        {
+            if (TryGetSpawnTransform(spawnSetting, out Transform spawnTransform))
+            {
+                SpawnJewelryGroup(spawnTransform.position, spawnSetting);
+            }
         }
 
         private void SpawnJewelryGroup(Vector3 centerPosition, JewelrySpawnSetting spawnSetting)
@@ -166,6 +191,37 @@ namespace InGame.Jewelry
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            foreach (JewelrySpawnSetting setting in _jewelrySpawnData.SpawnSettings)
+            {
+                if (setting.PositionIndex >= _spawnPositions.Length) continue;
+
+                if (setting.PositionIndex < 0)
+                {
+                    Gizmos.color = Color.yellow;
+                    foreach (Transform spawnPoint in _spawnPositions)
+                    {
+                        DrawSpawnArea(spawnPoint.position, setting);
+                    }
+                }
+                else
+                {
+                    Gizmos.color = Color.cyan;
+                    Transform spawnPoint = _spawnPositions[setting.PositionIndex];
+                    DrawSpawnArea(spawnPoint.position, setting);
+                }
+            }
+
+            return;
+
+            void DrawSpawnArea(Vector3 spawnPosition, JewelrySpawnSetting setting)
+            {
+                Vector3 center = spawnPosition + Vector3.up * setting.Height;
+                GizmosUtility.DrawCircle(center, Vector3.up, setting.SpawnRange);
+            }
         }
     }
 }

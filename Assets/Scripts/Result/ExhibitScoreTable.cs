@@ -39,6 +39,8 @@ namespace Result
         Shark,
         [DisplayName("クラーケン")]
         Kraken,
+        [DisplayName("海図")]
+        NauticalChart,
     }
 
     [Serializable]

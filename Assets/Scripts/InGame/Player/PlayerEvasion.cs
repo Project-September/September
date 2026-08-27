@@ -27,9 +27,9 @@ namespace InGame.Player
             _evasionData = evasionData;
         }
 
-        public bool TryStartEvasion(Vector2 inputDirection, Vector3 currentForward, float runnerTime, int playerWeight, out float weightCoefficient)
+        public bool TryStartEvasion(Vector2 inputDirection, Vector3 currentForward, float runnerTime, int playerWeight, out float rollAnimationDurationScale)
         {
-            weightCoefficient = 0;
+            rollAnimationDurationScale = 1f;
 
             if (_isEvading)
                 return false;
@@ -50,7 +50,7 @@ namespace InGame.Player
             var clampedAngle = Mathf.Clamp(angle, -_evasionData.InputAngle, _evasionData.InputAngle);
             _moveDirection = Quaternion.Euler(0, clampedAngle, 0) * currentForward;
 
-            weightCoefficient = CalculateWeightCoefficient(playerWeight);
+            float weightCoefficient = CalculateWeightCoefficient(playerWeight);
 
             _startTime = runnerTime;
             _rollEndTime = runnerTime + _evasionData.RollDuration * weightCoefficient;
@@ -59,6 +59,8 @@ namespace InGame.Player
             _turnEndTime = runnerTime + _evasionData.MaxTurnDuration * turnProgress * weightCoefficient;
             _previousDistance = 0f;
             _startDirection = currentForward;
+
+            rollAnimationDurationScale = _evasionData.RollDuration * weightCoefficient;
 
             return true;
         }
