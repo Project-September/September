@@ -31,6 +31,7 @@ namespace September.InGame.Exhibit
 
 		public void Render()
 		{
+			_projectileLauncher.BuildTrajectory();
 			if(_aimObjectActive)
 			{
 				_aimPositionEffect.transform.position =

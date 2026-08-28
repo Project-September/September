@@ -166,12 +166,12 @@ namespace InGame.Player
         private void StartEvasion()
         {
             int jewelryCount = _playerJewelryRuntime.JewelryCount;
-            var succeeded = _playerEvasion.TryStartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount, out var weightCoefficient);
+            var succeeded = _playerEvasion.TryStartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount, out float animationDurationScale);
 
             if (succeeded)
             {
                 Stop();
-                _onEvasion.OnNext(weightCoefficient);
+                _onEvasion.OnNext(animationDurationScale);
             }
         }
 
