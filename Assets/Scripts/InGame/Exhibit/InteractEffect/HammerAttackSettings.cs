@@ -12,6 +12,5 @@ namespace InGame.Exhibit.InteractEffect
         {
             return _disableDuration.Dictionary.TryGetValue(exhibitType, out duration);
         }
-
     }
 }
