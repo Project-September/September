@@ -1254,6 +1254,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   _hookPower: 10
   _flyingDamping: 8
+  _evasionData: {fileID: 0}
+  _playerHealth: {fileID: 0}
+  _playerJewelryRuntime: {fileID: 0}
   _printVaultFailedLog: 0
   _visibleGizmos: 0
   _vaultGizmoDebugger: {fileID: 0}
@@ -1265,6 +1268,7 @@ MonoBehaviour:
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
+  _IgnoreEvasionInput: 0
   _IsHookLocked: 0
   _mimickingParams:
     _mimickingParams:
@@ -1294,9 +1298,9 @@ MonoBehaviour:
   _focusPosition: {x: 0.5, y: 0.5, z: -1}
   _cameraMoveDuration: 0.2
   _scannableMaxDistance: 10
-  _ignoreLayer:
+  _targetLayer:
     serializedVersion: 2
-    m_Bits: 4160
+    m_Bits: 16384
   _scannerCanvas: {fileID: 7310910699517085291}
   _visual: {fileID: 5851093174879335224}
 --- !u!114 &3505574817478847412 stripped

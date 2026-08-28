@@ -30,8 +30,8 @@ namespace InGame.Player
         [SerializeField, Tooltip("擬態対象の候補にできる最大距離")]
         float _scannableMaxDistance = 10f;
 
-        [SerializeField, Tooltip("コライダーの対象として無視するレイヤー")]
-        LayerMask _ignoreLayer;
+        [SerializeField, Tooltip("コライダーの対象レイヤー")]
+        LayerMask _targetLayer;
 
         [SerializeField, Tooltip("演出用キャンバス")]
         ScannerCanvas _scannerCanvas;
@@ -40,7 +40,7 @@ namespace InGame.Player
         [SerializeField]
         TakamuraVisual _visual;
 
-        TakamuraScanTarget[] _interactables = Array.Empty<TakamuraScanTarget>();
+        TakamuraScanTarget[] _scanTargets = Array.Empty<TakamuraScanTarget>();
         readonly Dictionary<NetworkId, TakamuraScanTarget> _targetByNetworkId = new();
         int _focusIndex = -1;
 
@@ -60,7 +60,7 @@ namespace InGame.Player
         {
             _playerManager = GetComponent<PlayerManager>();
             _movement = GetComponent<TakamuraMovement>();
-            _interactables = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
+            _scanTargets = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
             CreateTargetDictionary();
 
             if (HasInputAuthority)
@@ -118,7 +118,7 @@ namespace InGame.Player
                     {
                         if (_focusIndex == -1) return;
 
-                        var target = _interactables[_focusIndex];
+                        var target = _scanTargets[_focusIndex];
                         if (target == null) return;
                         var networkObject = target.GetComponentInParent<NetworkObject>();
                         if (networkObject == null) return;
@@ -278,13 +278,13 @@ namespace InGame.Player
             var moreCenter = float.MaxValue;
             _focusIndex = -1;
 
-            foreach (var interactable in _interactables)
+            foreach (var interactable in _scanTargets)
             {
                 if (!interactable || !interactable.gameObject.activeSelf) continue;
 
                 // 画面上の位置
-                var pivot = interactable.ScanPos;
-                var position = pivot ? pivot.position : interactable.transform.position;
+                var scanPos = interactable.ScanPos;
+                var position = scanPos ? scanPos.position : interactable.transform.position;
                 var viewportPoint = _camera.WorldToViewportPoint(position);
 
                 // 画面内にいなければスキップ
@@ -311,8 +311,8 @@ namespace InGame.Player
                     rayDirection.normalized,
                     out var hit,
                     rayDistance,
-                    ~_ignoreLayer,
-                    QueryTriggerInteraction.Ignore);
+                    _targetLayer,
+                    QueryTriggerInteraction.Collide);
 
                 if (!hasHit)
                 {
@@ -327,7 +327,7 @@ namespace InGame.Player
                     // 条件に合致した
                     Debug.DrawLine(rayOrigin, hit.point, Color.green);
                     moreCenter = center;
-                    _focusIndex = Array.IndexOf(_interactables, interactable);
+                    _focusIndex = Array.IndexOf(_scanTargets, interactable);
                 }
             }
         }
@@ -362,7 +362,7 @@ namespace InGame.Player
             _scannerCanvas.ChangeImageVisibility(scanned);
             if (!scanned) return;
 
-            var target = _interactables[_focusIndex];
+            var target = _scanTargets[_focusIndex];
             if (!target) return;
 
             var pivot = target.ScanPos;
@@ -377,7 +377,7 @@ namespace InGame.Player
         {
             _targetByNetworkId.Clear();
 
-            foreach (var target in _interactables)
+            foreach (var target in _scanTargets)
             {
                 if (!target) continue;
 
