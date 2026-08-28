@@ -44,12 +44,6 @@ namespace September.InGame.Exhibit
 			_linePositions = new Vector3[(int)(_lifeTime / _simulationStepTime)];
 		}
 
-		public override void Render()
-		{
-			base.Render();
-			BuildTrajectory();
-		}
-
 		/// <summary>
 		///     投射物を発射する
 		/// </summary>
@@ -88,7 +82,7 @@ namespace September.InGame.Exhibit
 		///     障害物に当たった場合、そこを最終地点とする。
 		///     結果は_linePositionsと_lastPositionIndexに保存される。
 		/// </summary>
-		private void BuildTrajectory()
+		public void BuildTrajectory()
 		{
 			for (var i = 0; i < _linePositions.Length; i++)
 			{
@@ -103,7 +97,7 @@ namespace September.InGame.Exhibit
 				var ray = new Ray(_linePositions[i - 1], _linePositions[i] - _linePositions[i - 1]);
 
 				// 障害物が存在した場合、その地点を最終地点とする。
-				if (Physics.Raycast(ray, out var hit, Vector3.Distance(_linePositions[i - 1], _linePositions[i])))
+				if (Physics.Raycast(ray, out var hit, Vector3.Distance(_linePositions[i - 1], _linePositions[i]), _hitLayer))
 				{
 					_linePositions[i] = hit.point;
 					_lastPositionIndex = i;
