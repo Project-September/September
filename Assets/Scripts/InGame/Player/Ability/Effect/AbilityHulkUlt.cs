@@ -38,6 +38,8 @@ namespace InGame.Player.Ability.Effect
 
             foreach (var item in _exhibits)
             {
+                if (!item) continue;
+
                 var sqDistance = (item.transform.position - player.transform.position).sqrMagnitude;
                 if (sqDistance > _radius * _radius) continue;
 
