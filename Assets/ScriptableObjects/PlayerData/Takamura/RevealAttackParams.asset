@@ -13,28 +13,23 @@ MonoBehaviour:
   m_Name: RevealAttackParams
   m_EditorClassIdentifier: 
   _defaultRadius: 1
-  _radiusArray:
-  - _exhibitType: 1
-    _radius: 5
-  - _exhibitType: 2
-    _radius: 5
-  - _exhibitType: 3
-    _radius: 2
-  - _exhibitType: 4
-    _radius: 5
-  - _exhibitType: 5
-    _radius: 2
-  - _exhibitType: 6
-    _radius: 5
-  - _exhibitType: 7
-    _radius: 3
-  - _exhibitType: 8
-    _radius: 4
-  - _exhibitType: 9
-    _radius: 5
-  - _exhibitType: 10
-    _radius: 2
-  - _exhibitType: 11
-    _radius: 2
-  - _exhibitType: 12
-    _radius: 3
+  _radiusDict:
+    keys: 0102030405060708090a0b0c0d0e0f1011
+    values:
+    - 5
+    - 5
+    - 2
+    - 5
+    - 3
+    - 5
+    - 4
+    - 4
+    - 5
+    - 2
+    - 1
+    - 3
+    - 3
+    - 3
+    - 4
+    - 5
+    - 5
