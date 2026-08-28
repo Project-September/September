@@ -1,9 +1,7 @@
 using Fusion;
 using InGame.Exhibit;
 using InGame.Health;
-using log4net.Util;
 using September.Common;
-using September.InGame.Common.Stats;
 using September.InGame.Effect;
 using System;
 using UnityEngine;
