@@ -1047,7 +1047,6 @@ GameObject:
   - component: {fileID: 6751401814558250722}
   - component: {fileID: 6773177065010528805}
   - component: {fileID: -5982283155467583323}
-  - component: {fileID: -8190595206022697743}
   - component: {fileID: 4308694996682901781}
   m_Layer: 11
   m_Name: PropAirplane
@@ -1288,20 +1287,6 @@ MonoBehaviour:
   _cameraRadius: 0.1
   _motionDuration: 1
   _motionEase: 9
---- !u!114 &-8190595206022697743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7228950578283369073}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 6773177065010528805}
 --- !u!114 &4308694996682901781
 MonoBehaviour:
   m_ObjectHideFlags: 0

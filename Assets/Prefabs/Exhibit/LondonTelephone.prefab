@@ -268,7 +268,6 @@ GameObject:
   - component: {fileID: 5090696756398885557}
   - component: {fileID: 2101273202392379923}
   - component: {fileID: 6675958784025676327}
-  - component: {fileID: 1941025314924722290}
   - component: {fileID: 1029180789908668499}
   m_Layer: 11
   m_Name: LondonTelephone
@@ -396,20 +395,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8297157, y: 2.007451, z: 0.8869896}
   m_Center: {x: -0.002817154, y: 0.9833107, z: -0.01614952}
---- !u!114 &1941025314924722290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7382225231107150572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 2101273202392379923}
 --- !u!114 &1029180789908668499
 MonoBehaviour:
   m_ObjectHideFlags: 0

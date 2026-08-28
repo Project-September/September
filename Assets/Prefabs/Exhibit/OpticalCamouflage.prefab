@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7624587381050686148}
   - component: {fileID: 439631256018364724}
   - component: {fileID: 6428114833908659226}
-  - component: {fileID: 1610821991240361927}
   - component: {fileID: 7286847240433619292}
   m_Layer: 11
   m_Name: OpticalCamouflage
@@ -124,20 +123,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9334037, y: 1.4992065, z: 0.69239426}
   m_Center: {x: 0.009843379, y: 0.65807724, z: 0.011123657}
---- !u!114 &1610821991240361927
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4322834578117657907}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 7624587381050686148}
 --- !u!114 &7286847240433619292
 MonoBehaviour:
   m_ObjectHideFlags: 0

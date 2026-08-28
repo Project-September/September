@@ -194,7 +194,6 @@ GameObject:
   - component: {fileID: 2605522184190301224}
   - component: {fileID: 1470605871195394660}
   - component: {fileID: 8562786234446322791}
-  - component: {fileID: 2748905973681938131}
   m_Layer: 11
   m_Name: Car
   m_TagString: Untagged
@@ -375,20 +374,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cueSheet: ALLCue
---- !u!114 &2748905973681938131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2844190075288522215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 4731277372856524398}
 --- !u!1 &3646120520736363712
 GameObject:
   m_ObjectHideFlags: 0

@@ -2826,7 +2826,6 @@ GameObject:
   - component: {fileID: 312834631639533369}
   - component: {fileID: 1044747457554308472}
   - component: {fileID: 4658893626954123635}
-  - component: {fileID: 1396371694059391009}
   - component: {fileID: 3688485294182597585}
   - component: {fileID: 3724488099250409318}
   m_Layer: 11
@@ -3082,20 +3081,6 @@ MonoBehaviour:
   StateHashes: 000000004eeb5158547a6bb20d286c404e865f43b0e59c38f34baf3b65a9e87d37f39754
   TriggerHashes: 000000000d286c40a1609f62
   TotalWords: 2
---- !u!114 &1396371694059391009
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5553071078158247644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 1044747457554308472}
 --- !u!114 &3688485294182597585
 MonoBehaviour:
   m_ObjectHideFlags: 0

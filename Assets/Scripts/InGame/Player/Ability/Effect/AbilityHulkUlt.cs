@@ -1,10 +1,13 @@
 using Fusion;
+using System.Collections.Generic;
 using InGame.Exhibit;
 using InGame.Health;
+using InGame.Interact;
 using September.Common;
 using September.InGame.Effect;
 using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace InGame.Player.Ability.Effect
 {
@@ -29,15 +32,18 @@ namespace InGame.Player.Ability.Effect
         private Vector3 _effectCenter;
         private bool _isAttacking;
 
-
+        private IReadOnlyList<InteractableBase> _exhibits;
 
         protected override void OnStartEffect()
         {
             var player = Parameter.Owner;
 
-            var items = ExhibitRegistry.I.Items;
-            foreach (var item in items)
+            _exhibits ??= GetExhibits();
+
+            foreach (var item in _exhibits)
             {
+                if (!item) continue;
+
                 var sqDistance = (item.transform.position - player.transform.position).sqrMagnitude;
                 if (sqDistance > _radius * _radius) continue;
 
@@ -125,6 +131,19 @@ namespace InGame.Player.Ability.Effect
             {
                 ApplyAreaDamage();
                 _attackTimer = 0f;
+            }
+        }
+
+        private IReadOnlyList<InteractableBase> GetExhibits()
+        {
+            if (ExhibitRegistry.I != null)
+            {
+                return ExhibitRegistry.I.Items;
+            }
+            else
+            {
+                Debug.LogWarning("[AbilityHulkUlt] ExhibitRegistry が存在しないため、全探索を行います");
+                return Object.FindObjectsByType<InteractableBase>(FindObjectsSortMode.None);
             }
         }
     }

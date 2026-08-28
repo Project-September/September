@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 151875054639029464}
   - component: {fileID: 8465095304024051816}
   - component: {fileID: 1602652095538394138}
-  - component: {fileID: 188224458461940067}
   - component: {fileID: 6353190686858843198}
   m_Layer: 11
   m_Name: Art02
@@ -130,20 +129,6 @@ MonoBehaviour:
         _warpInSoundName: SE_Painting_Warp_In
         _warpOutSoundName: SE_Painting_Warp_Out
         _audioBroadcaster: {fileID: 6353190686858843198}
---- !u!114 &188224458461940067
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6296887427717845871}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 1602652095538394138}
 --- !u!114 &6353190686858843198
 MonoBehaviour:
   m_ObjectHideFlags: 0

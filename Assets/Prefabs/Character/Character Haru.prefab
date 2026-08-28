@@ -4512,6 +4512,10 @@ PrefabInstance:
       value: Scripts InGame.Player.Ability.Condition.AbilityUltCondition
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883914]._audio
+      value: 
+      objectReference: {fileID: 8632131234183488207}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883914]._phase
       value: 0
       objectReference: {fileID: 0}
@@ -4539,6 +4543,10 @@ PrefabInstance:
       propertyPath: managedReferences[7765555134153883914]._cooldown
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883914]._settings
+      value: 
+      objectReference: {fileID: 11400000, guid: c69b17e21040f17498b69136606dc67c, type: 2}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883915].IsEnabled
       value: 0
@@ -4998,3 +5006,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1920212954294529003, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
   m_PrefabInstance: {fileID: 7664495859708771136}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8632131234183488207 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2132102575819528591, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 7664495859708771136}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

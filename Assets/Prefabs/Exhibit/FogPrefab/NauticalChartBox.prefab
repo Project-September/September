@@ -20,7 +20,6 @@ GameObject:
   - component: {fileID: 1556800189702889066}
   - component: {fileID: 5153903193278629257}
   - component: {fileID: 1236876508739283936}
-  - component: {fileID: 6025952604352139143}
   m_Layer: 11
   m_Name: NauticalChartBox
   m_TagString: Untagged
@@ -308,20 +307,6 @@ MonoBehaviour:
       data:
         _characterType: 5
         _nauticalChartInteractable: {fileID: 1556800189702889066}
---- !u!114 &6025952604352139143
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7797308705639554541}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d0487f0201e1444f9eb9ce35ff55947, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cooldownTime: 5
-  _interactable: {fileID: 1236876508739283936}
 --- !u!1001 &4209219747121675289
 PrefabInstance:
   m_ObjectHideFlags: 0
