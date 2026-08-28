@@ -30,6 +30,7 @@ Material:
   - _DEPTH_FADE_ENABLED
   - _EMISSION_COLOR_COLOR
   - _EMISSION_MAP_MODE_2D
+  - _FLOW_MAP_TARGET_BASE
   - _PARALLAX_MAP_MODE_2D
   - _SOFT_PARTICLES_ENABLED
   - _TINT_AREA_ALL
@@ -118,7 +119,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FlowMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 9f0fe3c0aa4c6b2449286e548139b8c1, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GradientMap:
@@ -282,7 +283,7 @@ Material:
     - _FlowMapChannelsX: 0
     - _FlowMapChannelsY: 1
     - _FlowMapOffsetXCoord: 1
-    - _FlowMapOffsetYCoord: 0
+    - _FlowMapOffsetYCoord: 1
     - _FlowMapRotation: 0
     - _FlowMapRotationCoord: 0
     - _FlowMapTarget: 1
@@ -294,9 +295,9 @@ Material:
     - _InverseTintRim: 0
     - _KeepEdgeTransparency: 1
     - _LuminanceTransparencyEnabled: 0
-    - _LuminanceTransparencyProgress: 0.5
+    - _LuminanceTransparencyProgress: 0
     - _LuminanceTransparencyProgressCoord: 0
-    - _LuminanceTransparencySharpness: 0.5
+    - _LuminanceTransparencySharpness: 0
     - _LuminanceTransparencySharpnessCoord: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
@@ -385,7 +386,7 @@ Material:
     - _EmissionMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _FlowMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _TintColor: {r: 4, g: 4, b: 4, a: 1}
+    - _TintColor: {r: 8, g: 8, b: 8, a: 1}
     - _TintMapRotationOffsets: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
