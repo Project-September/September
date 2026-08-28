@@ -97,12 +97,10 @@ namespace InGame.Player
         /// <param name="input">このオブジェクトに対する入力権限を持つプレイヤーからの入力</param>
         void Ability2Flow(PlayerInput input)
         {
-            if (!_movement.IsGround) return;
-
             if (_movement.CurrentMimicryState == MimicryState.Default)
             {
-                // フォーカスをあてる
-                if (input.Buttons.WasPressed(_preInput, PlayerButtons.Ability2))
+                // フォーカスをあてる（地上にいる時のみ開始できる）
+                if (_movement.IsGround && input.Buttons.WasPressed(_preInput, PlayerButtons.Ability2))
                 {
                     if (HasInputAuthority) FocusStartEffective();
                     if (HasStateAuthority) FocusStartStateChange();
@@ -113,8 +111,9 @@ namespace InGame.Player
                 {
                     if (HasInputAuthority && _scannerCanvas.gameObject.activeSelf) FocusEffective(input);
 
-                    // 擬態する
-                    if (input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
+                    // 擬態する（地上にいる時のみ実行できる）
+                    if (_movement.IsGround
+                        && input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
                         && HasInputAuthority)
                     {
                         if (_focusIndex == -1) return;
@@ -129,7 +128,8 @@ namespace InGame.Player
                     }
                 }
 
-                // フォーカス解除
+                // フォーカス解除（着地するまで入力の押下/離した判定が持ち越されてしまうため、
+                // 空中にいる間も判定できるようにする）
                 if (input.Buttons.WasReleased(_preInput, PlayerButtons.Ability2))
                 {
                     if (HasInputAuthority)
@@ -141,8 +141,9 @@ namespace InGame.Player
             }
             else if (_movement.CurrentMimicryState == MimicryState.MimicExhibit)
             {
-                // 擬態解除する
-                if (input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
+                // 擬態解除する（地上にいる時のみ実行できる）
+                if (_movement.IsGround
+                    && input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
                     && HasInputAuthority)
                 {
                     RPC_Reveal();
