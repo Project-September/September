@@ -4520,8 +4520,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: managedReferences[7765555134153883915]._radius
+      propertyPath: managedReferences[7765555134153883915]._damage
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883915]._radius
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883917]._button
@@ -4546,6 +4550,10 @@ PrefabInstance:
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883914]._hitEffect
       value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883915]._attackTime
+      value: 4.5
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883915]._effectType
@@ -4574,6 +4582,14 @@ PrefabInstance:
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883914]._endAttackFrame
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883915]._attackDuration
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883915]._attackInterval
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883915]._effectOffset.x
@@ -4671,6 +4687,10 @@ PrefabInstance:
       propertyPath: managedReferences[7765555134153883914]._animationClipPlayer
       value: 
       objectReference: {fileID: 6617620132260137327}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883915]._hitLayerMask.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883915]._exhibitsCooldownTime
       value: 5
