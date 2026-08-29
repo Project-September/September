@@ -44,6 +44,11 @@ namespace InGame.Health
         RangedDamage,
         Custom,
     }
+
+    public static class HitActionTypeExtensions
+    {
+        public static bool IsDamage(this HitActionType hitActionType) => hitActionType is HitActionType.Damage or HitActionType.RangedDamage;
+    }
     
     public interface IDamageable
     {

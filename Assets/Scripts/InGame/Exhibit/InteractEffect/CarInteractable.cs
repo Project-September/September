@@ -275,7 +275,7 @@ namespace InGame.Exhibit.InteractEffect
                 playerPos,
                 other.transform.rotation);
             var damage = other.GetComponentInParent<IDamageable>();
-            var hitData = new HitData(HitActionType.Damage, _damage, _ownerRef, damage.OwnerPlayerRef);
+            var hitData = new HitData(HitActionType.RangedDamage, _damage, _ownerRef, damage.OwnerPlayerRef);
             damage.TakeHit(ref hitData);
         }
     }

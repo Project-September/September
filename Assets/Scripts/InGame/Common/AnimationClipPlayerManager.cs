@@ -75,7 +75,7 @@ namespace InGame.Common
 
             _playerHealth.OnHitTaken += (hitData) =>
             {
-                if (!_playerManager.IsStun && hitData.HitActionType == HitActionType.Damage)
+                if (!_playerManager.IsStun && hitData.HitActionType.IsDamage())
                 {
                     //被ダメのアニメーション再生
                     _animationClipPlayer.PlayClip(_hitReactionClip);

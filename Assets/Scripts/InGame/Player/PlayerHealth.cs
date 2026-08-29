@@ -83,7 +83,7 @@ namespace InGame.Player
                 return;
             }
 
-            if (hitData.HitActionType is HitActionType.Damage or HitActionType.RangedDamage)
+            if (hitData.HitActionType.IsDamage())
             {
                 hitData.Amount = TakeDamage(hitData.Amount);
             }
@@ -119,7 +119,7 @@ namespace InGame.Player
         private async UniTask HitDebug(HitActionType actionType)
         {
             _renderer.GetPropertyBlock(_materialPropertyBlock);
-            _materialPropertyBlock.SetColor("_BaseColor", actionType == HitActionType.Damage ? Color.red : Color.green);
+            _materialPropertyBlock.SetColor("_BaseColor", actionType.IsDamage() ? Color.red : Color.green);
             _renderer.SetPropertyBlock(_materialPropertyBlock);
             try
             {
