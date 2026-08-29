@@ -69,7 +69,7 @@ namespace InGame.Jewelry
                 if (resultDropped.Length > i)
                 {
                     resultDropped[i] = jewelry;
-                    result = i;
+                    result = i + 1;
                 }
                 else
                 {
