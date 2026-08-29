@@ -1,8 +1,10 @@
 using System;
 using Fusion;
+using InGame.Health;
 using InGame.Jewelry;
 using InGame.Jewelry.Common;
 using September.Common;
+using September.InGame.Health;
 using UnityEngine;
 
 namespace September.InGame.Rules
@@ -14,8 +16,13 @@ namespace September.InGame.Rules
         [SerializeField, Tooltip("死亡時の所持宝石数からドロップする割合")] private float _minDropRatio = 0f;
         [SerializeField, Tooltip("minDropXXX の計算後に残った所持宝石数からドロップする割合")] private float _additionalDropRatio = 0.5f;
 
-        public void ProcessKillEvent(PlayerRef killer, PlayerRef victim)
+        private readonly IJewelry[] _dropResultBuffer = new IJewelry[30];
+
+        public void ProcessKillEvent(HitData hitData)
         {
+            var killer = hitData.ExecutorRef;
+            var victim = hitData.TargetRef;
+
             NetworkObject victimObj = PlayerDatabase.Instance.PlayerObjectDic.Get(victim);
 
             // runtimeから現在の宝石所持情報を取得
@@ -28,7 +35,12 @@ namespace September.InGame.Rules
             int drop = Mathf.Min(sumDrop, jewelryQuantity);
 
             var container = victimObj.GetComponent<IJewelryContainer>();
-            container.DropJewelry(drop);
+            int count = container.DropJewelry(drop, _dropResultBuffer);
+
+            if (hitData.HitActionType == HitActionType.RangedDamage)
+            {
+                JewelryDropHitProcessor.PickupJewelries(_dropResultBuffer.AsSpan(..count), killer);
+            }
         }
     }
 }

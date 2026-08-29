@@ -70,7 +70,7 @@ namespace InGame.Jewelry
                 float t0 = _curve.Evaluate(t);
                 Vector3 targetPos = target.position + target.rotation * _offset;
 
-                Debug.Log($"{targetPos.y - startPos.y}");
+                Debug.Log($"{t} {t1} {heightOffset}");
 
                 transform.position = Vector3.LerpUnclamped(startPos, targetPos, t0) + heightOffset;
             }, 1f, duration).SetEase(Ease.Linear);

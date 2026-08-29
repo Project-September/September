@@ -41,11 +41,16 @@ namespace September.InGame.Health
             if (DropType == DropType.Drop) return;
 
             // Pickup処理
-            for (int i = 0; i < count; i++)
+            PickupJewelries(_resultBuffer.AsSpan(..count), hitData.ExecutorRef);
+        }
+
+        public static void PickupJewelries(ReadOnlySpan<IJewelry> jewelries, PlayerRef pickupPlayerRef)
+        {
+            foreach (IJewelry jewelry in jewelries)
             {
-                if (_resultBuffer[i] is global::InGame.Jewelry.Jewelry jewel)
+                if (jewelry is global::InGame.Jewelry.Jewelry jewel)
                 {
-                    jewel.PickupFrom(hitData.ExecutorRef).Forget();
+                    jewel.PickupFrom(pickupPlayerRef).Forget();
                 }
             }
         }
