@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gameStartStrategy:
     rid: 7765555185143251047
+  _playerHitStrategy:
+    rid: 7603375357084303672
   _playerKilledStrategy:
     rid: 7765555185143251033
   _rankingPolicy:
@@ -23,6 +25,13 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 7603375357084303672
+      type: {class: JewelPlayerHitStrategy, ns: September.InGame.Rules.PlayerDamaged, asm: Scripts}
+      data:
+        _defaultDamageProcessor:
+          _dropType: 0
+        _rangedDamageProcessor:
+          _dropType: 1
     - rid: 7765555185143251033
       type: {class: JewelPlayerKilledStrategy, ns: September.InGame.Rules, asm: Scripts}
       data:

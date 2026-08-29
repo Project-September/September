@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -7,11 +8,14 @@ using UnityEngine;
 
 namespace September.InGame.Health
 {
+    [Serializable]
     public class JewelryDropHitProcessor : IHitProcessor
     {
+        [SerializeField] private DropType _dropType;
+
         private readonly IJewelry[] _resultBuffer = new IJewelry[30];
 
-        public DropType DropType { get; set; }
+        public DropType DropType { get => _dropType; set => _dropType = value; }
 
         public JewelryDropHitProcessor(DropType dropType)
         {

@@ -5,7 +5,7 @@ using Fusion;
 using InGame.Health;
 using September.Common;
 using September.InGame.Common.Stats;
-using September.InGame.Health;
+using September.InGame.Rules;
 using UnityEngine;
 
 namespace InGame.Player
@@ -27,8 +27,6 @@ namespace InGame.Player
         /// <summary> 無敵 </summary> 無敵の set が　public なのどうなん
         [Networked, HideInInspector] public NetworkBool IsInvincible { get; set; }
         public int CurrentHealth => _status.CurrentHealth;
-
-        private readonly JewelryDropHitProcessor _pickupDropProcessor = new(DropType.Pickup);
 
         public override void Spawned()
         {
@@ -58,15 +56,7 @@ namespace InGame.Player
                 if (!IsAlive) OnDeath?.Invoke(hitData);
                 hitData.Executor?.HitExecution(hitData);
 
-                switch (hitData.HitActionType)
-                {
-                    case HitActionType.RangedDamage:
-                        _pickupDropProcessor.OnHitTaken(hitData);
-                        break;
-                    case HitActionType.Custom:
-                        hitData.CustomHitProcessor.OnHitTaken(hitData);
-                        break;
-                }
+                IGameRule.CurrentRule.PlayerHitStrategy?.OnHitTaken(ref hitData);
 
                 PlayerDatabase.Instance.Server_AddDamageDealt(hitData.ExecutorRef, hitData.Amount);
                 PlayerDatabase.Instance.Server_AddDamageReceived(hitData.TargetRef, hitData.Amount);
