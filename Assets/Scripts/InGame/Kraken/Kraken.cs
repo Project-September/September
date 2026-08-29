@@ -231,7 +231,7 @@ namespace September.InGame.Kraken
         private async UniTaskVoid Disappear()
         {
             _appearanceState = KrakenAppearanceState.Disappear;
-            _interactable.gameObject.SetActive(false);
+            _interactable.ForceSetInteractable = false;
             await _playableDirector.PlayAsync(_outTimeline);
             if (HasStateAuthority) Runner.Despawn(Object);
         }
