@@ -38,6 +38,13 @@ namespace InGame.Jewelry
 
         private const string JewelryTag = "Jewelry";
 
+        private PlayerJewelryRuntime _playerJewelryRuntime;
+
+        public override void Spawned()
+        {
+            _playerJewelryRuntime = GetComponentInChildren<PlayerJewelryRuntime>();
+        }
+
         /// <summary>
         /// 触れた宝石を拾う処理
         /// </summary>
@@ -61,7 +68,11 @@ namespace InGame.Jewelry
             {
                 NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefab, spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
 
-                if (!jewelryObj.TryGetComponent<IJewelry>(out var jewelry)) continue;
+                if (!jewelryObj.TryGetComponent<IJewelry>(out var jewelry))
+                {
+                    Debug.LogWarning("[PlayerJewelryContainer] not found IJewelry component in spawned object");
+                    continue;
+                }
                 _onDropJewelry?.Invoke(jewelry.JewelryParams.JewelryType);
 
                 if (resultDropped == null) continue;
@@ -73,7 +84,7 @@ namespace InGame.Jewelry
                 }
                 else
                 {
-                    Debug.LogWarning("result buffer size is too small");
+                    Debug.LogWarning("[PlayerJewelryContainer] result buffer size is too small");
                 }
             }
 
@@ -86,6 +97,11 @@ namespace InGame.Jewelry
 
                 jewelry.RandomThrow(_horizontalThrowForce, _upwardThrowForce);
             }
+        }
+
+        public int GetJewelryCount(JewelryType jewelryType)
+        {
+            return _playerJewelryRuntime.GetJewelryQuantity(jewelryType);
         }
 
         public void PickUp(IJewelry jewelry)

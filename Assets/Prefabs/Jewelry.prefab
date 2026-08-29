@@ -94,6 +94,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _jewelryParams: {fileID: 11400000, guid: 0b3623d5239e4044394a1c13d1bbea00, type: 2}
+  _jewelryControl: {fileID: 4243231678177404559}
 --- !u!114 &4243231678177404559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,6 +115,92 @@ MonoBehaviour:
   _getCoolTime: 5
   _collider: {fileID: 5553430812545105003}
   _rigidbody: {fileID: 7139659219292918844}
+  _offset: {x: 0, y: 1.5, z: 0}
+  _curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2.9704087
+      outSlope: 2.9704087
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.08111813
+    - serializedVersion: 3
+      time: 0.676619
+      value: 1.0983601
+      inSlope: -0.71927613
+      outSlope: -0.71927613
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.43134403
+    - serializedVersion: 3
+      time: 0.8251478
+      value: 0.94994426
+      inSlope: -0.2677266
+      outSlope: -0.2677266
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.5212453
+    - serializedVersion: 3
+      time: 0.95
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.31673932
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _heightOffsetCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 4.316902
+      outSlope: 4.316902
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.12990293
+    - serializedVersion: 3
+      time: 0.55856323
+      value: 0.9960861
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -4.4697666
+      outSlope: -4.4697666
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.052565593
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _heightOffsetScale: 1
 --- !u!54 &7139659219292918844
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -177,7 +264,7 @@ MonoBehaviour:
   _stateAuthorityChangeErrorCorrectionDelta: 0
   SyncScale: 0
   SyncParent: 1
-  _interpolationTarget: {fileID: 0}
+  _interpolationTarget: {fileID: 6896307084572742452}
   UsePreciseRotation: 0
   UseRenderSleepThresholds: 1
   RenderThresholds:

@@ -1,9 +1,9 @@
-using UnityEngine;
+using InGame.Health;
 
 namespace September.InGame.Jewelry
 {
     public interface IHitProcessor
     {
-        void OnTakeHit();
+        void OnHitTaken(HitData hitData);
     }
 }

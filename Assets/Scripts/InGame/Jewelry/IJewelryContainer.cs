@@ -16,5 +16,7 @@ namespace InGame.Jewelry.Common
         /// <param name="resultDropped">ドロップした宝石のデータを格納する配列（メソッド内から書き込み）</param>
         /// <returns>配列に書き込んだ数（配列のサイズより大きくなりません）</returns>
         public int DropJewelry(int dropAmount, IJewelry[] resultDropped = null);
+
+        public int GetJewelryCount(JewelryType jewelryType);
     }
 }

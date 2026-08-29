@@ -94,6 +94,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _jewelryParams: {fileID: 11400000, guid: 2147f865256d8764db1a7238cf3e0212, type: 2}
+  _jewelryControl: {fileID: 4243231678177404559}
 --- !u!114 &4243231678177404559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,6 +115,38 @@ MonoBehaviour:
   _getCoolTime: 5
   _collider: {fileID: 5553430812545105003}
   _rigidbody: {fileID: 7139659219292918844}
+  _offset: {x: 0, y: 1.5, z: 0}
+  _curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _heightOffsetCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _heightOffsetScale: 1
 --- !u!54 &7139659219292918844
 Rigidbody:
   m_ObjectHideFlags: 0
