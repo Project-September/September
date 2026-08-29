@@ -3,6 +3,7 @@ using Fusion;
 using InGame.Health;
 using September.Common;
 using UnityEngine;
+using UnityEngine.Splines;
 
 namespace InGame.Player.Okubo
 {
@@ -10,15 +11,17 @@ namespace InGame.Player.Okubo
     {
         [SerializeField] private PlayerMovement _playerMovement;
         [SerializeField] private PlayerInputManager _playerInputManager;
-        [SerializeField] private Transform _hookOrigin;
+        [SerializeField] private Transform _wireOrigin;
+        [SerializeField] private SplineContainer _wireSpline;
+        [SerializeField] private GameObject _wireMesh;
+        [SerializeField] private Transform _hookMesh;
         [SerializeField] private float _stretchDuration;
         [SerializeField] private float _pullDuration;
         [SerializeField] private float _wireLength;
         [SerializeField] private float _stretchedWaitTime = 0.3f;
         [SerializeField] private float _wireThickness;
         [SerializeField] private float _hitRadius;
-        [SerializeField] private Transform _wireCyl;
-        [SerializeField] private Transform _hookObject;
+        [SerializeField] private Vector3 _hookOffsetRotation;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _resistanceAmount;
         [SerializeField] private float _missAttackCoolTime;
@@ -33,7 +36,7 @@ namespace InGame.Player.Okubo
 
         public override void Spawned()
         {
-            _wireCyl.gameObject.SetActive(false);
+            _wireMesh.gameObject.SetActive(false);
             _ownerRef = Object.InputAuthority;
         }
 
@@ -47,7 +50,7 @@ namespace InGame.Player.Okubo
             {
                 case HookAttackState.Idol:
                     //フック攻撃開始
-                    if (input.Buttons.IsSet(PlayerButtons.Ability2))
+                    if (input.Buttons.IsSet(PlayerButtons.Ability1))
                         ChangeState(HookAttackState.Stretching);
                     break;
                 case HookAttackState.Stretching:
@@ -100,6 +103,9 @@ namespace InGame.Player.Okubo
             }
         }
 
+        /// <summary>
+        /// 伸ばす
+        /// </summary>
         private void OnStretching()
         {
             _currentHookLength += _wireLength / _stretchDuration * Runner.DeltaTime;
@@ -121,7 +127,7 @@ namespace InGame.Player.Okubo
             foreach (var player in _targetData.Values)
             {
                 Vector3 inputDirection = new Vector3(player.PlayerMovement.MoveDirection.x, 0, player.PlayerMovement.MoveDirection.y);
-                var angle = Vector3.Angle(_wireCyl.up, inputDirection);
+                var angle = Vector3.Angle(transform.forward, inputDirection);
 
                 float resistance = 1f - (angle / 180);
                 maxResistance = Mathf.Max(resistance * inputDirection.magnitude, maxResistance);
@@ -137,7 +143,7 @@ namespace InGame.Player.Okubo
 
             UpdateHookLength(_currentHookLength, transform.forward);
 
-            var hookSqr = (this.transform.position - _hookObject.transform.position).sqrMagnitude;
+            var hookSqr = (this.transform.position - _hookMesh.transform.position).sqrMagnitude;
             foreach (var kv in _targetData)
             {
                 if (kv.Value.IsHookFollow) continue;
@@ -174,23 +180,37 @@ namespace InGame.Player.Okubo
 
         private void UpdateHookLength(float length, Vector3 direction)
         {
-            direction = direction.normalized;
+            var startPosition = _wireOrigin.transform.position;
+            var endPosition = startPosition + direction * length;
 
-            // 長さ変更
-            Vector3 scale = _wireCyl.localScale;
-            scale.y = length * 0.5f; // Cylinderは高さ2が基準
-            _wireCyl.localScale = scale;
+            var spline = _wireSpline.Spline;
 
-            // 中心位置を始点から length/2 の位置へ
-            _wireCyl.position = _hookOrigin.transform.position + direction * (length * 0.5f);
+            // ワールド座標 → Splineのローカル座標
+            var localStartPosition = _wireSpline.transform.InverseTransformPoint(startPosition);
+            var localEndPosition = _wireSpline.transform.InverseTransformPoint(endPosition);
 
-            // 向きを合わせる
-            _wireCyl.up = direction;
+            // SplineのPosition設定
+            var start = spline[0];
+            start.Position = localStartPosition;
+            spline[0] = start;
+
+            var end = spline[spline.Count - 1];
+            end.Position = localEndPosition;
+            spline[spline.Count - 1] = end;
+
+            //フックの位置を変える
+            _hookMesh.position = endPosition;
+
+            // フックの向きをワイヤー方向に合わせる
+            if (direction.sqrMagnitude > 0.0001f)
+            {
+                _hookMesh.rotation = Quaternion.LookRotation(direction.normalized) * Quaternion.Euler(_hookOffsetRotation);
+            }
         }
 
         private void GetHitPlayer(float length, Vector3 direction)
         {
-            Vector3 position = _hookOrigin.transform.position + direction * length;
+            Vector3 position = _wireOrigin.transform.position + direction * length;
             var hitObjects = Physics.OverlapSphere(position, _hitRadius);
 
             foreach (var obj in hitObjects)
@@ -231,7 +251,7 @@ namespace InGame.Player.Okubo
             var targetData = GetOrCreateTargetData(playerRef);
             if (targetData == null || !targetData.PlayerObject.HasStateAuthority) return;
 
-            targetData.PlayerMovement.OnHookFollow(_hookObject);
+            targetData.PlayerMovement.OnHookFollow(_hookMesh.transform);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -258,7 +278,8 @@ namespace InGame.Player.Okubo
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_ChangeWireActive(bool active)
         {
-            _wireCyl.gameObject.SetActive(active);
+            Debug.Log("ワイヤーアクティブ " + active);
+            _wireMesh.gameObject.SetActive(active);
         }
 
         /// <summary>
