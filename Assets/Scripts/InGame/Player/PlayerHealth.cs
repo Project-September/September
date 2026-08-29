@@ -5,6 +5,7 @@ using Fusion;
 using InGame.Health;
 using September.Common;
 using September.InGame.Common.Stats;
+using September.InGame.Health;
 using UnityEngine;
 
 namespace InGame.Player
@@ -26,6 +27,8 @@ namespace InGame.Player
         /// <summary> 無敵 </summary> 無敵の set が　public なのどうなん
         [Networked, HideInInspector] public NetworkBool IsInvincible { get; set; }
         public int CurrentHealth => _status.CurrentHealth;
+
+        private readonly JewelryDropHitProcessor _pickupDropProcessor = new(DropType.Pickup);
 
         public override void Spawned()
         {
@@ -54,7 +57,17 @@ namespace InGame.Player
                 Debug.Log($"PlayerHealth: TakeHit - HitActionType: {hitData.HitActionType}, Amount: {hitData.Amount}, IsLastHit: {hitData.IsLastHit}");
                 if (!IsAlive) OnDeath?.Invoke(hitData);
                 hitData.Executor?.HitExecution(hitData);
-                
+
+                switch (hitData.HitActionType)
+                {
+                    case HitActionType.RangedDamage:
+                        _pickupDropProcessor.OnHitTaken(hitData);
+                        break;
+                    case HitActionType.Custom:
+                        hitData.CustomHitProcessor.OnHitTaken(hitData);
+                        break;
+                }
+
                 PlayerDatabase.Instance.Server_AddDamageDealt(hitData.ExecutorRef, hitData.Amount);
                 PlayerDatabase.Instance.Server_AddDamageReceived(hitData.TargetRef, hitData.Amount);
             }
@@ -70,7 +83,7 @@ namespace InGame.Player
                 return;
             }
 
-            if (hitData.HitActionType == HitActionType.Damage)
+            if (hitData.HitActionType is HitActionType.Damage or HitActionType.RangedDamage)
             {
                 hitData.Amount = TakeDamage(hitData.Amount);
             }

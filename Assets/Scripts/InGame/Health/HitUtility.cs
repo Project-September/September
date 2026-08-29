@@ -1,4 +1,5 @@
 using Fusion;
+using September.InGame.Jewelry;
 
 namespace InGame.Health
 {
@@ -12,8 +13,9 @@ namespace InGame.Health
         public IHitExecutor Executor;
         public PlayerRef TargetRef;
         public IDamageable Target;
+        public IHitProcessor CustomHitProcessor;
 
-        public HitData(HitActionType actionType, int amount, PlayerRef executorRef, PlayerRef targetRef, IHitExecutor executor = null, IDamageable target = null)
+        public HitData(HitActionType actionType, int amount, PlayerRef executorRef, PlayerRef targetRef, IHitExecutor executor = null, IDamageable target = null, IHitProcessor customHitProcessor = null)
         {
             HitActionType = actionType;
             Amount = amount;
@@ -22,6 +24,7 @@ namespace InGame.Health
             Executor = executor;
             TargetRef = targetRef;
             Target = target;
+            CustomHitProcessor = customHitProcessor;
         }
 
         public override string ToString()
@@ -37,7 +40,9 @@ namespace InGame.Health
     public enum HitActionType
     {
         Damage,
-        Heal
+        Heal,
+        RangedDamage,
+        Custom,
     }
     
     public interface IDamageable

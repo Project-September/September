@@ -11,10 +11,15 @@ namespace September.InGame.Health
     {
         private readonly IJewelry[] _resultBuffer = new IJewelry[30];
 
+        public DropType DropType { get; set; }
+
+        public JewelryDropHitProcessor(DropType dropType)
+        {
+            DropType = dropType;
+        }
+
         public void OnHitTaken(HitData hitData)
         {
-            if (hitData.HitActionType is not HitActionType.Damage) return;
-
             var runner = NetworkRunner.Instances[0];
             if (!runner) return;
 
@@ -28,6 +33,10 @@ namespace September.InGame.Health
 
             Debug.Log($"[JewelryDropHitProcessor] Dropped {count} jewelries");
 
+            // Dropの場合、デフォルトでその場にドロップするので何もしない
+            if (DropType == DropType.Drop) return;
+
+            // Pickup処理
             for (int i = 0; i < count; i++)
             {
                 if (_resultBuffer[i] is global::InGame.Jewelry.Jewelry jewel)
@@ -36,5 +45,11 @@ namespace September.InGame.Health
                 }
             }
         }
+    }
+
+    public enum DropType
+    {
+        Drop,
+        Pickup
     }
 }
