@@ -15,10 +15,15 @@ namespace September.InGame.Jewelry.Drop.Strategies
         [SerializeField, CurveRange(0f, 0f, 20f, 1f, EColor.Red)]
         private AnimationCurve _containerDropRate = AnimationCurve.Linear(0, 0, 11, 1);
 
+        [SerializeField] private AnimationCurve _damageMultiplierCurve = AnimationCurve.Linear(0, 1, 200, 4);
+
         public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer)
         {
             int jewelryCount = jewelryContainer.CalculateJewelryScore();
-            int dropAmount = Random.value <= _containerDropRate.Evaluate(jewelryCount) ? 1 : 0;
+            float damageMultiplier = _damageMultiplierCurve.Evaluate(hitData.Amount);
+            int dropAmount = Mathf.RoundToInt(
+                    (Random.value <= _containerDropRate.Evaluate(jewelryCount) ? 1 : 0) * damageMultiplier
+                );
             return Mathf.Max(dropAmount, _containerMinDropCount);
         }
     }
