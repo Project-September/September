@@ -11,7 +11,7 @@ namespace InGame.Jewelry
 {
     public class PlayerJewelryContainer : NetworkBehaviour, IJewelryContainer
     {
-        [SerializeField] private NetworkObject _jewelryPrefab;
+        [SerializeField] private SerializableDictionary<JewelryType, NetworkObject> _jewelryPrefabs;
         [Header("Throw")]
         [SerializeField] private float _horizontalThrowForce = 5f;
         [SerializeField] private float _upwardThrowForce = 3f;
@@ -59,14 +59,14 @@ namespace InGame.Jewelry
             }
         }
 
-        public int DropJewelry(int dropAmount, IJewelry[] resultDropped)
+        public int DropJewelry(JewelryType jewelryType, int dropAmount, IJewelry[] resultDropped)
         {
             Vector3 spawnCenter = transform.position + Vector3.up * _heightOffset;
 
             int result = 0;
             for (int i = 0; i < dropAmount; i++)
             {
-                NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefab, spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
+                NetworkObject jewelryObj = Runner.Spawn(_jewelryPrefabs[jewelryType], spawnCenter, Quaternion.identity, onBeforeSpawned: InitializeSpawnedJewelry);
 
                 if (!jewelryObj.TryGetComponent<IJewelry>(out var jewelry))
                 {

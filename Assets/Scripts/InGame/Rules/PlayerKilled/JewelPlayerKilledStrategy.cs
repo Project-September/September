@@ -35,7 +35,7 @@ namespace September.InGame.Rules
             int drop = Mathf.Min(sumDrop, jewelryQuantity);
 
             var container = victimObj.GetComponent<IJewelryContainer>();
-            int count = container.DropJewelry(drop, _dropResultBuffer);
+            int count = container.DropJewelry(JewelryType.NormalGem, drop, _dropResultBuffer);
 
             if (hitData.HitActionType == HitActionType.RangedDamage)
             {
