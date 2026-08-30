@@ -29,14 +29,14 @@ MonoBehaviour:
       type: {class: JewelPlayerHitStrategy, ns: September.InGame.Rules.PlayerDamaged, asm: Scripts}
       data:
         _defaultDamageProcessor:
-          _dropType: 0
+          _dropType: 1
           _dropSettingsList:
           - _jewelryType: 0
             _dropStrategies:
             - rid: 7603375379238355043
           - _jewelryType: 1
             _dropStrategies:
-            - rid: 7603375379238355043
+            - rid: 7603375399825047650
     - rid: 7603375379238355043
       type: {class: ContainsDropStrategy, ns: September.InGame.Jewelry.Drop.Strategies, asm: Scripts}
       data:
@@ -46,7 +46,7 @@ MonoBehaviour:
           m_Curve:
           - serializedVersion: 3
             time: 0
-            value: 0.25
+            value: 0.2
             inSlope: 0
             outSlope: 0
             tangentMode: 65
@@ -54,36 +54,18 @@ MonoBehaviour:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 2
-            value: 0.25
-            inSlope: 0
-            outSlope: 0.25
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 3
-            value: 0.5
-            inSlope: 0.25
-            outSlope: 0
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
             time: 5
-            value: 0.5
-            inSlope: 0
-            outSlope: 0.25
+            value: 0.2
+            inSlope: -0
+            outSlope: 0.2
             tangentMode: 69
             weightedMode: 0
             inWeight: 0.33333334
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 6
-            value: 0.75
-            inSlope: 0.25
+            value: 0.4
+            inSlope: 0.2
             outSlope: 0
             tangentMode: 69
             weightedMode: 0
@@ -91,22 +73,40 @@ MonoBehaviour:
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 10
-            value: 0.75
-            inSlope: 0
-            outSlope: 0.25
+            value: 0.4
+            inSlope: -0
+            outSlope: 0.20000002
             tangentMode: 69
             weightedMode: 0
             inWeight: 0.33333334
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 11
-            value: 1
-            inSlope: 0.25
+            value: 0.6
+            inSlope: 0.20000002
             outSlope: 0
             tangentMode: 69
             weightedMode: 0
-            inWeight: 0
-            outWeight: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 19
+            value: 0.6
+            inSlope: -0
+            outSlope: 0.19999999
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 20
+            value: 0.8
+            inSlope: 0.19999999
+            outSlope: 0.25
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
@@ -123,16 +123,16 @@ MonoBehaviour:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 29
+            time: 19
             value: 1
-            inSlope: -0
+            inSlope: 0
             outSlope: 1
             tangentMode: 69
             weightedMode: 0
             inWeight: 0.33333334
             outWeight: 0.33333334
           - serializedVersion: 3
-            time: 30
+            time: 20
             value: 2
             inSlope: 1
             outSlope: 0
@@ -143,7 +143,7 @@ MonoBehaviour:
           - serializedVersion: 3
             time: 49
             value: 2
-            inSlope: -0
+            inSlope: 0
             outSlope: 1
             tangentMode: 69
             weightedMode: 0
@@ -161,7 +161,7 @@ MonoBehaviour:
           - serializedVersion: 3
             time: 69
             value: 3
-            inSlope: -0
+            inSlope: 0
             outSlope: 1
             tangentMode: 69
             weightedMode: 0
@@ -179,7 +179,7 @@ MonoBehaviour:
           - serializedVersion: 3
             time: 99
             value: 4
-            inSlope: -0
+            inSlope: 0
             outSlope: 1
             tangentMode: 69
             weightedMode: 0
@@ -206,7 +206,7 @@ MonoBehaviour:
           m_Curve:
           - serializedVersion: 3
             time: 0
-            value: 0.25
+            value: 0.3
             inSlope: 0
             outSlope: 0
             tangentMode: 65
@@ -214,36 +214,18 @@ MonoBehaviour:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 2
-            value: 0.25
-            inSlope: 0
-            outSlope: 0.25
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 3
-            value: 0.5
-            inSlope: 0.25
-            outSlope: 0
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
             time: 5
-            value: 0.5
-            inSlope: 0
-            outSlope: 0.25
+            value: 0.3
+            inSlope: -0
+            outSlope: 0.19999999
             tangentMode: 69
             weightedMode: 0
             inWeight: 0.33333334
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 6
-            value: 0.75
-            inSlope: 0.25
+            value: 0.5
+            inSlope: 0.19999999
             outSlope: 0
             tangentMode: 69
             weightedMode: 0
@@ -251,22 +233,40 @@ MonoBehaviour:
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 10
-            value: 0.75
-            inSlope: 0
-            outSlope: 0.25
+            value: 0.5
+            inSlope: -0
+            outSlope: 0.3
             tangentMode: 69
             weightedMode: 0
             inWeight: 0.33333334
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 11
-            value: 1
-            inSlope: 0.25
+            value: 0.8
+            inSlope: 0.3
             outSlope: 0
             tangentMode: 69
             weightedMode: 0
-            inWeight: 0
-            outWeight: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 19
+            value: 0.8
+            inSlope: -0
+            outSlope: 0.19999999
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 20
+            value: 1
+            inSlope: 0.19999999
+            outSlope: 0.25
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
@@ -283,53 +283,17 @@ MonoBehaviour:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 29
+            time: 39
             value: 1
-            inSlope: 0
+            inSlope: -0
             outSlope: 1
             tangentMode: 69
             weightedMode: 0
             inWeight: 0.33333334
             outWeight: 0.33333334
           - serializedVersion: 3
-            time: 30
+            time: 40
             value: 2
-            inSlope: 1
-            outSlope: 0
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 49
-            value: 2
-            inSlope: 0
-            outSlope: 1
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 50
-            value: 3
-            inSlope: 1
-            outSlope: 0
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 69
-            value: 3
-            inSlope: 0
-            outSlope: 1
-            tangentMode: 69
-            weightedMode: 0
-            inWeight: 0.33333334
-            outWeight: 0.33333334
-          - serializedVersion: 3
-            time: 70
-            value: 4
             inSlope: 1
             outSlope: 0
             tangentMode: 69
@@ -338,8 +302,8 @@ MonoBehaviour:
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 99
-            value: 4
-            inSlope: 0
+            value: 2
+            inSlope: -0
             outSlope: 1
             tangentMode: 69
             weightedMode: 0
@@ -347,7 +311,7 @@ MonoBehaviour:
             outWeight: 0.33333334
           - serializedVersion: 3
             time: 100
-            value: 5
+            value: 3
             inSlope: 1
             outSlope: -0.01
             tangentMode: 69
@@ -363,11 +327,117 @@ MonoBehaviour:
         _minDropAmount: 1
         _minDropRatio: 0
         _additionalDropRatio: 0.5
+    - rid: 7603375399825047650
+      type: {class: ContainsDropStrategy, ns: September.InGame.Jewelry.Drop.Strategies, asm: Scripts}
+      data:
+        _containerMinDropCount: 0
+        _containerDropRate:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 65
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 7
+            value: 0
+            inSlope: -0
+            outSlope: 0.2
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 8
+            value: 0.2
+            inSlope: 0.2
+            outSlope: 0
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 19
+            value: 0.2
+            inSlope: -0
+            outSlope: 0.10000001
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 20
+            value: 0.3
+            inSlope: 0.10000001
+            outSlope: 0.25
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        _damageMultiplierCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 65
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 39
+            value: 1
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 40
+            value: 2
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 99
+            value: 2
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 100
+            value: 3
+            inSlope: 1
+            outSlope: -0.01
+            tangentMode: 69
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.33333334
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
     - rid: 7765555185143251033
       type: {class: JewelPlayerKilledStrategy, ns: September.InGame.Rules, asm: Scripts}
       data:
         _defaultDamageProcessor:
-          _dropType: 0
+          _dropType: 1
           _dropSettingsList:
           - _jewelryType: 0
             _dropStrategies:
