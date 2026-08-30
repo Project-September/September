@@ -64,13 +64,10 @@ namespace InGame.Jewelry
 
             await DOTween.To(() => 0f, t =>
             {
-                float t1 = _heightOffsetCurve.Evaluate(t);
-                Vector3 heightOffset = Vector3.up * (_heightOffsetCurve.Evaluate(t1) * _heightOffsetScale);
+                Vector3 heightOffset = Vector3.up * (_heightOffsetCurve.Evaluate(t) * _heightOffsetScale);
 
                 float t0 = _curve.Evaluate(t);
                 Vector3 targetPos = target.position + target.rotation * _offset;
-
-                Debug.Log($"{t} {t1} {heightOffset}");
 
                 transform.position = Vector3.LerpUnclamped(startPos, targetPos, t0) + heightOffset;
             }, 1f, duration).SetEase(Ease.Linear);
