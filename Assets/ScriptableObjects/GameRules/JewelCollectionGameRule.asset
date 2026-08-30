@@ -33,21 +33,21 @@ MonoBehaviour:
           _dropSettingsList:
           - _jewelryType: 0
             _dropStrategies:
-            - rid: 7603375379238355034
+            - rid: 7603375379238355043
           - _jewelryType: 1
             _dropStrategies:
-            - rid: 7603375379238355035
+            - rid: 7603375379238355044
         _rangedDamageProcessor:
           _dropType: 1
           _dropSettingsList:
           - _jewelryType: 0
             _dropStrategies:
-            - rid: 7603375379238355037
+            - rid: 7603375379238355045
           - _jewelryType: 1
             _dropStrategies:
-            - rid: 7603375379238355038
-    - rid: 7603375379238355034
-      type: {class: ContainsDropStrategy, ns: September.InGame.Health, asm: Scripts}
+            - rid: 7603375379238355046
+    - rid: 7603375379238355043
+      type: {class: ContainsDropStrategy, ns: September.InGame.Jewelry.Drop.Strategies, asm: Scripts}
       data:
         _containerMinDropCount: 0
         _containerDropRate:
@@ -119,8 +119,8 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 7603375379238355035
-      type: {class: ContainsDropStrategy, ns: September.InGame.Health, asm: Scripts}
+    - rid: 7603375379238355044
+      type: {class: ContainsDropStrategy, ns: September.InGame.Jewelry.Drop.Strategies, asm: Scripts}
       data:
         _containerMinDropCount: 0
         _containerDropRate:
@@ -192,8 +192,8 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 7603375379238355037
-      type: {class: ContainsDropStrategy, ns: September.InGame.Health, asm: Scripts}
+    - rid: 7603375379238355045
+      type: {class: ContainsDropStrategy, ns: September.InGame.Jewelry.Drop.Strategies, asm: Scripts}
       data:
         _containerMinDropCount: 0
         _containerDropRate:
@@ -265,8 +265,8 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 7603375379238355038
-      type: {class: ContainsDropStrategy, ns: September.InGame.Health, asm: Scripts}
+    - rid: 7603375379238355046
+      type: {class: ContainsDropStrategy, ns: September.InGame.Jewelry.Drop.Strategies, asm: Scripts}
       data:
         _containerMinDropCount: 0
         _containerDropRate:

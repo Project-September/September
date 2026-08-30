@@ -4,7 +4,7 @@ using InGame.Health;
 using InGame.Jewelry;
 using InGame.Jewelry.Common;
 using September.Common;
-using September.InGame.Health;
+using September.InGame.Jewelry.Drop;
 using UnityEngine;
 
 namespace September.InGame.Rules

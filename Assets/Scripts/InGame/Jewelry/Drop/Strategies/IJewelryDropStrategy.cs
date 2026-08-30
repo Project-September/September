@@ -1,7 +1,7 @@
 using InGame.Health;
 using InGame.Jewelry.Common;
 
-namespace September.InGame.Health
+namespace September.InGame.Jewelry.Drop.Strategies
 {
     public interface IJewelryDropStrategy
     {

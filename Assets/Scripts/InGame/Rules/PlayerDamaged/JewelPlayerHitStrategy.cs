@@ -1,6 +1,6 @@
 using System;
 using InGame.Health;
-using September.InGame.Health;
+using September.InGame.Jewelry.Drop;
 using UnityEngine;
 
 namespace September.InGame.Rules.PlayerDamaged

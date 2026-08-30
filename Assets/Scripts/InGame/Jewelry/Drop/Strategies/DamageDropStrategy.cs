@@ -5,7 +5,7 @@ using InGame.Health;
 using InGame.Jewelry.Common;
 using UnityEngine;
 
-namespace September.InGame.Health
+namespace September.InGame.Jewelry.Drop.Strategies
 {
     [Serializable]
     public class DamageDropStrategy : IJewelryDropStrategy

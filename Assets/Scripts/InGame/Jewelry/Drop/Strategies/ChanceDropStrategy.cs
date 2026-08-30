@@ -5,7 +5,7 @@ using NaughtyAttributes;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace September.InGame.Health
+namespace September.InGame.Jewelry.Drop.Strategies
 {
     [Serializable]
     public class ChanceDropStrategy : IJewelryDropStrategy
