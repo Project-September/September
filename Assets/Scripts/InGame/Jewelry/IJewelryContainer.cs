@@ -19,5 +19,9 @@ namespace InGame.Jewelry.Common
         public int DropJewelry(JewelryType jewelryType, int dropAmount, IJewelry[] resultDropped = null);
 
         public int GetJewelryCount(JewelryType jewelryType);
+
+        public int GetJewelryCount();
+
+        public int CalculateJewelryScore();
     }
 }

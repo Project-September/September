@@ -104,6 +104,16 @@ namespace InGame.Jewelry
             return _playerJewelryRuntime.GetJewelryQuantity(jewelryType);
         }
 
+        public int GetJewelryCount()
+        {
+            return _playerJewelryRuntime.GetJewelryCount();
+        }
+
+        public int CalculateJewelryScore()
+        {
+            return _playerJewelryRuntime.CalculateJewelryScore();
+        }
+
         public void PickUp(IJewelry jewelry)
         {
             // 宝石を取得したことを知らせる
