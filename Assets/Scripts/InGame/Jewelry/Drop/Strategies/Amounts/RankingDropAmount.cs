@@ -1,7 +1,7 @@
 using System;
 using NaughtyAttributes;
 using September.Common;
-using September.NewResult.RankingPolicy;
+using September.InGame.Common;
 using UnityEngine;
 
 namespace September.InGame.Jewelry.Drop.Strategies.Amounts
