@@ -1,5 +1,4 @@
 using System;
-using September.InGame.Jewelry.Drop.Strategies.Chances;
 using UnityEngine;
 
 namespace September.InGame.Jewelry.Drop.Strategies.Amounts

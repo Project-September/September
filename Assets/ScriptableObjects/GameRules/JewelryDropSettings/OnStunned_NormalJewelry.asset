@@ -9,21 +9,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b24a353b731a4879945210ce3724ceb7, type: 3}
-  m_Name: OnStunned_NormalJewelryDropSettings
+  m_Script: {fileID: 11500000, guid: c0e08a5b333d46409d8e32b119815966, type: 3}
+  m_Name: OnStunned_NormalJewelry
   m_EditorClassIdentifier: 
   _settings:
     _jewelryType: 0
     _higherRoundingMethod: 1
     _lowerRoundingMethod: 0
     _roundingThresholdNormalizedRank: 0.5
-    _dropStrategies:
-    - rid: 7603375409105207404
+    _dropChances:
+    - rid: 7603375409105207416
+    _dropAmounts:
+    - rid: 7603375409105207417
   references:
     version: 2
     RefIds:
-    - rid: 7603375409105207404
-      type: {class: RatioDropStrategy, ns: September.InGame.Rules, asm: Scripts}
+    - rid: 7603375409105207416
+      type: {class: ConstantDropChance, ns: September.InGame.Jewelry.Drop.Strategies.Chances, asm: Scripts}
+      data:
+        _dropChance: 1
+    - rid: 7603375409105207417
+      type: {class: RatioDropAmount, ns: September.InGame.Jewelry.Drop.Strategies.Amounts, asm: Scripts}
       data:
         _minDropAmount: 1
         _minDropRatio: 0
