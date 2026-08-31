@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b24a353b731a4879945210ce3724ceb7, type: 3}
+  m_Name: OnStunned_NormalJewelryDropSettings
+  m_EditorClassIdentifier: 
+  _settings:
+    _jewelryType: 0
+    _higherRoundingMethod: 1
+    _lowerRoundingMethod: 0
+    _roundingThresholdNormalizedRank: 0.5
+    _dropStrategies:
+    - rid: 7603375409105207404
+  references:
+    version: 2
+    RefIds:
+    - rid: 7603375409105207404
+      type: {class: RatioDropStrategy, ns: September.InGame.Rules, asm: Scripts}
+      data:
+        _minDropAmount: 1
+        _minDropRatio: 0
+        _additionalDropRatio: 0.5

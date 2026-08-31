@@ -13,7 +13,7 @@ namespace September.InGame.Jewelry.Drop
         [SerializeField] private DropType _dropType;
 
         [Header("ドロップ数設定")]
-        [SerializeField] private JewelryDropSettings[] _dropSettingsList;
+        [SerializeField] private JewelryDropSettingsContainer[] _dropSettingsList;
 
         private readonly IJewelry[] _resultBuffer = new IJewelry[30];
 
@@ -35,7 +35,7 @@ namespace September.InGame.Jewelry.Drop
 
             foreach (var dropSettings in _dropSettingsList)
             {
-                DropJewelry(dropSettings, jewelryContainer, hitData);
+                DropJewelry(dropSettings.Settings, jewelryContainer, hitData);
             }
 
             JewelryDropLogger.OutputLog();
