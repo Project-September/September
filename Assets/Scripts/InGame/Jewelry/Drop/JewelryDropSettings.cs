@@ -25,26 +25,45 @@ namespace September.InGame.Jewelry.Drop
         {
             JewelryDropContext context = new(hitData, _jewelryType, jewelryContainer);
 
-            float dropChanceSum = 0;
-            foreach (IJewelryDropChance chance in _dropChances)
+            // ドロップ確率の計算
             {
-                float currChance = chance.GetChance(context);
-                dropChanceSum += currChance;
+                if (outputLog) JewelryDropLogger.StartSection("CHANCE");
 
-                if (outputLog) JewelryDropLogger.AppendLog(chance, currChance);
+                float dropChanceSum = 0;
+                foreach (IJewelryDropChance chance in _dropChances)
+                {
+                    float currChance = chance.GetChance(context);
+                    dropChanceSum += currChance;
+
+                    if (outputLog) JewelryDropLogger.AppendLog(chance, currChance);
+                }
+
+                if (outputLog) JewelryDropLogger.AppendLog($"- dropChanceSum: {dropChanceSum}");
+
+                if (dropChanceSum < Random.value)
+                {
+                    if (outputLog) JewelryDropLogger.JoinSettingsLog(_jewelryType, 0);
+                    return 0;
+                }
             }
-            if (dropChanceSum >= Random.value) return 0;
 
-            foreach (IJewelryDropAmount amount in _dropAmounts)
+            // ドロップ量の計算
             {
-                int currAmount = amount.GetDropAmount(ref context);
+                if (outputLog) JewelryDropLogger.StartSection("AMOUNT");
+                foreach (IJewelryDropAmount amount in _dropAmounts)
+                {
+                    int currAmount = amount.GetDropAmount(ref context);
 
-                if (outputLog) JewelryDropLogger.AppendLog(amount, currAmount);
+                    if (outputLog) JewelryDropLogger.AppendLog(amount, currAmount);
+                }
+
+                int jewelryCount = jewelryContainer.GetJewelryCount(_jewelryType);
+                context.Amount = Mathf.Min(Mathf.RoundToInt(context.Amount), jewelryCount);
+
+                if (outputLog) JewelryDropLogger.AppendLog($"- dropAmountSum: {context.Amount} (jewelryCount: {jewelryCount})");
             }
 
-            int jewelryCount = jewelryContainer.GetJewelryCount(_jewelryType);
-
-            int dropAmount = Mathf.Min(Mathf.RoundToInt(context.Amount), jewelryCount);
+            int dropAmount = context.Amount;
 
             if (outputLog) JewelryDropLogger.JoinSettingsLog(_jewelryType, dropAmount);
 
