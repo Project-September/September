@@ -15,8 +15,6 @@ namespace InGame.Jewelry
 
         public async UniTask PickupFrom(PlayerRef player)
         {
-            Debug.Log("[Jewelry] PickupFrom");
-
             var obj = Runner.GetPlayerObject(player);
             var container = obj.GetComponentInChildren<IJewelryContainer>();
 
