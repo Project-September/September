@@ -39,6 +39,7 @@ namespace September.InGame.Common
         private void Start()
         {
             StaticServiceLocator.Instance.Register(this);
+            _gameRule.SetCurrentRule();
         }
 
         public void Register(ServiceLocator locator)

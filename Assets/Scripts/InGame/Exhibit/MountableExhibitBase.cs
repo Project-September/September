@@ -241,7 +241,7 @@ namespace InGame.Exhibit
                 hitData.Amount = 0;
                 return;
             }
-            if (hitData.HitActionType == HitActionType.Damage)
+            if (hitData.HitActionType.IsDamage())
             {
                 hitData.Amount = TakeDamage(hitData.Amount);
                 //HitAction?.Invoke();
@@ -282,5 +282,3 @@ namespace InGame.Exhibit
         }
     }
 }
-
-
