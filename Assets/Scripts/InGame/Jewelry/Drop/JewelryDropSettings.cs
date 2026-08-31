@@ -14,20 +14,25 @@ namespace September.InGame.Jewelry.Drop
 
         [SubclassSelector, SerializeReference] private IJewelryDropStrategy[] _dropStrategies;
 
-        public int GetDropAmount(HitData hitData, IJewelryContainer jewelryContainer)
+        public int GetDropAmount(HitData hitData, IJewelryContainer jewelryContainer, bool outputLog = false)
         {
             int dropAmount = 0;
 
             foreach (IJewelryDropStrategy strategy in _dropStrategies)
             {
                 int amount = strategy.GetDropAmount(hitData, _jewelryType, jewelryContainer);
-                Debug.Log($"{strategy.GetType().Name} amount:{amount}");
                 dropAmount += amount;
+
+                if (outputLog) JewelryDropLogger.AppendStrategyLog(strategy, amount);
             }
 
             int jewelryCount = jewelryContainer.GetJewelryCount(_jewelryType);
 
-            return Mathf.Min(dropAmount, jewelryCount);
+            dropAmount = Mathf.Min(dropAmount, jewelryCount);
+
+            if (outputLog) JewelryDropLogger.JoinSettingsLog(_jewelryType, dropAmount);
+
+            return dropAmount;
         }
     }
 }

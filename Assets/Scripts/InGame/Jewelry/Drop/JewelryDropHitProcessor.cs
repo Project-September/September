@@ -37,11 +37,13 @@ namespace September.InGame.Jewelry.Drop
             {
                 DropJewelry(dropSettings, jewelryContainer, hitData);
             }
+
+            JewelryDropLogger.OutputLog();
         }
 
         private void DropJewelry(JewelryDropSettings dropSettings, IJewelryContainer victimJewelryContainer, HitData hitData)
         {
-            int dropAmount = dropSettings.GetDropAmount(hitData, victimJewelryContainer);
+            int dropAmount = dropSettings.GetDropAmount(hitData, victimJewelryContainer, outputLog: true);
 
             int count = victimJewelryContainer.DropJewelry(dropSettings.JewelryType, dropAmount, _resultBuffer);
 
