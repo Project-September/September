@@ -16,19 +16,18 @@ namespace September.InGame.Jewelry.Drop
 
         public int GetDropAmount(HitData hitData, IJewelryContainer jewelryContainer, bool outputLog = false)
         {
-            int dropAmount = 0;
+            DropInfo dropInfo = new();
 
             foreach (IJewelryDropStrategy strategy in _dropStrategies)
             {
-                int amount = strategy.GetDropAmount(hitData, _jewelryType, jewelryContainer);
-                dropAmount += amount;
+                int amount = strategy.GetDropAmount(hitData, _jewelryType, jewelryContainer, ref dropInfo);
 
                 if (outputLog) JewelryDropLogger.AppendStrategyLog(strategy, amount);
             }
 
             int jewelryCount = jewelryContainer.GetJewelryCount(_jewelryType);
 
-            dropAmount = Mathf.Min(dropAmount, jewelryCount);
+            int dropAmount = Mathf.Min(Mathf.RoundToInt(dropInfo.Amount), jewelryCount);
 
             if (outputLog) JewelryDropLogger.JoinSettingsLog(_jewelryType, dropAmount);
 

@@ -16,7 +16,7 @@ namespace September.InGame.Jewelry.Drop.Strategies
 
         private Ranking _ranking;
 
-        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer)
+        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer, ref DropInfo info)
         {
             _ranking ??= StaticServiceLocator.Instance.Get<Ranking>();
 
@@ -31,6 +31,7 @@ namespace September.InGame.Jewelry.Drop.Strategies
 
             int dropAmount = Mathf.RoundToInt(_rankDropCurve.Evaluate(rankRatio));
 
+            info.Amount += dropAmount;
             return dropAmount;
         }
     }

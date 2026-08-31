@@ -17,11 +17,12 @@ namespace September.InGame.Jewelry.Drop.Strategies
         [SerializeField, CurveRange(0f, 0f, 1f, 10f, EColor.Blue)]
         private AnimationCurve _dropChanceMinCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
-        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer)
+        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer, ref DropInfo info)
         {
             float t = _dropChanceDamageCurve.Evaluate(hitData.Amount);
             int minDrop = Mathf.FloorToInt(_dropChanceMinCurve.Evaluate(t));
             int dropAmount = Mathf.RoundToInt(Random.Range(minDrop, _damageChancedDropRate));
+            info.Amount += dropAmount;
             return dropAmount;
         }
     }

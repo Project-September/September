@@ -21,7 +21,7 @@ namespace September.InGame.Jewelry.Drop.Strategies
         [Header("ダメージ量に応じたドロップ確率の変動")]
         [SerializeField] private AnimationCurve _damageChanceCurve = AnimationCurve.Linear(0, 0, 200, 0);
 
-        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer)
+        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer, ref DropInfo info)
         {
             int jewelryCount = jewelryContainer.CalculateJewelryScore();
             float damageMultiplier = _damageMultiplierCurve.Evaluate(hitData.Amount);
@@ -29,6 +29,7 @@ namespace September.InGame.Jewelry.Drop.Strategies
             int dropAmount = Mathf.RoundToInt(
                     (Random.value <= chance ? 1 : 0) * damageMultiplier
                 );
+            info.Amount += dropAmount;
             return Mathf.Max(dropAmount, _containerMinDropCount);
         }
     }

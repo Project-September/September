@@ -13,13 +13,14 @@ namespace September.InGame.Rules
         [SerializeField, Tooltip("死亡時の所持宝石数からドロップする割合")] private float _minDropRatio = 0f;
         [SerializeField, Tooltip("minDropXXX の計算後に残った所持宝石数からドロップする割合")] private float _additionalDropRatio = 0.5f;
 
-        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer)
+        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer, ref DropInfo info)
         {
             var jewelryQuantity = jewelryContainer.GetJewelryCount(jewelryType);
             int minDrop = _minDropAmount + Mathf.FloorToInt(jewelryQuantity * _minDropRatio);
             int sumDrop = minDrop + Mathf.FloorToInt((jewelryQuantity - minDrop) * _additionalDropRatio);
             int dropAmount = Mathf.Min(sumDrop, jewelryQuantity);
 
+            info.Amount += dropAmount;
             return dropAmount;
         }
     }

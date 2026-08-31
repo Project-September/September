@@ -14,7 +14,7 @@ namespace September.InGame.Jewelry.Drop.Strategies
         [SerializeField] private int _requiredDamage = 20;
         private readonly Dictionary<PlayerRef, float> _attackerDealDamages = new();
 
-        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer)
+        public int GetDropAmount(HitData hitData, JewelryType jewelryType, IJewelryContainer jewelryContainer, ref DropInfo info)
         {
             _attackerDealDamages.TryAdd(hitData.ExecutorRef, 0);
             _attackerDealDamages[hitData.ExecutorRef] += hitData.Amount;
@@ -24,6 +24,7 @@ namespace September.InGame.Jewelry.Drop.Strategies
             int dropAmount = Mathf.FloorToInt(_attackerDealDamages[hitData.ExecutorRef] / _requiredDamage);
             _attackerDealDamages[hitData.ExecutorRef] %= _requiredDamage;
 
+            info.Amount += dropAmount;
             return dropAmount;
         }
     }
