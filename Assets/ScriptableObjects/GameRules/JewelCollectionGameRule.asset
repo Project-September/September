@@ -31,16 +31,16 @@ MonoBehaviour:
         _defaultDamageProcessor:
           _dropType: 0
           _dropSettingsList:
-          - {fileID: 11400000, guid: da557ba28b830cf4db3cecce649cfa68, type: 2}
-          - {fileID: 11400000, guid: f55a9fa4e19a8b347b8f068083937ef2, type: 2}
+          - {fileID: 11400000, guid: 8c5ef205ae4b3874fba2fdc7b93f37f9, type: 2}
+          - {fileID: 11400000, guid: 2f12d7c6ef89ecb4098fdfa735ebbe61, type: 2}
     - rid: 7765555185143251033
       type: {class: JewelPlayerKilledStrategy, ns: September.InGame.Rules, asm: Scripts}
       data:
         _defaultDamageProcessor:
           _dropType: 1
           _dropSettingsList:
-          - {fileID: 11400000, guid: 214e7af719fe7e84797cc13ae842188e, type: 2}
-          - {fileID: 11400000, guid: 14d022febe3260c4bac49ed6f9866885, type: 2}
+          - {fileID: 11400000, guid: 90c4160262b709d4c8681a5185d182fa, type: 2}
+          - {fileID: 11400000, guid: 6e92ea50e6ae6f34b86fffd87ccad934, type: 2}
     - rid: 7765555185143251047
       type: {class: NullGameStartStrategy, ns: September.InGame.Rules, asm: Scripts}
       data: 
