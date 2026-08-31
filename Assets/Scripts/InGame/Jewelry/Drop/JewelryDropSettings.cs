@@ -29,6 +29,7 @@ namespace September.InGame.Jewelry.Drop
             {
                 if (outputLog) JewelryDropLogger.StartSection("CHANCE");
 
+                // 各要素が返す確率の総和を計算
                 float dropChanceSum = 0;
                 foreach (IJewelryDropChance chance in _dropChances)
                 {
@@ -40,6 +41,7 @@ namespace September.InGame.Jewelry.Drop
 
                 if (outputLog) JewelryDropLogger.AppendLog($"- dropChanceSum: {dropChanceSum}");
 
+                // 確率が通らなかったら終了
                 if (dropChanceSum < Random.value)
                 {
                     if (outputLog) JewelryDropLogger.JoinSettingsLog(_jewelryType, 0);
@@ -50,6 +52,8 @@ namespace September.InGame.Jewelry.Drop
             // ドロップ量の計算
             {
                 if (outputLog) JewelryDropLogger.StartSection("AMOUNT");
+
+                // 各要素が返す個数の総和を計算
                 foreach (IJewelryDropAmount amount in _dropAmounts)
                 {
                     int currAmount = amount.GetDropAmount(ref context);
@@ -57,6 +61,7 @@ namespace September.InGame.Jewelry.Drop
                     if (outputLog) JewelryDropLogger.AppendLog(amount, currAmount);
                 }
 
+                // 所持宝石数より多くドロップしない
                 int jewelryCount = jewelryContainer.GetJewelryCount(_jewelryType);
                 context.Amount = Mathf.Min(Mathf.RoundToInt(context.Amount), jewelryCount);
 
