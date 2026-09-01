@@ -121,10 +121,14 @@ namespace September.InGame.Effect
             NetworkId parentNetworkId = default(NetworkId);
             if (parent != null)
             {
-                var parentNetworkObject = parent.GetComponent<NetworkObject>();
+                var parentNetworkObject = parent.GetComponentInParent<NetworkObject>();
                 if (parentNetworkObject != null)
                 {
                     parentNetworkId = parentNetworkObject.Id;
+                }
+                else
+                {
+                    Debug.LogWarning($"[EffectSpawner] 指定オブジェクトにNetworkObjectが存在しないため、親オブジェクトを設定できません。parent: {parent}");
                 }
             }
 

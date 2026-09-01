@@ -51,7 +51,7 @@ public class PlayerEffectController : NetworkBehaviour
         if (effectSpawner)
         {
             _generateStunEffectId = effectSpawner.RequestPlayLoopEffect(EffectType.StunNormal,
-                transform.position + _stunEffectPositionOffset, Quaternion.identity);
+                transform.position + _stunEffectPositionOffset, Quaternion.identity, transform);
         }
     }
 
