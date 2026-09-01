@@ -60,12 +60,6 @@ namespace September.InGame.NauticalChart
             _effectSpawner.StopEffect(effectId);
         }
 
-        /// <summary> エフェクトIDを生成する </summary>
-        private static string GenerateEffectId()
-        {
-            return Guid.NewGuid().ToString();
-        }
-
         /// <summary> 雷の生成位置をランダムに決定する </summary>
         private Vector3 SpawnTransform()
         {
