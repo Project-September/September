@@ -47,6 +47,24 @@ namespace September.Editor.InGameDebug
 			_lobbyData.MapType = (MapType)EditorGUILayout.EnumPopup("Map Type", _lobbyData.MapType);
 			_lobbyData.LobbyName = EditorGUILayout.TextField("Lobby Name", _lobbyData.LobbyName);
 			_lobbyData.Nickname = EditorGUILayout.TextField("Nickname", _lobbyData.Nickname);
+			_lobbyData.TimeSettings ??= new InGameDebugTimeSettings();
+
+			EditorGUILayout.BeginVertical("box");
+			EditorGUILayout.LabelField("Time Settings", EditorStyles.boldLabel);
+			_lobbyData.TimeSettings.PreStartTime = EditorGUILayout.IntField(
+				"Pre Start Time", Mathf.Max(0, _lobbyData.TimeSettings.PreStartTime));
+			_lobbyData.TimeSettings.Duration = Mathf.Max(0f, EditorGUILayout.FloatField(
+				"Timer Duration", _lobbyData.TimeSettings.Duration));
+			_lobbyData.TimeSettings.AfterReadyDelay = Mathf.Max(0f, EditorGUILayout.FloatField(
+				"After Ready Delay", _lobbyData.TimeSettings.AfterReadyDelay));
+			_lobbyData.TimeSettings.GameTime = Mathf.Max(0f, EditorGUILayout.FloatField(
+				"Game Time", _lobbyData.TimeSettings.GameTime));
+			_lobbyData.TimeSettings.TimeRemaining = Mathf.Max(0f, EditorGUILayout.FloatField(
+				"Time Remaining Alert", _lobbyData.TimeSettings.TimeRemaining));
+			_lobbyData.TimeSettings.EndGameDelay = Mathf.Max(0f, EditorGUILayout.FloatField(
+				"End Game Delay", _lobbyData.TimeSettings.EndGameDelay));
+			EditorGUILayout.EndVertical();
+
 			_scroll = EditorGUILayout.BeginScrollView(_scroll);
 
 			for (var i = 0; i < _lobbyData.PlayerData.Count; i++)
