@@ -20,7 +20,7 @@ namespace InGame.Exhibit
         private Transform _currentParent;
         private PlayerRef _currentOwner;
 
-        private EffectID _effectId;
+        private EffectID _currentEffectId;
 
         public override void FixedUpdateNetwork()
         {
@@ -67,7 +67,7 @@ namespace InGame.Exhibit
 
             var playerRef = PlayerRef.FromEncoded(interactor);
             if (!PlayerDatabase.Instance.PlayerObjectDic.TryGet(playerRef, out var playerObj)) return;
-            _effectId = EffectSpawner.RequestPlayLoopEffect(
+            _currentEffectId = EffectSpawner.RequestPlayLoopEffect(
                 EffectType.Muramasa,
                 playerObj.transform.position + _muramasaOffset,
                 Quaternion.identity,
@@ -80,7 +80,7 @@ namespace InGame.Exhibit
 
         private void StopAttack()
         {
-            EffectSpawner.StopEffect(_effectId);
+            EffectSpawner.StopEffect(_currentEffectId);
             _currentOwner = PlayerRef.None;
             _currentParent = null;
         }
