@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbeabfe90ee24410ab34048409e6d23c, type: 3}
+  m_Name: SceneBGMNameContainer
+  m_EditorClassIdentifier: 
+  _maps:
+  - SceneName: Title
+    BGMType: 0
+    _bgmName: BGM_Title_01
+    _characterBGMNames:
+      keys: 
+      values: []
+  - SceneName: Lobby
+    BGMType: 0
+    _bgmName: BGM_Select_01
+    _characterBGMNames:
+      keys: 
+      values: []
+  - SceneName: InGameMock
+    BGMType: 1
+    _bgmName: 
+    _characterBGMNames:
+      keys: 01000000020000000300000004000000
+      values:
+      - BGM_Ingame_01
+      - BGM_Haruku_01
+      - BGM_Tanihira_01
+      - BGM_Koinuma_01
+  - SceneName: Pirate_Field
+    BGMType: 1
+    _bgmName: 
+    _characterBGMNames:
+      keys: 01000000020000000300000004000000
+      values:
+      - BGM_Ingame_01
+      - BGM_Haruku_01
+      - BGM_Tanihira_01
+      - BGM_Koinuma_01
+  - SceneName: Result
+    BGMType: 0
+    _bgmName: BGM_Result_01
+    _characterBGMNames:
+      keys: 
+      values: []
