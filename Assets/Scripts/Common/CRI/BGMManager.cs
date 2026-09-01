@@ -52,6 +52,7 @@ namespace CRISound
 
             if (!string.IsNullOrEmpty(newCueName))
             {
+                Debug.Log($"[BGMManager] PlayBGM: {newCueName}");
                 CRIAudio.PlayBGM("ALLCue", newCueName);
                 _currentCueName = newCueName;
             }
@@ -78,6 +79,8 @@ namespace CRISound
             {
                 CuePlayAtomExPlayer.Instance.ResetCategoryVolume();
             }
+
+            Debug.Log($"[BGMManager] OnSceneLoaded: {scene.name}");
 
             GetSceneBGMResult result = await SceneBGMContainer.GetBGMAsync(scene.name);
             if (!result.IsSuccess) return;

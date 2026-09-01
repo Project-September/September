@@ -53,7 +53,7 @@ namespace September.Common.CRI
             if (!instance.TryGetBGM(sceneName, out SceneBGM bgm))
             {
                 // 失敗
-                Debug.LogError($"SceneBGM not found for scene: {sceneName}");
+                Debug.LogWarning($"SceneBGM not found for scene: {sceneName}");
                 return new GetSceneBGMResult { IsSuccess = false };
             }
 
