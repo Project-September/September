@@ -4,8 +4,9 @@ using System.Linq;
 using Fusion;
 using September.Common;
 using September.InGame.Rules;
+using September.NewResult;
 
-namespace September.NewResult.RankingPolicy
+namespace September.InGame.Common
 {
     /// <summary>
     /// インゲーム中のリアルタイムなランキング情報を計算し保持するクラス
