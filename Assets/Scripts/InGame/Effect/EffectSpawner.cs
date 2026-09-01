@@ -81,7 +81,7 @@ namespace September.InGame.Effect
 
         private EffectID GenerateEffectId()
         {
-            return new EffectID(++_effectCount);
+            return new EffectID(++_effectCount, Runner.LocalPlayer);
         }
 
         /// <summary>
