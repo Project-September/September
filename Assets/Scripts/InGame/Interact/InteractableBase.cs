@@ -264,13 +264,12 @@ namespace InGame.Interact
         }
 
         /// <summary>
-        /// 派生クラスで個別のバリデーション条件を追加する仮想メソッド
-        /// デフォルトではゲーム終了状態とプレイヤースタン状態をチェック
+        /// インタラクト可能条件
         /// </summary>
         /// <param name="context">インタラクトのコンテキスト</param>
         /// <param name="charaType">キャラクタータイプ</param>
         /// <returns>true: インタラクト可能、false: インタラクト不可</returns>
-        protected virtual bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
+        private bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
         {
             // ゲーム終了状態の時はインタラクトを無効化
             if (IsGameEnded())
