@@ -158,8 +158,6 @@ namespace September.InGame.Effect
         [Rpc(RpcSources.All, RpcTargets.All)]
         private void RPC_PlayEffect(EffectType effectType, Vector3 position, Quaternion rotation, bool isLoop, EffectID effectId, NetworkId parentNetworkId)
         {
-            Debug.Log($"[EffectSpawner] RPC_PlayEffect: {effectType} {effectId} {isLoop}");
-
             if (_effectDatabase == null)
             {
                 InitializeEffectDatabase();
@@ -237,8 +235,6 @@ namespace September.InGame.Effect
         [Rpc(RpcSources.All, RpcTargets.All)]
         private void RPC_PlayEffectWithScale(EffectType effectType, Vector3 position, Quaternion rotation, Vector3 scale, bool isLoop, EffectID effectId, NetworkId parentNetworkId)
         {
-            Debug.Log($"[EffectSpawner] RPC_PlayEffect: {effectType} {effectId}");
-
             if (_effectDatabase == null)
             {
                 InitializeEffectDatabase();
@@ -303,8 +299,6 @@ namespace September.InGame.Effect
         [Rpc(RpcSources.All, RpcTargets.All)]
         private void RPC_StopEffectById(EffectID effectId)
         {
-            Debug.Log($"[EffectSpawner] RPC_StopEffectById: {effectId}");
-
             if (_activeEffects.TryGetValue(effectId, out GameObject effect))
             {
                 if (effect != null)
