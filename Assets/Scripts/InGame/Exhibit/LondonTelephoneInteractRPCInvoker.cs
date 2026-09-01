@@ -81,10 +81,5 @@ namespace InGame.Exhibit
         {
             _effectSpawner ??= StaticServiceLocator.Instance.Get<EffectSpawner>();
         }
-
-        private static string GenerateEffectId()
-        {
-            return Guid.NewGuid().ToString();
-        }
     }
 }
