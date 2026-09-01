@@ -42,7 +42,7 @@ namespace CRISound
             string newCueName = bgm.BGMType switch
             {
                 BGMType.Constant => bgm.GetConstantBGM(),
-                BGMType.CharacterData => bgm.GetCharacterBGM(CharacterType.OkabeWright), // Todo: ローカルプレイヤーのキャラクタータイプを取得する
+                BGMType.CharacterData => bgm.GetCharacterBGM(LocalPlayer.CharacterType),
                 _ => ""
             };
 
