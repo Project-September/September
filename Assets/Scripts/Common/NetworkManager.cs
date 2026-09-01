@@ -127,6 +127,9 @@ namespace September.Common
 
         public async UniTaskVoid StartGame(GameStartContext startContext)
         {
+            LocalPlayer.PlayerRef = _networkRunner.LocalPlayer;
+            LocalPlayer.CharacterType = PlayerDatabase.Instance.PlayerDataDic[LocalPlayer.PlayerRef].CharacterType;
+
             if (!_networkRunner.IsServer) return;
             _networkRunner.SessionInfo.IsOpen = false;
 
