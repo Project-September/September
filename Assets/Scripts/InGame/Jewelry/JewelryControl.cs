@@ -105,6 +105,46 @@ namespace InGame.Jewelry
             Velocity = v;
         }
 
+        /// <summary>
+        /// 物理判定を無効化し、目標位置に向かって放物運動を行います
+        /// </summary>
+        public void ThrowToNonPhysics(Vector3 position, float maxHeight, float duration, Ease ease = Ease.Linear)
+        {
+            _physicsEnabled = false;
+            _collider.enabled = false;
+            _rigidbody.isKinematic = true;
+
+            float dy = position.y - transform.position.y;
+            float gravity = 2 * maxHeight / (duration * duration) * Mathf.Pow(1 + Mathf.Sqrt(1 - dy / maxHeight), 2);
+
+            if (maxHeight < 0)
+            {
+                maxHeight = Mathf.Abs(position.y - transform.position.y) + 2f;
+                Debug.LogWarning("maxHeightは正の値にしてください", this);
+            }
+
+            float vy = Mathf.Sqrt(2 * gravity * maxHeight); // y方向の初速
+            float a = vy * vy - 2 * gravity * (position.y - transform.position.y);
+            if (a < 0)
+            {
+                Debug.LogWarning("maxHeightが最高到達点より低い位置にあるため、放物線を求めることができませんでした", this);
+                return;
+            }
+            Vector3 vh = (position - transform.position) / duration; // 水平方向の初速
+            Vector3 v = new(vh.x, vy, vh.z); // 初速
+
+            Vector3 startPos = transform.position;
+
+            DOTween.To(() => 0f, e =>
+            {
+                float t = e * duration;
+                Vector3 g = new(0f, gravity, 0f);
+                Vector3 p = v * t - 0.5f * g * t * t;
+                transform.position = startPos + p;
+            }, 1f, duration).SetEase(ease)
+            .onComplete += SetGrounded;
+        }
+
         public async UniTask PlayGetMove(Transform target)
         {
             const float duration = 1f;
