@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Fusion;
 using UnityEngine;
 
@@ -5,15 +6,16 @@ namespace September.InGame.NauticalChart
 {
     public class SkyboxChanger : NetworkBehaviour
     {
-        [SerializeField] private Material _stormSkyboxMaterial;
+        private static readonly int Blend = Shader.PropertyToID("_Blend");
 
-        private Material _originalSkyboxMaterial;
+        [SerializeField] private Ease _easeType = Ease.InOutSine;
+        [SerializeField] private float _duration = 0.5f;
 
         /// <summary> Skyboxを変更する </summary>
         public void SkyboxChangeStorm()
         {
-            _originalSkyboxMaterial = RenderSettings.skybox;
-            RenderSettings.skybox = _stormSkyboxMaterial;
+            var skybox = RenderSettings.skybox;
+            DOTween.To(() => skybox.GetFloat(Blend), x => skybox.SetFloat(Blend, x), 1, _duration).SetEase(_easeType);
         }
 
         /// <summary>
@@ -21,7 +23,8 @@ namespace September.InGame.NauticalChart
         /// </summary>
         public void RestoreSkybox()
         {
-            RenderSettings.skybox = _originalSkyboxMaterial;
+            var skybox = RenderSettings.skybox;
+            DOTween.To(() => skybox.GetFloat(Blend), x => skybox.SetFloat(Blend, x), 0, _duration).SetEase(_easeType);
         }
     }
 }
