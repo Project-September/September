@@ -11,11 +11,7 @@ namespace September.Common
 	public class InGameDebugTimeSettings
 	{
 		public int PreStartTime = 10;
-		public float Duration = 1f;
-		public float AfterReadyDelay = 1f;
 		public float GameTime = 180f;
-		public float TimeRemaining = 30f;
-		public float EndGameDelay;
 
 		/// <summary>
 		/// 保持している時間設定をゲームのタイマーへ適用します。
@@ -26,11 +22,7 @@ namespace September.Common
 				return;
 
 			timerData.PreStartTime = Mathf.Max(0, PreStartTime);
-			timerData.Duration = Mathf.Max(0f, Duration);
-			timerData.AfterReadyDelay = Mathf.Max(0f, AfterReadyDelay);
 			timerData.GameTime = Mathf.Max(0f, GameTime);
-			timerData.TimeRemaining = Mathf.Max(0f, TimeRemaining);
-			timerData.EndGameDelay = Mathf.Max(0f, EndGameDelay);
 		}
 	}
 
@@ -89,30 +81,18 @@ namespace September.Common
 		private readonly struct TimerDataValues
 		{
 			private readonly int _preStartTime;
-			private readonly float _duration;
-			private readonly float _afterReadyDelay;
 			private readonly float _gameTime;
-			private readonly float _timeRemaining;
-			private readonly float _endGameDelay;
 
 			public TimerDataValues(GameTimerData timerData)
 			{
 				_preStartTime = timerData.PreStartTime;
-				_duration = timerData.Duration;
-				_afterReadyDelay = timerData.AfterReadyDelay;
 				_gameTime = timerData.GameTime;
-				_timeRemaining = timerData.TimeRemaining;
-				_endGameDelay = timerData.EndGameDelay;
 			}
 
 			public void ApplyTo(GameTimerData timerData)
 			{
 				timerData.PreStartTime = _preStartTime;
-				timerData.Duration = _duration;
-				timerData.AfterReadyDelay = _afterReadyDelay;
 				timerData.GameTime = _gameTime;
-				timerData.TimeRemaining = _timeRemaining;
-				timerData.EndGameDelay = _endGameDelay;
 			}
 		}
 	}
