@@ -17,7 +17,8 @@ namespace September.InGame.Jewelry
         [SerializeField] private float _height = 1f;
         [SerializeField] private float _randomHeight = 0.3f;
         [SerializeField] private float _duration = 0.7f;
-        [SerializeField] private float _randomDuration = 0.1f;
+        [SerializeField] private float _randomDuration = 0.3f;
+        [SerializeField] private float _randomDelay = 0.2f;
         [SerializeField] private AnimationCurve _verticalEase;
         [SerializeField] private AnimationCurve _horizontalEase;
 
@@ -53,7 +54,13 @@ namespace September.InGame.Jewelry
                 {
                     Vector3 pos = GetRandomPosition();
                     DebugDrawUtility.DrawWireSphere(pos, 1f, Color.red, 5f);
-                    jewelry.JewelryControl.ThrowToNonPhysics(pos, (pos.y - transform.position.y) + _height + Random.Range(-.5f, .5f) * _randomHeight, _duration + Random.Range(-.5f, .5f) * _randomDuration, _verticalEase, _horizontalEase);
+                    jewelry.JewelryControl.ThrowToNonPhysics(
+                        pos,
+                        (pos.y - transform.position.y) + _height + Random.Range(-.5f, .5f) * _randomHeight,
+                        _duration + Random.Range(-.5f, .5f) * _randomDuration,
+                        Random.value * _randomDelay,
+                        _verticalEase,
+                        _horizontalEase);
                 }
             }
         }
