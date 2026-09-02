@@ -53,14 +53,21 @@ public class SharkInteractable : MountableExhibitBase
     }
 
     /// <summary>
-    /// アニメーターを既定ステート・既定ポーズへ戻してから停止する
+    /// アニメーターを待機ポーズへ戻してから停止する
     /// <para>停止するだけでは終了時点のポーズが次のインタラクトまで残り続けるため</para>
     /// </summary>
     private void ResetAnimator()
     {
         _animator.enabled = true;
-        _animator.Rebind();   // ステートとパラメータを初期値へ戻す
-        _animator.Update(0f); // 既定ポーズを即時反映させてから停止する
+        _animator.Rebind(); // ステートを既定へ、パラメータをコントローラの初期値へ戻す
+
+        // 既定ステートがロコモーションのブレンドツリーでも待機側で評価されるよう、
+        // コントローラの初期値任せにせず待機相当の値を明示する
+        _animator.ResetTrigger(Attack);
+        _animator.SetFloat(Speed, 0f);
+        _animator.SetBool(IsMoving, false);
+
+        _animator.Update(0f); // 待機ポーズを即時反映させてから停止する
         _animator.enabled = false;
     }
 
