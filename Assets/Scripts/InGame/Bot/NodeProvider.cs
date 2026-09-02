@@ -4,7 +4,7 @@ using UnityEngine;
 namespace InGame.Bot
 {
     /// <summary>
-    /// NodeData‚ğ‚Ç‚±‚Å‚àg‚¦‚é‚æ‚¤‚É‚·‚éƒNƒ‰ƒX
+    /// NodeDataã‚’ã©ã“ã§ã‚‚ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹ã‚¯ãƒ©ã‚¹
     /// </summary>
     public class NodeProvider : MonoBehaviour
     {
@@ -42,6 +42,11 @@ namespace InGame.Bot
         public NodeData GetRandomNode()
         {
             return Nodes[Random.Range(0, Nodes.Count)];
+        }
+
+        public void Reload()
+        {
+            _nodes = null;
         }
     }
 }
