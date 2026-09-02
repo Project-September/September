@@ -19,6 +19,7 @@ namespace InGame.Bot
         [SerializeField, Tooltip("生成したノードを書き込む")] private NodeMapData _mapData;
 
         [SerializeField, Tooltip("経路到達判定の基準地点")] private Transform _origin;
+        [SerializeField, Tooltip("Origin への NavMesh 到達経路を必須とするか（孤立した足場やワープ地点にもノードを作る場合は false）")] private bool _requirePathToOrigin = false;
         [SerializeField, Tooltip("描画するか")] private bool _isDrawGizumoIcon;
 
         [Header("Poisson Disk")]
@@ -27,6 +28,8 @@ namespace InGame.Bot
         [SerializeField, Tooltip("ノード間の目安距離")] private float _poissonRadius = 5f;
         [SerializeField, Tooltip("候補生成回数")] private int _poissonCandidateCount = 30;
         [SerializeField, Tooltip("最大ノード数。0なら無制限")] private int _maxNodeCount = 0;
+        [SerializeField, Tooltip("ワープ先や孤立した足場などの追加シード地点")] private Transform[] _isolatedSeedPoints;
+        [SerializeField, Tooltip("初期ランダムシード点の探索回数（孤立した島を拾いやすくするための試行数）")] private int _initialNavMeshSeedCount = 10;
 
         [Header("Connect")]
         [SerializeField, Tooltip("接続可能距離")] private float _connectDistance = 10f;
@@ -46,6 +49,7 @@ namespace InGame.Bot
 
         [Header("Vault")]
         [SerializeField] private CapsuleCollider _botCapsuleCollider;
+        [SerializeField, Tooltip("VaultNode接続の最大許容探索距離")] private float _vaultMaxConnectDistance = 3.0f;
         [SerializeField] private float _maxLedgeHeight = 1.5f;
         [SerializeField] private float _minLedgeHeight = 0.4f;
         [SerializeField] private float _maxLedgeDepth = 0.9f;
@@ -120,8 +124,11 @@ namespace InGame.Bot
             {
                 ValidateSettings();
 
-                if (_origin == null)
-                    throw new InvalidOperationException("Origin が設定されていません。");
+                if (_requirePathToOrigin && _origin == null)
+                    throw new InvalidOperationException("Require Path To Origin が有効ですが、Origin が設定されていません。");
+
+                if (_origin == null && _generationArea == null)
+                    throw new InvalidOperationException("Origin または Generation Area のいずれかを設定してください。");
 
                 if (_botCapsuleCollider == null)
                     throw new InvalidOperationException("Bot Capsule Collider が設定されていません。");
@@ -162,18 +169,31 @@ namespace InGame.Bot
                 BuildNodeGrid(nodeList);
 
                 // 飛び越え接続を作る
-                var vaultTargets = new Dictionary<NodeData, NodeData>();
+                var vaultNodes = GetComponentsInChildren<VaultNode>();
+                int vaultConnectedCount = 0;
 
-                foreach (var vaultNode in GetComponentsInChildren<VaultNode>())
+                foreach (var vaultNode in vaultNodes)
                 {
-                    vaultTargets.Add(GetNearestNode(vaultNode.GetStartPos()), GetNearestNode(vaultNode.GetEndPos()));
-                }
+                    if (vaultNode == null) continue;
 
-                foreach (var pair in vaultTargets)
-                {
-                    Debug.Log(pair.Key.NodeIndex);
-                    Debug.Log(pair.Value.NodeIndex);
-                    pair.Key.SetVaultConnect(pair.Value);
+                    var startNode = GetNearestNode(vaultNode.GetStartPos(), _vaultMaxConnectDistance);
+                    var endNode = GetNearestNode(vaultNode.GetEndPos(), _vaultMaxConnectDistance);
+
+                    if (startNode == null || endNode == null)
+                    {
+                        Debug.LogWarning($"[VaultNode] 接続ノードが見つかりませんでした (距離上限 {_vaultMaxConnectDistance}m 内)。Start: {vaultNode.GetStartPos()} -> {(startNode != null ? "OK" : "None")}, End: {vaultNode.GetEndPos()} -> {(endNode != null ? "OK" : "None")}", vaultNode);
+                        continue;
+                    }
+
+                    if (startNode == endNode)
+                    {
+                        Debug.LogWarning($"[VaultNode] 開始ノードと終了ノードが同一です。NodeIndex: {startNode.NodeIndex}", vaultNode);
+                        continue;
+                    }
+
+                    startNode.SetVaultConnect(endNode);
+                    vaultConnectedCount++;
+                    Debug.Log($"[VaultNode] 接続設定完了: Node[{startNode.NodeIndex}] -> Node[{endNode.NodeIndex}]");
                 }
 
                 // 接続を作る
@@ -222,15 +242,46 @@ namespace InGame.Bot
             var samples = new List<Vector3>();
             var activeList = new List<Vector3>();
 
-            if (!TryGetRandomNavMeshPoint(bounds, out var firstPoint))
+            // 1. 指定された孤立シード地点（ワープ地点や空中足場など）からシードを追加
+            if (_isolatedSeedPoints != null)
+            {
+                foreach (var seedTransform in _isolatedSeedPoints)
+                {
+                    if (seedTransform == null) continue;
+                    if (TryProjectToNavMesh(seedTransform.position, out var navPoint) && bounds.Contains(navPoint))
+                    {
+                        navPoint = GetGroundPosition(navPoint, 10);
+                        if (IsFarEnough(navPoint, samples, _poissonRadius))
+                        {
+                            samples.Add(navPoint);
+                            activeList.Add(navPoint);
+                        }
+                    }
+                }
+            }
+
+            // 2. Bounds内のランダムなNavMesh地点から初期シードを探索
+            int seedSearchCount = Mathf.Max(1, _initialNavMeshSeedCount);
+            for (int i = 0; i < seedSearchCount; i++)
+            {
+                if (TryGetRandomNavMeshPoint(bounds, out var seedPoint))
+                {
+                    seedPoint = GetGroundPosition(seedPoint, 10);
+                    if (IsFarEnough(seedPoint, samples, _poissonRadius))
+                    {
+                        samples.Add(seedPoint);
+                        activeList.Add(seedPoint);
+                    }
+                }
+            }
+
+            if (samples.Count == 0)
             {
                 Debug.LogWarning("NavMesh 上に初期点を見つけられませんでした。");
                 return samples;
             }
-            firstPoint = GetGroundPosition(firstPoint, 10);
-            samples.Add(firstPoint);
-            activeList.Add(firstPoint);
 
+            // 3. 各シードからポアソンディスクサンプリングを拡散
             while (activeList.Count > 0)
             {
                 if (_maxNodeCount > 0 && samples.Count >= _maxNodeCount)
@@ -315,7 +366,7 @@ namespace InGame.Bot
                 if (!bounds.Contains(result))
                     continue;
 
-                if (!HasValidPath(result, _origin.position))
+                if (_requirePathToOrigin && _origin != null && !HasValidPath(result, _origin.position))
                     continue;
 
                 return true;
@@ -368,7 +419,7 @@ namespace InGame.Bot
         {
             node = null;
 
-            if (!HasValidPath(position, _origin.position))
+            if (_requirePathToOrigin && _origin != null && !HasValidPath(position, _origin.position))
                 return false;
 
             var key = Quantize(position);
@@ -676,12 +727,14 @@ namespace InGame.Bot
         }
 
         /// <summary>
-        /// 指定座標に最も近いノード取得
+        /// 指定座標に最も近いノード取得（maxDistance を超える場合は null）
         /// </summary>
-        private NodeData GetNearestNode(Vector3 pos)
+        private NodeData GetNearestNode(Vector3 pos, float maxDistance = float.MaxValue)
         {
-            float minDistance = float.MaxValue;
+            float minDistance = maxDistance;
             NodeData nodeData = null;
+            if (Nodes == null) return null;
+
             foreach (var cell in Nodes)
             {
                 if (cell == null) continue;
