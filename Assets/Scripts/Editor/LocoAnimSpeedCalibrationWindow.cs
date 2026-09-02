@@ -13,7 +13,7 @@ namespace September.EditorExtension
         private const int DefaultSampleRate = 120;
 
         [SerializeField] private AnimationClipPlayerManager _target;
-        [SerializeField, Range(30, 240)] private int _sampleRate = DefaultSampleRate;
+        [SerializeField] private int _sampleRate = DefaultSampleRate;
 
         private LocoAnimSpeedEstimate _walkEstimate;
         private LocoAnimSpeedEstimate _runEstimate;

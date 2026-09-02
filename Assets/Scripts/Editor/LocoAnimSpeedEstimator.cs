@@ -75,25 +75,16 @@ namespace September.EditorExtension
 
             try
             {
-                sampleObject = UnityEngine.Object.Instantiate(sourceAnimator.gameObject);
-                sampleObject.name = $"{sourceAnimator.gameObject.name}_LocoSpeedSample";
+                sampleObject = new GameObject(sourceAnimator.gameObject.name);
                 sampleObject.hideFlags = HideFlags.HideAndDontSave;
                 sampleObject.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 sampleObject.transform.localScale = sourceAnimator.transform.lossyScale;
 
-                foreach (var child in sampleObject.GetComponentsInChildren<Transform>(true))
-                {
-                    child.gameObject.hideFlags = HideFlags.HideAndDontSave;
-                }
+                // GameplayコンポーネントのAwake/OnEnableを実行しないよう、Transform階層だけを再構築する。
+                CloneTransformChildren(sourceAnimator.transform, sampleObject.transform);
 
-                var sampleAnimator = sampleObject.GetComponent<Animator>();
-                if (sampleAnimator == null)
-                {
-                    error = "解析用Animatorの複製に失敗しました。";
-                    return false;
-                }
-
-                sampleAnimator.enabled = true;
+                var sampleAnimator = sampleObject.AddComponent<Animator>();
+                sampleAnimator.avatar = sourceAnimator.avatar;
                 sampleAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
                 sampleAnimator.applyRootMotion = false;
                 sampleAnimator.fireEvents = false;
@@ -144,6 +135,25 @@ namespace September.EditorExtension
             {
                 if (graph.IsValid()) graph.Destroy();
                 if (sampleObject != null) UnityEngine.Object.DestroyImmediate(sampleObject);
+            }
+        }
+
+        private static void CloneTransformChildren(Transform sourceParent, Transform destinationParent)
+        {
+            for (int i = 0; i < sourceParent.childCount; i++)
+            {
+                Transform sourceChild = sourceParent.GetChild(i);
+                var destinationObject = new GameObject(sourceChild.name)
+                {
+                    hideFlags = HideFlags.HideAndDontSave
+                };
+                Transform destinationChild = destinationObject.transform;
+                destinationChild.SetParent(destinationParent, false);
+                destinationChild.localPosition = sourceChild.localPosition;
+                destinationChild.localRotation = sourceChild.localRotation;
+                destinationChild.localScale = sourceChild.localScale;
+
+                CloneTransformChildren(sourceChild, destinationChild);
             }
         }
 
