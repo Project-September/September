@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
 using InGame.Jewelry.Common;
+using September.Common;
 using UnityEngine;
 
 namespace September.InGame.Jewelry.Drop
@@ -29,7 +30,7 @@ namespace September.InGame.Jewelry.Drop
             var runner = NetworkRunner.Instances[0];
             if (!runner) return;
 
-            var targetObj = runner.GetPlayerObject(hitData.TargetRef);
+            var targetObj = PlayerDatabase.Instance.PlayerObjectDic[hitData.TargetRef];
             var jewelryContainer = targetObj.GetComponentInChildren<IJewelryContainer>();
             if (jewelryContainer == null) return;
 
