@@ -52,6 +52,31 @@ namespace InGame.Jewelry
             Velocity = velocity;
         }
 
+        /// <summary>
+        /// 目標位置に向かって放物運動を行います
+        /// </summary>
+        /// <param name="position">目標位置</param>
+        /// <param name="maxHeight">最高到達点の高さ（変位）　値は0以上にしてください</param>
+        public void ThrowTo(Vector3 position, float maxHeight)
+        {
+            if (maxHeight < 0)
+            {
+                maxHeight = Mathf.Abs(position.y - transform.position.y) + 2f;
+                Debug.LogWarning("maxHeightは正の値にしてください", this);
+            }
+            float vy = Mathf.Sqrt(2 * _gravity * maxHeight); // y方向の初速
+            float a = vy * vy - 2 * _gravity * (position.y - transform.position.y);
+            if (a < 0)
+            {
+                Debug.LogWarning("maxHeightが最高到達点より低い位置にあるため、放物線を求めることができませんでした", this);
+                return;
+            }
+            float t = (vy + Mathf.Sqrt(a)) / _gravity; // 最終地点に到達するまでの時間
+            Vector3 vh = (position - transform.position) / t; // 水平方向の初速
+            Vector3 v = new(vh.x, vy, vh.z); // 初速
+            Velocity = v;
+        }
+
         public async UniTask PlayGetMove(Transform target)
         {
             const float duration = 1f;

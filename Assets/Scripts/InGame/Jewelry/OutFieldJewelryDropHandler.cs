@@ -1,0 +1,67 @@
+using InGame.Jewelry.Common;
+using InGame.Player;
+using September.Common.Attribute;
+using UnityEngine;
+using UnityEngine.AI;
+using Random = UnityEngine.Random;
+
+namespace September.InGame.Jewelry
+{
+    public class OutFieldJewelryDropHandler : MonoBehaviour
+    {
+        [SerializeField] private PlayerRespawn _playerRespawn;
+        [SerializeField, RequireInterface(typeof(IJewelryContainer))] private Component _jewelryContainerObj;
+        [SerializeField] private PlayerMovement _playerMovement;
+
+        private IJewelryContainer _jewelryContainer;
+
+        private Vector3 _prevGroundedPos;
+
+        public void Start()
+        {
+            _jewelryContainer = _jewelryContainerObj as IJewelryContainer;
+            _playerRespawn.OnOutFieldEvent += OnOutField;
+        }
+
+        private void Update()
+        {
+            if (_playerMovement.IsGroundNet)
+            {
+                Debug.Log(transform.position);
+                _prevGroundedPos = transform.position;
+            }
+        }
+
+        private void OnOutField()
+        {
+            int count = _jewelryContainer.GetJewelryCount(JewelryType.NormalGem) / 2;
+            var dropped = new IJewelry[count];
+            _jewelryContainer.DropJewelry(JewelryType.NormalGem, count, dropped);
+
+            DebugDrawUtility.DrawWireSphere(_prevGroundedPos, 1f, Color.green, 5f);
+
+            foreach (IJewelry drop in dropped)
+            {
+                if (drop is global::InGame.Jewelry.Jewelry jewelry)
+                {
+                    Vector3 pos = GetRandomPosition();
+                    DebugDrawUtility.DrawWireSphere(pos, 1f, Color.red, 5f);
+                    jewelry.JewelryControl.ThrowTo(pos, (pos.y - transform.position.y) + 2f);
+                }
+            }
+        }
+
+        private Vector3 GetRandomPosition()
+        {
+            var insideUnitCircle = Random.insideUnitCircle;
+            var randomOffset = new Vector3(insideUnitCircle.x, 0, insideUnitCircle.y) * 2f;
+            var target = _prevGroundedPos + randomOffset;
+            if (NavMesh.SamplePosition(target, out NavMeshHit hit, 50f, NavMesh.AllAreas))
+            {
+                return hit.position;
+            }
+
+            return _prevGroundedPos;
+        }
+    }
+}

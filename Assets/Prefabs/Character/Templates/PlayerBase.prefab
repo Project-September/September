@@ -5437,6 +5437,7 @@ GameObject:
   - component: {fileID: 8026515877087289600}
   - component: {fileID: 202504370253565435}
   - component: {fileID: 846463964584838234}
+  - component: {fileID: 2520683386849973483}
   m_Layer: 6
   m_Name: PlayerBase
   m_TagString: Player
@@ -6186,8 +6187,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _coolTime: 3
-  _outFieldHeight: -20
   _playerManager: {fileID: -4668177863944640257}
+--- !u!114 &2520683386849973483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d6f1bbf38834db98ae4a378155fd874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerRespawn: {fileID: 846463964584838234}
+  _jewelryContainerObj: {fileID: 8026515877087289600}
+  _playerMovement: {fileID: 3242880713039265549}
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0
