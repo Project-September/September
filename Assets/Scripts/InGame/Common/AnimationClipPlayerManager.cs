@@ -95,8 +95,9 @@ namespace InGame.Common
                 .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(this);
 
             // 回避開始 Tick の変化で発火する。Networked 状態由来なので、ホスト・予測中のクライアント・リモート表示の全てが同じ経路で再生される
+            // 回避中でなければ 0 に落とす。終了後も StartTick は残るため、途中参加時に過去の回避を再生してしまうのを防ぐ
             _playerMovement.UpdateAsObservable()
-                .Select(_ => _playerMovement.EvasionStartTick)
+                .Select(_ => _playerMovement.IsEvading ? _playerMovement.EvasionStartTick : 0)
                 .DistinctUntilChanged()
                 .Where(startTick => startTick > 0)
                 .Subscribe(_ =>
