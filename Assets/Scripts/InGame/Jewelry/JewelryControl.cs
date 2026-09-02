@@ -108,7 +108,7 @@ namespace InGame.Jewelry
         /// <summary>
         /// 物理判定を無効化し、目標位置に向かって放物運動を行います
         /// </summary>
-        public void ThrowToNonPhysics(Vector3 position, float maxHeight, float duration, AnimationCurve ease)
+        public void ThrowToNonPhysics(Vector3 position, float maxHeight, float duration, AnimationCurve verticalEase, AnimationCurve horizontalEase)
         {
             _physicsEnabled = false;
             _collider.enabled = false;
@@ -135,13 +135,16 @@ namespace InGame.Jewelry
 
             Vector3 startPos = transform.position;
 
-            DOTween.To(() => 0f, e =>
+            DOTween.To(() => 0f, t =>
             {
-                float t = e * duration;
-                Vector3 g = new(0f, gravity, 0f);
-                Vector3 p = v * t - 0.5f * g * t * t;
+                float tv = verticalEase.Evaluate(t) * duration;
+                float th = horizontalEase.Evaluate(t) * duration;
+
+                float y = v.y * tv - 0.5f * gravity * tv * tv;
+
+                Vector3 p = new(v.x * th, y, v.z * th);
                 transform.position = startPos + p;
-            }, 1f, duration).SetEase(ease)
+            }, 1, duration).SetEase(Ease.Linear)
             .onComplete += SetGrounded;
         }
 

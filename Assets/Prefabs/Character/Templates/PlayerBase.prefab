@@ -6204,35 +6204,69 @@ MonoBehaviour:
   _jewelryContainerObj: {fileID: 8026515877087289600}
   _playerMovement: {fileID: 3242880713039265549}
   _height: 1.5
+  _randomHeight: 0.3
   _duration: 1.5
   _randomDuration: 0.5
-  _ease:
+  _verticalEase:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2.071212
-      outSlope: 2.071212
+      inSlope: 1.964744
+      outSlope: 1.964744
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.18324688
+      outWeight: 0.20588568
     - serializedVersion: 3
-      time: 0.355768
-      value: 0.47202158
-      inSlope: 0.90450734
-      outSlope: 0.90450734
+      time: 0.34348303
+      value: 0.45300847
+      inSlope: 0.7965681
+      outSlope: 0.7965681
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.20800081
-      outWeight: 0.14650302
+      inWeight: 0.188608
+      outWeight: 0.20969991
+    - serializedVersion: 3
+      time: 0.6093591
+      value: 0.62306017
+      inSlope: 0.6843365
+      outSlope: 0.6843365
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.1655589
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0.819547
+      inSlope: 1.454781
       outSlope: 0
-      tangentMode: 5
+      tangentMode: 1
+      weightedMode: 0
+      inWeight: 0.1803537
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _horizontalEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
