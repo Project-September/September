@@ -43,11 +43,32 @@ public class SharkInteractable : MountableExhibitBase
 
     private void OnInteractingStateChanged()
     {
-        _animator.enabled = IsSharkInteracting;
+        if (IsSharkInteracting)
+        {
+            _animator.enabled = true;
+            return;
+        }
+
+        ResetAnimator();
+    }
+
+    /// <summary>
+    /// アニメーターを既定ステート・既定ポーズへ戻してから停止する
+    /// <para>停止するだけでは終了時点のポーズが次のインタラクトまで残り続けるため</para>
+    /// </summary>
+    private void ResetAnimator()
+    {
+        _animator.enabled = true;
+        _animator.Rebind();   // ステートとパラメータを初期値へ戻す
+        _animator.Update(0f); // 既定ポーズを即時反映させてから停止する
+        _animator.enabled = false;
     }
 
     public override void Render()
     {
+        // インタラクト中以外はアニメーターを止めているため、パラメータも更新しない
+        // (停止中に更新すると、次に有効化した瞬間に古い値でポーズが決まってしまう)
+        if (!IsSharkInteracting) return;
         _animator.SetFloat(Speed, _movementProcessing.CurrentSpeedRatio);
         _animator.SetBool(IsMoving, _movementProcessing.CurrentSpeedRatio > _idleSpeedThreshold);
     }
@@ -56,7 +77,7 @@ public class SharkInteractable : MountableExhibitBase
     {
         base.Spawned();
         _interactableBase = GetComponent<InteractableBase>();
-        _animator.enabled = false;
+        ResetAnimator();
     }
 
     public override void GetOn(PlayerRef playerRef)
@@ -72,9 +93,17 @@ public class SharkInteractable : MountableExhibitBase
 
     public override void GetOff(PlayerRef playerRef)
     {
+        // baseでKinematicへ戻される前に、残留速度と速度カーブの蓄積時間をリセットする
+        _movementProcessing.OnInteractEnd(Rigidbody);
+
         base.GetOff(playerRef);
         IsSharkInteracting = false;
         _interactableBase.ForceSetInteractable = true;
+
+        // 攻撃状態を次のインタラクトへ持ち越さない
+        IsAttacking = false;
+        _attackAnimationFrame = 0;
+        _cooldownTimer = _cooldownTime;
 
         // インタラクトしていたプレイヤーを取得し、海に落ちる直前の位置に移動させる
         var obj = StaticServiceLocator.Instance.Get<InGameManager>()
@@ -84,6 +113,8 @@ public class SharkInteractable : MountableExhibitBase
 
     public override void FixedUpdateNetwork()
     {
+        // 解除後も移動処理が走ると、リセットした速度と蓄積時間が復活してしまう
+        if (!IsSharkInteracting) return;
         if (!GetInput<PlayerInput>(out var playerInput)) return;
         _movementProcessing.UpdateMovement(playerInput, Runner.DeltaTime, Rigidbody, playerInput.DesiredLookDirection);
     }

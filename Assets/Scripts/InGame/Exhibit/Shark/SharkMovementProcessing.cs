@@ -164,8 +164,34 @@ public class SharkMovementProcessing : NetworkBehaviour
 
     public void OnInteractStart()
     {
+        ResetMovementState();
         LastGroundedTime = Runner.SimulationTime;
         PositionBeforeWaterFall = transform.position;
+    }
+
+    /// <summary>
+    /// インタラクト終了時の移動状態リセット
+    /// </summary>
+    /// <param name="rb">サメのRigidbody</param>
+    public void OnInteractEnd(Rigidbody rb)
+    {
+        ResetMovementState();
+
+        if (rb == null || rb.isKinematic) return;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+
+    /// <summary>
+    /// 速度に関わる状態を初期値へ戻す
+    /// <para>残したままだと次のインタラクトが前回終了時の速度から始まってしまう</para>
+    /// </summary>
+    private void ResetMovementState()
+    {
+        _keepMovingTime = 0;
+        CurrentSpeedRatio = 0;
+        _isGrounded = false;
+        _currentGroundNormal = Vector3.up;
     }
 
     private void OnDrawGizmosSelected()
