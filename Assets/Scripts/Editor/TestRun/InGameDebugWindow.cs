@@ -47,12 +47,11 @@ namespace September.Editor.InGameDebug
 			_lobbyData.MapType = (MapType)EditorGUILayout.EnumPopup("Map Type", _lobbyData.MapType);
 			_lobbyData.LobbyName = EditorGUILayout.TextField("Lobby Name", _lobbyData.LobbyName);
 			_lobbyData.Nickname = EditorGUILayout.TextField("Nickname", _lobbyData.Nickname);
-			_lobbyData.TimeSettings ??= new InGameDebugTimeSettings();
 
 			EditorGUILayout.BeginVertical("box");
 			EditorGUILayout.LabelField("Time Settings", EditorStyles.boldLabel);
-			_lobbyData.TimeSettings.PreStartTime = EditorGUILayout.IntField(
-				"Pre Start Time", Mathf.Max(0, _lobbyData.TimeSettings.PreStartTime));
+			_lobbyData.TimeSettings.PreStartTime = Mathf.Max(0, EditorGUILayout.IntField(
+				"Pre Start Time", _lobbyData.TimeSettings.PreStartTime));
 			_lobbyData.TimeSettings.GameTime = Mathf.Max(0f, EditorGUILayout.FloatField(
 				"Game Time", _lobbyData.TimeSettings.GameTime));
 			EditorGUILayout.EndVertical();
