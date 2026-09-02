@@ -17,6 +17,7 @@ namespace InGame.Player
         [SerializeField] private CapsuleCollider _moveCapsuleCollider;
         [SerializeField] private float _moveSpeed;
         [SerializeField, Tooltip("地面と認識する最大角度")] private float _groundSlopeThreshold = 45f;
+        [SerializeField, Tooltip("地面と認識する最大距離")] private float _groundDistanceThreshold = 0.25f;
         [SerializeField] private LayerMask _groundLayer = ~0;
         [Header("鬼状態時の移動速度")]
         [SerializeField] private float _ogreMoveSpeed;
@@ -74,6 +75,8 @@ namespace InGame.Player
         private bool _doingVault;
         // Roll
         private PlayerEvasion _playerEvasion;
+        /// <summary> 回避の同期状態。Tick 基準なので入力権限側の予測でも決定的に再計算できる </summary>
+        [Networked, HideInInspector] public EvasionState Evasion { get; private set; }
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
@@ -100,13 +103,14 @@ namespace InGame.Player
         public bool InfiniteStamina { get; set; } = false;
         public CapsuleCollider MoveCapsuleCollider => _moveCapsuleCollider;
         public LayerMask GroundLayer => _groundLayer;
-        public bool IsEvading => _playerEvasion.IsEvading;
+        public bool IsEvading => Evasion.IsEvading;
+        /// <summary> 回避を開始した Tick </summary>
+        public int EvasionStartTick => Evasion.StartTick;
+        /// <summary> 回避全体の所要時間 (秒、重量係数適用後) </summary>
+        public float EvasionDuration => Evasion.RollDuration;
         [Networked] public bool IgnoreMoveInput { get; set; }
         [Networked] public bool IgnoreEvasionInput { get; set; }
         [Networked] public bool IsHookLocked { get; set; }
-
-        private readonly Subject<float> _onEvasion = new();
-        public IObservable<float> OnEvasion => _onEvasion;
 
         private void Awake()
         {
@@ -125,10 +129,6 @@ namespace InGame.Player
             _prePos = transform.position;
 
             _playerEvasion = new(_evasionData);
-            _playerEvasion.EvasionEnded += () =>
-            {
-                _playerHealth.IsInvincible = false;
-            };
         }
 
 
@@ -145,34 +145,38 @@ namespace InGame.Player
                 _moveVelocity = followDirection * _hookPower;
             }
 
-            if (IgnoreMoveInput || IsHookLocked || _playerEvasion.IsEvading) moveInput = Vector2.zero;
+            if (IgnoreMoveInput || IsHookLocked || IsEvading) moveInput = Vector2.zero;
 
             Vector2 moveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             // set velocity
-            if (!_playerEvasion.IsEvading && isJump && HasStateAuthority) TryVault(moveDirection);
+            if (!IsEvading && isJump && HasStateAuthority) TryVault(moveDirection);
 
-            //回避
-            if (!IgnoreEvasionInput && IsGround && !DoingVault && isEvasion && HasStateAuthority)
+            //回避 状態が Networked なので入力権限のみのクライアントでも予測し、再シミュレーションで補正される
+            if (!IgnoreEvasionInput && IsGround && !DoingVault && isEvasion)
                 StartEvasion();
 
-            if (DoingVault || _playerEvasion.IsEvading)
+            if (DoingVault)
                 return;
 
-            Move(moveDirection, isDash, cameraYaw, deltaTime);
+            if (IsEvading)
+                _isDash = false;
+            else
+                Move(moveDirection, isDash, cameraYaw, deltaTime);
+
             AdsorptionOnGround();
         }
 
         private void StartEvasion()
         {
+            var state = Evasion;
             int jewelryCount = _playerJewelryRuntime.CalculateJewelryScore();
-            var succeeded = _playerEvasion.TryStartEvasion(MoveDirection, transform.forward, Runner.SimulationTime, jewelryCount, out float animationDurationScale);
 
-            if (succeeded)
-            {
-                Stop();
-                _onEvasion.OnNext(animationDurationScale);
-            }
+            if (!_playerEvasion.TryStartEvasion(ref state, MoveDirection, transform.forward, Runner.Tick, Runner.DeltaTime, jewelryCount))
+                return;
+
+            Evasion = state;
+            Stop();
         }
 
         /// <summary> 入力無関係のTick UpdateMovementとの呼び出し順序を確定させるためにManagerから呼ばれる </summary>
@@ -181,19 +185,7 @@ namespace InGame.Player
             CheckGroundManual();
 
             //回避
-            if (_playerEvasion.IsEvading)
-            {
-                transform.position = _playerEvasion.Move(transform.position, Runner.SimulationTime);
-                transform.forward = _playerEvasion.Turn(transform.forward, Runner.SimulationTime);
-
-                //無敵状態更新
-                bool isInvincible = _playerEvasion.IsInvincible(Runner.SimulationTime);
-
-                if (isInvincible != _playerHealth.IsInvincible)
-                    _playerHealth.IsInvincible = isInvincible;
-
-                return;
-            }
+            if (IsEvading) UpdateEvasion();
 
             if (DoingVault && HasStateAuthority) UpdateVault(deltaTime);
 
@@ -221,6 +213,42 @@ namespace InGame.Player
             _isGround = false;
             _groundNormal = Vector3.up;
             _moveVelocity = Vector3.zero;
+        }
+
+        /// <summary> 回避中の 1 Tick 分の更新。Tick 基準なので予測・再シミュレーションでも同じ結果になる </summary>
+        private void UpdateEvasion()
+        {
+            var state = Evasion;
+            int tick = Runner.Tick;
+            float dt = Runner.DeltaTime;
+
+            if (_playerEvasion.HasEnded(in state, tick, dt))
+            {
+                state.IsEvading = false;
+                state.LastEndTick = tick;
+                Evasion = state;
+
+                if (HasStateAuthority) _playerHealth.IsInvincible = false;
+                return;
+            }
+
+            // 速度ベースで移動する。Rigidbody が壁との衝突を解決するので座標直書きによる壁登りが起きない
+            Vector3 horizontalVelocity = _playerEvasion.CalcVelocity(in state, tick, dt);
+            _moveVelocity = Quaternion.FromToRotation(Vector3.up, _groundNormal) * horizontalVelocity;
+
+            Vector3 forward = _playerEvasion.CalcForward(in state, tick, dt);
+            _rb.rotation = Quaternion.LookRotation(forward);
+            // RotationByDirection が同じ向きへ RotateTowards するので実質 no-op
+            SetRotationDirection(forward);
+
+            //無敵状態更新
+            if (HasStateAuthority)
+            {
+                bool isInvincible = _playerEvasion.IsInvincible(in state, tick, dt);
+
+                if (isInvincible != _playerHealth.IsInvincible)
+                    _playerHealth.IsInvincible = isInvincible;
+            }
         }
 
         /// <summary> カメラ視点の移動入力を取得 </summary>
@@ -561,7 +589,7 @@ namespace InGame.Player
         {
             Vector3 origin = transform.position + Vector3.up * 0.1f;
 
-            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, 0.2f, _groundLayer))
+            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, _groundDistanceThreshold, _groundLayer))
             {
                 if (Vector3.Angle(Vector3.up, hitInfo.normal) <= _groundSlopeThreshold)
                 {
