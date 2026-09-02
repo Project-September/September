@@ -108,7 +108,7 @@ namespace InGame.Jewelry
         /// <summary>
         /// 物理判定を無効化し、目標位置に向かって放物運動を行います
         /// </summary>
-        public void ThrowToNonPhysics(Vector3 position, float maxHeight, float duration, Ease ease = Ease.Linear)
+        public void ThrowToNonPhysics(Vector3 position, float maxHeight, float duration, AnimationCurve ease)
         {
             _physicsEnabled = false;
             _collider.enabled = false;

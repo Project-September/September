@@ -6203,6 +6203,41 @@ MonoBehaviour:
   _playerRespawn: {fileID: 846463964584838234}
   _jewelryContainerObj: {fileID: 8026515877087289600}
   _playerMovement: {fileID: 3242880713039265549}
+  _height: 1.5
+  _duration: 1.5
+  _ease:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2.071212
+      outSlope: 2.071212
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.18324688
+    - serializedVersion: 3
+      time: 0.355768
+      value: 0.47202158
+      inSlope: 0.90450734
+      outSlope: 0.90450734
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.20800081
+      outWeight: 0.14650302
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.819547
+      outSlope: 0
+      tangentMode: 5
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8408815403407481762
 GameObject:
   m_ObjectHideFlags: 0

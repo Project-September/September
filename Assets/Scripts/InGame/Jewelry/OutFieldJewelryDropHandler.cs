@@ -1,3 +1,4 @@
+using DG.Tweening;
 using InGame.Jewelry.Common;
 using InGame.Player;
 using September.Common.Attribute;
@@ -13,6 +14,10 @@ namespace September.InGame.Jewelry
         [SerializeField, RequireInterface(typeof(IJewelryContainer))] private Component _jewelryContainerObj;
         [SerializeField] private PlayerMovement _playerMovement;
 
+        [SerializeField] private float _height = 1f;
+        [SerializeField] private float _duration = 0.7f;
+        [SerializeField] private AnimationCurve _ease;
+
         private IJewelryContainer _jewelryContainer;
 
         private Vector3 _prevGroundedPos;
@@ -27,7 +32,6 @@ namespace September.InGame.Jewelry
         {
             if (_playerMovement.IsGroundNet)
             {
-                Debug.Log(transform.position);
                 _prevGroundedPos = transform.position;
             }
         }
@@ -46,7 +50,7 @@ namespace September.InGame.Jewelry
                 {
                     Vector3 pos = GetRandomPosition();
                     DebugDrawUtility.DrawWireSphere(pos, 1f, Color.red, 5f);
-                    jewelry.JewelryControl.ThrowTo(pos, (pos.y - transform.position.y) + 2f);
+                    jewelry.JewelryControl.ThrowToNonPhysics(pos, (pos.y - transform.position.y) + _height, _duration, _ease);
                 }
             }
         }
@@ -56,7 +60,7 @@ namespace September.InGame.Jewelry
             var insideUnitCircle = Random.insideUnitCircle;
             var randomOffset = new Vector3(insideUnitCircle.x, 0, insideUnitCircle.y) * 2f;
             var target = _prevGroundedPos + randomOffset;
-            if (NavMesh.SamplePosition(target, out NavMeshHit hit, 50f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(target, out NavMeshHit hit, 10f, NavMesh.AllAreas))
             {
                 return hit.position;
             }
