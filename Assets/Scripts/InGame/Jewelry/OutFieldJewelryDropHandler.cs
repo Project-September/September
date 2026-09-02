@@ -1,4 +1,3 @@
-using DG.Tweening;
 using InGame.Jewelry.Common;
 using InGame.Player;
 using September.Common.Attribute;
@@ -14,6 +13,7 @@ namespace September.InGame.Jewelry
         [SerializeField, RequireInterface(typeof(IJewelryContainer))] private Component _jewelryContainerObj;
         [SerializeField] private PlayerMovement _playerMovement;
 
+        [Header("宝石ドロップアニメーション設定")]
         [SerializeField] private float _height = 1f;
         [SerializeField] private float _randomHeight = 0.3f;
         [SerializeField] private float _duration = 0.7f;
