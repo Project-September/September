@@ -48,6 +48,19 @@ Unity はプロジェクトを開くと `ProjectSettings/ProjectVersion.txt` を
 
 `Logs/compile-check.log` に Unity のログが残る (`Logs/` は `.gitignore` 済み)。
 
+## 外部アセットが必要
+
+Photon Fusion / CRI ADX / NaughtyAttributes / Final IK などの外部アセットは `.gitignore` 対象
+(`/[Aa]ssets/Plugins/`、`Assets/CRIMW/`) でリポジトリに含まれず、Unity メニューの
+**`September/Import` (アセットインポートツール)** から取得します。
+
+そのため**クローンしただけの作業ツリーはコンパイルできません**。検査は、アセットをインポート済みの
+チェックアウトに対して実行してください (`.github/workflows/build.cmd` が固定パスを `git pull` して
+使い回しているのと同じ理由です)。
+
+外部アセット由来の `CS0246` を検出した場合、スクリプトはコンパイルエラー (終了コード 1) ではなく
+**検査不能 (終了コード 2)** として報告します。「コードが壊れている」と誤読しないためです。
+
 ## バージョンが違う Unity で動かす場合
 
 要求バージョンが入っていないとき、既定では**実行せずに終了コード 2 で失敗する**。

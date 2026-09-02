@@ -184,6 +184,25 @@ function Restore-GuardedFile([string]$Project, $Snapshot) {
     return $restored
 }
 
+# Unity メニューの September/Import (アセットインポートツール) で入れる外部依存の名前空間。
+# これらは .gitignore 対象 (/Assets/Plugins/, Assets/CRIMW/) でリポジトリに含まれないため、
+# クローンしただけの作業ツリーでは大量の CS0246 が出る。コードの問題と区別する必要がある
+$ExternalNamespace = @(
+    'Fusion'          # Photon Fusion
+    'Photon'
+    'CriWare'         # CRI ADX
+    'NaughtyAttributes'
+    'RootMotion'      # Final IK
+    'WebSocketSharp'
+)
+
+function Test-ExternalAssetMissing($ErrorLines) {
+    $names = ($ExternalNamespace -join '|')
+    $pattern = "error CS0246: The type or namespace name '($names)'"
+
+    return @($ErrorLines | Where-Object { $_ -match $pattern }).Count -gt 0
+}
+
 function Get-CompileErrorLine([string]$Path) {
     if (-not (Test-Path $Path)) { return @() }
 
@@ -259,6 +278,15 @@ if ($errorLines.Count -gt 0) {
     Write-Section 'Compile errors'
     $errorLines | ForEach-Object { Write-Host $_ }
     Write-Host ''
+
+    # 外部アセット未インポートが混ざっている時点で、残りのエラーもその巻き添えの可能性が高い。
+    # コードの問題として報告すると誤解を招くため、検査不能として扱う
+    if (Test-ExternalAssetMissing $errorLines) {
+        Write-Failure ("外部アセットが未インポートのため検査できません ({0} など)。" -f ($ExternalNamespace -join ' / ')) 
+        Write-Failure 'Unity の September/Import からアセットをインポート済みの作業ツリーに対して実行してください。クローン直後の作業ツリーでは検査できません'
+        exit $ExitSetupError
+    }
+
     Write-Host ("コンパイルエラー {0} 件。詳細は {1}" -f $errorLines.Count, $LogFile)
     exit $ExitCompileError
 }
