@@ -38,8 +38,15 @@ namespace InGame.Common
         [SerializeField] private AnimationCurve _fallInCurve = null;   // null の場合は線形扱い
         [SerializeField, Range(0f, 1f)] private float _landOutTime = 0.12f;
         [SerializeField] private AnimationCurve _landOutCurve = null;
-        [SerializeField] private float _walkAnimSpeed = 1f;
-        [SerializeField] private float _runAnimSpeed = 2f;
+        [Header("Loco Playback Rate")]
+        [SerializeField, Tooltip("歩き/走りクリップに焼かれたルート移動量 (averageSpeed) から基準速度を自動算出する。焼かれていないクリップは下の手入力値を使う")]
+        private bool _useClipAverageSpeed = true;
+        [SerializeField, Tooltip("歩きクリップが 1 倍速で進む速さ (m/s)。自動算出できない場合に使用")]
+        private float _walkAnimSpeed = 1f;
+        [SerializeField, Tooltip("走りクリップが 1 倍速で進む速さ (m/s)。自動算出できない場合に使用")]
+        private float _runAnimSpeed = 2f;
+        private float _walkBaseSpeed;
+        private float _runBaseSpeed;
 
         [Header("被ダメ")]
         [SerializeField] private AnimationClip _hitReactionClip = null;
@@ -59,6 +66,8 @@ namespace InGame.Common
 
         private void Start()
         {
+            ResolveLocoBaseSpeeds();
+
             _playerManager.ObserveEveryValueChanged(x => x.IsStun)
                 .Subscribe(isStun =>
                 {
@@ -144,6 +153,23 @@ namespace InGame.Common
 
         [Networked] public bool EnableFallMotion { get; set; } = true;
 
+        /// <summary>
+        /// 歩き/走りクリップの基準速度を決める。クリップに焼かれたルート移動量を優先し、
+        /// 無い場合や自動算出を切っている場合は Inspector の手入力値を使う。
+        /// </summary>
+        private void ResolveLocoBaseSpeeds()
+        {
+            if (!_useClipAverageSpeed || _animationClipPlayer == null)
+            {
+                _walkBaseSpeed = _walkAnimSpeed;
+                _runBaseSpeed = _runAnimSpeed;
+                return;
+            }
+
+            _walkBaseSpeed = LocoAnimSpeedSource.Resolve(_animationClipPlayer.WalkClip, _walkAnimSpeed, nameof(_walkAnimSpeed), this);
+            _runBaseSpeed = LocoAnimSpeedSource.Resolve(_animationClipPlayer.RunClip, _runAnimSpeed, nameof(_runAnimSpeed), this);
+        }
+
         private void LateUpdate()
         {
             if (!_animationClipPlayer) return;
@@ -166,10 +192,10 @@ namespace InGame.Common
             // 速度を歩き〜走りの割合に変換
             var speedRate = Mathf.InverseLerp(walkSpeed, maxSpeed, speed);
 
-            // その割合でアニメーション基準速度を補間
+            // その割合でアニメーション基準速度 (1 倍速で進む m/s) を補間
             var baseSpeed = Mathf.Lerp(
-                _walkAnimSpeed,
-                _runAnimSpeed,
+                _walkBaseSpeed,
+                _runBaseSpeed,
                 speedRate);
 
             var playbackRate = baseSpeed > 0f ? speed / baseSpeed : 0f;

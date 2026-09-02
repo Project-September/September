@@ -29,8 +29,17 @@ namespace InGame.Common
         [SerializeField] protected Animator _animator;
 
         private PlayableGraph _graph;
+        private AnimationPlayableOutput _output;
         private AnimationMixerPlayable _baseMixer;
         private AnimationLayerMixerPlayable _layerMixer;
+
+        /// <summary>グラフ評価 (LateUpdate) の直前に呼ばれる。足 IK など出力後処理のパラメータ更新用。</summary>
+        public event Action BeforeEvaluate;
+
+        public PlayableGraph Graph => _graph;
+        public Animator Animator => _animator;
+        public AnimationClip WalkClip => _walk;
+        public AnimationClip RunClip => _run;
 
         /// <summary>
         /// LayerMixerに登録しているInputSlotのindex
@@ -84,11 +93,11 @@ namespace InGame.Common
             _graph = PlayableGraph.Create("AnimationClipPlayerGraph");
             _graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
 
-            var output = AnimationPlayableOutput.Create(_graph, "AnimationOutput", _animator);
-            output.SetWeight(1f);
+            _output = AnimationPlayableOutput.Create(_graph, "AnimationOutput", _animator);
+            _output.SetWeight(1f);
 
             _layerMixer = AnimationLayerMixerPlayable.Create(_graph, _layerInfo.Count);
-            output.SetSourcePlayable(_layerMixer);
+            _output.SetSourcePlayable(_layerMixer);
 
             _baseMixer = AnimationMixerPlayable.Create(_graph, 3);
             var baseSlot = _slotOf[LayerInfo.LayerType.Base];
@@ -151,7 +160,28 @@ namespace InGame.Common
 
         public void LateUpdate()
         {
+            BeforeEvaluate?.Invoke();
             _graph.Evaluate(Time.deltaTime * _graphSpeed);
+        }
+
+        /// <summary>
+        /// レイヤーミキサーと Animator 出力の間に後処理 Playable (足 IK ジョブ等) を差し込む。
+        /// processor の入力 0 にレイヤーミキサーを接続する。グラフが無効なら false。
+        /// グラフは再初期化されることがあるため、呼び出し側は Playable の IsValid で再差し込みを判断すること。
+        /// </summary>
+        public bool TryInstallOutputProcessor(Playable processor)
+        {
+            if (!_graph.IsValid() || !processor.IsValid() || !_layerMixer.IsValid()) return false;
+            if (processor.GetInputCount() < 1)
+            {
+                Debug.LogError("[AnimationClipPlayer] 出力後処理 Playable は入力を 1 つ以上持つ必要があります。");
+                return false;
+            }
+
+            processor.ConnectInput(0, _layerMixer, 0);
+            processor.SetInputWeight(0, 1f);
+            _output.SetSourcePlayable(processor);
+            return true;
         }
         #endregion
 
@@ -420,7 +450,9 @@ namespace InGame.Common
             _clipOf[layerType] = clip;
 
             var p = AnimationClipPlayable.Create(_graph, clip);
-            p.SetApplyFootIK(false);
+            // Humanoid の Foot IK はクリップに焼かれた足位置へ補正し、リターゲットによる足滑りを防ぐ。
+            // 意図的に切りたいクリップだけ AnimationClipsContainer 側で DisableFootIK を立てる。
+            p.SetApplyFootIK(!IsFootIKDisabledFor(clip));
             p.SetTime(0);
             p.SetDuration(clip.length);
             p.SetSpeed(playSpeed);
@@ -846,6 +878,19 @@ namespace InGame.Common
                 _runtimeClips.Remove(layerType);
                 _clipOf.Remove(layerType);
             }
+        }
+
+        /// <summary>
+        /// AnimationClipsContainer で Foot IK を切る指定があるか。未登録クリップ (TopLayer 等) は既定で有効扱い。
+        /// TryGetMontageIndex と違い、未登録でも警告を出さない。
+        /// </summary>
+        private static bool IsFootIKDisabledFor(AnimationClip clip)
+        {
+            var montages = AnimationClipsContainer.Instance?.AnimationMontages;
+            if (montages == null) return false;
+
+            int index = Array.FindIndex(montages, x => x.AnimClip && (x.AnimClip == clip || x.AnimClip.name == clip.name));
+            return index >= 0 && montages[index].DisableFootIK;
         }
 
         private bool TryGetMontageIndex(AnimationClip clip, out int index)
