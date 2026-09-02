@@ -33,7 +33,7 @@ namespace InGame.Bot
         }
         private void OnDrawGizmos()
         {
-            if (Application.isPlaying && _isDrawGizmo)
+            if (_isDrawGizmo)
             {
                 NodeGanerator.DrawGizmos(Nodes);
             }
