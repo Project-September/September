@@ -17,6 +17,7 @@ namespace InGame.Player
         [SerializeField] private CapsuleCollider _moveCapsuleCollider;
         [SerializeField] private float _moveSpeed;
         [SerializeField, Tooltip("地面と認識する最大角度")] private float _groundSlopeThreshold = 45f;
+        [SerializeField, Tooltip("地面と認識する最大距離")] private float _groundDistanceThreshold = 0.25f;
         [SerializeField] private LayerMask _groundLayer = ~0;
         [Header("鬼状態時の移動速度")]
         [SerializeField] private float _ogreMoveSpeed;
@@ -588,7 +589,7 @@ namespace InGame.Player
         {
             Vector3 origin = transform.position + Vector3.up * 0.1f;
 
-            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, 0.2f, _groundLayer))
+            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, _groundDistanceThreshold, _groundLayer))
             {
                 if (Vector3.Angle(Vector3.up, hitInfo.normal) <= _groundSlopeThreshold)
                 {
