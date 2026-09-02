@@ -39,6 +39,31 @@ namespace September.InGame.NauticalChart
         [SerializeField] private DirectionalLightSettings _normalLight;
         [SerializeField] private DirectionalLightSettings _stormLight;
 
+        #if UNITY_EDITOR
+        [ContextMenu(nameof(Setup))]
+        public void Setup()
+        {
+            UnityEditor.Undo.RecordObject(this, "Reset Skybox");
+            _normalAmbient = new AmbientSettings()
+            {
+                ambientMode = RenderSettings.ambientMode,
+                skyColor = RenderSettings.ambientSkyColor,
+                equatorColor = RenderSettings.ambientEquatorColor,
+                groundColor = RenderSettings.ambientGroundColor,
+                intensity = RenderSettings.ambientIntensity
+            };
+
+            if (!_directionalLight) return;
+
+            _normalLight = new DirectionalLightSettings()
+            {
+                color = _directionalLight.color,
+                intensity = _directionalLight.intensity,
+                shadowStrength = _directionalLight.shadowStrength
+            };
+        }
+        #endif
+
         /// <summary> Skyboxを変更する </summary>
         public void SkyboxChangeStorm()
         {
