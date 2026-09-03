@@ -22,6 +22,15 @@ namespace InGame.Jewelry
             _despawnTimer = TickTimer.CreateFromSeconds(Runner, _jewelryParams.LifeTime);
         }
 
+        public override void FixedUpdateNetwork()
+        {
+            if (_despawnTimer.Expired(Runner))
+            {
+                Runner.Despawn(Object);
+                DespawnedJewelryRepository.AddDespawnedJewelry(_jewelryParams.JewelryType);
+            }
+        }
+
         public override void Render()
         {
             if (_despawnTimer.RemainingTime(Runner) <= _jewelryParams.BlinkStartRemainingTime)
@@ -32,12 +41,6 @@ namespace InGame.Jewelry
                 {
                     r.enabled = blink;
                 }
-            }
-
-            if (_despawnTimer.Expired(Runner))
-            {
-                Runner.Despawn(Object);
-                DespawnedJewelryRepository.AddDespawnedJewelry(_jewelryParams.JewelryType);
             }
         }
 
