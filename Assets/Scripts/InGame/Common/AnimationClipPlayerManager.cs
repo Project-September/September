@@ -56,6 +56,7 @@ namespace InGame.Common
         private float _locoWeight;
         private CancellationTokenSource _jumpOverTokenSrc;
         private CancellationTokenSource _rollEvasionTokenSrc;
+        private bool _ignoreFallAnimation;
 
         private void Start()
         {
@@ -101,6 +102,8 @@ namespace InGame.Common
 
         private void SetFallAnim(bool isGround)
         {
+            if (_ignoreFallAnimation) return;
+
             if (!isGround
                 && EnableFallMotion
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
@@ -292,8 +295,33 @@ namespace InGame.Common
             _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
             _overrideCts = null;
         }
+        public void SetIgnoreFallAnimation(bool value)
+        {
+            _ignoreFallAnimation = value;
 
+            if (value)
+            {
+                // 現在のFallアニメーションを解除
+                if (_animationClipPlayer.IsPlayingTargetClip(_fallDown))
+                {
+                    _isFadingOutFall = false;
 
+                    _animationClipPlayer.PlayOnTopLayer(null);
+                    _animationClipPlayer.SetLayerWeight(
+                        LayerInfo.LayerType.TopLayer,
+                        0f
+                    );
+                }
+
+                return;
+            }
+
+            // Ignoreを解除した時点で空中ならFallを再生
+            if (!_playerMovement.IsGroundNet)
+            {
+                SetFallAnim(false);
+            }
+        }
 
         private async UniTaskVoid PlayFaintSequenceAsync()
         {

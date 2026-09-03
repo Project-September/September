@@ -66,7 +66,6 @@ namespace InGame.Player
         private bool _setDirection;
         private bool _isGround;
         private float _isGroundTimer;
-        private float _groundDistance;
         private Vector3 _groundNormal = Vector3.up;
         private bool _isDashCoolTime;
         private bool CanDash => !_isDashCoolTime && _status.CurrentStamina > 0 && IsGround;
@@ -95,7 +94,6 @@ namespace InGame.Player
         public float WalkSpeed => GetCurrentMoveSpeed();
         public float DashMoveSpeed => GetCurrentDashSpeed();
         public bool IsGround => (_isGround || _isGroundTimer > 0) && !_knockBackActive;
-        public float GroundDistance => _groundDistance;
         [Networked, HideInInspector]
         public NetworkBool IsGroundNet { get; private set; }
         public Vector3 GroundNormal => _groundNormal;
@@ -283,7 +281,6 @@ namespace InGame.Player
                 _isGround = false;
                 _isGroundTimer = 0.1f;
                 _isGroundTimer = 0;
-                _groundDistance = float.MaxValue;
             }
         }
 
@@ -367,7 +364,6 @@ namespace InGame.Player
                 _isGround = true;
                 _isGroundTimer = 0.1f;
                 _groundNormal = hitInfo.normal;
-                _groundDistance = hitInfo.distance;
             }
         }
 
@@ -572,7 +568,6 @@ namespace InGame.Player
                     _isGround = true;
                     _isGroundTimer = 0.1f;
                     _groundNormal = hitInfo.normal;
-                    _groundDistance = hitInfo.distance;
                 }
             }
         }

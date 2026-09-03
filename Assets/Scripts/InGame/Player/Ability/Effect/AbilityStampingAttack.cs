@@ -19,16 +19,18 @@ namespace InGame.Exhibit
         private float _endTime;
 
         private AnimationClipPlayer _animationClipPlayer;
+        private AnimationClipPlayerManager _animationClipPlayerManager;
         private PlayerMovement _playerMovement;
+
         protected override void OnStart()
         {
             _stampingState = StampingState.Falling;
-            _animationClipPlayer.PlayClip(_fallAnimation);
             _playerMovement.IgnoreMoveInput = true;
             _playerMovement.IgnoreEvasionInput = true;
-
-            Debug.Log("ジャンプ切り！！");
+            _animationClipPlayerManager.SetIgnoreFallAnimation(true);
+            _animationClipPlayer.PlayClipLoop(_fallAnimation);
         }
+
         protected override void OnUpdate(float deltaTime)
         {
             switch (_stampingState)
@@ -52,10 +54,10 @@ namespace InGame.Exhibit
         /// </summary>
         private void Falling()
         {
-            if (_playerMovement.GroundDistance < _attackStartGroundDistance)
+            if (GetGroundDistance() < _attackStartGroundDistance)
             {
-                Debug.Log("攻撃！！");
-                PlayAnimation(_attackAnimation);
+                _animationClipPlayer.StopClip(_fallAnimation);
+                _animationClipPlayer.PlayClip(_attackAnimation);
                 _stampingState = StampingState.Attacking;
             }
         }
@@ -67,8 +69,7 @@ namespace InGame.Exhibit
         {
             if (_playerMovement.IsGround)
             {
-                Debug.Log("着地！！");
-                PlayAnimation(_landingAnimation);
+                _animationClipPlayer.PlayClip(_landingAnimation);
                 _endTime = Runner.SimulationTime + _attackedFriezeTime;
                 _stampingState = StampingState.Landing;
             }
@@ -81,23 +82,40 @@ namespace InGame.Exhibit
         {
             if (Runner.SimulationTime > _endTime)
             {
-                Debug.Log("終了！！");
                 _playerMovement.IgnoreMoveInput = false;
                 _playerMovement.IgnoreEvasionInput = false;
+                _animationClipPlayerManager.SetIgnoreFallAnimation(false);
                 RequestEndAbility();
             }
         }
-
-        private void PlayAnimation(AnimationClip clip)
+        
+        /// <summary>
+         /// プレイヤーの足元から真下の地面までの距離を取得する。
+         /// 地面が見つからない場合は float.MaxValue を返す。
+         /// </summary>
+        private float GetGroundDistance()
         {
-            if (!_animationClipPlayer || !clip) return;
+            Vector3 feetPosition = _playerMovement.MoveCapsuleCollider.bounds.min;
 
-            _animationClipPlayer.PlayClip(clip);
+            if (Physics.Raycast(
+                    feetPosition + Vector3.up * 0.01f,
+                    Vector3.down,
+                    out RaycastHit hit,
+                    Mathf.Infinity,
+                    _playerMovement.GroundLayer,
+                    QueryTriggerInteraction.Ignore))
+            {
+                return hit.distance;
+            }
+
+            return float.MaxValue;
         }
+
         public override void SetPlayerComponent(GameObject player)
         {
             _playerMovement = player.GetComponent<PlayerMovement>();
             _animationClipPlayer = player.GetComponent<AnimationClipPlayer>();
+            _animationClipPlayerManager = player.GetComponent<AnimationClipPlayerManager>();
         }
 
         public enum StampingState

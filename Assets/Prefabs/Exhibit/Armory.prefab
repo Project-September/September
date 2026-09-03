@@ -157,7 +157,7 @@ MonoBehaviour:
         - AbilityNormalAttack
         - AbilityHammerAttack
         - AbilityMultiHitAttack
-        _duration: 30
+        _duration: 60
     - rid: 2115540685324288128
       type: {class: AbilityExcaliburAttack, ns: InGame.Player.Ability, asm: Scripts}
       data:
@@ -196,7 +196,7 @@ MonoBehaviour:
         _cooldown: 0
         _phase: 0
         IsEnabled: 1
-        _attackStartGroundDistance: 20
+        _attackStartGroundDistance: 10
         _attackedFriezeTime: 1
         _fallAnimation: {fileID: 7400000, guid: 7bbd6d80626ccbd438383b59cbd9bac7, type: 2}
         _attackAnimation: {fileID: 7400000, guid: a688dc165013d654d84f9e3c24b900e0, type: 2}
