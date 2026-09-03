@@ -5540,6 +5540,7 @@ MonoBehaviour:
   - {fileID: 8026515877087289600}
   - {fileID: 202504370253565435}
   - {fileID: 846463964584838234}
+  - {fileID: 2520683386849973483}
   - {fileID: 4810525472409146702}
   - {fileID: 2132102575819528591}
   - {fileID: 3043690341386287730}
@@ -5626,6 +5627,9 @@ MonoBehaviour:
   _moveCapsuleCollider: {fileID: 3128034714514688337}
   _moveSpeed: 1.8
   _groundSlopeThreshold: 45
+  _groundDistanceThreshold: 0.25
+  _groundSnapDistance: 0.4
+  _coyoteTime: 0.1
   _groundLayer:
     serializedVersion: 2
     m_Bits: 159
@@ -6226,6 +6230,11 @@ MonoBehaviour:
   _playerRespawn: {fileID: 846463964584838234}
   _jewelryContainerObj: {fileID: 8026515877087289600}
   _playerMovement: {fileID: 3242880713039265549}
+  _playerHealth: {fileID: 5358505061852357365}
+  _dropSettings:
+  - {fileID: 11400000, guid: a1ae910b68ab24548aeb22c70f07f662, type: 2}
+  - {fileID: 11400000, guid: 119bedf445fad8b43a29785def84571e, type: 2}
+  _hitRetentionTime: 20
   _height: 1.5
   _randomHeight: 0.3
   _duration: 1.5
