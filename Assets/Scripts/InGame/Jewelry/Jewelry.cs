@@ -32,7 +32,7 @@ namespace InGame.Jewelry
             }
 
             // 範囲外に出たら即時デスポーン
-            if (OutOfFieldArea.I.IsOutOfField(transform.position))
+            if (OutOfFieldArea.I.IsOutOfField(transform.position + Vector3.up * _jewelryParams.FallDepth))
             {
                 Despawn();
             }
