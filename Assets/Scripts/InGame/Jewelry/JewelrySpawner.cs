@@ -20,6 +20,10 @@ namespace InGame.Jewelry
         [SerializeField] private float _predictionVisibleDuration;
         [SerializeField] private JewelrySpawnData _jewelrySpawnData;
 
+        [Header("リポップ設定")]
+        [SerializeField] private Vector3 _repopOffset = new(0, 2f, 0);
+        [SerializeField] private Vector2 _repopThrowForce = new(3f, 1f);
+
         private int _nextTime = 0;
 
         private CancellationTokenSource _cts;
@@ -38,8 +42,7 @@ namespace InGame.Jewelry
         {
             foreach ((JewelryType jewelryType, int count) in DespawnedJewelryRepository.GetDespawnedJewelryCount())
             {
-                Vector3 offset = new(0, 2f, 0);
-                Vector3 spawnPosition = _spawnPositions[Random.Range(0, _spawnPositions.Length)].position + offset;
+                Vector3 spawnPosition = _spawnPositions[Random.Range(0, _spawnPositions.Length)].position + _repopOffset;
 
                 for (int i = 0; i < count; i++)
                 {
@@ -49,7 +52,7 @@ namespace InGame.Jewelry
 
                     if (obj.gameObject.TryGetComponent(out Jewelry jewelry))
                     {
-                        jewelry.JewelryControl.RandomThrow(3f, 1f);
+                        jewelry.JewelryControl.RandomThrow(_repopThrowForce.x, _repopThrowForce.y);
                     }
                 }
             }
