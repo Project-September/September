@@ -70,7 +70,7 @@ namespace InGame.Player
         private bool _isGround;
         private float _isGroundTimer;
         private Vector3 _groundNormal = Vector3.up;
-        /// <summary> 足裏から接地面までの垂直距離 </summary>
+        /// <summary> カプセルを接地面へ吸着させるための下方向移動量 </summary>
         private float _groundGap;
         /// <summary> 接地判定・吸着の探索開始オフセット。足裏からこの高さで探索を始める </summary>
         private const float GroundProbeOffset = 0.1f;
@@ -217,9 +217,12 @@ namespace InGame.Player
             }
 
             // is ground の管理
-            if (!_isGround && _isGroundTimer > 0) _isGroundTimer -= deltaTime;
+            if (!_isGround && _isGroundTimer > 0)
+                _isGroundTimer = Mathf.Max(0f, _isGroundTimer - deltaTime);
+            if (!_isGround && _isGroundTimer <= 0f)
+                _groundNormal = Vector3.up;
+
             _isGround = false;
-            _groundNormal = Vector3.up;
             _moveVelocity = Vector3.zero;
         }
 
@@ -411,15 +414,13 @@ namespace InGame.Player
             }
 
             // 実接地していない場合は、接地判定より広い範囲を探して足元へ引き戻す
-            Vector3 origin = _moveCapsuleCollider.transform.position + Vector3.up * (_moveCapsuleCollider.radius + GroundProbeOffset);
+            if (!TryProbeGround(_groundSnapDistance, out Vector3 normal, out float gap)) return;
 
-            if (!Physics.SphereCast(origin, _moveCapsuleCollider.radius, Vector3.down, out RaycastHit hitInfo, _groundSnapDistance, _groundLayer)) return;
-            if (hitInfo.distance <= 0f) return;
-
-            transform.position += Vector3.down * (hitInfo.distance - GroundProbeOffset);
+            if (gap > GroundSnapTolerance)
+                transform.position += Vector3.down * gap;
             _isGround = true;
             _isGroundTimer = _coyoteTime;
-            _groundNormal = hitInfo.normal;
+            _groundNormal = normal;
             _groundGap = 0f;
         }
 
@@ -629,41 +630,61 @@ namespace InGame.Player
         /// <summary>
         /// 足裏から真下の地面を探索する
         /// <para>
-        /// 足元中心の細いレイだと、坂へ踏み出したTickでカプセル半径ぶん下がった坂面を見逃して
-        /// 空中判定になり、法線も真上のままで速度が水平に出るため坂面から離れてしまう。
-        /// カプセル半径のSphereCastで足裏全体を見ることで、踏み出したTickから坂面の法線を拾う
+        /// 足元中心のRaycastを優先し、現在立っている面の法線を取得する。
+        /// 下り始めなどRaycastが地面を見失った場合だけSphereCastで補完し、
+        /// 登り切りで前方の平地を先取りして移動方向が水平になることを防ぐ
         /// </para>
         /// </summary>
         /// <param name="normal">接地面の法線</param>
-        /// <param name="gap">足裏から接地面までの垂直距離</param>
+        /// <param name="gap">接地面までの下方向移動量</param>
         /// <returns>地面が見つかったか</returns>
         private bool TryProbeGround(out Vector3 normal, out float gap)
+        {
+            return TryProbeGround(_groundDistanceThreshold, out normal, out gap);
+        }
+
+        private bool TryProbeGround(float probeDistance, out Vector3 normal, out float gap)
+        {
+            if (TryRaycastGround(probeDistance, out normal, out gap)) return true;
+            return TrySphereCastGround(probeDistance, out normal, out gap);
+        }
+
+        private bool TryRaycastGround(float probeDistance, out Vector3 normal, out float gap)
         {
             normal = Vector3.up;
             gap = 0f;
 
-            float radius = _moveCapsuleCollider.radius;
-            Vector3 sphereOrigin = transform.position + Vector3.up * (radius + GroundProbeOffset);
-
-            if (Physics.SphereCast(sphereOrigin, radius, Vector3.down, out RaycastHit sphereHit, _groundDistanceThreshold, _groundLayer)
-                && sphereHit.distance > 0f
-                && IsWalkable(sphereHit.normal))
-            {
-                normal = sphereHit.normal;
-                // SphereCastはカプセル下端が地面に接する位置で当たるので、
-                // 進んだ距離から開始オフセットを引くとそのまま足裏の浮き量になる
-                gap = sphereHit.distance - GroundProbeOffset;
-                return true;
-            }
-
-            // 球が壁面や段差に食い込んだ場合、法線が壁のものになったり距離0の無効な結果になる。
-            // その場合は従来どおり真下への細いレイで判定して、壁際で接地が外れないようにする
-            Vector3 rayOrigin = transform.position + Vector3.up * GroundProbeOffset;
-            if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit rayHit, _groundDistanceThreshold, _groundLayer)) return false;
+            Bounds bounds = _moveCapsuleCollider.bounds;
+            Vector3 rayOrigin = new(bounds.center.x, bounds.min.y + GroundProbeOffset, bounds.center.z);
+            if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit rayHit, probeDistance, _groundLayer)) return false;
             if (!IsWalkable(rayHit.normal)) return false;
 
+            float radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
+            float normalY = Mathf.Max(rayHit.normal.y, Mathf.Epsilon);
+            float capsuleSlopeClearance = radius * (1f / normalY - 1f);
             normal = rayHit.normal;
-            gap = rayHit.distance - GroundProbeOffset;
+            gap = Mathf.Max(0f, bounds.min.y - rayHit.point.y - capsuleSlopeClearance);
+            return true;
+        }
+
+        private bool TrySphereCastGround(float probeDistance, out Vector3 normal, out float gap)
+        {
+            normal = Vector3.up;
+            gap = 0f;
+
+            Bounds bounds = _moveCapsuleCollider.bounds;
+            float radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
+            Vector3 sphereOrigin = new(bounds.center.x, bounds.min.y + radius + GroundProbeOffset, bounds.center.z);
+
+            if (!Physics.SphereCast(sphereOrigin, radius, Vector3.down, out RaycastHit sphereHit, probeDistance, _groundLayer)) return false;
+            if (sphereHit.distance <= 0f || !IsWalkable(sphereHit.normal)) return false;
+
+            float expectedContactHeight = bounds.min.y + radius * (1f - sphereHit.normal.y);
+            // 通常の斜面接触より高い位置へ当たった場合は、頂上の縁を先取りしたものとして除外する
+            if (sphereHit.point.y > expectedContactHeight + GroundSnapTolerance) return false;
+
+            normal = sphereHit.normal;
+            gap = Mathf.Max(0f, sphereHit.distance - GroundProbeOffset);
             return true;
         }
 
