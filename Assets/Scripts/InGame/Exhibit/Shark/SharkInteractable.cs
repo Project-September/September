@@ -34,7 +34,7 @@ public class SharkInteractable : MountableExhibitBase
 
     private InteractableBase _interactableBase;
     private float _cooldownTimer; // 攻撃のクールダウンタイマー
-    private float _attackAnimationFrame; // 攻撃アニメーションの現在のフレーム
+    private int _attackTickCount; // 攻撃開始時からの経過ティック数（持続時間の計算用）
 
     private void OnAttackStateChanged()
     {
@@ -94,7 +94,7 @@ public class SharkInteractable : MountableExhibitBase
         _interactableBase.ForceSetInteractable = false;
         // 攻撃状態の初期化
         _cooldownTimer = _cooldownTime;
-        _attackAnimationFrame = 0;
+        _attackTickCount = 0;
         _movementProcessing.OnInteractStart();
     }
 
@@ -109,7 +109,7 @@ public class SharkInteractable : MountableExhibitBase
 
         // 攻撃状態を次のインタラクトへ持ち越さない
         IsAttacking = false;
-        _attackAnimationFrame = 0;
+        _attackTickCount = 0;
         _cooldownTimer = _cooldownTime;
 
         // インタラクトしていたプレイヤーを取得し、海に落ちる直前の位置に移動させる
@@ -169,18 +169,18 @@ public class SharkInteractable : MountableExhibitBase
         if (!IsAttacking) return;
 
         // フレームを進め、攻撃判定が有効なフレームだけヒット判定
-        _attackAnimationFrame++;
-        if (_attackAnimationFrame >= StartFrame && _attackAnimationFrame <= EndFrame)
+        _attackTickCount++;
+        if (_attackTickCount >= StartFrame && _attackTickCount <= EndFrame)
         {
             Executor?.Tick(deltaTime);
         }
 
         // 攻撃終了のフレームを超えたら、ヒットボックスを破棄する
-        if (!(_attackAnimationFrame >= EndFrame)) return;
+        if (!(_attackTickCount >= EndFrame)) return;
         Executor?.Init();
 
         // 攻撃状態を初期化
-        _attackAnimationFrame = 0;
+        _attackTickCount = 0;
         IsAttacking = false;
         Executor = null;
     }
