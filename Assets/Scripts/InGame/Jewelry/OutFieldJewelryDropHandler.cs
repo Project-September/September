@@ -12,7 +12,6 @@ using Random = UnityEngine.Random;
 
 namespace September.InGame.Jewelry
 {
-    [SimulationBehaviour(Modes = SimulationModes.Host | SimulationModes.Server)]
     public class OutFieldJewelryDropHandler : NetworkBehaviour
     {
         [SerializeField] private PlayerRespawn _playerRespawn;
