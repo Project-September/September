@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Jewelry.Common;
+using September.InGame.Jewelry;
 using UnityEngine;
 
 namespace InGame.Jewelry
@@ -9,9 +10,36 @@ namespace InGame.Jewelry
     {
         [Header("この宝石のパラメータ群"), SerializeField] JewelryInfo _jewelryParams;
         [SerializeField] JewelryControl _jewelryControl;
+        [SerializeField] ParticleSystemRenderer[] _renderers;
 
         public JewelryInfo JewelryParams => _jewelryParams;
         public JewelryControl JewelryControl => _jewelryControl;
+
+        private TickTimer _despawnTimer;
+
+        public override void Spawned()
+        {
+            _despawnTimer = TickTimer.CreateFromSeconds(Runner, _jewelryParams.LifeTime);
+        }
+
+        public override void Render()
+        {
+            if (_despawnTimer.RemainingTime(Runner) <= _jewelryParams.BlinkStartRemainingTime)
+            {
+                bool blink = Runner.SimulationTime * _jewelryParams.BlinkSpeed % 1f > 0.5f;
+
+                foreach (ParticleSystemRenderer r in _renderers)
+                {
+                    r.enabled = blink;
+                }
+            }
+
+            if (_despawnTimer.Expired(Runner))
+            {
+                Runner.Despawn(Object);
+                DespawnedJewelryRepository.AddDespawnedJewelry(_jewelryParams.JewelryType);
+            }
+        }
 
         public async UniTask PickupFrom(PlayerRef player)
         {
