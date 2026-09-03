@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Jewelry.Common;
+using September.InGame.Fields;
 using September.InGame.Jewelry;
 using UnityEngine;
 
@@ -24,7 +25,22 @@ namespace InGame.Jewelry
 
         public override void FixedUpdateNetwork()
         {
+            // 自動消滅時間を過ぎたらデスポーン
             if (_despawnTimer.Expired(Runner))
+            {
+                Despawn();
+            }
+
+            // 範囲外に出たら即時デスポーン
+            if (OutOfFieldArea.I.IsOutOfField(transform.position))
+            {
+                Despawn();
+            }
+
+            return;
+
+            // 自動消滅時の処理
+            void Despawn()
             {
                 Runner.Despawn(Object);
                 DespawnedJewelryRepository.AddDespawnedJewelry(_jewelryParams.JewelryType);
@@ -33,6 +49,7 @@ namespace InGame.Jewelry
 
         public override void Render()
         {
+            // 消滅前の点滅演出
             if (_despawnTimer.RemainingTime(Runner) <= _jewelryParams.BlinkStartRemainingTime)
             {
                 bool blink = Runner.SimulationTime * _jewelryParams.BlinkSpeed % 1f > 0.5f;
