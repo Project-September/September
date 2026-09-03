@@ -27,6 +27,8 @@ namespace September.InGame.Jewelry
         private float _hitRetentionTime = 20f;
 
         [Header("宝石ドロップアニメーション設定")]
+        [SerializeField] private float _randomOffsetRange = 3f;
+        [SerializeField] private float _searchFieldRadius = 10f;
         [SerializeField] private float _height = 1f;
         [SerializeField] private float _randomHeight = 0.3f;
         [SerializeField] private float _duration = 0.7f;
@@ -113,9 +115,9 @@ namespace September.InGame.Jewelry
             Vector3 GetRandomPosition()
             {
                 var insideUnitCircle = Random.insideUnitCircle;
-                var randomOffset = new Vector3(insideUnitCircle.x, 0, insideUnitCircle.y) * 2f;
+                var randomOffset = new Vector3(insideUnitCircle.x, 0, insideUnitCircle.y) * _randomOffsetRange;
                 var target = _prevGroundedPos + randomOffset;
-                if (NavMesh.SamplePosition(target, out NavMeshHit hit, 10f, NavMesh.AllAreas))
+                if (NavMesh.SamplePosition(target, out NavMeshHit hit, _searchFieldRadius, NavMesh.AllAreas))
                 {
                     return hit.position;
                 }
