@@ -74,6 +74,8 @@ namespace September.InGame.Jewelry
 
             JewelryDropLogger.OutputLog();
 
+            _recentHitData = new HitData();
+
             return;
 
             void HandleJewelryDrop(JewelryDropSettings dropSettings)
