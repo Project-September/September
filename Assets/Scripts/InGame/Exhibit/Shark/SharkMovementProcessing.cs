@@ -36,12 +36,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     private bool _isGrounded; // プレイヤーが地面に接地しているか
 
     /// <summary>
-    /// 壁に当たらずに移動し続けている時間。速度カーブの入力になる
-    /// <para>
-    /// ローカル変数だとホストでしか走らないGetOn/GetOffのリセットがクライアントへ届かず、
-    /// クライアントは前回の加速しきった値のまま予測してサーバーと食い違い、
-    /// 毎Tickロールバックしてガタつく。同期状態にして予測の基準を揃える
-    /// </para>
+    /// 壁に当たらずに移動し続けている時間
     /// </summary>
     [Networked] private float KeepMovingTime { get; set; }
 
@@ -192,8 +187,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     }
 
     /// <summary>
-    /// 速度に関わる状態を初期値へ戻す
-    /// <para>残したままだと次のインタラクトが前回終了時の速度から始まってしまう</para>
+    /// 内部状態を初期値へ戻し、何回インタラクトしても同じ効果が得られるようにする
     /// </summary>
     private void ResetMovementState()
     {
