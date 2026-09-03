@@ -34,7 +34,16 @@ public class SharkMovementProcessing : NetworkBehaviour
 
     private Vector3 _currentGroundNormal; // 現在、接触している地面の法線
     private bool _isGrounded; // プレイヤーが地面に接地しているか
-    float _keepMovingTime;
+
+    /// <summary>
+    /// 壁に当たらずに移動し続けている時間。速度カーブの入力になる
+    /// <para>
+    /// ローカル変数だとホストでしか走らないGetOn/GetOffのリセットがクライアントへ届かず、
+    /// クライアントは前回の加速しきった値のまま予測してサーバーと食い違い、
+    /// 毎Tickロールバックしてガタつく。同期状態にして予測の基準を揃える
+    /// </para>
+    /// </summary>
+    [Networked] private float KeepMovingTime { get; set; }
 
     [Networked] private float LastGroundedTime { get; set; }
 
@@ -115,14 +124,14 @@ public class SharkMovementProcessing : NetworkBehaviour
             && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
         {
             // 坂などは判定しないように内積で壁判定
-            _keepMovingTime = 0;
+            KeepMovingTime = 0;
         }
         else
         {
-            _keepMovingTime += deltaTime;
+            KeepMovingTime += deltaTime;
         }
         // アニメーションカーブで速度取得
-        float t = _speedCurve.Evaluate(_keepMovingTime);
+        float t = _speedCurve.Evaluate(KeepMovingTime);
         float baseSpeed = playerInput.Buttons.IsSet(PlayerButtons.Dash) ? _dashSpeed : _walkSpeed;
         float speed = baseSpeed * t;
 
@@ -188,7 +197,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     /// </summary>
     private void ResetMovementState()
     {
-        _keepMovingTime = 0;
+        KeepMovingTime = 0;
         CurrentSpeedRatio = 0;
         _isGrounded = false;
         _currentGroundNormal = Vector3.up;
