@@ -23,6 +23,7 @@ namespace InGame.Jewelry
         [Header("リポップ設定")]
         [SerializeField] private Vector3 _repopOffset = new(0, 2f, 0);
         [SerializeField] private Vector2 _repopThrowForce = new(3f, 1f);
+        [SerializeField] private float _repopDelay = 0f;
 
         private int _nextTime = 0;
 
@@ -46,18 +47,30 @@ namespace InGame.Jewelry
 
                 for (int i = 0; i < count; i++)
                 {
-                    NetworkObject obj = SpawnJewelry(spawnPosition, jewelryType);
-
-                    if (obj == null) continue;
-
-                    if (obj.gameObject.TryGetComponent(out Jewelry jewelry))
-                    {
-                        jewelry.JewelryControl.RandomThrow(_repopThrowForce.x, _repopThrowForce.y);
-                    }
+                    RespawnJewelry(spawnPosition, jewelryType, _repopDelay, _cts.Token).Forget();
                 }
             }
 
             DespawnedJewelryRepository.Clear();
+
+            return;
+
+            async UniTaskVoid RespawnJewelry(Vector3 spawnPosition, JewelryType jewelryType, float delay = 0f, CancellationToken token = default)
+            {
+                if (delay > 0)
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: token);
+                }
+
+                NetworkObject obj = SpawnJewelry(spawnPosition, jewelryType);
+
+                if (obj == null) return;
+
+                if (obj.gameObject.TryGetComponent(out Jewelry jewelry))
+                {
+                    jewelry.JewelryControl.RandomThrow(_repopThrowForce.x, _repopThrowForce.y);
+                }
+            }
         }
 
         private async UniTask WaitSpawnAsync()
