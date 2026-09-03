@@ -196,6 +196,24 @@ $ExternalNamespace = @(
     'WebSocketSharp'
 )
 
+function Invoke-Git([string]$Project, [string[]]$GitArgs) {
+    # ネイティブコマンドの stderr を成功ストリームへ混ぜると PS5.1 では
+    # NativeCommandError になるため、出力だけ受け取り $LASTEXITCODE で判定する
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { return & git -C $Project @GitArgs } finally { $ErrorActionPreference = $previous }
+}
+
+# Unity はプロジェクトを開くとマテリアルや .asset を自分のバージョンで
+# 再シリアライズすることがある。GuardedFile だけでは追い切れないため、
+# git チェックアウトなら tracked ファイルの変更有無で検知する
+function Get-TrackedChange([string]$Project) {
+    $output = Invoke-Git $Project @('status', '--porcelain', '--untracked-files=no')
+    if ($LASTEXITCODE -ne 0) { return $null }
+
+    return @($output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+}
+
 function Test-ExternalAssetMissing($ErrorLines) {
     $names = ($ExternalNamespace -join '|')
     $pattern = "error CS0246: The type or namespace name '($names)'"
@@ -239,6 +257,11 @@ Write-Host "Log     : $LogFile"
 # バージョンが違えばパッケージも解決し直して packages-lock.json を書き換える
 $guardSnapshot = Read-GuardedFile $ProjectPath
 
+# 実行前に tracked な変更が無かった場合だけ、実行後に Unity が付けた変更を戻す。
+# 元から変更があった場合は利用者の作業を消しかねないので触らず警告するだけにする
+$trackedBefore = Get-TrackedChange $ProjectPath
+$canRestoreTracked = ($null -ne $trackedBefore) -and ($trackedBefore.Count -eq 0)
+
 $unityArgs = @(
     '-batchmode'
     '-nographics'
@@ -250,6 +273,11 @@ $unityArgs = @(
 
 $started = Get-Date
 $process = Start-Process -FilePath $unity -ArgumentList $unityArgs -PassThru -NoNewWindow
+
+# Start-Process -PassThru が返す Process は、終了前にハンドルを掴んでおかないと
+# 終了後に ExitCode を読めず空になる。参照するだけでハンドルがキャッシュされる
+$null = $process.Handle
+
 $timedOut = $false
 
 if (-not $process.WaitForExit($TimeoutMinutes * 60 * 1000)) {
@@ -263,6 +291,16 @@ $elapsed = (Get-Date) - $started
 $restored = Restore-GuardedFile $ProjectPath $guardSnapshot
 if ($restored.Count -gt 0) {
     Write-Warning ("Unity が書き換えたため復元しました: {0}" -f ($restored -join ', '))
+}
+
+$trackedAfter = Get-TrackedChange $ProjectPath
+if ($null -ne $trackedAfter -and $trackedAfter.Count -gt 0) {
+    if ($canRestoreTracked) {
+        Invoke-Git $ProjectPath @('checkout', '--', '.') | Out-Null
+        Write-Warning ("Unity が再シリアライズした {0} 件の変更を git checkout で戻しました" -f $trackedAfter.Count)
+    } else {
+        Write-Warning ("Unity が {0} 件の tracked ファイルを書き換えた可能性がありますが、実行前から変更があったため戻していません。git status で確認してください" -f $trackedAfter.Count)
+    }
 }
 
 Write-Host ("Elapsed : {0:hh\:mm\:ss}" -f $elapsed)
@@ -291,8 +329,14 @@ if ($errorLines.Count -gt 0) {
     exit $ExitCompileError
 }
 
-if ($process.ExitCode -ne 0) {
-    Write-Failure ("Unity が終了コード {0} で終了しました。コンパイル以外の失敗の可能性があります。詳細は {1}" -f $process.ExitCode, $LogFile)
+$unityExitCode = $process.ExitCode
+if ($null -eq $unityExitCode) {
+    Write-Failure ("Unity の終了コードを取得できませんでした。詳細は {0}" -f $LogFile)
+    exit $ExitSetupError
+}
+
+if ($unityExitCode -ne 0) {
+    Write-Failure ("Unity が終了コード {0} で終了しました。コンパイル以外の失敗の可能性があります。詳細は {1}" -f $unityExitCode, $LogFile)
     exit $ExitSetupError
 }
 
