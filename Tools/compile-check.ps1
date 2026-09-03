@@ -211,7 +211,11 @@ function Get-TrackedChange([string]$Project) {
     $output = Invoke-Git $Project @('status', '--porcelain', '--untracked-files=no')
     if ($LASTEXITCODE -ne 0) { return $null }
 
-    return @($output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $changes = @($output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+
+    # 関数から空配列をそのまま返すと展開されて $null になり、
+    # 「変更なし」と「git 管理外」が区別できなくなる。カンマ演算子で配列のまま返す
+    return , $changes
 }
 
 function Test-ExternalAssetMissing($ErrorLines) {
@@ -259,8 +263,10 @@ $guardSnapshot = Read-GuardedFile $ProjectPath
 
 # 実行前に tracked な変更が無かった場合だけ、実行後に Unity が付けた変更を戻す。
 # 元から変更があった場合は利用者の作業を消しかねないので触らず警告するだけにする
+# Get-TrackedChange は git チェックアウトでなければ $null、そうなら配列を返す。
+# 型で判定して「git 管理下か」と「変更が無いか」を取り違えないようにする
 $trackedBefore = Get-TrackedChange $ProjectPath
-$canRestoreTracked = ($null -ne $trackedBefore) -and ($trackedBefore.Count -eq 0)
+$canRestoreTracked = ($trackedBefore -is [System.Array]) -and ($trackedBefore.Count -eq 0)
 
 $unityArgs = @(
     '-batchmode'
@@ -294,7 +300,7 @@ if ($restored.Count -gt 0) {
 }
 
 $trackedAfter = Get-TrackedChange $ProjectPath
-if ($null -ne $trackedAfter -and $trackedAfter.Count -gt 0) {
+if (($trackedAfter -is [System.Array]) -and ($trackedAfter.Count -gt 0)) {
     if ($canRestoreTracked) {
         Invoke-Git $ProjectPath @('checkout', '--', '.') | Out-Null
         Write-Warning ("Unity が再シリアライズした {0} 件の変更を git checkout で戻しました" -f $trackedAfter.Count)
