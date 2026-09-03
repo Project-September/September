@@ -18,6 +18,8 @@ namespace InGame.Player
         [SerializeField] private float _moveSpeed;
         [SerializeField, Tooltip("地面と認識する最大角度")] private float _groundSlopeThreshold = 45f;
         [SerializeField, Tooltip("地面と認識する最大距離")] private float _groundDistanceThreshold = 0.25f;
+        [SerializeField, Tooltip("接地していないときに足元へ吸着させる最大距離")] private float _groundSnapDistance = 0.4f;
+        [SerializeField, Tooltip("接地が切れてから空中扱いになるまでの猶予 (コヨーテタイム)")] private float _coyoteTime = 0.1f;
         [SerializeField] private LayerMask _groundLayer = ~0;
         [Header("鬼状態時の移動速度")]
         [SerializeField] private float _ogreMoveSpeed;
@@ -68,6 +70,12 @@ namespace InGame.Player
         private bool _isGround;
         private float _isGroundTimer;
         private Vector3 _groundNormal = Vector3.up;
+        /// <summary> 足裏から接地面までの垂直距離 </summary>
+        private float _groundGap;
+        /// <summary> 接地判定・吸着の探索開始オフセット。足裏からこの高さで探索を始める </summary>
+        private const float GroundProbeOffset = 0.1f;
+        /// <summary> この値以下の浮きは吸着しない。毎Tickの微小な上下でガタつかせないため </summary>
+        private const float GroundSnapTolerance = 0.02f;
         private bool _isDashCoolTime;
         private bool CanDash => !_isDashCoolTime && _status.CurrentStamina > 0 && IsGround;
         private bool _isDash;
@@ -379,20 +387,40 @@ namespace InGame.Player
             return result;
         }
 
+        /// <summary>
+        /// 足裏を地面へ吸着させる
+        /// <para>
+        /// 接地したまま足が浮いていると、ApplyVelocityがy速度を上書きして重力が効かず、
+        /// コヨーテタイムが切れるまで空中に留まってから落下する。下り坂ではこれが毎Tick起きて
+        /// 空中判定と着地を繰り返し、つっかえる。IsGroundで弾かず接地中も吸着させる
+        /// </para>
+        /// </summary>
         void AdsorptionOnGround()
         {
-            if (IsGround) return;
+            // ノックバック中と上方向へ飛ばされている間は引き戻さない
+            if (_knockBackActive || _flyingVelocity.y > 0f) return;
 
-            Vector3 origin = _moveCapsuleCollider.transform.position + Vector3.up * _moveCapsuleCollider.radius;
-            var hit = Physics.SphereCast(origin + Vector3.up * 0.1f, _moveCapsuleCollider.radius, Vector3.down, out var hitInfo, 0.4f, _groundLayer);
-
-            if (hit && hitInfo.distance > 0)
+            if (_isGround)
             {
-                transform.position += Vector3.down * (hitInfo.distance - 0.1f);
-                _isGround = true;
-                _isGroundTimer = 0.1f;
-                _groundNormal = hitInfo.normal;
+                // CheckGroundManualが測った浮き量へそのまま吸着する
+                if (_groundGap <= GroundSnapTolerance) return;
+
+                transform.position += Vector3.down * _groundGap;
+                _groundGap = 0f;
+                return;
             }
+
+            // 実接地していない場合は、接地判定より広い範囲を探して足元へ引き戻す
+            Vector3 origin = _moveCapsuleCollider.transform.position + Vector3.up * (_moveCapsuleCollider.radius + GroundProbeOffset);
+
+            if (!Physics.SphereCast(origin, _moveCapsuleCollider.radius, Vector3.down, out RaycastHit hitInfo, _groundSnapDistance, _groundLayer)) return;
+            if (hitInfo.distance <= 0f) return;
+
+            transform.position += Vector3.down * (hitInfo.distance - GroundProbeOffset);
+            _isGround = true;
+            _isGroundTimer = _coyoteTime;
+            _groundNormal = hitInfo.normal;
+            _groundGap = 0f;
         }
 
         protected virtual void ApplyVelocity(float deltaTime)
@@ -587,17 +615,56 @@ namespace InGame.Player
 
         private void CheckGroundManual()
         {
-            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            if (!TryProbeGround(out Vector3 normal, out float gap)) return;
 
-            if (Physics.Raycast(origin, Vector3.down, out var hitInfo, _groundDistanceThreshold, _groundLayer))
+            _isGround = true;
+            _isGroundTimer = _coyoteTime;
+            _groundNormal = normal;
+            _groundGap = gap;
+        }
+
+        /// <summary> 立てる角度の面か </summary>
+        private bool IsWalkable(Vector3 normal) => Vector3.Angle(Vector3.up, normal) <= _groundSlopeThreshold;
+
+        /// <summary>
+        /// 足裏から真下の地面を探索する
+        /// <para>
+        /// 足元中心の細いレイだと、坂へ踏み出したTickでカプセル半径ぶん下がった坂面を見逃して
+        /// 空中判定になり、法線も真上のままで速度が水平に出るため坂面から離れてしまう。
+        /// カプセル半径のSphereCastで足裏全体を見ることで、踏み出したTickから坂面の法線を拾う
+        /// </para>
+        /// </summary>
+        /// <param name="normal">接地面の法線</param>
+        /// <param name="gap">足裏から接地面までの垂直距離</param>
+        /// <returns>地面が見つかったか</returns>
+        private bool TryProbeGround(out Vector3 normal, out float gap)
+        {
+            normal = Vector3.up;
+            gap = 0f;
+
+            float radius = _moveCapsuleCollider.radius;
+            Vector3 sphereOrigin = transform.position + Vector3.up * (radius + GroundProbeOffset);
+
+            if (Physics.SphereCast(sphereOrigin, radius, Vector3.down, out RaycastHit sphereHit, _groundDistanceThreshold, _groundLayer)
+                && sphereHit.distance > 0f
+                && IsWalkable(sphereHit.normal))
             {
-                if (Vector3.Angle(Vector3.up, hitInfo.normal) <= _groundSlopeThreshold)
-                {
-                    _isGround = true;
-                    _isGroundTimer = 0.1f;
-                    _groundNormal = hitInfo.normal;
-                }
+                normal = sphereHit.normal;
+                // SphereCastはカプセル下端が地面に接する位置で当たるので、
+                // 進んだ距離から開始オフセットを引くとそのまま足裏の浮き量になる
+                gap = sphereHit.distance - GroundProbeOffset;
+                return true;
             }
+
+            // 球が壁面や段差に食い込んだ場合、法線が壁のものになったり距離0の無効な結果になる。
+            // その場合は従来どおり真下への細いレイで判定して、壁際で接地が外れないようにする
+            Vector3 rayOrigin = transform.position + Vector3.up * GroundProbeOffset;
+            if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit rayHit, _groundDistanceThreshold, _groundLayer)) return false;
+            if (!IsWalkable(rayHit.normal)) return false;
+
+            normal = rayHit.normal;
+            gap = rayHit.distance - GroundProbeOffset;
+            return true;
         }
 
 
