@@ -34,7 +34,11 @@ public class SharkMovementProcessing : NetworkBehaviour
 
     private Vector3 _currentGroundNormal; // 現在、接触している地面の法線
     private bool _isGrounded; // プレイヤーが地面に接地しているか
-    float _keepMovingTime;
+
+    /// <summary>
+    /// 壁に当たらずに移動し続けている時間
+    /// </summary>
+    [Networked] private float KeepMovingTime { get; set; }
 
     [Networked] private float LastGroundedTime { get; set; }
 
@@ -115,14 +119,14 @@ public class SharkMovementProcessing : NetworkBehaviour
             && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
         {
             // 坂などは判定しないように内積で壁判定
-            _keepMovingTime = 0;
+            KeepMovingTime = 0;
         }
         else
         {
-            _keepMovingTime += deltaTime;
+            KeepMovingTime += deltaTime;
         }
         // アニメーションカーブで速度取得
-        float t = _speedCurve.Evaluate(_keepMovingTime);
+        float t = _speedCurve.Evaluate(KeepMovingTime);
         float baseSpeed = playerInput.Buttons.IsSet(PlayerButtons.Dash) ? _dashSpeed : _walkSpeed;
         float speed = baseSpeed * t;
 
@@ -164,8 +168,33 @@ public class SharkMovementProcessing : NetworkBehaviour
 
     public void OnInteractStart()
     {
+        ResetMovementState();
         LastGroundedTime = Runner.SimulationTime;
         PositionBeforeWaterFall = transform.position;
+    }
+
+    /// <summary>
+    /// インタラクト終了時の移動状態リセット
+    /// </summary>
+    /// <param name="rb">サメのRigidbody</param>
+    public void OnInteractEnd(Rigidbody rb)
+    {
+        ResetMovementState();
+
+        if (rb == null || rb.isKinematic) return;
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+
+    /// <summary>
+    /// 内部状態を初期値へ戻し、何回インタラクトしても同じ効果が得られるようにする
+    /// </summary>
+    private void ResetMovementState()
+    {
+        KeepMovingTime = 0;
+        CurrentSpeedRatio = 0;
+        _isGrounded = false;
+        _currentGroundNormal = Vector3.up;
     }
 
     private void OnDrawGizmosSelected()
