@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Jewelry.Common;
+using September.Common;
+using September.InGame.Effect;
 using September.InGame.Fields;
 using September.InGame.Jewelry;
 using UnityEngine;
@@ -34,6 +36,7 @@ namespace InGame.Jewelry
             // 範囲外に出たら即時デスポーン
             if (OutOfFieldArea.I.IsOutOfField(transform.position + Vector3.up * _jewelryParams.FallDepth))
             {
+                PlayPickupEffect();
                 Despawn();
             }
 
@@ -71,6 +74,12 @@ namespace InGame.Jewelry
             await _jewelryControl.PlayGetMove(obj.transform);
 
             container.PickUp(this);
+        }
+
+        public void PlayPickupEffect()
+        {
+            EffectSpawner effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+            effectSpawner.RequestPlayOneShotEffect(_jewelryParams.PickupEffectType, transform.position + _jewelryParams.PickupEffectOffset, transform.rotation);
         }
     }
 }
