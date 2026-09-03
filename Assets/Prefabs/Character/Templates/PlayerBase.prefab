@@ -5433,6 +5433,7 @@ GameObject:
   - component: {fileID: 8782963132285940316}
   - component: {fileID: 7325268686366126974}
   - component: {fileID: 918520937756284502}
+  - component: {fileID: 1008730815285272535}
   - component: {fileID: 6992982918667310570}
   - component: {fileID: 8026515877087289600}
   - component: {fileID: 202504370253565435}
@@ -6000,6 +6001,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _useClipAverageSpeed: 0
   _walkAnimSpeed: 1
   _runAnimSpeed: 2
   _hitReactionClip: {fileID: 7400000, guid: dc52e77d074bc11469d9ad6d72bb5654, type: 2}
@@ -6119,6 +6121,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d209bb15182b7642b72658a821ece7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1008730815285272535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8360875997416129576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc06bf466eeb19831e502fc1073ffffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _rayStartHeight: 0.5
+  _rayDepth: 0.6
+  _footHeightOffset: 0.08
+  _weight: 1
+  _weightBlendSpeed: 8
+  _alignFootToSlope: 1
 --- !u!114 &6992982918667310570
 MonoBehaviour:
   m_ObjectHideFlags: 0

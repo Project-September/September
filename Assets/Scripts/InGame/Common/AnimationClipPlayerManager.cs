@@ -38,8 +38,15 @@ namespace InGame.Common
         [SerializeField] private AnimationCurve _fallInCurve = null;   // null の場合は線形扱い
         [SerializeField, Range(0f, 1f)] private float _landOutTime = 0.12f;
         [SerializeField] private AnimationCurve _landOutCurve = null;
-        [SerializeField] private float _walkAnimSpeed = 1f;
-        [SerializeField] private float _runAnimSpeed = 2f;
+        [Header("Loco Playback Rate")]
+        [SerializeField, Tooltip("歩き/走りクリップに焼かれたルート移動量 (averageSpeed) から基準速度を自動算出する。焼かれていないクリップは下の手入力値を使う")]
+        private bool _useClipAverageSpeed = true;
+        [SerializeField, Tooltip("歩きクリップが 1 倍速で進む速さ (m/s)。自動算出できない場合に使用")]
+        private float _walkAnimSpeed = 1f;
+        [SerializeField, Tooltip("走りクリップが 1 倍速で進む速さ (m/s)。自動算出できない場合に使用")]
+        private float _runAnimSpeed = 2f;
+        private float _walkBaseSpeed;
+        private float _runBaseSpeed;
 
         [Header("被ダメ")]
         [SerializeField] private AnimationClip _hitReactionClip = null;
@@ -59,6 +66,8 @@ namespace InGame.Common
 
         private void Start()
         {
+            ResolveLocoBaseSpeeds();
+
             _playerManager.ObserveEveryValueChanged(x => x.IsStun)
                 .Subscribe(isStun =>
                 {
@@ -94,8 +103,16 @@ namespace InGame.Common
                 .Select(_ => _playerMovement.IsGroundNet)
                 .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(this);
 
-            _playerMovement.OnEvasion
-                .Subscribe(x => RPC_TriggerEvasion(x))
+            // 回避開始 Tick の変化で発火する。Networked 状態由来なので、ホスト・予測中のクライアント・リモート表示の全てが同じ経路で再生される
+            // 回避中でなければ 0 に落とす。終了後も StartTick は残るため、途中参加時に過去の回避を再生してしまうのを防ぐ
+            _playerMovement.UpdateAsObservable()
+                .Select(_ => _playerMovement.IsEvading ? _playerMovement.EvasionStartTick : 0)
+                .DistinctUntilChanged()
+                .Where(startTick => startTick > 0)
+                .Subscribe(_ =>
+                {
+                    if (!_hardOverride) TriggerEvasion(_playerMovement.EvasionDuration).Forget();
+                })
                 .AddTo(this);
         }
 
@@ -144,6 +161,23 @@ namespace InGame.Common
 
         [Networked] public bool EnableFallMotion { get; set; } = true;
 
+        /// <summary>
+        /// 歩き/走りクリップの基準速度を決める。クリップに焼かれたルート移動量を優先し、
+        /// 無い場合や自動算出を切っている場合は Inspector の手入力値を使う。
+        /// </summary>
+        private void ResolveLocoBaseSpeeds()
+        {
+            if (!_useClipAverageSpeed || _animationClipPlayer == null)
+            {
+                _walkBaseSpeed = _walkAnimSpeed;
+                _runBaseSpeed = _runAnimSpeed;
+                return;
+            }
+
+            _walkBaseSpeed = LocoAnimSpeedSource.Resolve(_animationClipPlayer.WalkClip, _walkAnimSpeed, nameof(_walkAnimSpeed), this);
+            _runBaseSpeed = LocoAnimSpeedSource.Resolve(_animationClipPlayer.RunClip, _runAnimSpeed, nameof(_runAnimSpeed), this);
+        }
+
         private void LateUpdate()
         {
             if (!_animationClipPlayer) return;
@@ -166,10 +200,10 @@ namespace InGame.Common
             // 速度を歩き〜走りの割合に変換
             var speedRate = Mathf.InverseLerp(walkSpeed, maxSpeed, speed);
 
-            // その割合でアニメーション基準速度を補間
+            // その割合でアニメーション基準速度 (1 倍速で進む m/s) を補間
             var baseSpeed = Mathf.Lerp(
-                _walkAnimSpeed,
-                _runAnimSpeed,
+                _walkBaseSpeed,
+                _runBaseSpeed,
                 speedRate);
 
             var playbackRate = baseSpeed > 0f ? speed / baseSpeed : 0f;
@@ -204,15 +238,6 @@ namespace InGame.Common
             }
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_TriggerEvasion(float rollDurationScale)
-        {
-            if (!_hardOverride)
-            {
-                _ = TriggerEvasion(rollDurationScale);
-            }
-        }
-
         public async UniTask TriggerVault()
         {
 
@@ -240,9 +265,10 @@ namespace InGame.Common
             if (!_playerMovement.IsGroundNet) SetFallAnim(false);
         }
 
-        public async UniTask TriggerEvasion(float rollDurationScale)
+        /// <param name="rollDuration"> 回避全体の所要時間 (秒)。クリップ長を割ってこの秒数に収まる再生速度にする </param>
+        public async UniTask TriggerEvasion(float rollDuration)
         {
-            if (rollDurationScale <= 0f)
+            if (rollDuration <= 0f || !_rollEvasion || _rollEvasion.length <= 0f)
                 return;
 
             if (_rollEvasionTokenSrc != null)
@@ -250,34 +276,34 @@ namespace InGame.Common
                 _rollEvasionTokenSrc.Cancel();
                 _rollEvasionTokenSrc.Dispose();
             }
-            _animationClipPlayer.PlayOnTopLayer(_rollEvasion, 1 / rollDurationScale);
+            // クリップ長基準の再生速度にすることで、移動時間とモーションの長さが一致する
+            _animationClipPlayer.PlayOnTopLayer(_rollEvasion, _rollEvasion.length / rollDuration);
 
             _rollEvasionTokenSrc = new CancellationTokenSource();
 
-            if (_rollEvasion && _rollEvasion.length > 0f)
+            try
             {
-                try
-                {
-                    await _animationClipPlayer.BlendLayerWeight(
-                        LayerInfo.LayerType.TopLayer,
-                        1f,
-                        new LayerInfo.Blend { BlendTime = _evasionInTime, BlendCurve = _evasionInCurve },
-                        _rollEvasionTokenSrc.Token
-                    );
+                await _animationClipPlayer.BlendLayerWeight(
+                    LayerInfo.LayerType.TopLayer,
+                    1f,
+                    new LayerInfo.Blend { BlendTime = _evasionInTime, BlendCurve = _evasionInCurve },
+                    _rollEvasionTokenSrc.Token
+                );
 
-                    await UniTask.Delay(TimeSpan.FromSeconds(rollDurationScale - (_evasionInTime + _evasionOutTime)), cancellationToken: _rollEvasionTokenSrc.Token);
+                // ブレンドアウトが移動終了と同時に完了するよう、残り時間だけ待つ
+                float waitTime = Mathf.Max(0f, rollDuration - (_evasionInTime + _evasionOutTime));
+                await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: _rollEvasionTokenSrc.Token);
 
-                    await _animationClipPlayer.BlendLayerWeight(
-                        LayerInfo.LayerType.TopLayer,
-                        0f,
-                        new LayerInfo.Blend { BlendTime = _evasionOutTime, BlendCurve = _evasionOutCurve },
-                        _rollEvasionTokenSrc.Token
-                    );
-                }
-                catch (OperationCanceledException)
-                {
-                    return;
-                }
+                await _animationClipPlayer.BlendLayerWeight(
+                    LayerInfo.LayerType.TopLayer,
+                    0f,
+                    new LayerInfo.Blend { BlendTime = _evasionOutTime, BlendCurve = _evasionOutCurve },
+                    _rollEvasionTokenSrc.Token
+                );
+            }
+            catch (OperationCanceledException)
+            {
+                return;
             }
 
             _animationClipPlayer.PlayOnTopLayer(null);
