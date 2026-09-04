@@ -40,6 +40,7 @@ namespace InGame.Player
         [Header("Hook")]
         [SerializeField] private float _hookPower = 10f;
         [Header("Bomb")]
+        [SerializeField] private float _moveDumping = 0.5f;
         [SerializeField] private float _flyingDamping = 8f;
         [Header("Roll")]
         [SerializeField] private EvasionData _evasionData;
@@ -64,13 +65,12 @@ namespace InGame.Player
         private Vector3 _moveVelocity;
         public Vector3 MoveVelocity => _moveVelocity;
         private Vector3 _flyingVelocity;
-        private Vector3 _prevMoveVelocity;
+        private Vector3 _fallVelocity;
 
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
         private float _isGroundTimer;
-        private float _prevGroundedTime;
         private Vector3 _groundNormal = Vector3.up;
         /// <summary> カプセルを接地面へ吸着させるための下方向移動量 </summary>
         private float _groundGap;
@@ -121,11 +121,6 @@ namespace InGame.Player
         [Networked] public bool IgnoreMoveInput { get; set; }
         [Networked] public bool IgnoreEvasionInput { get; set; }
         [Networked] public bool IsHookLocked { get; set; }
-
-        public override void Spawned()
-        {
-            _prevGroundedTime = Runner.SimulationTime;
-        }
 
         private void Awake()
         {
@@ -213,8 +208,11 @@ namespace InGame.Player
 
             if (IsGround)
             {
-                _prevGroundedTime = Runner.SimulationTime;
-                _prevMoveVelocity = _moveVelocity;
+                _fallVelocity = Vector3.zero;
+            }
+            else
+            {
+                _fallVelocity += Physics.gravity * deltaTime;
             }
 
             ApplyVelocity(deltaTime);
@@ -235,8 +233,8 @@ namespace InGame.Player
             if (!_isGround && _isGroundTimer <= 0f)
                 _groundNormal = Vector3.up;
 
+            if (_isGround) _moveVelocity = Vector3.zero;
             _isGround = false;
-            _moveVelocity = Vector3.zero;
         }
 
         /// <summary> 回避中の 1 Tick 分の更新。Tick 基準なので予測・再シミュレーションでも同じ結果になる </summary>
@@ -326,7 +324,7 @@ namespace InGame.Player
         public void AddForce(Vector3 force)
         {
             _moveVelocity += force;
-            if (Vector3.Angle(MoveVelocity, _groundNormal) < 89)
+            if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
                 _moveVelocity += force;
             if (Vector3.Angle(_moveVelocity, _groundNormal) < 89)
             {
@@ -445,12 +443,11 @@ namespace InGame.Player
             }
             else
             {
-                float elapsedTimeGrounded = Runner.SimulationTime - _prevGroundedTime;
-                Vector3 dampedMove = _prevMoveVelocity * (1 / (1 + elapsedTimeGrounded));
+                _moveVelocity = Vector3.Lerp(_moveVelocity, Vector3.zero, _moveDumping * deltaTime);
 
                 _rb.linearVelocity =
-                    (_rb.useGravity ? elapsedTimeGrounded * Physics.gravity : Vector3.zero)
-                    + dampedMove
+                    (_rb.useGravity ? _fallVelocity : Vector3.zero)
+                    + _moveVelocity
                     + _flyingVelocity;
             }
 
@@ -560,7 +557,6 @@ namespace InGame.Player
         void EndVault(Vector3 endVelocity)
         {
             _moveVelocity = endVelocity;
-            _prevMoveVelocity = endVelocity;
             _rb.linearVelocity = _moveVelocity;
             DoingVault = false;
         }
@@ -595,8 +591,6 @@ namespace InGame.Player
         {
             transform.position = position;
             _moveVelocity = Vector3.zero;
-            _prevMoveVelocity = Vector3.zero;
-            _prevGroundedTime = Runner.SimulationTime;
         }
 
         public float GetSpeedOnPlane()
