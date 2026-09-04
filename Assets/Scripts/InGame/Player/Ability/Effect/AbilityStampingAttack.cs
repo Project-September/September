@@ -21,6 +21,7 @@ namespace InGame.Exhibit
         [SerializeField] private NetworkObject _shockwavePrefab;
         [SerializeField] private float _shockwaveMinSize;
         [SerializeField] private float _shockwaveScaleDuration;
+        [SerializeField] private float _attackDuration;
         [SerializeField] private float _attackRange;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _knockBackPower;
@@ -30,7 +31,8 @@ namespace InGame.Exhibit
         private StampingState _stampingState;
         private float _slashEndTime; //振り下ろし終了時間
         private float _landedTime; //着地した時間
-        private float _endTime; //終了時間
+        private float _endTime; //アビリティの終了時間
+        private float _attackEndTime; //攻撃判定の終了時間
 
         private GameObject _playerObject;
         private AnimationClipPlayer _animationClipPlayer;
@@ -114,34 +116,40 @@ namespace InGame.Exhibit
             float t = Mathf.InverseLerp(_landedTime, _landedTime + _shockwaveScaleDuration, Runner.SimulationTime);
             float scale = Mathf.Lerp(_shockwaveMinSize, _attackRange * 2, t);
             _shockwaveObject.transform.localScale = Vector3.one * scale;
-            float attackRange = scale / 2;
 
-            for (int i = _attackTargetPlayers.Count - 1; i >= 0; i--)
+            if (Runner.SimulationTime <= _attackEndTime)
             {
-                NetworkObject player = _attackTargetPlayers[i];
+                float attackRange = scale / 2;
 
-                //衝撃波に触れた
-                if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange * attackRange)
+                HitboxDebugUtility.DrawWireSphere(_playerObject.transform.position, attackRange, Color.red);
+
+                for (int i = _attackTargetPlayers.Count - 1; i >= 0; i--)
                 {
-                    //攻撃対象から外す
-                    _attackTargetPlayers.Remove(player);
+                    NetworkObject player = _attackTargetPlayers[i];
 
-                    //ダメージ処理
-                    if (player.TryGetComponent(out IDamageable damageable))
+                    //衝撃波に触れた
+                    if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange * attackRange)
                     {
-                        var hitData = new HitData(HitActionType.Damage, _damageAmount, _playerMovement.Object.InputAuthority, damageable.OwnerPlayerRef);
-                        damageable.TakeHit(ref hitData);
-                    }
+                        //攻撃対象から外す
+                        _attackTargetPlayers.Remove(player);
 
-                    //吹き飛ばす処理
-                    if (player.TryGetComponent(out PlayerMovement movement))
-                    {
-                        var dir = movement.transform.position - _playerObject.transform.position;
-                        var distance = dir.magnitude;
+                        //ダメージ処理
+                        if (player.TryGetComponent(out IDamageable damageable))
+                        {
+                            var hitData = new HitData(HitActionType.Damage, _damageAmount, _playerMovement.Object.InputAuthority, damageable.OwnerPlayerRef);
+                            damageable.TakeHit(ref hitData);
+                        }
 
-                        var power = _knockBackPower / Mathf.Max(distance, 0.1f);
+                        //吹き飛ばす処理
+                        if (player.TryGetComponent(out PlayerMovement movement))
+                        {
+                            var dir = movement.transform.position - _playerObject.transform.position;
+                            var distance = dir.magnitude;
 
-                        movement.AddFlyingVelocity(dir.normalized * power);
+                            var power = _knockBackPower / Mathf.Max(distance, 0.1f);
+
+                            movement.AddFlyingVelocity(dir.normalized * power);
+                        }
                     }
                 }
             }
@@ -164,6 +172,7 @@ namespace InGame.Exhibit
             _animationClipPlayer.PlayClip(_landingAnimation);
             _endTime = Runner.SimulationTime + Mathf.Max(_shockwaveScaleDuration, _attackedFreezeTime);
             _landedTime = Runner.SimulationTime;
+            _attackEndTime = Runner.SimulationTime + _attackDuration;
 
             Vector3 feetPosition = _playerMovement.MoveCapsuleCollider.bounds.min + Vector3.up * 0.1f;
             _shockwaveObject = Runner.Spawn(_shockwavePrefab, feetPosition);
