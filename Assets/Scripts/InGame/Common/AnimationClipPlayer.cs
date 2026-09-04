@@ -219,7 +219,7 @@ namespace InGame.Common
         }
 
         /// <summary> TopLayerでアニメーションを再生 </summary>
-        public void PlayOnLayer(AnimationClip clip, LayerInfo.LayerType layerType = LayerInfo.LayerType.TopLayer, float speed = 1f)
+        public void PlayOnLayer(AnimationClip clip, LayerInfo.LayerType layerType = LayerInfo.LayerType.TopLayer, float speed = 1f, bool loop = false)
         {
             if (!_slotOf.TryGetValue(layerType, out var slot))
             {
@@ -248,7 +248,7 @@ namespace InGame.Common
                 DisconnectAndDestroy(layerType, prev, slot);
             }
 
-            Play(clip, layerType, 1f,playSpeed: speed, additive: false);
+            Play(clip, layerType, 1f, playSpeed: speed, additive: false, loop: loop);
 
             var li = _layerInfo[slot];
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新

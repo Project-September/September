@@ -123,7 +123,7 @@ namespace InGame.Common
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
                 && !_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true))
             {
-                _animationClipPlayer.PlayOnLayer(_fallDown);
+                _animationClipPlayer.PlayOnLayer(_fallDown, loop: true);
                 _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
                 _animationClipPlayer.BlendLayerWeight(
                     LayerInfo.LayerType.TopLayer,
