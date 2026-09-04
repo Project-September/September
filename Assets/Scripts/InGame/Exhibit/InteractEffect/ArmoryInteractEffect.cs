@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Common;
 using InGame.Interact;
 using InGame.Player;
 using InGame.Player.Ability;
@@ -21,8 +22,8 @@ namespace InGame.Exhibit
         {
             return new ArmoryInteractEffect
             {
-                _addAbilities = Common.CloneUtility.CloneObject(_addAbilities),
-                _addAbilityConditions = Common.CloneUtility.CloneObject(_addAbilityConditions),
+                _addAbilities = _addAbilities,
+                _addAbilityConditions = _addAbilityConditions,
                 _overrideDisabledAbilities = _overrideDisabledAbilities,
                 _duration = _duration
             };
@@ -44,7 +45,6 @@ namespace InGame.Exhibit
                 return;
             }
 
-
             //上書きするAbilityを無効化
             playerAbility.SetAbilityEnabled(false, _overrideDisabledAbilities);
 
@@ -52,9 +52,8 @@ namespace InGame.Exhibit
             for (int i = 0; i < Mathf.Min(_addAbilities.Count, _addAbilityConditions.Count); i++)
             {
                 _addAbilities[i].SetPlayerComponent(playerObject.gameObject);
-                playerAbility.AddAbility(_addAbilities[i], _addAbilityConditions[i]);
+                playerAbility.AddAbility(CloneUtility.CloneObject(_addAbilities[i]), CloneUtility.CloneObject(_addAbilityConditions[i]));
             }
-
 
             equipmentManager.RPC_ChangeEquipment(EquipmentType.Armory);
 
