@@ -30,6 +30,10 @@ public class SharkMovementProcessing : NetworkBehaviour
     [SerializeField] LayerMask _wallLayerMask;
     [SerializeField, Range(0, 90)] float _wallAngle = 90;
 
+    [Header("空中正面衝突判定")]
+    [SerializeField] Vector3 _halfExtents = Vector3.one * 0.5f;
+    [SerializeField] Vector3 _forwardRayOffsetAir = new(0, 0.5f, 0);
+
     /// <summary>
     /// 海に落ちる直前の位置
     /// </summary>
@@ -116,13 +120,38 @@ public class SharkMovementProcessing : NetworkBehaviour
 
         // 前方に壁があるか判定
         var rot = Quaternion.LookRotation(moveDirection);
-        var ray = new Ray(transform.position + rot * _forwardRayOffset, moveDirection);
 
-        Debug.DrawRay(ray.origin, ray.direction * _forwardRayDistance, Color.yellow);
+        bool isHitWall = false;
+        {
+            if (_isGrounded)
+            {
+                var ray = new Ray(transform.position + rot * _forwardRayOffset, moveDirection);
 
-        // Rayを飛ばす
-        if (Physics.Raycast(ray, out var hit, _forwardRayDistance, _wallLayerMask)
-            && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
+                Debug.DrawRay(ray.origin, ray.direction * _forwardRayDistance, Color.yellow);
+
+                // Rayを飛ばす
+                if (Physics.Raycast(ray, out var hit, _forwardRayDistance, _wallLayerMask)
+                    && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
+                {
+                    isHitWall = true;
+                }
+            }
+            else
+            {
+                var ray = new Ray(transform.position + rot * _forwardRayOffsetAir, moveDirection);
+
+                DebugDrawUtility.DrawOrientedWireBox(ray.origin + ray.direction * _forwardRayDistance, _halfExtents, transform.rotation, Color.yellow);
+                Debug.DrawRay(ray.origin, ray.direction * _forwardRayDistance, Color.yellow);
+
+                if (Physics.BoxCast(ray.origin, _halfExtents, ray.direction, out var hit, transform.rotation, _forwardRayDistance, _wallLayerMask)
+                    && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
+                {
+                    isHitWall = true;
+                }
+            }
+        }
+
+        if (isHitWall)
         {
             // 坂などは判定しないように内積で壁判定
             KeepMovingTime = 0;
@@ -131,6 +160,7 @@ public class SharkMovementProcessing : NetworkBehaviour
         {
             KeepMovingTime += deltaTime;
         }
+
         // アニメーションカーブで速度取得
         float t = _speedCurve.Evaluate(KeepMovingTime);
         float baseSpeed = playerInput.Buttons.IsSet(PlayerButtons.Dash) ? _dashSpeed : _walkSpeed;
@@ -164,8 +194,6 @@ public class SharkMovementProcessing : NetworkBehaviour
         if (_isGrounded)
         {
             var diff = _heightAboveGround - _currentGroundHeight;
-
-            Debug.Log($"{diff}");
 
             if (diff > 0)
             {
@@ -223,6 +251,10 @@ public class SharkMovementProcessing : NetworkBehaviour
         // 前方に壁があるか判定
         Gizmos.color = Color.yellow;
         Gizmos.DrawRay(transform.position + transform.rotation * _forwardRayOffset, transform.forward * _forwardRayDistance);
+
+        Gizmos.color = new Color(1f, 0.5f, 0f);
+        Gizmos.DrawRay(transform.position + transform.rotation * _forwardRayOffsetAir, transform.forward * _forwardRayDistance);
+        Gizmos.DrawWireCube(transform.position + transform.rotation * _forwardRayOffsetAir + transform.forward * _forwardRayDistance, _halfExtents * 2f);
 
         // 地面から浮かせる距離
         Gizmos.color = Color.cyan;
