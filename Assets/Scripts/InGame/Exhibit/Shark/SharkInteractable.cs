@@ -4,6 +4,7 @@ using InGame.Exhibit;
 using InGame.Interact;
 using September.Common;
 using September.InGame.Common;
+using September.InGame.Fields;
 
 public class SharkInteractable : MountableExhibitBase
 {
@@ -122,6 +123,13 @@ public class SharkInteractable : MountableExhibitBase
     {
         // 解除後も移動処理が走ると、リセットした速度と蓄積時間が復活してしまう
         if (!IsSharkInteracting) return;
+
+        if (OutOfFieldArea.I && OutOfFieldArea.I.IsOutOfField(Rigidbody.position))
+        {
+            GetOff(OwnerPlayerRef);
+            return;
+        }
+
         if (!GetInput<PlayerInput>(out var playerInput)) return;
         _movementProcessing.UpdateMovement(playerInput, Runner.DeltaTime, Rigidbody, playerInput.DesiredLookDirection);
     }
@@ -183,14 +191,5 @@ public class SharkInteractable : MountableExhibitBase
         _attackTickCount = 0;
         IsAttacking = false;
         Executor = null;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        // Seaは仮の海のタグで付けているので、あとで変更を行う
-        if (other.CompareTag("Sea"))
-        {
-            IsSharkInteracting = false;
-        }
     }
 }
