@@ -30,8 +30,8 @@ namespace InGame.Exhibit
         private List<NetworkObject> _unattachedPlayers = new();
         private StampingState _stampingState;
         private float _slashEndTime; //U‚è‰º‚ë‚µI—¹ŠÔ
-        private float _landedTime;
-        private float _endTime;
+        private float _landedTime; //’…’n‚µ‚½ŠÔ
+        private float _endTime; //I—¹ŠÔ
 
         private GameObject _playerObject;
         private AnimationClipPlayer _animationClipPlayer;
