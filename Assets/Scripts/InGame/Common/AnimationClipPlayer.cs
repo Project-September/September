@@ -789,6 +789,12 @@ namespace InGame.Common
         #endregion
 
         #region Utility
+        /// <summary>
+        /// アニメーションが再生中かどうかを判定します
+        /// </summary>
+        /// <param name="clip"></param>
+        /// <param name="includeIsEnded">再生しきったアニメーションを判定に含めるか。持続モーションやループモーションを判定する時に使う。</param>
+        /// <param name="includeZeroWeight">重みがゼロのアニメーションを判定に含めるか。ノードそのものの生存をチェックする時に使う。</param>
         public bool IsPlayingTargetClip(AnimationClip clip, bool includeIsEnded = false, bool includeZeroWeight = false)
         {
             foreach (var kv in _clipOf)
@@ -798,13 +804,13 @@ namespace InGame.Common
                     // レイヤー重みもチェック
                     if (_slotOf.TryGetValue(kv.Key, out int slot))
                     {
-                        // アニメーションの再生が完了していたらスキップ
+                        // 再生が完了していれば未再生判定（ワンショットモーションが再生完了後も持続しないようにするため）
                         if (!includeIsEnded && p.GetTime() >= p.GetDuration() - 0.01)
                         {
                             continue;
                         }
 
-                        // ウェイトが無ければスキップ
+                        // Weightが0なら未再生判定。影響がない ＝ 再生していないものとしてあつかう
                         if (!includeZeroWeight && _layerMixer.GetInputWeight(slot) <= 0.001f)
                         {
                             continue;
