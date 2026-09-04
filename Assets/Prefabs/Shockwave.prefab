@@ -4844,6 +4844,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3055812052039239577}
   - component: {fileID: -572721302402780480}
+  - component: {fileID: 8967162041690529904}
   m_Layer: 0
   m_Name: Shockwave
   m_TagString: Untagged
@@ -4883,8 +4884,26 @@ MonoBehaviour:
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 8967162041690529904}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &8967162041690529904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941103743406674422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 1
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
 --- !u!1 &1909519783718811301
 GameObject:
   m_ObjectHideFlags: 0
