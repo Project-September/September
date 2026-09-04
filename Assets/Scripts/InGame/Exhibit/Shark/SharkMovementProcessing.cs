@@ -19,6 +19,8 @@ public class SharkMovementProcessing : NetworkBehaviour
     [SerializeField] private Vector3 _forwardGroundRayOriginOffset;
     [SerializeField] private Vector3 _backGroundRayOriginOffset;
     [SerializeField, Min(0)] private int _rayDivideCount;
+    [SerializeField] private float _heightAboveGround = 0.5f;
+    [SerializeField] private float _floatingSpeed = 1f;
 
     [Header("正面衝突判定")]
     [SerializeField] float _forwardRayDistance = 1;
@@ -34,6 +36,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     public float CurrentSpeedRatio { get; private set; }
 
     private Vector3 _currentGroundNormal; // 現在、接触している地面の法線
+    private float _currentGroundHeight; // 接触している地面との距離
     private bool _isGrounded; // プレイヤーが地面に接地しているか
 
     /// <summary>
@@ -80,6 +83,7 @@ public class SharkMovementProcessing : NetworkBehaviour
             {
                 _isGrounded = true;
                 _currentGroundNormal = groundHit.normal;　// 最初に見つかった地面の法線を保存
+                _currentGroundHeight = transform.position.y - groundHit.point.y; // 地面との距離を保存
                 PositionBeforeWaterFall = groundHit.point; // 最後に接していた地面の位置を保存
                 return;
             }
@@ -160,7 +164,20 @@ public class SharkMovementProcessing : NetworkBehaviour
     /// <param name="rb">プレイヤーのRigidbody</param>
     private void AdsorptionOnGround(float deltaTime, Rigidbody rb)
     {
-        if (_isGrounded) return;
+        if (_isGrounded)
+        {
+            var diff = _heightAboveGround - _currentGroundHeight;
+
+            Debug.Log($"{diff}");
+
+            if (diff > 0)
+            {
+                rb.linearVelocity += Vector3.up * _floatingSpeed;
+            }
+
+            return;
+        }
+
         var ray = Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, out RaycastHit hit,
             1.5f, _groundLayerMask);
         if (ray && hit.distance > 0)
@@ -217,5 +234,11 @@ public class SharkMovementProcessing : NetworkBehaviour
         // 前方に壁があるか判定
         Gizmos.color = Color.yellow;
         Gizmos.DrawRay(transform.position + transform.rotation * _forwardRayOffset, transform.forward * _forwardRayDistance);
+
+        // 地面から浮かせる距離
+        Gizmos.color = Color.cyan;
+        GizmosUtility.DrawHorizontalCross(transform.position, 1f);
+        Gizmos.DrawRay(transform.position, Vector3.down * _heightAboveGround);
+        GizmosUtility.DrawHorizontalCross(transform.position + Vector3.down * _heightAboveGround, 1f);
     }
 }

@@ -418,6 +418,8 @@ MonoBehaviour:
   _forwardGroundRayOriginOffset: {x: 0, y: 0.5, z: 3.23}
   _backGroundRayOriginOffset: {x: 0, y: 0.5, z: -1.55}
   _rayDivideCount: 2
+  _heightAboveGround: 0.2
+  _floatingSpeed: 1
   _forwardRayDistance: 2
   _forwardRayOffset: {x: 0, y: 0.76, z: 1.47}
   _wallLayerMask:
