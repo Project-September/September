@@ -44,7 +44,7 @@ namespace InGame.Exhibit
             _playerMovement.IgnoreEvasionInput = true;
 
             _animationClipPlayer.PlayClip(_attackAnimation);
-            _animationClipPlayerManager.SetIgnoreFallAnimation(true);
+            _animationClipPlayerManager.EnableFallMotion = false;
 
             _slashEndTime = Runner.SimulationTime + _attackAnimation.length;
 
@@ -149,7 +149,7 @@ namespace InGame.Exhibit
             {
                 _playerMovement.IgnoreMoveInput = false;
                 _playerMovement.IgnoreEvasionInput = false;
-                _animationClipPlayerManager.SetIgnoreFallAnimation(false);
+                _animationClipPlayerManager.EnableFallMotion = true;
                 Runner.Despawn(_shockwaveObject);
                 RequestEndAbility();
             }
