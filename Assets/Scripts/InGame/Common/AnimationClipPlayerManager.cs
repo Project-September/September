@@ -121,7 +121,7 @@ namespace InGame.Common
             if (!isGround
                 && EnableFallMotion
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
-                && !_animationClipPlayer.IsPlayingTargetClip(_fallDown))
+                && !_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true))
             {
                 _animationClipPlayer.PlayOnLayer(_fallDown);
                 _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
@@ -139,7 +139,7 @@ namespace InGame.Common
             }
 
             // ===== 着地の終了（1→0へブレンドしてからTopLayer解除） =====
-            if (!isGround || !_animationClipPlayer.IsPlayingTargetClip(_fallDown)) return;
+            if (!isGround || !_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true)) return;
             if (_isFadingOutFall) return;
             _isFadingOutFall = true;
             //topレイヤーにFallアニメーションがある場合は除外する
@@ -153,7 +153,7 @@ namespace InGame.Common
         {
             // 管理対象のアニメーションクリップをチェック
             return _animationClipPlayer.IsPlayingTargetClip(_jumpOver) ||
-                   _animationClipPlayer.IsPlayingTargetClip(_fallDown) ||
+                   _animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true) ||
                    _animationClipPlayer.IsPlayingTargetClip(_faint) ||
                    _animationClipPlayer.IsPlayingTargetClip(_getUp) ||
                    _animationClipPlayer.IsPlayingTargetClip(_rollEvasion);
@@ -400,8 +400,9 @@ namespace InGame.Common
                     BlendCurve = _landOutCurve
                 }
             );
-            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown) &&
-                _animationClipPlayer.GetTargetLayerWeight(LayerInfo.LayerType.TopLayer) == 0)
+
+            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true) &&
+                _animationClipPlayer.GetTargetLayerWeight(LayerInfo.LayerType.TopLayer) < 0.001f)
                 _animationClipPlayer.PlayOnLayer(null);
         }
     }
