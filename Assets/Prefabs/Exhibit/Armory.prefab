@@ -196,7 +196,6 @@ MonoBehaviour:
         _cooldown: 0
         _phase: 0
         IsEnabled: 1
-        _attackStartGroundDistance: 10
         _attackedFriezeTime: 1
         _attackAnimation: {fileID: 7400000, guid: a688dc165013d654d84f9e3c24b900e0, type: 2}
         _fallAnimation: {fileID: 7400000, guid: 7bbd6d80626ccbd438383b59cbd9bac7, type: 2}
@@ -205,8 +204,8 @@ MonoBehaviour:
         _shockwaveMinSize: 0.1
         _shockwaveScaleDuration: 1
         _attackRange: 10
-        _damageAmount: 10
-        _knockBackPower: 50
+        _damageAmount: 50
+        _knockBackPower: 100
     - rid: 2115540685324288144
       type: {class: AbilityStampingAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
       data:
