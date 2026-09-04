@@ -12,7 +12,7 @@ namespace InGame.Exhibit
     public class AbilityStampingAttack : AbilityBase
     {
         [Header("Time")]
-        [SerializeField] private float _attackedFriezeTime;
+        [SerializeField] private float _attackedFreezeTime;
         [Header("Animation")]
         [SerializeField] private AnimationClip _attackAnimation;
         [SerializeField] private AnimationClip _fallAnimation;
@@ -162,7 +162,7 @@ namespace InGame.Exhibit
         private void OnLanded()
         {
             _animationClipPlayer.PlayClip(_landingAnimation);
-            _endTime = Runner.SimulationTime + Mathf.Max(_shockwaveScaleDuration, _attackedFriezeTime);
+            _endTime = Runner.SimulationTime + Mathf.Max(_shockwaveScaleDuration, _attackedFreezeTime);
             _landedTime = Runner.SimulationTime;
 
             Vector3 feetPosition = _playerMovement.MoveCapsuleCollider.bounds.min + Vector3.up * 0.1f;
