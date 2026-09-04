@@ -50,7 +50,6 @@ namespace InGame.Exhibit
 
             _slashEndTime = Runner.SimulationTime + _attackAnimation.length;
 
-
             //©•ªˆÈŠO‚ğUŒ‚‘ÎÛ‚É‚·‚é
             _attackTargetPlayers.Clear();
             foreach (var player in PlayerDatabase.Instance.PlayerObjectDic)
@@ -72,7 +71,6 @@ namespace InGame.Exhibit
                 case StampingState.Falling:
                     Falling();
                     break;
-
                 case StampingState.Landing:
                     Landing();
                     break;

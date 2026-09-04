@@ -19,7 +19,6 @@ namespace InGame.Player.Ability.Condition
             if (!_playerMovement) _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
 
-
             //Availableó‘Ô‚Åƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚çğŒ‚ğ–‚½‚·
             return !_playerMovement.IsGround && !_playerManager.IsStun && !_playerMovement.IsEvading && !_playerMovement.DoingVault && !IsGameEnded() &&
                    _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal &&
