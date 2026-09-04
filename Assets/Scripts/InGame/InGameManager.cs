@@ -31,6 +31,11 @@ namespace September.InGame.Common
         public System.Action GameStarted { get; set; }
         public System.Action<PlayerRef, PlayerRef> PlayerKilled { get; set; }
 
+        private void Awake()
+        {
+            InGameDebugTimeInjector.Apply(_timerData);
+        }
+
         /// <summary>
         /// 現在のゲーム状態名を取得する
         /// </summary>

@@ -32,13 +32,13 @@ namespace CRISound
         {
             Debug.Log($"[BGMManager] ChangeBGM: {sceneName}");
 
-            SceneBGMContainer sceneBGMContainer = await SceneBGMContainer.GetInstance();
-            if (!sceneBGMContainer.TryGetBGM(sceneName, out SceneBGM bgm))
-            {
-                Debug.LogWarning($"[BGMManager] BGM not found for scene: {sceneName}");
-                return;
-            }
+            GetSceneBGMResult result = await SceneBGMContainer.GetBGMAsync(sceneName);
+            if (!result.IsSuccess) return;
+            ChangeBGM(result.BGM);
+        }
 
+        private static void ChangeBGM(SceneBGM bgm)
+        {
             string newCueName = bgm.BGMType switch
             {
                 BGMType.Constant => bgm.GetConstantBGM(),
@@ -52,6 +52,7 @@ namespace CRISound
 
             if (!string.IsNullOrEmpty(newCueName))
             {
+                Debug.Log($"[BGMManager] PlayBGM: {newCueName}");
                 CRIAudio.PlayBGM("ALLCue", newCueName);
                 _currentCueName = newCueName;
             }
@@ -79,7 +80,15 @@ namespace CRISound
                 CuePlayAtomExPlayer.Instance.ResetCategoryVolume();
             }
 
-            ChangeBGM(scene.name).Forget();
+            Debug.Log($"[BGMManager] OnSceneLoaded: {scene.name}");
+
+            GetSceneBGMResult result = await SceneBGMContainer.GetBGMAsync(scene.name);
+            if (!result.IsSuccess) return;
+
+            // シーンロード時に自動再生するか判定
+            if (!result.BGM.PlayOnSceneLoaded) return;
+
+            ChangeBGM(result.BGM);
         }
     }
 }

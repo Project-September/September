@@ -89,6 +89,8 @@ namespace September.InGame
             _playerTransform = transform.root;
             _cameraTransform = Camera.main.transform;
             SetupListenerAsync(this.GetCancellationTokenOnDestroy()).Forget();
+
+            _characterData = CharacterDataContainer.Instance.GetCharacterData(LocalPlayer.CharacterType);
         }
 
         private async UniTask SetupListenerAsync(CancellationToken ct)

@@ -38,6 +38,34 @@ namespace September.Common.CRI
 
             return false;
         }
+
+        public static async UniTask<GetSceneBGMResult> GetBGMAsync(string sceneName)
+        {
+            var instance = await GetInstance();
+
+            if (instance == null)
+            {
+                // 失敗
+                Debug.LogError("SceneBGMContainer is not loaded.");
+                return new GetSceneBGMResult { IsSuccess = false };
+            }
+
+            if (!instance.TryGetBGM(sceneName, out SceneBGM bgm))
+            {
+                // 失敗
+                Debug.LogWarning($"SceneBGM not found for scene: {sceneName}");
+                return new GetSceneBGMResult { IsSuccess = false };
+            }
+
+            // 成功
+            return new GetSceneBGMResult { IsSuccess = true, BGM = bgm };
+        }
+    }
+
+    public struct GetSceneBGMResult
+    {
+        public bool IsSuccess;
+        public SceneBGM BGM;
     }
 
     [Serializable]
@@ -48,6 +76,8 @@ namespace September.Common.CRI
 
         [SerializeField, AllowNesting, ShowIf("BGMType", BGMType.Constant)]
         private string _bgmName;
+
+        public bool PlayOnSceneLoaded;
 
         public string GetConstantBGM()
         {

@@ -354,6 +354,8 @@ namespace InGame.Exhibit
             // 既に誰か乗っていたら乗れないよん
             if (!Runner.IsServer || OwnerPlayerRef != PlayerRef.None) return;
 
+            ForceSetInteractable = false;
+
             // set input authority
             OwnerPlayerRef = ownerPlayerRef;
             LastUsedCooldownTime = -9999f;
@@ -388,6 +390,8 @@ namespace InGame.Exhibit
         void GetOff()
         {
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
+
+            ForceSetInteractable = true;
             
             PlayerDatabase.Instance.PlayerDataDic.TryGet(OwnerPlayerRef, out var playerData);
             RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? ControlDescriptionType.Sarutobi : ControlDescriptionType.Player);
@@ -472,11 +476,6 @@ namespace InGame.Exhibit
             if (_currentAccelText) _currentAccelText.text = "current accel : " + CurrentAccel.ToString("F2");
             if (_angleText) _angleText.text = "angle : " + transform.eulerAngles.ToString("F2");
             if (_isUpText) _isUpText.text = "is up : " + (Vector3.Angle(transform.up, Vector3.up) <= 90);
-        }
-
-        protected override bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
-        {
-            return OwnerPlayerRef == PlayerRef.None;
         }
 
         protected override void OnInteract(IInteractableContext context)
