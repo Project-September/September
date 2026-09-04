@@ -22,6 +22,7 @@ public class SharkMovementProcessing : NetworkBehaviour
 
     [Header("正面衝突判定")]
     [SerializeField] float _forwardRayDistance = 1;
+    [SerializeField] Vector3 _forwardRayOffset = new(0, 0.5f, 0);
     [SerializeField] LayerMask _wallLayerMask;
     [SerializeField, Range(0, 90)] float _wallAngle = 90;
 
@@ -113,7 +114,11 @@ public class SharkMovementProcessing : NetworkBehaviour
         Debug.DrawRay(transform.position, moveVelocity * 5f, Color.cyan);
 
         // 前方に壁があるか判定
-        var ray = new Ray(transform.position, moveDirection);
+        var rot = Quaternion.LookRotation(moveDirection);
+        var ray = new Ray(transform.position + rot * _forwardRayOffset, moveDirection);
+
+        Debug.DrawRay(ray.origin, ray.direction * _forwardRayDistance, Color.yellow);
+
         // Rayを飛ばす
         if (Physics.Raycast(ray, out var hit, _forwardRayDistance, _wallLayerMask)
             && Vector3.Dot(hit.normal, Vector3.up) <= Mathf.Cos(_wallAngle * Mathf.Deg2Rad))
@@ -208,5 +213,9 @@ public class SharkMovementProcessing : NetworkBehaviour
             var rayOrigin = Vector3.Lerp(forwardRayOrigin, backRayOrigin, i / (_rayDivideCount + 1f));
             Gizmos.DrawRay(rayOrigin, Vector3.down * _rayDistance);
         }
+
+        // 前方に壁があるか判定
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawRay(transform.position + transform.rotation * _forwardRayOffset, transform.forward * _forwardRayDistance);
     }
 }
