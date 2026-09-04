@@ -433,8 +433,10 @@ namespace InGame.Player
             }
             else
             {
-                var linearVelocity = _flyingVelocity;
-                var networkVelocity = _flyingVelocity;
+                // 回避中は接地に依らず確定した水平移動を継続する (崖から踏み出した瞬間に回避が止まらないように)
+                var evasionVelocity = IsEvading ? _moveVelocity : Vector3.zero;
+                var linearVelocity = _flyingVelocity + evasionVelocity;
+                var networkVelocity = _flyingVelocity + evasionVelocity;
 
                 linearVelocity.y = _rb.linearVelocity.y;
                 networkVelocity.y = NetworkVelocity.y;
