@@ -68,6 +68,7 @@ namespace InGame.Exhibit
             //無効化していたAbilityを有効化
             abilityManager.SetAbilityEnabled(true, _overrideDisabledAbilities);
 
+            //アビリティ実行途中なら待機
             await UniTask.WaitUntil(_addAbilities, abilities => abilities.All(x => x.Phase != AbilityBase.AbilityPhase.Active), cancellationToken: token);
 
             //追加したAbilityを消す
