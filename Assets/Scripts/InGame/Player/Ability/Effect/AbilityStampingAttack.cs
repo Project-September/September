@@ -115,6 +115,7 @@ namespace InGame.Exhibit
             float scale = Mathf.Lerp(_shockwaveMinSize, _attackRange * 2, t);
             _shockwaveObject.transform.localScale = Vector3.one * scale;
 
+            //çUåÇîªíË
             if (Runner.SimulationTime <= _attackEndTime)
             {
                 float attackRange = scale / 2;
