@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Fusion;
 using InGame.Common;
+using InGame.Health;
 using InGame.Player;
 using InGame.Player.Ability;
 using September.Common;
@@ -22,14 +23,17 @@ namespace InGame.Exhibit
         [SerializeField] private float _shockwaveMinSize;
         [SerializeField] private float _shockwaveScaleDuration;
         [SerializeField] private float _attackRange;
+        [SerializeField] private int _damageAmount;
+        [SerializeField] private float _knockBackPower;
 
         private NetworkObject _shockwaveObject;
-        private List<NetworkObject> _unattackedPlayers = new();
+        private List<NetworkObject> _unattachedPlayers = new();
         private StampingState _stampingState;
         private float _slashEndTime; //êUÇËâ∫ÇÎÇµèIóπéûä‘
         private float _landedTime;
         private float _endTime;
 
+        private GameObject _playerObject;
         private AnimationClipPlayer _animationClipPlayer;
         private AnimationClipPlayerManager _animationClipPlayerManager;
         private PlayerMovement _playerMovement;
@@ -41,10 +45,14 @@ namespace InGame.Exhibit
             _playerMovement.IgnoreEvasionInput = true;
             _animationClipPlayerManager.SetIgnoreFallAnimation(true);
 
-            _unattackedPlayers.Clear();
+            _unattachedPlayers.Clear();
             foreach (var player in PlayerDatabase.Instance.PlayerObjectDic)
             {
-                _unattackedPlayers.Add(player.Value);
+                if (player.Value.gameObject == _playerObject)
+                    continue;
+
+                Debug.Log($"Target {player.Value.gameObject.name}");
+                _unattachedPlayers.Add(player.Value);
             }
 
             _animationClipPlayer.PlayClip(_attackAnimation);
@@ -102,6 +110,35 @@ namespace InGame.Exhibit
             float t = Mathf.InverseLerp(_landedTime, _landedTime + _shockwaveScaleDuration, Runner.SimulationTime);
             float scale = Mathf.Lerp(_shockwaveMinSize, _attackRange * 2, t);
             _shockwaveObject.transform.localScale = Vector3.one * scale;
+            float attackRange = scale / 2;
+
+            foreach (var player in _unattachedPlayers)
+            {
+                //è’åÇîgÇ…êGÇÍÇΩ
+                if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange)
+                {
+                    _unattachedPlayers.Remove(player);
+
+                    //É_ÉÅÅ[ÉWèàóù
+                    if (player.TryGetComponent(out IDamageable damageable))
+                    {
+                        var hitData = new HitData(HitActionType.Damage, _damageAmount, _playerMovement.Object.InputAuthority, damageable.OwnerPlayerRef);
+                        damageable.TakeHit(ref hitData);
+                    }
+
+                    //êÅÇ´îÚÇŒÇ∑èàóù
+                    if (player.TryGetComponent(out PlayerMovement movement))
+                    {
+                        var dir = movement.transform.position - _playerObject.transform.position;
+                        var distance = dir.magnitude;
+
+                        var power = _knockBackPower / Mathf.Max(distance, 0.1f);
+
+                        movement.AddFlyingVelocity(dir.normalized * power);
+                    }
+                }
+            }
+
 
             if (Runner.SimulationTime > _endTime)
             {
@@ -115,6 +152,7 @@ namespace InGame.Exhibit
 
         public override void SetPlayerComponent(GameObject player)
         {
+            _playerObject = player;
             _playerMovement = player.GetComponent<PlayerMovement>();
             _animationClipPlayer = player.GetComponent<AnimationClipPlayer>();
             _animationClipPlayerManager = player.GetComponent<AnimationClipPlayerManager>();
