@@ -284,14 +284,14 @@ namespace InGame.Common
             if (!_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var currentClip)
                 || !currentClip.IsValid())
             {
-                PlayOnTopLayer(clip, speed);
+                PlayOnLayer(clip, LayerInfo.LayerType.TopLayer, speed);
                 return;
             }
 
             var currentInput = _layerMixer.GetInput(slot);
             if (!currentInput.IsValid())
             {
-                PlayOnTopLayer(clip, speed);
+                PlayOnLayer(clip, LayerInfo.LayerType.TopLayer, speed);
                 return;
             }
 
