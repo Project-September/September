@@ -143,8 +143,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     private void Rotate(float deltaTime, Vector3 moveDirection)
     {
         if (moveDirection == Vector3.zero) return;
-        // -90の補正を掛けて、常に横向きにする ※仮オブジェクトのため、本来のモデルなら必要なくなる
-        var rot = Quaternion.LookRotation(moveDirection) * Quaternion.Euler(-90, 0, 0);
+        var rot = Quaternion.LookRotation(moveDirection);
         var endRot = Quaternion.RotateTowards(transform.rotation, rot, _maxRotateValue * deltaTime);
         transform.rotation = endRot;
     }
