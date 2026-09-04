@@ -6012,17 +6012,80 @@ MonoBehaviour:
   _overrideInTime: 0.08
   _overrideInCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _overrideOutTime: 0.1
+  _overrideOutTime: 0.164
   _overrideOutCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _getUpBlendTime: 0
+  _getUpBlendCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _isGetUpAutoRotationEnabled: 0
+  _getUpRotationOffsetY: 0
   _EnableFallMotion: 1
 --- !u!114 &9111916553959908344
 MonoBehaviour:
@@ -6185,8 +6248,6 @@ MonoBehaviour:
   _heightOffset: 1.58
   _audioBroadcaster: {fileID: 2132102575819528591}
   _pickUpSoundCueName: SE_Jewel_PickUp
-  _interactEffectType: 27
-  _interactEffectOffset: {x: 0, y: 0.6, z: 0}
 --- !u!114 &202504370253565435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6235,6 +6296,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a1ae910b68ab24548aeb22c70f07f662, type: 2}
   - {fileID: 11400000, guid: 119bedf445fad8b43a29785def84571e, type: 2}
   _hitRetentionTime: 20
+  _randomOffsetRange: 3
+  _searchFieldRadius: 10
   _height: 1.5
   _randomHeight: 0.3
   _duration: 1.5

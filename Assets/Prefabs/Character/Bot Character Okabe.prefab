@@ -156,6 +156,14 @@ PrefabInstance:
       propertyPath: _playerManager
       value: 
       objectReference: {fileID: 3756915935459013970}
+    - target: {fileID: 5036416392918698701, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+      propertyPath: _getUpRotationOffsetY
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5036416392918698701, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
+      propertyPath: _isGetUpAutoRotationEnabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5053954526073002999, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: SortKey
       value: 1510239164
