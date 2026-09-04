@@ -219,11 +219,11 @@ namespace InGame.Common
         }
 
         /// <summary> TopLayerでアニメーションを再生 </summary>
-        public void PlayOnTopLayer(AnimationClip clip,float speed = 1f)
+        public void PlayOnLayer(AnimationClip clip, LayerInfo.LayerType layerType = LayerInfo.LayerType.TopLayer, float speed = 1f)
         {
-            if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
+            if (!_slotOf.TryGetValue(layerType, out var slot))
             {
-                Debug.LogWarning("[AnimationClipPlayer] TopLayer が設定されていません。_layerInfo の最後に追加してください。");
+                Debug.LogWarning($"[AnimationClipPlayer] {layerType} が設定されていません。_layerInfo の最後に追加してください。");
                 return;
             }
 
@@ -232,9 +232,9 @@ namespace InGame.Common
             {
                 _layerMixer.SetInputWeight(slot, 0f);
 
-                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var current) && current.IsValid())
+                if (_runtimeClips.TryGetValue(layerType, out var current) && current.IsValid())
                 {
-                    DisconnectAndDestroy(LayerInfo.LayerType.TopLayer, current, slot);
+                    DisconnectAndDestroy(layerType, current, slot);
                 }
 
                 var li0 = _layerInfo[slot];
@@ -243,12 +243,12 @@ namespace InGame.Common
                 return;
             }
 
-            if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var prev) && prev.IsValid())
+            if (_runtimeClips.TryGetValue(layerType, out var prev) && prev.IsValid())
             {
-                DisconnectAndDestroy(LayerInfo.LayerType.TopLayer, prev, slot);
+                DisconnectAndDestroy(layerType, prev, slot);
             }
 
-            Play(clip, LayerInfo.LayerType.TopLayer, 1f,playSpeed: speed, additive: false);
+            Play(clip, layerType, 1f,playSpeed: speed, additive: false);
 
             var li = _layerInfo[slot];
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
