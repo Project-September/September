@@ -121,7 +121,7 @@ namespace InGame.Exhibit
                 NetworkObject player = _attackTargetPlayers[i];
 
                 //ÕŒ‚”g‚ÉG‚ê‚½
-                if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange)
+                if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange * attackRange)
                 {
                     //UŒ‚‘ÎÛ‚©‚çŠO‚·
                     _attackTargetPlayers.Remove(player);
