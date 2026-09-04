@@ -258,10 +258,7 @@ MonoBehaviour:
     values:
     - 10
   _characterEffects:
-  - rid: 2261108650527948884
-  - rid: 2261108650527948885
-  - rid: 2261108650527948886
-  - rid: 2261108650527948887
+  - rid: 1044499857362387043
   _type: 15
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectTransform: {fileID: 1555983194214880285}
@@ -281,30 +278,25 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2261108650527948884
+    - rid: 1044499857362387043
+      type: {class: CompositeInteractEffect, ns: September.InGame.Interact, asm: Scripts}
+      data:
+        _characterType: 5
+        _interactEffects:
+        - rid: 1044499857362387044
+        - rid: 1044499857362387045
+    - rid: 1044499857362387044
       type: {class: SharkInteractEffect, ns: InGame.Exhibit, asm: Scripts}
       data:
-        _characterType: 1
+        _characterType: 5
         _interactTime: 10
         _sharkInteractable: {fileID: 7332413252645484968}
-    - rid: 2261108650527948885
-      type: {class: SharkInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+    - rid: 1044499857362387045
+      type: {class: MountableTimeLimitInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
       data:
-        _characterType: 2
-        _interactTime: 10
-        _sharkInteractable: {fileID: 7332413252645484968}
-    - rid: 2261108650527948886
-      type: {class: SharkInteractEffect, ns: InGame.Exhibit, asm: Scripts}
-      data:
-        _characterType: 3
-        _interactTime: 10
-        _sharkInteractable: {fileID: 7332413252645484968}
-    - rid: 2261108650527948887
-      type: {class: SharkInteractEffect, ns: InGame.Exhibit, asm: Scripts}
-      data:
-        _characterType: 4
-        _interactTime: 10
-        _sharkInteractable: {fileID: 7332413252645484968}
+        _characterType: 5
+        _targetMountable: {fileID: 7332413252645484968}
+        _duration: 20
 --- !u!114 &6716616855924409591
 MonoBehaviour:
   m_ObjectHideFlags: 0
