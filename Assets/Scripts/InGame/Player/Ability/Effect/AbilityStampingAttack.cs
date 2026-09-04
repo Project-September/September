@@ -11,8 +11,7 @@ namespace InGame.Exhibit
 {
     public class AbilityStampingAttack : AbilityBase
     {
-        [Header("Timing")]
-        [SerializeField] private float _attackStartGroundDistance;
+        [Header("Time")]
         [SerializeField] private float _attackedFriezeTime;
         [Header("Animation")]
         [SerializeField] private AnimationClip _attackAnimation;
@@ -27,7 +26,7 @@ namespace InGame.Exhibit
         [SerializeField] private float _knockBackPower;
 
         private NetworkObject _shockwaveObject;
-        private List<NetworkObject> _unattachedPlayers = new();
+        private List<NetworkObject> _attackTargetPlayers = new();
         private StampingState _stampingState;
         private float _slashEndTime; //êUÇËâ∫ÇÎÇµèIóπéûä‘
         private float _landedTime; //íÖínÇµÇΩéûä‘
@@ -40,29 +39,34 @@ namespace InGame.Exhibit
 
         protected override void OnStart()
         {
-            _stampingState = StampingState.Falling;
+            _stampingState = StampingState.Swing;
             _playerMovement.IgnoreMoveInput = true;
             _playerMovement.IgnoreEvasionInput = true;
+
+            _animationClipPlayer.PlayClip(_attackAnimation);
             _animationClipPlayerManager.SetIgnoreFallAnimation(true);
 
-            _unattachedPlayers.Clear();
+            _slashEndTime = Runner.SimulationTime + _attackAnimation.length;
+
+
+            //é©ï™à»äOÇçUåÇëŒè€Ç…Ç∑ÇÈ
+            _attackTargetPlayers.Clear();
             foreach (var player in PlayerDatabase.Instance.PlayerObjectDic)
             {
                 if (player.Value.gameObject == _playerObject)
                     continue;
 
-                Debug.Log($"Target {player.Value.gameObject.name}");
-                _unattachedPlayers.Add(player.Value);
+                _attackTargetPlayers.Add(player.Value);
             }
-
-            _animationClipPlayer.PlayClip(_attackAnimation);
-            _slashEndTime = Runner.SimulationTime + _attackAnimation.length;
         }
 
         protected override void OnUpdate(float deltaTime)
         {
             switch (_stampingState)
             {
+                case StampingState.Swing:
+                    Swing();
+                    break;
                 case StampingState.Falling:
                     Falling();
                     break;
@@ -74,31 +78,30 @@ namespace InGame.Exhibit
         }
 
         /// <summary>
+        /// êUÇËâ∫ÇÎÇµíÜÇÃèàóù
+        /// </summary>
+        private void Swing()
+        {
+            //êUÇËâ∫ÇÎÇµÇ™èIóπÇµÇΩÇÁóéâ∫Ç…à⁄çsÇ∑ÇÈ
+            if (Runner.SimulationTime >= _slashEndTime)
+            {
+                _animationClipPlayer.PlayClipLoop(_fallAnimation);
+                _stampingState = StampingState.Falling;
+            }
+
+            if (_playerMovement.IsGround)
+                OnLanded();
+        }
+
+        /// <summary>
         /// óéâ∫íÜÇÃèàóù
         /// </summary>
         private void Falling()
         {
-            if (Runner.SimulationTime >= _slashEndTime)
-            {
-                _animationClipPlayer.PlayClipLoop(_fallAnimation);
-            }
-
             if (_playerMovement.IsGround)
             {
-                if (Runner.SimulationTime >= _slashEndTime)
-                {
-                    _animationClipPlayer.StopClip(_fallAnimation);
-                }
-
-                _animationClipPlayer.PlayClip(_landingAnimation);
-                _endTime = Runner.SimulationTime + Mathf.Max(_shockwaveScaleDuration, _attackedFriezeTime);
-                _landedTime = Runner.SimulationTime;
-
-                Vector3 feetPosition = _playerMovement.MoveCapsuleCollider.bounds.min + Vector3.up * 0.1f;
-                _shockwaveObject = Runner.Spawn(_shockwavePrefab, feetPosition);
-                _shockwaveObject.transform.localScale = Vector3.one * _shockwaveMinSize;
-
-                _stampingState = StampingState.Landing;
+                _animationClipPlayer.StopClip(_fallAnimation);
+                OnLanded();
             }
         }
 
@@ -107,17 +110,19 @@ namespace InGame.Exhibit
         /// </summary>
         private void Landing()
         {
+            //è’åÇîgÇëÂÇ´Ç≠Ç∑ÇÈ
             float t = Mathf.InverseLerp(_landedTime, _landedTime + _shockwaveScaleDuration, Runner.SimulationTime);
             float scale = Mathf.Lerp(_shockwaveMinSize, _attackRange * 2, t);
             _shockwaveObject.transform.localScale = Vector3.one * scale;
             float attackRange = scale / 2;
 
-            foreach (var player in _unattachedPlayers)
+            foreach (var player in _attackTargetPlayers)
             {
                 //è’åÇîgÇ…êGÇÍÇΩ
                 if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange)
                 {
-                    _unattachedPlayers.Remove(player);
+                    //çUåÇëŒè€Ç©ÇÁäOÇ∑
+                    _attackTargetPlayers.Remove(player);
 
                     //É_ÉÅÅ[ÉWèàóù
                     if (player.TryGetComponent(out IDamageable damageable))
@@ -150,6 +155,22 @@ namespace InGame.Exhibit
             }
         }
 
+        /// <summary>
+        /// íÖínéûÇÃèàóù
+        /// </summary>
+        private void OnLanded()
+        {
+            _animationClipPlayer.PlayClip(_landingAnimation);
+            _endTime = Runner.SimulationTime + Mathf.Max(_shockwaveScaleDuration, _attackedFriezeTime);
+            _landedTime = Runner.SimulationTime;
+
+            Vector3 feetPosition = _playerMovement.MoveCapsuleCollider.bounds.min + Vector3.up * 0.1f;
+            _shockwaveObject = Runner.Spawn(_shockwavePrefab, feetPosition);
+            _shockwaveObject.transform.localScale = Vector3.one * _shockwaveMinSize;
+
+            _stampingState = StampingState.Landing;
+        }
+
         public override void SetPlayerComponent(GameObject player)
         {
             _playerObject = player;
@@ -160,6 +181,7 @@ namespace InGame.Exhibit
 
         public enum StampingState
         {
+            Swing,//êUÇËâ∫ÇÎÇµ
             Falling,  // óéÇøÇÈ
             Landing   // íÖín
         }
