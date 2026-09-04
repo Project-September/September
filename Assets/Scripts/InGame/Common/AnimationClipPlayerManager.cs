@@ -394,7 +394,6 @@ namespace InGame.Common
                 );
 
                 if (!ReferenceEquals(_overrideCts, cts)) return;
-                _animationClipPlayer.PlayOnTopLayer(null);
                 ClearGetUpVisualCorrection();
                 _animationClipPlayer.PlayOnLayer(null);
                 _hardOverride = false;
