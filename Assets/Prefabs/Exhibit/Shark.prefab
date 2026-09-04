@@ -160,7 +160,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.75
-  m_Height: 2.78
+  m_Height: 2.44
   m_Direction: 2
   m_Center: {x: 0, y: 0.81, z: 0.89}
 --- !u!54 &4484201000652167640
@@ -407,7 +407,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _rayDistance: 1
+  _rayDistance: 2
   _groundMaximumAngle: 90
   _fallGravity: {x: 0, y: -13, z: 0}
   _maxRotateValue: 250
@@ -418,10 +418,17 @@ MonoBehaviour:
   _forwardGroundRayOriginOffset: {x: 0, y: 0.5, z: 1.49}
   _backGroundRayOriginOffset: {x: 0, y: 0.5, z: 0.26}
   _rayDivideCount: 2
+  _groundRay:
+    StartOrigin: {x: 0, y: 0.5, z: 1.49}
+    EndOrigin: {x: 0, y: 0.5, z: 0.26}
+    Direction: {x: 0, y: -1, z: 0}
+    Distance: 2
+    DivideCount: 2
   _heightAboveGround: 0.2
   _floatingSpeed: 1
   _forwardRayDistance: 1.7
   _forwardRayOffset: {x: 0, y: 0.65, z: 0.78}
+  _forwardRayOffset: {x: 0, y: 1, z: 0.78}
   _wallLayerMask:
     serializedVersion: 2
     m_Bits: 2249

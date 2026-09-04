@@ -7,18 +7,20 @@ using UnityEngine;
 /// </summary>
 public class SharkMovementProcessing : NetworkBehaviour
 {
-    [Header("移動設定"), SerializeField] private float _walkSpeed;
+    [Header("移動設定")]
+    [SerializeField] private float _walkSpeed;
     [SerializeField] private float _dashSpeed;
-    [SerializeField] AnimationCurve _speedCurve;
-    [SerializeField] private float _rayDistance;
-    [SerializeField] private float _groundMaximumAngle;
+    [SerializeField] private AnimationCurve _speedCurve;
     [SerializeField] private Vector3 _fallGravity;
     [SerializeField] private float _maxRotateValue;
-    [SerializeField] private float _groundAdsorptionSpeed;
+
+    [Header("地面判定")]
     [SerializeField] private LayerMask _groundLayerMask;
-    [SerializeField] private Vector3 _forwardGroundRayOriginOffset;
-    [SerializeField] private Vector3 _backGroundRayOriginOffset;
-    [SerializeField, Min(0)] private int _rayDivideCount;
+    [SerializeField] private MultiRay _groundRay;
+    [SerializeField] private float _groundMaximumAngle;
+    [SerializeField] private float _groundAdsorptionSpeed;
+
+    [Header("地面浮遊")]
     [SerializeField] private float _heightAboveGround = 0.5f;
     [SerializeField] private float _floatingSpeed = 1f;
 
@@ -71,22 +73,17 @@ public class SharkMovementProcessing : NetworkBehaviour
     /// <param name="rb">プレイヤーのRigidbody</param>
     private void CheckGroundManual(Rigidbody rb)
     {
-        var forwardRayOrigin = transform.TransformPoint(_forwardGroundRayOriginOffset);
-        var backRayOrigin = transform.TransformPoint(_backGroundRayOriginOffset);
-
         // 地面判定
-        for (int i = 0; i < _rayDivideCount + 2; ++i)
+        foreach (RaycastHit hit in _groundRay.RaycastAll(rb.position, rb.rotation, _groundLayerMask))
         {
-            var rayOrigin = Vector3.Lerp(forwardRayOrigin, backRayOrigin, i / (_rayDivideCount + 1f));
-            bool isHit = Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit groundHit, _rayDistance, _groundLayerMask);
-            if (isHit && Vector3.Angle(groundHit.normal, Vector3.up) < _groundMaximumAngle)
-            {
-                _isGrounded = true;
-                _currentGroundNormal = groundHit.normal;　// 最初に見つかった地面の法線を保存
-                _currentGroundHeight = transform.position.y - groundHit.point.y; // 地面との距離を保存
-                PositionBeforeWaterFall = groundHit.point; // 最後に接していた地面の位置を保存
-                return;
-            }
+            if (!(Vector3.Angle(hit.normal, Vector3.up) < _groundMaximumAngle)) continue;
+
+            _isGrounded = true;
+            _currentGroundNormal = hit.normal;　// 最初に見つかった地面の法線を保存
+            _currentGroundHeight = transform.position.y - hit.point.y; // 地面との距離を保存
+            PositionBeforeWaterFall = hit.point; // 最後に接していた地面の位置を保存
+
+            return;
         }
 
         // 地面から離れた瞬間に、最後の接地時間を保存
@@ -221,15 +218,7 @@ public class SharkMovementProcessing : NetworkBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-
-        var forwardRayOrigin = transform.TransformPoint(_forwardGroundRayOriginOffset);
-        var backRayOrigin = transform.TransformPoint(_backGroundRayOriginOffset);
-
-        for (int i = 0; i < _rayDivideCount + 2; ++i)
-        {
-            var rayOrigin = Vector3.Lerp(forwardRayOrigin, backRayOrigin, i / (_rayDivideCount + 1f));
-            Gizmos.DrawRay(rayOrigin, Vector3.down * _rayDistance);
-        }
+        GizmosUtility.DrawMultiRay(_groundRay, transform.position, transform.rotation);
 
         // 前方に壁があるか判定
         Gizmos.color = Color.yellow;
