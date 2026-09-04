@@ -401,7 +401,7 @@ namespace InGame.Common
                 }
             );
 
-            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true) &&
+            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true, includeZeroWeight: true) &&
                 _animationClipPlayer.GetTargetLayerWeight(LayerInfo.LayerType.TopLayer) < 0.001f)
                 _animationClipPlayer.PlayOnLayer(null);
         }

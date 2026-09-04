@@ -789,23 +789,28 @@ namespace InGame.Common
         #endregion
 
         #region Utility
-        public bool IsPlayingTargetClip(AnimationClip clip, bool includeIsEnded = false)
+        public bool IsPlayingTargetClip(AnimationClip clip, bool includeIsEnded = false, bool includeZeroWeight = false)
         {
             foreach (var kv in _clipOf)
             {
                 if (kv.Value == clip && _runtimeClips.TryGetValue(kv.Key, out var p) && p.IsValid())
                 {
                     // レイヤー重みもチェック
-                    if (_slotOf.TryGetValue(kv.Key, out int slot) && _layerMixer.GetInputWeight(slot) > 0.001f)
+                    if (_slotOf.TryGetValue(kv.Key, out int slot))
                     {
-                        // 既にクリップを再生しきった状態を含む場合は完了状態をチェックせずに返す
-                        if (includeIsEnded) return true;
-
-                        // アニメーション完了状態もチェック
-                        if (p.GetTime() < p.GetDuration() - 0.01) // まだ再生中
+                        // アニメーションの再生が完了していたらスキップ
+                        if (!includeIsEnded && p.GetTime() >= p.GetDuration() - 0.01)
                         {
-                            return true;
+                            continue;
                         }
+
+                        // ウェイトが無ければスキップ
+                        if (!includeZeroWeight && _layerMixer.GetInputWeight(slot) <= 0.001f)
+                        {
+                            continue;
+                        }
+
+                        return true;
                     }
                 }
             }
