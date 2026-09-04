@@ -116,8 +116,10 @@ namespace InGame.Exhibit
             _shockwaveObject.transform.localScale = Vector3.one * scale;
             float attackRange = scale / 2;
 
-            foreach (var player in _attackTargetPlayers)
+            for (int i = _attackTargetPlayers.Count - 1; i >= 0; i--)
             {
+                NetworkObject player = _attackTargetPlayers[i];
+
                 //ÕŒ‚”g‚ÉG‚ê‚½
                 if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange)
                 {
@@ -143,7 +145,6 @@ namespace InGame.Exhibit
                     }
                 }
             }
-
 
             if (Runner.SimulationTime > _endTime)
             {
