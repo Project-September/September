@@ -255,6 +255,110 @@ namespace InGame.Common
             _layerInfo[slot] = li;
         }
 
+        /// <summary>
+        /// TopLayerで現在のアニメーションから指定したアニメーションへクロスフェードします。
+        /// </summary>
+        /// <param name="clip">遷移先のアニメーション</param>
+        /// <param name="speed">遷移先の再生速度</param>
+        /// <param name="blendTime">クロスフェード時間</param>
+        /// <param name="blendCurve">クロスフェードの補間曲線</param>
+        /// <param name="token">外部から遷移を中断するトークン</param>
+        public async UniTask CrossFadeOnTopLayerAsync(
+            AnimationClip clip,
+            float speed,
+            float blendTime,
+            AnimationCurve blendCurve,
+            CancellationToken token = default)
+        {
+            if (!clip)
+            {
+                return;
+            }
+
+            if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
+            {
+                Debug.LogWarning("[AnimationClipPlayer] TopLayer が設定されていません。_layerInfo の最後に追加してください。");
+                return;
+            }
+
+            if (!_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var currentClip)
+                || !currentClip.IsValid())
+            {
+                PlayOnTopLayer(clip, speed);
+                return;
+            }
+
+            var currentInput = _layerMixer.GetInput(slot);
+            if (!currentInput.IsValid())
+            {
+                PlayOnTopLayer(clip, speed);
+                return;
+            }
+
+            var nextClip = AnimationClipPlayable.Create(_graph, clip);
+            nextClip.SetApplyFootIK(!IsFootIKDisabledFor(clip));
+            nextClip.SetTime(0);
+            nextClip.SetDuration(clip.length);
+            nextClip.SetSpeed(speed);
+
+            var transitionMixer = AnimationMixerPlayable.Create(_graph, 2);
+            _layerMixer.DisconnectInput(slot);
+            transitionMixer.ConnectInput(0, currentInput, 0);
+            transitionMixer.ConnectInput(1, nextClip, 0);
+            transitionMixer.SetInputWeight(0, 1f);
+            transitionMixer.SetInputWeight(1, 0f);
+            _layerMixer.ConnectInput(slot, transitionMixer, 0);
+            _layerMixer.SetInputWeight(slot, 1f);
+            var transitionRoot = _layerMixer.GetInput(slot);
+
+            _runtimeClips[LayerInfo.LayerType.TopLayer] = nextClip;
+            _clipOf[LayerInfo.LayerType.TopLayer] = clip;
+
+            var blendDuration = Mathf.Max(blendTime, 0f);
+            if (blendDuration <= 0f)
+            {
+                transitionMixer.SetInputWeight(0, 0f);
+                transitionMixer.SetInputWeight(1, 1f);
+                return;
+            }
+
+            try
+            {
+                float elapsed = 0f;
+                while (elapsed < blendDuration)
+                {
+                    token.ThrowIfCancellationRequested();
+                    elapsed += Time.deltaTime;
+                    var progress = Mathf.Clamp01(elapsed / blendDuration);
+                    if (blendCurve != null)
+                    {
+                        progress = Mathf.Clamp01(blendCurve.Evaluate(progress));
+                    }
+
+                    transitionMixer.SetInputWeight(0, 1f - progress);
+                    transitionMixer.SetInputWeight(1, progress);
+                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+                }
+
+                transitionMixer.SetInputWeight(0, 0f);
+                transitionMixer.SetInputWeight(1, 1f);
+            }
+            catch (OperationCanceledException)
+            {
+                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var current)
+                    && current.Equals(nextClip)
+                    && current.IsValid())
+                {
+                    _layerMixer.DisconnectInput(slot);
+                    transitionRoot.DestroyTree();
+                    _runtimeClips.Remove(LayerInfo.LayerType.TopLayer);
+                    _clipOf.Remove(LayerInfo.LayerType.TopLayer);
+                }
+
+                throw;
+            }
+        }
+
         public void Play(AnimationClip clip, bool forcePlay = false)
         {
             if (!TryGetMontageIndex(clip, out int clipIndex))

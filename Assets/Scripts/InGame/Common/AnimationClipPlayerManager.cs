@@ -55,11 +55,19 @@ namespace InGame.Common
         [SerializeField] private AnimationCurve _overrideInCurve = null;
         [SerializeField, Range(0f, 1f)] private float _overrideOutTime = 0.10f;
         [SerializeField] private AnimationCurve _overrideOutCurve = null;
+        [SerializeField, Range(0f, 1f)] private float _getUpBlendTime = 0.12f;
+        [SerializeField] private AnimationCurve _getUpBlendCurve = null;
+        [SerializeField, Tooltip("DownとGetUpの向きを自動で揃える。OFFの場合は下の手動角度だけを使用する")]
+        private bool _isGetUpAutoRotationEnabled = true;
+        [SerializeField, Range(-180f, 180f), Tooltip("GetUp開始時に加える水平回転角度 (度)")]
+        private float _getUpRotationOffsetY;
         private bool _hardOverride = false;
 
         private bool _isFadingOutFall = false;       // 着地フェード多重起動防止
         private CancellationTokenSource _overrideCts;
         private bool _isFainting = false;          // 気絶中フラグ（多重起動防止）
+        private Transform _visualRoot;
+        private Quaternion _visualRootBaseLocalRotation;
         private float _locoWeight;
         private CancellationTokenSource _jumpOverTokenSrc;
         private CancellationTokenSource _rollEvasionTokenSrc;
@@ -209,8 +217,8 @@ namespace InGame.Common
             var playbackRate = baseSpeed > 0f ? speed / baseSpeed : 0f;
 
             _animationClipPlayer.SetLocoPlaybackRate(playbackRate);
-            // TopLayerで何も再生していないときはWeightを0にする
-            if (!HasActiveTopLayerClip())
+            // 強制上書き中は、非ループクリップが終端に到達しても倒れた姿勢を保持する。
+            if (!_hardOverride && !HasActiveTopLayerClip())
             {
                 _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
             }
@@ -226,6 +234,7 @@ namespace InGame.Common
         {
             // すでに実行中なら差し替え（再発動）
             _overrideCts?.Cancel();
+            ClearGetUpVisualCorrection();
             _ = PlayFaintSequenceAsync();
         }
 
@@ -316,6 +325,7 @@ namespace InGame.Common
             _hardOverride = false;
             _animationClipPlayer.PlayOnTopLayer(null);
             _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
+            ClearGetUpVisualCorrection();
             _overrideCts = null;
         }
 
@@ -324,6 +334,7 @@ namespace InGame.Common
         private async UniTaskVoid PlayFaintSequenceAsync()
         {
             _hardOverride = true;
+            CaptureVisualRootBasePose();
 
             var cts = new CancellationTokenSource();
             _overrideCts = cts;
@@ -339,33 +350,47 @@ namespace InGame.Common
                 await _animationClipPlayer.BlendLayerWeight(
                     LayerInfo.LayerType.TopLayer,
                     1f,
-                    new LayerInfo.Blend { BlendTime = _overrideInTime, BlendCurve = _overrideInCurve }
+                    new LayerInfo.Blend { BlendTime = _overrideInTime, BlendCurve = _overrideInCurve },
+                    cts.Token
                 );
 
-                // 気絶クリップの長さだけ待機（速度変更を考慮しない場合は length をそのまま使用）
-                if (_faint != null && _faint.length > 0f)
+                // 倒れた姿勢を維持し、気絶終了時刻から起き上がり時間を逆算する。
+                float getUpDuration = _getUp ? _getUp.length : 0f;
+                await WaitUntilRemainingStunTimeAsync(getUpDuration, cts.Token);
+
+                // 気絶時間が短く、起き上がり開始時点ですでに終了間際の場合は、終了時刻に収まる速度にする。
+                if (_playerManager.IsStun && _getUp)
                 {
-                    await UniTask.Delay(TimeSpan.FromSeconds(_faint.length), cancellationToken: cts.Token);
+                    bool hasDownForward = TryGetHumanoidHorizontalForward(out var downForward);
+                    float remainingStunTime = _playerManager.GetRemainingStunTime;
+                    float getUpSpeed = remainingStunTime > 0f && _getUp.length > 0f
+                        ? _getUp.length / remainingStunTime
+                        : 1f;
+                    var getUpBlendTask = _animationClipPlayer.CrossFadeOnTopLayerAsync(
+                        _getUp,
+                        getUpSpeed,
+                        _getUpBlendTime,
+                        _getUpBlendCurve,
+                        cts.Token);
+
+                    await ApplyGetUpVisualCorrectionAsync(downForward, hasDownForward, cts.Token);
+
+                    await getUpBlendTask;
                 }
 
-                // 起き上がり（任意）
-                if (_getUp != null)
-                {
-                    _animationClipPlayer.PlayOnTopLayer(_getUp);
-                    if (_getUp.length > 0f)
-                    {
-                        await UniTask.Delay(TimeSpan.FromSeconds(_getUp.length), cancellationToken: cts.Token);
-                    }
-                }
+                await WaitUntilStunEndedAsync(cts.Token);
 
                 // フェードアウトして解除
                 await _animationClipPlayer.BlendLayerWeight(
                     LayerInfo.LayerType.TopLayer,
                     0f,
-                    new LayerInfo.Blend { BlendTime = 0, BlendCurve = null }
+                    new LayerInfo.Blend { BlendTime = _overrideOutTime, BlendCurve = _overrideOutCurve },
+                    cts.Token
                 );
 
+                if (!ReferenceEquals(_overrideCts, cts)) return;
                 _animationClipPlayer.PlayOnTopLayer(null);
+                ClearGetUpVisualCorrection();
                 _hardOverride = false;
                 _overrideCts = null;
             }
@@ -376,14 +401,118 @@ namespace InGame.Common
             finally
             {
                 // 途中キャンセル時も確実に状態を畳む
-                if (_hardOverride && (cts.IsCancellationRequested))
+                if (cts.IsCancellationRequested && ReferenceEquals(_overrideCts, cts))
                 {
                     _animationClipPlayer.PlayOnTopLayer(null);
                     _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
+                    ClearGetUpVisualCorrection();
                     _hardOverride = false;
                     if (ReferenceEquals(_overrideCts, cts)) _overrideCts = null;
                 }
                 cts.Dispose();
+            }
+        }
+
+        private void CaptureVisualRootBasePose()
+        {
+            var animator = _animationClipPlayer != null ? _animationClipPlayer.Animator : null;
+            _visualRoot = animator != null ? animator.transform : null;
+            if (_visualRoot == null || _visualRoot == transform)
+            {
+                _visualRoot = null;
+                return;
+            }
+
+            _visualRootBaseLocalRotation = _visualRoot.localRotation;
+        }
+
+        /// <summary>
+        /// Humanoidの身体の水平方向を取得する。DownとGetUpの向きを揃える基準にする。
+        /// </summary>
+        private bool TryGetHumanoidHorizontalForward(out Vector3 horizontalForward)
+        {
+            horizontalForward = default;
+            var animator = _animationClipPlayer != null ? _animationClipPlayer.Animator : null;
+            if (animator == null || animator.avatar == null || !animator.avatar.isHuman)
+            {
+                return false;
+            }
+
+            horizontalForward = Vector3.ProjectOnPlane(animator.bodyRotation * Vector3.forward, Vector3.up);
+            if (horizontalForward.sqrMagnitude < 0.0001f)
+            {
+                var hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+                if (hips != null)
+                {
+                    horizontalForward = Vector3.ProjectOnPlane(hips.forward, Vector3.up);
+                }
+            }
+
+            if (horizontalForward.sqrMagnitude < 0.0001f)
+            {
+                horizontalForward = default;
+                return false;
+            }
+
+            horizontalForward.Normalize();
+            return true;
+        }
+
+        /// <summary>
+        /// GetUpを1フレーム評価した後、モデル全体の水平向きを補正する。
+        /// Foot IKやプレイヤー本体のTransformは変更しない。
+        /// </summary>
+        private async UniTask ApplyGetUpVisualCorrectionAsync(
+            Vector3 downForward,
+            bool hasDownForward,
+            CancellationToken token)
+        {
+            await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
+
+            if (_visualRoot == null) return;
+
+            float rotationOffsetY = _getUpRotationOffsetY;
+            if (_isGetUpAutoRotationEnabled && hasDownForward && TryGetHumanoidHorizontalForward(out var getUpForward))
+            {
+                rotationOffsetY += Vector3.SignedAngle(getUpForward, downForward, Vector3.up);
+            }
+
+            if (Mathf.Abs(rotationOffsetY) > Mathf.Epsilon)
+            {
+                var rotationOffset = Quaternion.AngleAxis(rotationOffsetY, Vector3.up);
+                _visualRoot.rotation = rotationOffset * _visualRoot.rotation;
+            }
+        }
+
+        private void ClearGetUpVisualCorrection()
+        {
+            if (_visualRoot != null)
+            {
+                _visualRoot.localRotation = _visualRootBaseLocalRotation;
+            }
+
+            _visualRoot = null;
+        }
+
+        /// <summary>
+        /// Fusionで同期された気絶タイマーが、指定した残り時間になるまで待機する。
+        /// </summary>
+        private async UniTask WaitUntilRemainingStunTimeAsync(float targetRemainingTime, CancellationToken token)
+        {
+            while (_playerManager.IsStun && _playerManager.GetRemainingStunTime > targetRemainingTime)
+            {
+                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
+            }
+        }
+
+        /// <summary>
+        /// ネットワーク上の気絶状態が解除されるまで待機する。
+        /// </summary>
+        private async UniTask WaitUntilStunEndedAsync(CancellationToken token)
+        {
+            while (_playerManager.IsStun)
+            {
+                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
             }
         }
 
