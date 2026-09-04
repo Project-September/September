@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Fusion;
 using InGame.Common;
 using InGame.Player;
@@ -15,8 +14,8 @@ namespace InGame.Exhibit
         [SerializeField] private float _attackStartGroundDistance;
         [SerializeField] private float _attackedFriezeTime;
         [Header("Animation")]
-        [SerializeField] private AnimationClip _fallAnimation;
         [SerializeField] private AnimationClip _attackAnimation;
+        [SerializeField] private AnimationClip _fallAnimation;
         [SerializeField] private AnimationClip _landingAnimation;
         [Header("Attack")]
         [SerializeField] private NetworkObject _shockwavePrefab;
@@ -27,6 +26,7 @@ namespace InGame.Exhibit
         private NetworkObject _shockwaveObject;
         private List<NetworkObject> _unattackedPlayers = new();
         private StampingState _stampingState;
+        private float _slashEndTime; //振り下ろし終了時間
         private float _landedTime;
         private float _endTime;
 
@@ -44,9 +44,11 @@ namespace InGame.Exhibit
             _unattackedPlayers.Clear();
             foreach (var player in PlayerDatabase.Instance.PlayerObjectDic)
             {
-                _unattackedPlayers.Add(player.Value); 
+                _unattackedPlayers.Add(player.Value);
             }
-            _animationClipPlayer.PlayClipLoop(_fallAnimation);
+
+            _animationClipPlayer.PlayClip(_attackAnimation);
+            _slashEndTime = Runner.SimulationTime + _attackAnimation.length;
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -55,10 +57,6 @@ namespace InGame.Exhibit
             {
                 case StampingState.Falling:
                     Falling();
-                    break;
-
-                case StampingState.Attacking:
-                    Attacking();
                     break;
 
                 case StampingState.Landing:
@@ -72,21 +70,18 @@ namespace InGame.Exhibit
         /// </summary>
         private void Falling()
         {
-            if (GetGroundDistance() < _attackStartGroundDistance)
+            if (Runner.SimulationTime >= _slashEndTime)
             {
-                _animationClipPlayer.StopClip(_fallAnimation);
-                _animationClipPlayer.PlayClip(_attackAnimation);
-                _stampingState = StampingState.Attacking;
+                _animationClipPlayer.PlayClipLoop(_fallAnimation);
             }
-        }
 
-        /// <summary>
-        /// 攻撃中の処理
-        /// </summary>
-        private void Attacking()
-        {
             if (_playerMovement.IsGround)
             {
+                if (Runner.SimulationTime >= _slashEndTime)
+                {
+                    _animationClipPlayer.StopClip(_fallAnimation);
+                }
+
                 _animationClipPlayer.PlayClip(_landingAnimation);
                 _endTime = Runner.SimulationTime + Mathf.Max(_shockwaveScaleDuration, _attackedFriezeTime);
                 _landedTime = Runner.SimulationTime;
@@ -118,28 +113,6 @@ namespace InGame.Exhibit
             }
         }
 
-        /// <summary>
-        /// プレイヤーの足元から真下の地面までの距離を取得する。
-        /// 地面が見つからない場合は float.MaxValue を返す。
-        /// </summary>
-        private float GetGroundDistance()
-        {
-            Vector3 feetPosition = _playerMovement.MoveCapsuleCollider.bounds.min;
-
-            if (Physics.Raycast(
-                    feetPosition + Vector3.up * 0.01f,
-                    Vector3.down,
-                    out RaycastHit hit,
-                    Mathf.Infinity,
-                    _playerMovement.GroundLayer,
-                    QueryTriggerInteraction.Ignore))
-            {
-                return hit.distance;
-            }
-
-            return float.MaxValue;
-        }
-
         public override void SetPlayerComponent(GameObject player)
         {
             _playerMovement = player.GetComponent<PlayerMovement>();
@@ -150,7 +123,6 @@ namespace InGame.Exhibit
         public enum StampingState
         {
             Falling,  // 落ちる
-            Attacking, // 攻撃
             Landing   // 着地
         }
     }
