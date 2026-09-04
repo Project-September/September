@@ -219,11 +219,11 @@ namespace InGame.Common
         }
 
         /// <summary> TopLayerでアニメーションを再生 </summary>
-        public void PlayOnTopLayer(AnimationClip clip,float speed = 1f)
+        public void PlayOnLayer(AnimationClip clip, LayerInfo.LayerType layerType = LayerInfo.LayerType.TopLayer, float speed = 1f, bool loop = false)
         {
-            if (!_slotOf.TryGetValue(LayerInfo.LayerType.TopLayer, out var slot))
+            if (!_slotOf.TryGetValue(layerType, out var slot))
             {
-                Debug.LogWarning("[AnimationClipPlayer] TopLayer が設定されていません。_layerInfo の最後に追加してください。");
+                Debug.LogWarning($"[AnimationClipPlayer] {layerType} が設定されていません。_layerInfo の最後に追加してください。");
                 return;
             }
 
@@ -232,9 +232,9 @@ namespace InGame.Common
             {
                 _layerMixer.SetInputWeight(slot, 0f);
 
-                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var current) && current.IsValid())
+                if (_runtimeClips.TryGetValue(layerType, out var current) && current.IsValid())
                 {
-                    DisconnectAndDestroy(LayerInfo.LayerType.TopLayer, current, slot);
+                    DisconnectAndDestroy(layerType, current, slot);
                 }
 
                 var li0 = _layerInfo[slot];
@@ -243,12 +243,12 @@ namespace InGame.Common
                 return;
             }
 
-            if (_runtimeClips.TryGetValue(LayerInfo.LayerType.TopLayer, out var prev) && prev.IsValid())
+            if (_runtimeClips.TryGetValue(layerType, out var prev) && prev.IsValid())
             {
-                DisconnectAndDestroy(LayerInfo.LayerType.TopLayer, prev, slot);
+                DisconnectAndDestroy(layerType, prev, slot);
             }
 
-            Play(clip, LayerInfo.LayerType.TopLayer, 1f,playSpeed: speed, additive: false);
+            Play(clip, layerType, 1f, playSpeed: speed, additive: false, loop: loop);
 
             var li = _layerInfo[slot];
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
@@ -893,20 +893,34 @@ namespace InGame.Common
         #endregion
 
         #region Utility
-        public bool IsPlayingTargetClip(AnimationClip clip)
+        /// <summary>
+        /// アニメーションが再生中かどうかを判定します
+        /// </summary>
+        /// <param name="clip"></param>
+        /// <param name="includeIsEnded">再生しきったアニメーションを判定に含めるか。持続モーションやループモーションを判定する時に使う。</param>
+        /// <param name="includeZeroWeight">重みがゼロのアニメーションを判定に含めるか。ノードそのものの生存をチェックする時に使う。</param>
+        public bool IsPlayingTargetClip(AnimationClip clip, bool includeIsEnded = false, bool includeZeroWeight = false)
         {
             foreach (var kv in _clipOf)
             {
                 if (kv.Value == clip && _runtimeClips.TryGetValue(kv.Key, out var p) && p.IsValid())
                 {
                     // レイヤー重みもチェック
-                    if (_slotOf.TryGetValue(kv.Key, out int slot) && _layerMixer.GetInputWeight(slot) > 0.001f)
+                    if (_slotOf.TryGetValue(kv.Key, out int slot))
                     {
-                        // アニメーション完了状態もチェック
-                        if (p.GetTime() < p.GetDuration() - 0.01) // まだ再生中
+                        // 再生が完了していれば未再生判定（ワンショットモーションが再生完了後も持続しないようにするため）
+                        if (!includeIsEnded && p.GetTime() >= p.GetDuration() - 0.01)
                         {
-                            return true;
+                            continue;
                         }
+
+                        // Weightが0なら未再生判定。影響がない ＝ 再生していないものとしてあつかう
+                        if (!includeZeroWeight && _layerMixer.GetInputWeight(slot) <= 0.001f)
+                        {
+                            continue;
+                        }
+
+                        return true;
                     }
                 }
             }

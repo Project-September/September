@@ -49,6 +49,8 @@ namespace September.InGame.Jewelry
             _jewelryContainer = _jewelryContainerObj as IJewelryContainer;
             _playerRespawn.OnOutFieldEvent += OnOutField;
             _playerHealth.OnHitTaken += OnHitTaken;
+
+            CleanHitData();
         }
 
         public override void FixedUpdateNetwork()
@@ -62,7 +64,7 @@ namespace September.InGame.Jewelry
 
             if (_recentHitRetentionTimer.Expired(Runner))
             {
-                _recentHitData = new HitData();
+                CleanHitData();
             }
         }
 
@@ -75,7 +77,7 @@ namespace September.InGame.Jewelry
 
             JewelryDropLogger.OutputLog();
 
-            _recentHitData = new HitData();
+            CleanHitData();
 
             return;
 
@@ -129,6 +131,12 @@ namespace September.InGame.Jewelry
         {
             _recentHitData = hitData;
             _recentHitRetentionTimer = TickTimer.CreateFromSeconds(Runner, _hitRetentionTime);
+        }
+
+        private void CleanHitData()
+        {
+            // 自身が被害者となるHitDataで初期化
+            _recentHitData = new HitData(HitActionType.Damage, 0, PlayerRef.None, Object.InputAuthority);
         }
     }
 }

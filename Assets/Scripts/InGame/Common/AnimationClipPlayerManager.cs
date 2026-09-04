@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -129,9 +129,9 @@ namespace InGame.Common
             if (!isGround
                 && EnableFallMotion
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
-                && !_animationClipPlayer.IsPlayingTargetClip(_fallDown))
+                && !_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true))
             {
-                _animationClipPlayer.PlayOnTopLayer(_fallDown);
+                _animationClipPlayer.PlayOnLayer(_fallDown, loop: true);
                 _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
                 _animationClipPlayer.BlendLayerWeight(
                     LayerInfo.LayerType.TopLayer,
@@ -147,7 +147,7 @@ namespace InGame.Common
             }
 
             // ===== 着地の終了（1→0へブレンドしてからTopLayer解除） =====
-            if (!isGround || !_animationClipPlayer.IsPlayingTargetClip(_fallDown)) return;
+            if (!isGround || !_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true)) return;
             if (_isFadingOutFall) return;
             _isFadingOutFall = true;
             //topレイヤーにFallアニメーションがある場合は除外する
@@ -161,7 +161,7 @@ namespace InGame.Common
         {
             // 管理対象のアニメーションクリップをチェック
             return _animationClipPlayer.IsPlayingTargetClip(_jumpOver) ||
-                   _animationClipPlayer.IsPlayingTargetClip(_fallDown) ||
+                   _animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true) ||
                    _animationClipPlayer.IsPlayingTargetClip(_faint) ||
                    _animationClipPlayer.IsPlayingTargetClip(_getUp) ||
                    _animationClipPlayer.IsPlayingTargetClip(_rollEvasion);
@@ -255,7 +255,7 @@ namespace InGame.Common
                 _jumpOverTokenSrc.Cancel();
                 _jumpOverTokenSrc.Dispose();
             }
-            _animationClipPlayer.PlayOnTopLayer(_jumpOver);
+            _animationClipPlayer.PlayOnLayer(_jumpOver);
 
             _jumpOverTokenSrc = new CancellationTokenSource();
             // ジャンプオーバークリップの長さだけ待機（速度変更を考慮しない場合は length をそのまま使用）
@@ -270,7 +270,7 @@ namespace InGame.Common
                     return;
                 }
             }
-            _animationClipPlayer.PlayOnTopLayer(null);
+            _animationClipPlayer.PlayOnLayer(null);
             if (!_playerMovement.IsGroundNet) SetFallAnim(false);
         }
 
@@ -286,14 +286,14 @@ namespace InGame.Common
                 _rollEvasionTokenSrc.Dispose();
             }
             // クリップ長基準の再生速度にすることで、移動時間とモーションの長さが一致する
-            _animationClipPlayer.PlayOnTopLayer(_rollEvasion, _rollEvasion.length / rollDuration);
+            _animationClipPlayer.PlayOnLayer(_rollEvasion, LayerInfo.LayerType.FullBody, _rollEvasion.length / rollDuration);
 
             _rollEvasionTokenSrc = new CancellationTokenSource();
 
             try
             {
                 await _animationClipPlayer.BlendLayerWeight(
-                    LayerInfo.LayerType.TopLayer,
+                    LayerInfo.LayerType.FullBody,
                     1f,
                     new LayerInfo.Blend { BlendTime = _evasionInTime, BlendCurve = _evasionInCurve },
                     _rollEvasionTokenSrc.Token
@@ -304,7 +304,7 @@ namespace InGame.Common
                 await UniTask.Delay(TimeSpan.FromSeconds(waitTime), cancellationToken: _rollEvasionTokenSrc.Token);
 
                 await _animationClipPlayer.BlendLayerWeight(
-                    LayerInfo.LayerType.TopLayer,
+                    LayerInfo.LayerType.FullBody,
                     0f,
                     new LayerInfo.Blend { BlendTime = _evasionOutTime, BlendCurve = _evasionOutCurve },
                     _rollEvasionTokenSrc.Token
@@ -315,7 +315,7 @@ namespace InGame.Common
                 return;
             }
 
-            _animationClipPlayer.PlayOnTopLayer(null);
+            _animationClipPlayer.PlayOnLayer(null, LayerInfo.LayerType.FullBody);
         }
 
         /// <summary>強制解除（リスポーン等）</summary>
@@ -323,7 +323,7 @@ namespace InGame.Common
         {
             _overrideCts?.Cancel();
             _hardOverride = false;
-            _animationClipPlayer.PlayOnTopLayer(null);
+            _animationClipPlayer.PlayOnLayer(null);
             _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
             ClearGetUpVisualCorrection();
             _overrideCts = null;
@@ -343,7 +343,7 @@ namespace InGame.Common
                 // 気絶へフェードイン（TopLayer=1）
                 if (_faint != null)
                 {
-                    _animationClipPlayer.PlayOnTopLayer(_faint);
+                    _animationClipPlayer.PlayOnLayer(_faint);
                 }
                 _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
 
@@ -376,6 +376,11 @@ namespace InGame.Common
                     await ApplyGetUpVisualCorrectionAsync(downForward, hasDownForward, cts.Token);
 
                     await getUpBlendTask;
+                    _animationClipPlayer.PlayOnLayer(_getUp);
+                    if (_getUp.length > 0f)
+                    {
+                        await UniTask.Delay(TimeSpan.FromSeconds(_getUp.length), cancellationToken: cts.Token);
+                    }
                 }
 
                 await WaitUntilStunEndedAsync(cts.Token);
@@ -391,6 +396,7 @@ namespace InGame.Common
                 if (!ReferenceEquals(_overrideCts, cts)) return;
                 _animationClipPlayer.PlayOnTopLayer(null);
                 ClearGetUpVisualCorrection();
+                _animationClipPlayer.PlayOnLayer(null);
                 _hardOverride = false;
                 _overrideCts = null;
             }
@@ -403,7 +409,7 @@ namespace InGame.Common
                 // 途中キャンセル時も確実に状態を畳む
                 if (cts.IsCancellationRequested && ReferenceEquals(_overrideCts, cts))
                 {
-                    _animationClipPlayer.PlayOnTopLayer(null);
+                    _animationClipPlayer.PlayOnLayer(null);
                     _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
                     ClearGetUpVisualCorrection();
                     _hardOverride = false;
@@ -529,9 +535,10 @@ namespace InGame.Common
                     BlendCurve = _landOutCurve
                 }
             );
-            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown) &&
-                _animationClipPlayer.GetTargetLayerWeight(LayerInfo.LayerType.TopLayer) == 0)
-                _animationClipPlayer.PlayOnTopLayer(null);
+
+            if (_animationClipPlayer.IsPlayingTargetClip(_fallDown, includeIsEnded: true, includeZeroWeight: true) &&
+                _animationClipPlayer.GetTargetLayerWeight(LayerInfo.LayerType.TopLayer) < 0.001f)
+                _animationClipPlayer.PlayOnLayer(null);
         }
     }
 }
