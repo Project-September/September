@@ -16,9 +16,11 @@ public class SharkMovementProcessing : NetworkBehaviour
 
     [Header("地面判定")]
     [SerializeField] private LayerMask _groundLayerMask;
-    [SerializeField] private MultiRay _groundRay;
-    [SerializeField] private float _groundMaximumAngle;
-    [SerializeField] private float _groundAdsorptionSpeed;
+    [SerializeField] private Vector3 _groundHalfExtents = new(0.5f, 0.1f, 0.6f);
+    [SerializeField] private Vector3 _groundRayOffset = new(0, 0.5f, 0.875f);
+    [SerializeField] private float _groundRayDistance = 2.0f;
+    [SerializeField] private float _groundMaximumAngle = 90f;
+    [SerializeField] private float _groundAdsorptionSpeed = 10f;
 
     [Header("地面浮遊")]
     [SerializeField] private float _heightAboveGround = 0.5f;
@@ -72,21 +74,20 @@ public class SharkMovementProcessing : NetworkBehaviour
     }
 
     /// <summary>
-    /// Raycastで地面の法線を取得する
+    /// BoxCastで地面の法線を取得する
     /// </summary>
     /// <param name="rb">プレイヤーのRigidbody</param>
     private void CheckGroundManual(Rigidbody rb)
     {
-        // 地面判定
-        foreach (RaycastHit hit in _groundRay.RaycastAll(rb.position, rb.rotation, _groundLayerMask))
-        {
-            if (!(Vector3.Angle(hit.normal, Vector3.up) < _groundMaximumAngle)) continue;
+        var ray = new Ray(rb.position + rb.rotation * _groundRayOffset, Vector3.down);
 
+        if (Physics.BoxCast(ray.origin, _groundHalfExtents, ray.direction, out var hit, rb.rotation, _groundRayDistance, _groundLayerMask)
+            && Vector3.Angle(hit.normal, Vector3.up) < _groundMaximumAngle)
+        {
             _isGrounded = true;
-            _currentGroundNormal = hit.normal;　// 最初に見つかった地面の法線を保存
+            _currentGroundNormal = hit.normal; // 最初に見つかった地面の法線を保存
             _currentGroundHeight = transform.position.y - hit.point.y; // 地面との距離を保存
             PositionBeforeWaterFall = hit.point; // 最後に接していた地面の位置を保存
-
             return;
         }
 
@@ -246,15 +247,21 @@ public class SharkMovementProcessing : NetworkBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        GizmosUtility.DrawMultiRay(_groundRay, transform.position, transform.rotation);
+        Matrix4x4 prevMatrix = Gizmos.matrix;
+        Gizmos.matrix = transform.localToWorldMatrix;
+        Gizmos.DrawWireCube(_groundRayOffset, _groundHalfExtents * 2f);
+        Gizmos.DrawWireCube(_groundRayOffset + Vector3.down * _groundRayDistance, _groundHalfExtents * 2f);
+        Gizmos.DrawLine(_groundRayOffset, _groundRayOffset + Vector3.down * _groundRayDistance);
+
+        Gizmos.color = new Color(1f, 0.5f, 0f);
+        Gizmos.DrawRay(_forwardRayOffsetAir, Vector3.forward * _forwardRayDistance);
+        Gizmos.DrawWireCube(_forwardRayOffsetAir + Vector3.forward * _forwardRayDistance, _halfExtents * 2f);
+        Gizmos.matrix = prevMatrix;
 
         // 前方に壁があるか判定
         Gizmos.color = Color.yellow;
         Gizmos.DrawRay(transform.position + transform.rotation * _forwardRayOffset, transform.forward * _forwardRayDistance);
 
-        Gizmos.color = new Color(1f, 0.5f, 0f);
-        Gizmos.DrawRay(transform.position + transform.rotation * _forwardRayOffsetAir, transform.forward * _forwardRayDistance);
-        Gizmos.DrawWireCube(transform.position + transform.rotation * _forwardRayOffsetAir + transform.forward * _forwardRayDistance, _halfExtents * 2f);
 
         // 地面から浮かせる距離
         Gizmos.color = Color.cyan;

@@ -412,15 +412,12 @@ MonoBehaviour:
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 2249
-  _groundRay:
-    StartOrigin: {x: 0, y: 0.5, z: 1.49}
-    EndOrigin: {x: 0, y: 0.5, z: 0.26}
-    Direction: {x: 0, y: -1, z: 0}
-    Distance: 2
-    DivideCount: 2
+  _groundHalfExtents: {x: 0.44, y: 0.1, z: 0.615}
+  _groundRayOffset: {x: 0, y: 0.5, z: 0.875}
+  _groundRayDistance: 2
   _groundMaximumAngle: 90
   _groundAdsorptionSpeed: 10
-  _heightAboveGround: 0.2
+  _heightAboveGround: 0
   _floatingSpeed: 1
   _forwardRayDistance: 1.7
   _forwardRayOffset: {x: 0, y: 1, z: 0.78}
@@ -428,7 +425,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2249
   _wallAngle: 85
-  _halfExtents: {x: 0.15, y: 0.78, z: 0.5}
+  _halfExtents: {x: 0.15, y: 1.08, z: 0.5}
   _forwardRayOffsetAir: {x: 0, y: 0.57, z: 0.42}
 --- !u!114 &4711930171390678857
 MonoBehaviour:
