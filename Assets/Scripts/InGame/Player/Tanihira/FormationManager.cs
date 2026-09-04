@@ -189,8 +189,7 @@ namespace Ingame.Tanihira
 
         private FriendBase[] GetFriendsForWarp()
         {
-            var friends = _friendsList.Count > 0 ? _friendsList : _currentFriendsList;
-            return friends.Where(friend => friend != null).ToArray();
+            return _currentFriendsList.Where(friend => friend != null).ToArray();
         }
 
         /// <summary>
@@ -261,40 +260,61 @@ namespace Ingame.Tanihira
 
             try
             {
-                //フレンドのステートの切り替え
+                var validFriends = new List<FriendBase>();
+                var warpPositions = new Dictionary<FriendBase, Vector3>();
+
+                // 先にワープ先を確定し、失敗するフレンドのAgentやステートは変更しない。
                 foreach (FriendBase friend in friends)
                 {
-                    if (friend == null)
+                    if (friend.Agent == null
+                        || !TryGetWarpPosition(warpPosition, friend.Agent.baseOffset,
+                            isLandingRecovery, out Vector3 fixedPos))
+                    {
+                        Debug.LogWarning($"{friend.name}をNavMesh上へワープできませんでした", friend);
+                        ResumeFriendAfterWarpSearchFailure(friend);
                         continue;
+                    }
 
-                    if (friend.Agent != null)
-                        friend.Agent.enabled = false;
+                    validFriends.Add(friend);
+                    warpPositions.Add(friend, fixedPos);
+                }
+
+                if (validFriends.Count == 0)
+                    return;
+
+                var previousStates = new Dictionary<FriendBase, FriendState>();
+                var previousPositions = new Dictionary<FriendBase, Vector3>();
+                var previousRotations = new Dictionary<FriendBase, Quaternion>();
+                var previousWarpStates = new Dictionary<FriendBase, bool>();
+
+                // フレンドのステートを切り替え、移動だけを停止する。
+                foreach (FriendBase friend in validFriends)
+                {
+                    previousStates[friend] = friend.CurrentState;
+                    previousPositions[friend] = friend.transform.position;
+                    previousRotations[friend] = friend.transform.rotation;
+                    previousWarpStates[friend] = friend.IsWarp;
 
                     if (friend.Animator != null)
                         friend.Animator.SetFloat("MoveBlend", 0);
 
                     friend.IsWarp = false;
                     friend.ChangeState(FriendState.Wait);
+
+                    if (friend.Agent.enabled && friend.Agent.isOnNavMesh)
+                        friend.Agent.isStopped = true;
                 }
 
                 //少し待ってから移動させる
                 await UniTask.Delay(TimeSpan.FromSeconds(_warpDuration),
                     cancellationToken: this.GetCancellationTokenOnDestroy());
                 
-                //フレンドを隊列のフレンドをワープさせる
-                foreach (FriendBase friend in friends)
+                // フレンドを隊列の位置へワープさせる
+                foreach (FriendBase friend in validFriends)
                 {
-                    if (friend == null)
-                        continue;
+                    Vector3 fixedPos = warpPositions[friend];
 
-                    if (friend.Agent == null || !TryGetWarpPosition(warpPosition, friend.Agent.baseOffset,
-                            isLandingRecovery, out Vector3 fixedPos))
-                    {
-                        Debug.LogWarning($"{friend.name}をNavMesh上へワープできませんでした", friend);
-                        continue;
-                    }
-
-                    // 無効化中のAgentへWarpすると接地状態が復旧しないため、位置を合わせてから再有効化する
+                    // Agentを無効化せずにWarpする。無効化状態のフレンドはここでのみ再有効化する。
                     friend.transform.SetPositionAndRotation(fixedPos, warpRotation);
                     friend.Agent.enabled = true;
                     bool warped = friend.Agent.Warp(fixedPos);
@@ -309,7 +329,12 @@ namespace Ingame.Tanihira
 
                     if (!warped || !friend.Agent.isOnNavMesh)
                     {
-                        friend.Agent.enabled = false;
+                        RestoreFriendAfterWarpFailure(
+                            friend,
+                            previousPositions[friend],
+                            previousRotations[friend],
+                            previousStates[friend],
+                            previousWarpStates[friend]);
                         Debug.LogWarning($"{friend.name}のNavMeshAgentを復旧できませんでした", friend);
                         continue;
                     }
@@ -325,6 +350,43 @@ namespace Ingame.Tanihira
             {
                 _isWarpingFriends = false;
             }
+        }
+
+        private void RestoreFriendAfterWarpFailure(
+            FriendBase friend,
+            Vector3 previousPosition,
+            Quaternion previousRotation,
+            FriendState previousState,
+            bool previousIsWarp)
+        {
+            friend.transform.SetPositionAndRotation(previousPosition, previousRotation);
+            friend.Agent.enabled = true;
+
+            if (friend.Agent.isOnNavMesh)
+            {
+                friend.Agent.Warp(previousPosition);
+                friend.Agent.nextPosition = previousPosition;
+            }
+
+            friend.IsWarp = false;
+            friend.ChangeState(previousState);
+            friend.IsWarp = previousIsWarp;
+
+            if (friend.Agent.enabled && friend.Agent.isOnNavMesh)
+                friend.Agent.isStopped = previousState is not (FriendState.Move or FriendState.Chase);
+        }
+
+        private static void ResumeFriendAfterWarpSearchFailure(FriendBase friend)
+        {
+            if (friend.Agent == null
+                || !friend.Agent.enabled
+                || !friend.Agent.isOnNavMesh
+                || friend.CurrentState is not (FriendState.Move or FriendState.Chase))
+            {
+                return;
+            }
+
+            friend.Agent.isStopped = false;
         }
 
         private bool TryGetWarpPosition(Vector3 warpPosition, float agentBaseOffset, bool isLandingRecovery,
