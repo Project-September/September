@@ -11,12 +11,13 @@ using NaughtyAttributes;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Effect;
+using September.InGame.Mountable;
 using September.InGame.UI;
 using UnityEngine;
 
 namespace InGame.Exhibit
 {
-    public class MountableExhibitBase : NetworkBehaviour,IDamageable
+    public class MountableExhibitBase : NetworkBehaviour, IDamageable , IMountable
     {
         protected CameraController CameraController { get; private set; }
         
