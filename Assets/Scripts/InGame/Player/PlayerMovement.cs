@@ -64,11 +64,13 @@ namespace InGame.Player
         private Vector3 _moveVelocity;
         public Vector3 MoveVelocity => _moveVelocity;
         private Vector3 _flyingVelocity;
+        private Vector3 _prevMoveVelocity;
 
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
         private float _isGroundTimer;
+        private float _prevGroundedTime;
         private Vector3 _groundNormal = Vector3.up;
         /// <summary> カプセルを接地面へ吸着させるための下方向移動量 </summary>
         private float _groundGap;
@@ -99,11 +101,6 @@ namespace InGame.Player
         private Vector3? _teleportTarget;
         // knock back
         private bool _knockBackActive = false;
-        /// <summary>
-        /// ノックバックによる水平速度。ApplyVelocity の空中分岐は Rigidbody の水平速度を毎Tick捨てるので、
-        /// ここへ預けて着地するまで維持する。_flyingVelocity と違い減衰させない
-        /// </summary>
-        private Vector3 _knockBackVelocity;
         // Gizmo
         private List<CapsuleCastData> _capsuleCastData = new();
 
@@ -124,6 +121,11 @@ namespace InGame.Player
         [Networked] public bool IgnoreMoveInput { get; set; }
         [Networked] public bool IgnoreEvasionInput { get; set; }
         [Networked] public bool IsHookLocked { get; set; }
+
+        public override void Spawned()
+        {
+            _prevGroundedTime = Runner.SimulationTime;
+        }
 
         private void Awake()
         {
@@ -206,8 +208,13 @@ namespace InGame.Player
             {
                 transform.position = _teleportTarget.Value;
                 _moveVelocity = Vector3.zero;
-                _knockBackVelocity = Vector3.zero;
                 _teleportTarget = null;
+            }
+
+            if (IsGround)
+            {
+                _prevGroundedTime = Runner.SimulationTime;
+                _prevMoveVelocity = _moveVelocity;
             }
 
             ApplyVelocity(deltaTime);
@@ -432,25 +439,22 @@ namespace InGame.Player
 
         protected virtual void ApplyVelocity(float deltaTime)
         {
-            if (IsGround)
+            if (_isGround)
             {
-                // 着地したらノックバックの水平速度は破棄し、移動入力へ操作を返す
-                _knockBackVelocity = Vector3.zero;
-
                 _rb.linearVelocity = _moveVelocity + _flyingVelocity;
-                NetworkVelocity = _moveVelocity + _flyingVelocity;
             }
             else
             {
-                // ノックバックの水平速度は着地するまで足し続ける。ここで加えないと
-                // Rigidbody へ直接書いた水平速度が次の Tick で捨てられ、垂直に落ちるだけになる
-                var linearVelocity = _flyingVelocity + _knockBackVelocity;
+                float elapsedTimeGrounded = Runner.SimulationTime - _prevGroundedTime;
+                Vector3 dampedMove = _prevMoveVelocity * (1 / (1 + elapsedTimeGrounded));
 
-                linearVelocity.y = _rb.linearVelocity.y;
-
-                _rb.linearVelocity = linearVelocity;
-                NetworkVelocity = linearVelocity;
+                _rb.linearVelocity =
+                    (_rb.useGravity ? elapsedTimeGrounded * Physics.gravity : Vector3.zero)
+                    + dampedMove
+                    + _flyingVelocity;
             }
+
+            NetworkVelocity = _rb.linearVelocity;
 
             // 減衰
             _flyingVelocity = Vector3.Lerp(_flyingVelocity, Vector3.zero, _flyingDamping * deltaTime);
@@ -556,6 +560,7 @@ namespace InGame.Player
         void EndVault(Vector3 endVelocity)
         {
             _moveVelocity = endVelocity;
+            _prevMoveVelocity = endVelocity;
             _rb.linearVelocity = _moveVelocity;
             DoingVault = false;
         }
@@ -564,8 +569,6 @@ namespace InGame.Player
         public void Stop()
         {
             _moveVelocity = Vector3.zero;
-            // 空中では ApplyVelocity が毎Tick足し直すので、ここで消さないと停止しない
-            _knockBackVelocity = Vector3.zero;
             _rb.linearVelocity = _moveVelocity;
         }
 
@@ -576,7 +579,6 @@ namespace InGame.Player
             // 垂直成分は Rigidbody に直接与えて打ち上げ、水平成分は ApplyVelocity が維持する
             // _knockBackVelocity へ預ける。Rigidbody へ書くだけでは水平方向が次の Tick で消える
             _rb.linearVelocity = force;
-            _knockBackVelocity = new Vector3(force.x, 0f, force.z);
             _knockBackActive = true;
 
             await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: this.GetCancellationTokenOnDestroy());
@@ -593,7 +595,8 @@ namespace InGame.Player
         {
             transform.position = position;
             _moveVelocity = Vector3.zero;
-            _knockBackVelocity = Vector3.zero;
+            _prevMoveVelocity = Vector3.zero;
+            _prevGroundedTime = Runner.SimulationTime;
         }
 
         public float GetSpeedOnPlane()
