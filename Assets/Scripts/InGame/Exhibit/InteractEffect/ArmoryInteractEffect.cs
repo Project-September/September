@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
@@ -22,8 +23,8 @@ namespace InGame.Exhibit
         {
             return new ArmoryInteractEffect
             {
-                _addAbilities = _addAbilities,
-                _addAbilityConditions = _addAbilityConditions,
+                _addAbilities = _addAbilities.Select(CloneUtility.CloneObject).ToList(),
+                _addAbilityConditions = _addAbilityConditions.Select(CloneUtility.CloneObject).ToList(),
                 _overrideDisabledAbilities = _overrideDisabledAbilities,
                 _duration = _duration
             };
@@ -52,7 +53,7 @@ namespace InGame.Exhibit
             for (int i = 0; i < Mathf.Min(_addAbilities.Count, _addAbilityConditions.Count); i++)
             {
                 _addAbilities[i].SetPlayerComponent(playerObject.gameObject);
-                playerAbility.AddAbility(CloneUtility.CloneObject(_addAbilities[i]), CloneUtility.CloneObject(_addAbilityConditions[i]));
+                playerAbility.AddAbility(_addAbilities[i], _addAbilityConditions[i]);
             }
 
             equipmentManager.RPC_ChangeEquipment(EquipmentType.Armory);
@@ -66,6 +67,8 @@ namespace InGame.Exhibit
 
             //無効化していたAbilityを有効化
             abilityManager.SetAbilityEnabled(true, _overrideDisabledAbilities);
+
+            await UniTask.WaitUntil(_addAbilities, abilities => abilities.All(x => x.Phase != AbilityBase.AbilityPhase.Active), cancellationToken: token);
 
             //追加したAbilityを消す
             foreach (var ability in _addAbilities)
