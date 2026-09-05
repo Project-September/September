@@ -446,18 +446,21 @@ namespace InGame.Player
 
         protected virtual void ApplyVelocity(float deltaTime)
         {
-            if (_isGround)
+            if (!_knockBackActive)
             {
-                _rb.linearVelocity = _moveVelocity + _flyingVelocity;
-            }
-            else
-            {
-                _flyingMoveVelocity = Vector3.Lerp(_flyingMoveVelocity, Vector3.zero, _moveDumping * deltaTime);
+                if (_isGround)
+                {
+                    _rb.linearVelocity = _moveVelocity + _flyingVelocity;
+                }
+                else
+                {
+                    _flyingMoveVelocity = Vector3.Lerp(_flyingMoveVelocity, Vector3.zero, _moveDumping * deltaTime);
 
-                _rb.linearVelocity =
-                    (_rb.useGravity ? _fallVelocity : Vector3.zero)
-                    + _flyingMoveVelocity
-                    + _flyingVelocity;
+                    _rb.linearVelocity =
+                        (_rb.useGravity ? _fallVelocity : Vector3.zero)
+                        + _flyingMoveVelocity
+                        + _flyingVelocity;
+                }
             }
 
             NetworkVelocity = _rb.linearVelocity;
@@ -585,6 +588,7 @@ namespace InGame.Player
             // 垂直成分は Rigidbody に直接与えて打ち上げ、水平成分は ApplyVelocity が維持する
             // _knockBackVelocity へ預ける。Rigidbody へ書くだけでは水平方向が次の Tick で消える
             _rb.linearVelocity = force;
+            _flyingVelocity = force;
             _knockBackActive = true;
 
             await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: this.GetCancellationTokenOnDestroy());
