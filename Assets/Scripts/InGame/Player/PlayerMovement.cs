@@ -585,8 +585,6 @@ namespace InGame.Player
         {
             if (!HasStateAuthority) return;
 
-            // 垂直成分は Rigidbody に直接与えて打ち上げ、水平成分は ApplyVelocity が維持する
-            // _knockBackVelocity へ預ける。Rigidbody へ書くだけでは水平方向が次の Tick で消える
             _rb.linearVelocity = force;
             _flyingVelocity = force;
             _knockBackActive = true;
