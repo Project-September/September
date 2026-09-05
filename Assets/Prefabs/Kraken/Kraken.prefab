@@ -4181,6 +4181,7 @@ GameObject:
   - component: {fileID: 556529480512052422}
   - component: {fileID: 9035893430072922872}
   - component: {fileID: 88873817092493449}
+  - component: {fileID: 7433912045861223470}
   - component: {fileID: 6602018564722246398}
   - component: {fileID: 745504057526346727}
   m_Layer: 0
@@ -4249,6 +4250,8 @@ MonoBehaviour:
   _attackPredictionFactory: {fileID: 88873817092493449}
   _predictionSize: {x: 4, y: 10, z: 60}
   _predictionEndTime: 4
+  _aimMarker: {fileID: 7433912045861223470}
+  _aimFallbackDistance: 20
   _interactable: {fileID: 9018000286361871000}
   _dealScore: 10
   _stayDuration: 20
@@ -4403,6 +4406,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _predictionParticlePrefab: {fileID: 1533809294603722301, guid: 331186b38f7bca64fa394b20d1d328f6, type: 3}
+--- !u!114 &7433912045861223470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6280979293500677608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d4f28c6b0a74e13ab7c5e08f2136d9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _markerPrefab: {fileID: 7134496785314036137, guid: 6b83f1d0c25a4a9f9c0e4171d38ab5c7, type: 3}
+  _surfaceOffset: 0.1
+  _alignToSurface: 1
 --- !u!320 &6602018564722246398
 PlayableDirector:
   m_ObjectHideFlags: 0
