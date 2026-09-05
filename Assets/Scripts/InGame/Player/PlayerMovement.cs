@@ -578,6 +578,8 @@ namespace InGame.Player
         public void Stop()
         {
             _moveVelocity = Vector3.zero;
+            _flyingMoveVelocity = Vector3.zero;
+            _fallVelocity = Vector3.zero;
             _rb.linearVelocity = _moveVelocity;
         }
 
@@ -602,9 +604,8 @@ namespace InGame.Player
         public void TeleportImmediate(Vector3 position)
         {
             transform.position = position;
-            _moveVelocity = Vector3.zero;
-            _flyingMoveVelocity = Vector3.zero;
             _prevGroundedTime = Runner.SimulationTime;
+            Stop();
         }
 
         public float GetSpeedOnPlane()
