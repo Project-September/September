@@ -66,11 +66,13 @@ namespace InGame.Player
         public Vector3 MoveVelocity => _moveVelocity;
         private Vector3 _flyingVelocity;
         private Vector3 _fallVelocity;
+        private Vector3 _flyingMoveVelocity;
 
         private Vector3 _rotationDirection;
         private bool _setDirection;
         private bool _isGround;
         private float _isGroundTimer;
+        private float _prevGroundedTime;
         private Vector3 _groundNormal = Vector3.up;
         /// <summary> カプセルを接地面へ吸着させるための下方向移動量 </summary>
         private float _groundGap;
@@ -121,6 +123,11 @@ namespace InGame.Player
         [Networked] public bool IgnoreMoveInput { get; set; }
         [Networked] public bool IgnoreEvasionInput { get; set; }
         [Networked] public bool IsHookLocked { get; set; }
+
+        public override void Spawned()
+        {
+            _prevGroundedTime = Runner.SimulationTime;
+        }
 
         private void Awake()
         {
@@ -209,6 +216,8 @@ namespace InGame.Player
             if (IsGround)
             {
                 _fallVelocity = Vector3.zero;
+                _prevGroundedTime = Runner.SimulationTime;
+                _flyingMoveVelocity = _moveVelocity;
             }
             else
             {
@@ -443,11 +452,11 @@ namespace InGame.Player
             }
             else
             {
-                _moveVelocity = Vector3.Lerp(_moveVelocity, Vector3.zero, _moveDumping * deltaTime);
+                _flyingMoveVelocity = Vector3.Lerp(_flyingMoveVelocity, Vector3.zero, _moveDumping * deltaTime);
 
                 _rb.linearVelocity =
                     (_rb.useGravity ? _fallVelocity : Vector3.zero)
-                    + _moveVelocity
+                    + _flyingMoveVelocity
                     + _flyingVelocity;
             }
 
@@ -557,6 +566,7 @@ namespace InGame.Player
         void EndVault(Vector3 endVelocity)
         {
             _moveVelocity = endVelocity;
+            _flyingMoveVelocity = endVelocity;
             _rb.linearVelocity = _moveVelocity;
             DoingVault = false;
         }
@@ -591,6 +601,8 @@ namespace InGame.Player
         {
             transform.position = position;
             _moveVelocity = Vector3.zero;
+            _flyingMoveVelocity = Vector3.zero;
+            _prevGroundedTime = Runner.SimulationTime;
         }
 
         public float GetSpeedOnPlane()
