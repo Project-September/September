@@ -86,7 +86,7 @@ namespace September.InGame.Kraken
 
             _cameraController.Init(true);
             _attackHandler.Initialize(_tentacles.Arms, _settings, this);
-            _aimPointResolver = new KrakenAimPointResolver(_settings.AttackPointRayHitLayer, _aimFallbackDistance);
+            _aimPointResolver = new KrakenAimPointResolver(_settings.AttackPointRayHitLayer);
 
             SlamParticlePool = new ObjectPool<ParticleSystem>(
                 () => Instantiate(_settings.SlamEffect),

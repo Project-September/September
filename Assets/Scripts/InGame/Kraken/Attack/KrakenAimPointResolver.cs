@@ -8,16 +8,13 @@ namespace September.InGame.Kraken.Attack
     public class KrakenAimPointResolver
     {
         private readonly LayerMask _hitLayer;
-        private readonly float _fallbackDistance;
 
         private Camera _camera;
 
         /// <param name="hitLayer"> 目標地点の判定に使うレイヤー </param>
-        /// <param name="fallbackDistance"> 視線の先に何も無かった場合に目標地点とする距離 </param>
-        public KrakenAimPointResolver(LayerMask hitLayer, float fallbackDistance)
+        public KrakenAimPointResolver(LayerMask hitLayer)
         {
             _hitLayer = hitLayer;
-            _fallbackDistance = fallbackDistance;
         }
 
         /// <summary>
@@ -44,9 +41,8 @@ namespace September.InGame.Kraken.Attack
                 return true;
             }
 
-            // 何にも当たらなかった場合は視線方向の一定距離を目標とする
-            aimPoint = new KrakenAimPoint(origin + forward * _fallbackDistance, Vector3.up, false);
-            return true;
+            aimPoint = default;
+            return false;
         }
     }
 
