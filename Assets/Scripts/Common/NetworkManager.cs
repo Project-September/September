@@ -18,6 +18,7 @@ namespace September.Common
         [SerializeField, Scene] string _lobbySceneName;
         [SerializeField, Scene] string _gameSceneName;
         [SerializeField, Scene] string _resultSceneName;
+        [SerializeField, Scene] string _tutorialSceneName;
         NetworkRunner _networkRunner;
         UniTask<StartGameResult> _currentTask;
 
@@ -138,6 +139,24 @@ namespace September.Common
             else
             {
                 Debug.LogError("MapSceneContainer not found");
+            }
+        }
+
+        public async UniTaskVoid LoadTutorialScene()
+        {
+            var result = await _networkRunner.StartGame(new StartGameArgs()
+            {
+                GameMode = GameMode.Single,
+                Scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex)
+            });
+
+            if (result.Ok)
+            {
+                await _networkRunner.LoadScene(_tutorialSceneName);
+            }
+            else
+            {
+                Debug.LogError($"[Tutorial] Failed to start network: {result.ErrorMessage}");
             }
         }
 
