@@ -208,8 +208,8 @@ namespace InGame.Interact
             // クールダウン終了待機
             await UniTask.WaitUntil(this, s => !s.IsInCooldown(), cancellationToken: this.GetCancellationTokenOnDestroy());
 
-            // エフェクトをフェードアウトさせて停止
-            effectSpawner.StopEffectGradually(effectId);
+            // 使用可能になったら既存の粒子も消し、使用不可表示を残さない。
+            effectSpawner.StopEffect(effectId);
 
             // クールダウン回復音を全クライアントで再生
             Rpc_PlaySE(SoundCues.SE.Exhibit_Revive.Sheet, SoundCues.SE.Exhibit_Revive.Name, effectTransform.position);
