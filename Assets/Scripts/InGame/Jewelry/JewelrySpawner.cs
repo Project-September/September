@@ -229,7 +229,12 @@ namespace InGame.Jewelry
                 return null;
             }
 
-            return Runner.Spawn(prefab, position, Quaternion.identity);
+            NetworkObject obj = Runner.Spawn(prefab, position, Quaternion.identity);
+            if (obj.TryGetComponent(out Jewelry jewelry))
+            {
+                jewelry.RPC_PlaySpawnEffect();
+            }
+            return obj;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
