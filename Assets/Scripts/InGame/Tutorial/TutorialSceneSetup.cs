@@ -8,6 +8,7 @@ using September.Common;
 using September.InGame.Common;
 using September.InGame.UI;
 using Unity.Cinemachine;
+using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -36,6 +37,7 @@ namespace September.InGame.Tutorial
         private NetworkRunner _runner;
         private bool _ownsRunner;
         private bool _isExiting;
+        private bool _playerExitPrepared;
         private Tween _fadeTween;
         private CinemachineBrain _cameraBrain;
 
@@ -246,6 +248,7 @@ namespace September.InGame.Tutorial
             _isExiting = true;
             if (!_ownsRunner && NetworkManager.Instance)
             {
+                PreparePlayerForExit();
                 NetworkManager.Instance.QuitLobby().Forget();
                 return;
             }
@@ -264,8 +267,23 @@ namespace September.InGame.Tutorial
         private async UniTask ShutdownOwnedRunnerAsync()
         {
             if (!_ownsRunner || !_runner) return;
+            PreparePlayerForExit();
             _ownsRunner = false;
             await _runner.Shutdown();
+        }
+
+        private void PreparePlayerForExit()
+        {
+            if (_playerExitPrepared || !_runner || !_runner.IsRunning ||
+                !_runner.TryGetPlayerObject(_runner.LocalPlayer, out var player) || !player) return;
+            _playerExitPrepared = true;
+
+            // Tutorialを終了して破棄するプレイヤーだけを対象とする。復帰・再利用には使わない。
+            // ネットワーク値が有効なうちに監視を解除し、Shutdown中の参照を防ぐ。
+            foreach (var animation in player.GetComponentsInChildren<global::InGame.Common.AnimationClipPlayerManager>(true))
+                animation.enabled = false;
+            foreach (var trigger in player.GetComponentsInChildren<ObservableDestroyTrigger>(true))
+                trigger.ForceRaiseOnDestroy();
         }
 
         private void OnDestroy()
