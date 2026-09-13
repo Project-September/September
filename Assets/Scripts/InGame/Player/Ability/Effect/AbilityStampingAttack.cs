@@ -93,7 +93,14 @@ namespace InGame.Exhibit
                 _animationClipPlayer.PlayClipLoop(_fallAnimation);
                 _stampingState = StampingState.Falling;
                 var excaliburTransform = GetExcaliburTransform();
-                _effectId = _effectSpawner.RequestPlayLoopEffect(_stampEffectType, excaliburTransform.position, excaliburTransform.rotation * Quaternion.Euler(0, 0, -90f), excaliburTransform);
+                if (excaliburTransform != null)
+                {
+                    _effectId = _effectSpawner.RequestPlayLoopEffect(
+                        _stampEffectType,
+                        excaliburTransform.position,
+                        Quaternion.identity,
+                        Parameter.Owner.transform);
+                }
             }
 
             if (_playerMovement.IsGround)
