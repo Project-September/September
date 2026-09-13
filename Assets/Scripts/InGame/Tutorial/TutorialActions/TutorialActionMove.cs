@@ -17,13 +17,11 @@ namespace September.InGame.Tutorial
         private PlayerMovement _playerMovement;
         private const int CHECK_FRAME_INTERVAL = 5;
         private bool _isMoveCompleted = false;
-        private bool _isRunCompleted = false;
         private bool _isVaultCompleted = false;
 
         private enum MoveType
         {
             Walk,
-            Run,
             Overcome
         }
         public override void OnStart(TutorialActionData actionData)
@@ -48,10 +46,9 @@ namespace September.InGame.Tutorial
             base.OnUpdate();
 
             WalkMove();
-            RunMove();
             VaultMove();
 
-            if (_isMoveCompleted && _isRunCompleted && _isVaultCompleted)
+            if (_isMoveCompleted && _isVaultCompleted)
             {
                 _isCompleted = true;
                 _actionData.Action?.Invoke();   
@@ -70,14 +67,6 @@ namespace September.InGame.Tutorial
             }
         }
 
-        private void RunMove()
-        {
-            if (_playerMovement.IsDash && !_isRunCompleted)
-            {
-                _isRunCompleted = true;
-                ConditionTextSet();
-            }
-        }
 
         private void VaultMove()
         {
@@ -141,9 +130,8 @@ namespace September.InGame.Tutorial
         private void ConditionTextSet()
         {
             string message1 = $"指定場所に移動{_warkTargetIndex}/{_walkTarget.Length}";
-            string message2 = $"走る{(_isRunCompleted ? "1" : "0")}/1";
-            string message3 = $"柵障害物を乗り越える{(_isVaultCompleted ? "1" : "0")}/1";
-            _actionData.ActionConditionText.text = $"{message1}\n{message2}\n{message3}";
+            string message2 = $"柵障害物を乗り越える{(_isVaultCompleted ? "1" : "0")}/1";
+            _actionData.ActionConditionText.text = $"{message1}\n{message2}";
         }
 
         public override void OnEndAction()
