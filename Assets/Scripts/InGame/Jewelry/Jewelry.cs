@@ -28,6 +28,11 @@ namespace InGame.Jewelry
 
         private TickTimer _despawnTimer;
 
+        [Networked] private NetworkBool IsSpawnEffectPlaying { get; set; }
+        [Networked] private TickTimer SpawnEffectTimer { get; set; }
+
+        private bool _isSpawnEffectPlayingLocal;
+
         public override void Spawned()
         {
             _despawnTimer = TickTimer.CreateFromSeconds(Runner, _jewelryParams.LifeTime);
@@ -35,6 +40,14 @@ namespace InGame.Jewelry
 
         public override void FixedUpdateNetwork()
         {
+            // スポーンエフェクトの再生完了時（宝石を出現させるタイミング）
+            if (IsSpawnEffectPlaying && SpawnEffectTimer.Expired(Runner))
+            {
+                _jewelryControl.UnFreeze();
+                IsSpawnEffectPlaying = false;
+                SpawnEffectTimer = TickTimer.None;
+            }
+
             // 自動消滅時間を過ぎたらデスポーン
             if (_despawnTimer.Expired(Runner))
             {
@@ -60,6 +73,13 @@ namespace InGame.Jewelry
 
         public override void Render()
         {
+            // スポーン演出
+            if (_isSpawnEffectPlayingLocal != IsSpawnEffectPlaying)
+            {
+                _isSpawnEffectPlayingLocal = IsSpawnEffectPlaying;
+                OnChangedIsSpawnEffectPlaying();
+            }
+
             // 消滅前の点滅演出
             if (_despawnTimer.RemainingTime(Runner) <= _jewelryParams.BlinkStartRemainingTime)
             {
@@ -90,13 +110,7 @@ namespace InGame.Jewelry
             effectSpawner.RequestPlayOneShotEffect(_jewelryParams.PickupEffectType, transform.position + _jewelryParams.PickupEffectOffset, transform.rotation);
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void RPC_PlaySpawnEffect()
-        {
-            PlaySpawnEffect().Forget();
-        }
-
-        private async UniTask PlaySpawnEffect()
+        public void PlaySpawnEffect()
         {
             if (!_spawnEffect || !_jewelryEffect || !_jewelryControl)
             {
@@ -104,17 +118,28 @@ namespace InGame.Jewelry
                 return;
             }
 
-            // スポーン前扱いなので非表示・動かない
+            // スポーン前に移動しないように
             _jewelryControl.Freeze();
-            _jewelryEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
             // スポーンエフェクトを再生
-            _spawnEffect.Play(true);
-            await UniTask.WaitForSeconds(_spawnTimeOffset, cancellationToken: destroyCancellationToken);
+            IsSpawnEffectPlaying = true;
+            SpawnEffectTimer = TickTimer.CreateFromSeconds(Runner, _spawnTimeOffset);
+        }
 
-            // フラッシュのタイミングで表示・動作開始
-            _jewelryControl.UnFreeze();
-            _jewelryEffect.Play(true);
+        private void OnChangedIsSpawnEffectPlaying()
+        {
+            // スポーンエフェクトを再生開始
+            if (IsSpawnEffectPlaying)
+            {
+                _spawnEffect.Play(true);
+                // 宝石そのものは非表示にする
+                _jewelryEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+            // スポーンエフェクトの再生完了後に宝石を表示
+            else
+            {
+                _jewelryEffect.Play(true);
+            }
         }
     }
 }

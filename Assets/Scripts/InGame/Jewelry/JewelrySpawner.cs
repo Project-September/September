@@ -232,7 +232,7 @@ namespace InGame.Jewelry
             NetworkObject obj = Runner.Spawn(prefab, position, Quaternion.identity);
             if (obj.TryGetComponent(out Jewelry jewelry))
             {
-                jewelry.RPC_PlaySpawnEffect();
+                jewelry.PlaySpawnEffect();
             }
             return obj;
         }
