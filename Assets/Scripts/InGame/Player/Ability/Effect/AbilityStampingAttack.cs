@@ -7,6 +7,7 @@ using InGame.Player.Ability;
 using September.Common;
 using September.InGame.Effect;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace InGame.Exhibit
 {
@@ -23,6 +24,9 @@ namespace InGame.Exhibit
         [SerializeField] private EffectType _stampEffectType;
         [SerializeField] private float _impactEffectOffset = 1f;
         [SerializeField] private Vector3 _impactEffectRotationOffset = Vector3.zero;
+        [SerializeField, FormerlySerializedAs("_fallingEffectPositionOffset"), FormerlySerializedAs("_positionOffest")]
+        private Vector3 _positionOffset = Vector3.zero;
+        [SerializeField] private Vector3 _fallingEffectRotationOffset = Vector3.zero;
         [SerializeField] private float _impactSize = 1f;
         [SerializeField] private float _attackRange;
         [SerializeField] private int _damageAmount;
@@ -92,15 +96,11 @@ namespace InGame.Exhibit
             {
                 _animationClipPlayer.PlayClipLoop(_fallAnimation);
                 _stampingState = StampingState.Falling;
-                var excaliburTransform = GetExcaliburTransform();
-                if (excaliburTransform != null)
-                {
-                    _effectId = _effectSpawner.RequestPlayLoopEffect(
+                    _effectId = _effectSpawner.RequestPlayLoopEffectLocal(
                         _stampEffectType,
-                        excaliburTransform.position,
-                        Quaternion.identity,
+                        _positionOffset,
+                        Quaternion.Euler(_fallingEffectRotationOffset),
                         Parameter.Owner.transform);
-                }
             }
 
             if (_playerMovement.IsGround)
@@ -199,26 +199,6 @@ namespace InGame.Exhibit
             _playerMovement = player.GetComponent<PlayerMovement>();
             _animationClipPlayer = player.GetComponent<AnimationClipPlayer>();
             _animationClipPlayerManager = player.GetComponent<AnimationClipPlayerManager>();
-        }
-
-        private Transform GetExcaliburTransform()
-        {
-            var equipmentManager =
-                _playerObject.GetComponent<PlayerEquipmentManager>();
-
-            if (equipmentManager == null)
-                return null;
-
-            foreach (var equipment in equipmentManager.CurrentEquipments.Values)
-            {
-                if (equipment.Type == EquipmentType.Armory &&
-                    equipment.ClonedObject != null)
-                {
-                    return equipment.ClonedObject.transform;
-                }
-            }
-
-            return null;
         }
 
         public enum StampingState
