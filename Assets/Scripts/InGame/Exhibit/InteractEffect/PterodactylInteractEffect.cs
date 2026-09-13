@@ -44,7 +44,7 @@ namespace InGame.Exhibit
             {
                 _interactTimer += _runner.DeltaTime;
 
-                if (playerInput.Buttons.IsSet(PlayerButtons.Interact) && _interactTimer > 1f)
+                if (playerInput.Buttons.IsSet(PlayerButtons.AirPlaneBack) && _interactTimer > 1f)
                 {
                     GetOff();
                     return;
