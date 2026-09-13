@@ -37,6 +37,8 @@ public enum EffectType
     BallistaHit,
     BallistaShoot,
     CandleAura,
-    Cursor
+    CannonShoot,
+    CannonHit,
+    CannonHitGround
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
