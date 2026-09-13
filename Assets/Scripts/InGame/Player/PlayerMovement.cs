@@ -504,7 +504,7 @@ namespace InGame.Player
                 // CheckGroundManualが測った浮き量へそのまま吸着する
                 if (_groundGap <= GroundSnapTolerance) return;
 
-                SnapDownWithoutPenetration(_groundGap);
+                if (!SnapDownWithoutPenetration(_groundGap)) return;
                 _groundGap = 0f;
                 return;
             }
@@ -512,8 +512,7 @@ namespace InGame.Player
             // 実接地していない場合は、接地判定より広い範囲を探して足元へ引き戻す
             if (!TryProbeGround(_groundSnapDistance, out Vector3 normal, out float gap)) return;
 
-            if (gap > GroundSnapTolerance)
-                SnapDownWithoutPenetration(gap);
+            if (gap > GroundSnapTolerance && !SnapDownWithoutPenetration(gap)) return;
             _isGround = true;
             GroundedGraceRemaining = _coyoteTime;
             NetworkedGroundNormal = normal;
@@ -522,8 +521,10 @@ namespace InGame.Player
 
         // 坂と平地の境界では中心Rayの距離だけ下げるとカプセル端が床に食い込む。
         // 接地面の選択は従来のまま、吸着だけをカプセル全体の移動可能量で制限する。
-        private void SnapDownWithoutPenetration(float requestedDistance)
+        private bool SnapDownWithoutPenetration(float requestedDistance)
         {
+            if (requestedDistance <= GroundSnapTolerance) return true;
+
             Transform capsule = _moveCapsuleCollider.transform;
             Vector3 scale = capsule.lossyScale;
             float radius = _moveCapsuleCollider.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
@@ -534,15 +535,16 @@ namespace InGame.Player
             Vector3 bottom = center - offset;
 
             // 重なっている場合の解消は物理に任せ、さらに下へ押し込まない。
-            if (Physics.CheckCapsule(top, bottom, radius, _groundLayer, QueryTriggerInteraction.Ignore)) return;
+            if (Physics.CheckCapsule(top, bottom, radius, _groundLayer, QueryTriggerInteraction.UseGlobal)) return false;
             if (!Physics.CapsuleCast(top, bottom, radius, Vector3.down, out RaycastHit hit,
-                    requestedDistance + GroundSnapTolerance, _groundLayer, QueryTriggerInteraction.Ignore)) return;
-            if (!IsWalkable(hit.normal)) return;
+                    requestedDistance + GroundSnapTolerance, _groundLayer, QueryTriggerInteraction.UseGlobal)) return false;
+            if (!IsWalkable(hit.normal)) return false;
 
             float distance = Mathf.Min(requestedDistance, Mathf.Max(0f, hit.distance - GroundSnapTolerance));
-            if (distance <= 0f) return;
+            if (distance <= 0f) return false;
             _rb.position += Vector3.down * distance;
             transform.position = _rb.position;
+            return true;
         }
 
         protected virtual void ApplyVelocity(float deltaTime)
