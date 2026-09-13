@@ -504,7 +504,7 @@ namespace InGame.Player
                 // CheckGroundManualが測った浮き量へそのまま吸着する
                 if (_groundGap <= GroundSnapTolerance) return;
 
-                transform.position += Vector3.down * _groundGap;
+                SnapDownWithoutPenetration(_groundGap);
                 _groundGap = 0f;
                 return;
             }
@@ -513,11 +513,36 @@ namespace InGame.Player
             if (!TryProbeGround(_groundSnapDistance, out Vector3 normal, out float gap)) return;
 
             if (gap > GroundSnapTolerance)
-                transform.position += Vector3.down * gap;
+                SnapDownWithoutPenetration(gap);
             _isGround = true;
             GroundedGraceRemaining = _coyoteTime;
             NetworkedGroundNormal = normal;
             _groundGap = 0f;
+        }
+
+        // 坂と平地の境界では中心Rayの距離だけ下げるとカプセル端が床に食い込む。
+        // 接地面の選択は従来のまま、吸着だけをカプセル全体の移動可能量で制限する。
+        private void SnapDownWithoutPenetration(float requestedDistance)
+        {
+            Transform capsule = _moveCapsuleCollider.transform;
+            Vector3 scale = capsule.lossyScale;
+            float radius = _moveCapsuleCollider.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+            float halfHeight = Mathf.Max(radius, _moveCapsuleCollider.height * Mathf.Abs(scale.y) * 0.5f);
+            Vector3 center = capsule.TransformPoint(_moveCapsuleCollider.center);
+            Vector3 offset = Vector3.up * (halfHeight - radius);
+            Vector3 top = center + offset;
+            Vector3 bottom = center - offset;
+
+            // 重なっている場合の解消は物理に任せ、さらに下へ押し込まない。
+            if (Physics.CheckCapsule(top, bottom, radius, _groundLayer, QueryTriggerInteraction.Ignore)) return;
+            if (!Physics.CapsuleCast(top, bottom, radius, Vector3.down, out RaycastHit hit,
+                    requestedDistance + GroundSnapTolerance, _groundLayer, QueryTriggerInteraction.Ignore)) return;
+            if (!IsWalkable(hit.normal)) return;
+
+            float distance = Mathf.Min(requestedDistance, Mathf.Max(0f, hit.distance - GroundSnapTolerance));
+            if (distance <= 0f) return;
+            _rb.position += Vector3.down * distance;
+            transform.position = _rb.position;
         }
 
         protected virtual void ApplyVelocity(float deltaTime)
