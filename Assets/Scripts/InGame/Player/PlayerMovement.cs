@@ -93,6 +93,54 @@ namespace InGame.Player
         private PlayerEvasion _playerEvasion;
         /// <summary> 回避の同期状態。Tick 基準なので入力権限側の予測でも決定的に再計算できる </summary>
         [Networked, HideInInspector] public EvasionState Evasion { get; private set; }
+        public const int MaxEvasionStamina = 3;
+        public int EvasionStamina => _status.CurrentEvasionStamina;
+        [Networked] private TickTimer RecoveryTimer { get; set; }
+        [Networked] private float RecoveryRemaining { get; set; }
+        [Networked] private float RecoveryInterval { get; set; }
+        [Networked] private NetworkBool RecoveryPaused { get; set; }
+
+        public float EvasionStaminaProgress
+        {
+            get
+            {
+                float value = EvasionStamina;
+                if (value >= _status.MaxEvasionStamina || RecoveryInterval <= 0f) return value;
+                if (!RecoveryPaused && !RecoveryTimer.IsRunning) return value;
+                float remaining = RecoveryPaused ? RecoveryRemaining : RecoveryTimer.RemainingTime(Runner) ?? 0f;
+                return Mathf.Min(_status.MaxEvasionStamina, value + 1f - Mathf.Clamp01(remaining / RecoveryInterval));
+            }
+        }
+
+        private void PauseEvasionRecovery(float interval)
+        {
+            RecoveryInterval = Mathf.Max(0.01f, interval);
+            RecoveryRemaining = RecoveryTimer.RemainingTime(Runner) ?? RecoveryInterval;
+            RecoveryTimer = TickTimer.None;
+            RecoveryPaused = true;
+        }
+
+        private void ConsumeEvasionStaminaAndPauseRecovery(float interval)
+        {
+            // 回復途中で回避した場合は残り時間を保存して停止する。
+            PauseEvasionRecovery(interval);
+            _status.AddBaseValue(StatType.EvasionStamina, -1f);
+        }
+
+        private void ResumeEvasionRecovery()
+        {
+            RecoveryPaused = false;
+            RecoveryTimer = TickTimer.CreateFromSeconds(Runner, Mathf.Max(Runner.DeltaTime, RecoveryRemaining));
+        }
+
+        public void UpdateEvasionStamina()
+        {
+            if (RecoveryPaused || EvasionStamina >= _status.MaxEvasionStamina || !RecoveryTimer.Expired(Runner)) return;
+            _status.AddBaseValue(StatType.EvasionStamina, 1f);
+            RecoveryTimer = EvasionStamina < _status.MaxEvasionStamina
+                ? TickTimer.CreateFromSeconds(Runner, RecoveryInterval)
+                : TickTimer.None;
+        }
         [Networked, HideInInspector] public bool DoingVault { get; private set; }
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
@@ -122,7 +170,7 @@ namespace InGame.Player
         public bool IsEvading => Evasion.IsEvading;
         /// <summary> 回避を開始した Tick </summary>
         public int EvasionStartTick => Evasion.StartTick;
-        /// <summary> 回避全体の所要時間 (秒、重量係数適用後) </summary>
+        /// <summary> 回避全体の所要時間 (秒、重量による速度補正適用後) </summary>
         public float EvasionDuration => Evasion.RollDuration;
         [Networked] public bool IgnoreMoveInput { get; set; }
         [Networked] public bool IgnoreEvasionInput { get; set; }
@@ -192,12 +240,16 @@ namespace InGame.Player
 
         private void StartEvasion()
         {
+            if (EvasionStamina <= 0) return;
+
             var state = Evasion;
             int jewelryCount = _playerJewelryRuntime.CalculateJewelryScore();
 
             if (!_playerEvasion.TryStartEvasion(ref state, MoveDirection, transform.forward, Runner.Tick, Runner.DeltaTime, jewelryCount))
                 return;
 
+            // 回避が有効に開始した瞬間に消費し、回避中は回復を停止する。
+            ConsumeEvasionStaminaAndPauseRecovery(_evasionData.StaminaRecoveryInterval);
             Evasion = state;
             Stop();
         }
@@ -279,6 +331,9 @@ namespace InGame.Player
                 state.IsEvading = false;
                 state.LastEndTick = tick;
                 Evasion = state;
+
+                // 停止していた残り時間から回復を再開する。
+                ResumeEvasionRecovery();
 
                 if (HasStateAuthority) _playerHealth.IsInvincible = false;
                 return;
@@ -449,7 +504,7 @@ namespace InGame.Player
                 // CheckGroundManualが測った浮き量へそのまま吸着する
                 if (_groundGap <= GroundSnapTolerance) return;
 
-                transform.position += Vector3.down * _groundGap;
+                if (!SnapDownWithoutPenetration(_groundGap)) return;
                 _groundGap = 0f;
                 return;
             }
@@ -457,12 +512,39 @@ namespace InGame.Player
             // 実接地していない場合は、接地判定より広い範囲を探して足元へ引き戻す
             if (!TryProbeGround(_groundSnapDistance, out Vector3 normal, out float gap)) return;
 
-            if (gap > GroundSnapTolerance)
-                transform.position += Vector3.down * gap;
+            if (gap > GroundSnapTolerance && !SnapDownWithoutPenetration(gap)) return;
             _isGround = true;
             GroundedGraceRemaining = _coyoteTime;
             NetworkedGroundNormal = normal;
             _groundGap = 0f;
+        }
+
+        // 坂と平地の境界では中心Rayの距離だけ下げるとカプセル端が床に食い込む。
+        // 接地面の選択は従来のまま、吸着だけをカプセル全体の移動可能量で制限する。
+        private bool SnapDownWithoutPenetration(float requestedDistance)
+        {
+            if (requestedDistance <= GroundSnapTolerance) return true;
+
+            Transform capsule = _moveCapsuleCollider.transform;
+            Vector3 scale = capsule.lossyScale;
+            float radius = _moveCapsuleCollider.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+            float halfHeight = Mathf.Max(radius, _moveCapsuleCollider.height * Mathf.Abs(scale.y) * 0.5f);
+            Vector3 center = capsule.TransformPoint(_moveCapsuleCollider.center);
+            Vector3 offset = Vector3.up * (halfHeight - radius);
+            Vector3 top = center + offset;
+            Vector3 bottom = center - offset;
+
+            // 重なっている場合の解消は物理に任せ、さらに下へ押し込まない。
+            if (Physics.CheckCapsule(top, bottom, radius, _groundLayer, QueryTriggerInteraction.UseGlobal)) return false;
+            if (!Physics.CapsuleCast(top, bottom, radius, Vector3.down, out RaycastHit hit,
+                    requestedDistance + GroundSnapTolerance, _groundLayer, QueryTriggerInteraction.UseGlobal)) return false;
+            if (!IsWalkable(hit.normal)) return false;
+
+            float distance = Mathf.Min(requestedDistance, Mathf.Max(0f, hit.distance - GroundSnapTolerance));
+            if (distance <= 0f) return false;
+            _rb.position += Vector3.down * distance;
+            transform.position = _rb.position;
+            return true;
         }
 
         protected virtual void ApplyVelocity(float deltaTime)
@@ -637,6 +719,19 @@ namespace InGame.Player
         public void ResetFlyingVelocity()
         {
             NetworkedFlyingVelocity = Vector3.zero;
+        }
+
+        /// <summary>
+        /// 落下速度を維持したまま、横方向の移動・吹き飛び速度を消す。
+        /// </summary>
+        public void ResetHorizontalVelocity()
+        {
+            NetworkedMoveVelocity = Vector3.zero;
+            NetworkedAirMoveVelocity = Vector3.zero;
+            NetworkedFlyingVelocity = new Vector3(0f, NetworkedFlyingVelocity.y, 0f);
+
+            Vector3 velocity = _rb.linearVelocity;
+            _rb.linearVelocity = new Vector3(0f, velocity.y, 0f);
         }
 
         public void Stop()

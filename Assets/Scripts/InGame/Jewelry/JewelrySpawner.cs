@@ -187,7 +187,7 @@ namespace InGame.Jewelry
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_ShowSpawnMessage(float second)
         {
-            UIController.I.ShowStatusUpUI(second, Exhibit.StatusUpType.JewelrySpawn);
+            UIController.I.ShowNotice(second, NoticeType.JewelrySpawn);
         }
 
         private void SpawnJewelryGroup(JewelrySpawnSetting spawnSetting)
@@ -229,7 +229,12 @@ namespace InGame.Jewelry
                 return null;
             }
 
-            return Runner.Spawn(prefab, position, Quaternion.identity);
+            NetworkObject obj = Runner.Spawn(prefab, position, Quaternion.identity);
+            if (obj.TryGetComponent(out Jewelry jewelry))
+            {
+                jewelry.PlaySpawnEffect();
+            }
+            return obj;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -269,5 +274,11 @@ namespace InGame.Jewelry
                 GizmosUtility.DrawCircle(center, Vector3.up, setting.SpawnRange);
             }
         }
+    }
+    public enum NoticeType
+    {
+        None,
+        JewelrySpawn,
+        KrakenSpawn,
     }
 }

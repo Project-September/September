@@ -139,11 +139,46 @@ namespace September.InGame.Effect
         }
 
         /// <summary>
+        /// プレイヤーを親にして、親基準の座標・回転でループエフェクトを生成する。
+        /// ワールド座標をRPCで送ると、受信時の補間位置の差でクライアントごとにずれるため使用する。
+        /// </summary>
+        public EffectID RequestPlayLoopEffectLocal(EffectType effectType, Vector3 localPosition, Quaternion localRotation, Transform parent)
+        {
+            if (effectType == EffectType.None) return default;
+
+            NetworkId parentNetworkId = default(NetworkId);
+            if (parent != null)
+            {
+                var parentNetworkObject = parent.GetComponentInParent<NetworkObject>();
+                if (parentNetworkObject != null)
+                {
+                    parentNetworkId = parentNetworkObject.Id;
+                }
+                else
+                {
+                    Debug.LogWarning($"[EffectSpawner] 指定オブジェクトにNetworkObjectが存在しません。parent: {parent}");
+                }
+            }
+
+            EffectID effectId = GenerateEffectId();
+            RPC_PlayEffectLocal(effectType, localPosition, localRotation, effectId, parentNetworkId);
+            return effectId;
+        }
+
+        /// <summary>
         /// 指定されたIDのエフェクトを停止する
         /// </summary>
         public void StopEffect(EffectID effectId)
         {
             RPC_StopEffectById(effectId);
+        }
+
+        /// <summary>
+        /// 指定されたIDのエフェクトの新規放出を止め、パーティクルの寿命に従って徐々にフェードアウトさせる
+        /// </summary>
+        public void StopEffectGradually(EffectID effectId)
+        {
+            RPC_StopEffectGraduallyById(effectId);
         }
 
         /// <summary>
@@ -228,6 +263,59 @@ namespace September.InGame.Effect
                 }
             }
         }
+
+        /// <summary>
+        /// 親のローカル座標でループエフェクトを生成するRPC。
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_PlayEffectLocal(EffectType effectType, Vector3 localPosition, Quaternion localRotation, EffectID effectId, NetworkId parentNetworkId)
+        {
+            if (_effectDatabase == null)
+            {
+                InitializeEffectDatabase();
+            }
+
+            var effectData = _effectDatabase.GetEffectData(effectType);
+            if (effectData.Prefab == null)
+            {
+                Debug.LogError($"'{effectType}' に対応するプレハブが見つかりません");
+                return;
+            }
+
+            Transform parent = null;
+            if (parentNetworkId != default(NetworkId) &&
+                _networkRunner.TryFindObject(parentNetworkId, out NetworkObject parentNetworkObject))
+            {
+                parent = parentNetworkObject.transform;
+            }
+
+            GameObject effect;
+            if (parent != null)
+            {
+                effect = Instantiate(effectData.Prefab, parent);
+                effect.transform.localPosition = localPosition;
+                effect.transform.localRotation = localRotation;
+            }
+            else
+            {
+                Debug.LogWarning($"[EffectSpawner] 親NetworkObjectが見つからないため、ローカル座標をワールド座標として生成します。id: {parentNetworkId}");
+                effect = Instantiate(effectData.Prefab, localPosition, localRotation);
+            }
+
+            ParticleSystem system = effect.GetComponent<ParticleSystem>();
+            if (system != null)
+            {
+                var main = system.main;
+                main.loop = true;
+                system.Play();
+                _activeEffects[effectId] = effect;
+            }
+            else
+            {
+                Debug.LogWarning($"エフェクト '{effectType}' にParticleSystemが見つかりません");
+                _activeEffects[effectId] = effect;
+            }
+        }
         
         /// <summary>
         /// スケール付きエフェクト再生RPC
@@ -295,6 +383,55 @@ namespace September.InGame.Effect
             }
         }
 
+        /// <summary>
+        /// エフェクトをフェードアウトさせながら止めるRPC
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_StopEffectGraduallyById(EffectID effectId)
+        {
+            if (_activeEffects.TryGetValue(effectId, out GameObject effect))
+            {
+                if (effect != null)
+                {
+                    var particleSystems = effect.GetComponentsInChildren<ParticleSystem>();
+
+                    if (particleSystems.Length > 0)
+                    {
+                        effect.transform.SetParent(null);
+
+                        float maxLifetime = 0f;
+
+                        foreach (var ps in particleSystems)
+                        {
+                            // 各 ParticleSystem の最大粒子寿命を取得
+                            float lifetime = ps.main.startLifetime.constantMax;
+                            if (lifetime > maxLifetime)
+                            {
+                                maxLifetime = lifetime;
+                            }
+
+                            // 新規放出をストップ
+                            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                        }
+
+                        // 全ての粒子が消え去るタイミングで削除
+                        Destroy(effect, maxLifetime);
+
+                    }
+                    else
+                    {
+                        // ParticleSystem が無い場合は削除
+                        Destroy(effect);
+                    }
+                }
+                _activeEffects.Remove(effectId);
+            }
+            else
+            {
+                Debug.LogWarning($"[EffectSpawner] エフェクトID:{effectId} は存在しません");
+            }
+        }
+
         //エフェクトを止める
         [Rpc(RpcSources.All, RpcTargets.All)]
         private void RPC_StopEffectById(EffectID effectId)
@@ -312,6 +449,8 @@ namespace September.InGame.Effect
                 Debug.LogWarning($"[EffectSpawner] エフェクトID:{effectId} は存在しません");
             }
         }
+
+
 
         private void OnDestroy()
         {

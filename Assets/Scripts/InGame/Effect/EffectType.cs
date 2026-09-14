@@ -36,5 +36,13 @@ public enum EffectType
     Thunder,
     BallistaHit,
     BallistaShoot,
+    CandleAura,
+    CannonShoot,
+    CannonHit,
+    CannonHitGround,
+    ExcaliburAttack,
+    ExcaliburStamp,
+    ExcaliburHit,
+    ExcaliburImpact,
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
