@@ -6786,38 +6786,6 @@ MonoBehaviour:
       m_Data: []
     m_ObjectData:
       m_Data: []
-  - m_EditModeType: 1
-    m_Knots:
-    - Position:
-        x: 0
-        y: 0
-        z: 0
-      TangentIn:
-        x: -0
-        y: -0
-        z: -0.27614236
-      TangentOut:
-        x: 0
-        y: 0
-        z: 0.27614236
-      Rotation:
-        value:
-          x: 0
-          y: 0
-          z: 0
-          w: 1
-    m_MetaData:
-    - Mode: 4
-      Tension: 0.5
-    m_Closed: 0
-    m_IntData:
-      m_Data: []
-    m_FloatData:
-      m_Data: []
-    m_Float4Data:
-      m_Data: []
-    m_ObjectData:
-      m_Data: []
   m_Knots:
     m_KnotsLink: []
 --- !u!1 &7988256539409897521
@@ -8126,7 +8094,6 @@ MonoBehaviour:
   _opticalCamouflageMaterial: {fileID: 2100000, guid: 9c38977772e2e4240ac333399ae5edb9, type: 2}
   _renderers:
   - {fileID: 6089400133442776939}
-  - {fileID: 0}
   _playerEquipmentManager: {fileID: 2510949646608516932}
   _hideObjects:
   - {fileID: 3623662566276085713}
@@ -8578,7 +8545,6 @@ MonoBehaviour:
   _playerInputManager: {fileID: 8662693787533303848}
   _wireOrigin: {fileID: 8721620199340885035}
   _wireSpline: {fileID: 3454141809864283659}
-  _wireExtrude: {fileID: 0}
   _wireMesh: {fileID: 2475458012208602023}
   _hookMesh: {fileID: 621392962862902147}
   _stretchDuration: 1
