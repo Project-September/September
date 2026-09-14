@@ -8,6 +8,7 @@ namespace September
     public class TutorialActionAbility : TutorialActionBase
     {
         [SerializeField] private TutorialDummyEnemy _dummyEnemy;
+        [SerializeField] private TutorialMoveGuide _guide;
         private PlayerAbilityManager _playerAbilityManager;
         private bool _isNormalAttacked = false;
         private bool _isAbilityAttacked = false;
@@ -26,7 +27,9 @@ namespace September
             }
             actionData.TutorialText.text = _explanationText;
             ConditionTextSet();
+            _dummyEnemy.gameObject.SetActive(true);
             _dummyEnemy.OnStartAbilityTutorial(OnAttackDummy);
+            if (_guide) _guide.Show(actionData.Player.transform, _dummyEnemy.transform);
         }
 
         public void OnAttackDummy(HitData hitData)
@@ -69,8 +72,10 @@ namespace September
 
         public override void OnEndAction()
         {
+            if (_guide) _guide.Hide();
             base.OnEndAction();
             _dummyEnemy.OnEndAbilityTutorial();
+            _dummyEnemy.gameObject.SetActive(false);
         }
     }
 }
