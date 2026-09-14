@@ -7,6 +7,7 @@ using InGame.Common;
 using InGame.Interact;
 using September.Common;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace InGame.Player
 {
@@ -21,20 +22,24 @@ namespace InGame.Player
         AnimationClipPlayer _animationClipPlayer;
         bool _scanAnimationPlaying;
         AnimationClip _currentScanClip;
-        float _scanAnimationTime;
-        bool _scanIdlePlaying;
+        bool _spawned;
+        float _localScanStartTime = float.MinValue;
+        float _interruptedScanStartTime = float.MinValue;
+        PlayableGraph _scanAnimationGraph;
         LayerInfo.LayerType _scanAnimationLayer;
         CancellationTokenSource _scanReturnBlendCts;
 
         [Header("スキャンアニメーション")]
         [SerializeField] AnimationClip _scanAnimationClip;
-        [SerializeField, Tooltip("しゃがみ完了後にループする待機モーション。未設定なら開始モーションの最後の姿勢を保持")]
-        AnimationClip _scanIdleAnimationClip;
         [SerializeField, Min(0f), Tooltip("スキャン終了時に通常モーションへ戻るブレンド時間（秒）")]
         float _scanReturnBlendDuration = 0.25f;
 
         [Networked, OnChangedRender(nameof(OnMimicTargetChanged))]
         NetworkId MimicTargetId { get; set; }
+
+        // 一度きりのRPCではなく状態を保持し、途中参加・描画準備の遅れにも対応する。
+        [Networked] bool ScanAnimationActive { get; set; }
+        [Networked] float ScanAnimationStartTime { get; set; }
 
         [Header("カメラ制御")]
         [SerializeField, Tooltip("フォーカス時のカメラの位置")]
@@ -83,6 +88,14 @@ namespace InGame.Player
             _playerManager = GetComponent<PlayerManager>();
             _movement = GetComponent<TakamuraMovement>();
             _animationClipPlayer = GetComponentInChildren<AnimationClipPlayer>(true);
+            _spawned = true;
+            _localScanStartTime = float.MinValue;
+            _interruptedScanStartTime = float.MinValue;
+            if (_animationClipPlayer)
+            {
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
+                _animationClipPlayer.BeforeEvaluate += UpdateScanAnimation;
+            }
             _scanTargets = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
             CreateTargetDictionary();
 
@@ -99,6 +112,9 @@ namespace InGame.Player
         public override void FixedUpdateNetwork()
         {
             if (HasStateAuthority) ApplyPendingStateChange();
+
+            if (HasStateAuthority && _movement.CurrentMimicryState != MimicryState.Default)
+                ScanAnimationActive = false;
 
             // inputにはこのオブジェクトに対する入力権限があるプレイヤーからの入力が入る
             if (!GetInput<PlayerInput>(out var input)) return;
@@ -248,7 +264,6 @@ namespace InGame.Player
         /// </summary>
         void FocusStartEffective()
         {
-            RPC_SetScanAnimation(true);
             _scannerCanvas.gameObject.SetActive(true);
             _scannerCanvas.ChangeImageVisibility(false);
             _cameraController.ChangeOffset(_focusPosition, _cameraMoveDuration);
@@ -270,64 +285,82 @@ namespace InGame.Player
         /// </summary>
         void FocusEndEffective()
         {
-            RPC_SetScanAnimation(false);
             _cameraController.ResetOffset(_cameraMoveDuration);
             _scannerCanvas.ChangeImageVisibility(false);
             _scannerCanvas.gameObject.SetActive(false);
             _focusIndex = -1;
         }
 
-        // PlayOnLayerはローカル再生なので、高村側で開始・停止だけを通知する。
-        [Rpc(RpcSources.InputAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
-        void RPC_SetScanAnimation(bool playing)
+        // 全端末で、同期状態とPlayableの準備状態を描画直前に確認する。
+        void UpdateScanAnimation()
         {
-            if (!playing)
+            if (!_spawned || !Object || !Object.IsValid || !Runner) return;
+            if (!ScanAnimationActive || _movement.CurrentMimicryState != MimicryState.Default)
             {
                 StopScanAnimationLocal();
                 return;
             }
-            if (_scanAnimationPlaying || !_animationClipPlayer || !_scanAnimationClip) return;
+
+            if (!_animationClipPlayer || !_animationClipPlayer.isActiveAndEnabled
+                || !_animationClipPlayer.IsValid || !_scanAnimationClip) return;
+
+            // モデルの再有効化などでグラフが作り直された場合は、現在の同期状態から再生を復元する。
+            if (!_scanAnimationGraph.Equals(_animationClipPlayer.Graph))
+            {
+                StopScanAnimationLocal(immediate: true);
+                _scanAnimationGraph = _animationClipPlayer.Graph;
+                _interruptedScanStartTime = float.MinValue;
+            }
+
+            if (_scanAnimationPlaying && _localScanStartTime != ScanAnimationStartTime)
+                StopScanAnimationLocal(immediate: true);
+
+            if (_scanAnimationPlaying
+                && !_animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _currentScanClip))
+            {
+                // 攻撃などの明示的な割り込みを、次の描画で上書きしない。
+                _interruptedScanStartTime = ScanAnimationStartTime;
+                StopScanAnimationLocal();
+                return;
+            }
+
+            if (!_scanAnimationPlaying)
+            {
+                if (_interruptedScanStartTime == ScanAnimationStartTime) return;
+                StartScanAnimationLocal();
+            }
+            if (!_scanAnimationPlaying
+                || !_animationClipPlayer.TryGetPlayableInfo(_scanAnimationClip, out var info)) return;
+
+            // RPC到着時刻や端末のフレームレートではなく、同期された開始時刻を基準にする。
+            var renderTime = HasInputAuthority || HasStateAuthority
+                ? Runner.LocalRenderTime
+                : Runner.RemoteRenderTime;
+            var elapsed = Mathf.Max(0f, (float)renderTime - ScanAnimationStartTime);
+            var clipTime = Mathf.Min(elapsed * Mathf.Max(0f, info.montage.PlaySpeed),
+                _scanAnimationClip.length);
+            info.SetTime(clipTime, updateBlendWeight: false);
+        }
+
+        void StartScanAnimationLocal()
+        {
 
             var montages = AnimationClipsContainer.Instance?.AnimationMontages;
             var index = montages == null ? -1 : Array.FindIndex(montages,
                 montage => montage.AnimClip == _scanAnimationClip);
             if (index < 0 || montages[index].TargetLayer == LayerInfo.LayerType.Base)
             {
-                Debug.LogWarning("スキャン開始モーションをBase以外のレイヤーで登録してください。", this);
+                // アセットの読み込みが完了するまで次の描画で再試行する。
                 return;
             }
 
             CancelScanReturnBlend();
             _scanAnimationLayer = montages[index].TargetLayer;
             _animationClipPlayer.PlayOnLayer(_scanAnimationClip, _scanAnimationLayer, speed: 0f);
+            if (!_animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _scanAnimationClip)) return;
             _currentScanClip = _scanAnimationClip;
             _scanAnimationPlaying = true;
-            _scanIdlePlaying = false;
-            _scanAnimationTime = 0f;
-        }
-
-        void Update()
-        {
-            if (!_scanAnimationPlaying || !_animationClipPlayer) return;
-            // 攻撃などが同じレイヤーを使った場合は、そのモーションを上書きしない。
-            if (!_animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _currentScanClip))
-            {
-                StopScanAnimationLocal();
-                return;
-            }
-            if (_scanIdlePlaying) return;
-            if (!_animationClipPlayer.TryGetPlayableInfo(_scanAnimationClip, out var info)) return;
-
-            _scanAnimationTime = Mathf.Min(_scanAnimationTime + Time.deltaTime
-                * Mathf.Max(0f, info.montage.PlaySpeed), _scanAnimationClip.length);
-            // 自動終了・BlendOutを使わず、最終フレームでもレイヤーの重みを維持する。
-            info.SetTime(_scanAnimationTime, updateBlendWeight: false);
-            if (_scanAnimationTime >= _scanAnimationClip.length && _scanIdleAnimationClip)
-            {
-                _animationClipPlayer.PlayOnLayer(_scanIdleAnimationClip, _scanAnimationLayer, loop: true);
-                _currentScanClip = _scanIdleAnimationClip;
-                _scanIdlePlaying = true;
-            }
+            _localScanStartTime = ScanAnimationStartTime;
         }
 
         void StopScanAnimationLocal(bool immediate = false)
@@ -336,7 +369,6 @@ namespace InGame.Player
             if (!_scanAnimationPlaying && !immediate) return;
             CancelScanReturnBlend();
             _scanAnimationPlaying = false;
-            _scanIdlePlaying = false;
 
             if (_animationClipPlayer
                 && _animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _currentScanClip))
@@ -381,6 +413,25 @@ namespace InGame.Player
 
         void OnDisable()
         {
+            if (_animationClipPlayer)
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
+            StopScanAnimationLocal(immediate: true);
+        }
+
+        void OnEnable()
+        {
+            if (_spawned && _animationClipPlayer)
+            {
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
+                _animationClipPlayer.BeforeEvaluate += UpdateScanAnimation;
+            }
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            _spawned = false;
+            if (_animationClipPlayer)
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
             StopScanAnimationLocal(immediate: true);
         }
 
@@ -389,6 +440,9 @@ namespace InGame.Player
         /// </summary>
         void FocusStartStateChange()
         {
+            if (!ScanAnimationActive)
+                ScanAnimationStartTime = Runner.SimulationTime;
+            ScanAnimationActive = true;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             _movement.CurrentAbilityPhase = ScanAbilityPhase.Scanning;
         }
@@ -398,6 +452,7 @@ namespace InGame.Player
         /// </summary>
         void FocusEndStateChange()
         {
+            ScanAnimationActive = false;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _movement.CurrentAbilityPhase = ScanAbilityPhase.Default;
         }
