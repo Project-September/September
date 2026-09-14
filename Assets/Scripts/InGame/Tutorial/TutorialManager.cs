@@ -68,6 +68,14 @@ namespace September.InGame.Tutorial
             Debug.Log($"TutorialManager: OnTutorialStart called for player {player.name}");
             _actionData.Player = player.gameObject;
             _actionData.PlayerInputManager = playerInputManager;
+            // 練習開始前に、このシーンの展示物の操作とインタラクト案内を無効にする。
+            // ネットワーク登録済みの展示物だけを、状態を管理する側で変更する。
+            foreach (var root in gameObject.scene.GetRootGameObjects())
+            foreach (var interactable in root.GetComponentsInChildren<global::InGame.Interact.InteractableBase>(true))
+            {
+                if (interactable.Object && interactable.Object.IsValid && interactable.HasStateAuthority)
+                    interactable.ForceSetInteractable = false;
+            }
             _tutorialActions[_currentActionIndex].OnStart(_actionData);
             _hasStarted = true;
         }
