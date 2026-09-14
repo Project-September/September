@@ -8,7 +8,6 @@ namespace InGame.Player.Ability.Condition
     public class AbilityStampingAttackCondition : IAbilityExecuteCondition
     {
         [SerializeField] private string _targetAbilityName = nameof(AbilityStampingAttack);
-        [SerializeField] private PlayerButtons _button = PlayerButtons.Jump;
         public string TargetAbilityName => _targetAbilityName;
         private PlayerMovement _playerMovement;
         private PlayerManager _playerManager;
@@ -19,12 +18,12 @@ namespace InGame.Player.Ability.Condition
             if (!_playerMovement) _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
 
-            //Availableó‘Ô‚Åƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚çğŒ‚ğ–‚½‚·
+            //AvailableçŠ¶æ…‹ã§ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã‚‰æ¡ä»¶ã‚’æº€ãŸã™
             return !_playerMovement.IsGround && !_playerManager.IsStun && !_playerMovement.IsEvading && !_playerMovement.DoingVault && !IsGameEnded() &&
                    _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal &&
                    context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available &&
                    context.AbilityRef.CanStartAbilityOverride() &&
-                   context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(_button);
+                   context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(PlayerButtons.Attack);
         }
 
         private bool IsGameEnded()
@@ -34,12 +33,12 @@ namespace InGame.Player.Ability.Condition
                 var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
                 if (inGameManager == null) return false;
 
-                // EndingState‚©PlayingStateˆÈŠO‚Ìê‡‚ÍUŒ‚‚ğ–³Œø‚É‚·‚é
+                // EndingStateã‹PlayingStateä»¥å¤–ã®å ´åˆã¯æ”»æ’ƒã‚’ç„¡åŠ¹ã«ã™ã‚‹
                 return inGameManager.CurrentStateName != "PlayingState";
             }
             catch (System.Exception)
             {
-                // ƒGƒ‰[‚ª”­¶‚µ‚½ê‡‚ÍˆÀ‘S‘¤‚ÉUŒ‚‚ğ–³Œø‚É‚·‚é
+                // ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ãŸå ´åˆã¯å®‰å…¨å´ã«æ”»æ’ƒã‚’ç„¡åŠ¹ã«ã™ã‚‹
                 return true;
             }
         }

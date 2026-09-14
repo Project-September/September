@@ -40,6 +40,10 @@ public enum EffectType
     CannonShoot,
     CannonHit,
     CannonHitGround,
+    ExcaliburAttack,
+    ExcaliburStamp,
+    ExcaliburHit,
+    ExcaliburImpact,
     Cursor
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

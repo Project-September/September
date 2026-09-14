@@ -89,6 +89,63 @@ MonoBehaviour:
     InteractVoice: VO_Koinuma_Interact_01
     UniqueActionVoice: VO_Koinuma_Grapple
     BGM: BGM_Koinuma_01
+  - Type: 6
+    DisplayName: "\u30CF\u30BF\u30CE\u30FB\u30A8\u30EA\u30AF\u30BD\u30F3"
+    AbilityName: "\u30AF\u30EA\u30E0\u30BE\u30F3\u30FB\u30A4\u30EA\u30E5\u30FC\u30B8\u30E7\u30F3"
+    AbilityExplain: "\u5C02\u7528\u306E\u30EC\u30FC\u30B6\u30FC\u30AC\u30F3\u3067\u72D9\u3046\u3053\u3068\u3067\u3001\u9060\u304F\u306B\u3042\u308B\u4E00\u90E8\u5C55\u793A\u7269\u306B\u30A4\u30F3\u30BF\u30E9\u30AF\u30C8\u3059\u308B\u3053\u3068\u304C\u3067\u304D\u308B\u3002\r\n\u30CF\u30F3\u30C9\u30AC\u30F3\u3092\u4F7F\u3063\u3066\u3001\u9023\u7D9A\u9060\u8DDD\u96E2\u653B\u6483\u304C\u3067\u304D\u308B\u3002"
+    Prefab:
+      RawGuidValue: 71f5d1c6945b63649954a3ab1e261145
+    BotPrefab:
+      RawGuidValue: 157ca9ed5c106ea4a952c1d4c0054347
+    ExplainVideo: {fileID: 0}
+    CharacterIcon: {fileID: 21300000, guid: d724bd05f9ec7274cb05b147cbc71f58, type: 3}
+    EmoteAnimation: {fileID: 5869935710289458297, guid: 21bfe027bc21cf6488b1e040a4ca5f9d, type: 3}
+    SelectedVoice: VO_Koinuma_CharacterSelect
+    StartVoice: VO_Koinuma_GameStart
+    WinningVoice: VO_Koinuma_Win
+    AttackVoice: VO_Koinuma_Attack_01
+    DamageVoice: VO_Koinuma_Damage_01
+    InteractVoice: VO_Koinuma_Interact_01
+    UniqueActionVoice: VO_Koinuma_Grapple
+    BGM: BGM_Koinuma_01
+  - Type: 7
+    DisplayName: "\u30AA\u30AA\u30AF\u30DC\u30FB\u30D9\u30E9\u30DF\u30FC"
+    AbilityName: --
+    AbilityExplain: --
+    Prefab:
+      RawGuidValue: a330609cbba1f504ebd8c0d786c1b012
+    BotPrefab:
+      RawGuidValue: 157ca9ed5c106ea4a952c1d4c0054347
+    ExplainVideo: {fileID: 0}
+    CharacterIcon: {fileID: 21300000, guid: b960790107625eb479fe751220ecfaee, type: 3}
+    EmoteAnimation: {fileID: 1827226128182048838, guid: bcb852e73340fc84db5c492207e5392e, type: 3}
+    SelectedVoice: VO_Koinuma_CharacterSelect
+    StartVoice: VO_Koinuma_GameStart
+    WinningVoice: VO_Koinuma_Win
+    AttackVoice: VO_Koinuma_Attack_01
+    DamageVoice: VO_Koinuma_Damage_01
+    InteractVoice: VO_Koinuma_Interact_01
+    UniqueActionVoice: VO_Koinuma_Grapple
+    BGM: BGM_Koinuma_01
+  - Type: 8
+    DisplayName: "\u30BF\u30AB\u30E0\u30E9\u30FB\u30EC\u30AA\u30F3"
+    AbilityName: --
+    AbilityExplain: --
+    Prefab:
+      RawGuidValue: cc28b6aa258b8c24596e257efad21b31
+    BotPrefab:
+      RawGuidValue: 157ca9ed5c106ea4a952c1d4c0054347
+    ExplainVideo: {fileID: 0}
+    CharacterIcon: {fileID: 21300000, guid: 7dff715ec3059c845af2a9db52ccdc74, type: 3}
+    EmoteAnimation: {fileID: 7400000, guid: 917476f3cb760c043a45cf5a21a49fa5, type: 2}
+    SelectedVoice: VO_Koinuma_CharacterSelect
+    StartVoice: VO_Koinuma_GameStart
+    WinningVoice: VO_Koinuma_Win
+    AttackVoice: VO_Koinuma_Attack_01
+    DamageVoice: VO_Koinuma_Damage_01
+    InteractVoice: VO_Koinuma_Interact_01
+    UniqueActionVoice: VO_Koinuma_Grapple
+    BGM: BGM_Koinuma_01
   _controlDictionary:
-    keys: 01000000020000000300000004000000
-    values: 00000000000000000300000002000000
+    keys: 01000000020000000300000004000000060000000700000008000000
+    values: 00000000000000000300000002000000000000000000000000000000
