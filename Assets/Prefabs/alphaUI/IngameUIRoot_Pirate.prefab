@@ -1662,7 +1662,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _jewelryUIArray:
-  - _jewelryImage: {fileID: 0}
+  - _jewelryImage: {fileID: 899179675740898725}
     _jewelryCountText: {fileID: 6754575049615542841}
   _hideLocal: 0
 --- !u!114 &8071119911755349693
@@ -3403,6 +3403,17 @@ PrefabInstance:
 --- !u!114 &579057523282209303 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7262593627608965115, guid: 2d115f7443573284a8ddf8086cc4165c, type: 3}
+  m_PrefabInstance: {fileID: 7836496255661716972}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &899179675740898725 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6969976787164770377, guid: 2d115f7443573284a8ddf8086cc4165c, type: 3}
   m_PrefabInstance: {fileID: 7836496255661716972}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
