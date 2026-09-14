@@ -1,10 +1,9 @@
-using UnityEngine;
 using Fusion;
 using InGame.Exhibit;
-using InGame.Interact;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Fields;
+using UnityEngine;
 
 public class SharkInteractable : MountableExhibitBase
 {
@@ -84,11 +83,14 @@ public class SharkInteractable : MountableExhibitBase
     {
         base.Spawned();
         ResetAnimator();
+        RPC_ActiveObject(false);
     }
 
     public override void GetOn(PlayerRef playerRef)
     {
         base.GetOn(playerRef);
+
+        RPC_ActiveObject(true);
         IsSharkInteracting = true;
         _interactable.ForceSetInteractable = false;
         // 攻撃状態の初期化
@@ -103,6 +105,7 @@ public class SharkInteractable : MountableExhibitBase
         _movementProcessing.OnInteractEnd(Rigidbody);
 
         base.GetOff(playerRef);
+        RPC_ActiveObject(false);
         IsSharkInteracting = false;
         _interactable.ForceSetInteractable = true;
 
@@ -142,6 +145,12 @@ public class SharkInteractable : MountableExhibitBase
         OnAttackUpdate(deltaTime);　//Attack中にだけ発火するメソッド
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ActiveObject(bool active)
+    {
+        this.gameObject.SetActive(active);
+    }
+
     /// <summary>
     /// 攻撃入力
     /// </summary>
@@ -151,6 +160,7 @@ public class SharkInteractable : MountableExhibitBase
     {
         // 攻撃ボタンが押されていない場合、処理を行わない
         if (!playerInput.Buttons.IsSet(PlayerButtons.Attack)) return;
+        Debug.Log("Attack");
         AttackCoolDownCheck();
         CreateHitBox(playerRef);
     }

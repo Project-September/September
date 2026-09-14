@@ -10,6 +10,7 @@ namespace InGame.Exhibit
     {
         [SerializeField] private float _interactTime;
         [SerializeField] private SharkInteractable _sharkInteractable;
+        [SerializeField] private GameObject _hungSharkObject;
         private PlayerRef _ownerPlayerRef;
         private PlayerManager _ownerPlayerManager;
         private NetworkRunner _networkRunner;
@@ -21,7 +22,9 @@ namespace InGame.Exhibit
             _networkRunner = target.Runner;
             _interactable = target;
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
+            _interactable.Object.AssignInputAuthority(playerRef);
             GetOn(playerRef);
+            RPC_ActiveObject(false);
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
@@ -33,7 +36,7 @@ namespace InGame.Exhibit
                 GetOff();
                 return;
             }
-            
+
             if (CheckInteractEnd())
             {
                 GetOff();
@@ -45,8 +48,20 @@ namespace InGame.Exhibit
                 GetOff();
                 return;
             }
-            
+
             _sharkInteractable.OnInteractFixedUpdate(playerInput, _networkRunner.DeltaTime);
+        }
+        public override void OnInteractEnd()
+        {
+            base.OnInteractEnd();
+            RPC_ActiveObject(true);
+            _interactable.Object.RemoveInputAuthority();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_ActiveObject(bool active)
+        {
+            _hungSharkObject.SetActive(active);
         }
 
         private bool CheckInteractEnd()
@@ -74,7 +89,8 @@ namespace InGame.Exhibit
             return new SharkInteractEffect()
             {
                 _interactTime = _interactTime,
-                _sharkInteractable = _sharkInteractable
+                _sharkInteractable = _sharkInteractable,
+                _hungSharkObject = _hungSharkObject,
             };
         }
     }
