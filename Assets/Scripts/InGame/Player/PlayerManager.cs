@@ -383,6 +383,7 @@ namespace InGame.Player
         {
             _playerHealth.IsInvincible = false;
             IsStun = false;
+            RPC_SetPositionLock(false);
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
@@ -393,6 +394,7 @@ namespace InGame.Player
             // ビルドの減衰分を乗算
             StunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             IsStun = true;
+            RPC_SetPositionLock(true);
             _playerEffectController.PlayStunEffect();
         }
 
@@ -439,6 +441,12 @@ namespace InGame.Player
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetPositionLock(NetworkBool isLocked)
         {
+            if (isLocked)
+            {
+                _rigidbody.linearVelocity = Vector3.zero;
+                _rigidbody.angularVelocity = Vector3.zero;
+            }
+
             _rigidbody.constraints = isLocked ?
                 RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
