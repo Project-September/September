@@ -26,6 +26,8 @@ namespace InGame.Player.Ability
         [SerializeField] private int _endAttackFrame = 22;
         [Header("ヒットエフェクト")]
         [SerializeField] protected EffectType _hitEffect = EffectType.HitNormal;
+        [SerializeField, Tooltip("命中地点からの位置補正。攻撃者基準でXが右、Yが上、Zが前（スケール非依存）。")]
+        protected Vector3 _hitEffectPositionOffset = Vector3.zero;
 
         [Header("参照")]
         [SerializeField] private AnimationClip _normalAttackAnimationClip;
@@ -178,8 +180,14 @@ namespace InGame.Player.Ability
             damageable.TakeHit(ref hitData);
             _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
 
-            //エフェクトの再生
-            _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);
+            // HitEffectのZ+を攻撃者の前方へ向ける。
+            Quaternion hitEffectRotation = _playerMovement.Rigidbody.rotation;
+            Vector3 hitEffectPosition = hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition))
+                + hitEffectRotation * _hitEffectPositionOffset;
+            _effectSpawner.RequestPlayOneShotEffect(
+                _hitEffect,
+                hitEffectPosition,
+                hitEffectRotation);
         }
 
         /// <summary>

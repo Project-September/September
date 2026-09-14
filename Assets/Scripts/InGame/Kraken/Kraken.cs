@@ -9,6 +9,7 @@ using September.Common.Input;
 using September.InGame.Kraken.Animations;
 using September.InGame.Kraken.Attack;
 using September.InGame.Mountable;
+using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Pool;
@@ -39,6 +40,12 @@ namespace September.InGame.Kraken
 
         [Header("インタラクト設定")]
         [SerializeField] private InteractableBase _interactable;
+
+        [Header("甲板の魔法陣")]
+        [SerializeField] private LayerMask _magicCircleGroundMask = 1 << 7;
+        [SerializeField, Min(0f)] private float _magicCircleSurfaceOffset = 0.05f;
+        [SerializeField] private KrakenMagicCircle _magicCircle;
+        [Networked] private NetworkBool MagicCircleFinished { get; set; }
 
         [Header("ダメージ設定")]
         [SerializeField] private int _dealScore = 10;
@@ -140,7 +147,33 @@ namespace September.InGame.Kraken
 
         public override void Spawned()
         {
+            ShowMagicCircle();
             Appear().Forget();
+        }
+
+        public override void Render()
+        {
+            if (MagicCircleFinished && _magicCircle != null) _magicCircle.End();
+        }
+
+        private void ShowMagicCircle()
+        {
+            if (MagicCircleFinished || _magicCircle == null || _interactable == null) return;
+
+            // UI 用の位置オフセットではなく、実際のインタラクト範囲の直下に表示する。
+            var anchor = _interactable.transform;
+            var position = anchor.position;
+            var normal = Vector3.up;
+            if (Physics.Raycast(position + Vector3.up * 2f, Vector3.down, out var hit,
+                    20f, _magicCircleGroundMask, QueryTriggerInteraction.Ignore))
+            {
+                position = hit.point;
+                normal = hit.normal;
+            }
+
+            _magicCircle.transform.SetPositionAndRotation(position + normal * _magicCircleSurfaceOffset,
+                Quaternion.FromToRotation(Vector3.up, normal));
+            _magicCircle.Play();
         }
 
         public override void FixedUpdateNetwork()
@@ -232,10 +265,14 @@ namespace September.InGame.Kraken
             // このプレイヤーから入力を受け取るように設定する
             Object.AssignInputAuthority(owner);
 
+            // 搭乗中は展示物用の操作説明を表示する。
+            RPC_ChangeDescriptionUI(owner, ControlDescriptionType.Exhibit);
+
             _interactable.ForceSetInteractable = false;
 
             OwnerPlayerRef = owner;
             _settings.RecentOwnerPlayerRef = owner;
+            MagicCircleFinished = true;
         }
 
         /// <summary>
@@ -245,6 +282,13 @@ namespace September.InGame.Kraken
         {
             // 実際の解除タイミングを制御するためにリクエストとして保存する
             _isGetOffRequested = true;
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType type)
+        {
+            if (Runner.LocalPlayer == target)
+                UIController.I.ChangeDescriptionUI(type);
         }
 
         private void HandleGetOff(PlayerRef owner)
@@ -274,6 +318,13 @@ namespace September.InGame.Kraken
             // 入力を受け取らないようにする
             Object.RemoveInputAuthority();
 
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(owner, out var playerData))
+            {
+                var type = CharacterDataContainer.Instance
+                    .GetControlDescriptionType(playerData.CharacterType);
+                RPC_ChangeDescriptionUI(owner, type);
+            }
+
             OwnerPlayerRef = default;
 
             _isGetOffRequested = false;
@@ -294,6 +345,8 @@ namespace September.InGame.Kraken
 
         private async UniTaskVoid Disappear()
         {
+            if (HasStateAuthority) MagicCircleFinished = true;
+            if (_magicCircle != null) _magicCircle.End();
             _appearanceState = KrakenAppearanceState.Disappear;
             _interactable.ForceSetInteractable = false;
             await _playableDirector.PlayAsync(_outTimeline);
