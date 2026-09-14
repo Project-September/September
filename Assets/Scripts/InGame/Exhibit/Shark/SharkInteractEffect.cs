@@ -40,7 +40,7 @@ namespace InGame.Exhibit
                 return;
             }
 
-            if (playerInput.Buttons.IsSet(PlayerButtons.Interact) && _interactTimer > 1f)
+            if (playerInput.Buttons.IsSet(PlayerButtons.Evasion) && _interactTimer > 1f)
             {
                 GetOff();
                 return;
