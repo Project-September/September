@@ -2022,13 +2022,14 @@ GameObject:
   - component: {fileID: 3887634903304423906}
   - component: {fileID: 2094216595413892803}
   - component: {fileID: 1237484897937156252}
+  - component: {fileID: 3894021327011245215}
   m_Layer: 6
   m_Name: WireMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1110204418141212097
 Transform:
   m_ObjectHideFlags: 0
@@ -2051,7 +2052,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2475458012208602023}
-  m_Mesh: {fileID: 4300000, guid: 8f91732eef7327c4bb2eb5524b0754b0, type: 2}
+  m_Mesh: {fileID: 0}
 --- !u!23 &2094216595413892803
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2109,10 +2110,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 222dc08d484f16869bdd89edd9d368fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Container: {fileID: 3454141809864283659}
+  m_Container: {fileID: 0}
   m_RebuildOnSplineChange: 1
-  m_RebuildFrequency: 30
-  m_UpdateColliders: 1
+  m_RebuildFrequency: 1000
+  m_UpdateColliders: 0
   m_Sides: 8
   m_SegmentsPerUnit: 4
   m_Capped: 0
@@ -2128,6 +2129,21 @@ MonoBehaviour:
       type: {class: Circle, ns: UnityEngine.Splines.ExtrusionShapes, asm: Unity.Splines}
       data:
         m_Sides: 6
+--- !u!114 &3894021327011245215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2475458012208602023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd6d6929443c4b9f8d514035b95d7eae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _splineContainer: {fileID: 3454141809864283659}
+  _splineExtrude: {fileID: 1237484897937156252}
+  _meshFilter: {fileID: 3887634903304423906}
 --- !u!1 &2488181347740176824
 GameObject:
   m_ObjectHideFlags: 0
@@ -8562,6 +8578,7 @@ MonoBehaviour:
   _playerInputManager: {fileID: 8662693787533303848}
   _wireOrigin: {fileID: 8721620199340885035}
   _wireSpline: {fileID: 3454141809864283659}
+  _wireExtrude: {fileID: 0}
   _wireMesh: {fileID: 2475458012208602023}
   _hookMesh: {fileID: 621392962862902147}
   _stretchDuration: 1
