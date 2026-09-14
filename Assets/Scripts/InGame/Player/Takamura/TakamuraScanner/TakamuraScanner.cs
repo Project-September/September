@@ -6,6 +6,7 @@ using Fusion;
 using InGame.Common;
 using InGame.Interact;
 using September.Common;
+using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -82,6 +83,13 @@ namespace InGame.Player
         }
 
         public TakamuraVisual Visual => _visual;
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
+        public void RPC_OnCharacterMimicRestored()
+        {
+            if (UIController.I)
+                UIController.I.ShowOutFieldUI(false);
+        }
 
         public override void Spawned()
         {
@@ -180,8 +188,8 @@ namespace InGame.Player
             }
             else if (_movement.CurrentMimicryState == MimicryState.MimicExhibit)
             {
-                // 擬態解除する（地上にいる時のみ実行できる）
-                if (_movement.IsGround
+                // 展示物の操作に使うAttack入力では擬態を解除しない。
+                if (CanReveal()
                     && input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
                     && HasInputAuthority)
                 {
@@ -221,9 +229,16 @@ namespace InGame.Player
         /// </summary>
         void ReserveReveal()
         {
-            if (_movement.CurrentMimicryState != MimicryState.MimicExhibit) return;
-            transform.position += Vector3.up;
+            if (!CanReveal()) return;
             ReserveStateChange(StateChangeType.Reveal);
+        }
+
+        bool CanReveal()
+        {
+            return _playerManager && _movement
+                && _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal
+                && _movement.CurrentMimicryState == MimicryState.MimicExhibit
+                && _movement.IsGround;
         }
 
         /// <summary>
@@ -250,6 +265,9 @@ namespace InGame.Player
                     FocusEndStateChange();
                     break;
                 case StateChangeType.Reveal:
+                    // 予約後に搭乗・展示物操作が始まった場合も解除を破棄する。
+                    if (!CanReveal()) break;
+                    transform.position += Vector3.up;
                     MimicTargetId = default;
                     _movement.CurrentMimicryState = MimicryState.Default;
                     break;

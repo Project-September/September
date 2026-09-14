@@ -5,6 +5,7 @@ using Fusion;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
+using September.InGame.Fields;
 using September.InGame.Rules;
 using UnityEngine;
 
@@ -162,9 +163,8 @@ namespace InGame.Player.Takamura.Mimic
                 if (!TryGetCurrentPlayer(pair.Key, out var currentPlayer))
                     continue;
 
-                // スタン関連のNetworked状態を別Prefabへ引き継がず、解除されるまで復帰を保留する。
-                var playerManager = currentPlayer.GetComponent<PlayerManager>();
-                if (playerManager && playerManager.IsStun)
+                // スタン・搭乗中や空中では交換せず、降車・着地してから復帰する。
+                if (ShouldDeferRestore(currentPlayer))
                     continue;
 
                 expiredPlayers.Add(pair.Key);
@@ -275,6 +275,8 @@ namespace InGame.Player.Takamura.Mimic
             {
                 if (!TryGetCurrentPlayer(player, out var copiedPlayer))
                     return;
+                if (ShouldDeferRestore(copiedPlayer))
+                    return;
 
                 // 擬態解除前の情報を保存
                 var snapshot = PlayerTransformationSnapshot.Capture(copiedPlayer);
@@ -285,6 +287,18 @@ namespace InGame.Player.Takamura.Mimic
                     snapshot.Rotation,
                     inputAuthority: player);
 
+                // SpawnAsyncを待つ間に離陸・搭乗・スタン・操作キャラクターの変更が起きる場合がある。
+                // まだ参照を置き換えていない生成物だけ破棄し、変身情報は残して後から再試行する。
+                if (!TryGetCurrentPlayer(player, out var currentPlayer)
+                    || currentPlayer != copiedPlayer || ShouldDeferRestore(currentPlayer))
+                {
+                    if (restoredPlayer)
+                        _runner.Despawn(restoredPlayer);
+                    return;
+                }
+
+                // 待機中の移動や降車位置・ステータス変化を反映する。
+                snapshot = PlayerTransformationSnapshot.Capture(copiedPlayer);
                 // 擬態解除前の情報を反映
                 snapshot.ApplyTo(restoredPlayer);
                 // 擬態解除した時のオブジェクトが正常に動作するようにする
@@ -298,6 +312,9 @@ namespace InGame.Player.Takamura.Mimic
                 // 擬態先のフォーカス解除処理が操作説明を変更することがあるため、
                 // すべての後処理が完了した最後に元キャラクターの説明へ戻す。
                 ChangeDescriptionUI(player, restoredPlayer, transformation.OriginalDescriptionType);
+                // 旧Prefabのfalse通知が描画されずにDespawnされても、交換完了後に本人のUIを消す。
+                if (restoredPlayer.TryGetComponent<TakamuraScanner>(out var scanner))
+                    scanner.RPC_OnCharacterMimicRestored();
                 // 擬態中の情報を削除
                 _activeTransformations.Remove(player);
             }
@@ -310,6 +327,20 @@ namespace InGame.Player.Takamura.Mimic
                 // 擬態関連の処理中フラグを解除
                 _processingPlayers.Remove(player);
             }
+        }
+
+        private static bool ShouldDeferRestore(NetworkObject player)
+        {
+            if (!player) return true;
+            // 落下通知がまだ描画されていない瞬間も、場外なら交換を保留する。
+            if (OutOfFieldArea.I && OutOfFieldArea.I.IsOutOfField(player.transform.position)) return true;
+            var movement = player.GetComponent<PlayerMovement>();
+            // 接地を確認できない間は、時間切れでも変身情報を残して再試行する。
+            if (!movement || !movement.IsGround) return true;
+            var manager = player.GetComponent<PlayerManager>();
+            // IsMovableは落下時にfalse、復帰時にtrueになる既存の同期状態を使う。
+            return manager && (!manager.IsMovable || manager.IsStun
+                || manager.CurrentPlayerControlState == PlayerManager.PlayerControlState.ForcedControl);
         }
 
         /// <summary>
