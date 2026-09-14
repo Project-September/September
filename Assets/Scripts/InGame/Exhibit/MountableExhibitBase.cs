@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using Ingame.Tanihira;
 using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
-using Ingame.Tanihira;
 using NaughtyAttributes;
 using September.Common;
 using September.InGame.Common;
@@ -17,18 +16,18 @@ using UnityEngine;
 
 namespace InGame.Exhibit
 {
-    public class MountableExhibitBase : NetworkBehaviour, IDamageable , IMountable
+    public class MountableExhibitBase : NetworkBehaviour, IDamageable, IMountable
     {
         protected CameraController CameraController { get; private set; }
-        
+
         protected Animator Animator { get; private set; }
 
         protected Rigidbody Rigidbody { get; private set; }
-        
-       // protected Action HitAction { get; set; }
+
+        // protected Action HitAction { get; set; }
 
         protected bool IsSpawned { get; private set; }
-        
+
         #region AttackParam
 
         protected MeleeHitboxExecutor Executor;
@@ -41,26 +40,26 @@ namespace InGame.Exhibit
         protected float StartFrame => _startFrame;
         protected float EndFrame => _endFrame;
         #endregion
-        
+
         #region DamageableParam
-        public bool IsAlive =>CurrentHealth > 0;
+        public bool IsAlive => CurrentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
 
-        private bool _isInvincible ;
-    
+        private bool _isInvincible;
+
         public int CurrentHealth;
-        
+
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
-    
+
         [SerializeField] private int _maxHealth;
-        
+
         #endregion
-        
+
         private PlayerManager _ownerPlayerManager;
-        
+
         [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
-        
+
         private Collider _collider;
 
         [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
@@ -69,68 +68,68 @@ namespace InGame.Exhibit
         private InGameManager _inGameManager;
         public bool IsEnding;
         private CancellationTokenSource _cts;
-        [SerializeField,Label("降りた後の無敵時間")] private float _invincibleTime;
+        [SerializeField, Label("降りた後の無敵時間")] private float _invincibleTime;
         public override void Spawned()
         {
-             IsEnding = false;
-             Rigidbody = GetComponent<Rigidbody>();
-             if (TryGetComponent(out CameraController cameraController))
-             {
-                 CameraController = cameraController;
-                 cameraController.Init(true);
-             }
-             Animator = GetComponent<Animator>();
-             Rigidbody.isKinematic = true;
-             CurrentHealth = _maxHealth;
-             IsSpawned = true;
-             _initialPosition = transform.position;
-             _initialRotation = transform.rotation;
-             _collider = gameObject.GetComponentInHierarchy<Collider>();
-             if (!_effectSpawner)
-                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
-             if(!Runner.IsServer) return;
-             _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
-             _inGameManager.GameEnded += () => {IsEnding = true;};
-             RPC_SetIsKinematic(true);
+            IsEnding = false;
+            Rigidbody = GetComponent<Rigidbody>();
+            if (TryGetComponent(out CameraController cameraController))
+            {
+                CameraController = cameraController;
+                cameraController.Init(true);
+            }
+            Animator = GetComponent<Animator>();
+            Rigidbody.isKinematic = true;
+            CurrentHealth = _maxHealth;
+            IsSpawned = true;
+            _initialPosition = transform.position;
+            _initialRotation = transform.rotation;
+            _collider = gameObject.GetComponentInHierarchy<Collider>();
+            if (!_effectSpawner)
+                _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+            if (!Runner.IsServer) return;
+            _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+            _inGameManager.GameEnded += () => { IsEnding = true; };
+            RPC_SetIsKinematic(true);
         }
-        
+
         protected void CreateHitBox(PlayerRef playerRef)
         {
             Executor = new MeleeHitboxExecutor(_points, _hitboxRadius, _hitMask, _startFrame, _endFrame)
             {
-                OnHit = (col,pos) =>
+                OnHit = (col, pos) =>
                 {
                     var damageable = col.GetComponentInParent<IDamageable>();
-                    if(col == _collider) return;
+                    if (col == _collider) return;
                     if (damageable == null) return;
                     var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
                         damageable.OwnerPlayerRef);
                     damageable.TakeHit(ref hitData);
-                    _effectSpawner.RequestPlayOneShotEffect(EffectType.HitNormal,col.ClosestPoint(pos), Quaternion.identity);
+                    _effectSpawner.RequestPlayOneShotEffect(EffectType.HitNormal, col.ClosestPoint(pos), Quaternion.identity);
                 }
             };
         }
-        
+
         /// <summary>
         /// 展示物に乗ってる間のUpdate関数
         /// </summary>
-        public virtual void OnInteractFixedUpdate(PlayerInput playerInput,float deltaTime)
+        public virtual void OnInteractFixedUpdate(PlayerInput playerInput, float deltaTime)
         {
-            if(_ownerPlayerManager == null) return;
+            if (_ownerPlayerManager == null) return;
             _ownerPlayerManager.transform.position = transform.position;
         }
-        
+
         private void LateUpdate()
         {
-            if(!IsSpawned || !HasInputAuthority) return;
-            
+            if (!IsSpawned || !HasInputAuthority) return;
+
             if (GameInput.I.Player.Aim.triggered)
             {
                 CameraController.CameraReset();
             }
-            CameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(),Runner.DeltaTime);
+            CameraController.RotateCamera(GameInput.I.Player.Look.ReadValue<Vector2>(), Runner.DeltaTime);
         }
-        
+
         /// <summary>
         /// インタラクト開始時の切り替え処理
         /// ホストでのみ実行される点に注意
@@ -151,14 +150,14 @@ namespace InGame.Exhibit
             Object.AssignInputAuthority(playerRef);
             RPC_ChangeDescriptionUI(playerRef, ControlDescriptionType.Exhibit);
             CameraController.Init(true);
-            RPC_SetCameraPriority(playerRef,15);
+            RPC_SetCameraPriority(playerRef, 15);
             RPC_SetIsKinematic(false);
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
                 formationManager.WarpFriendOutField();
             }
         }
-        
+
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
         {
@@ -167,7 +166,7 @@ namespace InGame.Exhibit
                 UIController.I.ChangeDescriptionUI(mode);
             }
         }
-        
+
         /// <summary>
         /// インタラクト終了時の切り替え処理
         /// ホストでのみ実行される点に注意
@@ -183,20 +182,20 @@ namespace InGame.Exhibit
 
             PlayerDatabase.Instance.PlayerDataDic.TryGet(playerRef, out var playerData);
             ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
-            
+
             // UIの切り替え
             RPC_ChangeDescriptionUI(playerRef, type);
-            
+
             // インタラクト物を基の位置に移動
             transform.SetPositionAndRotation(_initialPosition, _initialRotation);
-            
+
             // クールダウン処理
             var chara = PlayerDatabase.Instance.PlayerDataDic[playerRef].CharacterType;
             var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
                 ? all
                 : _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
             _interactable.SetCooldown(time);
-            
+
             // プレイヤーの状態復帰
             _ownerPlayerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _ownerPlayerManager.RPC_SetUseGrav(true);
@@ -204,9 +203,9 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetMeshActive(true);
             _ownerPlayerManager.transform.SetPositionAndRotation(getOffPosition, getOffRotation);
             var health = _ownerPlayerManager.GetComponent<PlayerHealth>();
-            SetInvincible(health,true).Forget();
+            SetInvincible(health, true).Forget();
             Object.RemoveInputAuthority();
-            RPC_SetCameraPriority(playerRef,5);
+            RPC_SetCameraPriority(playerRef, 5);
             RPC_SetIsKinematic(true);
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
@@ -217,7 +216,7 @@ namespace InGame.Exhibit
             CameraController.CameraReset();
         }
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_SetCameraPriority(PlayerRef player,int priority)
+        private void RPC_SetCameraPriority(PlayerRef player, int priority)
         {
             if (Runner.LocalPlayer == player)
             {
@@ -227,10 +226,10 @@ namespace InGame.Exhibit
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         private void RPC_SetIsKinematic(bool kinematic)
         {
-           Rigidbody.isKinematic = kinematic;
+            Rigidbody.isKinematic = kinematic;
         }
-        
-        
+
+
         public void TakeHit(ref HitData hitData)
         {
             ApplyHit(ref hitData);
@@ -276,11 +275,11 @@ namespace InGame.Exhibit
             return prevHealth - CurrentHealth;
         }
 
-        private async UniTaskVoid SetInvincible(PlayerHealth playerHealth,bool isInvincible)
+        private async UniTaskVoid SetInvincible(PlayerHealth playerHealth, bool isInvincible)
         {
-            if(!HasStateAuthority) return; 
+            if (!HasStateAuthority) return;
             playerHealth.IsInvincible = isInvincible;
-            await UniTask.WaitForSeconds(_invincibleTime,cancellationToken: _cts.Token); // 展示物から降りて〇秒間は無敵
+            await UniTask.WaitForSeconds(_invincibleTime, cancellationToken: _cts.Token); // 展示物から降りて〇秒間は無敵
             playerHealth.IsInvincible = !isInvincible;
         }
 

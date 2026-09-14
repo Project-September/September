@@ -1,10 +1,10 @@
+using System;
 using Fusion;
+using Ingame.Tanihira;
 using InGame.Common;
 using InGame.Interact;
-using September.Common;
-using System;
-using Ingame.Tanihira;
 using InGame.Player;
+using September.Common;
 using UnityEngine;
 using UnityEngine.Splines;
 

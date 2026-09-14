@@ -51,6 +51,7 @@ namespace InGame.Exhibit
 
             _sharkInteractable.OnInteractFixedUpdate(playerInput, _networkRunner.DeltaTime);
         }
+
         public override void OnInteractEnd()
         {
             base.OnInteractEnd();
