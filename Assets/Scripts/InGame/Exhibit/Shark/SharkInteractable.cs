@@ -33,7 +33,6 @@ public class SharkInteractable : MountableExhibitBase
     /// </summary>
     [Networked, OnChangedRender(nameof(OnAttackStateChanged))] private bool IsAttacking { get; set; }
 
-    private InteractableBase _interactableBase;
     private float _cooldownTimer; // 攻撃のクールダウンタイマー
     private int _attackTickCount; // 攻撃開始時からの経過ティック数（持続時間の計算用）
 
@@ -84,7 +83,6 @@ public class SharkInteractable : MountableExhibitBase
     public override void Spawned()
     {
         base.Spawned();
-        _interactableBase = GetComponent<InteractableBase>();
         ResetAnimator();
     }
 
@@ -92,7 +90,7 @@ public class SharkInteractable : MountableExhibitBase
     {
         base.GetOn(playerRef);
         IsSharkInteracting = true;
-        _interactableBase.ForceSetInteractable = false;
+        _interactable.ForceSetInteractable = false;
         // 攻撃状態の初期化
         _cooldownTimer = _cooldownTime;
         _attackTickCount = 0;
@@ -106,7 +104,7 @@ public class SharkInteractable : MountableExhibitBase
 
         base.GetOff(playerRef);
         IsSharkInteracting = false;
-        _interactableBase.ForceSetInteractable = true;
+        _interactable.ForceSetInteractable = true;
 
         // 攻撃状態を次のインタラクトへ持ち越さない
         IsAttacking = false;

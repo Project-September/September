@@ -65,7 +65,7 @@ namespace InGame.Exhibit
 
         [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
         EffectSpawner _effectSpawner;
-        [SerializeField] private InteractableBase _interactable;
+        [SerializeField] protected InteractableBase _interactable;
         private InGameManager _inGameManager;
         public bool IsEnding;
         private CancellationTokenSource _cts;
