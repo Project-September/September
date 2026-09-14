@@ -721,6 +721,19 @@ namespace InGame.Player
             NetworkedFlyingVelocity = Vector3.zero;
         }
 
+        /// <summary>
+        /// 落下速度を維持したまま、横方向の移動・吹き飛び速度を消す。
+        /// </summary>
+        public void ResetHorizontalVelocity()
+        {
+            NetworkedMoveVelocity = Vector3.zero;
+            NetworkedAirMoveVelocity = Vector3.zero;
+            NetworkedFlyingVelocity = new Vector3(0f, NetworkedFlyingVelocity.y, 0f);
+
+            Vector3 velocity = _rb.linearVelocity;
+            _rb.linearVelocity = new Vector3(0f, velocity.y, 0f);
+        }
+
         public void Stop()
         {
             NetworkedMoveVelocity = Vector3.zero;
