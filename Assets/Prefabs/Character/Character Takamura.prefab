@@ -6305,6 +6305,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[1705309116627681364]._hitEffectPositionOffset.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[1705309116627681364]._hitEffectPositionOffset.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[1705309116627681364]._hitEffectPositionOffset.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[1705309116627681364]._normalAttackAnimationClip
       value: 
       objectReference: {fileID: 7400000, guid: bca6193f688d20a43b0b8202f53a204a, type: 2}
@@ -6737,7 +6749,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccb4dc5b90f5e7d428d90cec59147410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _focusPosition: {x: 0.5, y: 0.5, z: -1.5}
+  _scanAnimationClip: {fileID: 7400000, guid: 4a630596b1da43648b5e0a8357ea036b, type: 2}
+  _scanIdleAnimationClip: {fileID: 0}
+  _scanReturnBlendDuration: 0.25
+  _focusPosition: {x: 0.5, y: 0, z: -1.5}
   _cameraMoveDuration: 0.2
   _scannableMaxDistance: 10
   _targetLayer:

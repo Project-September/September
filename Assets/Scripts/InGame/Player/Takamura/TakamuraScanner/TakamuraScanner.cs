@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Common;
 using InGame.Interact;
 using September.Common;
 using UnityEngine;
@@ -15,6 +18,20 @@ namespace InGame.Player
         CameraController _cameraController;
         Camera _camera;
         NetworkButtons _preInput;
+        AnimationClipPlayer _animationClipPlayer;
+        bool _scanAnimationPlaying;
+        AnimationClip _currentScanClip;
+        float _scanAnimationTime;
+        bool _scanIdlePlaying;
+        LayerInfo.LayerType _scanAnimationLayer;
+        CancellationTokenSource _scanReturnBlendCts;
+
+        [Header("スキャンアニメーション")]
+        [SerializeField] AnimationClip _scanAnimationClip;
+        [SerializeField, Tooltip("しゃがみ完了後にループする待機モーション。未設定なら開始モーションの最後の姿勢を保持")]
+        AnimationClip _scanIdleAnimationClip;
+        [SerializeField, Min(0f), Tooltip("スキャン終了時に通常モーションへ戻るブレンド時間（秒）")]
+        float _scanReturnBlendDuration = 0.25f;
 
         [Networked, OnChangedRender(nameof(OnMimicTargetChanged))]
         NetworkId MimicTargetId { get; set; }
@@ -65,6 +82,7 @@ namespace InGame.Player
         {
             _playerManager = GetComponent<PlayerManager>();
             _movement = GetComponent<TakamuraMovement>();
+            _animationClipPlayer = GetComponentInChildren<AnimationClipPlayer>(true);
             _scanTargets = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
             CreateTargetDictionary();
 
@@ -230,6 +248,7 @@ namespace InGame.Player
         /// </summary>
         void FocusStartEffective()
         {
+            RPC_SetScanAnimation(true);
             _scannerCanvas.gameObject.SetActive(true);
             _scannerCanvas.ChangeImageVisibility(false);
             _cameraController.ChangeOffset(_focusPosition, _cameraMoveDuration);
@@ -251,10 +270,118 @@ namespace InGame.Player
         /// </summary>
         void FocusEndEffective()
         {
+            RPC_SetScanAnimation(false);
             _cameraController.ResetOffset(_cameraMoveDuration);
             _scannerCanvas.ChangeImageVisibility(false);
             _scannerCanvas.gameObject.SetActive(false);
             _focusIndex = -1;
+        }
+
+        // PlayOnLayerはローカル再生なので、高村側で開始・停止だけを通知する。
+        [Rpc(RpcSources.InputAuthority, RpcTargets.All, Channel = RpcChannel.Reliable)]
+        void RPC_SetScanAnimation(bool playing)
+        {
+            if (!playing)
+            {
+                StopScanAnimationLocal();
+                return;
+            }
+            if (_scanAnimationPlaying || !_animationClipPlayer || !_scanAnimationClip) return;
+
+            var montages = AnimationClipsContainer.Instance?.AnimationMontages;
+            var index = montages == null ? -1 : Array.FindIndex(montages,
+                montage => montage.AnimClip == _scanAnimationClip);
+            if (index < 0 || montages[index].TargetLayer == LayerInfo.LayerType.Base)
+            {
+                Debug.LogWarning("スキャン開始モーションをBase以外のレイヤーで登録してください。", this);
+                return;
+            }
+
+            CancelScanReturnBlend();
+            _scanAnimationLayer = montages[index].TargetLayer;
+            _animationClipPlayer.PlayOnLayer(_scanAnimationClip, _scanAnimationLayer, speed: 0f);
+            _currentScanClip = _scanAnimationClip;
+            _scanAnimationPlaying = true;
+            _scanIdlePlaying = false;
+            _scanAnimationTime = 0f;
+        }
+
+        void Update()
+        {
+            if (!_scanAnimationPlaying || !_animationClipPlayer) return;
+            // 攻撃などが同じレイヤーを使った場合は、そのモーションを上書きしない。
+            if (!_animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _currentScanClip))
+            {
+                StopScanAnimationLocal();
+                return;
+            }
+            if (_scanIdlePlaying) return;
+            if (!_animationClipPlayer.TryGetPlayableInfo(_scanAnimationClip, out var info)) return;
+
+            _scanAnimationTime = Mathf.Min(_scanAnimationTime + Time.deltaTime
+                * Mathf.Max(0f, info.montage.PlaySpeed), _scanAnimationClip.length);
+            // 自動終了・BlendOutを使わず、最終フレームでもレイヤーの重みを維持する。
+            info.SetTime(_scanAnimationTime, updateBlendWeight: false);
+            if (_scanAnimationTime >= _scanAnimationClip.length && _scanIdleAnimationClip)
+            {
+                _animationClipPlayer.PlayOnLayer(_scanIdleAnimationClip, _scanAnimationLayer, loop: true);
+                _currentScanClip = _scanIdleAnimationClip;
+                _scanIdlePlaying = true;
+            }
+        }
+
+        void StopScanAnimationLocal(bool immediate = false)
+        {
+            // ボタンを離す通知が重複しても、進行中の戻りブレンドは続ける。
+            if (!_scanAnimationPlaying && !immediate) return;
+            CancelScanReturnBlend();
+            _scanAnimationPlaying = false;
+            _scanIdlePlaying = false;
+
+            if (_animationClipPlayer
+                && _animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _currentScanClip))
+            {
+                if (!immediate && _scanReturnBlendDuration > 0f)
+                {
+                    _scanReturnBlendCts = new CancellationTokenSource();
+                    BlendBackToNormalAsync(_currentScanClip, _scanAnimationLayer,
+                        _scanReturnBlendCts.Token).Forget();
+                    return;
+                }
+                _animationClipPlayer.PlayOnLayer(null, _scanAnimationLayer);
+            }
+            _currentScanClip = null;
+        }
+
+        async UniTask BlendBackToNormalAsync(AnimationClip clip, LayerInfo.LayerType layer,
+            CancellationToken token)
+        {
+            var blend = new LayerInfo.Blend
+            {
+                BlendTime = _scanReturnBlendDuration,
+                BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f)
+            };
+            await _animationClipPlayer.BlendLayerWeight(layer, 0f, blend, token);
+
+            // 再スキャンや別モーションへの切り替え後に古い終了処理を適用しない。
+            if (token.IsCancellationRequested || !_animationClipPlayer) return;
+            if (_animationClipPlayer.IsCurrentClipOnLayer(layer, clip))
+                _animationClipPlayer.PlayOnLayer(null, layer);
+            _currentScanClip = null;
+            CancelScanReturnBlend();
+        }
+
+        void CancelScanReturnBlend()
+        {
+            var cancellation = _scanReturnBlendCts;
+            _scanReturnBlendCts = null;
+            cancellation?.Cancel();
+            cancellation?.Dispose();
+        }
+
+        void OnDisable()
+        {
+            StopScanAnimationLocal(immediate: true);
         }
 
         /// <summary>
