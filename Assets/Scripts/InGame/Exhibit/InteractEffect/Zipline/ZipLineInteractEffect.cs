@@ -17,6 +17,8 @@ namespace September
         public SplineContainer Spline;
         public GameObject Trolley;
         public float Duration = 5f;
+        public GameObject ExhibitObject;
+        public GameObject RideGameObject;
         [Min(1f), Tooltip("オカベ乗車時の速度倍率。1で通常速度、1.5で1.5倍、2で2倍。")]
         public float OkabeSpeedMultiplier = 1.5f;
         public float ReturnDuration = 5f;
@@ -97,6 +99,10 @@ namespace September
             playerManager.RPC_SetUseGrav(false);
             playerManager.SetControlState(PlayerManager.PlayerControlState.ForcedControl);
             _networkController.PublishZiplinePose(Trolley.transform, _targetPlayerObject, PlayerOffset);
+
+            //ライドモデルに変更
+            ExhibitObject.SetActive(false);
+            RideGameObject.SetActive(true);
         }
 
         public override void OnInteractUpdate(float deltaTime)
@@ -218,6 +224,10 @@ namespace September
                 _activeEffect.ForceSetInteractable = true; // ここで初めて使用可能に戻す
                 _activeEffect = null;
             }
+
+            //展示物モデルに戻す
+            ExhibitObject.SetActive(true);
+            RideGameObject.SetActive(false);
         }
 
         public override CharacterInteractEffectBase Clone()
@@ -231,7 +241,9 @@ namespace September
                 OkabeSpeedMultiplier = OkabeSpeedMultiplier,
                 ReturnDuration = ReturnDuration,
                 SpeedCurve = SpeedCurve,
-                PlayerOffset = PlayerOffset
+                PlayerOffset = PlayerOffset,
+                ExhibitObject = ExhibitObject,
+                RideGameObject = RideGameObject,
             };
         }
     }
