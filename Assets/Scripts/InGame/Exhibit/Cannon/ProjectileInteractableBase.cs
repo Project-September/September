@@ -178,7 +178,7 @@ namespace September.InGame.Exhibit
 			// フィールド外に出た場合の強制終了
 			if ((OutOfFieldArea.I && OutOfFieldArea.I.IsOutOfField(_usingPlayer.transform.position)) ||
 			    // Interactボタンが押されたときの強制終了
-			    (input.Buttons.IsSet(PlayerButtons.Interact) && InteractEndLockTimer.ExpiredOrNotRunning(Runner)))
+			    (input.Buttons.IsSet(PlayerButtons.Evasion) && InteractEndLockTimer.ExpiredOrNotRunning(Runner)))
 				InteractEnd();
 			
 			// タイムラグをインタラクト後に発生させる場合の終了処理
