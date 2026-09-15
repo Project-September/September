@@ -16,6 +16,7 @@ namespace September.InGame.Exhibit
 		[SerializeField] private LayerMask _layerMask;
 		[SerializeField] private float _playerOffset = 3;
 		[SerializeField] private float _rotateSpeed = 1.5f;
+		[SerializeField] private float _raycastDistance = 1000f;
 
 		[Header("CameraAngleLimit")] [SerializeField]
 		private bool _useYawLimit;
@@ -77,10 +78,10 @@ namespace September.InGame.Exhibit
 		void IProjectileMovement.Update(PlayerInput input)
 		{
 			var cameraForward = input.DesiredLookDirection;
-			Debug.DrawRay(_cameraController.GetCameraPosition(), cameraForward * 100, Color.green);
+			Debug.DrawRay(_cameraController.GetCameraPosition(), cameraForward * _raycastDistance, Color.green);
 			Debug.DrawRay(_barrel.position, _barrel.forward * 100, Color.red);
 			
-			if (Physics.Raycast(input.CameraPosition, cameraForward, out var hit, 100, _layerMask))
+			if (Physics.Raycast(input.CameraPosition, cameraForward, out var hit, _raycastDistance, _layerMask))
 			{
 				var baseDir = (hit.point - _rotateBase.position).normalized;
 				var lookRotation = Quaternion.LookRotation(baseDir);

@@ -8,6 +8,7 @@ using InGame.Interact;
 using InGame.Player;
 using September.Common;
 using September.InGame.Fields;
+using September.InGame.UI;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -130,7 +131,8 @@ namespace September.InGame.Exhibit
 			RPC_StartAnimation(true);
 
 			Object.AssignInputAuthority(CurrentUsePlayerRef);
-
+			// 操作UIの切り替え用処理
+			RPC_ChangeDescriptionUI(CurrentUsePlayerRef, ControlDescriptionType.Exhibit);
 			// 使用中のプレイヤーに対する処理
 			if (!_usingPlayer) return;
 			GetPlayerAnimatorClipPlayer(_usingPlayer);
@@ -200,6 +202,11 @@ namespace September.InGame.Exhibit
 			Object.RemoveInputAuthority();
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 			WaitExitTimer = TickTimer.None;
+			
+			// 操作UIの切り替え用処理
+			PlayerDatabase.Instance.PlayerDataDic.TryGet(CurrentUsePlayerRef, out var playerData);
+			ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
+			RPC_ChangeDescriptionUI(CurrentUsePlayerRef, type);
 
 			if (!_usingPlayer) return;
 			PlayerActive(true);
@@ -254,6 +261,15 @@ namespace September.InGame.Exhibit
 			
 			if(isActive) OnInteractStart?.Invoke(this);
 			else OnInteractEnd?.Invoke(this);
+		}
+		
+		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+		private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
+		{
+			if (Runner.LocalPlayer == target)
+			{
+				UIController.I.ChangeDescriptionUI(mode);
+			}
 		}
 
 		private void GetPlayerAnimatorClipPlayer(PlayerManager playerManager)
