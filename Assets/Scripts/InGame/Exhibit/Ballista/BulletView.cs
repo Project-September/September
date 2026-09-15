@@ -27,10 +27,10 @@ namespace September
             }
         }
 
-        public async UniTask Reload(float Time)
+        public async UniTask Reload(float time)
         {
             _reloadText.SetActive(true);
-            await UniTask.WaitForSeconds(Time);
+            await UniTask.WaitForSeconds(time);
             _reloadText.SetActive(false);
         }
         
