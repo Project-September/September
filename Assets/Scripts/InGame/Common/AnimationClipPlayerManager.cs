@@ -131,6 +131,10 @@ namespace InGame.Common
 
         private void SetFallAnim(bool isGround)
         {
+            // 気絶などの強制上書き中は、落下・着地処理で同じTopLayerを変更しない。
+            // これにより空中で気絶しても、物理的には落下しつつ気絶モーションを維持できる。
+            if (_hardOverride) return;
+
             if (!isGround
                 && EnableFallMotion
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
