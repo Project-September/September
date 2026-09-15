@@ -38,6 +38,7 @@ namespace InGame.Common
 
         public PlayableGraph Graph => _graph;
         public Animator Animator => _animator;
+        public AnimationClip WaitClip => _wait;
         public AnimationClip WalkClip => _walk;
         public AnimationClip RunClip => _run;
 
@@ -139,6 +140,31 @@ namespace InGame.Common
             _graph.Play();
         }
         #endregion
+
+        /// <summary>
+        /// Baseレイヤーの待機モーションを実行中に差し替える。
+        /// 装備などで待機姿勢だけを変更し、歩行・走行モーションは維持したい場合に使用する。
+        /// </summary>
+        public void SetWaitClip(AnimationClip clip)
+        {
+            if (_wait == clip) return;
+
+            _wait = clip;
+            if (!_graph.IsValid() || !_baseMixer.IsValid()) return;
+
+            var currentPlayable = _baseMixer.GetInput(0);
+            _graph.Disconnect(_baseMixer, 0);
+            if (currentPlayable.IsValid())
+                _graph.DestroyPlayable(currentPlayable);
+
+            if (_wait)
+            {
+                var playable = AnimationClipPlayable.Create(_graph, _wait);
+                _baseMixer.ConnectInput(0, playable, 0);
+            }
+
+            UpdateLocoBlend(_locoWeight);
+        }
 
         #region Update
         public void Update()

@@ -1,9 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Fusion;
+using InGame.Common;
 using InGame.Interact;
+using InGame.Player.Ability;
 using September.Common;
+using September.InGame.UI;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace InGame.Player
 {
@@ -15,9 +21,27 @@ namespace InGame.Player
         CameraController _cameraController;
         Camera _camera;
         NetworkButtons _preInput;
+        AnimationClipPlayer _animationClipPlayer;
+        bool _scanAnimationPlaying;
+        AnimationClip _currentScanClip;
+        bool _spawned;
+        float _localScanStartTime = float.MinValue;
+        float _interruptedScanStartTime = float.MinValue;
+        PlayableGraph _scanAnimationGraph;
+        LayerInfo.LayerType _scanAnimationLayer;
+        CancellationTokenSource _scanReturnBlendCts;
+
+        [Header("スキャンアニメーション")]
+        [SerializeField] AnimationClip _scanAnimationClip;
+        [SerializeField, Min(0f), Tooltip("スキャン終了時に通常モーションへ戻るブレンド時間（秒）")]
+        float _scanReturnBlendDuration = 0.25f;
 
         [Networked, OnChangedRender(nameof(OnMimicTargetChanged))]
         NetworkId MimicTargetId { get; set; }
+
+        // 一度きりのRPCではなく状態を保持し、途中参加・描画準備の遅れにも対応する。
+        [Networked] bool ScanAnimationActive { get; set; }
+        [Networked] float ScanAnimationStartTime { get; set; }
 
         [Header("カメラ制御")]
         [SerializeField, Tooltip("フォーカス時のカメラの位置")]
@@ -40,6 +64,14 @@ namespace InGame.Player
         [SerializeField]
         TakamuraVisual _visual;
 
+        [Header("宝石UI")]
+        [SerializeField] CanvasGroup _playerJewelryView;
+        [SerializeField] GameObject _nameText;
+        [SerializeField] GameObject _nameBack;
+
+        PlayerEquipmentManager _playerEquipmentManager;
+        PlayerAbilityManager _playerAbilityManager;
+
         TakamuraScanTarget[] _scanTargets = Array.Empty<TakamuraScanTarget>();
         readonly Dictionary<NetworkId, TakamuraScanTarget> _targetByNetworkId = new();
         int _focusIndex = -1;
@@ -56,10 +88,28 @@ namespace InGame.Player
 
         public TakamuraVisual Visual => _visual;
 
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, Channel = RpcChannel.Reliable)]
+        public void RPC_OnCharacterMimicRestored()
+        {
+            if (UIController.I)
+                UIController.I.ShowOutFieldUI(false);
+        }
+
         public override void Spawned()
         {
             _playerManager = GetComponent<PlayerManager>();
             _movement = GetComponent<TakamuraMovement>();
+            _playerEquipmentManager = GetComponent<PlayerEquipmentManager>();
+            _playerAbilityManager = GetComponent<PlayerAbilityManager>();
+            _animationClipPlayer = GetComponentInChildren<AnimationClipPlayer>(true);
+            _spawned = true;
+            _localScanStartTime = float.MinValue;
+            _interruptedScanStartTime = float.MinValue;
+            if (_animationClipPlayer)
+            {
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
+                _animationClipPlayer.BeforeEvaluate += UpdateScanAnimation;
+            }
             _scanTargets = FindObjectsByType<TakamuraScanTarget>(FindObjectsSortMode.None);
             CreateTargetDictionary();
 
@@ -70,12 +120,16 @@ namespace InGame.Player
             }
 
             _scannerCanvas.gameObject.SetActive(false);
+            SetExcaliburAttackEnabled(_movement.CurrentMimicryState != MimicryState.MimicExhibit);
             ChangeVisual();
         }
 
         public override void FixedUpdateNetwork()
         {
             if (HasStateAuthority) ApplyPendingStateChange();
+
+            if (HasStateAuthority && _movement.CurrentMimicryState != MimicryState.Default)
+                ScanAnimationActive = false;
 
             // inputにはこのオブジェクトに対する入力権限があるプレイヤーからの入力が入る
             if (!GetInput<PlayerInput>(out var input)) return;
@@ -141,8 +195,8 @@ namespace InGame.Player
             }
             else if (_movement.CurrentMimicryState == MimicryState.MimicExhibit)
             {
-                // 擬態解除する（地上にいる時のみ実行できる）
-                if (_movement.IsGround
+                // 展示物の操作に使うAttack入力では擬態を解除しない。
+                if (CanReveal()
                     && input.Buttons.WasPressed(_preInput, PlayerButtons.Attack)
                     && HasInputAuthority)
                 {
@@ -182,9 +236,16 @@ namespace InGame.Player
         /// </summary>
         void ReserveReveal()
         {
-            if (_movement.CurrentMimicryState != MimicryState.MimicExhibit) return;
-            transform.position += Vector3.up;
+            if (!CanReveal()) return;
             ReserveStateChange(StateChangeType.Reveal);
+        }
+
+        bool CanReveal()
+        {
+            return _playerManager && _movement
+                && _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal
+                && _movement.CurrentMimicryState == MimicryState.MimicExhibit
+                && _movement.IsGround;
         }
 
         /// <summary>
@@ -208,11 +269,18 @@ namespace InGame.Player
             {
                 case StateChangeType.Mimic:
                     _movement.CurrentMimicryState = MimicryState.MimicExhibit;
+                    // 擬態解除用のAttack入力でエクスカリバー攻撃が同時発動しないようにする。
+                    SetExcaliburAttackEnabled(false);
                     FocusEndStateChange();
                     break;
                 case StateChangeType.Reveal:
+                    // 予約後に搭乗・展示物操作が始まった場合も解除を破棄する。
+                    if (!CanReveal()) break;
+                    transform.position += Vector3.up;
                     MimicTargetId = default;
                     _movement.CurrentMimicryState = MimicryState.Default;
+                    // 解除入力を処理した次のTick以降から、エクスカリバー攻撃を再び使用可能にする。
+                    SetExcaliburAttackEnabled(true);
                     break;
             }
 
@@ -220,11 +288,18 @@ namespace InGame.Player
             _stateChangeTick = -1;
         }
 
+        /// <summary>展示物への擬態中だけエクスカリバー攻撃を無効化する。</summary>
+        void SetExcaliburAttackEnabled(bool enabled)
+        {
+            _playerAbilityManager?.SetAbilityEnabled(enabled, nameof(AbilityExcaliburAttack));
+        }
+
         /// <summary>
         /// フォーカスを開始した時の演出メソッド
         /// </summary>
         void FocusStartEffective()
         {
+            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(false);
             _scannerCanvas.gameObject.SetActive(true);
             _scannerCanvas.ChangeImageVisibility(false);
             _cameraController.ChangeOffset(_focusPosition, _cameraMoveDuration);
@@ -246,10 +321,155 @@ namespace InGame.Player
         /// </summary>
         void FocusEndEffective()
         {
+            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(true);
             _cameraController.ResetOffset(_cameraMoveDuration);
             _scannerCanvas.ChangeImageVisibility(false);
             _scannerCanvas.gameObject.SetActive(false);
             _focusIndex = -1;
+        }
+
+        // 全端末で、同期状態とPlayableの準備状態を描画直前に確認する。
+        void UpdateScanAnimation()
+        {
+            if (!_spawned || !Object || !Object.IsValid || !Runner) return;
+            if (!ScanAnimationActive || _movement.CurrentMimicryState != MimicryState.Default)
+            {
+                StopScanAnimationLocal();
+                return;
+            }
+
+            if (!_animationClipPlayer || !_animationClipPlayer.isActiveAndEnabled
+                || !_animationClipPlayer.IsValid || !_scanAnimationClip) return;
+
+            // モデルの再有効化などでグラフが作り直された場合は、現在の同期状態から再生を復元する。
+            if (!_scanAnimationGraph.Equals(_animationClipPlayer.Graph))
+            {
+                StopScanAnimationLocal(immediate: true);
+                _scanAnimationGraph = _animationClipPlayer.Graph;
+                _interruptedScanStartTime = float.MinValue;
+            }
+
+            if (_scanAnimationPlaying && _localScanStartTime != ScanAnimationStartTime)
+                StopScanAnimationLocal(immediate: true);
+
+            if (_scanAnimationPlaying
+                && !_animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _currentScanClip))
+            {
+                // 攻撃などの明示的な割り込みを、次の描画で上書きしない。
+                _interruptedScanStartTime = ScanAnimationStartTime;
+                StopScanAnimationLocal();
+                return;
+            }
+
+            if (!_scanAnimationPlaying)
+            {
+                if (_interruptedScanStartTime == ScanAnimationStartTime) return;
+                StartScanAnimationLocal();
+            }
+            if (!_scanAnimationPlaying
+                || !_animationClipPlayer.TryGetPlayableInfo(_scanAnimationClip, out var info)) return;
+
+            // RPC到着時刻や端末のフレームレートではなく、同期された開始時刻を基準にする。
+            var renderTime = HasInputAuthority || HasStateAuthority
+                ? Runner.LocalRenderTime
+                : Runner.RemoteRenderTime;
+            var elapsed = Mathf.Max(0f, (float)renderTime - ScanAnimationStartTime);
+            var clipTime = Mathf.Min(elapsed * Mathf.Max(0f, info.montage.PlaySpeed),
+                _scanAnimationClip.length);
+            info.SetTime(clipTime, updateBlendWeight: false);
+        }
+
+        void StartScanAnimationLocal()
+        {
+
+            var montages = AnimationClipsContainer.Instance?.AnimationMontages;
+            var index = montages == null ? -1 : Array.FindIndex(montages,
+                montage => montage.AnimClip == _scanAnimationClip);
+            if (index < 0 || montages[index].TargetLayer == LayerInfo.LayerType.Base)
+            {
+                // アセットの読み込みが完了するまで次の描画で再試行する。
+                return;
+            }
+
+            CancelScanReturnBlend();
+            _scanAnimationLayer = montages[index].TargetLayer;
+            _animationClipPlayer.PlayOnLayer(_scanAnimationClip, _scanAnimationLayer, speed: 0f);
+            if (!_animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _scanAnimationClip)) return;
+            _currentScanClip = _scanAnimationClip;
+            _scanAnimationPlaying = true;
+            _localScanStartTime = ScanAnimationStartTime;
+        }
+
+        void StopScanAnimationLocal(bool immediate = false)
+        {
+            // ボタンを離す通知が重複しても、進行中の戻りブレンドは続ける。
+            if (!_scanAnimationPlaying && !immediate) return;
+            CancelScanReturnBlend();
+            _scanAnimationPlaying = false;
+
+            if (_animationClipPlayer
+                && _animationClipPlayer.IsCurrentClipOnLayer(_scanAnimationLayer, _currentScanClip))
+            {
+                if (!immediate && _scanReturnBlendDuration > 0f)
+                {
+                    _scanReturnBlendCts = new CancellationTokenSource();
+                    BlendBackToNormalAsync(_currentScanClip, _scanAnimationLayer,
+                        _scanReturnBlendCts.Token).Forget();
+                    return;
+                }
+                _animationClipPlayer.PlayOnLayer(null, _scanAnimationLayer);
+            }
+            _currentScanClip = null;
+        }
+
+        async UniTask BlendBackToNormalAsync(AnimationClip clip, LayerInfo.LayerType layer,
+            CancellationToken token)
+        {
+            var blend = new LayerInfo.Blend
+            {
+                BlendTime = _scanReturnBlendDuration,
+                BlendCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f)
+            };
+            await _animationClipPlayer.BlendLayerWeight(layer, 0f, blend, token);
+
+            // 再スキャンや別モーションへの切り替え後に古い終了処理を適用しない。
+            if (token.IsCancellationRequested || !_animationClipPlayer) return;
+            if (_animationClipPlayer.IsCurrentClipOnLayer(layer, clip))
+                _animationClipPlayer.PlayOnLayer(null, layer);
+            _currentScanClip = null;
+            CancelScanReturnBlend();
+        }
+
+        void CancelScanReturnBlend()
+        {
+            var cancellation = _scanReturnBlendCts;
+            _scanReturnBlendCts = null;
+            cancellation?.Cancel();
+            cancellation?.Dispose();
+        }
+
+        void OnDisable()
+        {
+            if (_animationClipPlayer)
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
+            StopScanAnimationLocal(immediate: true);
+        }
+
+        void OnEnable()
+        {
+            if (_spawned && _animationClipPlayer)
+            {
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
+                _animationClipPlayer.BeforeEvaluate += UpdateScanAnimation;
+            }
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            _spawned = false;
+            if (_animationClipPlayer)
+                _animationClipPlayer.BeforeEvaluate -= UpdateScanAnimation;
+            StopScanAnimationLocal(immediate: true);
         }
 
         /// <summary>
@@ -257,6 +477,9 @@ namespace InGame.Player
         /// </summary>
         void FocusStartStateChange()
         {
+            if (!ScanAnimationActive)
+                ScanAnimationStartTime = Runner.SimulationTime;
+            ScanAnimationActive = true;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             _movement.CurrentAbilityPhase = ScanAbilityPhase.Scanning;
         }
@@ -266,6 +489,7 @@ namespace InGame.Player
         /// </summary>
         void FocusEndStateChange()
         {
+            ScanAnimationActive = false;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _movement.CurrentAbilityPhase = ScanAbilityPhase.Default;
         }
@@ -400,17 +624,28 @@ namespace InGame.Player
         /// </summary>
         void ChangeVisual()
         {
-            if (!_visual) return;
-
             if (MimicTargetId == default)
             {
-                _visual.Reveal();
+                // 擬態解除後は、所持しているエクスカリバーなどの装備を再表示する。
+                _playerEquipmentManager?.SetCurrentEquipmentVisible(true);
+                _visual?.Reveal();
+                // キャンバスを表示
+                if (_playerJewelryView) _playerJewelryView.alpha = 1;
+                _nameText?.SetActive(true);
+                _nameBack?.SetActive(true);
                 return;
             }
 
+            // 対象の描画準備が遅れていても、同期上擬態中なら装備は先に隠しておく。
+            _playerEquipmentManager?.SetCurrentEquipmentVisible(false);
+
             if (_targetByNetworkId.TryGetValue(MimicTargetId, out var target) && target)
             {
-                _visual.Mimic(target);
+                _visual?.Mimic(target);
+                // キャンバスを非表示
+                if (_playerJewelryView) _playerJewelryView.alpha = 0;
+                _nameText?.SetActive(false);
+                _nameBack?.SetActive(false);
             }
         }
     }
