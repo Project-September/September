@@ -3,6 +3,7 @@ using Fusion;
 using InGame.Common;
 using InGame.Health;
 using September.Common;
+using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -10,18 +11,25 @@ namespace InGame.Player.Okubo
 {
     public class AbilityHookAttack : NetworkBehaviour
     {
+        [Header("Component")]
+        [SerializeField] private PlayerManager _playerManager;
+        [SerializeField] private PlayerMovement _playerMovement;
+        [SerializeField] private PlayerInputManager _playerInputManager;
+        [SerializeField] private CameraController _cameraController;
+        [Header("Button")]
         [SerializeField] private PlayerButtons _aimButton;
         [SerializeField] private PlayerButtons _shotButton;
+        [Header("Animation")]
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         [SerializeField] private AnimationClip _shotClip;
         [SerializeField] private AnimationClip _aimClip;
         [SerializeField] private AnimationClip _pullClip;
-        [SerializeField] private PlayerMovement _playerMovement;
-        [SerializeField] private PlayerInputManager _playerInputManager;
+        [Header("WireObject")]
         [SerializeField] private Transform _wireOrigin;
         [SerializeField] private SplineContainer _wireSpline;
         [SerializeField] private GameObject _wireMesh;
         [SerializeField] private Transform _hookMesh;
+        [Header("WireParameter")]
         [SerializeField] private float _stretchDuration;
         [SerializeField] private float _pullDuration;
         [SerializeField] private float _wireLength;
@@ -31,8 +39,12 @@ namespace InGame.Player.Okubo
         [SerializeField] private Vector3 _hookOffsetRotation;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _resistanceAmount;
+        [Header("Time")]
         [SerializeField] private float _missAttackCoolTime;
         [SerializeField] private float _hitCoolTime;
+        [Header("Camera")]
+        [SerializeField] private Vector3 _stanceCameraOffset;
+        [SerializeField] private float _changeOffsetDuration;
 
         private HookAttackState _currentState;
         private float _currentHookLength;
@@ -66,6 +78,7 @@ namespace InGame.Player.Okubo
                     if (!input.Buttons.IsSet(_aimButton))
                         ChangeState(HookAttackState.Idle);
 
+                    _playerMovement.SetRotationDirection(HasInputAuthority ? Camera.main.transform.forward : input.DesiredLookDirection);
                     //攻撃
                     if (input.Buttons.IsSet(_shotButton))
                         ChangeState(HookAttackState.Stretching);
@@ -90,21 +103,30 @@ namespace InGame.Player.Okubo
             switch (state)
             {
                 case HookAttackState.Idle:
-                    //カメラを元に戻す
+
+                    //Aim -> Idleの場合はアニメーションを停止
                     if (_currentState == HookAttackState.Aim)
                         _animationClipPlayer.StopClip(_aimClip);
+
+                    _playerMovement.IsHookLocked = false;
+                    RPC_ChangeDescriptionUI(ControlDescriptionType.Okubo);
+                    _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+                    RPC_ChangeCameraPosition(false);
                     break;
-                //フック攻撃初期化
                 case HookAttackState.Aim:
-                    //エイム
+                    //構える
+                    _playerMovement.IsHookLocked = true;
+                    _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+                    RPC_ChangeDescriptionUI(ControlDescriptionType.OkuboAiming);
                     _animationClipPlayer.PlayClipLoop(_aimClip);
+                    RPC_ChangeCameraPosition(true);
                     break;
                 case HookAttackState.Stretching:
                     RPC_ChangeWireActive(true);
                     _targetData.Clear();
-                    _playerMovement.IsHookLocked = true;
                     _currentHookLength = 0;
                     _startAttackTime = Runner.SimulationTime;
+
                     _animationClipPlayer.StopClip(_aimClip);
                     _animationClipPlayer.PlayClip(_shotClip);
                     break;
@@ -125,7 +147,6 @@ namespace InGame.Player.Okubo
                     }
                     RPC_ChangeWireActive(false);
                     _waitTimer = isTarget ? _hitCoolTime : _missAttackCoolTime;
-                    _playerMovement.IsHookLocked = false;
                     break;
             }
             _currentState = state;
@@ -201,7 +222,15 @@ namespace InGame.Player.Okubo
                     break;
 
                 case HookAttackState.CoolDown:
-                    ChangeState(HookAttackState.Idle);
+                    _playerInputManager.GetPlayerInput(out var input);
+
+
+                    if (input.Buttons.IsSet(_aimButton))
+                    {
+                        ChangeState(HookAttackState.Aim);
+                    }
+                    else
+                        ChangeState(HookAttackState.Idle);
                     break;
             }
         }
@@ -271,6 +300,25 @@ namespace InGame.Player.Okubo
                         break;
                     }
                 }
+            }
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+        private void RPC_ChangeDescriptionUI(ControlDescriptionType mode)
+        {
+            UIController.I.ChangeDescriptionUI(mode);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+        private void RPC_ChangeCameraPosition(bool isAim)
+        {
+            if (isAim)
+            {
+                _cameraController.ChangeOffset(_stanceCameraOffset, _changeOffsetDuration);
+            }
+            else
+            {
+                _cameraController.ResetOffset(_changeOffsetDuration);
             }
         }
 

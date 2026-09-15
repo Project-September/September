@@ -7768,6 +7768,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8736522266100138394, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
   m_PrefabInstance: {fileID: 7656603966945804420}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1851644955780477357 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8355274600117350697, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 7656603966945804420}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2181559532762875052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 549068b2e6fdfd442a5bba033df184c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2181559532762875052 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
@@ -7785,14 +7796,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea90a082de027fd4db8a71d74ef0591c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerManager: {fileID: 6158378143110015099}
+  _playerMovement: {fileID: 5134312956570206089}
+  _playerInputManager: {fileID: 7421515818726201042}
+  _cameraController: {fileID: 1851644955780477357}
   _aimButton: 6
   _shotButton: 3
   _animationClipPlayer: {fileID: 6614372434425721515}
   _shotClip: {fileID: -8127976319273920460, guid: b6c7691e9f1d3af42b32fb777d82704c, type: 3}
   _aimClip: {fileID: 9066288702235629102, guid: 37f55441950b98041bab2e1a8ae6af0b, type: 3}
   _pullClip: {fileID: -7023660084421661956, guid: 707bf377ff7fc814bbd2e6126d1e6694, type: 3}
-  _playerMovement: {fileID: 5134312956570206089}
-  _playerInputManager: {fileID: 7421515818726201042}
   _wireOrigin: {fileID: 8721620199340885035}
   _wireSpline: {fileID: 3454141809864283659}
   _wireMesh: {fileID: 2475458012208602023}
@@ -7808,6 +7821,8 @@ MonoBehaviour:
   _resistanceAmount: 7
   _missAttackCoolTime: 0.1
   _hitCoolTime: 5
+  _stanceCameraOffset: {x: 0.5, y: -0.5, z: -1}
+  _changeOffsetDuration: 0.2
 --- !u!114 &-7425297506862547660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7966,6 +7981,17 @@ MonoBehaviour:
   _namePartsToMatch:
   - R_Hand
   _sockets: []
+--- !u!114 &6158378143110015099 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -4668177863944640257, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  m_PrefabInstance: {fileID: 7656603966945804420}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2181559532762875052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82df9dd14a0794b429f808e8d246e3c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6614372434425721515 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
