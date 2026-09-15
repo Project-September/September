@@ -55,25 +55,12 @@ namespace September.InGame.NauticalChart
             }
         }
 
-        /// <summary>
-        /// 放出を止めてから消す。即時にDestroyしない
-        /// </summary>
         public void HideHeadMist()
         {
             foreach (GameObject headMist in _headMistInstances)
             {
                 if (headMist == null) continue;
-
-                float delay = 0f;
-                ParticleSystem[] particleSystems = headMist.GetComponentsInChildren<ParticleSystem>();
-                foreach (ParticleSystem particle in particleSystems)
-                {
-                    particle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-                    delay = Mathf.Max(delay, particle.main.startLifetime.constantMax);
-                }
-
-                // 残っているもやもやが消えてからDestroyする
-                Destroy(headMist, delay);
+                Destroy(headMist);
             }
 
             _headMistInstances.Clear();
