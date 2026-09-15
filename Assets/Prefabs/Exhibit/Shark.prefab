@@ -753,8 +753,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7561636362705928479}
   - component: {fileID: 4770353196366820648}
-  - component: {fileID: 3977831736267880342}
-  m_Layer: 11
+  m_Layer: 6
   m_Name: PlayerBlockColliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -796,32 +795,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.85
-  m_Height: 5.65
+  m_Height: 8.69
   m_Direction: 2
-  m_Center: {x: 0, y: 0.81, z: -0.59}
---- !u!136 &3977831736267880342
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9011712798482146313}
-  m_Material: {fileID: 13400000, guid: 64d84d3edc2acd747bbb0413825fa2ef, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 32703
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.54
-  m_Height: 7
-  m_Direction: 2
-  m_Center: {x: 0, y: 0.81, z: -2.58}
+  m_Center: {x: 0, y: 0.81, z: -2.03}
 --- !u!1001 &348748399630788686
 PrefabInstance:
   m_ObjectHideFlags: 0

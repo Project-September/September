@@ -60,8 +60,6 @@ namespace InGame.Exhibit
 
         [SerializeField, Label("Playerが登場する位置")] private Transform _getOffPoint;
 
-        private Collider _collider;
-
         [Label("Playerに戻るときの地面からの高さ")][SerializeField] private float _height = 10f;
         EffectSpawner _effectSpawner;
         [SerializeField] protected InteractableBase _interactable;
@@ -84,7 +82,6 @@ namespace InGame.Exhibit
             IsSpawned = true;
             _initialPosition = transform.position;
             _initialRotation = transform.rotation;
-            _collider = gameObject.GetComponentInHierarchy<Collider>();
             if (!_effectSpawner)
                 _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             if (!Runner.IsServer) return;
@@ -100,8 +97,7 @@ namespace InGame.Exhibit
                 OnHit = (col, pos) =>
                 {
                     var damageable = col.GetComponentInParent<IDamageable>();
-                    if (col == _collider) return;
-                    if (damageable == null) return;
+                    if (damageable == null || ReferenceEquals(damageable, this)) return;
                     var hitData = new HitData(HitActionType.Damage, _damageAmount, playerRef,
                         damageable.OwnerPlayerRef);
                     damageable.TakeHit(ref hitData);
