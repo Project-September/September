@@ -348,13 +348,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mistPrefab: {fileID: 364519087004515219, guid: ab31f475304632c4dbec752c2c0e12ce, type: 3}
-  _worldCenter: {x: 0, y: 8.12, z: -6.5}
+  _worldCenter: {x: 0, y: 6.7, z: -6.5}
   _worldSize: {x: 103.5, y: 4, z: 69.35}
-  _gridCountX: 3
-  _gridCountZ: 3
+  _gridCountX: 5
+  _gridCountZ: 5
   _minSpacing: 10
   _yOffset: 0
-  _yRandomRange: 4
+  _yRandomRange: 1
 --- !u!114 &355871142760304320
 MonoBehaviour:
   m_ObjectHideFlags: 0
