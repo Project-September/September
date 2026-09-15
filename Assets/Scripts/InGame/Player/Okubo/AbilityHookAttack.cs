@@ -49,6 +49,7 @@ namespace InGame.Player.Okubo
         private HookAttackState _currentState;
         private float _currentHookLength;
         private float _startAttackTime;
+        private bool _isPlayAimClip;
         private float _waitTimer;
         /// <summary>PlayerMovementなどのキャッシュ用 </summary>
         private Dictionary<PlayerRef, HookTargetData> _targetData = new();
@@ -127,6 +128,7 @@ namespace InGame.Player.Okubo
                     _currentHookLength = 0;
                     _startAttackTime = Runner.SimulationTime;
 
+                    _isPlayAimClip = false;
                     _animationClipPlayer.StopClip(_aimClip);
                     _animationClipPlayer.PlayClip(_shotClip);
                     break;
@@ -134,6 +136,12 @@ namespace InGame.Player.Okubo
                     _waitTimer = _stretchedWaitTime;
                     break;
                 case HookAttackState.Pulling:
+
+                    if (_isPlayAimClip)
+                    {
+                        _animationClipPlayer.StopClip(_aimClip);
+                        _isPlayAimClip = false;
+                    }
                     _animationClipPlayer.PlayClip(_pullClip);
                     break;
                 case HookAttackState.CoolDown:
@@ -166,6 +174,11 @@ namespace InGame.Player.Okubo
                 ChangeState(HookAttackState.Stretched);
             }
 
+            if (!_isPlayAimClip && Runner.SimulationTime - _startAttackTime > _shotClip.length)
+            {
+                _animationClipPlayer.PlayClipLoop(_aimClip);
+                _isPlayAimClip = true;
+            }
             RPC_UpdateHookLength(_currentHookLength, this.transform.forward);
             GetHitPlayer(_currentHookLength, this.transform.forward);
         }
