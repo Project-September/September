@@ -10,6 +10,8 @@ namespace InGame.Player.Okubo
 {
     public class AbilityHookAttack : NetworkBehaviour
     {
+        [SerializeField] private PlayerButtons _aimButton;
+        [SerializeField] private PlayerButtons _shotButton;
         [SerializeField] private AnimationClipPlayer _animationClipPlayer;
         [SerializeField] private AnimationClip _shotClip;
         [SerializeField] private AnimationClip _aimClip;
@@ -35,7 +37,6 @@ namespace InGame.Player.Okubo
         private HookAttackState _currentState;
         private float _currentHookLength;
         private float _startAttackTime;
-        private bool _isPlayAimClip;
         private float _waitTimer;
         /// <summary>PlayerMovementなどのキャッシュ用 </summary>
         private Dictionary<PlayerRef, HookTargetData> _targetData = new();
@@ -55,9 +56,18 @@ namespace InGame.Player.Okubo
 
             switch (_currentState)
             {
-                case HookAttackState.Idol:
-                    //フック攻撃開始
-                    if (input.Buttons.IsSet(PlayerButtons.Ability1))
+                case HookAttackState.Idle:
+                    //構える
+                    if (input.Buttons.IsSet(_aimButton))
+                        ChangeState(HookAttackState.Aim);
+                    break;
+                case HookAttackState.Aim:
+                    //構え解除
+                    if (!input.Buttons.IsSet(_aimButton))
+                        ChangeState(HookAttackState.Idle);
+
+                    //攻撃
+                    if (input.Buttons.IsSet(_shotButton))
                         ChangeState(HookAttackState.Stretching);
                     break;
                 case HookAttackState.Stretching:
@@ -76,31 +86,32 @@ namespace InGame.Player.Okubo
 
         private void ChangeState(HookAttackState state)
         {
-            _currentState = state;
 
             switch (state)
             {
-                case HookAttackState.Idol:
+                case HookAttackState.Idle:
+                    //カメラを元に戻す
+                    if (_currentState == HookAttackState.Aim)
+                        _animationClipPlayer.StopClip(_aimClip);
                     break;
                 //フック攻撃初期化
+                case HookAttackState.Aim:
+                    //エイム
+                    _animationClipPlayer.PlayClipLoop(_aimClip);
+                    break;
                 case HookAttackState.Stretching:
                     RPC_ChangeWireActive(true);
                     _targetData.Clear();
                     _playerMovement.IsHookLocked = true;
                     _currentHookLength = 0;
                     _startAttackTime = Runner.SimulationTime;
-                    _isPlayAimClip = false;
+                    _animationClipPlayer.StopClip(_aimClip);
                     _animationClipPlayer.PlayClip(_shotClip);
                     break;
                 case HookAttackState.Stretched:
                     _waitTimer = _stretchedWaitTime;
                     break;
                 case HookAttackState.Pulling:
-                    if (_isPlayAimClip)
-                    {
-                        _animationClipPlayer.StopClip(_aimClip);
-                        _isPlayAimClip = false;
-                    }
                     _animationClipPlayer.PlayClip(_pullClip);
                     break;
                 case HookAttackState.CoolDown:
@@ -117,6 +128,7 @@ namespace InGame.Player.Okubo
                     _playerMovement.IsHookLocked = false;
                     break;
             }
+            _currentState = state;
         }
 
         /// <summary>
@@ -131,11 +143,6 @@ namespace InGame.Player.Okubo
             {
                 _currentHookLength = _wireLength;
                 ChangeState(HookAttackState.Stretched);
-            }
-            if (!_isPlayAimClip && Runner.SimulationTime - _startAttackTime > _shotClip.length)
-            {
-                _animationClipPlayer.PlayClipLoop(_aimClip);
-                _isPlayAimClip = true;
             }
 
             RPC_UpdateHookLength(_currentHookLength, this.transform.forward);
@@ -194,7 +201,7 @@ namespace InGame.Player.Okubo
                     break;
 
                 case HookAttackState.CoolDown:
-                    ChangeState(HookAttackState.Idol);
+                    ChangeState(HookAttackState.Idle);
                     break;
             }
         }
@@ -327,7 +334,7 @@ namespace InGame.Player.Okubo
 
         private enum HookAttackState
         {
-            Idol, Stretching, Stretched, Pulling, CoolDown
+            Idle, Aim, Stretching, Stretched, Pulling, CoolDown
         }
 
         private class HookTargetData
