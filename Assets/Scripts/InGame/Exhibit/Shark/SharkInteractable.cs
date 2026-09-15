@@ -1,10 +1,9 @@
-using UnityEngine;
 using Fusion;
 using InGame.Exhibit;
-using InGame.Interact;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Fields;
+using UnityEngine;
 
 public class SharkInteractable : MountableExhibitBase
 {
@@ -18,6 +17,10 @@ public class SharkInteractable : MountableExhibitBase
     [Header("アニメーション")]
     [SerializeField] Animator _animator;
     [SerializeField] float _idleSpeedThreshold = 0.1f;
+
+    [Header("表示切り替え")]
+    [SerializeField] private GameObject _displayModel;
+    [SerializeField] private GameObject _hungSharkObject;
 
     [SerializeField] Transform _cameraTransform;
 
@@ -33,7 +36,6 @@ public class SharkInteractable : MountableExhibitBase
     /// </summary>
     [Networked, OnChangedRender(nameof(OnAttackStateChanged))] private bool IsAttacking { get; set; }
 
-    private InteractableBase _interactableBase;
     private float _cooldownTimer; // 攻撃のクールダウンタイマー
     private int _attackTickCount; // 攻撃開始時からの経過ティック数（持続時間の計算用）
 
@@ -44,6 +46,8 @@ public class SharkInteractable : MountableExhibitBase
 
     private void OnInteractingStateChanged()
     {
+        SetVisualState(IsSharkInteracting);
+
         if (IsSharkInteracting)
         {
             _animator.enabled = true;
@@ -84,15 +88,17 @@ public class SharkInteractable : MountableExhibitBase
     public override void Spawned()
     {
         base.Spawned();
-        _interactableBase = GetComponent<InteractableBase>();
         ResetAnimator();
+        SetVisualState(IsSharkInteracting);
     }
 
     public override void GetOn(PlayerRef playerRef)
     {
         base.GetOn(playerRef);
+
         IsSharkInteracting = true;
-        _interactableBase.ForceSetInteractable = false;
+        SetVisualState(true);
+        _interactable.ForceSetInteractable = false;
         // 攻撃状態の初期化
         _cooldownTimer = _cooldownTime;
         _attackTickCount = 0;
@@ -106,7 +112,8 @@ public class SharkInteractable : MountableExhibitBase
 
         base.GetOff(playerRef);
         IsSharkInteracting = false;
-        _interactableBase.ForceSetInteractable = true;
+        SetVisualState(false);
+        _interactable.ForceSetInteractable = true;
 
         // 攻撃状態を次のインタラクトへ持ち越さない
         IsAttacking = false;
@@ -142,6 +149,12 @@ public class SharkInteractable : MountableExhibitBase
         _cooldownTimer = Mathf.Min(_cooldownTime, _cooldownTimer + deltaTime);
         AttackStartTrigger(playerInput, OwnerPlayerRef);　// 攻撃開始
         OnAttackUpdate(deltaTime);　//Attack中にだけ発火するメソッド
+    }
+
+    private void SetVisualState(bool isRiding)
+    {
+        if (_displayModel != null) _displayModel.SetActive(isRiding);
+        if (_hungSharkObject != null) _hungSharkObject.SetActive(!isRiding);
     }
 
     /// <summary>
