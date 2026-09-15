@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pivot: {fileID: 8291306824684874452}
   _scanPos: {fileID: 8941559416278937509}
+  _visualRoot: {fileID: 0}
 --- !u!1 &5344940182192764311
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,6 +177,7 @@ MonoBehaviour:
         - AbilityNormalAttack
         - AbilityHammerAttack
         - AbilityMultiHitAttack
+        - AbilityCameraAttack
         _duration: 45
     - rid: 2115540685324288128
       type: {class: AbilityExcaliburAttack, ns: InGame.Player.Ability, asm: Scripts}
