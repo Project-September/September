@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Common;
 using InGame.Interact;
+using InGame.Player.Ability;
 using September.Common;
 using September.InGame.UI;
 using UnityEngine;
@@ -68,6 +69,9 @@ namespace InGame.Player
         [SerializeField] GameObject _nameText;
         [SerializeField] GameObject _nameBack;
 
+        PlayerEquipmentManager _playerEquipmentManager;
+        PlayerAbilityManager _playerAbilityManager;
+
         TakamuraScanTarget[] _scanTargets = Array.Empty<TakamuraScanTarget>();
         readonly Dictionary<NetworkId, TakamuraScanTarget> _targetByNetworkId = new();
         int _focusIndex = -1;
@@ -95,6 +99,8 @@ namespace InGame.Player
         {
             _playerManager = GetComponent<PlayerManager>();
             _movement = GetComponent<TakamuraMovement>();
+            _playerEquipmentManager = GetComponent<PlayerEquipmentManager>();
+            _playerAbilityManager = GetComponent<PlayerAbilityManager>();
             _animationClipPlayer = GetComponentInChildren<AnimationClipPlayer>(true);
             _spawned = true;
             _localScanStartTime = float.MinValue;
@@ -114,6 +120,7 @@ namespace InGame.Player
             }
 
             _scannerCanvas.gameObject.SetActive(false);
+            SetExcaliburAttackEnabled(_movement.CurrentMimicryState != MimicryState.MimicExhibit);
             ChangeVisual();
         }
 
@@ -262,6 +269,8 @@ namespace InGame.Player
             {
                 case StateChangeType.Mimic:
                     _movement.CurrentMimicryState = MimicryState.MimicExhibit;
+                    // 擬態解除用のAttack入力でエクスカリバー攻撃が同時発動しないようにする。
+                    SetExcaliburAttackEnabled(false);
                     FocusEndStateChange();
                     break;
                 case StateChangeType.Reveal:
@@ -270,6 +279,8 @@ namespace InGame.Player
                     transform.position += Vector3.up;
                     MimicTargetId = default;
                     _movement.CurrentMimicryState = MimicryState.Default;
+                    // 解除入力を処理した次のTick以降から、エクスカリバー攻撃を再び使用可能にする。
+                    SetExcaliburAttackEnabled(true);
                     break;
             }
 
@@ -277,11 +288,18 @@ namespace InGame.Player
             _stateChangeTick = -1;
         }
 
+        /// <summary>展示物への擬態中だけエクスカリバー攻撃を無効化する。</summary>
+        void SetExcaliburAttackEnabled(bool enabled)
+        {
+            _playerAbilityManager?.SetAbilityEnabled(enabled, nameof(AbilityExcaliburAttack));
+        }
+
         /// <summary>
         /// フォーカスを開始した時の演出メソッド
         /// </summary>
         void FocusStartEffective()
         {
+            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(false);
             _scannerCanvas.gameObject.SetActive(true);
             _scannerCanvas.ChangeImageVisibility(false);
             _cameraController.ChangeOffset(_focusPosition, _cameraMoveDuration);
@@ -303,6 +321,7 @@ namespace InGame.Player
         /// </summary>
         void FocusEndEffective()
         {
+            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(true);
             _cameraController.ResetOffset(_cameraMoveDuration);
             _scannerCanvas.ChangeImageVisibility(false);
             _scannerCanvas.gameObject.SetActive(false);
@@ -605,11 +624,11 @@ namespace InGame.Player
         /// </summary>
         void ChangeVisual()
         {
-            if (!_visual) return;
-
             if (MimicTargetId == default)
             {
-                _visual.Reveal();
+                // 擬態解除後は、所持しているエクスカリバーなどの装備を再表示する。
+                _playerEquipmentManager?.SetCurrentEquipmentVisible(true);
+                _visual?.Reveal();
                 // キャンバスを表示
                 if (_playerJewelryView) _playerJewelryView.alpha = 1;
                 _nameText?.SetActive(true);
@@ -617,9 +636,12 @@ namespace InGame.Player
                 return;
             }
 
+            // 対象の描画準備が遅れていても、同期上擬態中なら装備は先に隠しておく。
+            _playerEquipmentManager?.SetCurrentEquipmentVisible(false);
+
             if (_targetByNetworkId.TryGetValue(MimicTargetId, out var target) && target)
             {
-                _visual.Mimic(target);
+                _visual?.Mimic(target);
                 // キャンバスを非表示
                 if (_playerJewelryView) _playerJewelryView.alpha = 0;
                 _nameText?.SetActive(false);
