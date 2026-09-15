@@ -18,6 +18,10 @@ public class SharkInteractable : MountableExhibitBase
     [SerializeField] Animator _animator;
     [SerializeField] float _idleSpeedThreshold = 0.1f;
 
+    [Header("表示切り替え")]
+    [SerializeField] private GameObject _displayModel;
+    [SerializeField] private GameObject _hungSharkObject;
+
     [SerializeField] Transform _cameraTransform;
 
     /// <summary>
@@ -42,6 +46,8 @@ public class SharkInteractable : MountableExhibitBase
 
     private void OnInteractingStateChanged()
     {
+        SetVisualState(IsSharkInteracting);
+
         if (IsSharkInteracting)
         {
             _animator.enabled = true;
@@ -83,15 +89,15 @@ public class SharkInteractable : MountableExhibitBase
     {
         base.Spawned();
         ResetAnimator();
-        RPC_ActiveObject(false);
+        SetVisualState(IsSharkInteracting);
     }
 
     public override void GetOn(PlayerRef playerRef)
     {
         base.GetOn(playerRef);
 
-        RPC_ActiveObject(true);
         IsSharkInteracting = true;
+        SetVisualState(true);
         _interactable.ForceSetInteractable = false;
         // 攻撃状態の初期化
         _cooldownTimer = _cooldownTime;
@@ -105,8 +111,8 @@ public class SharkInteractable : MountableExhibitBase
         _movementProcessing.OnInteractEnd(Rigidbody);
 
         base.GetOff(playerRef);
-        RPC_ActiveObject(false);
         IsSharkInteracting = false;
+        SetVisualState(false);
         _interactable.ForceSetInteractable = true;
 
         // 攻撃状態を次のインタラクトへ持ち越さない
@@ -145,10 +151,10 @@ public class SharkInteractable : MountableExhibitBase
         OnAttackUpdate(deltaTime);　//Attack中にだけ発火するメソッド
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_ActiveObject(bool active)
+    private void SetVisualState(bool isRiding)
     {
-        this.gameObject.SetActive(active);
+        if (_displayModel != null) _displayModel.SetActive(isRiding);
+        if (_hungSharkObject != null) _hungSharkObject.SetActive(!isRiding);
     }
 
     /// <summary>

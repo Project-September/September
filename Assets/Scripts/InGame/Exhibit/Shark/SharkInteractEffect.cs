@@ -10,7 +10,6 @@ namespace InGame.Exhibit
     {
         [SerializeField] private float _interactTime;
         [SerializeField] private SharkInteractable _sharkInteractable;
-        [SerializeField] private GameObject _hungSharkObject;
         private PlayerRef _ownerPlayerRef;
         private PlayerManager _ownerPlayerManager;
         private NetworkRunner _networkRunner;
@@ -24,7 +23,6 @@ namespace InGame.Exhibit
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
             _interactable.Object.AssignInputAuthority(playerRef);
             GetOn(playerRef);
-            RPC_ActiveObject(false);
         }
 
         public override void OnInteractFixedNetworkUpdate(PlayerInput playerInput)
@@ -55,20 +53,13 @@ namespace InGame.Exhibit
         public override void OnInteractEnd()
         {
             base.OnInteractEnd();
-            RPC_ActiveObject(true);
             _interactable.Object.RemoveInputAuthority();
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_ActiveObject(bool active)
-        {
-            _hungSharkObject.SetActive(active);
         }
 
         private bool CheckInteractEnd()
         {
-            // 海に落ちるまで、インタラクションを辞めない
-            return !_sharkInteractable.IsSharkInteracting;
+            // サメのHPが尽きた場合、またはサメ側ですでに終了している場合は降車する
+            return !_sharkInteractable.IsAlive || !_sharkInteractable.IsSharkInteracting;
         }
 
         private void GetOn(PlayerRef ownerPlayerRef)
@@ -91,7 +82,6 @@ namespace InGame.Exhibit
             {
                 _interactTime = _interactTime,
                 _sharkInteractable = _sharkInteractable,
-                _hungSharkObject = _hungSharkObject,
             };
         }
     }
