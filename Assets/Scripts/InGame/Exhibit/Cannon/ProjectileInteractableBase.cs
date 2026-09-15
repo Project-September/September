@@ -25,17 +25,18 @@ namespace September.InGame.Exhibit
 		[Header("reload設定")] [SerializeReference] [SubclassSelector]
 		public IFireController FireBulletController;
 
+		[Header("レティクル設定")] [SerializeReference] [SubclassSelector]
+		private IReticleEffect _reticleEffect;
+
 		protected ProjectileLauncher _launcher;
 		protected IProjectileMovement _move;
 		protected PlayerManager _usingPlayer;
 		private AnimationClipPlayer _animationClipPlayer;
-
 		/// <summary>
-		///     現在の弾丸が減った時のコールバック
-		///     変数は球数、クールタイム
+		/// 現在の弾丸が減った時のコールバック
+		/// 変数は球数、クールタイム
 		/// </summary>
 		public event Action<int, float> OnAmmoChanged;
-
 		public event Action<ProjectileInteractableBase> OnInteractStart;
 		public event Action<ProjectileInteractableBase> OnInteractEnd;
 
@@ -48,11 +49,8 @@ namespace September.InGame.Exhibit
 		[Networked]
 		[OnChangedRender(nameof(AmmoChanged))]
 		private int CurrentAmmo { get; set; }
-
-		[field: Header("レティクル設定")]
-		[field: SerializeReference]
-		[field: SubclassSelector]
-		public IReticleEffect ReticleEffect { get; }
+		
+		public IReticleEffect ReticleEffect => _reticleEffect;
 
 		private bool _isSpawned;
 
@@ -61,7 +59,7 @@ namespace September.InGame.Exhibit
 			base.Spawned();
 			_launcher = GetComponent<ProjectileLauncher>();
 			_move = GetComponent<IProjectileMovement>();
-			ReticleEffect?.Init();
+			_reticleEffect?.Init();
 			_isSpawned = true;
 		}
 
@@ -76,7 +74,9 @@ namespace September.InGame.Exhibit
 			_move?.Render();
 
 			if (_animationClipPlayer && !_animationClipPlayer.IsPlayingTargetClip(_playerUseAnimationClip))
+			{
 				_animationClipPlayer.PlayClip(_playerUseAnimationClip);
+			}
 		}
 
 		private void LateUpdate()
@@ -84,7 +84,7 @@ namespace September.InGame.Exhibit
 			if (!_isSpawned) return;
 
 			// NetworkRigidbodyが諸々のTransformを動かした後に描画する必要があるため、LateUpdateで呼び出す（Renderの後）
-			ReticleEffect?.Render();
+			_reticleEffect?.Render();
 		}
 
 		public override void FixedUpdateNetwork()
@@ -137,7 +137,7 @@ namespace September.InGame.Exhibit
 			if (!_usingPlayer) return;
 			GetPlayerAnimatorClipPlayer(_usingPlayer);
 			PlayerActive(false);
-
+			
 			// モジュール関連の初期化
 			_move.InitializeStateAuthority(_usingPlayer.Object, playerRef);
 			FireBulletController.Init();
@@ -176,13 +176,13 @@ namespace September.InGame.Exhibit
 		protected virtual void CheckInteractEnd(PlayerInput input)
 		{
 			if (!HasStateAuthority) return;
-
+			
 			// フィールド外に出た場合の強制終了
 			if ((OutOfFieldArea.I && OutOfFieldArea.I.IsOutOfField(_usingPlayer.transform.position)) ||
 			    // Interactボタンが押されたときの強制終了
 			    (input.Buttons.IsSet(PlayerButtons.Evasion) && InteractEndLockTimer.ExpiredOrNotRunning(Runner)))
 				InteractEnd();
-
+			
 			// タイムラグをインタラクト後に発生させる場合の終了処理
 			if (WaitExitTimer.Expired(Runner))
 			{
@@ -202,16 +202,16 @@ namespace September.InGame.Exhibit
 			Object.RemoveInputAuthority();
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
 			WaitExitTimer = TickTimer.None;
-
+			
 			// 操作UIの切り替え用処理
 			PlayerDatabase.Instance.PlayerDataDic.TryGet(CurrentUsePlayerRef, out var playerData);
-			var type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
+			ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
 			RPC_ChangeDescriptionUI(CurrentUsePlayerRef, type);
 
 			if (!_usingPlayer) return;
 			PlayerActive(true);
 			RPC_AllClientInit(CurrentUsePlayerRef, false);
-			_usingPlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;
+			_usingPlayer.GetComponent<PlayerHealth>().OnHitTaken -= PlayerHitTaken;			
 			AnimationEnd();
 
 
@@ -231,13 +231,15 @@ namespace September.InGame.Exhibit
 				_usingPlayer.RPC_SetUseGrav(isActive);
 
 				if (_usingPlayer.TryGetComponent(out AnimationClipPlayerManager animationClipPlayerManager))
+				{
 					animationClipPlayerManager.EnableFallMotion = isActive;
+				}
 			}
 		}
 
 		private void SetCooldown()
 		{
-			if (CurrentUsePlayerRef.IsNone) return;
+			if(CurrentUsePlayerRef.IsNone) return;
 			// クールダウン処理
 			var chara = PlayerDatabase.Instance.PlayerDataDic[CurrentUsePlayerRef].CharacterType;
 			var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
@@ -252,17 +254,18 @@ namespace September.InGame.Exhibit
 		{
 			EffectActive(currentPlayer, isActive);
 			_move.Initialize();
-
-			if (currentPlayer != Runner.LocalPlayer) return;
-
-			if (isActive) OnInteractStart?.Invoke(this);
+			if(currentPlayer != Runner.LocalPlayer) return;
+			if(isActive) OnInteractStart?.Invoke(this);
 			else OnInteractEnd?.Invoke(this);
 		}
-
+		
 		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
 		private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
 		{
-			if (Runner.LocalPlayer == target) UIController.I.ChangeDescriptionUI(mode);
+			if (Runner.LocalPlayer == target)
+			{
+				UIController.I.ChangeDescriptionUI(mode);
+			}
 		}
 
 		private void GetPlayerAnimatorClipPlayer(PlayerManager playerManager)
@@ -270,7 +273,9 @@ namespace September.InGame.Exhibit
 			// Playerのアニメーション適応
 			if (_playerUseAnimationClip == null) return;
 			if (playerManager.TryGetComponent(out AnimationClipPlayer playerManagerAnimationClipPlayer))
+			{
 				_animationClipPlayer = playerManagerAnimationClipPlayer;
+			}
 		}
 
 		private void AnimationEnd()
@@ -281,8 +286,8 @@ namespace September.InGame.Exhibit
 
 		protected virtual void EffectActive(PlayerRef currentPlayer, bool isActive)
 		{
-			ReticleEffect.AllClientEffectActive(isActive);
-			if (Runner.LocalPlayer == currentPlayer) ReticleEffect?.SetActive(isActive);
+			_reticleEffect.AllClientEffectActive(isActive);
+			if (Runner.LocalPlayer == currentPlayer) _reticleEffect?.SetActive(isActive);
 		}
 
 		private void PlayerHitTaken(HitData hitData)
