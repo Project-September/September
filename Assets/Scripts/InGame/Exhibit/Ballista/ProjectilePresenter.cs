@@ -2,7 +2,7 @@ using System;
 using September.InGame.Exhibit;
 using UnityEngine;
 
-namespace September
+namespace September.InGame.Exhibit
 {
     public class ProjectilePresenter : MonoBehaviour
     {
@@ -14,6 +14,8 @@ namespace September
         private void Start()
         {
             Subscribe(FindProjectileObjects());
+            _uiParent.SetActive(false);
+            _crosshairObject.SetActive(false);
         }
 
         private ProjectileInteractableBase[] FindProjectileObjects()
