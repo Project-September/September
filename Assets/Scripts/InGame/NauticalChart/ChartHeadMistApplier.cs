@@ -51,8 +51,6 @@ namespace September.InGame.NauticalChart
 
                 // 頭ボーンの子にする
                 GameObject headMist = Instantiate(_headMistPrefab, head);
-                headMist.transform.localPosition = Vector3.zero;
-                headMist.transform.localRotation = Quaternion.identity;
                 _headMistInstances.Add(headMist);
             }
         }
