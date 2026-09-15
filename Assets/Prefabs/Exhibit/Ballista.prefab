@@ -134,7 +134,7 @@ MonoBehaviour:
     m_Bits: 128
   _playerOffset: 3
   _rotateSpeed: 1.5
-  _useYawLimit: 1
+  _useYawLimit: 0
   _pitchLimit: {x: -40, y: 40}
   _yawLimit: {x: -90, y: 90}
   _baseUp: {x: 0, y: 1, z: 0}
@@ -165,8 +165,7 @@ MonoBehaviour:
     RefIds:
     - rid: 3743209666480701524
       type: {class: BallistaReticle, ns: September.InGame.Exhibit, asm: Scripts}
-      data:
-        _reticuleUIGameObject: {fileID: 0}
+      data: 
     - rid: 3743209666480701525
       type: {class: UseReload, ns: September.InGame.Exhibit, asm: Scripts}
       data:
