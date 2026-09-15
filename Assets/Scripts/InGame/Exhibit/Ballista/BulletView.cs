@@ -11,7 +11,13 @@ namespace September
         [SerializeField] private GameObject[] _bulletObjectsArray;
         [SerializeField] private GameObject _reloadText;
         private List<GameObject> _bulletObjects = new();
-
+        
+        private void Start()
+        {
+            _bulletObjects = _bulletObjectsArray.ToList();
+            _reloadText.SetActive(false);
+        }
+        
         public void UpdateAmmo(int currentAmmo, float reloadTime)
         {
             BulletUpdate(currentAmmo);
@@ -19,11 +25,6 @@ namespace September
             {
                 Reload(reloadTime).Forget();
             }
-        }
-        
-        private void Start()
-        {
-            _bulletObjects = _bulletObjectsArray.ToList();
         }
 
         public async UniTask Reload(float Time)
