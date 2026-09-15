@@ -21,6 +21,7 @@ namespace InGame.Exhibit
             _networkRunner = target.Runner;
             _interactable = target;
             var playerRef = PlayerRef.FromEncoded(context.Interactor);
+            _interactable.Object.AssignInputAuthority(playerRef);
             GetOn(playerRef);
         }
 
@@ -33,7 +34,7 @@ namespace InGame.Exhibit
                 GetOff();
                 return;
             }
-            
+
             if (CheckInteractEnd())
             {
                 GetOff();
@@ -45,14 +46,20 @@ namespace InGame.Exhibit
                 GetOff();
                 return;
             }
-            
+
             _sharkInteractable.OnInteractFixedUpdate(playerInput, _networkRunner.DeltaTime);
+        }
+
+        public override void OnInteractEnd()
+        {
+            base.OnInteractEnd();
+            _interactable.Object.RemoveInputAuthority();
         }
 
         private bool CheckInteractEnd()
         {
-            // 海に落ちるまで、インタラクションを辞めない
-            return !_sharkInteractable.IsSharkInteracting;
+            // サメのHPが尽きた場合、またはサメ側ですでに終了している場合は降車する
+            return !_sharkInteractable.IsAlive || !_sharkInteractable.IsSharkInteracting;
         }
 
         private void GetOn(PlayerRef ownerPlayerRef)
@@ -74,7 +81,7 @@ namespace InGame.Exhibit
             return new SharkInteractEffect()
             {
                 _interactTime = _interactTime,
-                _sharkInteractable = _sharkInteractable
+                _sharkInteractable = _sharkInteractable,
             };
         }
     }

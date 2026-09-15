@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Fusion;
 using September.Common;
 using UnityEngine;
 using UnityEngine.Search;
@@ -10,9 +9,7 @@ namespace September.NewResult
     [CreateAssetMenu(fileName = "ResultCharacterAssetsContainer", menuName = "ScriptableObjects/ResultCharacterAssetsContainer", order = 0)]
     public class ResultCharacterAssetsContainer : ScriptableObject
     {
-        private const int DataCount = 4;
-        
-        [SerializeField, ArrayLength(DataCount)] private ResultPerformanceCharacterAssets[] _assets;
+        [SerializeField] private ResultPerformanceCharacterAssets[] _assets;
         
         public ResultPerformanceCharacterAssets GetAssets(CharacterType characterType)
         {

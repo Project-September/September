@@ -1,10 +1,10 @@
+using System;
 using Fusion;
+using Ingame.Tanihira;
 using InGame.Common;
 using InGame.Interact;
-using September.Common;
-using System;
-using Ingame.Tanihira;
 using InGame.Player;
+using September.Common;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -218,6 +218,7 @@ namespace September
                 _activeEffect.ForceSetInteractable = true; // ここで初めて使用可能に戻す
                 _activeEffect = null;
             }
+
         }
 
         public override CharacterInteractEffectBase Clone()
@@ -231,7 +232,7 @@ namespace September
                 OkabeSpeedMultiplier = OkabeSpeedMultiplier,
                 ReturnDuration = ReturnDuration,
                 SpeedCurve = SpeedCurve,
-                PlayerOffset = PlayerOffset
+                PlayerOffset = PlayerOffset,
             };
         }
     }
