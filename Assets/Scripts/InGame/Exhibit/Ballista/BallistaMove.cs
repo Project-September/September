@@ -17,8 +17,11 @@ namespace September.InGame.Exhibit
 		[SerializeField] private LayerMask _layerMask;
 		[SerializeField] private float _playerOffset = 3;
 		[SerializeField] private float _rotateSpeed = 1.5f;
+		
+		[Header("ターゲット距離設定")]
 		[SerializeField] private float _raycastDistance = 1000f;
 		[SerializeField] private float _defaultDistance = 100f;
+		[SerializeField] private float _minDistance = 20f;
 
 		[Header("CameraAngleLimit")] [SerializeField]
 		private bool _useYawLimit;
@@ -87,9 +90,16 @@ namespace September.InGame.Exhibit
 			Vector3 targetPos;
 			
 			// _defaultDistance以下のhit距離の場合はdefault距離での値に統一する
-			if (Physics.Raycast(ray, out var hit, _raycastDistance, _layerMask) && hit.distance > _defaultDistance)
+			if (Physics.Raycast(ray, out var hit, _raycastDistance, _layerMask))
 			{
-				targetPos = hit.point;
+				if (hit.distance > _minDistance)
+				{
+					targetPos = hit.point;
+				}
+				else
+				{
+					targetPos = ray.origin + ray.direction * _minDistance;
+				}
 			}
 			else
 			{

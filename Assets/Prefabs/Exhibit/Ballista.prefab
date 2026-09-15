@@ -136,7 +136,8 @@ MonoBehaviour:
   _playerOffset: 3
   _rotateSpeed: 1.5
   _raycastDistance: 1000
-  _defaultDistance: 15
+  _defaultDistance: 30
+  _minDistance: 16
   _useYawLimit: 0
   _pitchLimit: {x: -40, y: 40}
   _yawLimit: {x: -90, y: 90}
