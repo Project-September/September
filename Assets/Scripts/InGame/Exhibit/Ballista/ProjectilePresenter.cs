@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace September.InGame.Exhibit
@@ -12,9 +13,20 @@ namespace September.InGame.Exhibit
 
 		private void Start()
 		{
-			Subscribe(FindProjectileObjects());
+			_projectileObjects = FindProjectileObjects();
+			Subscribe(_projectileObjects);
 			_uiParent.SetActive(false);
 			_crosshairObject.SetActive(false);
+		}
+
+		private void OnDisable()
+		{
+			foreach (var projectileObject in _projectileObjects)
+			{
+				projectileObject.OnInteractStart -= InteractStart;
+				projectileObject.OnInteractEnd -= InteractEnd;
+				projectileObject.OnAmmoChanged -= _bulletView.UpdateAmmo;
+			}
 		}
 
 		private ProjectileInteractableBase[] FindProjectileObjects()
