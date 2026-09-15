@@ -166,7 +166,6 @@ public class SharkInteractable : MountableExhibitBase
     {
         // 攻撃ボタンが押されていない場合、処理を行わない
         if (!playerInput.Buttons.IsSet(PlayerButtons.Attack)) return;
-        Debug.Log("Attack");
         AttackCoolDownCheck();
         CreateHitBox(playerRef);
     }
