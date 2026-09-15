@@ -12,11 +12,13 @@ namespace September.InGame.Exhibit
 		[SerializeField] private Transform _rotateBase;
 		[SerializeField] private Transform _shootPos;
 		[SerializeField] private Transform _playerPos;
+		[SerializeField] private Transform _muzzle;
 		[SerializeField] private CameraController _cameraController;
 		[SerializeField] private LayerMask _layerMask;
 		[SerializeField] private float _playerOffset = 3;
 		[SerializeField] private float _rotateSpeed = 1.5f;
 		[SerializeField] private float _raycastDistance = 1000f;
+		[SerializeField] private float _defaultDistance = 100f;
 
 		[Header("CameraAngleLimit")] [SerializeField]
 		private bool _useYawLimit;
@@ -79,25 +81,31 @@ namespace September.InGame.Exhibit
 		{
 			var cameraForward = input.DesiredLookDirection;
 			Debug.DrawRay(_cameraController.GetCameraPosition(), cameraForward * _raycastDistance, Color.green);
-			Debug.DrawRay(_barrel.position, _barrel.forward * 100, Color.red);
+			Debug.DrawRay(_muzzle.position, _muzzle.forward * _raycastDistance, Color.cyan);
 			
-			if (Physics.Raycast(input.CameraPosition, cameraForward, out var hit, _raycastDistance, _layerMask))
+			var ray = new Ray(input.CameraPosition, cameraForward);
+			Vector3 targetPos;
+			
+			// _defaultDistance以下のhit距離の場合はdefault距離での値に統一する
+			if (Physics.Raycast(ray, out var hit, _raycastDistance, _layerMask) && hit.distance > _defaultDistance)
 			{
-				var baseDir = (hit.point - _rotateBase.position).normalized;
-				var lookRotation = Quaternion.LookRotation(baseDir);
-				Yaw = lookRotation.eulerAngles.y;
-				
-				var barrelDir = (hit.point - _barrel.position).normalized;
-				var barrelRotation = Quaternion.LookRotation(barrelDir);
-				Pitch = barrelRotation.eulerAngles.x;
+				targetPos = hit.point;
 			}
 			else
 			{
-				var lookRotation = Quaternion.LookRotation(cameraForward);
-				Yaw = lookRotation.eulerAngles.y;
-				Pitch = lookRotation.eulerAngles.x;
+				targetPos = ray.origin + ray.direction * _defaultDistance;
 			}
+			
+			Vector3 direction = targetPos - _muzzle.position;
+			float yaw = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+			float horizontalDistance =
+				new Vector2(direction.x, direction.z).magnitude;
 
+			float pitch =
+				-Mathf.Atan2(direction.y, horizontalDistance) * Mathf.Rad2Deg;
+			Yaw = yaw;
+			Pitch = pitch;
+			
 			UpdatePlayerPosition();
 		}
 

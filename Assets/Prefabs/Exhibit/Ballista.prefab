@@ -128,6 +128,7 @@ MonoBehaviour:
   _rotateBase: {fileID: 8130292378159950461}
   _shootPos: {fileID: 1585084859612402059}
   _playerPos: {fileID: 5299343936273957316}
+  _muzzle: {fileID: 1585084859612402059}
   _cameraController: {fileID: 4565694175186777013}
   _layerMask:
     serializedVersion: 2
@@ -135,6 +136,7 @@ MonoBehaviour:
   _playerOffset: 3
   _rotateSpeed: 1.5
   _raycastDistance: 1000
+  _defaultDistance: 15
   _useYawLimit: 0
   _pitchLimit: {x: -40, y: 40}
   _yawLimit: {x: -90, y: 90}
