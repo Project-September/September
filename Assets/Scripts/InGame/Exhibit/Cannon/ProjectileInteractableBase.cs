@@ -36,6 +36,8 @@ namespace September.InGame.Exhibit
 		/// 変数は球数、クールタイム
 		/// </summary>
 		public event Action<int, float> OnAmmoChanged;
+		public event Action<ProjectileInteractableBase> OnInteractStart;
+		public event Action<ProjectileInteractableBase> OnInteractEnd;
 
 		[Networked] private NetworkButtons _attackButton { get; set; }
 		[Networked] protected PlayerRef CurrentUsePlayerRef { get; set; }
@@ -46,6 +48,8 @@ namespace September.InGame.Exhibit
 		[Networked]
 		[OnChangedRender(nameof(AmmoChanged))]
 		private int CurrentAmmo { get; set; }
+		
+		public IReticleEffect ReticleEffect => _reticleEffect;
 
 		private bool _isSpawned;
 
@@ -243,6 +247,13 @@ namespace September.InGame.Exhibit
 		{
 			EffectActive(currentPlayer, isActive);
 			_move.Initialize();
+			
+			Debug.Log(currentPlayer);
+			Debug.Log(Runner.LocalPlayer);
+			if(currentPlayer != Runner.LocalPlayer) return; ;
+			
+			if(isActive) OnInteractStart?.Invoke(this);
+			else OnInteractEnd?.Invoke(this);
 		}
 
 		private void GetPlayerAnimatorClipPlayer(PlayerManager playerManager)
