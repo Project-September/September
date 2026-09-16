@@ -1,4 +1,5 @@
 using System;
+using CRISound;
 using Fusion;
 using September.Common;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace InGame.Player.Ult
         private PlayerRef _ownerRef;
         /// <summary>PlayerDataBaseの参照を保持する変数</summary>
         private PlayerDatabase _subscribedDatabase;
+
+        private bool _wasAvailable;
 
         public int RemainingScore => Mathf.Clamp(_requiredScore - (_currentScore - PrevScore), 0, _requiredScore);
         public float Progress => Mathf.Clamp01((float)(_currentScore - PrevScore) / _requiredScore);
@@ -37,6 +40,7 @@ namespace InGame.Player.Ult
         public void OnUltActivated()
         {
             PrevScore = _currentScore;
+            _wasAvailable = false;
         }
 
         /// <summary>
@@ -57,11 +61,14 @@ namespace InGame.Player.Ult
         /// </summary>
         private void OnPrevScoreChangedRender()
         {
+            _wasAvailable = IsAvailable();
             OnProgressChanged?.Invoke();
         }
 
         private void Start()
         {
+            _wasAvailable = IsAvailable();
+
             _ownerRef = Object.InputAuthority;
             _subscribedDatabase = PlayerDatabase.Instance;
 
@@ -100,6 +107,14 @@ namespace InGame.Player.Ult
             }
 
             _currentScore = playerData.Score;
+
+            bool isAvailable = IsAvailable();
+            if (Object.HasInputAuthority && !_wasAvailable && isAvailable)
+            {
+                CRIAudio.PlaySE(SoundCues.SE.Ult_Charge.Sheet, SoundCues.SE.Ult_Charge.Name);
+            }
+
+            _wasAvailable = isAvailable;
             OnProgressChanged?.Invoke();
         }
 
