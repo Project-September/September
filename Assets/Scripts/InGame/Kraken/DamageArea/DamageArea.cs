@@ -57,7 +57,7 @@ namespace September.InGame.Kraken
 			}
 		}
 
-		void FindDamageableObjects(List<IDamageable> damageableObjects)
+		private void FindDamageableObjects(List<IDamageable> damageableObjects)
 		{
 			damageableObjects.Clear();
 			var cols = Physics.OverlapBox(transform.position + _hitAreaOffset, _hitAreaSize * .5f, transform.rotation, _hitLayer);
@@ -67,16 +67,15 @@ namespace September.InGame.Kraken
 				if (damageable == null) continue;
 				damageableObjects.Add(damageable);
 			}
-			Debug.Log(damageableObjects.Count);
 		}
 
 		[Rpc]
-		void RPC_EffectActive(bool active)
+		private void RPC_EffectActive(bool active)
 		{
 			EffectActive(active);
 		}
 
-		void EffectActive(bool active)
+		private void EffectActive(bool active)
 		{
 			foreach (var poisonEffect in _poisonEffects)
 			{
@@ -87,7 +86,7 @@ namespace September.InGame.Kraken
 			}
 		}
 		
-		void OnDrawGizmos()
+		private void OnDrawGizmos()
 		{
 			Gizmos.color = Color.green;
 			Gizmos.DrawWireCube(transform.position+ _hitAreaOffset, _hitAreaSize);
