@@ -7,12 +7,15 @@ namespace September.Lobby
     {
         [SerializeField] private Button _button;
         [SerializeField] private Image _characterImage;
-        [SerializeField] private Image _selectImage;
+        [SerializeField] private float _selectedScaleMultiplier = 1.2f;
+        private float _originalScale;
         public Button Button => _button;
         public Image CharacterImage => _characterImage;
 
         private void Awake()
         {
+            // アイコンは正方形であることを前提としているため、X軸のスケールを基準にする
+            _originalScale = Button.transform.localScale.x;
             DeselectCharacter();
         }
 
@@ -29,12 +32,14 @@ namespace September.Lobby
 
         public void SelectCharacter()
         {
-            if(_selectImage) _selectImage.enabled = true;
+            // 選択時の拡大処理
+            Button.transform.localScale *= _selectedScaleMultiplier;
         }
 
         public void DeselectCharacter()
         {
-            if(_selectImage) _selectImage.enabled = false;
+            // 選択解除時の縮小処理
+            Button.transform.localScale = new Vector3(_originalScale, _originalScale, _originalScale);
         }
     }
 }

@@ -34,6 +34,7 @@ namespace September.Lobby
 
                 selectCharacterIcon.Button.onClick.AddListener(() =>
                 {
+                    if (HandleIconSubmit(temp)) return;
                     if (!SelectCharacter(characterNames[temp], temp)) return;
                     OnCharacterIconClick(characterNames[temp], temp);
                     foreach (var icon in _selectCharacterIcons)
@@ -69,6 +70,8 @@ namespace September.Lobby
             Debug.Log(PlayerDatabase.Instance);
             PlayerDatabase.Instance.Rpc_SetCharacter(_localPlayerRef, data.Type);
         }
+
+        protected virtual bool HandleIconSubmit(int index) => false;
 
         protected abstract void SelectCharacterIconSetting(SelectCharacterIcon characterIcon, int index);
 
