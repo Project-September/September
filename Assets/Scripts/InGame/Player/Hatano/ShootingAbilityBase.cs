@@ -42,7 +42,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// </summary>
         protected void ShootingInputJudgment()
         {
-            if (_playerManager.IsStun || _playerManager.GetComponent<PlayerMovement>().IsEvading)
+            if (_playerManager.IsStun)
             {
                 ForceEndAbility();
                 return;
@@ -55,6 +55,15 @@ namespace InGame.Player.Ability.Effect.Shooting
                 ApplyCameraState(ShootingStateType.None);
                 ResetShootingState();
                 EndAnimation(blend: true);
+                return;
+            }
+
+            // 回避は構えAbilityを終了しない。カメラと構えを維持し、
+            // 攻撃入力と遠距離インタラクトの進行だけを止める。
+            if (_playerManager.GetComponent<PlayerMovement>().IsEvading)
+            {
+                OnNoShooting();
+                _isShootingAnimation = false;
                 return;
             }
 
@@ -158,7 +167,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         }
 
         /// <summary>
-        /// Ends the stance from every exit path (button release, evasion, ult and stun).
+        /// Ends the stance for ability completion, ult and stun; evasion keeps it active.
         /// The control state is restored only while this stance still owns the aim state;
         /// this prevents a cancelled gun from unlocking an ult that just took control.
         /// </summary>
