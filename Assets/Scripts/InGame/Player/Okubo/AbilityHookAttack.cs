@@ -71,13 +71,16 @@ namespace InGame.Player.Okubo
             {
                 case HookAttackState.Idle:
                     //構える
-                    if (input.Buttons.IsSet(_aimButton))
+                    if (input.Buttons.IsSet(_aimButton) && CanStartAim())
                         ChangeState(HookAttackState.Aim);
                     break;
                 case HookAttackState.Aim:
                     //構え解除
                     if (!input.Buttons.IsSet(_aimButton))
+                    {
                         ChangeState(HookAttackState.Idle);
+                        break;
+                    }
 
                     _playerMovement.SetRotationDirection(HasInputAuthority ? Camera.main.transform.forward : input.DesiredLookDirection);
                     //攻撃
@@ -96,6 +99,14 @@ namespace InGame.Player.Okubo
                     OnWait();
                     break;
             }
+        }
+
+        private bool CanStartAim()
+        {
+            // 連続攻撃などで操作が制限されている間は構えを開始しない。
+            return !_playerMovement.IgnoreMoveInput
+                && !_playerMovement.IsHookLocked
+                && _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal;
         }
 
         private void ChangeState(HookAttackState state)
@@ -246,7 +257,7 @@ namespace InGame.Player.Okubo
                     _playerInputManager.GetPlayerInput(out var input);
 
 
-                    if (input.Buttons.IsSet(_aimButton))
+                    if (input.Buttons.IsSet(_aimButton) && CanStartAim())
                     {
                         ChangeState(HookAttackState.Aim);
                     }
