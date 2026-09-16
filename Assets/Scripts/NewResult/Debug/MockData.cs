@@ -64,7 +64,9 @@ namespace September.NewResult
                     );
             }
 
-            var gameResultInfo = new GameResultInfo("Field", players);
+            var rankedPlayers = rankingPolicy.Apply(players).ToArray();
+
+            var gameResultInfo = new GameResultInfo("Field", rankedPlayers);
             return gameResultInfo;
         }
     }
