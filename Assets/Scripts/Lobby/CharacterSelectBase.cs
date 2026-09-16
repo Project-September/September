@@ -34,6 +34,7 @@ namespace September.Lobby
 
                 selectCharacterIcon.Button.onClick.AddListener(() =>
                 {
+                    if (HandleIconSubmit(temp)) return;
                     if (!SelectCharacter(characterNames[temp], temp)) return;
                     OnCharacterIconClick(characterNames[temp], temp);
                     foreach (var icon in _selectCharacterIcons)
@@ -48,20 +49,20 @@ namespace September.Lobby
         }
 
         /// <summary>
-        /// ƒLƒƒƒ‰ƒNƒ^[‚ğ‘I‘ğ(ƒNƒŠƒbƒN)‚µ‚½‚Ì“®ì
+        /// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚’é¸æŠ(ã‚¯ãƒªãƒƒã‚¯)ã—ãŸæ™‚ã®å‹•ä½œ
         /// </summary>
         private bool SelectCharacter(string characterName, int index)
         {
             if (_changeCharacterInfo || _currentCharacterName == characterName) return false;
             var data = CharacterDataContainer.Instance.GetCharacterData(index);
-            //  ‘I‘ğ‚µ‚Ä‚¢‚éƒLƒƒƒ‰ƒNƒ^[‚ÌƒCƒ“ƒfƒbƒNƒX‚ğT‚¦‚é
+            //  é¸æŠã—ã¦ã„ã‚‹ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æ§ãˆã‚‹
             _currentCharacterIndex = index;
-            CRIAudio.PlaySE("ALLCue", data.SelectedVoice); // ƒLƒƒƒ‰‘I‘ğƒ{ƒCƒXÄ¶
+            CRIAudio.PlayVoiceExclusive("ALLCue", data.SelectedVoice); // ã‚­ãƒ£ãƒ©é¸æŠãƒœã‚¤ã‚¹å†ç”Ÿ
             return true;
         }
 
         /// <summary>
-        /// ƒLƒƒƒ‰ƒNƒ^[‚ğŒˆ’è‚µ‚½‚Ì“®ì
+        /// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚’æ±ºå®šã—ãŸæ™‚ã®å‹•ä½œ
         /// </summary>
         protected void SubmitCharacter()
         {
@@ -69,6 +70,8 @@ namespace September.Lobby
             Debug.Log(PlayerDatabase.Instance);
             PlayerDatabase.Instance.Rpc_SetCharacter(_localPlayerRef, data.Type);
         }
+
+        protected virtual bool HandleIconSubmit(int index) => false;
 
         protected abstract void SelectCharacterIconSetting(SelectCharacterIcon characterIcon, int index);
 

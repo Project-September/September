@@ -65,6 +65,8 @@ namespace September.InGame.Kraken
         [Header("攻撃設定")]
         [SerializeField] private KrakenAttackHandler _attackHandler;
         [SerializeField] private KrakenSettings _settings;
+        
+        private DamageArea[] _damageAreas;
 
         private InputWrapper _attack;
 
@@ -149,6 +151,7 @@ namespace September.InGame.Kraken
         {
             ShowMagicCircle();
             Appear().Forget();
+            _damageAreas = FindObjectsByType<DamageArea>(FindObjectsSortMode.None);
         }
 
         public override void Render()
@@ -267,6 +270,12 @@ namespace September.InGame.Kraken
 
             // 搭乗中は展示物用の操作説明を表示する。
             RPC_ChangeDescriptionUI(owner, ControlDescriptionType.Exhibit);
+            
+            // ダメージエリアを有効化する
+            foreach (var damageArea in _damageAreas)
+            {
+                damageArea.EnableDamageArea(owner);
+            }
 
             _interactable.ForceSetInteractable = false;
 
@@ -323,6 +332,11 @@ namespace September.InGame.Kraken
                 var type = CharacterDataContainer.Instance
                     .GetControlDescriptionType(playerData.CharacterType);
                 RPC_ChangeDescriptionUI(owner, type);
+            }
+            // ダメージエリアを無効化
+            foreach (var damageArea in _damageAreas)
+            {
+                damageArea.DisableDamageArea();
             }
 
             OwnerPlayerRef = default;
