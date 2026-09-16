@@ -105,6 +105,7 @@ namespace InGame.Player.Ability.Effect.Shooting
             if (_playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal)
                 return false;
 
+            _aimCameraController.StopAim();
             ResetShootingState();
             // Ult や展示物側が設定したカメラ・操作状態・モーションを上書きしない。
             if (_animationClipPlayer.IsCurrentClipOnLayer(LayerInfo.LayerType.UpperBody, _stanceAnimationClip)
@@ -168,18 +169,13 @@ namespace InGame.Player.Ability.Effect.Shooting
 
         /// <summary>
         /// Ends the stance for ability completion, ult and stun; evasion keeps it active.
-        /// The control state is restored only while this stance still owns the aim state;
-        /// this prevents a cancelled gun from unlocking an ult that just took control.
+        /// Camera/stance cleanup must not unlock the control state owned by respawn or ult.
         /// </summary>
         private void EndStance()
         {
-            bool wasAiming = _aimCameraController != null && _aimCameraController.IsAim;
             _shootingType = ShootingStateType.None;
             _lastShootingType = ShootingStateType.None;
             ApplyCameraState(ShootingStateType.None);
-
-            if (wasAiming && !_playerManager.IsStun)
-                _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
 
             OnStopTheStance();
         }

@@ -422,7 +422,11 @@ namespace InGame.Player
 
             // 入力が届かない Tick でも搭乗時のロックオンを持ち越さない。
             if (CurrentPlayerControlState != PlayerControlState.Normal)
+            {
                 DisableLockOn();
+                // 落水などの操作制限は、次の入力Tickを待たず構えも終了する。
+                if (HasStateAuthority) _playerAbilityManager?.EndActiveShootingAbilities();
+            }
 
             if (CurrentPlayerControlState == PlayerControlState.ForcedControl)
             {

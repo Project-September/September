@@ -25,7 +25,7 @@ namespace InGame.Player.Ability
             
             // 条件を定義
             return _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal
-                   && !_playerManager.IsStun
+                   && !_playerManager.IsStun && _playerManager.IsMovable
                    && !_abilityStatusManagement.IsChangingWeapon
                    && !context.CurrentButtons.IsSet(PlayerButtons.Ultimate)
                    && context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available
