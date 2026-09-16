@@ -1,6 +1,7 @@
 using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
+using InGame.Player.Ability;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
@@ -35,6 +36,7 @@ namespace InGame.Player
         CameraController _cameraController;
         PlayerHealth _playerHealth;
         PlayerEffectController _playerEffectController;
+        PlayerAbilityManager _playerAbilityManager;
         Rigidbody _rigidbody;
         private bool _shouldWarp = false;
         private Vector3 _targetPosition;
@@ -145,6 +147,7 @@ namespace InGame.Player
         void InitComponents()
         {
             _playerMovement = GetComponent<PlayerMovement>();
+            _playerAbilityManager = GetComponent<PlayerAbilityManager>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
             _rigidbody = GetComponent<Rigidbody>();
             if (TryGetComponent(out CameraController cameraController))
@@ -398,6 +401,7 @@ namespace InGame.Player
             IsStun = true;
             _playerMovement.ResetHorizontalVelocity();
             RPC_SetPositionLock(true);
+            _playerAbilityManager?.EndActiveUltimates();
             _playerEffectController.PlayStunEffect();
         }
 

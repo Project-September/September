@@ -206,6 +206,25 @@ namespace InGame.Interact
             UIController.I.SetInteractProgress(Mathf.Clamp01(timer / time));
         }
 
+        /// <summary>Displays the remote-interaction affordance without starting its timer.</summary>
+        public void RemoteInteractionPreview(InteractableBase interactableBase)
+        {
+            if (_isBot || IsRemoting || !HasInputAuthority) return;
+
+            if (interactableBase == null)
+            {
+                UIController.I?.ShowInteractUI(false);
+                return;
+            }
+
+            var context = new InteractableContext { Interactor = Object.InputAuthority.RawEncoded };
+            var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
+                PlayerManager.PlayerControlState.ForcedControl;
+            UIController.I?.ShowInteractUI(!isRiding && interactableBase.ValidateInteraction(context),
+                interactableBase.gameObject);
+            UIController.I?.SetInteractProgress(0f);
+        }
+
         /// <summary>
         ///　途中で遠距離インタラクションを中止したときに呼ぶ
         /// ・インタラクションの入力を辞めたとき

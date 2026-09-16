@@ -39,6 +39,13 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// </summary>
         protected void ShootingInputJudgment()
         {
+            if (_playerManager.IsStun || _playerManager.GetComponent<PlayerMovement>().IsEvading)
+            {
+                RequestEndAbility();
+                return;
+            }
+
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             //射撃ステートが構えの場合、射撃入力を受け付ける
             if (_shootingType == ShootingStateType.Stance)
             {
@@ -120,8 +127,26 @@ namespace InGame.Player.Ability.Effect.Shooting
 
         protected override void OnEndAbility()
         {
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            EndStance();
             EndAnimation();
+        }
+
+        /// <summary>
+        /// Ends the stance from every exit path (button release, evasion, ult and stun).
+        /// The control state is restored only while this stance still owns the aim state;
+        /// this prevents a cancelled gun from unlocking an ult that just took control.
+        /// </summary>
+        private void EndStance()
+        {
+            bool wasAiming = _aimCameraController != null && _aimCameraController.IsAim;
+            _shootingType = ShootingStateType.None;
+            _lastShootingType = ShootingStateType.None;
+            ApplyCameraState(ShootingStateType.None);
+
+            if (wasAiming && !_playerManager.IsStun)
+                _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+
+            OnStopTheStance();
         }
 
         /// <summary>

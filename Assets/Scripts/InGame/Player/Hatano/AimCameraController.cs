@@ -34,7 +34,7 @@ public class AimCameraController : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if(!HasInputAuthority || MainCamera == null) return;
-        
+
         if (IsAim)
         {
             AimOrigin = MainCamera.transform.position;
@@ -63,6 +63,26 @@ public class AimCameraController : NetworkBehaviour
     {
         AimOrigin = aimOrigin;
         AimDirection = aimDirection;
+
+        // The state authority owns the replicated transform.  Updating only the
+        // input-authority transform made remote clients see an aiming player
+        // continue to face its movement direction.
+        if (IsAim)
+        {
+            var forward = aimDirection;
+            forward.y = 0f;
+            if (forward.sqrMagnitude > Mathf.Epsilon)
+                transform.forward = forward.normalized;
+        }
+    }
+
+    /// <summary>Ends aiming and restores the normal camera/UI for every peer.</summary>
+    public void StopAim()
+    {
+        if (!IsAim) return;
+
+        RPC_NormalCamera();
+        RPC_CrosshairToggleChange(false);
     }
 
     /// <summary>
