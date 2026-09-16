@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 
 namespace InGame.TreasureChest
@@ -15,15 +16,17 @@ namespace InGame.TreasureChest
     public struct TriggerContext
     {
         public readonly Vector3 CenterPosition;
+        public readonly NetworkRunner Runner;
 
-        private TriggerContext(Vector3 centerPosition)
+        private TriggerContext(Vector3 centerPosition,NetworkRunner runner)
         {
             CenterPosition = centerPosition;
+            Runner = runner;
         }
 
-        public static TriggerContext Create(Vector3 centerPosition)
+        public static TriggerContext Create(Vector3 centerPosition,NetworkRunner runner)
         {
-           return new TriggerContext(centerPosition);
+           return new TriggerContext(centerPosition,runner);
         }
     }
 }
