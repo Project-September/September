@@ -48,7 +48,7 @@ namespace September.InGame.Kraken
         [Networked] private NetworkBool MagicCircleFinished { get; set; }
 
         [Header("ダメージ設定")]
-        [SerializeField] private int _dealScore = 10;
+        [SerializeField] private int _dealScoreMultiplier = 1;
 
         [Header("出現時間設定")]
         [Tooltip("誰にもインタラクトされなかった場合に自動的に退場するまでの時間")]
@@ -386,9 +386,9 @@ namespace September.InGame.Kraken
 
         public void TakeHit(ref HitData hitData)
         {
-            if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
+            if (HasStateAuthority && hitData.HitActionType != HitActionType.Heal)
             {
-                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, _dealScore);
+                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, hitData.Amount * _dealScoreMultiplier);
             }
         }
 
