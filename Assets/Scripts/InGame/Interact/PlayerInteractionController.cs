@@ -288,7 +288,8 @@ namespace InGame.Interact
         public void RemoteInteractionCancel(ref float timer)
         {
             IsRemoting = false;
-            _remotePreviewObject = null;
+            // 候補はローカルの照準検出が更新する。射撃していない間もホストでは
+            // 毎Tickここを通るため、進行の中断で候補まで消すとUIが点滅する。
             timer = 0;
             RemoteInteractTimer = 0f;
             CancelInteraction();
