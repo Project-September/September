@@ -198,7 +198,7 @@ namespace InGame.Jewelry
             }
         }
 
-        private void SpawnJewelryGroup(Vector3 centerPosition, JewelrySpawnSetting spawnSetting)
+        public void SpawnJewelryGroup(Vector3 centerPosition, JewelrySpawnSetting spawnSetting)
         {
             centerPosition.y += spawnSetting.Height;
 

@@ -14070,6 +14070,18 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883942]._hitEffectPositionOffset.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883942]._hitEffectPositionOffset.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883942]._hitEffectPositionOffset.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883942]._normalAttackAnimationClip
       value: 
       objectReference: {fileID: 7400000, guid: a487619fcfe31c84fb9a904ec7a0e774, type: 2}
@@ -14276,10 +14288,6 @@ PrefabInstance:
     - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020943087661863767, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _requiredScore
-      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 7325268686366126974, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_PlayableAsset
@@ -15222,7 +15230,6 @@ MonoBehaviour:
   _kunaiSpeed: 100
   _bulletMark: {fileID: 7762581465889203969, guid: 052631cb43762b9479c2428dc1d6ca4d, type: 3}
   _crosshairPrefab: {fileID: 2541600367538618662, guid: a369727939273664ea0cfb03757f02c7, type: 3}
-  _otherPlayers: []
   _State: 0
 --- !u!114 &6364334948149518988
 MonoBehaviour:

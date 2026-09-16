@@ -1,6 +1,8 @@
 using Fusion;
+using InGame.Common;
 using InGame.Player.Ability;
 using Result;
+using System.Linq;
 using UnityEngine;
 
 namespace InGame.Player
@@ -9,6 +11,12 @@ namespace InGame.Player
     {
         [SerializeField] MimickingParams _mimickingParams;
         [SerializeField] RevealAttackParams _attackParams;
+        [Header("エクスカリバー装備時の待機モーション")]
+        [SerializeField] AnimationClip _armoryWaitClip;
+
+        AnimationClipPlayer _animationClipPlayer;
+        PlayerEquipmentManager _equipmentManager;
+        AnimationClip _defaultWaitClip;
 
 #if UNITY_EDITOR
         [Header("Gizmo確認用")]
@@ -23,6 +31,41 @@ namespace InGame.Player
 
         [Networked, HideInInspector]
         public ExhibitType CurrentExhibitType { get; set; } = ExhibitType.None;
+
+        public override void Spawned()
+        {
+            base.Spawned();
+
+            _animationClipPlayer = GetComponent<AnimationClipPlayer>();
+            _equipmentManager = GetComponent<PlayerEquipmentManager>();
+            if (!_animationClipPlayer || !_equipmentManager) return;
+
+            _defaultWaitClip = _animationClipPlayer.WaitClip;
+            _equipmentManager.Equipped += OnEquipmentChanged;
+            _equipmentManager.Unequipped += OnEquipmentChanged;
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (_equipmentManager)
+            {
+                _equipmentManager.Equipped -= OnEquipmentChanged;
+                _equipmentManager.Unequipped -= OnEquipmentChanged;
+            }
+
+            if (_animationClipPlayer)
+                _animationClipPlayer.SetWaitClip(_defaultWaitClip);
+        }
+
+        /// <summary>エクスカリバーの装備状態に合わせてタカムラの待機姿勢を切り替える。</summary>
+        void OnEquipmentChanged(Equipment _)
+        {
+            if (!_animationClipPlayer || !_equipmentManager) return;
+
+            bool hasArmory = _equipmentManager.CurrentEquipments.Values
+                .Any(equipment => equipment.Type == EquipmentType.Armory);
+            _animationClipPlayer.SetWaitClip(hasArmory ? _armoryWaitClip : _defaultWaitClip);
+        }
 
         protected override float GetMoveMagnification()
         {

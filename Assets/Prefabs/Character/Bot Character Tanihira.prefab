@@ -304,10 +304,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bot Character Tanihira
       objectReference: {fileID: 0}
-    - target: {fileID: 8723154009885109927, guid: 4e3821407920e444fa000f0867465095, type: 3}
-      propertyPath: _requiredScore
-      value: 500
+    - target: {fileID: 9063826164472942222, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_SceneBindings.Array.size
+      value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 9063826164472942222, guid: 4e3821407920e444fa000f0867465095, type: 3}
+      propertyPath: m_SceneBindings.Array.data[8].key
+      value: 
+      objectReference: {fileID: 8306306375264181983, guid: ac378c5bb1e5c644a81a297628ca160c, type: 2}
     m_RemovedComponents:
     - {fileID: 2834721467161433359, guid: 4e3821407920e444fa000f0867465095, type: 3}
     - {fileID: 1503785826349280166, guid: 4e3821407920e444fa000f0867465095, type: 3}
@@ -507,6 +511,8 @@ MonoBehaviour:
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
   _attackWeapon: {fileID: 0}
+  _lockOnSearchRadius: 20
+  _lockOnVerticalRange: 1.5
   _buildGenerator: {fileID: 1713223934560425713}
   _playerStatus: {fileID: 786117970274265609}
   _CurrentPlayerControlState: 0
@@ -514,6 +520,8 @@ MonoBehaviour:
     _value: 0
   _IsMovable:
     _value: 1
+  _IsLockOnActive:
+    _value: 0
 --- !u!114 &3475998015589936158
 MonoBehaviour:
   m_ObjectHideFlags: 0

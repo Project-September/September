@@ -1,33 +1,37 @@
 using System;
+using InGame.Common;
 using September.Common;
 using UnityEngine;
+using Fusion;
 
 namespace InGame.Player.Ability.Effect.Shooting
 {
     [Serializable]
     public abstract class ShootingAbilityBase : AbilityBase
     {
-        [Header("AimCameraController")]
-        [SerializeField] protected AimCameraController _aimCameraController;
-        
+        [Header("AnimationClipPlayer"), SerializeField] private AnimationClipPlayer _animationClipPlayer;
+        [Header("AimCameraController"), SerializeField] protected AimCameraController _aimCameraController;
         //現在と最後の射撃ステートを比較して状態の管理を行う
-        [Header("射撃ステート（現在）")]
-        [SerializeField] protected ShootingStateType _shootingType;
-        [Header("射撃ステート（最後）")]
-        [SerializeField] protected ShootingStateType _lastShootingType;
-
+        [Header("射撃ステート（現在）"), SerializeField] protected ShootingStateType _shootingType;
+        [Header("射撃ステート（最後）"), SerializeField] protected ShootingStateType _lastShootingType;
         [Header("射撃Abilityの設定")]
-        [Header("射撃距離")]
-        [SerializeField] protected float _shootingDistance;
-        [Header("マズル（数に応じて追加）")]
-        [SerializeField] protected Transform[] _muzzlePos;
+        [Header("射撃距離"), SerializeField] protected float _shootingDistance;
+        [Header("マズル（数に応じて追加）"), SerializeField] protected Transform[] _muzzlePos;
+        [Header("AnimationClip")]
+        [Header("構え"), SerializeField] private AnimationClip _stanceAnimationClip;
+        [Header("撃つ"), SerializeField] private AnimationClip _shootAnimationClip;
         
         private PlayerManager _playerManager;
 
+        private NetworkBool _isShootingAnimation; // 射撃アニメーションを再生済みか
+        
         protected override void OnStart()
         {
             if(_playerManager == null)
                 _playerManager = Parameter.Owner.GetComponent<PlayerManager>();
+            
+            _animationClipPlayer.SetAim(true);
+            _animationClipPlayer.PlayOnUpperBody(_stanceAnimationClip);
         }
 
         /// <summary>
@@ -35,7 +39,6 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// </summary>
         protected void ShootingInputJudgment()
         {
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             //射撃ステートが構えの場合、射撃入力を受け付ける
             if (_shootingType == ShootingStateType.Stance)
             {
@@ -43,10 +46,17 @@ namespace InGame.Player.Ability.Effect.Shooting
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
                     OnShooting();
+                    if (!_isShootingAnimation)
+                    {
+                        _isShootingAnimation = true;
+                        _animationClipPlayer.PlayOnUpperBody(_shootAnimationClip);
+                    }
+                   
                 }
                 else //射撃入力がされていないときに行う処理
                 {
                     OnNoShooting();
+                    _isShootingAnimation = false;
                 }
             }
 
@@ -59,6 +69,7 @@ namespace InGame.Player.Ability.Effect.Shooting
                 _shootingType = ShootingStateType.None;
                 _lastShootingType = ShootingStateType.None;
                 OnStopTheStance();
+                EndAnimation();
             }
         }
         
@@ -110,6 +121,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         protected override void OnEndAbility()
         {
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            EndAnimation();
         }
 
         /// <summary>
@@ -126,5 +138,15 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// 構え状態が終了したときに行う処理を書く
         /// </summary>
         protected virtual void OnStopTheStance(){}
+
+        /// <summary>
+        /// アニメーションを停止
+        /// </summary>
+        private void EndAnimation()
+        {
+            _isShootingAnimation = false;
+            _animationClipPlayer.PlayOnUpperBody(null);
+            _animationClipPlayer.SetAim(false);
+        }
     }
 }
