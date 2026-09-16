@@ -6,6 +6,7 @@ namespace September.Lobby
 {
     public class HowToPlayView : MonoBehaviour
     {
+        [SerializeField] GameObject _backGround;
         [SerializeField] GameObject _howToPlayPanel;
         [SerializeField] Button _closeButton;
         [SerializeField] Selectable _selectWhenShow;
@@ -35,12 +36,14 @@ namespace September.Lobby
         public void OpenHowToPlayPanel()
         {
             _howToPlayPanel.SetActive(true);
+            _backGround.SetActive(true);
             EventSystem.current.SetSelectedGameObject(_selectWhenShow.gameObject);
         }
 
         public void CloseHowToPlayPanel()
         {
             _howToPlayPanel.SetActive(false);
+            _backGround.SetActive(false);
             EventSystem.current.SetSelectedGameObject(_selectWhenHide.gameObject);
         }
     }
