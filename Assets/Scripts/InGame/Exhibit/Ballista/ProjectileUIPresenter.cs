@@ -1,3 +1,4 @@
+using Fusion;
 using UnityEngine;
 
 namespace September.InGame.Exhibit
@@ -17,7 +18,7 @@ namespace September.InGame.Exhibit
 			_projectile.OnAmmoChanged -= UpdateAmmo;
 		}
 
-		private void UpdateAmmo(int ammo, float coolTime)
+		private void UpdateAmmo(int ammo, float coolTime, PlayerRef PlayerRef)
 		{
 			_ammoView.UpdateAmmo(ammo, coolTime);
 		}
