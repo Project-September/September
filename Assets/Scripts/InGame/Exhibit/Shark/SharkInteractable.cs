@@ -21,6 +21,7 @@ public class SharkInteractable : MountableExhibitBase
     [Header("表示切り替え")]
     [SerializeField] private GameObject _displayModel;
     [SerializeField] private GameObject _hungSharkObject;
+    [SerializeField] private Collider[] _ridingColliders;
 
     [SerializeField] Transform _cameraTransform;
 
@@ -155,6 +156,12 @@ public class SharkInteractable : MountableExhibitBase
     {
         if (_displayModel != null) _displayModel.SetActive(isRiding);
         if (_hungSharkObject != null) _hungSharkObject.SetActive(!isRiding);
+
+        if (_ridingColliders == null) return;
+        foreach (var ridingCollider in _ridingColliders)
+        {
+            if (ridingCollider != null) ridingCollider.enabled = isRiding;
+        }
     }
 
     /// <summary>
