@@ -25,8 +25,7 @@ namespace InGame.Player.Ability
                 damage,
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
-            damageable.TakeHit(ref hitData);
-            _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
+            ApplyHitAndUpdateAttackBuild(hitInfo, damageable, ref hitData, _buildGenerator);
 
             var playerMovement = hitInfo.GetComponentInParent<PlayerMovement>();
             if (playerMovement != null)
