@@ -35,6 +35,13 @@ namespace CRISound
         public static void PlayVoice(string cueSheet, string cueName) =>
         CuePlayAtomExPlayer.Instance.Player(SoundType.Voice).Play(cueSheet, cueName);
 
+        public static void PlayVoiceExclusive(string cueSheet, string cueName)
+        {
+            var voicePlayer = CuePlayAtomExPlayer.Instance.Player(SoundType.Voice);
+            voicePlayer.Stop();
+            voicePlayer.Play(cueSheet, cueName);
+        }
+
         public static CuePlayAtomExPlayer.SEPlayerWith3D.Sound3D PlaySE(Vector3 pos, string cueSheet, string cueName) =>
         CuePlayAtomExPlayer.SE.Play3D(pos, cueSheet, cueName);
 
