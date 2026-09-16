@@ -18,14 +18,13 @@ namespace InGame.Jewelry
         /// <summary>直前の宝石の数を保存する配列</summary>
         int[] _preJewelryQuantities;
         JewelryInfo[] _jewelryInfos;
+        int[] _pendingRestoredQuantities;
         bool _initialized;
 
-        event Action<JewelryType, Sprite> _onInitialize;
+        event Action<JewelryType, JewelryInfo> _onInitialize;
         event Action<JewelryType, int> _onUpdateJewelryQuantity;
 
-        public int JewelryCount => CalculateJewelryScore();
-
-        public Action OnInitialize(Action<JewelryType, Sprite> act)
+        public Action OnInitialize(Action<JewelryType, JewelryInfo> act)
         {
             _onInitialize += act;
             return () => _onInitialize -= act;
@@ -56,14 +55,17 @@ namespace InGame.Jewelry
             foreach (var info in jewelryInfos)
             {
                 var jewelryType = info.JewelryInfo.JewelryType;
-                var quantity = info.JewelryCount;
+                var quantity = _pendingRestoredQuantities != null
+                               && (int)jewelryType < _pendingRestoredQuantities.Length
+                    ? _pendingRestoredQuantities[(int)jewelryType]
+                    : info.JewelryCount;
 
                 if (HasStateAuthority)
                 {
                     _jewelryQuantities.Set((int)jewelryType, quantity);
                 }
 
-                _onInitialize?.Invoke(jewelryType, info.JewelryInfo.JewelrySprite);
+            _onInitialize?.Invoke(jewelryType, info.JewelryInfo);
             }
 
             var score = CalculateJewelryScore();
@@ -76,6 +78,43 @@ namespace InGame.Jewelry
                 _preJewelryQuantities[i] = _jewelryQuantities.Get(i);
             }
             _initialized = true;
+            _pendingRestoredQuantities = null;
+        }
+
+        /// <summary>Prefab交換をまたいで引き継ぐため、種類ごとの現在所持数を複製して返す。</summary>
+        public int[] CaptureJewelryQuantities()
+        {
+            var quantities = new int[(int)JewelryType.JewelryTypeCount];
+            for (int i = 0; i < quantities.Length; i++)
+                quantities[i] = _jewelryQuantities.Get(i);
+            return quantities;
+        }
+
+        /// <summary>
+        /// Prefab交換前の所持数を復元する。
+        /// 初期化前に呼ばれた場合は、Initでキャラクター既定値を設定する代わりにこの値を使用する。
+        /// </summary>
+        public void RestoreJewelryQuantities(int[] quantities)
+        {
+            if (quantities == null) return;
+
+            if (!_initialized)
+            {
+                _pendingRestoredQuantities = (int[])quantities.Clone();
+                return;
+            }
+
+            if (!HasStateAuthority) return;
+
+            int count = Mathf.Min(quantities.Length, (int)JewelryType.JewelryTypeCount);
+            for (int i = 0; i < count; i++)
+            {
+                _jewelryQuantities.Set(i, quantities[i]);
+                if (_preJewelryQuantities != null && i < _preJewelryQuantities.Length)
+                    _preJewelryQuantities[i] = quantities[i];
+            }
+
+            _onUpdateJewelryQuantity?.Invoke(JewelryType.NormalGem, CalculateJewelryScore());
         }
 
         public override void Render()
@@ -100,7 +139,7 @@ namespace InGame.Jewelry
         /// 現在のスコアを計算するメソッド
         /// </summary>
         /// <returns>現在のスコア</returns>
-        int CalculateJewelryScore()
+        public int CalculateJewelryScore()
         {
             int result = 0;
 
@@ -110,6 +149,19 @@ namespace InGame.Jewelry
 
                 // 所持数 * スコアを計算
                 result += _jewelryInfos[i].Score * current;
+            }
+
+            return result;
+        }
+
+        public int GetJewelryCount()
+        {
+            int result = 0;
+
+            for (int i = 0; i < (int)JewelryType.JewelryTypeCount; i++)
+            {
+                int current = _jewelryQuantities.Get(i);
+                result += current;
             }
 
             return result;

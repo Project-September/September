@@ -1,0 +1,119 @@
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+
+namespace September.Editor.HumanoidRig
+{
+    /// <summary>一覧 1 行に出す状態表示 (色付きラベルと詳細)。</summary>
+    internal readonly struct ModelRowInfo
+    {
+        public string Status { get; }
+        public Color StatusColor { get; }
+        public string Detail { get; }
+
+        public ModelRowInfo(string status, Color statusColor, string detail)
+        {
+            Status = status;
+            StatusColor = statusColor;
+            Detail = detail;
+        }
+
+        public static ModelRowInfo Plain(string detail) => new ModelRowInfo(string.Empty, Color.gray, detail);
+    }
+
+    /// <summary>
+    /// モデルアセットのパス一覧をチェックボックス付きで描画し、選択状態を保持する。
+    /// 行の状態表示は呼び出し側のデリゲートに委ねるため、どのタブからも使い回せる。
+    /// </summary>
+    internal sealed class ModelPathSelectionList
+    {
+        private const float PathColumnWidth = 320f;
+        private const float StatusColumnWidth = 64f;
+
+        private readonly List<string> _paths = new List<string>();
+        private readonly HashSet<string> _selected = new HashSet<string>(StringComparer.Ordinal);
+        private Vector2 _scroll;
+
+        public int Count => _paths.Count;
+
+        public IReadOnlyList<string> Selected => _paths.Where(_selected.Contains).ToList();
+
+        public int SelectedCount => _paths.Count(_selected.Contains);
+
+        public void SetPaths(IEnumerable<string> paths)
+        {
+            _paths.Clear();
+            _paths.AddRange(paths);
+            _selected.IntersectWith(_paths);
+        }
+
+        public void Clear()
+        {
+            _paths.Clear();
+            _selected.Clear();
+        }
+
+        public void Draw(string detailHeader, Func<string, ModelRowInfo> rowInfo, string emptyMessage,
+            Func<string, bool> canSelect = null)
+        {
+            if (canSelect != null) _selected.RemoveWhere(path => !canSelect(path));
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+            {
+                if (GUILayout.Button("全選択", EditorStyles.toolbarButton, GUILayout.Width(60f)))
+                {
+                    foreach (var path in _paths)
+                        if (canSelect == null || canSelect(path)) _selected.Add(path);
+                }
+                if (GUILayout.Button("全解除", EditorStyles.toolbarButton, GUILayout.Width(60f)))
+                {
+                    _selected.Clear();
+                }
+                GUILayout.Label("パス", GUILayout.Width(PathColumnWidth));
+                GUILayout.Label("状態", GUILayout.Width(StatusColumnWidth));
+                GUILayout.Label(detailHeader);
+            }
+
+            using (var scroll = new EditorGUILayout.ScrollViewScope(_scroll))
+            {
+                _scroll = scroll.scrollPosition;
+                if (_paths.Count == 0)
+                {
+                    EditorGUILayout.HelpBox(emptyMessage, MessageType.Info);
+                    return;
+                }
+                foreach (var path in _paths) DrawRow(path, rowInfo(path), canSelect == null || canSelect(path));
+            }
+        }
+
+        private void DrawRow(string path, ModelRowInfo info, bool canSelect)
+        {
+            using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
+            {
+                bool selected = _selected.Contains(path);
+                bool now;
+                using (new EditorGUI.DisabledScope(!canSelect))
+                    now = EditorGUILayout.Toggle(selected, GUILayout.Width(18f));
+                if (now != selected)
+                {
+                    if (now) _selected.Add(path);
+                    else _selected.Remove(path);
+                }
+
+                if (GUILayout.Button(path, EditorStyles.linkLabel, GUILayout.Width(PathColumnWidth)))
+                {
+                    EditorGUIUtility.PingObject(AssetDatabase.LoadMainAssetAtPath(path));
+                }
+
+                var style = new GUIStyle(EditorStyles.label);
+                style.normal.textColor = info.StatusColor;
+                GUILayout.Label(info.Status, style, GUILayout.Width(StatusColumnWidth));
+
+                EditorGUILayout.LabelField(info.Detail, EditorStyles.wordWrappedLabel);
+            }
+        }
+    }
+}
+#endif

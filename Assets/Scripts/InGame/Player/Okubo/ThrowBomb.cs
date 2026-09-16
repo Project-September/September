@@ -47,13 +47,13 @@ namespace InGame.Player.Okubo
 
             if (pressed.IsSet(PlayerButtons.Ability1))
             {
-                OnThrow();
+                //OnThrow();
             }
 
             _previousButtons = input.Buttons;
         }
 
-        private void OnThrow()
+        public void OnThrow()
         {
             if (_coolTimer > 0f)
                 return;

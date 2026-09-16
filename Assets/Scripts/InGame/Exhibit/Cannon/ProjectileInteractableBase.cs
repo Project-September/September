@@ -7,6 +7,8 @@ using InGame.Health;
 using InGame.Interact;
 using InGame.Player;
 using September.Common;
+using September.InGame.Fields;
+using September.InGame.UI;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -30,7 +32,13 @@ namespace September.InGame.Exhibit
 		protected IProjectileMovement _move;
 		protected PlayerManager _usingPlayer;
 		private AnimationClipPlayer _animationClipPlayer;
-		public event Action<int> OnAmmoChanged;
+		/// <summary>
+		/// 現在の弾丸が減った時のコールバック
+		/// 変数は球数、クールタイム
+		/// </summary>
+		public event Action<int, float> OnAmmoChanged;
+		public event Action<ProjectileInteractableBase> OnInteractStart;
+		public event Action<ProjectileInteractableBase> OnInteractEnd;
 
 		[Networked] private NetworkButtons _attackButton { get; set; }
 		[Networked] protected PlayerRef CurrentUsePlayerRef { get; set; }
@@ -41,6 +49,10 @@ namespace September.InGame.Exhibit
 		[Networked]
 		[OnChangedRender(nameof(AmmoChanged))]
 		private int CurrentAmmo { get; set; }
+		
+		public IReticleEffect ReticleEffect => _reticleEffect;
+
+		private bool _isSpawned;
 
 		public override void Spawned()
 		{
@@ -48,17 +60,31 @@ namespace September.InGame.Exhibit
 			_launcher = GetComponent<ProjectileLauncher>();
 			_move = GetComponent<IProjectileMovement>();
 			_reticleEffect?.Init();
+			_isSpawned = true;
+		}
+
+		public override void Despawned(NetworkRunner runner, bool hasState)
+		{
+			_isSpawned = false;
 		}
 
 		public override void Render()
 		{
 			base.Render();
-			_reticleEffect?.Render();
+			_move?.Render();
 
 			if (_animationClipPlayer && !_animationClipPlayer.IsPlayingTargetClip(_playerUseAnimationClip))
 			{
 				_animationClipPlayer.PlayClip(_playerUseAnimationClip);
 			}
+		}
+
+		private void LateUpdate()
+		{
+			if (!_isSpawned) return;
+
+			// NetworkRigidbodyが諸々のTransformを動かした後に描画する必要があるため、LateUpdateで呼び出す（Renderの後）
+			_reticleEffect?.Render();
 		}
 
 		public override void FixedUpdateNetwork()
@@ -105,11 +131,14 @@ namespace September.InGame.Exhibit
 			RPC_StartAnimation(true);
 
 			Object.AssignInputAuthority(CurrentUsePlayerRef);
-
+			// 操作UIの切り替え用処理
+			RPC_ChangeDescriptionUI(CurrentUsePlayerRef, ControlDescriptionType.Exhibit);
 			// 使用中のプレイヤーに対する処理
 			if (!_usingPlayer) return;
 			GetPlayerAnimatorClipPlayer(_usingPlayer);
 			PlayerActive(false);
+			
+			// モジュール関連の初期化
 			_move.InitializeStateAuthority(_usingPlayer.Object, playerRef);
 			FireBulletController.Init();
 			CurrentAmmo = FireBulletController.CurrentAmmo;
@@ -147,10 +176,14 @@ namespace September.InGame.Exhibit
 		protected virtual void CheckInteractEnd(PlayerInput input)
 		{
 			if (!HasStateAuthority) return;
-
-			if (input.Buttons.IsSet(PlayerButtons.Interact) && InteractEndLockTimer.ExpiredOrNotRunning(Runner))
+			
+			// フィールド外に出た場合の強制終了
+			if ((OutOfFieldArea.I && OutOfFieldArea.I.IsOutOfField(_usingPlayer.transform.position)) ||
+			    // Interactボタンが押されたときの強制終了
+			    (input.Buttons.IsSet(PlayerButtons.Evasion) && InteractEndLockTimer.ExpiredOrNotRunning(Runner)))
 				InteractEnd();
-
+			
+			// タイムラグをインタラクト後に発生させる場合の終了処理
 			if (WaitExitTimer.Expired(Runner))
 			{
 				WaitExitTimer = TickTimer.None;
@@ -163,11 +196,22 @@ namespace September.InGame.Exhibit
 		/// </summary>
 		public void InteractEnd()
 		{
+			// 被弾と入力解除などから同じTickに複数回呼ばれる場合がある。
+			// 既に終了済みなら、初期値のPlayerRefで辞書を参照せず終了する。
+			if (CurrentUsePlayerRef.IsNone)
+				return;
+
 			SetCooldown();
 			_move.Reset();
 			RPC_StartAnimation(false);
 			Object.RemoveInputAuthority();
 			RPC_SetCameraPriority(CurrentUsePlayerRef, 5);
+			WaitExitTimer = TickTimer.None;
+			
+			// 操作UIの切り替え用処理
+			PlayerDatabase.Instance.PlayerDataDic.TryGet(CurrentUsePlayerRef, out var playerData);
+			ControlDescriptionType type = CharacterDataContainer.Instance.GetControlDescriptionType(playerData.CharacterType);
+			RPC_ChangeDescriptionUI(CurrentUsePlayerRef, type);
 
 			if (!_usingPlayer) return;
 			PlayerActive(true);
@@ -200,8 +244,15 @@ namespace September.InGame.Exhibit
 
 		private void SetCooldown()
 		{
+			if(CurrentUsePlayerRef.IsNone) return;
 			// クールダウン処理
-			var chara = PlayerDatabase.Instance.PlayerDataDic[CurrentUsePlayerRef].CharacterType;
+			var chara = CharacterType.All;
+			if (PlayerDatabase.Instance != null
+			    && PlayerDatabase.Instance.PlayerDataDic.TryGet(CurrentUsePlayerRef, out var playerData))
+			{
+				chara = playerData.CharacterType;
+			}
+
 			var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
 				? all
 				: _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
@@ -214,6 +265,18 @@ namespace September.InGame.Exhibit
 		{
 			EffectActive(currentPlayer, isActive);
 			_move.Initialize();
+			if(currentPlayer != Runner.LocalPlayer) return;
+			if(isActive) OnInteractStart?.Invoke(this);
+			else OnInteractEnd?.Invoke(this);
+		}
+		
+		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+		private void RPC_ChangeDescriptionUI(PlayerRef target, ControlDescriptionType mode)
+		{
+			if (Runner.LocalPlayer == target)
+			{
+				UIController.I.ChangeDescriptionUI(mode);
+			}
 		}
 
 		private void GetPlayerAnimatorClipPlayer(PlayerManager playerManager)
@@ -258,7 +321,7 @@ namespace September.InGame.Exhibit
 
 		private void AmmoChanged()
 		{
-			OnAmmoChanged?.Invoke(CurrentAmmo);
+			OnAmmoChanged?.Invoke(CurrentAmmo, LastFireTimer.RemainingTime(Runner) ?? 0f);
 		}
 
 		#region Helper
@@ -266,7 +329,7 @@ namespace September.InGame.Exhibit
 		[Rpc(RpcSources.All, RpcTargets.All)]
 		private void RPC_SetCameraPriority(PlayerRef playerRef, int priority)
 		{
-			if (Runner.LocalPlayer != playerRef) return;
+			if (Runner.LocalPlayer != playerRef || _cameraController == null) return;
 			_cameraController.Priority = priority;
 			_cameraController.MoveToTopOfPrioritySubqueue();
 		}
@@ -278,6 +341,7 @@ namespace September.InGame.Exhibit
 	{
 		public void InitializeStateAuthority(NetworkObject playerObject, PlayerRef playerRef);
 		public void Initialize();
+		public void Render();
 		public void Update(PlayerInput input);
 		public void Reset();
 	}

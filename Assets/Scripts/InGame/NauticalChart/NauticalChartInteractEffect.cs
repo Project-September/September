@@ -1,28 +1,30 @@
 using Fusion;
 using InGame.Interact;
-using NaughtyAttributes;
 using UnityEngine;
 
-namespace InGame.Exhibit
+namespace September.InGame.NauticalChart
 {
     /// <summary> 海図のインタラクション効果を制御するクラス </summary>
-    public class NauticalChartInteractEffect : NetworkBehaviour
+    public class NauticalChartInteractEffect : CharacterInteractEffectBase
     {
-        [SerializeReference, SubclassSelector] private IFogController _fogController;
+        [SerializeField] private NauticalChartInteractable _nauticalChartInteractable;
 
-        public void OnInterractStart(IInteractableContext context, InteractableBase target)
+        private PlayerRef _interactPlayerRef;
+
+        /// <summary> NauticalChartInteractEffectを複製して返す </summary>
+        public override CharacterInteractEffectBase Clone()
         {
-            var playerRef = PlayerRef.FromEncoded(context.Interactor);
-            RPC_IsRestrictedPlayer(playerRef);
+            return new NauticalChartInteractEffect
+            {
+                _nauticalChartInteractable = _nauticalChartInteractable
+            };
         }
 
-        /// <summary> RPCで制限されたプレイヤーかどうかを判定する </summary>
-        /// <param name="interactPlayerRef"></param>
-        [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RPC_IsRestrictedPlayer(PlayerRef interactPlayerRef)
+        public override void OnInteractStart(IInteractableContext context, InteractableBase target)
         {
-            if (Runner.LocalPlayer == interactPlayerRef) return;
-            _fogController.ShowFog();
+            _interactPlayerRef = PlayerRef.FromEncoded(context.Interactor);
+            _nauticalChartInteractable.RPC_OnInteractStart(_interactPlayerRef);
+            _nauticalChartInteractable.FixedUpdateNetwork();
         }
     }
 }

@@ -8,5 +8,8 @@ namespace September.Common
         Tanihira,
         Sarutobi,
         All,
+        Hatano,
+        Okubo,
+        Takamura,
     }
 }

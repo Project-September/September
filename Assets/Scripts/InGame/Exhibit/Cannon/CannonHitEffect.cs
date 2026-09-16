@@ -10,31 +10,43 @@ namespace September.InGame.Exhibit
 	public class CannonHitEffect : IProjectileHitEffect
 	{
 		[SerializeField] private ParticleSystem _explosionParticlePrefab;
+		[SerializeField] private ParticleSystem _explosionGroundParticlePrefab;
 		[SerializeField] private float _radius;
 		[SerializeField] private int _damage;
 		[SerializeField] private float _knockBackPower = 10;
 		[SerializeField] private float _knockBackUpwardPower = 2;
 		[SerializeField] private float _knockBackDuration = 0.5f;
 		[SerializeField] private LayerMask _hitLayer;
+		[SerializeField] private LayerMask _groundLayer;
+		[SerializeField] private Vector3 _effectScale;
 		private ParticleSystem _explosionParticle;
+		private ParticleSystem _explosionGroundParticle;
 
-		public void Initialize()
+		public void Initialize(NetworkRunner runner)
 		{
 			_explosionParticle = Object.Instantiate(_explosionParticlePrefab);
+			_explosionParticle.transform.localScale = _effectScale;
 			_explosionParticle.Stop();
+			
+			_explosionGroundParticle = Object.Instantiate(_explosionGroundParticlePrefab);
+			_explosionGroundParticle.transform.localScale = _effectScale;
+			_explosionGroundParticle.Stop();
 		}
 		
-		public void PlayEffect(Vector3 position, Vector3 normal)
+		public void OnHit(Vector3 position, Vector3 normal)
 		{
+			// ヒット地点のlayerによって再生するパーティクルを変える
+			ParticleSystem useParticle=Physics.Raycast(position, -normal, out _, 1, _groundLayer)?
+				_explosionGroundParticle : _explosionParticle;
+			if (!useParticle) return;
 			// 着弾時のエフェクト
-			_explosionParticle.transform.position = position;
-			_explosionParticle.transform.up = normal.normalized;
+			useParticle.transform.position = position;
+			useParticle.transform.up = normal.normalized;
 			
-			if (!_explosionParticle) return;
-			_explosionParticle.Play(true);
+			useParticle.Play(true);
 		}
 
-		public void Hit(Vector3 position, Vector3 normal, GameObject hitObject, PlayerRef usePlayer)
+		public void OnStateAuthorityHit(Vector3 position, Vector3 normal, GameObject hitObject, PlayerRef usePlayer)
 		{
 			var colliders = Physics.OverlapSphere(position, _radius, _hitLayer); // TODO:当たり判定統一するかも
 			// ダメージ処理
@@ -57,7 +69,7 @@ namespace September.InGame.Exhibit
 
 		private void TakeDamage(IDamageable damageable, PlayerRef usingPlayer)
 		{
-			var hitData = new HitData(HitActionType.Damage, _damage, usingPlayer,
+			var hitData = new HitData(HitActionType.RangedDamage, _damage, usingPlayer,
 				damageable.OwnerPlayerRef);
 			PlayerDatabase.Instance.PlayerDataDic.Get(damageable.OwnerPlayerRef);
 			PlayerDatabase.Instance.PlayerDataDic.Get(usingPlayer);
