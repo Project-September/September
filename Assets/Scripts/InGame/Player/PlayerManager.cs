@@ -1,7 +1,6 @@
 using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
-using InGame.Player.Hatano;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
@@ -33,7 +32,6 @@ namespace InGame.Player
         [SerializeField] PlayerStatus _playerStatus;
 
         PlayerMovement _playerMovement;
-        HatanoAbilityStatusManagement _hatanoAbilityStatus;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
         PlayerEffectController _playerEffectController;
@@ -102,6 +100,14 @@ namespace InGame.Player
         private RigidbodyConstraints _defaultConstraints;
 
         [Networked] public PlayerControlState CurrentPlayerControlState { get; private set; } = PlayerControlState.Normal;
+        [Networked] public bool IsMovementInputBlocked { get; private set; }
+
+        /// <summary>移動・ダッシュ・ジャンプ・回避の入力制限を状態権限側から設定する。</summary>
+        public void SetMovementInputBlocked(bool blocked)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority) return;
+            IsMovementInputBlocked = blocked;
+        }
 
         public void Start()
         {
@@ -147,7 +153,6 @@ namespace InGame.Player
         void InitComponents()
         {
             _playerMovement = GetComponent<PlayerMovement>();
-            _hatanoAbilityStatus = GetComponent<HatanoAbilityStatusManagement>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
             _rigidbody = GetComponent<Rigidbody>();
             if (TryGetComponent(out CameraController cameraController))
@@ -222,12 +227,11 @@ namespace InGame.Player
 
                 if (!IsStun && IsMovable && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
-                    bool isChangingWeapon = _hatanoAbilityStatus && _hatanoAbilityStatus.IsChangingWeapon;
                     // player movement に入力を与えて更新する_playerInputManager
-                    _playerMovement.UpdateMovement(isChangingWeapon ? Vector2.zero : input.MoveDirection,
-                        !isChangingWeapon && input.Buttons.IsSet(PlayerButtons.Dash), input.CameraYaw,
-                        !isChangingWeapon && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump),
-                        !isChangingWeapon && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
+                    _playerMovement.UpdateMovement(IsMovementInputBlocked ? Vector2.zero : input.MoveDirection,
+                        !IsMovementInputBlocked && input.Buttons.IsSet(PlayerButtons.Dash), input.CameraYaw,
+                        !IsMovementInputBlocked && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump),
+                        !IsMovementInputBlocked && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
                 }
 
                 // 乗車中は台車に移動を任せ、それ以外は接地・落下・速度を更新する。

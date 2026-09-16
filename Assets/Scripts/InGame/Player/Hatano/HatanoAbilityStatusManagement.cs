@@ -147,6 +147,7 @@ namespace InGame.Player.Hatano
             if (clip == null) return;
 
             IsChangingWeapon = true;
+            _playerManager.SetMovementInputBlocked(true);
             try
             {
                 _animClipPlayer.PlayOnUpperBody(null);
@@ -156,7 +157,10 @@ namespace InGame.Player.Hatano
             finally
             {
                 if (Object != null && Object.IsValid && HasStateAuthority)
+                {
                     IsChangingWeapon = false;
+                    _playerManager.SetMovementInputBlocked(false);
+                }
             }
         }
     }
