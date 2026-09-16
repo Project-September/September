@@ -4,7 +4,9 @@ using System.Threading;
 using Fusion;
 using NaughtyAttributes;
 using September.Common;
+using September.InGame.Rules;
 using September.InGame.UI;
+using September.NewResult.RankingPolicy;
 using UnityEngine;
 
 namespace September.InGame.Common
@@ -13,15 +15,27 @@ namespace September.InGame.Common
     {
         [Header("Timer Settings"), SerializeField, Label("TimerData")]
         private GameTimerData _timerData;
+
+        [Header("Game Settings"), SerializeField]
+        private GameRule _gameRule;
         
         private readonly Dictionary<PlayerRef, NetworkObject> _playerDataDic = new();
 
         private NetworkRunner _networkRunner;
+        private Ranking _ranking;
         public IReadOnlyDictionary<PlayerRef, NetworkObject> PlayerDataDic => _playerDataDic;
         public GameTimerData TimerData => _timerData;
+        public IGameRule GameRule => _gameRule;
         public CancellationTokenSource Cts { get; private set; }
 
         public System.Action GameStarted { get; set; }
+        public System.Action<PlayerRef, PlayerRef> PlayerKilled { get; set; }
+
+        private void Awake()
+        {
+            InGameDebugTimeInjector.Apply(_timerData);
+            StaticServiceLocator.Instance.Register(this);
+        }
 
         /// <summary>
         /// 現在のゲーム状態名を取得する
@@ -32,7 +46,7 @@ namespace September.InGame.Common
 
         private void Start()
         {
-            StaticServiceLocator.Instance.Register(this);
+            _gameRule.SetCurrentRule();
         }
 
         public void Register(ServiceLocator locator)
@@ -45,6 +59,11 @@ namespace September.InGame.Common
             Cts = new CancellationTokenSource();
             _networkRunner = FindFirstObjectByType<NetworkRunner>();
             if (_networkRunner == null) Debug.LogError("NetworkRunnerがありません");
+
+            _ranking = new Ranking();
+            _ranking.Initialize();
+            StaticServiceLocator.Instance.Register(_ranking);
+
             if (_states.Length > 0) base.Spawned();
         }
 
@@ -58,7 +77,17 @@ namespace September.InGame.Common
 
         public void AddPlayerObject(PlayerRef playerRef, NetworkObject networkObject)
         {
-            _playerDataDic.Add(playerRef, networkObject);
+            // 擬態などでPlayerのNetworkObjectが交換された場合も同じPlayerRefを更新できるようにする。
+            _playerDataDic[playerRef] = networkObject;
+        }
+
+        private void OnDestroy()
+        {
+            if (_ranking != null)
+            {
+                _ranking.Dispose();
+                _ranking = null;
+            }
         }
     }
 }

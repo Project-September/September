@@ -1,3 +1,4 @@
+using System;
 using InGame.Player;
 using September.Common;
 using September.InGame.UI;
@@ -5,11 +6,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using InGame.Common;
+using UnityEngine.Events;
 
 public class InGameDebugSetting : MonoBehaviour
 {
+    public static event Action<InGameDebugSetting> OnStart;
+
+    [SerializeField] private RectTransform _contentsRoot;
+    [SerializeField] private GameObject _toggleSettingPrefab;
+
     [SerializeField] private GameTimerData _gameTimerData;
-    
+
     [SerializeField] private TMP_InputField _beforeStartTimeInputField;
     [SerializeField] private Button _applyBeforeStartTimeButton;
     [SerializeField] private TMP_InputField _ingameTimeInputField;
@@ -19,7 +26,7 @@ public class InGameDebugSetting : MonoBehaviour
     [SerializeField] private TMP_InputField _motionNameInputField;
     [SerializeField] private Button _playMotionButton;
     [SerializeField] private Button _logPlayableMotionButton;
-    
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -63,6 +70,17 @@ public class InGameDebugSetting : MonoBehaviour
 
         // 利用可能なアニメーションクリップをログ出力
         _logPlayableMotionButton?.onClick.AddListener(LogAvailableAnimations);
+
+        OnStart?.Invoke(this);
+    }
+
+    public void RegisterToggleSetting(string settingName, Action<bool> setter, bool defaultValue = false)
+    {
+        var setting = Instantiate(_toggleSettingPrefab, _contentsRoot);
+        setting.GetComponent<Text>().text = settingName;
+        var toggle = setting.GetComponentInChildren<Toggle>();
+        toggle.isOn = defaultValue;
+        toggle.onValueChanged.AddListener(new UnityAction<bool>(setter));
     }
 
     private void PlayMotionOnLocalPlayer()
@@ -133,5 +151,10 @@ public class InGameDebugSetting : MonoBehaviour
         {
             Debug.LogWarning("AnimationClipsContainer が見つかりません");
         }
+    }
+
+    private void OnDestroy()
+    {
+        OnStart = null;
     }
 }

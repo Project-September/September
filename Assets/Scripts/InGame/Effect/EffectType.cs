@@ -1,6 +1,7 @@
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 public enum EffectType
 {
+    None = -1,
     Test,
     Warp,
     Tutankhamen,
@@ -28,5 +29,21 @@ public enum EffectType
     CooldownBig,
     CooldownPartition,
     CarDash,
+    JewelPickUp,
+    HulkUltImpact,
+    PenguinHuge,
+    KunaiUlt,
+    Thunder,
+    BallistaHit,
+    BallistaShoot,
+    CandleAura,
+    CannonShoot,
+    CannonHit,
+    CannonHitGround,
+    ExcaliburAttack,
+    ExcaliburStamp,
+    ExcaliburHit,
+    ExcaliburImpact,
+    Cursor
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

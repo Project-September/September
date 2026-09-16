@@ -1,0 +1,175 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bb23cd2aae0432b965beaa171d65944, type: 3}
+  m_Name: Haru
+  m_EditorClassIdentifier: 
+  CharacterType: 2
+  TemplatePrefab: {fileID: 8360875997416129576, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+  BotTemplatePrefab: {fileID: 1473268200689759529, guid: 438af04c2bad2894d8bfb59f2799e49e, type: 3}
+  GeneratedCharacterPrefab: {fileID: 2187076012426182504, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
+  OutputPath: Assets/Prefabs/Character
+  MoveSpeed: 1.7
+  GroundSlopeThreshold: 45
+  GroundLayer:
+    serializedVersion: 2
+    m_Bits: 159
+  OgreMoveSpeed: 2.04
+  OgreDashSpeed: 8.52
+  DashSpeed: 7.1
+  DashCooldown: 1
+  StaminaConsumption: 22
+  RotationSpeed: 720
+  MaxLedgeHeight: 1.5
+  MinLedgeHeight: 0.4
+  MaxLedgeDepth: 0.9
+  ReachDistance: 0.2
+  TimeToVault: 0.5
+  VaultCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 3.1011324
+      outSlope: 3.1011324
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.042589433
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _abilities:
+  - rid: 7765555134153883819
+  - rid: 7765555134153883820
+  _conditions:
+  - rid: 7765555134153883821
+  - rid: 7765555134153883822
+  _layerInfo:
+  - Type: 0
+    LayerMask: {fileID: 0}
+    Weight: 1
+    Additive: 0
+  - Type: 1
+    LayerMask: {fileID: 31900000, guid: e79b47197069d2745b4537a36e7dc837, type: 2}
+    Weight: 1
+    Additive: 0
+  - Type: 2
+    LayerMask: {fileID: 31900000, guid: f96fc62dae4e2664aa42686080ba4bbc, type: 2}
+    Weight: 0
+    Additive: 0
+  - Type: 3
+    LayerMask: {fileID: 0}
+    Weight: 0
+    Additive: 0
+  Wait: {fileID: 7400000, guid: 7c956bf30146acd4bb1b9fbb79e5ac17, type: 2}
+  Walk: {fileID: 7400000, guid: bcdcdc93ebc1e6445bcc205510e1ae2b, type: 2}
+  Run: {fileID: 7400000, guid: 3a4664b380a211248a76866ed6180b6f, type: 2}
+  JumpOver: {fileID: 7400000, guid: 64cbf72c59bebe548b89037fd481297c, type: 2}
+  JumpOverDuration: 0.6
+  FallDown: {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+  Faint: {fileID: 7400000, guid: 00a8b652748ed8f4ea8e54c508f4eb58, type: 2}
+  GetUp: {fileID: 7400000, guid: 185b7a4f581769045a34df560bf6ab0c, type: 2}
+  InteractRadius: 2.5
+  InteractMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  InteractAngle: 90
+  BaseInteractTime: 1
+  OgreInteractMultiplier: 1
+  InteractResponseTimeout: 3
+  InteractAngleBuffer: 10
+  InteractRadiusBuffer: 0.3
+  EquipmentData:
+  - _type: 0
+    _prefab: {fileID: 919132149155446097, guid: 2fc8ba7b63ad0f141a5c84041e00173e, type: 3}
+    _positionOffset: {x: -0.106, y: -0.296, z: -0.066}
+    _rotationOffset: {x: -0.00005879178, y: 255.00014, z: 179.99995}
+    _humanBodyBones: 18
+    _startingEquipment: 1
+    ClonedObject: {fileID: 0}
+  - _type: 1
+    _prefab: {fileID: 919132149155446097, guid: 004865cff7bc48743a8342854ad5326b, type: 3}
+    _positionOffset: {x: 0.119, y: 0.015, z: -0.073}
+    _rotationOffset: {x: 0, y: -180, z: 0}
+    _humanBodyBones: 18
+    _startingEquipment: 0
+    ClonedObject: {fileID: 0}
+  RequireScore: 2147483647
+  UltSequence: {fileID: 11400000, guid: 7928ee08f495b0c4492ff8184987a580, type: 2}
+  _animatorController: {fileID: 9100000, guid: f943d3aa900631f4397dc6a7d54ca24b, type: 2}
+  _avatar: {fileID: 9000000, guid: 10cbca10665106243a92a49e0e614984, type: 2}
+  StunEffectPositionOffset: {x: 0, y: 2, z: 0}
+  FootstepCueName: SE_Hulk_Footstep
+  PunchSwingCueName: SE_Player_Punch_Swing
+  PunchHitCueName: SE_Player_Punch_Hit
+  _footstepBlockClipList:
+  - {fileID: 7400000, guid: c426146fa1ef9fa41bae001fb50ec593, type: 2}
+  MeshFbx: {fileID: 919132149155446097, guid: c7e7c27f891362445ae42dcfbd5ec058, type: 3}
+  ReadTargetPrefab: {fileID: 1310722873612347470, guid: a53fa27f9ed0c8548a132c0b2e966b96, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7765555134153883819
+      type: {class: AbilityHammerAttack, ns: InGame.Player.Ability.Effect, asm: Scripts}
+      data:
+        _cooldown: 0
+        _phase: 0
+        IsEnabled: 1
+        _attackDamage: 55
+        _ogreAttackDamage: 110
+        _startHitCheckFrame: 8
+        _endHitCheckFrame: 10
+        _endAttackFrame: 11
+        _hitEffect: 18
+        _normalAttackAnimationClip: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
+        _animationClipPlayer: {fileID: 0}
+        _enableAutoAim: 1
+        _moveForwardSpeed: 3
+        _searchRadius: 3
+        _boxHalfExtents: {x: 0.85, y: 1, z: 0.85}
+        _boxLocalOffset: {x: 0, y: 1, z: 0}
+        _boxCastDistance: 1
+        _hitLayer:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        _triggerInteraction: 1
+        _debugHitBoxColor: {r: 0, g: 0.6, b: 1, a: 1}
+        _debugDrawDuration: 1
+        _buildGenerator: {fileID: 0}
+        _playerStatus: {fileID: 0}
+    - rid: 7765555134153883820
+      type: {class: AbilityHulkUlt, ns: InGame.Player.Ability.Effect, asm: Scripts}
+      data:
+        _cooldown: 5
+        _phase: 0
+        IsEnabled: 0
+        _radius: 30
+        _exhibitsCooldownTime: 5
+        _effectType: 8
+    - rid: 7765555134153883821
+      type: {class: AbilityHammerAttackCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+      data: 
+    - rid: 7765555134153883822
+      type: {class: AbilityUltCondition, ns: InGame.Player.Ability.Condition, asm: Scripts}
+      data:
+        _targetAbilityName: AbilityHulkUlt
+        _button: 7

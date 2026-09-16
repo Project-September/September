@@ -25,11 +25,12 @@ namespace InGame.Common
         #else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         #endif
-        static async void Init()
+        static void Init()
         {
             try
             {
-                Instance = await Addressables.LoadAssetAsync<AnimationClipsContainer>(AssetPath);
+                var handle = Addressables.LoadAssetAsync<AnimationClipsContainer>(AssetPath);
+                Instance = handle.WaitForCompletion();
             }
             catch (Exception e)
             {
@@ -50,6 +51,8 @@ namespace InGame.Common
         [Header("Layer Meta")]
         public LayerInfo.LayerType TargetLayer;
         public bool IsAdditive;
+        [Tooltip("ON にすると Humanoid の Foot IK (クリップに焼かれた足位置への補正) を切る。通常は OFF のままで、リターゲット時の足滑りを防ぐ")]
+        public bool DisableFootIK;
 
         public AnimationMontageStruct(float playSpeed = 1)
         {
@@ -59,6 +62,7 @@ namespace InGame.Common
             BlendOut = new LayerInfo.Blend();
             TargetLayer = LayerInfo.LayerType.Base;
             IsAdditive = false;
+            DisableFootIK = false;
         }
     }
 }

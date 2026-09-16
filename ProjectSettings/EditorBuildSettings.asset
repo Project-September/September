@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/NetworkMock/Title.unity
     guid: aa54f58c04bd52948b2c1d8690409ef7
   - enabled: 1
-    path: Assets/Scenes/NetworkMock/InGameMock.unity
+    path: Assets/Scenes/Maps/Museum/InGameMock.unity
     guid: 41bc177a3815d694c9753c8e79acda82
   - enabled: 1
     path: Assets/Scenes/03_Result.unity
@@ -21,7 +21,7 @@ EditorBuildSettings:
     path: Assets/Scenes/NetworkMock/Lobby.unity
     guid: 6a8a1e02f6e06b745b60399e1fa33c1a
   - enabled: 1
-    path: Assets/Scenes/Field.unity
+    path: Assets/Scenes/Maps/Museum/Field.unity
     guid: 49d38a7cd9601a94baabf80114e4131e
   - enabled: 1
     path: Assets/Scenes/NetworkMock/Result.unity
@@ -32,6 +32,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Result_Field.unity
     guid: d88eddb8049778f4b91c144ca1f74710
+  - enabled: 1
+    path: Assets/Scenes/Maps/Pirate/Pirate_Field.unity
+    guid: dfd7858ee4cd0c249b3ae61c4a0aa001
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: f6cb3f85ebbf85c45b9274aa20555b46, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

@@ -10,8 +10,6 @@ namespace InGame.Bot
 {
     public class BotStateMachine : MonoBehaviour
     {
-        [SerializeField] private NetworkObject _netObject;
-        public NetworkObject NetObject => _netObject;
         [SerializeField] private BotStateData _botStateData;
         [SerializeField] private PlayerMovement _playerMovement;
         /// <summary>NodeとBotが離れすぎて次のステートにする距離 </summary>

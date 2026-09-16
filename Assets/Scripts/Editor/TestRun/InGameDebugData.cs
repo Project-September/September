@@ -22,6 +22,7 @@ namespace September.Editor.InGameDebug
 				if (_lobbyData == null)
 				{
 					_lobbyData = LoadLobbyData() ?? new InGameDebugLobbyData();
+					_lobbyData.TimeSettings ??= new InGameDebugTimeSettings();
 				}
 
 				return _lobbyData;
@@ -67,8 +68,11 @@ namespace September.Editor.InGameDebug
 	{
 		// 拡張windowからゲームが開始したかどうか
 		public bool IsStartedFromExtensionWindow;
+		public MapType MapType;
 		public string LobbyName = "TestLobby";
 		public string Nickname = "TestPlayer";
+		public InGameDebugTimeSettings TimeSettings = new();
+
 		[SerializeField] private List<PlayerSetupData> _playerSetupData = new();
 		[NonSerialized] public bool RequestMoveToGameScene;
 		public List<PlayerSetupData> PlayerData => _playerSetupData;

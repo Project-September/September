@@ -1,4 +1,3 @@
-using September.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +24,7 @@ namespace September.Lobby
                     var obj = _buildObjects[i];
                     if (obj == null) continue;
                     obj.Init();
+                    obj.SetIconImage(builds[i].BuildSprite);
                     // ボタンでインデックスを直接選択できるように
                     var index = i;
                     obj.RegisterAction(() => MoveIndexForButton(index));
@@ -68,13 +68,6 @@ namespace September.Lobby
 
         public override void VisualizeSelection(int index)
         {
-            // 仮の決定描画
-            var colors = _decisionButton.colors;
-            colors.normalColor = Color.red;
-            colors.selectedColor = Color.red;
-            colors.highlightedColor = Color.red;
-            _decisionButton.colors = colors;
-
             // 現在選択中のものの描画処理
             _buildObjects[_currentSelectIndex]?.Decision();
 

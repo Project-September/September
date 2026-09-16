@@ -19,8 +19,7 @@ namespace September.Lobby
         [SerializeField] private Button _closeExplainButton;
         
         [SerializeField] private Image _selectedCharacterImage;
-        [SerializeField] private Sprite[] _selectedCharacterSprites;
-        
+
         private CharacterInfoPanel _currentFrontPanel;
         private CharacterInfoPanel _currentBackPanel;
         private void Start()
@@ -59,8 +58,7 @@ namespace September.Lobby
             _characterDisplay.SetCharacter(_currentCharacterIndex);
             //  表示を切り替え
             ChangeCharacterInfo(characterName, data.AbilityName, data.AbilityExplain).Forget();
-            if (index < 0 || index >= _selectedCharacterSprites.Length) return;
-            _selectedCharacterImage.sprite = _selectedCharacterSprites[index];
+            _selectedCharacterImage.sprite = data.CharacterPortrait;
         }
         private void SetCharacterIconsNavigation()
         {

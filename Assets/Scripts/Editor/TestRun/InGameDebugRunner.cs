@@ -39,6 +39,7 @@ namespace September.Editor.InGameDebug
 
 				case PlayModeStateChange.ExitingPlayMode:
 					lobbyData.IsStartedFromExtensionWindow = false;
+					InGameDebugTimeInjector.Clear();
 					InGameDebugDataRepository.SaveLobbyData();
 					break;
 			}
@@ -67,6 +68,7 @@ namespace September.Editor.InGameDebug
 			}
 			
 			NickNameProvider.SetNickName(_lobbyData.Nickname);
+			InGameDebugTimeInjector.Set(_lobbyData.TimeSettings);
 
 			// これがメインエディターであればLobbyを作成する。
 			if (SessionState.GetBool("InGameDebug.IsMainEditor", false))
@@ -96,7 +98,7 @@ namespace September.Editor.InGameDebug
 				if (index < PlayersData.Count)
 					playerDatabase.Rpc_SetCharacter(player.Key, PlayersData[index++].CharacterType);
 
-			networkManager.StartGame().Forget();
+			networkManager.StartGame(new GameStartContext(_lobbyData.MapType)).Forget();
 		}
 
 		private async UniTask JoinLobby()

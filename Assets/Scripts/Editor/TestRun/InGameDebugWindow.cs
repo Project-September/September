@@ -44,8 +44,18 @@ namespace September.Editor.InGameDebug
 			}
 
 			GUI.enabled = !Application.isPlaying;
+			_lobbyData.MapType = (MapType)EditorGUILayout.EnumPopup("Map Type", _lobbyData.MapType);
 			_lobbyData.LobbyName = EditorGUILayout.TextField("Lobby Name", _lobbyData.LobbyName);
 			_lobbyData.Nickname = EditorGUILayout.TextField("Nickname", _lobbyData.Nickname);
+
+			EditorGUILayout.BeginVertical("box");
+			EditorGUILayout.LabelField("Time Settings", EditorStyles.boldLabel);
+			_lobbyData.TimeSettings.PreStartTime = Mathf.Max(0, EditorGUILayout.IntField(
+				"Pre Start Time", _lobbyData.TimeSettings.PreStartTime));
+			_lobbyData.TimeSettings.GameTime = Mathf.Max(0f, EditorGUILayout.FloatField(
+				"Game Time", _lobbyData.TimeSettings.GameTime));
+			EditorGUILayout.EndVertical();
+
 			_scroll = EditorGUILayout.BeginScrollView(_scroll);
 
 			for (var i = 0; i < _lobbyData.PlayerData.Count; i++)

@@ -19,6 +19,13 @@ public enum ControlDescriptionType
     Tanihira,
     SarutobiAiming,
     TanihiraAiming,
+    Hatano,
+    HatanoAiming,
+    Okubo,
+    OkuboAiming,
+    Takamura,
+    Kraken,
+    AirPlane,
 }
 
 /// <summary>

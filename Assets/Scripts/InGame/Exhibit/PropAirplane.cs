@@ -12,7 +12,6 @@ using TMPro;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 using CRISound;
-using Cysharp.Threading.Tasks;
 using September.InGame.UI;
 
 namespace InGame.Exhibit
@@ -48,7 +47,8 @@ namespace InGame.Exhibit
         [SerializeField] private ParticleSystem _bulletMark;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _gunMaxDistance;
-        [SerializeField] private LayerMask _gunLayerMask = ~0;
+        [SerializeField] private LayerMask _shootingTargetLayerMask = ~0;
+        [SerializeField] private LayerMask _bulletHitLayerMask = ~0;
         [SerializeField] private float _castRadius;
         [Header("Debug")] [SerializeField] private TMP_Text _velocityText;
         [SerializeField] private TMP_Text _forwardSpeedText;
@@ -98,6 +98,7 @@ namespace InGame.Exhibit
         [SerializeField] private bool _isSpawned = false;
 
         private bool _isEnd;
+
         public override void Spawned()
         {
             _isSpawned = false;
@@ -312,7 +313,7 @@ namespace InGame.Exhibit
             _machineGunTimer = _fireInterval;
             var hits = new RaycastHit[20];
             var num = Physics.SphereCastNonAlloc(_firePoint.position, _castRadius, transform.forward, hits,
-                _gunMaxDistance, _gunLayerMask);
+                _gunMaxDistance, _shootingTargetLayerMask);
             for (int i = 0; i < num; i++)
             {
                 if(hits[i].point == Vector3.zero) continue;
@@ -321,7 +322,7 @@ namespace InGame.Exhibit
                 var direction =  hits[i].point - _firePoint.position;
                 var ray = new Ray(_firePoint.position, direction);
                 if(!Physics.Raycast(ray,out var info) || info.transform !=  hits[i].transform) continue;
-                var hitData = new HitData(HitActionType.Damage, _damageAmount, OwnerPlayerRef, damageable.OwnerPlayerRef, null,
+                var hitData = new HitData(HitActionType.RangedDamage, _damageAmount, OwnerPlayerRef, damageable.OwnerPlayerRef, null,
                     damageable);
                 damageable.TakeHit(ref hitData);
                 foreach (var muzzle in _muzzles)
@@ -333,7 +334,7 @@ namespace InGame.Exhibit
 
             foreach (var muzzle in _muzzles)
             {
-                var cast = Physics.Raycast(muzzle.position, transform.forward,out var info,_gunMaxDistance);
+                var cast = Physics.Raycast(muzzle.position, transform.forward, out var info, _gunMaxDistance, _bulletHitLayerMask);
                 RPC_PlayEffect(muzzle.position, info.point);
             }
         }
@@ -353,6 +354,8 @@ namespace InGame.Exhibit
             // 既に誰か乗っていたら乗れないよん
             if (!Runner.IsServer || OwnerPlayerRef != PlayerRef.None) return;
 
+            ForceSetInteractable = false;
+
             // set input authority
             OwnerPlayerRef = ownerPlayerRef;
             LastUsedCooldownTime = -9999f;
@@ -364,7 +367,7 @@ namespace InGame.Exhibit
             _ownerPlayerManager.RPC_SetUseGrav(false);
             _ownerPlayerManager.RPC_SetColliderActive(false);
             _ownerPlayerManager.RPC_SetMeshActive(false);
-            RPC_ChangeDescriptionUI(ownerPlayerRef, ControlDescriptionType.Exhibit);
+            RPC_ChangeDescriptionUI(ownerPlayerRef, ControlDescriptionType.AirPlane);
             RPC_SetIsKinematic(false);
             // 乗った時刻を記録
             GetOnTime = Runner.SimulationTime;
@@ -387,6 +390,8 @@ namespace InGame.Exhibit
         void GetOff()
         {
             if (!Runner.IsServer || OwnerPlayerRef == PlayerRef.None) return;
+
+            ForceSetInteractable = true;
             
             PlayerDatabase.Instance.PlayerDataDic.TryGet(OwnerPlayerRef, out var playerData);
             RPC_ChangeDescriptionUI(OwnerPlayerRef, playerData.CharacterType == CharacterType.Sarutobi? ControlDescriptionType.Sarutobi : ControlDescriptionType.Player);
@@ -422,8 +427,8 @@ namespace InGame.Exhibit
             //隊列がある場合の処理
             if (_ownerPlayerManager.TryGetComponent<FormationManager>(out var formationManager))
             {
-                formationManager.WarpFriendNearPlayer(_ownerPlayerManager.transform.position,
-                    _ownerPlayerManager.transform.rotation);
+                formationManager.WarpFriendNearPlayerWhenGrounded(
+                    _ownerPlayerManager.GetComponent<PlayerMovement>());
             }
             AudioBroadcaster.RequestStopSound(SoundCues.SE.ZeroFighter_Interact.Name);          // 飛行中のループ音(サウンドデータの関係でInteractの音で判定)
             AudioBroadcaster.RequestStopSound(SoundCues.SE.ZeroFighter_TakeoffGunFire.Name);    // もしくは射撃音を止める
@@ -471,11 +476,6 @@ namespace InGame.Exhibit
             if (_currentAccelText) _currentAccelText.text = "current accel : " + CurrentAccel.ToString("F2");
             if (_angleText) _angleText.text = "angle : " + transform.eulerAngles.ToString("F2");
             if (_isUpText) _isUpText.text = "is up : " + (Vector3.Angle(transform.up, Vector3.up) <= 90);
-        }
-
-        protected override bool OnValidateInteraction(IInteractableContext context, CharacterType charaType)
-        {
-            return OwnerPlayerRef == PlayerRef.None;
         }
 
         protected override void OnInteract(IInteractableContext context)
