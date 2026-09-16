@@ -47,6 +47,10 @@ namespace InGame.Common
         private bool _isUpperBodyBlending;
         private float _upperBodyBlendTarget;
         private float _upperBodyBlendDuration;
+        private bool _isEvaluating;
+        private bool _hasPendingUpperBodyPlay;
+        private AnimationClip _pendingUpperBodyClip;
+        private float _pendingUpperBodyBlendDuration;
 
         public float AimBlendDuration => _aimBlendDuration;
 
@@ -291,7 +295,25 @@ namespace InGame.Common
             UpdateAimBlend();
             UpdateUpperBodyBlend();
             BeforeEvaluate?.Invoke();
-            _graph.Evaluate(Time.deltaTime * _graphSpeed);
+            _isEvaluating = true;
+            try
+            {
+                _graph.Evaluate(Time.deltaTime * _graphSpeed);
+            }
+            finally
+            {
+                _isEvaluating = false;
+            }
+
+            // 終端イベントで評価中のクリップを破棄しない。現在のポーズを出力してから差し替える。
+            if (_hasPendingUpperBodyPlay)
+            {
+                var clip = _pendingUpperBodyClip;
+                var blendDuration = _pendingUpperBodyBlendDuration;
+                _hasPendingUpperBodyPlay = false;
+                _pendingUpperBodyClip = null;
+                ExecutePlayOnUpperBodyInternal(clip, blendDuration);
+            }
         }
 
         /// <summary>
@@ -425,6 +447,15 @@ namespace InGame.Common
 
         private void ExecutePlayOnUpperBodyInternal(AnimationClip clip, float blendDuration)
         {
+            if (_isEvaluating)
+            {
+                // 同じ評価中に複数の要求が来た場合は、最後の再生・解除要求を適用する。
+                _hasPendingUpperBodyPlay = true;
+                _pendingUpperBodyClip = clip;
+                _pendingUpperBodyBlendDuration = blendDuration;
+                return;
+            }
+
             if (!_slotOf.TryGetValue(LayerInfo.LayerType.UpperBody, out var slot))
             {
                 Debug.LogWarning($"[AnimationClipPlayer] UpperBody が設定されていません。_layerInfo の最後に追加してください。");
@@ -727,6 +758,11 @@ namespace InGame.Common
 
             if (this == null || !_graph.IsValid()) return EndClipType.Interrupted;
 
+            // 終端イベントで別クリップへ引き継いだ場合、そのレイヤーをフェードアウトしない。
+            if (token.IsCancellationRequested
+                || !_runtimeClips.TryGetValue(layerType, out var currentClip)
+                || !currentClip.Equals(played)) return EndClipType.Interrupted;
+
             var from = Mathf.Clamp01(_layerInfo[slot].Weight);
             if (outBlend.BlendTime > 0f)
             {
@@ -739,6 +775,11 @@ namespace InGame.Common
                     return EndClipType.Interrupted;
                 }
             }
+
+            // BlendOut の待機中に差し替わった場合も、新しいクリップの Weight を維持する。
+            if (token.IsCancellationRequested
+                || !_runtimeClips.TryGetValue(layerType, out currentClip)
+                || !currentClip.Equals(played)) return EndClipType.Interrupted;
 
             // Out 完了時の最終スナップ → 0
             SetInputWeight(slot, 0f);
@@ -1221,6 +1262,8 @@ namespace InGame.Common
         public void SafeDestroy()
         {
             _isUpperBodyBlending = false;
+            _hasPendingUpperBodyPlay = false;
+            _pendingUpperBodyClip = null;
             if (!_graph.IsValid()) return;
 
             foreach (var kv in _runtimeClips)
