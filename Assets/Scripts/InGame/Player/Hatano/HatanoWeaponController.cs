@@ -1,3 +1,5 @@
+using System.Collections;
+using CRISound;
 using Fusion;
 using UnityEngine;
 
@@ -22,6 +24,91 @@ namespace InGame.Player.Hatano
         [SerializeField] private Transform _rocketPrefabTransform;
         [SerializeField] private Transform[] _doublePrefabTransform;
         [SerializeField] private Transform _laserPrefabTransform;
+
+        [Header("二丁拳銃エフェクト（未設定なら再生しない）")]
+        [SerializeField] private GameObject _muzzleFlashPrefab;
+        [SerializeField] private GameObject _bulletTrailPrefab;
+        [SerializeField] private GameObject _bulletHitPrefab;
+        [SerializeField, Min(0.01f)] private float _bulletTrailSpeed = 100f;
+        [SerializeField, Min(0.01f)] private float _effectLifetime = 2f;
+
+        // 命中判定は権限側で行い、見た目には確定した終点だけを渡す。
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_PlayGunShot(Vector3 leftOrigin, Vector3 leftEnd, Vector3 leftNormal, bool leftHit,
+            Vector3 rightOrigin, Vector3 rightEnd, Vector3 rightNormal, bool rightHit)
+        {
+            PlayBulletEffects(leftOrigin, leftEnd, leftNormal, leftHit);
+            PlayBulletEffects(rightOrigin, rightEnd, rightNormal, rightHit);
+            PlaySound(SoundCues.SE.ZeroFighter_TakeoffGunFire, (leftOrigin + rightOrigin) * 0.5f);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_PlayRemoteInteractionSound(Vector3 position)
+        {
+            PlaySound(SoundCues.SE.Hatano_Shoot, position);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_PlayRocketReadySound()
+        {
+            PlaySound(SoundCues.SE.Hatano_Ult_1, transform.position);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_PlayRocketFireSound(Vector3 position)
+        {
+            PlaySound(SoundCues.SE.Hatano_Ult_2, position);
+        }
+
+        private static void PlaySound(CueData cue, Vector3 position)
+        {
+            if (CuePlayAtomExPlayer.Instance.IsReady)
+                CRIAudio.PlaySE(position, cue.Sheet, cue.Name);
+        }
+
+        private void PlayBulletEffects(Vector3 origin, Vector3 end, Vector3 normal, bool hit)
+        {
+            var direction = end - origin;
+            var rotation = direction.sqrMagnitude > 0.0001f
+                ? Quaternion.LookRotation(direction) : transform.rotation;
+            SpawnShotEffect(_muzzleFlashPrefab, origin, rotation);
+            // hitscan のダメージ判定と同じタイミングで着弾を表示する。
+            if (hit)
+                SpawnShotEffect(_bulletHitPrefab, end,
+                    normal.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(normal) : rotation);
+
+            if (_bulletTrailPrefab != null)
+                StartCoroutine(PlayBulletTrail(origin, end, rotation));
+        }
+
+        private void SpawnShotEffect(GameObject prefab, Vector3 position, Quaternion rotation)
+        {
+            if (prefab == null) return;
+            var effect = Instantiate(prefab, position, rotation);
+            Destroy(effect, Mathf.Max(0.01f, _effectLifetime));
+        }
+
+        private IEnumerator PlayBulletTrail(Vector3 origin, Vector3 end, Quaternion rotation)
+        {
+            var trail = Instantiate(_bulletTrailPrefab, origin, rotation);
+            var duration = Vector3.Distance(origin, end) / Mathf.Max(0.01f, _bulletTrailSpeed);
+            // キャラクター消滅でコルーチンが停止しても、生成物は必ず破棄する。
+            Destroy(trail, duration + Mathf.Max(0.01f, _effectLifetime));
+            var elapsed = 0f;
+            while (trail != null && elapsed < duration)
+            {
+                yield return null;
+                elapsed += Time.deltaTime;
+                if (trail != null)
+                    trail.transform.position = Vector3.Lerp(origin, end, Mathf.Clamp01(elapsed / duration));
+            }
+
+            if (trail == null) yield break;
+            foreach (var particle in trail.GetComponentsInChildren<ParticleSystem>())
+                particle.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+            foreach (var renderer in trail.GetComponentsInChildren<TrailRenderer>())
+                renderer.emitting = false;
+        }
 
         public override void Spawned()
         {

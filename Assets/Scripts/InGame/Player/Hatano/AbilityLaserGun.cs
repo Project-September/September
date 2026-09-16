@@ -24,10 +24,15 @@ namespace InGame.Player.Ability
         /// </summary>
         private InteractableBase _currentInteractableBase;
         private HatanoAbilityStatusManagement _abilityStatusManagement;
+        private HatanoWeaponController _weaponController;
+        private bool _isFiring;
 
         protected override void OnStart()
         {
             base.OnStart();
+            _isFiring = false;
+            if (_weaponController == null)
+                _weaponController = Parameter.Owner.GetComponentInChildren<HatanoWeaponController>(true);
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = ShootingStateType.Stance;
@@ -79,7 +84,7 @@ namespace InGame.Player.Ability
             var origin = _muzzlePos[0].position;
             var target = ShootingPositionDetection(aimOrigin, aimDirection);
             var direction = target - origin;
-            if (!Physics.Raycast(origin, direction, out var hit, _shootingDistance))
+            if (!Physics.Raycast(origin, direction, out var hit, _shootingDistance, _hitLayerMask))
             {
                 _playerInteractionController.RemoteInteractionPreview(null);
                 return;
@@ -104,11 +109,18 @@ namespace InGame.Player.Ability
             var camDir = _aimCameraController.AimDirection;
             var targetPos = ShootingPositionDetection(camOri, camDir);
             var origin = _muzzlePos[0].position; //銃口
+            // 長押し中は初回だけ再生し、入力解除・回避・構え終了で再び再生可能にする。
+            if (!_isFiring)
+            {
+                _isFiring = true;
+                if (_weaponController != null)
+                    _weaponController.RPC_PlayRemoteInteractionSound(origin);
+            }
             var dir = targetPos - origin;
             Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
             //hitした場所に向かってRayを飛ばす
-            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance);
+            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance, _hitLayerMask);
             if (laserPoint)
             {
                 //Rayが当たった場所のColliderを取得して、小さいインタラクションオブジェクトも取得出来るようにする
@@ -157,6 +169,7 @@ namespace InGame.Player.Ability
 
         protected override void OnNoShooting()
         {
+            _isFiring = false;
             _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
@@ -164,6 +177,7 @@ namespace InGame.Player.Ability
 
         protected override void OnStopTheStance()
         {
+            _isFiring = false;
             _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
