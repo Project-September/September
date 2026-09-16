@@ -171,11 +171,6 @@ namespace CRISound
             public virtual void SetUp()
             {
                 _atomExPlayer = new CriAtomExPlayer();
-
-                if (_type == SoundType.BGM)
-                {
-                    _atomExPlayer.Loop(true);
-                }
             }
 
             public virtual void Dispose()
