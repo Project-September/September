@@ -61,6 +61,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FoamFlow5WavesCustomFunction_00000000000000000000000000fb6001_Texture_0_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 5fbcffe9c2077f04186883cb39275fcc, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FoamPerWaveCrest5CustomFunction_00000000000000000000000000fb6001_Texture_0_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 5fbcffe9c2077f04186883cb39275fcc, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -79,6 +87,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_04bb36e8be81482bb22beca01349b017_Texture_1_Texture2D:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_176a397cf8d748e1f8f6177e340ffc91_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 5fbcffe9c2077f04186883cb39275fcc, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
@@ -102,6 +114,8 @@ Material:
     - _Active1: 1
     - _Active2: 1
     - _Active3: 1
+    - _Active4: 1
+    - _Active5: 1
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
@@ -121,11 +135,16 @@ Material:
     - _FadeStart: 30
     - _FoamAmount: 7
     - _FoamCutOff: 2
+    - _FoamHeightEnd: 0.9
+    - _FoamHeightStart: 0.3
+    - _FoamRange: 0.5
     - _FoamScale: 6
     - _FoamSpeed: 0.4
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _HeightFoamStrength: 0.24
+    - _HeightFoamTiling: 0.1
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -134,7 +153,7 @@ Material:
     - _ReceiveShadows: 1
     - _ReflectionScale: 0.5
     - _ReflectionSpeed: 0.4
-    - _ReflectionStrength: 60
+    - _ReflectionStrength: 0.02
     - _RefractionScale: 1
     - _RefractionSpeed: 1
     - _RefractionStrength: 1
@@ -149,35 +168,47 @@ Material:
     - _Surface: 0
     - _WaterDepth: 10
     - _WaveHeight: 1.5
-    - _WaveHeight1_1: 1
-    - _WaveHeight2: 0.5
-    - _WaveHeight3: 1
+    - _WaveHeight1_1: 0.4
+    - _WaveHeight2: 0.9
+    - _WaveHeight3: 0.02
+    - _WaveHeight4: 0.1
+    - _WaveHeight5: 0.25
     - _WaveLength: 0.09
-    - _WaveLength1_1: 4
-    - _WaveLength2: 3
-    - _WaveLength3: 1
+    - _WaveLength1_1: 21.6
+    - _WaveLength2: 32.4
+    - _WaveLength3: 11
+    - _WaveLength4: 4
+    - _WaveLength5: 7.7
     - _WaveSharpness: -100
-    - _WaveSharpness1_1: 2
-    - _WaveSharpness2: 1
-    - _WaveSharpness3: 3
+    - _WaveSharpness1_1: 0.9
+    - _WaveSharpness2: 0.1
+    - _WaveSharpness3: 0.9
+    - _WaveSharpness4: 0
+    - _WaveSharpness5: 0.1
     - _WaveSpeed: 0.03
-    - _WaveSpeed1_1: 1
-    - _WaveSpeed2: 0.6
-    - _WaveSpeed3: 0.1
+    - _WaveSpeed1_1: 0.9
+    - _WaveSpeed2: 1
+    - _WaveSpeed3: 0.3
+    - _WaveSpeed4: 0.7
+    - _WaveSpeed5: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DeepWaterColor: {r: 0.052054755, g: 0.29503754, b: 0.35220104, a: 1}
+    - _DeepWaterColor: {r: 0.052054554, g: 0.29503727, b: 0.35220078, a: 0.88}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FoamColor: {r: 0.81761, g: 0.81761, b: 0.81761, a: 0.7254902}
-    - _ShallowWaterColor: {r: 0.46398467, g: 0.5557241, b: 0.5786162, a: 0.5411765}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HeightFoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SamplePosition: {r: 0, g: 0, b: 0, a: 0}
+    - _ShallowWaterColor: {r: 0.46398467, g: 0.5557241, b: 0.5786162, a: 0.50980395}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Water_F0Color: {r: 0.14999977, g: 0.14999977, b: 0.14999977, a: 0}
+    - _Water_F0Color: {r: 0.04, g: 0.04, b: 0.04, a: 1}
     - _WaveDirection: {r: 1, g: 0, b: 0, a: 0}
-    - _WaveDirection1_1: {r: 1, g: 0, b: 0, a: 0}
-    - _WaveDirection2: {r: 1, g: 1, b: 0, a: 0}
-    - _WaveDirection3: {r: 0, g: 0, b: 0, a: 0}
+    - _WaveDirection1_1: {r: 1, g: 0.08, b: 0, a: 0}
+    - _WaveDirection2: {r: -1, g: 0.6, b: 0, a: 0}
+    - _WaveDirection3: {r: 0.8, g: -0.9, b: 0, a: 0}
+    - _WaveDirection4: {r: -0.9, g: -1.1, b: 0, a: 0}
+    - _WaveDirection5: {r: 2, g: -0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
