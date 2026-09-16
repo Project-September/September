@@ -1,4 +1,5 @@
 using System;
+using CRISound;
 using Fusion;
 using September.Common;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace InGame.Player.Ult
         [Networked, OnChangedRender(nameof(OnPrevScoreChangedRender))] private int PrevScore { get; set; }
         
         private int _currentScore;
+        private bool _wasAvailable;
+        private PlayerDatabase _playerDatabase;
         
         public int RemainingScore => Mathf.Clamp(_requiredScore - (_currentScore - PrevScore), 0, _requiredScore);
         public float Progress => Mathf.Clamp01((float)(_currentScore - PrevScore) / _requiredScore);
@@ -27,6 +30,7 @@ namespace InGame.Player.Ult
         public void OnUltActivated()
         {
             PrevScore = _currentScore;
+            _wasAvailable = false;
         }
 
         /// <summary>
@@ -34,22 +38,48 @@ namespace InGame.Player.Ult
         /// </summary>
         private void OnPrevScoreChangedRender()
         {
+            _wasAvailable = IsAvailable();
             OnProgressChanged?.Invoke();
         }
         
         private void Start()
         {
+            _wasAvailable = IsAvailable();
+
             // スコアの変動を監視
-            PlayerDatabase.Instance.ChangedDataAction += dict =>
+            _playerDatabase = PlayerDatabase.Instance;
+            if (_playerDatabase != null)
             {
-                if (!dict.TryGet(Object.InputAuthority, out var playerData))
-                {
-                    Debug.LogError("[UltCondition] PlayerData is not found");
-                    return;
-                }
-                _currentScore = playerData.Score;
-                OnProgressChanged?.Invoke();
-            };
+                _playerDatabase.ChangedDataAction += OnPlayerDataChanged;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (_playerDatabase != null)
+            {
+                _playerDatabase.ChangedDataAction -= OnPlayerDataChanged;
+            }
+        }
+
+        private void OnPlayerDataChanged(NetworkDictionary<PlayerRef, SessionPlayerData> playerDataDictionary)
+        {
+            if (!playerDataDictionary.TryGet(Object.InputAuthority, out var playerData))
+            {
+                Debug.LogError("[UltCondition] PlayerData is not found");
+                return;
+            }
+
+            _currentScore = playerData.Score;
+
+            bool isAvailable = IsAvailable();
+            if (Object.HasInputAuthority && !_wasAvailable && isAvailable)
+            {
+                CRIAudio.PlaySE(SoundCues.SE.Ult_Charge.Sheet, SoundCues.SE.Ult_Charge.Name);
+            }
+
+            _wasAvailable = isAvailable;
+            OnProgressChanged?.Invoke();
         }
     }
 }

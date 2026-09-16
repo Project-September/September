@@ -105,14 +105,14 @@ MonoBehaviour:
     CharacterIcon: {fileID: 21300000, guid: d724bd05f9ec7274cb05b147cbc71f58, type: 3}
     CharacterPortrait: {fileID: 0}
     EmoteAnimation: {fileID: 5869935710289458297, guid: 21bfe027bc21cf6488b1e040a4ca5f9d, type: 3}
-    SelectedVoice: VO_Koinuma_CharacterSelect
-    StartVoice: VO_Koinuma_GameStart
-    WinningVoice: VO_Koinuma_Win
-    AttackVoice: VO_Koinuma_Attack_01
-    DamageVoice: VO_Koinuma_Damage_01
-    InteractVoice: VO_Koinuma_Interact_01
-    UniqueActionVoice: VO_Koinuma_Grapple
-    BGM: BGM_Koinuma_01
+    SelectedVoice: VO_Hatano_CharacterSelect
+    StartVoice: VO_Hatano_InGameStart
+    WinningVoice: VO_Hatano_Result
+    AttackVoice: VO_Hatano_Attack
+    DamageVoice: VO_Hatano_Damage
+    InteractVoice: VO_Hatano_Interact
+    UniqueActionVoice:
+    BGM: BGM_Okb_01
   - Type: 7
     DisplayName: "\u30AA\u30AA\u30AF\u30DC\u30FB\u30D9\u30E9\u30DF\u30FC"
     AbilityName: --
@@ -125,14 +125,14 @@ MonoBehaviour:
     CharacterIcon: {fileID: 21300000, guid: b960790107625eb479fe751220ecfaee, type: 3}
     CharacterPortrait: {fileID: 0}
     EmoteAnimation: {fileID: 1827226128182048838, guid: bcb852e73340fc84db5c492207e5392e, type: 3}
-    SelectedVoice: VO_Koinuma_CharacterSelect
-    StartVoice: VO_Koinuma_GameStart
-    WinningVoice: VO_Koinuma_Win
-    AttackVoice: VO_Koinuma_Attack_01
-    DamageVoice: VO_Koinuma_Damage_01
-    InteractVoice: VO_Koinuma_Interact_01
-    UniqueActionVoice: VO_Koinuma_Grapple
-    BGM: BGM_Koinuma_01
+    SelectedVoice: VO_Ookubo_CharacterSelect
+    StartVoice: VO_Ookubo_InGameStart
+    WinningVoice: VO_Ookubo_Result
+    AttackVoice: VO_Ookubo_Attack
+    DamageVoice: VO_Ookubo_Damage
+    InteractVoice: VO_Ookubo_Interact
+    UniqueActionVoice:
+    BGM: BGM_Okb_01
   - Type: 8
     DisplayName: "\u30BF\u30AB\u30E0\u30E9\u30FB\u30EC\u30AA\u30F3"
     AbilityName: --
@@ -145,14 +145,14 @@ MonoBehaviour:
     CharacterIcon: {fileID: 21300000, guid: 7dff715ec3059c845af2a9db52ccdc74, type: 3}
     CharacterPortrait: {fileID: 0}
     EmoteAnimation: {fileID: 7400000, guid: 917476f3cb760c043a45cf5a21a49fa5, type: 2}
-    SelectedVoice: VO_Koinuma_CharacterSelect
-    StartVoice: VO_Koinuma_GameStart
-    WinningVoice: VO_Koinuma_Win
-    AttackVoice: VO_Koinuma_Attack_01
-    DamageVoice: VO_Koinuma_Damage_01
-    InteractVoice: VO_Koinuma_Interact_01
-    UniqueActionVoice: VO_Koinuma_Grapple
-    BGM: BGM_Koinuma_01
+    SelectedVoice: VO_Takamura_CharacterSelect
+    StartVoice: VO_Takamura_InGameStart
+    WinningVoice: VO_Takamura_Result
+    AttackVoice: VO_Takamura_Attack
+    DamageVoice: VO_Takamura_Damage
+    InteractVoice: VO_Takamura_Interact
+    UniqueActionVoice:
+    BGM: BGM_Okb_01
   _controlDictionary:
     keys: 01000000020000000300000004000000060000000700000008000000
     values: 00000000000000000300000002000000000000000000000000000000

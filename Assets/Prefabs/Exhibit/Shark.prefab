@@ -146,7 +146,7 @@ MonoBehaviour:
   _cooldownEffectType: 24
   _spawnCooldownEffectOnStart: 0
   _audioBroadcaster: {fileID: 8175028653652493909}
-  _interactSoundCueName: 
+  _interactSoundCueName: SE_Shark_Interact
   _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
@@ -567,6 +567,9 @@ MonoBehaviour:
   _idleSpeedThreshold: 0.01
   _displayModel: {fileID: 8078080115182993591}
   _hungSharkObject: {fileID: 2136887078407453736}
+  _ridingColliders:
+  - {fileID: 2423329419071984983}
+  - {fileID: 4770353196366820648}
   _cameraTransform: {fileID: 914298458122404144}
   _IsSharkInteracting: 0
 --- !u!1 &3617152938281305472
