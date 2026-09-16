@@ -686,9 +686,6 @@
         },
         {
             "m_Id": "5daa649db8e44ec29eb7e9e30a1772dd"
-        },
-        {
-            "m_Id": "cc3381def63442ceb96a81bf50e599c8"
         }
     ],
     "m_GroupDatas": [
@@ -17469,7 +17466,7 @@
     "m_ObjectId": "c0aa3542a1a448809e74b122f8beb606",
     "m_Title": "NormalGroup(Gerstner)",
     "m_Position": {
-        "x": 254.9999542236328,
+        "x": 255.0,
         "y": -4395.0
     }
 }
@@ -18316,43 +18313,6 @@
         "z": 0.0
     },
     "m_Labels": []
-}
-
-{
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.CustomFunctionNode",
-    "m_ObjectId": "cc3381def63442ceb96a81bf50e599c8",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "Custom Function",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -116.99998474121094,
-            "y": -2666.0,
-            "width": 208.0,
-            "height": 245.0
-        }
-    },
-    "m_Slots": [],
-    "synonyms": [
-        "code",
-        "HLSL"
-    ],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SourceType": 0,
-    "m_FunctionName": "Enter function name here...",
-    "m_FunctionSource": "",
-    "m_FunctionSourceUsePragmas": true,
-    "m_FunctionBody": "Enter function body here..."
 }
 
 {
