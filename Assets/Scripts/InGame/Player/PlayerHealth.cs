@@ -31,6 +31,7 @@ namespace InGame.Player
 
         /// <summary> 無敵 </summary> 無敵の set が　public なのどうなん
         [Networked, HideInInspector] public NetworkBool IsInvincible { get; set; }
+        [Networked, HideInInspector] public NetworkBool IsItemInvincible { get; set; }
         public int CurrentHealth => _status.CurrentHealth;
 
         public override void Spawned()
@@ -103,7 +104,7 @@ namespace InGame.Player
 
         int TakeDamage(int damage)
         {
-            if (IsInvincible) return 0;
+            if (IsInvincible || IsItemInvincible) return 0;
             int previousHealth = _status.CurrentHealth;
             _status.AddBaseValue(StatType.Health, -damage);
             return previousHealth - _status.CurrentHealth;
@@ -111,7 +112,7 @@ namespace InGame.Player
 
         int TakeHeal(int heal)
         {
-            if (IsInvincible) return 0;
+            if (IsInvincible || IsItemInvincible) return 0;
             int previousHealth = _status.CurrentHealth;
             _status.AddBaseValue(StatType.Health, heal);
             return _status.CurrentHealth - previousHealth;
