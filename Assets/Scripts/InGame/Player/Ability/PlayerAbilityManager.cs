@@ -123,8 +123,8 @@ namespace InGame.Player.Ability
             foreach (var ability in _abilities)
             {
                 if (ability is Effect.Shooting.ShootingAbilityBase &&
-                    ability.Phase is AbilityBase.AbilityPhase.Started or AbilityBase.AbilityPhase.Active)
-                    ability.RequestEndAbility();
+                    ability.Phase is AbilityBase.AbilityPhase.Started or AbilityBase.AbilityPhase.Active or AbilityBase.AbilityPhase.Ending)
+                    ability.ForceEndAbility();
             }
         }
 
@@ -134,7 +134,7 @@ namespace InGame.Player.Ability
             foreach (var ability in _abilities)
             {
                 if (ability is Effect.AbilityUltBase &&
-                    ability.Phase is AbilityBase.AbilityPhase.Started or AbilityBase.AbilityPhase.Active)
+                    ability.Phase is AbilityBase.AbilityPhase.Started or AbilityBase.AbilityPhase.Active or AbilityBase.AbilityPhase.Ending)
                     ability.ForceEndAbility();
             }
         }

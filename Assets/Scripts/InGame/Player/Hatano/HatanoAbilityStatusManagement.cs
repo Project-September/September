@@ -109,8 +109,11 @@ namespace InGame.Player.Hatano
         {
             if (!CanChangeWeapon()) return;
             if (GetInput<PlayerInput>(out var input) && input.Buttons.IsSet(PlayerButtons.Ultimate)) return;
+            // 状態変更後に旧武器の終了処理が走っても、切替開始時の構えを保持する。
+            var wasAiming = _aimCameraController.IsAim
+                || (GetInput<PlayerInput>(out var aimInput) && aimInput.Buttons.IsSet(PlayerButtons.Ability2));
             _abilityStatus = GetNextHatanoAbilityStatus();
-            ChangeAbility(_abilityStatus).Forget();
+            ChangeAbility(_abilityStatus, wasAiming).Forget();
         }
 
         /// <summary>
@@ -139,11 +142,11 @@ namespace InGame.Player.Hatano
         /// アビリティの変更
         /// </summary>
         /// <param name="status">変更後のアビリティ</param>
-        private async UniTask ChangeAbility(HatanoAbilityStatus status)
+        private async UniTask ChangeAbility(HatanoAbilityStatus status, bool wasAiming)
         {
             var clip = status == HatanoAbilityStatus.LaserGun
-                ? (_aimCameraController.IsAim ? _changeAimDLClip : _changeDLClip)
-                : (_aimCameraController.IsAim ? _changeAimLDClip : _changeLDClip);
+                ? (wasAiming ? _changeAimDLClip : _changeDLClip)
+                : (wasAiming ? _changeAimLDClip : _changeLDClip);
             if (clip == null) return;
 
             IsChangingWeapon = true;

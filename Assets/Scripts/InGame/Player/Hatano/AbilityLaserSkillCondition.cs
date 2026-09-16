@@ -34,9 +34,7 @@ namespace InGame.Player.Ability
                    && !context.CurrentButtons.IsSet(PlayerButtons.Ultimate)
                    && context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available
                    && context.AbilityRef.CanStartAbilityOverride()
-                   && (context.CurrentButtons.GetPressed(context.PreviousButtons).IsSet(PlayerButtons.Ability2)
-                       || (_aimCameraController && _aimCameraController.IsAim
-                           && context.CurrentButtons.IsSet(PlayerButtons.Ability2)));
+                   && context.CurrentButtons.IsSet(PlayerButtons.Ability2);
         }
     }
 }

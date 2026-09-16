@@ -45,10 +45,8 @@ namespace InGame.Player.Ability
             }
             
             ShootingInputJudgment();
-            if (_phase == AbilityPhase.Ending) return;
+            if (_phase != AbilityPhase.Active) return;
             StateDetection();
-
-            PreviewRemoteInteractable(_aimCameraController.AimOrigin, _aimCameraController.AimDirection);
         }
 
         public override void OnUpdateLocal(float deltaTime, GameObject owner)
@@ -57,8 +55,15 @@ namespace InGame.Player.Ability
                 return;
             if (!owner.TryGetComponent<HatanoAbilityStatusManagement>(out var statusManagement) ||
                 statusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun ||
-                !owner.TryGetComponent<AimCameraController>(out var aimController) || !aimController.IsAim)
+                statusManagement.IsChangingWeapon ||
+                !owner.TryGetComponent<AimCameraController>(out var aimController) || !aimController.IsAim ||
+                !owner.TryGetComponent<PlayerManager>(out var playerManager) || playerManager.IsStun ||
+                playerManager.CurrentPlayerControlState != PlayerManager.PlayerControlState.Normal ||
+                (owner.TryGetComponent<PlayerMovement>(out var movement) && movement.IsEvading))
+            {
+                _playerInteractionController.RemoteInteractionPreview(null);
                 return;
+            }
 
             var camera = Camera.main;
             if (camera != null)

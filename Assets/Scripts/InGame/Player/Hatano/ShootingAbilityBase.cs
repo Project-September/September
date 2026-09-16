@@ -34,6 +34,7 @@ namespace InGame.Player.Ability.Effect.Shooting
             
             _animationClipPlayer.SetAim(true);
             _animationClipPlayer.PlayOnUpperBody(_stanceAnimationClip);
+            ApplyCameraState(ShootingStateType.Stance);
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         {
             if (_playerManager.IsStun || _playerManager.GetComponent<PlayerMovement>().IsEvading)
             {
-                RequestEndAbility();
+                ForceEndAbility();
                 return;
             }
 
@@ -125,7 +126,8 @@ namespace InGame.Player.Ability.Effect.Shooting
             if (_shootingType != _lastShootingType)
             {
                 _lastShootingType = _shootingType;
-                ApplyCameraState(ShootingStateType.Stance);
+                ApplyCameraState(_shootingType == ShootingStateType.None
+                    ? ShootingStateType.None : ShootingStateType.Stance);
             }
         }
 

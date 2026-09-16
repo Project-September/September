@@ -104,10 +104,12 @@ namespace InGame.Player.Ability
         /// <summary>Terminates an active ability synchronously for state interrupts such as stun.</summary>
         public void ForceEndAbility()
         {
-            if (_phase is AbilityPhase.Available or AbilityPhase.Cooldown or AbilityPhase.Ending)
+            if (_phase is AbilityPhase.Available or AbilityPhase.Cooldown)
                 return;
 
-            OnEndAbility();
+            // Started は OnStart 前なので、まだ確保していない資源の終了処理を呼ばない。
+            if (_phase != AbilityPhase.Started)
+                OnEndAbility();
             ResetCooldown();
             _phase = AbilityPhase.Cooldown;
         }

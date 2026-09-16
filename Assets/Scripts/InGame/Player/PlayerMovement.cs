@@ -612,8 +612,13 @@ namespace InGame.Player
 
             // Aiming owns facing direction.  Rotating again toward strafe input
             // competes with the replicated camera direction and causes jitter.
-            if (_aimCameraController != null && _aimCameraController.IsAim)
+            if (!IsEvading && _aimCameraController != null && _aimCameraController.IsFacingCamera
+                && GetInput<PlayerInput>(out var input))
+            {
+                SetRotationImmediately(input.DesiredLookDirection);
+                _setDirection = false;
                 return;
+            }
 
             if (direction == Vector3.zero) return;
 

@@ -409,6 +409,7 @@ namespace InGame.Player
             // ビルドの減衰分を乗算
             StunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             IsStun = true;
+            _playerAbilityManager?.EndActiveShootingAbilities();
             _playerMovement.ResetHorizontalVelocity();
             RPC_SetPositionLock(true);
             _playerAbilityManager?.EndActiveUltimates();

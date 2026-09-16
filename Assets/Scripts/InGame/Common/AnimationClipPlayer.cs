@@ -41,6 +41,9 @@ namespace InGame.Common
         private AnimationMixerPlayable _aimMixer; // Aim
         private AnimationLayerMixerPlayable _layerMixer;
         [Networked] private NetworkBool IsAimAnimation { get; set; }
+        [SerializeField, Min(0f)] private float _aimBlendDuration = 0.15f;
+        private bool _aimBlendTarget;
+        private float _aimBlendWeight;
 
         /// <summary>グラフ評価 (LateUpdate) の直前に呼ばれる。足 IK など出力後処理のパラメータ更新用。</summary>
         public event Action BeforeEvaluate;
@@ -280,6 +283,7 @@ namespace InGame.Common
 
         public void LateUpdate()
         {
+            UpdateAimBlend();
             BeforeEvaluate?.Invoke();
             _graph.Evaluate(Time.deltaTime * _graphSpeed);
         }
@@ -988,18 +992,17 @@ namespace InGame.Common
 
         private void ApplyAim(bool aim)
         {
-            if (!_baseMixer.IsValid()) return;
+            _aimBlendTarget = aim;
+        }
 
-            if (aim) // Aimアニメーションに変更
-            {
-                _baseMixer.SetInputWeight(0, 0f);
-                _baseMixer.SetInputWeight(1, 1f);
-            }
-            else // 通常アニメーションに変更
-            {
-                _baseMixer.SetInputWeight(0, 1f);
-                _baseMixer.SetInputWeight(1, 0f);
-            }
+        private void UpdateAimBlend()
+        {
+            if (!_baseMixer.IsValid()) return;
+            var target = _aimBlendTarget ? 1f : 0f;
+            _aimBlendWeight = _aimBlendDuration <= 0f ? target
+                : Mathf.MoveTowards(_aimBlendWeight, target, Time.deltaTime / _aimBlendDuration);
+            _baseMixer.SetInputWeight(0, 1f - _aimBlendWeight);
+            _baseMixer.SetInputWeight(1, _aimBlendWeight);
         }
 
         public float GetTargetLayerWeight(LayerInfo.LayerType layer)
@@ -1523,29 +1526,35 @@ namespace InGame.Common
 
         public void ChangeWaitAnimationClip(AnimationClip clip)
         {
+            var weight = _normalMixer.GetInputWeight(_waitPort);
+            _wait = clip;
             _normalMixer.DisconnectInput(_waitPort);
             
             _waitClipPlayable.Destroy();
             _waitClipPlayable = AnimationClipPlayable.Create(_graph, clip);
-            _normalMixer.ConnectInput(_waitPort, _waitClipPlayable, 0);
+            _normalMixer.ConnectInput(_waitPort, _waitClipPlayable, 0, weight);
         }
 
         public void ChangeWalkAnimationClip(AnimationClip clip)
         {
+            var weight = _normalMixer.GetInputWeight(_walkPort);
+            _walk = clip;
             _normalMixer.DisconnectInput(_walkPort);
             
             _walkClipPlayable.Destroy();
             _walkClipPlayable = AnimationClipPlayable.Create(_graph, clip);
-            _normalMixer.ConnectInput(_walkPort, _walkClipPlayable, 0);
+            _normalMixer.ConnectInput(_walkPort, _walkClipPlayable, 0, weight);
         }
 
         public void ChangeRunAnimationClip(AnimationClip clip)
         {
+            var weight = _normalMixer.GetInputWeight(_runPort);
+            _run = clip;
             _normalMixer.DisconnectInput(_runPort);
             
             _runClipPlayable.Destroy();
             _runClipPlayable = AnimationClipPlayable.Create(_graph, clip);
-            _normalMixer.ConnectInput(_runPort, _runClipPlayable, 0);
+            _normalMixer.ConnectInput(_runPort, _runClipPlayable, 0, weight);
         }
         
 

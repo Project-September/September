@@ -219,12 +219,17 @@ namespace InGame.Interact
             {
                 Interactor = Object.InputAuthority.RawEncoded,
             };
-            if (!interactableBase.ValidateInteraction(context)) return;
+            if (!interactableBase.ValidateInteraction(context))
+            {
+                RemoteInteractionCancel(ref timer);
+                return;
+            }
 
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
             _focusedObj = interactableBase;
-            UIController.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj);
+            if (HasInputAuthority && !_isBot)
+                UIController.I?.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj);
 
             IsRemoting = true;
             RemoteFocusedObject = interactableBase;
@@ -238,35 +243,35 @@ namespace InGame.Interact
                 timer = 0f;
                 RemoteInteractTimer = 0f;
                 CompleteInteraction();
-                UIController.I.ShowInteractUI(false);
+                if (HasInputAuthority && !_isBot) UIController.I?.ShowInteractUI(false);
 
                 //インタラクションに成功したらアビリティを終了
                 abilityPhase = AbilityBase.AbilityPhase.Ending;
                 aimCameraController.RPC_NormalCamera();
                 aimCameraController.RPC_CrosshairToggleChange(false);
             }
-            UIController.I.SetInteractProgress(Mathf.Clamp01(timer / time));
+            if (HasInputAuthority && !_isBot)
+                UIController.I?.SetInteractProgress(time > 0f ? Mathf.Clamp01(timer / time) : 1f);
         }
 
         /// <summary>Displays the remote-interaction affordance without starting its timer.</summary>
         public void RemoteInteractionPreview(InteractableBase interactableBase)
         {
-            if (_isBot || IsRemoting) return;
+            if (_isBot || !HasInputAuthority) return;
 
+            if (IsInteractionBlocked) interactableBase = null;
+            bool hadPreview = _remotePreviewObject != null;
             _remotePreviewObject = interactableBase;
 
-            if (interactableBase == null)
+            if (interactableBase == null && hadPreview && !IsRemoting)
             {
                 UIController.I?.ShowInteractUI(false);
-                return;
             }
-
-            ShowRemoteInteractionPreview(interactableBase);
         }
 
         private void ShowRemoteInteractionPreview(InteractableBase interactableBase)
         {
-            if (interactableBase == null) return;
+            if (interactableBase == null || !HasInputAuthority || IsInteractionBlocked) return;
             var context = new InteractableContext { Interactor = Object.InputAuthority.RawEncoded };
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
@@ -470,7 +475,7 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            if (!_isBot)
+            if (!_isBot && HasInputAuthority)
             {
                 UIController.I?.SetInteractProgress(0f);
             }

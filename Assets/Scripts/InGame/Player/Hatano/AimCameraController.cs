@@ -1,5 +1,6 @@
 using Fusion;
 using InGame.Player;
+using September.Common;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -12,7 +13,6 @@ public class AimCameraController : NetworkBehaviour
     [SerializeField] private GameObject _crosshairPrefab;
     [Header("回転のスムーズさ"), SerializeField] private float _rotationSpeed = 15f;
     private GameObject _crosshair;
-    private PlayerMovement _playerMovement;
     public Camera MainCamera { get; private set; }
     
     [Networked]public Vector3 AimOrigin { get; private set; }
@@ -21,11 +21,13 @@ public class AimCameraController : NetworkBehaviour
     /// <summary>
     /// true：構えている状態　false：構えていない状態
     /// </summary>
-    public bool IsAim { get; private set; }
+    [Networked] private NetworkBool IsAiming { get; set; }
+    [Networked] private NetworkBool IsUltAiming { get; set; }
+    public bool IsAim => IsAiming;
+    public bool IsFacingCamera => IsAiming || IsUltAiming;
 
     public override void Spawned()
     {
-        _playerMovement = GetComponent<PlayerMovement>();
         if (HasInputAuthority)
         {
             MainCamera = Camera.main;
@@ -36,37 +38,20 @@ public class AimCameraController : NetworkBehaviour
     
     public override void FixedUpdateNetwork()
     {
-        if(!HasInputAuthority || MainCamera == null) return;
-
-        if (IsAim)
-        {
-            AimOrigin = MainCamera.transform.position;
-            AimDirection = MainCamera.transform.forward;
-        }
-        RPC_SetAim(MainCamera.transform.position, MainCamera.transform.forward);
+        if (!GetInput<PlayerInput>(out var input)) return;
+        AimOrigin = input.CameraPosition;
+        AimDirection = input.DesiredLookDirection;
     }
 
     /// <summary>
-    /// カメラの位置等をクライアントから送信しホスト側で変更
+    /// 同期された構え状態を所有プレイヤーのカメラに適用する。
     /// </summary>
-    /// <param name="aimOrigin">カメラ場所</param>
-    /// <param name="aimDirection">カメラのForward</param>
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_SetAim(Vector3 aimOrigin, Vector3 aimDirection)
+    public override void Render()
     {
-        AimOrigin = aimOrigin;
-        AimDirection = aimDirection;
-
-        // The state authority owns the replicated transform.  Updating only the
-        // input-authority transform made remote clients see an aiming player
-        // continue to face its movement direction.
-        if (IsAim)
-        {
-            var forward = aimDirection;
-            forward.y = 0f;
-            if (_playerMovement != null && forward.sqrMagnitude > Mathf.Epsilon)
-                _playerMovement.SetRotationImmediately(forward.normalized);
-        }
+        if (!HasInputAuthority) return;
+        _normalCamera.gameObject.SetActive(!IsFacingCamera);
+        _aimCamera.gameObject.SetActive(IsAim);
+        _ultCamera.gameObject.SetActive(IsUltAiming);
     }
 
     /// <summary>Ends aiming and restores the normal camera/UI for every peer.</summary>
@@ -85,10 +70,9 @@ public class AimCameraController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_NormalCamera()
     {
-        IsAim = false;
-        _normalCamera.gameObject.SetActive(true);
-        _aimCamera.gameObject.SetActive(false);
-        _ultCamera.gameObject.SetActive(false);
+        if (!HasStateAuthority) return;
+        IsAiming = false;
+        IsUltAiming = false;
     }
     
     /// <summary>
@@ -98,16 +82,9 @@ public class AimCameraController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_AimCamera()
     {
-        IsAim = true;
-        if (HasInputAuthority)
-        {
-            _normalCamera.gameObject.SetActive(false);
-            _aimCamera.gameObject.SetActive(true);
-            _ultCamera.gameObject.SetActive(false);
-        }
-        var camForward = AimDirection;
-        camForward.y = 0;
-        gameObject.transform.forward = camForward;
+        if (!HasStateAuthority) return;
+        IsAiming = true;
+        IsUltAiming = false;
     }
 
     /// <summary>
@@ -116,17 +93,9 @@ public class AimCameraController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_ULTCamera()
     {
-        IsAim = true;
-        if (HasInputAuthority)
-        {
-            _normalCamera.gameObject.SetActive(false);
-            _aimCamera.gameObject.SetActive(false);
-            _ultCamera.gameObject.SetActive(true);
-        }
-        
-        var camForward = AimDirection;
-        camForward.y = 0;
-        gameObject.transform.forward = camForward;
+        if (!HasStateAuthority) return;
+        IsAiming = false;
+        IsUltAiming = true;
     }
 
     /// <summary>

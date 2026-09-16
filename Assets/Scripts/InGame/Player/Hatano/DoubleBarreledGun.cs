@@ -11,9 +11,7 @@ namespace InGame.Player.Ability
     [Serializable]
     public class DoubleBarreledGun : ShootingAbilityBase
     {
-        [Header("射撃インターバル")] 
-        [SerializeField] private float _shootingInterval;
-        private float _shootingIntervalTimer;
+        private TickTimer _shotCooldown;
         [Header("通常時のダメージ")]
         [SerializeField] private int _damage;
         [Header("鬼の時のダメージ")] 
@@ -28,8 +26,8 @@ namespace InGame.Player.Ability
             base.OnStart();
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
-            _shootingType = ShootingStateType.Stance;
-            _shootingIntervalTimer = 0;
+            _shootingType = _shotCooldown.ExpiredOrNotRunning(Runner)
+                ? ShootingStateType.Stance : ShootingStateType.Shooting;
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -42,8 +40,9 @@ namespace InGame.Player.Ability
                 return;
             }
             
-            ShootingInputJudgment();
             GunInterval();
+            ShootingInputJudgment();
+            if (_phase != AbilityPhase.Active) return;
             StateDetection();
         }
 
@@ -52,15 +51,14 @@ namespace InGame.Player.Ability
         /// </summary>
         private void GunInterval()
         {
-            //撃つステートの場合、タイマーを加算していく
+            // 構え直しても、直前の発射からのクールタイムは維持する。
             if (_shootingType == ShootingStateType.Shooting)
             {
-                _shootingIntervalTimer += Runner.DeltaTime;
                 //タイマーが時間を超えたら再度、構えステートに変更
-                if (_shootingIntervalTimer >= _shootingInterval)
+                // Inspector のクールタイムを射撃間隔にも使用する。
+                if (_shotCooldown.ExpiredOrNotRunning(Runner))
                 {
                     _shootingType = ShootingStateType.Stance;
-                    _shootingIntervalTimer = 0;
                 }
             }
         }
@@ -128,6 +126,7 @@ namespace InGame.Player.Ability
         protected override void OnShooting()
         {
             GunShootingDetection();
+            _shotCooldown = TickTimer.CreateFromSeconds(Runner, Mathf.Max(0f, _cooldown));
             _shootingType = ShootingStateType.Shooting;
         }
     }
