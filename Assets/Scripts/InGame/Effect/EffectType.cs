@@ -44,5 +44,6 @@ public enum EffectType
     ExcaliburStamp,
     ExcaliburHit,
     ExcaliburImpact,
+    Cursor
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

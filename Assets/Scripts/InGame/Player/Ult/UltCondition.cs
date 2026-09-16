@@ -12,14 +12,24 @@ namespace InGame.Player.Ult
 
         /// <summary> 直近の必殺技発動時のスコア </summary>
         [Networked, OnChangedRender(nameof(OnPrevScoreChangedRender))] private int PrevScore { get; set; }
-        
+
         private int _currentScore;
+        /// <summary>操作主の参照を保存する変数</summary>
+        private PlayerRef _ownerRef;
+        /// <summary>PlayerDataBaseの参照を保持する変数</summary>
+        private PlayerDatabase _subscribedDatabase;
+
         private bool _wasAvailable;
-        private PlayerDatabase _playerDatabase;
-        
+
         public int RemainingScore => Mathf.Clamp(_requiredScore - (_currentScore - PrevScore), 0, _requiredScore);
         public float Progress => Mathf.Clamp01((float)(_currentScore - PrevScore) / _requiredScore);
-        
+
+        /// <summary>
+        /// Prefab交換をまたいでULTの消費状態を維持するため、
+        /// 直近のULT発動時点のスコアを取得する。
+        /// </summary>
+        public int ConsumedScore => PrevScore;
+
         public event Action OnProgressChanged;
 
         public bool IsAvailable()
@@ -34,6 +44,19 @@ namespace InGame.Player.Ult
         }
 
         /// <summary>
+        /// 擬態によるPrefab交換後のUltConditionへ消費状態を引き継ぐ。
+        /// 通常のULT処理からは使用せず、タカムラの擬態状態復元時だけ呼び出す。
+        /// </summary>
+        public void RestoreConsumedScore(int consumedScore)
+        {
+            if (!HasStateAuthority)
+                return;
+
+            PrevScore = consumedScore;
+            OnProgressChanged?.Invoke();
+        }
+
+        /// <summary>
         /// 必殺技発動時にUIを更新する用
         /// </summary>
         private void OnPrevScoreChangedRender()
@@ -41,32 +64,45 @@ namespace InGame.Player.Ult
             _wasAvailable = IsAvailable();
             OnProgressChanged?.Invoke();
         }
-        
+
         private void Start()
         {
             _wasAvailable = IsAvailable();
 
-            // スコアの変動を監視
-            _playerDatabase = PlayerDatabase.Instance;
-            if (_playerDatabase != null)
+            _ownerRef = Object.InputAuthority;
+            _subscribedDatabase = PlayerDatabase.Instance;
+
+            if (_subscribedDatabase == null)
             {
-                _playerDatabase.ChangedDataAction += OnPlayerDataChanged;
+                Debug.LogError("[UltCondition] PlayerDatabase is not found");
+                return;
             }
+
+            // スコアの変動を監視
+            _subscribedDatabase.ChangedDataAction += OnPlayerDataChanged;
+            OnPlayerDataChanged(_subscribedDatabase.PlayerDataDic);
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            UnsubscribePlayerData();
         }
 
         private void OnDestroy()
         {
-            if (_playerDatabase != null)
-            {
-                _playerDatabase.ChangedDataAction -= OnPlayerDataChanged;
-            }
+            // NetworkObject以外の理由で破棄された場合の保険。
+            UnsubscribePlayerData();
         }
 
-        private void OnPlayerDataChanged(NetworkDictionary<PlayerRef, SessionPlayerData> playerDataDictionary)
+        /// <summary>
+        /// プレイヤー情報が変更されたときに呼ばれるメソッド
+        /// </summary>
+        /// <param name="dict">プレイヤーの情報を持つ辞書</param>
+        private void OnPlayerDataChanged(NetworkDictionary<PlayerRef, SessionPlayerData> dict)
         {
-            if (!playerDataDictionary.TryGet(Object.InputAuthority, out var playerData))
+            if (!dict.TryGet(_ownerRef, out var playerData))
             {
-                Debug.LogError("[UltCondition] PlayerData is not found");
+                Debug.LogError($"[UltCondition] PlayerData is not found: {_ownerRef}");
                 return;
             }
 
@@ -80,6 +116,18 @@ namespace InGame.Player.Ult
 
             _wasAvailable = isAvailable;
             OnProgressChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// イベントを解除するメソッド
+        /// </summary>
+        private void UnsubscribePlayerData()
+        {
+            if (_subscribedDatabase == null)
+                return;
+
+            _subscribedDatabase.ChangedDataAction -= OnPlayerDataChanged;
+            _subscribedDatabase = null;
         }
     }
 }
