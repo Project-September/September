@@ -267,6 +267,7 @@ namespace InGame.Common
             _locoWeight = Mathf.MoveTowards(_locoWeight, LocoTargetWeight, _locoBlendSpeed * Time.deltaTime);
             _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
             _animationClipPlayer.SetLocoPlaybackRate(LocoPlaybackRate);
+            _animationClipPlayer.SetAimLocoBlendWeight(_playerMovement.MoveInput);
             // 強制上書き中は、非ループクリップが終端に到達しても倒れた姿勢を保持する。
             if (!_hardOverride && !HasActiveTopLayerClip())
             {
