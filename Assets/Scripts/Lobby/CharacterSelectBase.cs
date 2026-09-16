@@ -49,20 +49,20 @@ namespace September.Lobby
         }
 
         /// <summary>
-        /// ƒLƒƒƒ‰ƒNƒ^[‚ğ‘I‘ğ(ƒNƒŠƒbƒN)‚µ‚½‚Ì“®ì
+        /// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚’é¸æŠ(ã‚¯ãƒªãƒƒã‚¯)ã—ãŸæ™‚ã®å‹•ä½œ
         /// </summary>
         private bool SelectCharacter(string characterName, int index)
         {
             if (_changeCharacterInfo || _currentCharacterName == characterName) return false;
             var data = CharacterDataContainer.Instance.GetCharacterData(index);
-            //  ‘I‘ğ‚µ‚Ä‚¢‚éƒLƒƒƒ‰ƒNƒ^[‚ÌƒCƒ“ƒfƒbƒNƒX‚ğT‚¦‚é
+            //  é¸æŠã—ã¦ã„ã‚‹ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æ§ãˆã‚‹
             _currentCharacterIndex = index;
-            CRIAudio.PlaySE("ALLCue", data.SelectedVoice); // ƒLƒƒƒ‰‘I‘ğƒ{ƒCƒXÄ¶
+            CRIAudio.PlayVoiceExclusive("ALLCue", data.SelectedVoice); // ã‚­ãƒ£ãƒ©é¸æŠãƒœã‚¤ã‚¹å†ç”Ÿ
             return true;
         }
 
         /// <summary>
-        /// ƒLƒƒƒ‰ƒNƒ^[‚ğŒˆ’è‚µ‚½‚Ì“®ì
+        /// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚’æ±ºå®šã—ãŸæ™‚ã®å‹•ä½œ
         /// </summary>
         protected void SubmitCharacter()
         {

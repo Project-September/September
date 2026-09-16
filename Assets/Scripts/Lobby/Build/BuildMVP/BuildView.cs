@@ -32,10 +32,13 @@ namespace September.Lobby
             if (_buildObjects != null && builds != null)
             {
                 // UIへの範囲外アクセスを防止したfor文
-                for (int i = 0; i < Mathf.Min(_buildObjects.Length, builds.Length); i++)
+                for (int i = 0; i < _buildObjects.Length; i++)
                 {
                     var obj = _buildObjects[i];
                     if (obj == null) continue;
+                    bool hasBuild = i < _buildCount;
+                    obj.gameObject.SetActive(hasBuild);
+                    if (!hasBuild) continue;
                     obj.Init();
                     obj.SetIconImage(builds[i].BuildSprite);
                     // ボタンでインデックスを直接選択できるように
@@ -43,6 +46,12 @@ namespace September.Lobby
                     obj.Button.OnSelectAsObservable().Subscribe(_ =>
                     {
                         if (!_confirming) MoveIndexForButton(index);
+                    }).AddTo(this);
+                    obj.Button.OnCancelAsObservable().Subscribe(e =>
+                    {
+                        SetPhase(false);
+                        FocusCurrentBuild();
+                        e.Use();
                     }).AddTo(this);
                     obj.RegisterAction(() =>
                     {
@@ -76,7 +85,7 @@ namespace September.Lobby
             {
                 if (!_confirming) return;
                 SetPhase(false);
-                _buildObjects[_currentSelectIndex].Button.Select();
+                FocusCurrentBuild();
                 e.Use();
             }).AddTo(this);
             _initialized = true;
@@ -88,7 +97,11 @@ namespace September.Lobby
             _confirming = confirming;
             _decisionButton.interactable = confirming;
             if (_decisionArrow) _decisionArrow.gameObject.SetActive(confirming);
-            foreach (var obj in _buildObjects) obj.Button.interactable = !confirming;
+            for (int i = 0; i < _buildCount; i++)
+            {
+                var obj = _buildObjects[i];
+                if (obj) obj.Button.interactable = !confirming;
+            }
         }
 
         void LateUpdate()
@@ -102,11 +115,11 @@ namespace September.Lobby
                 LayoutRebuilder.ForceRebuildLayoutImmediate(
                     (RectTransform)(_iconLayoutGroup ? _iconLayoutGroup.transform : transform));
                 MoveIndexForButton(0);
-                _buildObjects[0].Button.Select();
+                FocusCurrentBuild();
             }
             else if (interactive && !_confirming && EventSystem.current &&
                      !EventSystem.current.currentSelectedGameObject)
-                _buildObjects[_currentSelectIndex].Button.Select();
+                FocusCurrentBuild();
             _wasInteractive = interactive;
             if (interactive && !_confirming) RefreshNavigation();
         }
@@ -194,6 +207,14 @@ namespace September.Lobby
             // 確定しても、最後に選んだルートの拡大とフレームは維持する。
             _buildObjects[_currentSelectIndex]?.Select();
             SetPhase(false);
+        }
+
+        void FocusCurrentBuild()
+        {
+            if (_buildCount == 0) return;
+            int index = Mathf.Clamp(_currentSelectIndex, 0, _buildCount - 1);
+            var button = _buildObjects[index].Button;
+            if (button.isActiveAndEnabled && button.IsInteractable()) button.Select();
         }
     }
 }

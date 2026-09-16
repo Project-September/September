@@ -12,10 +12,19 @@ namespace September.Lobby
         [SerializeField] Selectable _selectWhenHide;
         private GameInput _gameInput;
 
+        public bool IsOpen => _howToPlayPanel.activeInHierarchy;
+
         private void Awake()
         {
             _gameInput = GameInput.I;
             _closeButton.onClick.AddListener(CloseHowToPlayPanel);
+            EventSystem.current.SetSelectedGameObject(_closeButton.gameObject);
+        }
+
+        private void LateUpdate()
+        {
+            if (!IsOpen || !EventSystem.current) return;
+            if (EventSystem.current.currentSelectedGameObject == _closeButton.gameObject) return;
             EventSystem.current.SetSelectedGameObject(_closeButton.gameObject);
         }
 
@@ -42,6 +51,11 @@ namespace September.Lobby
         {
             _howToPlayPanel.SetActive(false);
             EventSystem.current.SetSelectedGameObject(_selectWhenHide.gameObject);
+        }
+
+        public void SetSelectWhenHide(Selectable selectable)
+        {
+            _selectWhenHide = selectable;
         }
     }
 }

@@ -8,14 +8,16 @@ namespace September.Lobby
         [SerializeField] private Button _button;
         [SerializeField] private Image _characterImage;
         [SerializeField] private float _selectedScaleMultiplier = 1.2f;
-        private float _originalScale;
+        private Vector3 _originalScale;
+        private Image _selectFrame;
         public Button Button => _button;
         public Image CharacterImage => _characterImage;
 
         private void Awake()
         {
-            // ƒAƒCƒRƒ“‚Í³•ûŒ`‚Å‚ ‚é‚±‚Æ‚ğ‘O’ñ‚Æ‚µ‚Ä‚¢‚é‚½‚ßAX²‚ÌƒXƒP[ƒ‹‚ğŠî€‚É‚·‚é
-            _originalScale = Button.transform.localScale.x;
+            // å…ƒã®ç¸¦æ¨ªæ¯”ã‚’ä¿ã£ãŸã¾ã¾ã€é¸æŠçŠ¶æ…‹ã‚’ç¹°ã‚Šè¿”ã—ã¦ã‚‚æ‹¡å¤§ç‡ãŒç´¯ç©ã—ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚
+            _originalScale = Button.transform.localScale;
+            _selectFrame = transform.Find("SelectFrame")?.GetComponent<Image>();
             DeselectCharacter();
         }
 
@@ -32,14 +34,16 @@ namespace September.Lobby
 
         public void SelectCharacter()
         {
-            // ‘I‘ğ‚ÌŠg‘åˆ—
-            Button.transform.localScale *= _selectedScaleMultiplier;
+            // é¸æŠæ™‚ã®æ‹¡å¤§å‡¦ç†
+            Button.transform.localScale = _originalScale * _selectedScaleMultiplier;
+            if (_selectFrame) _selectFrame.enabled = true;
         }
 
         public void DeselectCharacter()
         {
-            // ‘I‘ğ‰ğœ‚Ìk¬ˆ—
-            Button.transform.localScale = new Vector3(_originalScale, _originalScale, _originalScale);
+            // é¸æŠè§£é™¤æ™‚ã®ç¸®å°å‡¦ç†
+            Button.transform.localScale = _originalScale;
+            if (_selectFrame) _selectFrame.enabled = false;
         }
     }
 }

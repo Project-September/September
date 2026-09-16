@@ -19,6 +19,7 @@ namespace September.Lobby
         [SerializeField] private TextureCharacterDisplay _characterDisplay;
         [SerializeField] private ToggleTweenAnimation _toggleTweenAnimation;
         [SerializeField] private Button _closeExplainButton;
+        [SerializeField] private HowToPlayView _howToPlayView;
         
         [SerializeField] private Image _selectedCharacterImage;
 
@@ -69,11 +70,12 @@ namespace September.Lobby
             
             _currentBackPanel.ApplyContents (data.DisplayName, data.AbilityName, data.AbilityExplain);
             _currentFrontPanel.ApplyContents (data.DisplayName, data.AbilityName, data.AbilityExplain);
+            _howToPlayView.SetSelectWhenHide(_selectCharacterIcons[0].Button);
             SetConfirmationPhase(false);
             _closeExplainButton.onClick.AddListener(() =>
             {
                //ボイス鳴らす
-                CRIAudio.PlaySE("ALLCue", CharacterDataContainer.Instance.GetCharacterData(_currentCharacterIndex).SelectedVoice);
+                CRIAudio.PlayVoiceExclusive("ALLCue", CharacterDataContainer.Instance.GetCharacterData(_currentCharacterIndex).SelectedVoice);
             });
         }
 
@@ -126,6 +128,11 @@ namespace September.Lobby
         private void LateUpdate()
         {
             if (_navigationPositions == null || _selectCharacterIcons.Count == 0) return;
+            if (_howToPlayView.IsOpen)
+            {
+                _navigationWasVisible = false;
+                return;
+            }
             if (!_selectCharacterIcons[0].gameObject.activeInHierarchy)
             {
                 _navigationWasVisible = false;
@@ -138,13 +145,13 @@ namespace September.Lobby
                 LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_iconLayoutGroup.transform);
                 RefreshIconNavigation();
                 // 表示された最初のフレームに、先頭アイコンへ十字キー操作の選択を合わせる。
-                _selectCharacterIcons[0].Button.Select();
+                FocusCurrentCharacter();
             }
             // キャラ選択中に背景クリックでフォーカスが外れても、十字キー操作を継続する。
             var eventSystem = UnityEngine.EventSystems.EventSystem.current;
             if (!_isConfirming && eventSystem && !eventSystem.currentSelectedGameObject &&
                 _selectCharacterIcons[_currentCharacterIndex].Button.IsInteractable())
-                _selectCharacterIcons[_currentCharacterIndex].Button.Select();
+                FocusCurrentCharacter();
 
             // パネルを開いた後や画面サイズ変更後に配置が変わった場合だけ再設定する。
             for (int i = 0; i < _navigationPositions.Length; i++)
@@ -215,16 +222,14 @@ namespace September.Lobby
             bool changed = _currentCharacterIndex != index || string.IsNullOrEmpty(_currentCharacterName);
             _currentCharacterIndex = index;
             _currentCharacterName = data.DisplayName;
-            // 既存の拡大処理は乗算なので、先に全て戻してから選択中の一つだけ拡大する。
+            // 選択表示を一度戻してから、現在の一つだけを強調する。
             foreach (var icon in _selectCharacterIcons)
             {
                 icon.DeselectCharacter();
-                var frame = icon.transform.Find("SelectFrame")?.GetComponent<Image>();
-                if (frame) frame.enabled = icon == _selectCharacterIcons[index];
             }
             _selectCharacterIcons[index].SelectCharacter();
             if (!changed) return;
-            CRIAudio.PlaySE("ALLCue", data.SelectedVoice);
+            CRIAudio.PlayVoiceExclusive("ALLCue", data.SelectedVoice);
             OnCharacterIconClick(data.DisplayName, index);
         }
 
@@ -236,8 +241,7 @@ namespace September.Lobby
             SetConfirmationPhase(true);
             _submitButton.Select();
             // フォーカス移動で消されるフレームを戻し、選択キャラを示し続ける。
-            var frame = _selectCharacterIcons[index].transform.Find("SelectFrame")?.GetComponent<Image>();
-            if (frame) frame.enabled = true;
+            _selectCharacterIcons[index].SelectCharacter();
             return true;
         }
 
@@ -257,10 +261,25 @@ namespace September.Lobby
         {
             characterIcon.Button.OnSelectAsObservable()
                 .Subscribe(_ => PreviewCharacter(index)).AddTo(characterIcon);
+            characterIcon.Button.OnCancelAsObservable()
+                .Subscribe(eventData =>
+                {
+                    SetConfirmationPhase(false);
+                    FocusCurrentCharacter();
+                    eventData.Use();
+                }).AddTo(characterIcon);
             if (index != 0) return;
             // 決定中の方向入力では選択フェーズへ戻さず、Cancelで戻す。
             _submitButton.navigation = new Navigation { mode = Navigation.Mode.None };
             _toggleTweenAnimation.SelectWhenOpen = characterIcon.Button;
+        }
+
+        private void FocusCurrentCharacter()
+        {
+            if (_selectCharacterIcons.Count == 0) return;
+            int index = Mathf.Clamp(_currentCharacterIndex, 0, _selectCharacterIcons.Count - 1);
+            var button = _selectCharacterIcons[index].Button;
+            if (button.isActiveAndEnabled && button.IsInteractable()) button.Select();
         }
     }
 }
