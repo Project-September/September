@@ -1,5 +1,6 @@
 using System;
 using Fusion;
+using InGame.Interact;
 using InGame.Player.Ult;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ namespace InGame.Player.Ability.Effect
         private CutInAnimatorBase _cutInAnimator;
         private PlayerHealth _playerHealth;
         private PlayerManager _playerManager;
+        private PlayerInteractionController _interactionController;
 
         /// <summary>
         /// カットイン終了まで待機するタイマー
@@ -58,6 +60,10 @@ namespace InGame.Player.Ability.Effect
             if (!_playerHealth) _playerHealth = player.GetComponent<PlayerHealth>();
             if (!_cutInAnimator) _cutInAnimator = player.GetComponent<CutInAnimatorBase>();
             if (!_playerManager) _playerManager = player.GetComponent<PlayerManager>();
+            if (!_interactionController) _interactionController = player.GetComponent<PlayerInteractionController>();
+
+            // カットイン後に移動可能になる必殺技も、能力終了まではインタラクトを禁止する。
+            if (_interactionController) _interactionController.SetInteractionBlocked(true);
             
             // アビリティが発動したら条件をリセットする
             if (player.TryGetComponent<IUltCondition>(out var condition))
@@ -131,7 +137,14 @@ namespace InGame.Player.Ability.Effect
             Debug.Log($"<color=yellow>[AbilityUlt]</color> End {StartTick} {Runner.Tick} {Runner.Tick - StartTick} {(Runner.Tick - StartTick) * Runner.DeltaTime}", Parameter.Owner);
             _isCutInEnd = false;
             _isEffectTriggered = false;
-            OnEndUlt();
+            try
+            {
+                OnEndUlt();
+            }
+            finally
+            {
+                if (_interactionController) _interactionController.SetInteractionBlocked(false);
+            }
         }
 
         protected virtual void OnCutInStart() { }

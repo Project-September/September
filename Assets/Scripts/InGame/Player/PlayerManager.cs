@@ -100,6 +100,14 @@ namespace InGame.Player
         private RigidbodyConstraints _defaultConstraints;
 
         [Networked] public PlayerControlState CurrentPlayerControlState { get; private set; } = PlayerControlState.Normal;
+        [Networked] public bool IsMovementInputBlocked { get; private set; }
+
+        /// <summary>移動・ダッシュ・ジャンプ・回避の入力制限を状態権限側から設定する。</summary>
+        public void SetMovementInputBlocked(bool blocked)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority) return;
+            IsMovementInputBlocked = blocked;
+        }
 
         public void Start()
         {
@@ -220,8 +228,10 @@ namespace InGame.Player
                 if (!IsStun && IsMovable && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する_playerInputManager
-                    _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
-                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
+                    _playerMovement.UpdateMovement(IsMovementInputBlocked ? Vector2.zero : input.MoveDirection,
+                        !IsMovementInputBlocked && input.Buttons.IsSet(PlayerButtons.Dash), input.CameraYaw,
+                        !IsMovementInputBlocked && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump),
+                        !IsMovementInputBlocked && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
                 }
 
                 // 乗車中は台車に移動を任せ、それ以外は接地・落下・速度を更新する。

@@ -40,6 +40,7 @@ namespace InGame.Common
         private AnimationMixerPlayable _normalMixer; // 通常
         private AnimationMixerPlayable _aimMixer; // Aim
         private AnimationLayerMixerPlayable _layerMixer;
+        [Networked] private NetworkBool IsAimAnimation { get; set; }
 
         /// <summary>グラフ評価 (LateUpdate) の直前に呼ばれる。足 IK など出力後処理のパラメータ更新用。</summary>
         public event Action BeforeEvaluate;
@@ -973,6 +974,21 @@ namespace InGame.Common
         /// <param name="aim">true：Aimアニメーション　false：通常アニメーション</param>
         public void SetAim(bool aim)
         {
+            if (Object != null && Object.IsValid && HasStateAuthority)
+                IsAimAnimation = aim;
+
+            ApplyAim(aim);
+        }
+
+        public override void Render()
+        {
+            ApplyAim(IsAimAnimation);
+        }
+
+        private void ApplyAim(bool aim)
+        {
+            if (!_baseMixer.IsValid()) return;
+
             if (aim) // Aimアニメーションに変更
             {
                 _baseMixer.SetInputWeight(0, 0f);

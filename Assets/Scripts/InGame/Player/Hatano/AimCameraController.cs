@@ -1,4 +1,5 @@
 using Fusion;
+using InGame.Player;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ public class AimCameraController : NetworkBehaviour
     [SerializeField] private GameObject _crosshairPrefab;
     [Header("回転のスムーズさ"), SerializeField] private float _rotationSpeed = 15f;
     private GameObject _crosshair;
+    private PlayerMovement _playerMovement;
     public Camera MainCamera { get; private set; }
     
     [Networked]public Vector3 AimOrigin { get; private set; }
@@ -23,6 +25,7 @@ public class AimCameraController : NetworkBehaviour
 
     public override void Spawned()
     {
+        _playerMovement = GetComponent<PlayerMovement>();
         if (HasInputAuthority)
         {
             MainCamera = Camera.main;
@@ -44,7 +47,7 @@ public class AimCameraController : NetworkBehaviour
             camForward.y = 0;
 
             // 構え中の前後左右移動時に発生するカクつきを軽減するため、回転を補間させる
-            if (camForward.sqrMagnitude > 0.1f)
+            if (camForward.sqrMagnitude > 0.1f && (!_playerMovement || !_playerMovement.IsEvading))
             {
                 Quaternion targetRotation = Quaternion.LookRotation(camForward.normalized);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Runner.DeltaTime * _rotationSpeed);

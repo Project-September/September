@@ -20,6 +20,8 @@ namespace InGame.Player.Ability
         [SerializeField] private int _ogreDamage;
         
         private HatanoAbilityStatusManagement _abilityStatusManagement;
+
+        protected override bool ReplayAnimationOnEveryShot => true;
         
         protected override void OnStart()
         {
@@ -27,11 +29,18 @@ namespace InGame.Player.Ability
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = ShootingStateType.Stance;
+            _shootingIntervalTimer = 0;
         }
 
         protected override void OnUpdate(float deltaTime)
         {
-            if(_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.DoubleBarreledGun) return;
+            if (StopIfControlLocked()) return;
+
+            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.DoubleBarreledGun)
+            {
+                ResetShootingState();
+                return;
+            }
             
             ShootingInputJudgment();
             GunInterval();
@@ -89,10 +98,12 @@ namespace InGame.Player.Ability
         private void GetGunHitPointIDamageable(RaycastHit hitLeft, RaycastHit hitRight)
         {
             //自身に当たった場合、処理を行わない
-            if(hitLeft.collider.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
-            if(hitRight.collider.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
-            var damageableL = hitLeft.collider.GetComponentInParent<IDamageable>();
-            var damageableR = hitRight.collider.GetComponentInParent<IDamageable>();
+            var damageableL = hitLeft.collider != null
+                && hitLeft.collider.GetComponentInParent<NetworkObject>() != Parameter.Owner
+                ? hitLeft.collider.GetComponentInParent<IDamageable>() : null;
+            var damageableR = hitRight.collider != null
+                && hitRight.collider.GetComponentInParent<NetworkObject>() != Parameter.Owner
+                ? hitRight.collider.GetComponentInParent<IDamageable>() : null;
             GunDamage(damageableL);
             GunDamage(damageableR);
         }
