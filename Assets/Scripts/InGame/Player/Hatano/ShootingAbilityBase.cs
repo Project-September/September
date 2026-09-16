@@ -20,6 +20,7 @@ namespace InGame.Player.Ability.Effect.Shooting
         [Header("AnimationClip")]
         [Header("構え"), SerializeField] private AnimationClip _stanceAnimationClip;
         [Header("撃つ"), SerializeField] private AnimationClip _shootAnimationClip;
+        [Header("ヒット対象レイヤー"), SerializeField] protected LayerMask _hitLayerMask = ~0;
         
         private PlayerManager _playerManager;
 

@@ -84,7 +84,7 @@ namespace InGame.Player.Ability
             var origin = _muzzlePos[0].position;
             var target = ShootingPositionDetection(aimOrigin, aimDirection);
             var direction = target - origin;
-            if (!Physics.Raycast(origin, direction, out var hit, _shootingDistance))
+            if (!Physics.Raycast(origin, direction, out var hit, _shootingDistance, _hitLayerMask))
             {
                 _playerInteractionController.RemoteInteractionPreview(null);
                 return;
@@ -120,7 +120,7 @@ namespace InGame.Player.Ability
             Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
             //hitした場所に向かってRayを飛ばす
-            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance);
+            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance, _hitLayerMask);
             if (laserPoint)
             {
                 //Rayが当たった場所のColliderを取得して、小さいインタラクションオブジェクトも取得出来るようにする

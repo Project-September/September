@@ -16,7 +16,7 @@ namespace InGame.Player.Ability
         [SerializeField] private int _damage;
         [Header("鬼の時のダメージ")] 
         [SerializeField] private int _ogreDamage;
-        
+
         private HatanoAbilityStatusManagement _abilityStatusManagement;
         private HatanoWeaponController _weaponController;
 
@@ -86,8 +86,8 @@ namespace InGame.Player.Ability
             Debug.DrawRay(originRight, dirRight * _shootingDistance, Color.blue);
             
             //左右のマズルから、ヒットした場所にRayを飛ばす
-            var hitLeft = Physics.Raycast(originLeft, dirLeft, out var gunHitInfoLeft, _shootingDistance);
-            var hitRight = Physics.Raycast(originRight, dirRight, out var gunHitInfoRight, _shootingDistance);
+            var hitLeft = Physics.Raycast(originLeft, dirLeft, out var gunHitInfoLeft, _shootingDistance, _hitLayerMask);
+            var hitRight = Physics.Raycast(originRight, dirRight, out var gunHitInfoRight, _shootingDistance, _hitLayerMask);
             if (_weaponController != null)
                 _weaponController.RPC_PlayGunShot(
                     originLeft, hitLeft ? gunHitInfoLeft.point : originLeft + dirLeft.normalized * _shootingDistance,
