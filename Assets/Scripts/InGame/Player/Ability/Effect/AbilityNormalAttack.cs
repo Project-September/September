@@ -175,8 +175,14 @@ namespace InGame.Player.Ability
                 damage,
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
+            var targetPlayer = hitInfo.GetComponentInParent<PlayerManager>();
+            bool wasStunned = targetPlayer != null && targetPlayer.IsStun;
+
             damageable.TakeHit(ref hitData);
-            _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
+            if (!wasStunned)
+            {
+                _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
+            }
 
             // HitEffectのZ+を攻撃者の前方へ向ける。
             Quaternion hitEffectRotation = _playerMovement.Rigidbody.rotation;
