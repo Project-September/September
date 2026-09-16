@@ -39,7 +39,38 @@ namespace InGame.Player.Ability
             if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun) return;
             
             ShootingInputJudgment();
+            if (_phase == AbilityPhase.Ending) return;
             StateDetection();
+
+            PreviewRemoteInteractable();
+        }
+
+        /// <summary>
+        /// The laser gun advertises a valid target while aiming; interaction
+        /// progress still begins only while the shooting input is held.
+        /// </summary>
+        private void PreviewRemoteInteractable()
+        {
+            var origin = _muzzlePos[0].position;
+            var target = ShootingPositionDetection(_aimCameraController.AimOrigin, _aimCameraController.AimDirection);
+            var direction = target - origin;
+            if (!Physics.Raycast(origin, direction, out var hit, _shootingDistance))
+            {
+                _playerInteractionController.RemoteInteractionPreview(null);
+                return;
+            }
+
+            InteractableBase interactable = null;
+            foreach (var collider in Physics.OverlapBox(hit.point, _judgmentBoxSize, Quaternion.identity))
+            {
+                var obj = collider.gameObject;
+                interactable = obj.GetComponentInParent<InteractableBase>()
+                    ?? obj.GetComponent<InteractableBase>()
+                    ?? obj.GetComponentInChildren<InteractableBase>();
+                if (interactable != null) break;
+            }
+
+            _playerInteractionController.RemoteInteractionPreview(interactable);
         }
 
         protected override void OnShooting()

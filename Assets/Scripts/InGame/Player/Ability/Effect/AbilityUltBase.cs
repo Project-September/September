@@ -58,6 +58,13 @@ namespace InGame.Player.Ability.Effect
             if (!_playerHealth) _playerHealth = player.GetComponent<PlayerHealth>();
             if (!_cutInAnimator) _cutInAnimator = player.GetComponent<CutInAnimatorBase>();
             if (!_playerManager) _playerManager = player.GetComponent<PlayerManager>();
+
+            // An ult is exclusive with firearm aiming.  Cancel the gun first so
+            // its input loop cannot keep shooting during the cut-in.
+            if (player.TryGetComponent<PlayerAbilityManager>(out var abilityManager))
+                abilityManager.EndActiveShootingAbilities();
+            if (player.TryGetComponent<AimCameraController>(out var aimCameraController))
+                aimCameraController.StopAim();
             
             // アビリティが発動したら条件をリセットする
             if (player.TryGetComponent<IUltCondition>(out var condition))
@@ -131,6 +138,8 @@ namespace InGame.Player.Ability.Effect
             Debug.Log($"<color=yellow>[AbilityUlt]</color> End {StartTick} {Runner.Tick} {Runner.Tick - StartTick} {(Runner.Tick - StartTick) * Runner.DeltaTime}", Parameter.Owner);
             _isCutInEnd = false;
             _isEffectTriggered = false;
+            if (_playerHealth) _playerHealth.IsInvincible = _playerManager && _playerManager.IsStun;
+            if (_playerManager) _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             OnEndUlt();
         }
 
