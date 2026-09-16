@@ -8,10 +8,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 395481797178668813, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
-      propertyPath: _requiredScore
-      value: 500
-      objectReference: {fileID: 0}
     - target: {fileID: 1159011118462689394, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: m_Name
       value: Bot Character Okabe
@@ -454,6 +450,8 @@ MonoBehaviour:
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
   _attackWeapon: {fileID: 0}
+  _lockOnSearchRadius: 20
+  _lockOnVerticalRange: 1.5
   _buildGenerator: {fileID: 3590047751524659484}
   _playerStatus: {fileID: 3241513518113312228}
   _CurrentPlayerControlState: 0
@@ -461,6 +459,8 @@ MonoBehaviour:
     _value: 0
   _IsMovable:
     _value: 1
+  _IsLockOnActive:
+    _value: 0
 --- !u!114 &1315137790211532409
 MonoBehaviour:
   m_ObjectHideFlags: 0
