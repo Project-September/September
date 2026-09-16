@@ -196,6 +196,11 @@ namespace September.InGame.Exhibit
 		/// </summary>
 		public void InteractEnd()
 		{
+			// 被弾と入力解除などから同じTickに複数回呼ばれる場合がある。
+			// 既に終了済みなら、初期値のPlayerRefで辞書を参照せず終了する。
+			if (CurrentUsePlayerRef.IsNone)
+				return;
+
 			SetCooldown();
 			_move.Reset();
 			RPC_StartAnimation(false);
@@ -241,7 +246,13 @@ namespace September.InGame.Exhibit
 		{
 			if(CurrentUsePlayerRef.IsNone) return;
 			// クールダウン処理
-			var chara = PlayerDatabase.Instance.PlayerDataDic[CurrentUsePlayerRef].CharacterType;
+			var chara = CharacterType.All;
+			if (PlayerDatabase.Instance != null
+			    && PlayerDatabase.Instance.PlayerDataDic.TryGet(CurrentUsePlayerRef, out var playerData))
+			{
+				chara = playerData.CharacterType;
+			}
+
 			var time = _interactable.CooldownTimeDictionary.Dictionary.TryGetValue(CharacterType.All, out var all)
 				? all
 				: _interactable.CooldownTimeDictionary.Dictionary.GetValueOrDefault(chara, 0f);
