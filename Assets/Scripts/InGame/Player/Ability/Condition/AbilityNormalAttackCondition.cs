@@ -12,12 +12,18 @@ namespace InGame.Player.Ability
         public string TargetAbilityName => _targetAbilityName;
         private PlayerMovement _playerMovement;
         private PlayerManager _playerManager;
+        private AimCameraController _aimCameraController;
 
         public bool IsConditionMatch(in TriggerEventContext context)
         {
             if (!context.Owner) return false;
             if (!_playerMovement) _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
+            if (!_aimCameraController) _aimCameraController = context.Owner.GetComponent<AimCameraController>();
+
+            // 展示物から追加される通常攻撃も、ハタノの構え中には開始しない。
+            if (_aimCameraController && (_aimCameraController.IsAim ||
+                context.CurrentButtons.IsSet(PlayerButtons.Ability2))) return false;
 
 
             //Available状態でAttackボタンが押されたら条件を満たす

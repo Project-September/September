@@ -43,6 +43,7 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
+        [Networked] public bool IsInteractionBlocked { get; private set; }
         private bool _isBot;
 
         [Networked] private bool IsRemoting { get; set; } //遠距離インタラクション中かの判定
@@ -82,9 +83,38 @@ namespace InGame.Interact
             }
         }
 
+        /// <summary>状態権限側からインタラクトの制限を設定し、全端末へ同期する。</summary>
+        public void SetInteractionBlocked(bool blocked)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority) return;
+
+            IsInteractionBlocked = blocked;
+            if (!blocked) return;
+
+            // 必殺技終了後に途中の遠距離インタラクトを再開しない。
+            IsRemoting = false;
+            RemoteFocusedObject = null;
+            RemoteInteractTime = 0f;
+            RemoteInteractTimer = 0f;
+            _isHoldingInteract = false;
+            _isExecutingInteraction = false;
+            _currentInteractTime = 0f;
+        }
+
         private void Update()
         {
+            if (Object == null || !Object.IsValid) return;
             if (!HasInputAuthority && !_isBot) return;
+
+            if (IsInteractionBlocked)
+            {
+                _isHoldingInteract = false;
+                _isWaitingForResponse = false;
+                _interactWaitTimer = 0f;
+                CancelInteraction();
+                if (!_isBot) UIController.I?.ShowInteractUI(false);
+                return;
+            }
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
@@ -144,6 +174,7 @@ namespace InGame.Interact
             _isHoldingInteract = false; // 毎フレームリセット
 
             if (!HasInputAuthority && !_isBot) return;
+            if (IsInteractionBlocked) return;
             if (!_inputManager.GetPlayerInput(out PlayerInput input)) return;
 
             // Fusionのシミュレーション内でのみ行う処理
@@ -173,6 +204,11 @@ namespace InGame.Interact
         public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase,
             ref AbilityBase.AbilityPhase abilityPhase, AimCameraController aimCameraController)
         {
+            if (IsInteractionBlocked)
+            {
+                RemoteInteractionCancel(ref timer);
+                return;
+            }
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
@@ -368,6 +404,11 @@ namespace InGame.Interact
 
         private void CompleteInteraction()
         {
+            if (IsInteractionBlocked)
+            {
+                CancelInteraction();
+                return;
+            }
             _isExecutingInteraction = false;
 
             _buildGenerator?.UpdateBuild(BuildRouteType.FastInteract);
@@ -423,6 +464,7 @@ namespace InGame.Interact
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         private void RPC_RequestInteract(int interactor, int characterType, NetworkObject target)
         {
+            if (IsInteractionBlocked) return;
             Debug.Log($"target.HasStateAuthority: {target.HasStateAuthority}, Runner.LocalPlayer: {Runner.LocalPlayer}");
 
             InteractableBase interactable;

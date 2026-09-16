@@ -24,6 +24,8 @@ namespace InGame.Player.Ability.Effect.Shooting
         private PlayerManager _playerManager;
 
         private NetworkBool _isShootingAnimation; // 射撃アニメーションを再生済みか
+
+        protected virtual bool ReplayAnimationOnEveryShot => false;
         
         protected override void OnStart()
         {
@@ -45,7 +47,16 @@ namespace InGame.Player.Ability.Effect.Shooting
                 return;
             }
 
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            // 構え解除と同時の射撃を受け付けない。
+            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
+            {
+                _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+                ApplyCameraState(ShootingStateType.None);
+                ResetShootingState();
+                EndAnimation();
+                return;
+            }
+
             //射撃ステートが構えの場合、射撃入力を受け付ける
             if (_shootingType == ShootingStateType.Stance)
             {
@@ -53,7 +64,7 @@ namespace InGame.Player.Ability.Effect.Shooting
                 if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
                 {
                     OnShooting();
-                    if (!_isShootingAnimation)
+                    if (ReplayAnimationOnEveryShot || !_isShootingAnimation)
                     {
                         _isShootingAnimation = true;
                         _animationClipPlayer.PlayOnUpperBody(_shootAnimationClip);
@@ -67,17 +78,30 @@ namespace InGame.Player.Ability.Effect.Shooting
                 }
             }
 
-            //構え入力が終了➤構える前の状態に戻す
-            if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
-            {
-                _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
-                ApplyCameraState(ShootingStateType.None);
-                _phase = AbilityPhase.Available;
-                _shootingType = ShootingStateType.None;
-                _lastShootingType = ShootingStateType.None;
-                OnStopTheStance();
-                EndAnimation();
-            }
+        }
+
+        // 切替先のカメラや上半身モーションには触れず、旧武器の処理を終了する。
+        protected void ResetShootingState()
+        {
+            _phase = AbilityPhase.Available;
+            _shootingType = ShootingStateType.None;
+            _lastShootingType = ShootingStateType.None;
+            _isShootingAnimation = false;
+            OnStopTheStance();
+        }
+
+        protected bool StopIfControlLocked()
+        {
+            if (_playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal)
+                return false;
+
+            ResetShootingState();
+            // Ult や展示物側が設定したカメラ・操作状態・モーションを上書きしない。
+            if (_animationClipPlayer.IsCurrentClipOnLayer(LayerInfo.LayerType.UpperBody, _stanceAnimationClip)
+                || _animationClipPlayer.IsCurrentClipOnLayer(LayerInfo.LayerType.UpperBody, _shootAnimationClip))
+                _animationClipPlayer.PlayOnUpperBody(null);
+            _animationClipPlayer.SetAim(false);
+            return true;
         }
         
         /// <summary>

@@ -43,6 +43,7 @@ namespace InGame.Player.Ability
 
         protected override void OnCutInStart()
         {
+            _aimCameraController.RPC_CrosshairToggleChange(false);
             _rocketAnimator.SetBool(_rocketAnimName, true);
         }
 
@@ -55,6 +56,8 @@ namespace InGame.Player.Ability
             _effectID = _effectSpawner.RequestPlayLoopEffect(EffectType.Cursor, Vector3.zero, Quaternion.identity);
             
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+
+            _animationClipPlayer.PlayClipLoop(_idleClip);
         }
 
         protected override void OnCutInUpdate(float deltaTime)
@@ -76,11 +79,6 @@ namespace InGame.Player.Ability
                 }
                 
                 return;
-            }
-            
-            if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
-            {
-                _animationClipPlayer.PlayClip(_idleClip);
             }
             
             if (_playerInput.Buttons.IsSet(PlayerButtons.Attack))

@@ -1,5 +1,6 @@
 using System;
 using Fusion;
+using InGame.Interact;
 using InGame.Player.Ult;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ namespace InGame.Player.Ability.Effect
         private CutInAnimatorBase _cutInAnimator;
         private PlayerHealth _playerHealth;
         private PlayerManager _playerManager;
+        private PlayerInteractionController _interactionController;
 
         /// <summary>
         /// カットイン終了まで待機するタイマー
@@ -58,13 +60,16 @@ namespace InGame.Player.Ability.Effect
             if (!_playerHealth) _playerHealth = player.GetComponent<PlayerHealth>();
             if (!_cutInAnimator) _cutInAnimator = player.GetComponent<CutInAnimatorBase>();
             if (!_playerManager) _playerManager = player.GetComponent<PlayerManager>();
-
             // An ult is exclusive with firearm aiming.  Cancel the gun first so
             // its input loop cannot keep shooting during the cut-in.
             if (player.TryGetComponent<PlayerAbilityManager>(out var abilityManager))
                 abilityManager.EndActiveShootingAbilities();
             if (player.TryGetComponent<AimCameraController>(out var aimCameraController))
                 aimCameraController.StopAim();
+            if (!_interactionController) _interactionController = player.GetComponent<PlayerInteractionController>();
+
+            // カットイン後に移動可能になる必殺技も、能力終了まではインタラクトを禁止する。
+            if (_interactionController) _interactionController.SetInteractionBlocked(true);
             
             // アビリティが発動したら条件をリセットする
             if (player.TryGetComponent<IUltCondition>(out var condition))
@@ -140,7 +145,14 @@ namespace InGame.Player.Ability.Effect
             _isEffectTriggered = false;
             if (_playerHealth) _playerHealth.IsInvincible = _playerManager && _playerManager.IsStun;
             if (_playerManager) _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
-            OnEndUlt();
+            try
+            {
+                OnEndUlt();
+            }
+            finally
+            {
+                if (_interactionController) _interactionController.SetInteractionBlocked(false);
+            }
         }
 
         protected virtual void OnCutInStart() { }

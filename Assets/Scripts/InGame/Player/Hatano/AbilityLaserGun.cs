@@ -34,8 +34,14 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
+            if (StopIfControlLocked()) return;
+
             //現在のAbilityがレーザー銃でない場合、処理をしない
-            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun) return;
+            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun)
+            {
+                ResetShootingState();
+                return;
+            }
             
             ShootingInputJudgment();
             if (_phase == AbilityPhase.Ending) return;

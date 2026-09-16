@@ -40,6 +40,7 @@ namespace InGame.Common
         private AnimationMixerPlayable _normalMixer; // 通常
         private AnimationMixerPlayable _aimMixer; // Aim
         private AnimationLayerMixerPlayable _layerMixer;
+        [Networked] private NetworkBool IsAimAnimation { get; set; }
 
         /// <summary>グラフ評価 (LateUpdate) の直前に呼ばれる。足 IK など出力後処理のパラメータ更新用。</summary>
         public event Action BeforeEvaluate;
@@ -242,17 +243,18 @@ namespace InGame.Common
             if (_wait == clip) return;
 
             _wait = clip;
-            if (!_graph.IsValid() || !_baseMixer.IsValid()) return;
+            if (!_graph.IsValid() || !_normalMixer.IsValid()) return;
 
-            var currentPlayable = _baseMixer.GetInput(0);
-            _graph.Disconnect(_baseMixer, 0);
-            if (currentPlayable.IsValid())
-                _graph.DestroyPlayable(currentPlayable);
+            // BaseMixerの入力0は待機モーションではなくNormalMixerそのもの。
+            // ここではNormalMixer内の待機ポートだけを差し替える。
+            _normalMixer.DisconnectInput(_waitPort);
+            if (_waitClipPlayable.IsValid())
+                _graph.DestroyPlayable(_waitClipPlayable);
 
             if (_wait)
             {
-                var playable = AnimationClipPlayable.Create(_graph, _wait);
-                _baseMixer.ConnectInput(0, playable, 0);
+                _waitClipPlayable = AnimationClipPlayable.Create(_graph, _wait);
+                _normalMixer.ConnectInput(_waitPort, _waitClipPlayable, 0);
             }
 
             UpdateLocoBlend(_locoWeight);
@@ -973,6 +975,21 @@ namespace InGame.Common
         /// <param name="aim">true：Aimアニメーション　false：通常アニメーション</param>
         public void SetAim(bool aim)
         {
+            if (Object != null && Object.IsValid && HasStateAuthority)
+                IsAimAnimation = aim;
+
+            ApplyAim(aim);
+        }
+
+        public override void Render()
+        {
+            ApplyAim(IsAimAnimation);
+        }
+
+        private void ApplyAim(bool aim)
+        {
+            if (!_baseMixer.IsValid()) return;
+
             if (aim) // Aimアニメーションに変更
             {
                 _baseMixer.SetInputWeight(0, 0f);
