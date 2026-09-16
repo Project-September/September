@@ -4,6 +4,7 @@ using Fusion;
 using InGame.Bot;
 using InGame.Player;
 using InGame.Player.Ability;
+using InGame.Player.Hatano;
 using September.Common;
 using September.InGame;
 using September.InGame.Common.Stats;
@@ -43,6 +44,9 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
+        private HatanoAbilityStatusManagement _hatanoAbilityStatus;
+        private bool IsHatanoInputLocked => _hatanoAbilityStatus && _playerManager &&
+            _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.InputLocked;
         private bool _isBot;
 
         [Networked] private bool IsRemoting { get; set; } //遠距離インタラクション中かの判定
@@ -55,6 +59,7 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
+            _hatanoAbilityStatus = GetComponent<HatanoAbilityStatusManagement>();
             _playerAudioController = GetComponentInChildren<PlayerAudioController>();
 
 #if UNITY_EDITOR
@@ -85,6 +90,14 @@ namespace InGame.Interact
         private void Update()
         {
             if (!HasInputAuthority && !_isBot) return;
+
+            if (IsHatanoInputLocked)
+            {
+                _isHoldingInteract = false;
+                CancelInteraction();
+                if (!_isBot) UIController.I?.ShowInteractUI(false);
+                return;
+            }
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
@@ -173,6 +186,11 @@ namespace InGame.Interact
         public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase,
             ref AbilityBase.AbilityPhase abilityPhase, AimCameraController aimCameraController)
         {
+            if (IsHatanoInputLocked)
+            {
+                RemoteInteractionCancel(ref timer);
+                return;
+            }
             var context = new InteractableContext
             {
                 Interactor = Object.InputAuthority.RawEncoded,
@@ -349,6 +367,11 @@ namespace InGame.Interact
 
         private void CompleteInteraction()
         {
+            if (IsHatanoInputLocked)
+            {
+                CancelInteraction();
+                return;
+            }
             _isExecutingInteraction = false;
 
             _buildGenerator?.UpdateBuild(BuildRouteType.FastInteract);
@@ -404,6 +427,7 @@ namespace InGame.Interact
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         private void RPC_RequestInteract(int interactor, int characterType, NetworkObject target)
         {
+            if (IsHatanoInputLocked) return;
             Debug.Log($"target.HasStateAuthority: {target.HasStateAuthority}, Runner.LocalPlayer: {Runner.LocalPlayer}");
 
             InteractableBase interactable;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Fusion;
+using Cysharp.Threading.Tasks;
 using InGame.Common;
 using UnityEngine;
 using September.Common;
@@ -27,54 +28,89 @@ namespace InGame.Player.Hatano
         private HatanoAbilityStatusUIManager _abilityStatusUIManager;
         private AimCameraController _aimCameraController;
         private bool _isChangeAbilityInput; //Abilityの変更入力
+        private PlayerManager _playerManager;
+        private PlayerMovement _playerMovement;
+        [Networked] public NetworkBool IsChangingWeapon { get; private set; }
 
         private void Awake()
         {
             _abilityStatusUIManager = GetComponent<HatanoAbilityStatusUIManager>();
             _aimCameraController = GetComponent<AimCameraController>();
+            _playerManager = GetComponent<PlayerManager>();
+            _playerMovement = GetComponent<PlayerMovement>();
         }
 
         public override void Spawned()
         {
-            _abilityStatus = HatanoAbilityStatus.DoubleBarreledGun;
+            if (HasStateAuthority)
+                _abilityStatus = HatanoAbilityStatus.DoubleBarreledGun;
+            _lastAbilityStatus = HatanoAbilityStatus.None;
         }
 
-        public override void FixedUpdateNetwork()
+        public override void Render()
         {
-            if (_abilityStatus != _lastAbilityStatus)
+            if (_animClipPlayer.IsValid && _abilityStatus != _lastAbilityStatus)
             {
                 _lastAbilityStatus = _abilityStatus;
 
                 // UI更新
                 _abilityStatusUIManager.SelectedAbilityUITextChanged(_abilityStatus);
+                _changeAnimation.ChangeMoveAnimation(_abilityStatus);
             }
-            
-            if (!HasInputAuthority) return;
+        }
+
+        public override void FixedUpdateNetwork()
+        {
             // 入力がなかったら処理を行わない
             if (!GetInput<PlayerInput>(out var input)) return;
+
+            // 切替前の射撃 Ability が終了した後も、エイム解除入力は処理する。
+            if (HasStateAuthority && IsChangingWeapon && _aimCameraController.IsAim
+                && !input.Buttons.IsSet(PlayerButtons.Ability2)
+                && _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal)
+            {
+                _aimCameraController.RPC_NormalCamera();
+                _aimCameraController.RPC_CrosshairToggleChange(false);
+                _animClipPlayer.SetAim(false);
+            }
+
+            if (!HasInputAuthority) return;
 
             if (input.Buttons.IsSet(PlayerButtons.Ability1) && !_isChangeAbilityInput)
             {
                 _isChangeAbilityInput = true;
-                var next = GetNextHatanoAbilityStatus();
+                if (input.Buttons.IsSet(PlayerButtons.Ultimate) || !CanChangeWeapon()) return;
 
                 // アビリティの変更
                 if (HasStateAuthority)
                 {
-                    _abilityStatus = next;
+                    ChangeAbilityStatus();
                 }
                 else
                 {
-                    RPC_ChangeAbilityStatus(next);
+                    RPC_ChangeAbilityStatus();
                 }
-                // アビリティの変更があったタイミングで切り替え等の処理を実行
-                ChangeAbility(_abilityStatus);
             }
 
             if (!input.Buttons.IsSet(PlayerButtons.Ability1) && _isChangeAbilityInput)
             {
                 _isChangeAbilityInput = false;
             }
+        }
+
+        private bool CanChangeWeapon()
+        {
+            return _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal
+                   && !_playerManager.IsStun && _playerManager.IsMovable && !IsChangingWeapon
+                   && !_playerMovement.IsEvading && !_playerMovement.DoingVault;
+        }
+
+        private void ChangeAbilityStatus()
+        {
+            if (!CanChangeWeapon()) return;
+            if (GetInput<PlayerInput>(out var input) && input.Buttons.IsSet(PlayerButtons.Ultimate)) return;
+            _abilityStatus = GetNextHatanoAbilityStatus();
+            ChangeAbility(_abilityStatus).Forget();
         }
 
         /// <summary>
@@ -93,33 +129,35 @@ namespace InGame.Player.Hatano
         /// <summary>
         /// アビリティの変更を行う
         /// </summary>
-        /// <param name="status">変更後のアビリティ</param>
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-        private void RPC_ChangeAbilityStatus(HatanoAbilityStatus status)
+        private void RPC_ChangeAbilityStatus()
         {
-            _abilityStatus = status;
+            ChangeAbilityStatus();
         }
 
         /// <summary>
         /// アビリティの変更
         /// </summary>
         /// <param name="status">変更後のアビリティ</param>
-        private void ChangeAbility(HatanoAbilityStatus status)
+        private async UniTask ChangeAbility(HatanoAbilityStatus status)
         {
-            // 表示する銃とアニメーションを変更
-            switch (status)
+            var clip = status == HatanoAbilityStatus.LaserGun
+                ? (_aimCameraController.IsAim ? _changeAimDLClip : _changeDLClip)
+                : (_aimCameraController.IsAim ? _changeAimLDClip : _changeLDClip);
+            if (clip == null) return;
+
+            IsChangingWeapon = true;
+            try
             {
-                case HatanoAbilityStatus.LaserGun:
-                    _animClipPlayer.PlayOnUpperBody(null);
-                    _animClipPlayer.PlayClip(_aimCameraController.IsAim ? _changeAimDLClip : _changeDLClip);
-                    break;
-                case HatanoAbilityStatus.DoubleBarreledGun:
-                    _animClipPlayer.PlayOnUpperBody(null);
-                    _animClipPlayer.PlayClip(_aimCameraController.IsAim ? _changeAimLDClip : _changeLDClip);
-                    break;
+                _animClipPlayer.PlayOnUpperBody(null);
+                // 確定した装備の切替を StateAuthority から全員へ通知する。
+                await _animClipPlayer.PlayClipAndWait(clip);
             }
-            
-            _changeAnimation.ChangeMoveAnimation(status);
+            finally
+            {
+                if (Object != null && Object.IsValid && HasStateAuthority)
+                    IsChangingWeapon = false;
+            }
         }
     }
 }

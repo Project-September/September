@@ -1,6 +1,7 @@
 using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
+using InGame.Player.Hatano;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
@@ -32,6 +33,7 @@ namespace InGame.Player
         [SerializeField] PlayerStatus _playerStatus;
 
         PlayerMovement _playerMovement;
+        HatanoAbilityStatusManagement _hatanoAbilityStatus;
         CameraController _cameraController;
         PlayerHealth _playerHealth;
         PlayerEffectController _playerEffectController;
@@ -145,6 +147,7 @@ namespace InGame.Player
         void InitComponents()
         {
             _playerMovement = GetComponent<PlayerMovement>();
+            _hatanoAbilityStatus = GetComponent<HatanoAbilityStatusManagement>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
             _rigidbody = GetComponent<Rigidbody>();
             if (TryGetComponent(out CameraController cameraController))
@@ -219,9 +222,12 @@ namespace InGame.Player
 
                 if (!IsStun && IsMovable && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
+                    bool isChangingWeapon = _hatanoAbilityStatus && _hatanoAbilityStatus.IsChangingWeapon;
                     // player movement に入力を与えて更新する_playerInputManager
-                    _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
-                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
+                    _playerMovement.UpdateMovement(isChangingWeapon ? Vector2.zero : input.MoveDirection,
+                        !isChangingWeapon && input.Buttons.IsSet(PlayerButtons.Dash), input.CameraYaw,
+                        !isChangingWeapon && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump),
+                        !isChangingWeapon && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
                 }
 
                 // 乗車中は台車に移動を任せ、それ以外は接地・落下・速度を更新する。

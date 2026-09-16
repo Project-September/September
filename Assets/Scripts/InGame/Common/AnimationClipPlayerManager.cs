@@ -69,6 +69,7 @@ namespace InGame.Common
         private Transform _visualRoot;
         private Quaternion _visualRootBaseLocalRotation;
         private float _locoWeight;
+        private Vector2 _aimLocoInput;
         [Networked] private float LocoTargetWeight { get; set; }
         [Networked] private float LocoPlaybackRate { get; set; }
         private CancellationTokenSource _jumpOverTokenSrc;
@@ -267,7 +268,9 @@ namespace InGame.Common
             _locoWeight = Mathf.MoveTowards(_locoWeight, LocoTargetWeight, _locoBlendSpeed * Time.deltaTime);
             _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
             _animationClipPlayer.SetLocoPlaybackRate(LocoPlaybackRate);
-            _animationClipPlayer.SetAimLocoBlendWeight(_playerMovement.MoveInput);
+            _aimLocoInput = Vector2.MoveTowards(
+                _aimLocoInput, _playerMovement.MoveInput, _locoBlendSpeed * Time.deltaTime);
+            _animationClipPlayer.SetAimLocoBlendWeight(_aimLocoInput);
             // 強制上書き中は、非ループクリップが終端に到達しても倒れた姿勢を保持する。
             if (!_hardOverride && !HasActiveTopLayerClip())
             {

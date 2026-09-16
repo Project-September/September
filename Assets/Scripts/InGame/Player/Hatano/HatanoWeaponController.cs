@@ -22,6 +22,23 @@ namespace InGame.Player.Hatano
         [SerializeField] private Transform _rocketPrefabTransform;
         [SerializeField] private Transform[] _doublePrefabTransform;
         [SerializeField] private Transform _laserPrefabTransform;
+
+        public override void Spawned()
+        {
+            // Prefab 保存時の姿勢に依存せず、開始時の装備をソケットへ配置する。
+            AttachRocketBody();
+            var status = GetComponentInParent<HatanoAbilityStatusManagement>();
+            if (status != null && status.AbilityStatus == HatanoAbilityStatus.LaserGun)
+            {
+                AttachLaserGunHand();
+                AttachDoubleGunBody();
+            }
+            else
+            {
+                AttachDoubleGunHand();
+                AttachLaserGunHip();
+            }
+        }
         
         #region 二丁拳銃
 

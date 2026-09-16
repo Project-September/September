@@ -43,6 +43,7 @@ namespace InGame.Player.Ability
 
         protected override void OnCutInStart()
         {
+            _aimCameraController.RPC_CrosshairToggleChange(false);
             _rocketAnimator.SetBool(_rocketAnimName, true);
         }
 
