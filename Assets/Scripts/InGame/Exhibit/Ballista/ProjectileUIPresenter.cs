@@ -18,7 +18,7 @@ namespace September.InGame.Exhibit
 			_projectile.OnAmmoChanged -= UpdateAmmo;
 		}
 
-		private void UpdateAmmo(int ammo, float coolTime, PlayerRef PlayerRef)
+		private void UpdateAmmo(int ammo, float coolTime, PlayerRef playerRef)
 		{
 			_ammoView.UpdateAmmo(ammo, coolTime);
 		}
