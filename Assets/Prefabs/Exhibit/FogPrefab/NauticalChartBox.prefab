@@ -20,6 +20,8 @@ GameObject:
   - component: {fileID: 1556800189702889066}
   - component: {fileID: 5153903193278629257}
   - component: {fileID: 1236876508739283936}
+  - component: {fileID: 7637869232133720223}
+  - component: {fileID: 355871142760304320}
   m_Layer: 11
   m_Name: NauticalChartBox
   m_TagString: Untagged
@@ -249,6 +251,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _duration: 10
   _stormManager: {fileID: 3059726425097524901}
+  _mistSpawner: {fileID: 7637869232133720223}
+  _headMistApplier: {fileID: 355871142760304320}
   _fogController:
     rid: 7603375265544667231
   references:
@@ -306,6 +310,8 @@ MonoBehaviour:
   _characterEffects:
   - rid: 7603375265544667232
   _type: 17
+  _interactPositionOffset: {x: 0, y: 0, z: 0}
+  _interactAreaCollider: {fileID: 0}
   _interactEffectOffset: {x: 0, y: 0, z: 0}
   _cooldownEffectTransform: {fileID: 0}
   _cooldownEffectOffset: {x: 0, y: -0.2, z: 0}
@@ -315,7 +321,7 @@ MonoBehaviour:
   _cooldownEffectType: 24
   _spawnCooldownEffectOnStart: 1
   _audioBroadcaster: {fileID: 5153903193278629257}
-  _interactSoundCueName: 
+  _interactSoundCueName: SE_NauticalChart_Interact
   _interactSoundTrackingType: 0
   _LastInteractTime: -9999
   _LastUsedCooldownTime: 0
@@ -329,6 +335,39 @@ MonoBehaviour:
       data:
         _characterType: 5
         _nauticalChartInteractable: {fileID: 1556800189702889066}
+--- !u!114 &7637869232133720223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7797308705639554541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615bbd9e4395fbc4eac3c8144ad3f962, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mistPrefab: {fileID: 364519087004515219, guid: ab31f475304632c4dbec752c2c0e12ce, type: 3}
+  _worldCenter: {x: 0, y: 6.7, z: -6.5}
+  _worldSize: {x: 103.5, y: 4, z: 69.35}
+  _gridCountX: 5
+  _gridCountZ: 5
+  _minSpacing: 10
+  _yOffset: 0
+  _yRandomRange: 1
+--- !u!114 &355871142760304320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7797308705639554541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca2b13da7d413448994e4ad5c7bef1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _headMistPrefab: {fileID: 4208788458372898687, guid: 5ab3bbee54250f5498e508b07f812a86, type: 3}
 --- !u!1001 &4209219747121675289
 PrefabInstance:
   m_ObjectHideFlags: 0

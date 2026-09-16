@@ -9,7 +9,6 @@ namespace InGame.Player.Ability
     [Serializable]
     public class AbilityLaserGun : ShootingAbilityBase
     {
-        [Header("参照")]
         [Header("PlayerInteractionController")]
         [SerializeField] private PlayerInteractionController _playerInteractionController;
         [Space(30)]
@@ -18,7 +17,7 @@ namespace InGame.Player.Ability
         private float _interactionTimer;
         [Header("判定を取るためのBoxの大きさ")]
         [SerializeField] private Vector3 _judgmentBoxSize;
-
+        
         /// <summary>
         /// 現在、インタラクション中のオブジェクトを保持
         /// </summary>
@@ -35,8 +34,14 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
+            if (StopIfControlLocked()) return;
+
             //現在のAbilityがレーザー銃でない場合、処理をしない
-            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun) return;
+            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun)
+            {
+                ResetShootingState();
+                return;
+            }
             
             ShootingInputJudgment();
             StateDetection();

@@ -5,7 +5,9 @@ using InGame.Health;
 using InGame.Player;
 using InGame.Player.Ability;
 using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace InGame.Exhibit
 {
@@ -18,26 +20,30 @@ namespace InGame.Exhibit
         [SerializeField] private AnimationClip _fallAnimation;
         [SerializeField] private AnimationClip _landingAnimation;
         [Header("Attack")]
-        [SerializeField] private NetworkObject _shockwavePrefab;
-        [SerializeField] private float _shockwaveMinSize;
-        [SerializeField] private float _shockwaveScaleDuration;
-        [SerializeField] private float _attackDuration;
+        [SerializeField] private NetworkObject _impactEffectPrefab;
+        [SerializeField] private EffectType _stampEffectType;
+        [SerializeField] private float _impactEffectOffset = 1f;
+        [SerializeField] private Vector3 _impactEffectRotationOffset = Vector3.zero;
+        [SerializeField, FormerlySerializedAs("_fallingEffectPositionOffset"), FormerlySerializedAs("_positionOffest")]
+        private Vector3 _positionOffset = Vector3.zero;
+        [SerializeField] private Vector3 _fallingEffectRotationOffset = Vector3.zero;
+        [SerializeField] private float _impactSize = 1f;
         [SerializeField] private float _attackRange;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _knockBackPower;
 
-        private NetworkObject _shockwaveObject;
+        private NetworkObject _impactEffectObject;
         private List<NetworkObject> _attackTargetPlayers = new();
         private StampingState _stampingState;
-        private float _slashEndTime; //U‚è‰º‚ë‚µI—¹ŠÔ
-        private float _landedTime; //’…’n‚µ‚½ŠÔ
-        private float _endTime; //ƒAƒrƒŠƒeƒB‚ÌI—¹ŠÔ
-        private float _attackEndTime; //UŒ‚”»’è‚ÌI—¹ŠÔ
+        private float _slashEndTime; //ï¿½Uï¿½è‰ºï¿½ë‚µï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        private float _endTime; //ï¿½Aï¿½rï¿½ï¿½ï¿½eï¿½Bï¿½ÌIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
         private GameObject _playerObject;
         private AnimationClipPlayer _animationClipPlayer;
         private AnimationClipPlayerManager _animationClipPlayerManager;
         private PlayerMovement _playerMovement;
+        private EffectSpawner _effectSpawner;
+        private EffectID _effectId;
 
         protected override void OnStart()
         {
@@ -50,7 +56,7 @@ namespace InGame.Exhibit
 
             _slashEndTime = Runner.SimulationTime + _attackAnimation.length;
 
-            //©•ªˆÈŠO‚ğUŒ‚‘ÎÛ‚É‚·‚é
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ÈŠOï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ÎÛ‚É‚ï¿½ï¿½ï¿½
             _attackTargetPlayers.Clear();
             foreach (var player in PlayerDatabase.Instance.PlayerObjectDic)
             {
@@ -59,6 +65,9 @@ namespace InGame.Exhibit
 
                 _attackTargetPlayers.Add(player.Value);
             }
+            if (!_effectSpawner)
+                _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
+
         }
 
         protected override void OnUpdate(float deltaTime)
@@ -78,15 +87,20 @@ namespace InGame.Exhibit
         }
 
         /// <summary>
-        /// U‚è‰º‚ë‚µ’†‚Ìˆ—
+        /// ï¿½Uï¿½è‰ºï¿½ë‚µï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½
         /// </summary>
         private void Swing()
         {
-            //U‚è‰º‚ë‚µ‚ªI—¹‚µ‚½‚ç—‰º‚ÉˆÚs‚·‚é
+            //ï¿½Uï¿½è‰ºï¿½ë‚µï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç—ï¿½ï¿½ï¿½ÉˆÚsï¿½ï¿½ï¿½ï¿½
             if (Runner.SimulationTime >= _slashEndTime)
             {
                 _animationClipPlayer.PlayClipLoop(_fallAnimation);
                 _stampingState = StampingState.Falling;
+                    _effectId = _effectSpawner.RequestPlayLoopEffectLocal(
+                        _stampEffectType,
+                        _positionOffset,
+                        Quaternion.Euler(_fallingEffectRotationOffset),
+                        Parameter.Owner.transform);
             }
 
             if (_playerMovement.IsGround)
@@ -94,7 +108,7 @@ namespace InGame.Exhibit
         }
 
         /// <summary>
-        /// —‰º’†‚Ìˆ—
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½
         /// </summary>
         private void Falling()
         {
@@ -106,78 +120,77 @@ namespace InGame.Exhibit
         }
 
         /// <summary>
-        /// ’…’n‚Ìˆ—
+        /// ï¿½ï¿½ï¿½nï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½
         /// </summary>
         private void Landing()
         {
-            //ÕŒ‚”g‚ğ‘å‚«‚­‚·‚é
-            float t = Mathf.InverseLerp(_landedTime, _landedTime + _shockwaveScaleDuration, Runner.SimulationTime);
-            float scale = Mathf.Lerp(_shockwaveMinSize, _attackRange * 2, t);
-            _shockwaveObject.transform.localScale = Vector3.one * scale;
-
-            //UŒ‚”»’è
-            if (Runner.SimulationTime <= _attackEndTime)
-            {
-                float attackRange = scale / 2;
-
-                HitboxDebugUtility.DrawWireSphere(_playerObject.transform.position, attackRange, Color.red);
-
-                for (int i = _attackTargetPlayers.Count - 1; i >= 0; i--)
-                {
-                    NetworkObject player = _attackTargetPlayers[i];
-
-                    //ÕŒ‚”g‚ÉG‚ê‚½
-                    if ((_playerObject.transform.position - player.transform.position).sqrMagnitude < attackRange * attackRange)
-                    {
-                        //UŒ‚‘ÎÛ‚©‚çŠO‚·
-                        _attackTargetPlayers.Remove(player);
-
-                        //ƒ_ƒ[ƒWˆ—
-                        if (player.TryGetComponent(out IDamageable damageable))
-                        {
-                            var hitData = new HitData(HitActionType.Damage, _damageAmount, _playerMovement.Object.InputAuthority, damageable.OwnerPlayerRef);
-                            damageable.TakeHit(ref hitData);
-                        }
-
-                        //‚«”ò‚Î‚·ˆ—
-                        if (player.TryGetComponent(out PlayerMovement movement))
-                        {
-                            var dir = movement.transform.position - _playerObject.transform.position;
-                            var distance = dir.magnitude;
-
-                            var power = _knockBackPower / Mathf.Max(distance, 0.1f);
-
-                            movement.AddFlyingVelocity(dir.normalized * power);
-                        }
-                    }
-                }
-            }
-
             if (Runner.SimulationTime > _endTime)
             {
+                if (_impactEffectObject != null)
+                {
+                    Runner.Despawn(_impactEffectObject);
+                    _impactEffectObject = null;
+                }
+
                 _playerMovement.IgnoreMoveInput = false;
                 _playerMovement.IgnoreEvasionInput = false;
                 _animationClipPlayerManager.EnableFallMotion = true;
-                Runner.Despawn(_shockwaveObject);
                 RequestEndAbility();
             }
         }
 
         /// <summary>
-        /// ’…’n‚Ìˆ—
+        /// ï¿½ï¿½ï¿½nï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½
         /// </summary>
         private void OnLanded()
         {
             _animationClipPlayer.PlayClip(_landingAnimation);
-            _endTime = Runner.SimulationTime + Mathf.Max(_shockwaveScaleDuration, _attackedFreezeTime);
-            _landedTime = Runner.SimulationTime;
-            _attackEndTime = Runner.SimulationTime + _attackDuration;
+            _endTime = Runner.SimulationTime + _attackedFreezeTime;
+
+            _effectSpawner.StopEffect(_effectId);
 
             Vector3 feetPosition = _playerMovement.MoveCapsuleCollider.bounds.min + Vector3.up * 0.1f;
-            _shockwaveObject = Runner.Spawn(_shockwavePrefab, feetPosition);
-            _shockwaveObject.transform.localScale = Vector3.one * _shockwaveMinSize;
+            var forward = _playerObject.transform.forward.normalized;
+            Vector3 spawnPosition = feetPosition + forward * _impactEffectOffset;
+            _impactEffectObject = Runner.Spawn(
+                _impactEffectPrefab,
+                spawnPosition,
+                _playerObject.transform.rotation * Quaternion.Euler(_impactEffectRotationOffset),
+                Parameter.Owner.InputAuthority);
+            _impactEffectObject.transform.localScale = Vector3.one * _impactSize;
+
+            ApplyImpactDamage(spawnPosition);
 
             _stampingState = StampingState.Landing;
+        }
+
+        private void ApplyImpactDamage(Vector3 impactPosition)
+        {
+            HitboxDebugUtility.DrawWireSphere(impactPosition, _attackRange, Color.red);
+
+            foreach (NetworkObject player in _attackTargetPlayers)
+            {
+                if ((impactPosition - player.transform.position).sqrMagnitude >= _attackRange * _attackRange)
+                    continue;
+
+                if (player.TryGetComponent(out IDamageable damageable))
+                {
+                    var hitData = new HitData(
+                        HitActionType.Damage,
+                        _damageAmount,
+                        _playerMovement.Object.InputAuthority,
+                        damageable.OwnerPlayerRef);
+                    damageable.TakeHit(ref hitData);
+                }
+
+                if (player.TryGetComponent(out PlayerMovement movement))
+                {
+                    var direction = movement.transform.position - impactPosition;
+                    float distance = direction.magnitude;
+                    float power = _knockBackPower / Mathf.Max(distance, 0.1f);
+                    movement.AddFlyingVelocity(direction.normalized * power);
+                }
+            }
         }
 
         public override void SetPlayerComponent(GameObject player)
@@ -190,9 +203,9 @@ namespace InGame.Exhibit
 
         public enum StampingState
         {
-            Swing,//U‚è‰º‚ë‚µ
-            Falling,  // —‚¿‚é
-            Landing   // ’…’n
+            Swing,//ï¿½Uï¿½è‰ºï¿½ë‚µ
+            Falling,  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            Landing   // ï¿½ï¿½ï¿½n
         }
     }
 }

@@ -4,6 +4,7 @@ using InGame.Health;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
+using September.InGame.UI;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 
@@ -99,6 +100,14 @@ namespace InGame.Player
         private RigidbodyConstraints _defaultConstraints;
 
         [Networked] public PlayerControlState CurrentPlayerControlState { get; private set; } = PlayerControlState.Normal;
+        [Networked] public bool IsMovementInputBlocked { get; private set; }
+
+        /// <summary>移動・ダッシュ・ジャンプ・回避の入力制限を状態権限側から設定する。</summary>
+        public void SetMovementInputBlocked(bool blocked)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority) return;
+            IsMovementInputBlocked = blocked;
+        }
 
         public void Start()
         {
@@ -219,8 +228,10 @@ namespace InGame.Player
                 if (!IsStun && IsMovable && CurrentPlayerControlState == PlayerControlState.Normal)
                 {
                     // player movement に入力を与えて更新する_playerInputManager
-                    _playerMovement.UpdateMovement(input.MoveDirection, input.Buttons.IsSet(PlayerButtons.Dash),
-                        input.CameraYaw, input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump), input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
+                    _playerMovement.UpdateMovement(IsMovementInputBlocked ? Vector2.zero : input.MoveDirection,
+                        !IsMovementInputBlocked && input.Buttons.IsSet(PlayerButtons.Dash), input.CameraYaw,
+                        !IsMovementInputBlocked && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Jump),
+                        !IsMovementInputBlocked && input.Buttons.WasPressed(PreviousButtons, PlayerButtons.Evasion), Runner.DeltaTime);
                 }
 
                 // 乗車中は台車に移動を任せ、それ以外は接地・落下・速度を更新する。
@@ -383,6 +394,8 @@ namespace InGame.Player
         {
             _playerHealth.IsInvincible = false;
             IsStun = false;
+            _playerMovement.ResetHorizontalVelocity();
+            RPC_SetPositionLock(false);
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
@@ -393,6 +406,8 @@ namespace InGame.Player
             // ビルドの減衰分を乗算
             StunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             IsStun = true;
+            _playerMovement.ResetHorizontalVelocity();
+            RPC_SetPositionLock(true);
             _playerEffectController.PlayStunEffect();
         }
 
@@ -439,8 +454,13 @@ namespace InGame.Player
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetPositionLock(NetworkBool isLocked)
         {
+            Vector3 velocity = _rigidbody.linearVelocity;
+            _rigidbody.linearVelocity = new Vector3(0f, velocity.y, 0f);
+            _rigidbody.angularVelocity = Vector3.zero;
+
             _rigidbody.constraints = isLocked ?
-                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
+                RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ |
+                RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
         }
 
@@ -454,6 +474,19 @@ namespace InGame.Player
             _rigidbody.constraints = active ?
                 RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
+        }
+
+        /// <summary>
+        /// 指定したプレイヤー本人の画面だけ、現在操作するキャラクターの操作説明へ切り替える。
+        /// State Authorityで行われる擬態のPrefab交換完了をInput Authority側のUIへ通知するために使用する。
+        /// </summary>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_ChangeMimicDescriptionUI(PlayerRef target, ControlDescriptionType type)
+        {
+            if (Runner.LocalPlayer != target || !UIController.I)
+                return;
+
+            UIController.I.ChangeDescriptionUI(type);
         }
 
         /// <summary> 非常用リスポーン </summary>

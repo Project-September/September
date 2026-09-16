@@ -23,6 +23,7 @@ MonoBehaviour:
       RawGuidValue: 19f655b49e829a745808b1f4b2be3ce2
     ExplainVideo: {fileID: 32900000, guid: 845c31cff8abdf145b125084cf6d4b51, type: 3}
     CharacterIcon: {fileID: 21300000, guid: 6644d27345ce9874b84f049469dd68f4, type: 3}
+    CharacterPortrait: {fileID: 21300000, guid: b0573cbbfa4269d46a26f20197db354b, type: 3}
     EmoteAnimation: {fileID: 7400000, guid: 48dc126edf5d26940b9e42f6355487ae, type: 2}
     SelectedVoice: VO_OKB_CharacterSelect
     StartVoice: VO_OKB_GameStart
@@ -42,6 +43,7 @@ MonoBehaviour:
       RawGuidValue: af06be98e08b2d24cb436322a7fd8790
     ExplainVideo: {fileID: 32900000, guid: 845c31cff8abdf145b125084cf6d4b51, type: 3}
     CharacterIcon: {fileID: 21300000, guid: 34b16b27a9491194683e52bfea2af9f4, type: 3}
+    CharacterPortrait: {fileID: 21300000, guid: 0bd9f93ffb6489f47b38c30a6071008f, type: 3}
     EmoteAnimation: {fileID: 7400000, guid: 448bab7b97604614b8eed12fa10f0ea1, type: 2}
     SelectedVoice: VO_Haru_CharacterSelect
     StartVoice: VO_Haru_GameStart
@@ -61,6 +63,7 @@ MonoBehaviour:
       RawGuidValue: 5a4f920190097c847a14b9ed199085e4
     ExplainVideo: {fileID: 32900000, guid: 845c31cff8abdf145b125084cf6d4b51, type: 3}
     CharacterIcon: {fileID: 21300000, guid: 452f619d0a53ab947a7179525f3b1900, type: 3}
+    CharacterPortrait: {fileID: 21300000, guid: 59931e82a2af0b54780001ad8c828a9a, type: 3}
     EmoteAnimation: {fileID: 7400000, guid: 783bb62416cf76846888919d4ab6708c, type: 2}
     SelectedVoice: VO_Tanihira_CharacterSelect
     StartVoice: VO_Tanihira_GameStart
@@ -80,6 +83,7 @@ MonoBehaviour:
       RawGuidValue: 157ca9ed5c106ea4a952c1d4c0054347
     ExplainVideo: {fileID: 32900000, guid: 845c31cff8abdf145b125084cf6d4b51, type: 3}
     CharacterIcon: {fileID: 21300000, guid: b1858861a0d8ec74eb25f5086fb30cd5, type: 3}
+    CharacterPortrait: {fileID: 21300000, guid: 5e414744279be984e84df470d9ad7080, type: 3}
     EmoteAnimation: {fileID: -203655887218126122, guid: 2ba78ef63f6078d4085d57ccff7d3903, type: 3}
     SelectedVoice: VO_Koinuma_CharacterSelect
     StartVoice: VO_Koinuma_GameStart
@@ -89,6 +93,66 @@ MonoBehaviour:
     InteractVoice: VO_Koinuma_Interact_01
     UniqueActionVoice: VO_Koinuma_Grapple
     BGM: BGM_Koinuma_01
+  - Type: 6
+    DisplayName: "\u30CF\u30BF\u30CE\u30FB\u30A8\u30EA\u30AF\u30BD\u30F3"
+    AbilityName: "\u30AF\u30EA\u30E0\u30BE\u30F3\u30FB\u30A4\u30EA\u30E5\u30FC\u30B8\u30E7\u30F3"
+    AbilityExplain: "\u30EC\u30FC\u30B6\u30FC\u30AC\u30F3\u3067\u9060\u304F\u306B\u3042\u308B\u4E00\u90E8\u5C55\u793A\u7269\u306B\u30A4\u30F3\u30BF\u30E9\u30AF\u30C8\u3059\u308B\u3053\u3068\u304C\u3067\u304D\u308B\u3002\r\n\u30CF\u30F3\u30C9\u30AC\u30F3\u3092\u4F7F\u3063\u3066\u3001\u9023\u7D9A\u9060\u8DDD\u96E2\u653B\u6483\u304C\u3067\u304D\u308B\u3002"
+    Prefab:
+      RawGuidValue: 974e3cd243685294b9c10d5b88880049
+    BotPrefab:
+      RawGuidValue: 157ca9ed5c106ea4a952c1d4c0054347
+    ExplainVideo: {fileID: 0}
+    CharacterIcon: {fileID: 21300000, guid: 5fec6df1f4f858d4e8c81bb542c49c2a, type: 3}
+    CharacterPortrait: {fileID: 21300000, guid: d361ced7d2514ea4792d7af108bd3a09, type: 3}
+    EmoteAnimation: {fileID: 5869935710289458297, guid: 21bfe027bc21cf6488b1e040a4ca5f9d, type: 3}
+    SelectedVoice: VO_Hatano_CharacterSelect
+    StartVoice: VO_Hatano_InGameStart
+    WinningVoice: VO_Hatano_Result
+    AttackVoice: VO_Hatano_Attack
+    DamageVoice: VO_Hatano_Damage
+    InteractVoice: VO_Hatano_Interact
+    UniqueActionVoice:
+    BGM: BGM_Okb_01
+  - Type: 7
+    DisplayName: "\u30AA\u30AA\u30AF\u30DC\u30FB\u30D9\u30E9\u30DF\u30FC"
+    AbilityName: --
+    AbilityExplain: --
+    Prefab:
+      RawGuidValue: a330609cbba1f504ebd8c0d786c1b012
+    BotPrefab:
+      RawGuidValue: 157ca9ed5c106ea4a952c1d4c0054347
+    ExplainVideo: {fileID: 0}
+    CharacterIcon: {fileID: 21300000, guid: b422911c41937d440a5148895dc9b4b1, type: 3}
+    CharacterPortrait: {fileID: 21300000, guid: 0ffa3eb46755b1240a6e5e1ce4f33a17, type: 3}
+    EmoteAnimation: {fileID: 1827226128182048838, guid: bcb852e73340fc84db5c492207e5392e, type: 3}
+    SelectedVoice: VO_Ookubo_CharacterSelect
+    StartVoice: VO_Ookubo_InGameStart
+    WinningVoice: VO_Ookubo_Result
+    AttackVoice: VO_Ookubo_Attack
+    DamageVoice: VO_Ookubo_Damage
+    InteractVoice: VO_Ookubo_Interact
+    UniqueActionVoice:
+    BGM: BGM_Okb_01
+  - Type: 8
+    DisplayName: "\u30BF\u30AB\u30E0\u30E9\u30FB\u30EC\u30AA\u30F3"
+    AbilityName: --
+    AbilityExplain: --
+    Prefab:
+      RawGuidValue: cc28b6aa258b8c24596e257efad21b31
+    BotPrefab:
+      RawGuidValue: 157ca9ed5c106ea4a952c1d4c0054347
+    ExplainVideo: {fileID: 0}
+    CharacterIcon: {fileID: 21300000, guid: 788a683eb0334e44eb43db8c34c94c3b, type: 3}
+    CharacterPortrait: {fileID: 21300000, guid: 7253120658387ad4c9926f7534fbf1fe, type: 3}
+    EmoteAnimation: {fileID: 7400000, guid: 917476f3cb760c043a45cf5a21a49fa5, type: 2}
+    SelectedVoice: VO_Takamura_CharacterSelect
+    StartVoice: VO_Takamura_InGameStart
+    WinningVoice: VO_Takamura_Result
+    AttackVoice: VO_Takamura_Attack
+    DamageVoice: VO_Takamura_Damage
+    InteractVoice: VO_Takamura_Interact
+    UniqueActionVoice:
+    BGM: BGM_Okb_01
   _controlDictionary:
-    keys: 01000000020000000300000004000000
-    values: 00000000000000000300000002000000
+    keys: 01000000020000000300000004000000060000000700000008000000
+    values: 0000000000000000030000000200000006000000080000000a000000

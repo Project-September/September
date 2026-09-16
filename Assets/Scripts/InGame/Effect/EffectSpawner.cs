@@ -139,6 +139,33 @@ namespace September.InGame.Effect
         }
 
         /// <summary>
+        /// プレイヤーを親にして、親基準の座標・回転でループエフェクトを生成する。
+        /// ワールド座標をRPCで送ると、受信時の補間位置の差でクライアントごとにずれるため使用する。
+        /// </summary>
+        public EffectID RequestPlayLoopEffectLocal(EffectType effectType, Vector3 localPosition, Quaternion localRotation, Transform parent)
+        {
+            if (effectType == EffectType.None) return default;
+
+            NetworkId parentNetworkId = default(NetworkId);
+            if (parent != null)
+            {
+                var parentNetworkObject = parent.GetComponentInParent<NetworkObject>();
+                if (parentNetworkObject != null)
+                {
+                    parentNetworkId = parentNetworkObject.Id;
+                }
+                else
+                {
+                    Debug.LogWarning($"[EffectSpawner] 指定オブジェクトにNetworkObjectが存在しません。parent: {parent}");
+                }
+            }
+
+            EffectID effectId = GenerateEffectId();
+            RPC_PlayEffectLocal(effectType, localPosition, localRotation, effectId, parentNetworkId);
+            return effectId;
+        }
+
+        /// <summary>
         /// 指定されたIDのエフェクトを停止する
         /// </summary>
         public void StopEffect(EffectID effectId)
@@ -152,6 +179,33 @@ namespace September.InGame.Effect
         public void StopEffectGradually(EffectID effectId)
         {
             RPC_StopEffectGraduallyById(effectId);
+        }
+        
+        /// <summary>
+        /// エフェクトの位置を更新
+        /// </summary>
+        /// <param name="effectId">ユーザー名＋タイムスタンプ推奨</param>
+        /// <param name="position">位置</param>
+        /// <param name="rotation">回転</param>
+        public void UpdateEffect(EffectID effectId, Vector3 position, Quaternion rotation)
+        {
+            RPC_UpdateEffect(effectId, position, rotation);
+        }
+
+        /// <summary>
+        /// エフェクトの位置を更新RPC
+        /// </summary>
+        /// <param name="effectId">エフェクトID</param>
+        /// <param name="position">位置</param>
+        /// <param name="rotation">回転</param>
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_UpdateEffect(EffectID effectId, Vector3 position, Quaternion rotation)
+        {
+            if (_activeEffects.TryGetValue(effectId, out var effect))
+            {
+                effect.transform.position = position;
+                effect.transform.rotation = rotation;
+            }
         }
 
         /// <summary>
@@ -234,6 +288,59 @@ namespace September.InGame.Effect
                 {
                     _activeEffects[effectId] = effect;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 親のローカル座標でループエフェクトを生成するRPC。
+        /// </summary>
+        [Rpc(RpcSources.All, RpcTargets.All)]
+        private void RPC_PlayEffectLocal(EffectType effectType, Vector3 localPosition, Quaternion localRotation, EffectID effectId, NetworkId parentNetworkId)
+        {
+            if (_effectDatabase == null)
+            {
+                InitializeEffectDatabase();
+            }
+
+            var effectData = _effectDatabase.GetEffectData(effectType);
+            if (effectData.Prefab == null)
+            {
+                Debug.LogError($"'{effectType}' に対応するプレハブが見つかりません");
+                return;
+            }
+
+            Transform parent = null;
+            if (parentNetworkId != default(NetworkId) &&
+                _networkRunner.TryFindObject(parentNetworkId, out NetworkObject parentNetworkObject))
+            {
+                parent = parentNetworkObject.transform;
+            }
+
+            GameObject effect;
+            if (parent != null)
+            {
+                effect = Instantiate(effectData.Prefab, parent);
+                effect.transform.localPosition = localPosition;
+                effect.transform.localRotation = localRotation;
+            }
+            else
+            {
+                Debug.LogWarning($"[EffectSpawner] 親NetworkObjectが見つからないため、ローカル座標をワールド座標として生成します。id: {parentNetworkId}");
+                effect = Instantiate(effectData.Prefab, localPosition, localRotation);
+            }
+
+            ParticleSystem system = effect.GetComponent<ParticleSystem>();
+            if (system != null)
+            {
+                var main = system.main;
+                main.loop = true;
+                system.Play();
+                _activeEffects[effectId] = effect;
+            }
+            else
+            {
+                Debug.LogWarning($"エフェクト '{effectType}' にParticleSystemが見つかりません");
+                _activeEffects[effectId] = effect;
             }
         }
         

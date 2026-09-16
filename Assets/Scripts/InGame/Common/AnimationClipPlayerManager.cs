@@ -69,10 +69,12 @@ namespace InGame.Common
         private Transform _visualRoot;
         private Quaternion _visualRootBaseLocalRotation;
         private float _locoWeight;
+        private Vector2 _aimLocoInput;
         [Networked] private float LocoTargetWeight { get; set; }
         [Networked] private float LocoPlaybackRate { get; set; }
         private CancellationTokenSource _jumpOverTokenSrc;
         private CancellationTokenSource _rollEvasionTokenSrc;
+        private readonly CompositeDisposable _subscriptions = new();
 
         private void Awake()
         {
@@ -93,28 +95,15 @@ namespace InGame.Common
                     {
                         _isFainting = false;
                     }
-                }).AddTo(this);
+                }).AddTo(_subscriptions);
 
-            _playerHealth.OnHitTaken += (hitData) =>
-            {
-                if (!_playerManager.IsStun && hitData.HitActionType.IsDamage())
-                {
-                    //被ダメのアニメーション再生
-                    _animationClipPlayer.PlayClip(_hitReactionClip);
-                }
-            };
+            _playerHealth.OnHitTaken += OnHitTaken;
 
-            _playerMovement.OnStartVault += () =>
-            {
-                if (!_hardOverride)
-                {
-                    RPC_TriggerVault();
-                }
-            };
+            _playerMovement.OnStartVault += OnStartVault;
 
             _playerMovement.UpdateAsObservable()
                 .Select(_ => _playerMovement.IsGroundNet || !EnableFallMotion) // EnableFallMotionが偽なら落下モーションを即時解除
-                .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(this);
+                .DistinctUntilChanged().Subscribe(x => SetFallAnim(x)).AddTo(_subscriptions);
 
             // 回避開始 Tick の変化で発火する。Networked 状態由来なので、ホスト・予測中のクライアント・リモート表示の全てが同じ経路で再生される
             // 回避中でなければ 0 に落とす。終了後も StartTick は残るため、途中参加時に過去の回避を再生してしまうのを防ぐ
@@ -126,11 +115,61 @@ namespace InGame.Common
                 {
                     if (!_hardOverride) TriggerEvasion(_playerMovement.EvasionDuration).Forget();
                 })
-                .AddTo(this);
+                .AddTo(_subscriptions);
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            ReleaseSubscriptions();
+        }
+
+        private void OnDestroy()
+        {
+            ReleaseSubscriptions();
+        }
+
+        /// <summary>
+        /// ダメージを食らったときに呼ばれるメソッド
+        /// </summary>
+        /// <param name="hitData">当たった情報</param>
+        private void OnHitTaken(HitData hitData)
+        {
+            if (!_playerManager.IsStun && hitData.HitActionType.IsDamage())
+            {
+                //被ダメのアニメーション再生
+                _animationClipPlayer.PlayClip(_hitReactionClip);
+            }
+        }
+
+        private void OnStartVault()
+        {
+            if (!_hardOverride)
+                RPC_TriggerVault();
+        }
+
+        /// <summary>
+        /// 購読を解除するメソッド
+        /// </summary>
+        private void ReleaseSubscriptions()
+        {
+            // NetworkObjectのDespawn後まで気絶シーケンスが継続すると、
+            // 破棄済みAnimationClipPlayerへアクセスするため先にキャンセルする。
+            _overrideCts?.Cancel();
+
+            _subscriptions.Clear();
+
+            if (_playerHealth)
+                _playerHealth.OnHitTaken -= OnHitTaken;
+            if (_playerMovement)
+                _playerMovement.OnStartVault -= OnStartVault;
         }
 
         private void SetFallAnim(bool isGround)
         {
+            // 気絶などの強制上書き中は、落下・着地処理で同じTopLayerを変更しない。
+            // これにより空中で気絶しても、物理的には落下しつつ気絶モーションを維持できる。
+            if (_hardOverride) return;
+
             if (!isGround
                 && EnableFallMotion
                 && !_animationClipPlayer.IsPlayingTargetClip(_jumpOver)
@@ -229,6 +268,9 @@ namespace InGame.Common
             _locoWeight = Mathf.MoveTowards(_locoWeight, LocoTargetWeight, _locoBlendSpeed * Time.deltaTime);
             _animationClipPlayer.SetLocoWeight(Mathf.Clamp(_locoWeight, 0f, 2f));
             _animationClipPlayer.SetLocoPlaybackRate(LocoPlaybackRate);
+            _aimLocoInput = Vector2.MoveTowards(
+                _aimLocoInput, _playerMovement.MoveInput, _locoBlendSpeed * Time.deltaTime);
+            _animationClipPlayer.SetAimLocoBlendWeight(_aimLocoInput);
             // 強制上書き中は、非ループクリップが終端に到達しても倒れた姿勢を保持する。
             if (!_hardOverride && !HasActiveTopLayerClip())
             {
@@ -359,7 +401,9 @@ namespace InGame.Common
             _hardOverride = true;
             CaptureVisualRootBasePose();
 
-            var cts = new CancellationTokenSource();
+            // Managerの寿命にも連動させ、Despawn/Destroy後にシーケンスを再開させない。
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(
+                this.GetCancellationTokenOnDestroy());
             _overrideCts = cts;
             try
             {
@@ -399,6 +443,7 @@ namespace InGame.Common
                     await ApplyGetUpVisualCorrectionAsync(downForward, hasDownForward, cts.Token);
 
                     await getUpBlendTask;
+                    cts.Token.ThrowIfCancellationRequested();
                     _animationClipPlayer.PlayOnLayer(_getUp);
                     if (_getUp.length > 0f)
                     {
@@ -407,6 +452,7 @@ namespace InGame.Common
                 }
 
                 await WaitUntilStunEndedAsync(cts.Token);
+                cts.Token.ThrowIfCancellationRequested();
 
                 // フェードアウトして解除
                 await _animationClipPlayer.BlendLayerWeight(
@@ -416,6 +462,7 @@ namespace InGame.Common
                     cts.Token
                 );
 
+                cts.Token.ThrowIfCancellationRequested();
                 if (!ReferenceEquals(_overrideCts, cts)) return;
                 ClearGetUpVisualCorrection();
                 _animationClipPlayer.PlayOnLayer(null);
@@ -431,9 +478,14 @@ namespace InGame.Common
                 // 途中キャンセル時も確実に状態を畳む
                 if (cts.IsCancellationRequested && ReferenceEquals(_overrideCts, cts))
                 {
-                    _animationClipPlayer.PlayOnLayer(null);
-                    _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
-                    ClearGetUpVisualCorrection();
+                    // OnDestroy/Despawnedからキャンセルされた場合、Unityオブジェクトには触れない。
+                    if (this && _animationClipPlayer)
+                    {
+                        _animationClipPlayer.PlayOnLayer(null);
+                        _animationClipPlayer.SetLayerWeight(LayerInfo.LayerType.TopLayer, 0f);
+                        ClearGetUpVisualCorrection();
+                    }
+
                     _hardOverride = false;
                     if (ReferenceEquals(_overrideCts, cts)) _overrideCts = null;
                 }

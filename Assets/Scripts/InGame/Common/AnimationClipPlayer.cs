@@ -25,19 +25,29 @@ namespace InGame.Common
         [SerializeField] private AnimationClip _wait;
         [SerializeField] private AnimationClip _walk;
         [SerializeField] private AnimationClip _run;
+        [Header("Aimアニメーション")] 
+        [SerializeField] private AnimationClip _aimWait;
+        [SerializeField] private AnimationClip _aimFrontWalk;
+        [SerializeField] private AnimationClip _aimBackWalk;
+        [SerializeField] private AnimationClip _aimRightWalk;
+        [SerializeField] private AnimationClip _aimLeftWalk;
         [SerializeField, Range(0f, 2f)] private float _locoWeight = 0f;
         [SerializeField] protected Animator _animator;
 
         private PlayableGraph _graph;
         private AnimationPlayableOutput _output;
-        private AnimationMixerPlayable _baseMixer;
+        private AnimationMixerPlayable _baseMixer; // 通常とAimをまとめたMixer
+        private AnimationMixerPlayable _normalMixer; // 通常
+        private AnimationMixerPlayable _aimMixer; // Aim
         private AnimationLayerMixerPlayable _layerMixer;
+        [Networked] private NetworkBool IsAimAnimation { get; set; }
 
         /// <summary>グラフ評価 (LateUpdate) の直前に呼ばれる。足 IK など出力後処理のパラメータ更新用。</summary>
         public event Action BeforeEvaluate;
 
         public PlayableGraph Graph => _graph;
         public Animator Animator => _animator;
+        public AnimationClip WaitClip => _wait;
         public AnimationClip WalkClip => _walk;
         public AnimationClip RunClip => _run;
 
@@ -53,8 +63,25 @@ namespace InGame.Common
         /// 現在再生中のクリップ情報
         /// </summary>
         private readonly Dictionary<LayerInfo.LayerType, AnimationClip> _clipOf = new();
+        
+        // 通常移動
+        private AnimationClipPlayable _waitClipPlayable;
+        private AnimationClipPlayable _walkClipPlayable;
+        private AnimationClipPlayable _runClipPlayable;
+        // 構え移動
+        private AnimationClipPlayable _aimWaitClipPlayable;
+        private AnimationClipPlayable _aimFrontWalkClipPlayable;
+        private AnimationClipPlayable _aimBackWalkClipPlayable;
+        private AnimationClipPlayable _aimRightWalkClipPlayable;
+        private AnimationClipPlayable _aimLeftWalkClipPlayable;
+        // 移動ポート
+        private int _waitPort;
+        private int _walkPort;
+        private int _runPort;
 
         public AnimationMixerPlayable BaseMixer => _baseMixer;
+        public AnimationMixerPlayable NormalMixer => _normalMixer;
+        public AnimationMixerPlayable AimMixer => _aimMixer;
 
         public bool IsValid => _graph.IsValid();
 
@@ -98,47 +125,140 @@ namespace InGame.Common
 
             _layerMixer = AnimationLayerMixerPlayable.Create(_graph, _layerInfo.Count);
             _output.SetSourcePlayable(_layerMixer);
+            
+            BaseMixerInitialize();
+            NormalMixerInitialize();
+            AimMixerInitialize();
+            BaseMixerConnect();
+            // 開始時は通常にする
+            _baseMixer.SetInputWeight(0, 1f);
+            _baseMixer.SetInputWeight(1, 0f);
+            _graph.Play();
+        }
 
-            _baseMixer = AnimationMixerPlayable.Create(_graph, 3);
+        private void BaseMixerInitialize()
+        {
+            _baseMixer = AnimationMixerPlayable.Create(_graph, 2);
+
             var baseSlot = _slotOf[LayerInfo.LayerType.Base];
             _graph.Connect(_baseMixer, 0, _layerMixer, baseSlot);
             _layerMixer.SetInputWeight(baseSlot, 1f);
             _layerMixer.SetLayerAdditive((uint)baseSlot, false);
-
-            //各レイヤーの初期設定
+            
+            // 各レイヤーの初期設定
             for (int i = 0; i < _layerInfo.Count; i++)
             {
                 var li = _layerInfo[i];
-                if (li.LayerMask) _layerMixer.SetLayerMaskFromAvatarMask((uint)i, li.LayerMask);
+                if(li.LayerMask) _layerMixer.SetLayerMaskFromAvatarMask((uint)i, li.LayerMask);
                 _layerMixer.SetLayerAdditive((uint)i, li.Additive);
-                if (i != baseSlot) _layerMixer.SetInputWeight(i, Mathf.Clamp01(li.Weight));
+                if(i != baseSlot) _layerMixer.SetInputWeight(i, Mathf.Clamp01(li.Weight));
             }
+        }
+
+        private void NormalMixerInitialize()
+        {
+            _normalMixer = AnimationMixerPlayable.Create(_graph, 3);
 
             var port = 0;
             if (_wait)
             {
-                var p = AnimationClipPlayable.Create(_graph, _wait);
-                _baseMixer.ConnectInput(port++, p, 0);
+                _waitPort = port;
+                _waitClipPlayable = AnimationClipPlayable.Create(_graph, _wait);
+                _normalMixer.ConnectInput(port++, _waitClipPlayable, 0);
             }
-            else _baseMixer.SetInputWeight(port++, 0f);
-
+            else _normalMixer.SetInputWeight(port++, 0f);
+            
             if (_walk)
             {
-                var p = AnimationClipPlayable.Create(_graph, _walk);
-                _baseMixer.ConnectInput(port++, p, 0);
+                _walkPort = port;
+                _walkClipPlayable = AnimationClipPlayable.Create(_graph, _walk);
+                _normalMixer.ConnectInput(port++, _walkClipPlayable, 0);
             }
-            else _baseMixer.SetInputWeight(port++, 0f);
-
+            else _normalMixer.SetInputWeight(port++, 0f);
+            
             if (_run)
             {
-                var p = AnimationClipPlayable.Create(_graph, _run);
-                _baseMixer.ConnectInput(port, p, 0);
+                _runPort = port;
+                _runClipPlayable = AnimationClipPlayable.Create(_graph, _run);
+                _normalMixer.ConnectInput(port, _runClipPlayable, 0);
             }
-            else _baseMixer.SetInputWeight(port, 0f);
-
-            _graph.Play();
+            else _normalMixer.SetInputWeight(port, 0f);
         }
+
+        private void AimMixerInitialize()
+        {
+            _aimMixer = AnimationMixerPlayable.Create(_graph, 5);
+
+            var port = 0;
+            if (_aimWait)
+            {
+                _aimWaitClipPlayable = AnimationClipPlayable.Create(_graph, _aimWait);
+                _aimMixer.ConnectInput(port++, _aimWaitClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port++, 0f);
+            
+            if (_aimFrontWalk)
+            {
+                _aimFrontWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimFrontWalk);
+                _aimMixer.ConnectInput(port++, _aimFrontWalkClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port++, 0f);
+            
+            if (_aimBackWalk)
+            {
+                _aimBackWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimBackWalk);
+                _aimMixer.ConnectInput(port++, _aimBackWalkClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port++, 0f);
+            
+            if (_aimRightWalk)
+            {
+                 _aimRightWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimRightWalk);
+                _aimMixer.ConnectInput(port++, _aimRightWalkClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port++, 0f);
+            
+            if (_aimLeftWalk)
+            {
+                _aimLeftWalkClipPlayable = AnimationClipPlayable.Create(_graph, _aimLeftWalk);
+                _aimMixer.ConnectInput(port, _aimLeftWalkClipPlayable, 0);
+            }
+            else _aimMixer.SetInputWeight(port, 0f);
+        }
+
+        private void BaseMixerConnect()
+        {
+            _graph.Connect(_normalMixer, 0, _baseMixer, 0);
+            _graph.Connect(_aimMixer, 0, _baseMixer, 1);
+        }
+        
         #endregion
+
+        /// <summary>
+        /// Baseレイヤーの待機モーションを実行中に差し替える。
+        /// 装備などで待機姿勢だけを変更し、歩行・走行モーションは維持したい場合に使用する。
+        /// </summary>
+        public void SetWaitClip(AnimationClip clip)
+        {
+            if (_wait == clip) return;
+
+            _wait = clip;
+            if (!_graph.IsValid() || !_normalMixer.IsValid()) return;
+
+            // BaseMixerの入力0は待機モーションではなくNormalMixerそのもの。
+            // ここではNormalMixer内の待機ポートだけを差し替える。
+            _normalMixer.DisconnectInput(_waitPort);
+            if (_waitClipPlayable.IsValid())
+                _graph.DestroyPlayable(_waitClipPlayable);
+
+            if (_wait)
+            {
+                _waitClipPlayable = AnimationClipPlayable.Create(_graph, _wait);
+                _normalMixer.ConnectInput(_waitPort, _waitClipPlayable, 0);
+            }
+
+            UpdateLocoBlend(_locoWeight);
+        }
 
         #region Update
         public void Update()
@@ -254,6 +374,80 @@ namespace InGame.Common
             }
 
             Play(clip, layerType, 1f, playSpeed: speed, additive: false, loop: loop);
+
+            var li = _layerInfo[slot];
+            li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
+            _layerInfo[slot] = li;
+        }
+
+        public void PlayOnUpperBody(AnimationClip clip)
+        {
+            if (Object.HasStateAuthority)
+            {
+                var index = -1;
+                if (clip != null && TryGetMontageIndex(clip, out var clipIndex))
+                {
+                    index = clipIndex;
+                }
+                // クライアント側で再生する
+                RPC_PlayOnUpperBody(index);
+            }
+
+            // ホスト側で再生する
+            ExecutePlayOnUpperBodyInternal(clip);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_PlayOnUpperBody(int index)
+        {
+            AnimationClip clip = null;
+
+            // 範囲内か判定を行う
+            var montages = AnimationClipsContainer.Instance.AnimationMontages;
+            if (index >= 0)
+            {
+                clip = montages[index].AnimClip;
+            }
+
+            // クライアント側で再生する
+            ExecutePlayOnUpperBodyInternal(clip);
+        }
+
+        private void ExecutePlayOnUpperBodyInternal(AnimationClip clip)
+        {
+            if (!_slotOf.TryGetValue(LayerInfo.LayerType.UpperBody, out var slot))
+            {
+                Debug.LogWarning($"[AnimationClipPlayer] UpperBody が設定されていません。_layerInfo の最後に追加してください。");
+                return;
+            }
+
+            // 同じレイヤーで進行中の再生/ブレンドを止める。
+            // 止めないと、差し替え前のクリップを待っていた PlayAsync が終了処理としてレイヤー Weight を 0 へ落とし、
+            // 差し替え後のクリップ (攻撃中に始めた回避など) が再生されなくなる。
+            TakeLayerControl(LayerInfo.LayerType.UpperBody);
+
+            // 解除要求
+            if (clip == null)
+            {
+                _layerMixer.SetInputWeight(slot, 0f);
+
+                if (_runtimeClips.TryGetValue(LayerInfo.LayerType.UpperBody, out var current) && current.IsValid())
+                {
+                    DisconnectAndDestroy(LayerInfo.LayerType.UpperBody, current, slot);
+                }
+
+                var li0 = _layerInfo[slot];
+                li0.Weight = 0f;
+                _layerInfo[slot] = li0;
+                return;
+            }
+
+            if (_runtimeClips.TryGetValue(LayerInfo.LayerType.UpperBody, out var prev) && prev.IsValid())
+            {
+                DisconnectAndDestroy(LayerInfo.LayerType.UpperBody, prev, slot);
+            }
+
+            Play(clip, LayerInfo.LayerType.UpperBody, 1f, additive: false);
 
             var li = _layerInfo[slot];
             li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
@@ -690,12 +884,17 @@ namespace InGame.Common
 
         public void SetLocoPlaybackRate(float rate)
         {
-            rate = Mathf.Max(0f, rate);
+            rate = Mathf.Max(0, rate);
+            SetMixerPlaybackRate(_normalMixer, rate);
+            SetMixerPlaybackRate(_aimMixer, rate);
+        }
 
+        private void SetMixerPlaybackRate(AnimationMixerPlayable mixer, float rate)
+        {
             // 0番は待機、1番が歩き、2番が走り
-            for (int i = 1; i < _baseMixer.GetInputCount(); i++)
+            for (int i = 1; i < mixer.GetInputCount(); i++)
             {
-                var input = _baseMixer.GetInput(i);
+                var input = mixer.GetInput(i);
 
                 if (input.IsValid())
                     input.SetSpeed(rate);
@@ -719,9 +918,88 @@ namespace InGame.Common
                 wRun = w - 1f;
             }
 
-            _baseMixer.SetInputWeight(0, wWait);
-            _baseMixer.SetInputWeight(1, wWalk);
-            _baseMixer.SetInputWeight(2, wRun);
+            SetLocoBlendWeight(_normalMixer, wWait, wWalk, wRun);
+        }
+        
+        /// <summary>
+        /// Mixerに接続されている各アニメーションのWeightを設定
+        /// </summary>
+        /// <param name="mixer">設定するMixer</param>
+        /// <param name="wait">待機</param>
+        /// <param name="walk">歩き</param>
+        /// <param name="run">走り</param>
+        private void SetLocoBlendWeight(AnimationMixerPlayable mixer, float wait, float walk, float run)
+        {
+            mixer.SetInputWeight(0, wait);
+            mixer.SetInputWeight(1, walk);
+            mixer.SetInputWeight(2, run);
+        }
+        
+        /// <summary>
+        /// AimMixerに接続されている各AimアニメーションのWeightを設定
+        /// </summary>
+        /// <param name="move">入力</param>
+        public void SetAimLocoBlendWeight(Vector2 move)
+        {
+            move = Vector2.ClampMagnitude(move, 1f);
+
+            var front = Mathf.Max(0, move.y);
+            var back = Mathf.Max(0, -move.y);
+            var right =  Mathf.Max(0, move.x);
+            var left =  Mathf.Max(0, -move.x);
+            // 移動量によって減少
+            var wait = Mathf.Clamp01(1 - Mathf.Max(Mathf.Abs(move.x), Mathf.Abs(move.y)));
+            
+            // 合計値で割って、割合を求める
+            float total = wait + front + back + right + left;
+            if(total > 0)
+            {
+                wait   /= total;
+                front  /= total;
+                back   /= total;
+                right  /= total;
+                left   /= total;
+            }
+            
+            // Weight設定
+            _aimMixer.SetInputWeight(0, wait);
+            _aimMixer.SetInputWeight(1, front);
+            _aimMixer.SetInputWeight(2, back);
+            _aimMixer.SetInputWeight(3, right);
+            _aimMixer.SetInputWeight(4, left);
+        }
+        
+        /// <summary>
+        /// Aim設定
+        /// </summary>
+        /// <param name="aim">true：Aimアニメーション　false：通常アニメーション</param>
+        public void SetAim(bool aim)
+        {
+            if (Object != null && Object.IsValid && HasStateAuthority)
+                IsAimAnimation = aim;
+
+            ApplyAim(aim);
+        }
+
+        public override void Render()
+        {
+            ApplyAim(IsAimAnimation);
+        }
+
+        private void ApplyAim(bool aim)
+        {
+            if (!_baseMixer.IsValid()) return;
+
+            if (aim) // Aimアニメーションに変更
+            {
+                _baseMixer.SetInputWeight(0, 0f);
+                _baseMixer.SetInputWeight(1, 1f);
+            }
+            else // 通常アニメーションに変更
+            {
+                _baseMixer.SetInputWeight(0, 1f);
+                _baseMixer.SetInputWeight(1, 0f);
+            }
         }
 
         public float GetTargetLayerWeight(LayerInfo.LayerType layer)
@@ -1239,6 +1517,38 @@ namespace InGame.Common
                 player.DisconnectAndDestroy(layerType, playable, slot);
             }
         }
+        #endregion
+
+        #region ChangeAnimationClip
+
+        public void ChangeWaitAnimationClip(AnimationClip clip)
+        {
+            _normalMixer.DisconnectInput(_waitPort);
+            
+            _waitClipPlayable.Destroy();
+            _waitClipPlayable = AnimationClipPlayable.Create(_graph, clip);
+            _normalMixer.ConnectInput(_waitPort, _waitClipPlayable, 0);
+        }
+
+        public void ChangeWalkAnimationClip(AnimationClip clip)
+        {
+            _normalMixer.DisconnectInput(_walkPort);
+            
+            _walkClipPlayable.Destroy();
+            _walkClipPlayable = AnimationClipPlayable.Create(_graph, clip);
+            _normalMixer.ConnectInput(_walkPort, _walkClipPlayable, 0);
+        }
+
+        public void ChangeRunAnimationClip(AnimationClip clip)
+        {
+            _normalMixer.DisconnectInput(_runPort);
+            
+            _runClipPlayable.Destroy();
+            _runClipPlayable = AnimationClipPlayable.Create(_graph, clip);
+            _normalMixer.ConnectInput(_runPort, _runClipPlayable, 0);
+        }
+        
+
         #endregion
     }
 
