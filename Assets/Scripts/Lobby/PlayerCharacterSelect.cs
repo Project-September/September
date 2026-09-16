@@ -29,6 +29,7 @@ namespace September.Lobby
         private bool _navigationWasVisible;
         private bool _isConfirming;
         private Transform _confirmationArrow;
+        private Selectable _lastSelectedUi;
 
         private CharacterInfoPanel _currentFrontPanel;
         private CharacterInfoPanel _currentBackPanel;
@@ -46,6 +47,8 @@ namespace September.Lobby
                 SubmitCharacter();
                 SetConfirmationPhase(false);
             });
+            _submitButton.OnSelectAsObservable()
+                .Subscribe(_ => _lastSelectedUi = _submitButton).AddTo(this);
             _submitButton.OnCancelAsObservable().Subscribe(eventData =>
             {
                 if (!_isConfirming || _selectCharacterIcons.Count == 0) return;
@@ -150,12 +153,7 @@ namespace September.Lobby
                 // 表示された最初のフレームに、先頭アイコンへ十字キー操作の選択を合わせる。
                 FocusCurrentCharacter();
             }
-            // フォーカス喪失時は確認フェーズも解除し、直前に選んだアイコンから再開する。
-            if (!HasCurrentPhaseFocus())
-            {
-                SetConfirmationPhase(false);
-                FocusCurrentCharacter();
-            }
+            if (!HasUsableFocus()) RestoreLastSelectedUi();
 
             // パネルを開いた後や画面サイズ変更後に配置が変わった場合だけ再設定する。
             for (int i = 0; i < _navigationPositions.Length; i++)
@@ -264,7 +262,11 @@ namespace September.Lobby
         protected override void SelectCharacterIconSetting(SelectCharacterIcon characterIcon, int index)
         {
             characterIcon.Button.OnSelectAsObservable()
-                .Subscribe(_ => PreviewCharacter(index)).AddTo(characterIcon);
+                .Subscribe(_ =>
+                {
+                    _lastSelectedUi = characterIcon.Button;
+                    PreviewCharacter(index);
+                }).AddTo(characterIcon);
             characterIcon.Button.OnCancelAsObservable()
                 .Subscribe(eventData =>
                 {
@@ -283,17 +285,29 @@ namespace September.Lobby
             if (_selectCharacterIcons.Count == 0) return;
             int index = Mathf.Clamp(_currentCharacterIndex, 0, _selectCharacterIcons.Count - 1);
             var button = _selectCharacterIcons[index].Button;
-            if (button.isActiveAndEnabled && button.IsInteractable()) button.Select();
+            if (!button.isActiveAndEnabled || !button.IsInteractable()) return;
+            _lastSelectedUi = button;
+            button.Select();
         }
 
-        private bool HasCurrentPhaseFocus()
+        private bool HasUsableFocus()
         {
             var eventSystem = UnityEngine.EventSystems.EventSystem.current;
             if (!eventSystem) return false;
-            var expected = _isConfirming
-                ? _submitButton.gameObject
-                : _selectCharacterIcons[_currentCharacterIndex].Button.gameObject;
-            return eventSystem.currentSelectedGameObject == expected;
+            var selectedObject = eventSystem.currentSelectedGameObject;
+            if (!selectedObject) return false;
+            var selectable = selectedObject.GetComponent<Selectable>();
+            return selectable && selectable.isActiveAndEnabled && selectable.IsInteractable();
+        }
+
+        private void RestoreLastSelectedUi()
+        {
+            if (_lastSelectedUi && _lastSelectedUi.isActiveAndEnabled && _lastSelectedUi.IsInteractable())
+            {
+                _lastSelectedUi.Select();
+                return;
+            }
+            FocusCurrentCharacter();
         }
     }
 }

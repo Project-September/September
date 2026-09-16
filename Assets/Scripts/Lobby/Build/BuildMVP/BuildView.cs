@@ -21,6 +21,7 @@ namespace September.Lobby
         bool _initialized;
         bool _wasInteractive;
         Transform _decisionArrow;
+        Selectable _lastSelectedUi;
 
         public override void Init(BuildDataBase[] builds)
         {
@@ -45,6 +46,7 @@ namespace September.Lobby
                     var index = i;
                     obj.Button.OnSelectAsObservable().Subscribe(_ =>
                     {
+                        _lastSelectedUi = obj.Button;
                         if (!_confirming) MoveIndexForButton(index);
                     }).AddTo(this);
                     obj.Button.OnCancelAsObservable().Subscribe(e =>
@@ -81,6 +83,8 @@ namespace September.Lobby
                 registered |= _decisionButton.onClick.GetPersistentTarget(i) == this &&
                     _decisionButton.onClick.GetPersistentMethodName(i) == nameof(SelectBuild);
             if (!registered) _decisionButton.onClick.AddListener(SelectBuild);
+            _decisionButton.OnSelectAsObservable()
+                .Subscribe(_ => _lastSelectedUi = _decisionButton).AddTo(this);
             _decisionButton.OnCancelAsObservable().Subscribe(e =>
             {
                 if (!_confirming) return;
@@ -117,11 +121,7 @@ namespace September.Lobby
                 MoveIndexForButton(0);
                 FocusCurrentBuild();
             }
-            else if (interactive && !HasCurrentPhaseFocus())
-            {
-                SetPhase(false);
-                FocusCurrentBuild();
-            }
+            else if (interactive && !HasUsableFocus()) RestoreLastSelectedUi();
             _wasInteractive = interactive;
             if (interactive && !_confirming) RefreshNavigation();
         }
@@ -216,16 +216,28 @@ namespace September.Lobby
             if (_buildCount == 0) return;
             int index = Mathf.Clamp(_currentSelectIndex, 0, _buildCount - 1);
             var button = _buildObjects[index].Button;
-            if (button.isActiveAndEnabled && button.IsInteractable()) button.Select();
+            if (!button.isActiveAndEnabled || !button.IsInteractable()) return;
+            _lastSelectedUi = button;
+            button.Select();
         }
 
-        bool HasCurrentPhaseFocus()
+        bool HasUsableFocus()
         {
             if (!EventSystem.current) return false;
-            var expected = _confirming
-                ? _decisionButton.gameObject
-                : _buildObjects[_currentSelectIndex].Button.gameObject;
-            return EventSystem.current.currentSelectedGameObject == expected;
+            var selectedObject = EventSystem.current.currentSelectedGameObject;
+            if (!selectedObject) return false;
+            var selectable = selectedObject.GetComponent<Selectable>();
+            return selectable && selectable.isActiveAndEnabled && selectable.IsInteractable();
+        }
+
+        void RestoreLastSelectedUi()
+        {
+            if (_lastSelectedUi && _lastSelectedUi.isActiveAndEnabled && _lastSelectedUi.IsInteractable())
+            {
+                _lastSelectedUi.Select();
+                return;
+            }
+            FocusCurrentBuild();
         }
     }
 }
