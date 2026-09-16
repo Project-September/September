@@ -39,7 +39,7 @@ namespace InGame.Player.Hatano
         {
             PlayBulletEffects(leftOrigin, leftEnd, leftNormal, leftHit);
             PlayBulletEffects(rightOrigin, rightEnd, rightNormal, rightHit);
-            PlaySound(SoundCues.SE.Hatano_Shoot, (leftOrigin + rightOrigin) * 0.5f);
+            PlaySound(SoundCues.SE.ZeroFighter_TakeoffGunFire, (leftOrigin + rightOrigin) * 0.5f);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
