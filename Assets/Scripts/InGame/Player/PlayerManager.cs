@@ -4,6 +4,7 @@ using InGame.Health;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
+using September.InGame.UI;
 using UnityEngine;
 using PlayerInput = September.Common.PlayerInput;
 
@@ -256,6 +257,14 @@ namespace InGame.Player
         /// </summary>
         private void UpdateLockOn(PlayerInput input)
         {
+            // キャラクター固有のエイム能力に関係なく、入力中と搭乗中は解除する。
+            if (input.Buttons.IsSet(PlayerButtons.Aim)
+                || CurrentPlayerControlState != PlayerControlState.Normal)
+            {
+                DisableLockOn();
+                return;
+            }
+
             if (input.Buttons.WasPressed(PreviousButtons, PlayerButtons.LockOn)
                 && !IsStun
                 && IsMovable
@@ -278,6 +287,7 @@ namespace InGame.Player
         {
             target = null;
             return IsLockOnActive
+                && !GameInput.I.Player.Aim.IsPressed()
                 && !IsStun
                 && IsMovable
                 && CurrentPlayerControlState == PlayerControlState.Normal
@@ -374,6 +384,8 @@ namespace InGame.Player
         {
             _playerHealth.IsInvincible = false;
             IsStun = false;
+            _playerMovement.ResetHorizontalVelocity();
+            RPC_SetPositionLock(false);
             _playerEffectController.StopStunEffect();
             _buildGenerator?.UpdateBuild(BuildRouteType.StunResistance);
         }
@@ -384,12 +396,18 @@ namespace InGame.Player
             // ビルドの減衰分を乗算
             StunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             IsStun = true;
+            _playerMovement.ResetHorizontalVelocity();
+            RPC_SetPositionLock(true);
             _playerEffectController.PlayStunEffect();
         }
 
         public void SetControlState(PlayerControlState controlState)
         {
             CurrentPlayerControlState = controlState;
+
+            // 入力が届かない Tick でも搭乗時のロックオンを持ち越さない。
+            if (CurrentPlayerControlState != PlayerControlState.Normal)
+                DisableLockOn();
 
             if (CurrentPlayerControlState == PlayerControlState.ForcedControl)
             {
@@ -426,8 +444,13 @@ namespace InGame.Player
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_SetPositionLock(NetworkBool isLocked)
         {
+            Vector3 velocity = _rigidbody.linearVelocity;
+            _rigidbody.linearVelocity = new Vector3(0f, velocity.y, 0f);
+            _rigidbody.angularVelocity = Vector3.zero;
+
             _rigidbody.constraints = isLocked ?
-                RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
+                RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ |
+                RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
         }
 
@@ -441,6 +464,19 @@ namespace InGame.Player
             _rigidbody.constraints = active ?
                 RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation :
                 _defaultConstraints;
+        }
+
+        /// <summary>
+        /// 指定したプレイヤー本人の画面だけ、現在操作するキャラクターの操作説明へ切り替える。
+        /// State Authorityで行われる擬態のPrefab交換完了をInput Authority側のUIへ通知するために使用する。
+        /// </summary>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_ChangeMimicDescriptionUI(PlayerRef target, ControlDescriptionType type)
+        {
+            if (Runner.LocalPlayer != target || !UIController.I)
+                return;
+
+            UIController.I.ChangeDescriptionUI(type);
         }
 
         /// <summary> 非常用リスポーン </summary>

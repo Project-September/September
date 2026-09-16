@@ -16,10 +16,10 @@ namespace InGame.Player
         private CancellationTokenSource _cts;
         Renderer _renderer;
         MaterialPropertyBlock _materialPropertyBlock;
-        
+
         public bool IsAlive => _status.CurrentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
-        
+
         // event
         public event Action<HitData> OnHitTaken;
         public event Action<HitData> OnDeath;
@@ -31,6 +31,7 @@ namespace InGame.Player
 
         /// <summary> 無敵 </summary> 無敵の set が　public なのどうなん
         [Networked, HideInInspector] public NetworkBool IsInvincible { get; set; }
+        [Networked, HideInInspector] public NetworkBool IsItemInvincible { get; set; }
         public int CurrentHealth => _status.CurrentHealth;
 
         public override void Spawned()
@@ -39,7 +40,7 @@ namespace InGame.Player
             {
                 OnDeath += Death;
             }
-            
+
             _status = GetComponent<PlayerStatus>();
             _cts = new CancellationTokenSource();
             _renderer = GetComponentInChildren<Renderer>();
@@ -70,7 +71,7 @@ namespace InGame.Player
                 PlayerDatabase.Instance.Server_AddDamageDealt(hitData.ExecutorRef, hitData.Amount);
                 PlayerDatabase.Instance.Server_AddDamageReceived(hitData.TargetRef, hitData.Amount);
             }
-            
+
             //RPC_HitDebug(hitData.HitActionType);
         }
 
@@ -103,7 +104,7 @@ namespace InGame.Player
 
         int TakeDamage(int damage)
         {
-            if (IsInvincible) return 0;
+            if (IsInvincible || IsItemInvincible) return 0;
             int previousHealth = _status.CurrentHealth;
             _status.AddBaseValue(StatType.Health, -damage);
             return previousHealth - _status.CurrentHealth;
@@ -111,7 +112,7 @@ namespace InGame.Player
 
         int TakeHeal(int heal)
         {
-            if (IsInvincible) return 0;
+            if (IsInvincible || IsItemInvincible) return 0;
             int previousHealth = _status.CurrentHealth;
             _status.AddBaseValue(StatType.Health, heal);
             return _status.CurrentHealth - previousHealth;
@@ -122,7 +123,7 @@ namespace InGame.Player
         {
             HitDebug(actionType).Forget();
         }
-        
+
 
         private async UniTask HitDebug(HitActionType actionType)
         {
@@ -133,9 +134,9 @@ namespace InGame.Player
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: _cts.Token);
             }
-            catch(OperationCanceledException) { }
+            catch (OperationCanceledException) { }
             _renderer.GetPropertyBlock(_materialPropertyBlock);
-            _materialPropertyBlock.SetColor("_BaseColor",Color.white);
+            _materialPropertyBlock.SetColor("_BaseColor", Color.white);
             _renderer.SetPropertyBlock(_materialPropertyBlock);
         }
 

@@ -14,7 +14,20 @@ namespace InGame.Jewelry
         [SerializeField] private Collider _collider;
         [SerializeField] private Rigidbody _rigidbody;
 
-        private Vector3 Velocity { get => _rigidbody.linearVelocity; set => _rigidbody.linearVelocity = value; }
+        private Vector3 Velocity
+        {
+            get => _rigidbody.linearVelocity;
+            set
+            {
+                _rigidbody.linearVelocity = value;
+                _unFreezeVelocity = value;
+            }
+        }
+
+        /// <summary> フリーズ解除時の初速 </summary>
+        private Vector3 _unFreezeVelocity;
+        private bool _isFreezing;
+
         private bool _isGrounded;
 
         private bool _physicsEnabled = true;
@@ -172,7 +185,7 @@ namespace InGame.Jewelry
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasStateAuthority || _isGrounded || !_physicsEnabled)
+            if (!HasStateAuthority || _isFreezing || _isGrounded || !_physicsEnabled)
                 return;
 
             Velocity += Vector3.down * _gravity * Runner.DeltaTime;
@@ -199,6 +212,26 @@ namespace InGame.Jewelry
             _collider.enabled = true;
             _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
             _isGrounded = true;
+        }
+
+        /// <summary>
+        /// 一時的に移動や加速を行わないフリーズ状態にします。フリーズ中に速度に変更があった場合、フリーズ解除時に適用されます。
+        /// </summary>
+        public void Freeze()
+        {
+            _unFreezeVelocity = Velocity;
+            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            _isFreezing = true;
+        }
+
+        /// <summary>
+        /// フリーズ状態を解除します。フリーズ中に変更された速度を剛体に適用します
+        /// </summary>
+        public void UnFreeze()
+        {
+            _rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+            _rigidbody.linearVelocity = _unFreezeVelocity;
+            _isFreezing = false;
         }
     }
 }

@@ -4716,6 +4716,18 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883914]._hitEffectPositionOffset.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883914]._hitEffectPositionOffset.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[7765555134153883914]._hitEffectPositionOffset.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[7765555134153883914]._normalAttackAnimationClip
       value: 
       objectReference: {fileID: 7400000, guid: 1fe747848ed3bfb49bb3639fce5f6153, type: 2}
@@ -4846,10 +4858,6 @@ PrefabInstance:
     - target: {fileID: 6174387095309582537, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7020943087661863767, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _requiredScore
-      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 7325268686366126974, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_PlayableAsset

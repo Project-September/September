@@ -9,7 +9,6 @@ namespace InGame.Player.Ability
     [Serializable]
     public class AbilityLaserGun : ShootingAbilityBase
     {
-        [Header("参照")]
         [Header("PlayerInteractionController")]
         [SerializeField] private PlayerInteractionController _playerInteractionController;
         [Space(30)]
@@ -18,7 +17,7 @@ namespace InGame.Player.Ability
         private float _interactionTimer;
         [Header("判定を取るためのBoxの大きさ")]
         [SerializeField] private Vector3 _judgmentBoxSize;
-
+        
         /// <summary>
         /// 現在、インタラクション中のオブジェクトを保持
         /// </summary>
