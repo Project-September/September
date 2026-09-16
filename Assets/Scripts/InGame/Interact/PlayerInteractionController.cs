@@ -271,7 +271,7 @@ namespace InGame.Interact
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
             UIController.I?.ShowInteractUI(!isRiding && interactableBase.ValidateInteraction(context),
-                interactableBase.gameObject);
+                interactableBase);
             UIController.I?.SetInteractProgress(0f);
         }
 
