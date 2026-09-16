@@ -4,7 +4,6 @@ using Fusion;
 using InGame.Bot;
 using InGame.Player;
 using InGame.Player.Ability;
-using InGame.Player.Hatano;
 using September.Common;
 using September.InGame;
 using September.InGame.Common.Stats;
@@ -44,9 +43,7 @@ namespace InGame.Interact
         [SerializeField] private bool _isHoldingInteract = false;
         private bool _hasCompletedInteraction = false;
         private PlayerManager _playerManager;
-        private HatanoAbilityStatusManagement _hatanoAbilityStatus;
-        private bool IsHatanoInputLocked => _hatanoAbilityStatus && _playerManager &&
-            _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.InputLocked;
+        [Networked] public bool IsInteractionBlocked { get; private set; }
         private bool _isBot;
 
         [Networked] private bool IsRemoting { get; set; } //遠距離インタラクション中かの判定
@@ -59,7 +56,6 @@ namespace InGame.Interact
             if (!_interactOrigin)
                 _interactOrigin = transform;
             _playerManager = GetComponent<PlayerManager>();
-            _hatanoAbilityStatus = GetComponent<HatanoAbilityStatusManagement>();
             _playerAudioController = GetComponentInChildren<PlayerAudioController>();
 
 #if UNITY_EDITOR
@@ -87,13 +83,34 @@ namespace InGame.Interact
             }
         }
 
+        /// <summary>状態権限側からインタラクトの制限を設定し、全端末へ同期する。</summary>
+        public void SetInteractionBlocked(bool blocked)
+        {
+            if (Object == null || !Object.IsValid || !HasStateAuthority) return;
+
+            IsInteractionBlocked = blocked;
+            if (!blocked) return;
+
+            // 必殺技終了後に途中の遠距離インタラクトを再開しない。
+            IsRemoting = false;
+            RemoteFocusedObject = null;
+            RemoteInteractTime = 0f;
+            RemoteInteractTimer = 0f;
+            _isHoldingInteract = false;
+            _isExecutingInteraction = false;
+            _currentInteractTime = 0f;
+        }
+
         private void Update()
         {
+            if (Object == null || !Object.IsValid) return;
             if (!HasInputAuthority && !_isBot) return;
 
-            if (IsHatanoInputLocked)
+            if (IsInteractionBlocked)
             {
                 _isHoldingInteract = false;
+                _isWaitingForResponse = false;
+                _interactWaitTimer = 0f;
                 CancelInteraction();
                 if (!_isBot) UIController.I?.ShowInteractUI(false);
                 return;
@@ -157,6 +174,7 @@ namespace InGame.Interact
             _isHoldingInteract = false; // 毎フレームリセット
 
             if (!HasInputAuthority && !_isBot) return;
+            if (IsInteractionBlocked) return;
             if (!_inputManager.GetPlayerInput(out PlayerInput input)) return;
 
             // Fusionのシミュレーション内でのみ行う処理
@@ -186,7 +204,7 @@ namespace InGame.Interact
         public void RemoteInteraction(ref float timer, float time, InteractableBase interactableBase,
             ref AbilityBase.AbilityPhase abilityPhase, AimCameraController aimCameraController)
         {
-            if (IsHatanoInputLocked)
+            if (IsInteractionBlocked)
             {
                 RemoteInteractionCancel(ref timer);
                 return;
@@ -367,7 +385,7 @@ namespace InGame.Interact
 
         private void CompleteInteraction()
         {
-            if (IsHatanoInputLocked)
+            if (IsInteractionBlocked)
             {
                 CancelInteraction();
                 return;
@@ -427,7 +445,7 @@ namespace InGame.Interact
         [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
         private void RPC_RequestInteract(int interactor, int characterType, NetworkObject target)
         {
-            if (IsHatanoInputLocked) return;
+            if (IsInteractionBlocked) return;
             Debug.Log($"target.HasStateAuthority: {target.HasStateAuthority}, Runner.LocalPlayer: {Runner.LocalPlayer}");
 
             InteractableBase interactable;
