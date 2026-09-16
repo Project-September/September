@@ -109,10 +109,7 @@ namespace InGame.Player.Okubo
                     if (_currentState == HookAttackState.Aim)
                         _animationClipPlayer.StopClip(_aimClip);
 
-                    _playerMovement.IsHookLocked = false;
-                    RPC_ChangeDescriptionUI(ControlDescriptionType.Okubo);
-                    _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
-                    RPC_ChangeCameraPosition(false);
+                    RestoreNormalControl();
                     break;
                 case HookAttackState.Aim:
                     //構える
@@ -154,10 +151,19 @@ namespace InGame.Player.Okubo
                         isTarget = true;
                     }
                     RPC_ChangeWireActive(false);
+                    RestoreNormalControl();
                     _waitTimer = isTarget ? _hitCoolTime : _missAttackCoolTime;
                     break;
             }
             _currentState = state;
+        }
+
+        private void RestoreNormalControl()
+        {
+            _playerMovement.IsHookLocked = false;
+            RPC_ChangeDescriptionUI(ControlDescriptionType.Okubo);
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            RPC_ChangeCameraPosition(false);
         }
 
         /// <summary>
@@ -200,7 +206,9 @@ namespace InGame.Player.Okubo
             if (_currentHookLength <= 0)
             {
                 _currentHookLength = 0;
+                RPC_UpdateHookLength(_currentHookLength, transform.forward);
                 ChangeState(HookAttackState.CoolDown);
+                return;
             }
 
             RPC_UpdateHookLength(_currentHookLength, transform.forward);
