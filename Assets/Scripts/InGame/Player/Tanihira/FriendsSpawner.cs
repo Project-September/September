@@ -2,6 +2,7 @@
 using Ingame.Tanihira;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 namespace InGame.Tanihira
 {
@@ -15,7 +16,7 @@ namespace InGame.Tanihira
         [SerializeField] private Transform _firstSpawnPoint;
         [SerializeField] private float _navmeshSerchRadius = 5.0f;
         private NetworkRunner _networkRunner;
-        private readonly System.Collections.Generic.List<NetworkObject> _spawnedFriends = new();
+        private readonly List<NetworkObject> _spawnedFriends = new();
         private bool _isInitialized;
 
         public void Start()

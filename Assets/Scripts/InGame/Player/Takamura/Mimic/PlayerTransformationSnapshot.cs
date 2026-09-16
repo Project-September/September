@@ -1,4 +1,5 @@
 using Fusion;
+using InGame.Jewelry;
 using InGame.Player.Ult;
 using September.InGame.Common.Stats;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace InGame.Player.Takamura.Mimic
         public readonly float Stamina;
         public readonly NetworkBool IsInvincible;
         public readonly int UltConsumedScore;
+        public readonly int[] JewelryQuantities;
 
         private PlayerTransformationSnapshot(
             Vector3 position,
@@ -23,7 +25,8 @@ namespace InGame.Player.Takamura.Mimic
             int health,
             float stamina,
             NetworkBool isInvincible,
-            int ultConsumedScore)
+            int ultConsumedScore,
+            int[] jewelryQuantities)
         {
             Position = position;
             Rotation = rotation;
@@ -32,6 +35,7 @@ namespace InGame.Player.Takamura.Mimic
             Stamina = stamina;
             IsInvincible = isInvincible;
             UltConsumedScore = ultConsumedScore;
+            JewelryQuantities = jewelryQuantities;
         }
 
         /// <summary>
@@ -45,6 +49,7 @@ namespace InGame.Player.Takamura.Mimic
             var status = player.GetComponent<PlayerStatus>();
             var health = player.GetComponent<PlayerHealth>();
             var ultCondition = player.GetComponent<UltCondition>();
+            var jewelryRuntime = player.GetComponentInChildren<PlayerJewelryRuntime>(true);
 
             return new PlayerTransformationSnapshot(
                 player.transform.position,
@@ -53,7 +58,8 @@ namespace InGame.Player.Takamura.Mimic
                 status ? status.CurrentHealth : 0,
                 status ? status.CurrentStamina : 0f,
                 health && health.IsInvincible,
-                ultCondition ? ultCondition.ConsumedScore : 0);
+                ultCondition ? ultCondition.ConsumedScore : 0,
+                jewelryRuntime ? jewelryRuntime.CaptureJewelryQuantities() : null);
         }
 
         /// <summary>
@@ -85,6 +91,12 @@ namespace InGame.Player.Takamura.Mimic
             var ultCondition = player.GetComponent<UltCondition>();
             if (ultCondition)
                 ultCondition.RestoreConsumedScore(UltConsumedScore);
+
+            // PlayerJewelryRuntimeの初期化はSpawnの1フレーム後に行われるため、
+            // 初期化前なら復元予約として保持し、キャラクター既定値による上書きを防ぐ。
+            var jewelryRuntime = player.GetComponentInChildren<PlayerJewelryRuntime>(true);
+            if (jewelryRuntime)
+                jewelryRuntime.RestoreJewelryQuantities(JewelryQuantities);
         }
     }
 }
