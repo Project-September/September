@@ -136,6 +136,11 @@ namespace September.Lobby
                 _navigationWasVisible = false;
                 return;
             }
+            if (!_toggleTweenAnimation.IsInteractable)
+            {
+                _navigationWasVisible = false;
+                return;
+            }
             var phaseButton = _isConfirming
                 ? _submitButton
                 : _selectCharacterIcons[_currentCharacterIndex].Button;

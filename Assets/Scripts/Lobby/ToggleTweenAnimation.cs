@@ -21,6 +21,7 @@ namespace September.Lobby
         private Vector2[] _initialPositions;
         private UniTask _currentTask;
         public Selectable SelectWhenOpen { get; set; } = null;
+        public bool IsInteractable => _canvasGroup.interactable;
         private void Awake()
         {
             _initialPositions = _rectOffsets.Select(r => r.RectTransform.anchoredPosition).ToArray();
