@@ -56,13 +56,16 @@ namespace September.Editor.HumanoidRig
             _selected.Clear();
         }
 
-        public void Draw(string detailHeader, Func<string, ModelRowInfo> rowInfo, string emptyMessage)
+        public void Draw(string detailHeader, Func<string, ModelRowInfo> rowInfo, string emptyMessage,
+            Func<string, bool> canSelect = null)
         {
+            if (canSelect != null) _selected.RemoveWhere(path => !canSelect(path));
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 if (GUILayout.Button("全選択", EditorStyles.toolbarButton, GUILayout.Width(60f)))
                 {
-                    foreach (var path in _paths) _selected.Add(path);
+                    foreach (var path in _paths)
+                        if (canSelect == null || canSelect(path)) _selected.Add(path);
                 }
                 if (GUILayout.Button("全解除", EditorStyles.toolbarButton, GUILayout.Width(60f)))
                 {
@@ -81,16 +84,18 @@ namespace September.Editor.HumanoidRig
                     EditorGUILayout.HelpBox(emptyMessage, MessageType.Info);
                     return;
                 }
-                foreach (var path in _paths) DrawRow(path, rowInfo(path));
+                foreach (var path in _paths) DrawRow(path, rowInfo(path), canSelect == null || canSelect(path));
             }
         }
 
-        private void DrawRow(string path, ModelRowInfo info)
+        private void DrawRow(string path, ModelRowInfo info, bool canSelect)
         {
             using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
             {
                 bool selected = _selected.Contains(path);
-                bool now = EditorGUILayout.Toggle(selected, GUILayout.Width(18f));
+                bool now;
+                using (new EditorGUI.DisabledScope(!canSelect))
+                    now = EditorGUILayout.Toggle(selected, GUILayout.Width(18f));
                 if (now != selected)
                 {
                     if (now) _selected.Add(path);
