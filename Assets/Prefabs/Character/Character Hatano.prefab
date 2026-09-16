@@ -4916,7 +4916,7 @@ PrefabInstance:
       objectReference: {fileID: 3200269982010440961}
     - target: {fileID: 2664302539866463009, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: TotalWords
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2664302539866463009, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: StateHashes.Array.size
@@ -5888,6 +5888,8 @@ MonoBehaviour:
   - {fileID: 8559499691932461495}
   - {fileID: 4930531363891988664}
   _lastAbilityStatus: 3
+  _IsChangingWeapon:
+    _value: 0
 --- !u!114 &9120332163078756307
 MonoBehaviour:
   m_ObjectHideFlags: 0
