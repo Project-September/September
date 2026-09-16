@@ -36,9 +36,9 @@ namespace September.InGame.Exhibit
 		/// 現在の弾丸が減った時のコールバック
 		/// 変数は球数、クールタイム
 		/// </summary>
-		public event Action<int, float> OnAmmoChanged;
-		public event Action<ProjectileInteractableBase> OnInteractStart;
-		public event Action<ProjectileInteractableBase> OnInteractEnd;
+		public event Action<int, float, PlayerRef> OnAmmoChanged;
+		public event Action<ProjectileInteractableBase, PlayerRef> OnInteractStart;
+		public event Action<ProjectileInteractableBase, PlayerRef> OnInteractEnd;
 
 		[Networked] private NetworkButtons _attackButton { get; set; }
 		[Networked] protected PlayerRef CurrentUsePlayerRef { get; set; }
@@ -266,8 +266,8 @@ namespace September.InGame.Exhibit
 			EffectActive(currentPlayer, isActive);
 			_move.Initialize();
 			if(currentPlayer != Runner.LocalPlayer) return;
-			if(isActive) OnInteractStart?.Invoke(this);
-			else OnInteractEnd?.Invoke(this);
+			if(isActive) OnInteractStart?.Invoke(this, currentPlayer);
+			else OnInteractEnd?.Invoke(this, currentPlayer);
 		}
 		
 		[Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -321,7 +321,7 @@ namespace September.InGame.Exhibit
 
 		private void AmmoChanged()
 		{
-			OnAmmoChanged?.Invoke(CurrentAmmo, LastFireTimer.RemainingTime(Runner) ?? 0f);
+			OnAmmoChanged?.Invoke(CurrentAmmo, LastFireTimer.RemainingTime(Runner) ?? 0f, CurrentUsePlayerRef);
 		}
 
 		#region Helper
