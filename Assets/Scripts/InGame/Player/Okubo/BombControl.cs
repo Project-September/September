@@ -1,6 +1,7 @@
 using Fusion;
 using InGame.Health;
 using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Okubo
@@ -12,13 +13,16 @@ namespace InGame.Player.Okubo
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _flyingPower;
         [SerializeField] private Rigidbody _rb;
+        [SerializeField] private EffectType _explosion;
 
-        private float _waitTimer;
+        private float _explodeTime;
         private PlayerRef _ownerRef;
+        private EffectSpawner _effectSpawner;
 
         public override void Spawned()
         {
-            _waitTimer = _waitDuration;
+            _explodeTime = Runner.SimulationTime + _waitDuration;
+            _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
         }
 
         public void SetData(Vector3 force, PlayerRef ownerRef)
@@ -32,9 +36,8 @@ namespace InGame.Player.Okubo
             if (!HasStateAuthority)
                 return;
 
-            if (_waitTimer > 0f)
+            if (Runner.SimulationTime < _explodeTime)
             {
-                _waitTimer -= Runner.DeltaTime;
                 return;
             }
             Explode();
@@ -42,6 +45,7 @@ namespace InGame.Player.Okubo
 
         private void Explode()
         {
+            Debug.Log("”š”­II");
             var hitObjects = Physics.OverlapSphere(this.transform.position, _range);
 
             foreach (var obj in hitObjects)
@@ -74,9 +78,13 @@ namespace InGame.Player.Okubo
                     movement.AddFlyingVelocity(dir.normalized * power);
 
                     break;
+
                 }
             }
+            _effectSpawner.RequestPlayOneShotEffect(_explosion, this.transform.position, Quaternion.identity);
+
             Runner.Despawn(Object);
+
         }
     }
 }
