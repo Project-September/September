@@ -30,7 +30,7 @@ namespace September.Lobby
 
         private void Update()
         {
-            if (_gameInput.UI.Option.triggered || _gameInput.Debug.Title.triggered)
+            if (IsOpen && (_gameInput.UI.Option.triggered || _gameInput.Debug.Title.triggered))
             {
                 CloseHowToPlayPanel();
             }
@@ -49,6 +49,7 @@ namespace September.Lobby
 
         public void CloseHowToPlayPanel()
         {
+            if (!IsOpen) return;
             _howToPlayPanel.SetActive(false);
             EventSystem.current.SetSelectedGameObject(_selectWhenHide.gameObject);
         }
