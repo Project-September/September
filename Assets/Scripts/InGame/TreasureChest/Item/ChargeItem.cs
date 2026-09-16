@@ -10,7 +10,8 @@ namespace InGame.TreasureChest
         {
             if (player.TryGetComponent(out NetworkObject networkObject))
             {
-                PlayerDatabase.Instance.Server_AddExhibit(networkObject.InputAuthority, Result.ExhibitType.Moai);//一旦モアイインタラクト扱いにする
+                //スコア増加が難しそうだったので一旦モアイをインタラクトしたことにする
+                PlayerDatabase.Instance.Server_AddExhibit(networkObject.InputAuthority, Result.ExhibitType.Moai);
             }
         }
     }

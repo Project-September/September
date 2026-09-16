@@ -8,7 +8,7 @@ namespace InGame.TreasureChest
     {
         [Header("Šm—¦")]
         [SerializeField] private float _probability = 1f;
-        public float Probability  => _probability;
+        public float Probability => _probability;
 
         public abstract void Trigger(TriggerContext context);
     }
@@ -28,7 +28,7 @@ namespace InGame.TreasureChest
 
         public static TriggerContext Create(Vector3 centerPosition, NetworkObject treasureChest, NetworkRunner runner)
         {
-           return new TriggerContext(centerPosition, treasureChest, runner);
+            return new TriggerContext(centerPosition, treasureChest, runner);
         }
     }
 }

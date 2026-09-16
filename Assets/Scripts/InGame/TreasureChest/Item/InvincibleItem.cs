@@ -8,6 +8,7 @@ namespace InGame.TreasureChest
     public class InvincibleItem : ItemBase
     {
         [SerializeField] private float _buffDuration;
+
         protected override void OnHitPlayer(GameObject player)
         {
             if (player.TryGetComponent(out PlayerHealth health))

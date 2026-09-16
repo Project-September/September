@@ -13,14 +13,14 @@ namespace InGame.TreasureChest
 
         public override void Spawned()
         {
-            _nextTime =  Runner.SimulationTime + _intervalSecond;
+            _nextTime = Runner.SimulationTime + _intervalSecond;
         }
 
         public override void FixedUpdateNetwork()
         {
             if (!HasStateAuthority) return;
 
-            if(Runner.SimulationTime >= _nextTime)
+            if (Runner.SimulationTime >= _nextTime)
             {
                 _nextTime = Runner.SimulationTime + _intervalSecond;
                 TriggerRandomEvent();
@@ -30,7 +30,7 @@ namespace InGame.TreasureChest
         private void TriggerRandomEvent()
         {
             var randomEvent = GetRandomEvent();
-            var context = TriggerContext.Create(this.transform.position,Object,Runner);
+            var context = TriggerContext.Create(this.transform.position, Object, Runner);
             randomEvent?.Trigger(context);
         }
 

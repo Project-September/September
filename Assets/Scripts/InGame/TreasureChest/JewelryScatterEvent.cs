@@ -1,9 +1,9 @@
-using UnityEngine;
 using InGame.Jewelry;
+using UnityEngine;
 
 namespace InGame.TreasureChest
 {
-    [System.Serializable ]
+    [System.Serializable]
     public class JewelryScatterEvent : TreasureChestEventBase
     {
         [SerializeField] JewelrySpawnSetting _jewelrySpawnSetting;

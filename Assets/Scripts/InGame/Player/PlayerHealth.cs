@@ -16,10 +16,10 @@ namespace InGame.Player
         private CancellationTokenSource _cts;
         Renderer _renderer;
         MaterialPropertyBlock _materialPropertyBlock;
-        
+
         public bool IsAlive => _status.CurrentHealth > 0;
         public PlayerRef OwnerPlayerRef => Object.InputAuthority;
-        
+
         // event
         public event Action<HitData> OnHitTaken;
         public event Action<HitData> OnDeath;
@@ -40,7 +40,7 @@ namespace InGame.Player
             {
                 OnDeath += Death;
             }
-            
+
             _status = GetComponent<PlayerStatus>();
             _cts = new CancellationTokenSource();
             _renderer = GetComponentInChildren<Renderer>();
@@ -71,7 +71,7 @@ namespace InGame.Player
                 PlayerDatabase.Instance.Server_AddDamageDealt(hitData.ExecutorRef, hitData.Amount);
                 PlayerDatabase.Instance.Server_AddDamageReceived(hitData.TargetRef, hitData.Amount);
             }
-            
+
             //RPC_HitDebug(hitData.HitActionType);
         }
 
@@ -123,7 +123,7 @@ namespace InGame.Player
         {
             HitDebug(actionType).Forget();
         }
-        
+
 
         private async UniTask HitDebug(HitActionType actionType)
         {
@@ -134,9 +134,9 @@ namespace InGame.Player
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: _cts.Token);
             }
-            catch(OperationCanceledException) { }
+            catch (OperationCanceledException) { }
             _renderer.GetPropertyBlock(_materialPropertyBlock);
-            _materialPropertyBlock.SetColor("_BaseColor",Color.white);
+            _materialPropertyBlock.SetColor("_BaseColor", Color.white);
             _renderer.SetPropertyBlock(_materialPropertyBlock);
         }
 

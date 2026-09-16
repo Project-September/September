@@ -36,7 +36,7 @@ namespace InGame.TreasureChest
                 _cancellationTokenSource.Token).Forget();
         }
 
-        private async UniTask FireDamageAsync(TriggerContext context, CancellationTokenSource cancellationTokenSource,   CancellationToken token)
+        private async UniTask FireDamageAsync(TriggerContext context, CancellationTokenSource cancellationTokenSource, CancellationToken token)
         {
             _fireEffect.SetActive(true);
 
