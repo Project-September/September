@@ -65,6 +65,9 @@ namespace September.InGame.Kraken
         [Header("攻撃設定")]
         [SerializeField] private KrakenAttackHandler _attackHandler;
         [SerializeField] private KrakenSettings _settings;
+        
+        [Header("AI設定")]
+        [SerializeField] private KrakenAIController _aiController;
 
         private InputWrapper _attack;
 
@@ -97,6 +100,7 @@ namespace September.InGame.Kraken
             _cameraController.Init(true);
             _attackHandler.Initialize(_tentacles.Arms, _settings, this);
             _aimPointResolver = new KrakenAimPointResolver(_settings.AttackPointRayHitLayer);
+            _aiController.Initialize(transform);
 
             SlamParticlePool = new ObjectPool<ParticleSystem>(
                 () => Instantiate(_settings.SlamEffect),
@@ -183,6 +187,18 @@ namespace September.InGame.Kraken
             // 未搭乗時の処理
             if (!OwnerPlayerRef.IsRealPlayer)
             {
+                if (_appearanceState == KrakenAppearanceState.Staying && Runner.IsForward)
+                {
+                    _aiController.Tick(Runner.DeltaTime);
+
+                    if (_aiController.CanAttack())
+                    {
+                        RPC_Attack(_aiController.GetResolveNetwork());
+                        _aiController.NotifyAttacked();
+                    }
+                }
+                
+                
                 // 一定時間放置されたら自動的に退場する
                 if (DisappearTimer.Expired(Runner) && _appearanceState == KrakenAppearanceState.Staying)
                 {
@@ -238,6 +254,9 @@ namespace September.InGame.Kraken
         /// <param name="owner"> </param>
         public void GetOn(PlayerRef owner)
         {
+            // aiを停止する
+            _aiController.Stop();
+            
             // カメラを有効化する
             RPC_ResetCamera(owner);
             RPC_SetCameraPriority(owner, CameraPriority);
@@ -338,6 +357,8 @@ namespace September.InGame.Kraken
             await _playableDirector.PlayAsync(_inTimeline);
             DisappearTimer = TickTimer.CreateFromSeconds(Runner, _stayDuration);
             _appearanceState = KrakenAppearanceState.Staying;
+            
+            _aiController.Begin(_stayDuration);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
