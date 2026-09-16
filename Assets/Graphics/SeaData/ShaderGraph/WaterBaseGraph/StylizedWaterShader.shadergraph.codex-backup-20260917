@@ -685,10 +685,7 @@
             "m_Id": "cb93cc8bc4dc48f4b3d2cee3bbaf9a08"
         },
         {
-            "m_Id": "5daa649db8e44ec29eb7e9e30a1772dd"
-        },
-        {
-            "m_Id": "cc3381def63442ceb96a81bf50e599c8"
+            "m_Id": "75612db2f878431cae7f0fd607a8d65f"
         }
     ],
     "m_GroupDatas": [
@@ -2123,20 +2120,6 @@
             "m_InputSlot": {
                 "m_Node": {
                     "m_Id": "9429ebbe9de04660a26d873278a0fb10"
-                },
-                "m_SlotId": 0
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "7def408f995046baad817dd1c14e8cb4"
-                },
-                "m_SlotId": 1
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "aa6f4ab7f2974df2a297a9d80de7b45d"
                 },
                 "m_SlotId": 0
             }
@@ -3951,7 +3934,7 @@
                 "m_Id": "cb93cc8bc4dc48f4b3d2cee3bbaf9a08"
             },
             {
-                "m_Id": "5daa649db8e44ec29eb7e9e30a1772dd"
+                "m_Id": "75612db2f878431cae7f0fd607a8d65f"
             }
         ]
     },
@@ -6727,24 +6710,9 @@
     "m_ObjectId": "1b896e57c12b4760a514f67cb210d407",
     "m_Title": "FadeWaterMove",
     "m_Position": {
-        "x": -1438.0,
-        "y": -1783.0
+        "x": -1438.0001220703125,
+        "y": -1783.000244140625
     }
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "1b9408f5fccd4ce79553db626d0312ff",
-    "m_Id": 0,
-    "m_DisplayName": "Metallic",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "Metallic",
-    "m_StageCapability": 2,
-    "m_Value": 0.0,
-    "m_DefaultValue": 0.0,
-    "m_Labels": []
 }
 
 {
@@ -7307,8 +7275,8 @@
     "m_ObjectId": "252ccbac6cf047ff874e67656c73e864",
     "m_Title": "GerstnerGroup(1)",
     "m_Position": {
-        "x": -3208.0,
-        "y": -5054.0
+        "x": -3208.000732421875,
+        "y": -5054.00048828125
     }
 }
 
@@ -9163,7 +9131,7 @@
     "m_WorkflowMode": 1,
     "m_NormalDropOffSpace": 0,
     "m_ClearCoat": false,
-    "m_BlendModePreserveSpecular": false
+    "m_BlendModePreserveSpecular": true
 }
 
 {
@@ -9292,7 +9260,7 @@
     "m_Title": "WaterColorGroup",
     "m_Position": {
         "x": -338.0,
-        "y": -331.0
+        "y": -331.0001525878906
     }
 }
 
@@ -10401,8 +10369,8 @@
     "m_ObjectId": "5cd66039fa6844a298a7c934f8b96975",
     "m_Title": "FresnelGroup",
     "m_Position": {
-        "x": 1491.0,
-        "y": 36.0
+        "x": 1491.0001220703125,
+        "y": 35.999874114990237
     }
 }
 
@@ -10448,40 +10416,6 @@
     "m_CustomColors": {
         "m_SerializableColors": []
     }
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
-    "m_ObjectId": "5daa649db8e44ec29eb7e9e30a1772dd",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "SurfaceDescription.Metallic",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 0.0,
-            "height": 0.0
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "1b9408f5fccd4ce79553db626d0312ff"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedDescriptor": "SurfaceDescription.Metallic"
 }
 
 {
@@ -12287,6 +12221,40 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
+    "m_ObjectId": "75612db2f878431cae7f0fd607a8d65f",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "SurfaceDescription.Metallic",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 0.0,
+            "height": 0.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "befb905e6438418d87a3183ee0091b7c"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_SerializedDescriptor": "SurfaceDescription.Metallic"
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicValueMaterialSlot",
     "m_ObjectId": "7638696d1a7d8d49c4deaab601febec4",
     "m_Id": 2,
@@ -13241,7 +13209,7 @@
     "m_ObjectId": "821728db5a404ea5bcb064b0d5fc0373",
     "m_Title": "FoamGroup",
     "m_Position": {
-        "x": 483.0,
+        "x": 483.0000915527344,
         "y": 946.0
     }
 }
@@ -13252,8 +13220,8 @@
     "m_ObjectId": "8236d5060bdc4df3a8716f73bbfd3cce",
     "m_Title": "WaterMoveGroup",
     "m_Position": {
-        "x": -3521.0,
-        "y": -2206.0
+        "x": -3521.000732421875,
+        "y": -2206.000244140625
     }
 }
 
@@ -14809,8 +14777,8 @@
     "m_ObjectId": "966bc60ad1684221b6536fbbedf18518",
     "m_Title": "GerstnerGroup(2)",
     "m_Position": {
-        "x": -3212.0,
-        "y": -4217.0
+        "x": -3212.00048828125,
+        "y": -4217.00048828125
     }
 }
 
@@ -16226,8 +16194,8 @@
     "m_ObjectId": "acef2ef3d4f047daae72aa86fde4a5d0",
     "m_Title": "GerstnerGroup(3)",
     "m_Position": {
-        "x": -3212.0,
-        "y": -3363.0
+        "x": -3212.00048828125,
+        "y": -3363.000244140625
     }
 }
 
@@ -16360,8 +16328,8 @@
     "m_ObjectId": "ae42d0a54e098ff0f7ebed3c24c2e751",
     "m_Title": "HeightFoam",
     "m_Position": {
-        "x": 255.0,
-        "y": -1537.0
+        "x": 255.00003051757813,
+        "y": -1537.0001220703125
     }
 }
 
@@ -17261,6 +17229,21 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "befb905e6438418d87a3183ee0091b7c",
+    "m_Id": 0,
+    "m_DisplayName": "Metallic",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Metallic",
+    "m_StageCapability": 2,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "bf0724b2426544a989db74bc1fca923d",
     "m_Id": 953195238,
     "m_DisplayName": "WaveSpeed3",
@@ -17469,8 +17452,8 @@
     "m_ObjectId": "c0aa3542a1a448809e74b122f8beb606",
     "m_Title": "NormalGroup(Gerstner)",
     "m_Position": {
-        "x": 254.9999542236328,
-        "y": -4395.0
+        "x": 255.00003051757813,
+        "y": -4395.00048828125
     }
 }
 
@@ -18316,43 +18299,6 @@
         "z": 0.0
     },
     "m_Labels": []
-}
-
-{
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.CustomFunctionNode",
-    "m_ObjectId": "cc3381def63442ceb96a81bf50e599c8",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "Custom Function",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -116.99998474121094,
-            "y": -2666.0,
-            "width": 208.0,
-            "height": 245.0
-        }
-    },
-    "m_Slots": [],
-    "synonyms": [
-        "code",
-        "HLSL"
-    ],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SourceType": 0,
-    "m_FunctionName": "Enter function name here...",
-    "m_FunctionSource": "",
-    "m_FunctionSourceUsePragmas": true,
-    "m_FunctionBody": "Enter function body here..."
 }
 
 {

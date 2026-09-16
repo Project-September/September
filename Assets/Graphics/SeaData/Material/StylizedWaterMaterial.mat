@@ -143,7 +143,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _HeightFoamStrength: 0.24
+    - _HeightFoamStrength: 0
     - _HeightFoamTiling: 0.1
     - _Metallic: 0
     - _OcclusionStrength: 1
@@ -156,7 +156,7 @@ Material:
     - _ReflectionStrength: 0.02
     - _RefractionScale: 1
     - _RefractionSpeed: 1
-    - _RefractionStrength: 1
+    - _RefractionStrength: 10
     - _RefrectionScale: 1
     - _RefrectionSpeed: 0.05
     - _RefrectionStrength: 11.18
@@ -174,7 +174,7 @@ Material:
     - _WaveHeight4: 0.1
     - _WaveHeight5: 0.25
     - _WaveLength: 0.09
-    - _WaveLength1_1: 21.6
+    - _WaveLength1_1: 16
     - _WaveLength2: 32.4
     - _WaveLength3: 11
     - _WaveLength4: 4
@@ -196,14 +196,14 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DeepWaterColor: {r: 0.052054554, g: 0.29503727, b: 0.35220078, a: 0.88}
+    - _DeepWaterColor: {r: 0.025216522, g: 0.13151518, b: 0.15723258, a: 0.8117647}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _FoamColor: {r: 0.74213827, g: 0.74213827, b: 0.74213827, a: 1}
     - _HeightFoamColor: {r: 1, g: 1, b: 1, a: 1}
     - _SamplePosition: {r: 0, g: 0, b: 0, a: 0}
-    - _ShallowWaterColor: {r: 0.46398467, g: 0.5557241, b: 0.5786162, a: 0.50980395}
+    - _ShallowWaterColor: {r: 0.16882233, g: 0.50020164, b: 0.55345905, a: 0.76862746}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _Water_F0Color: {r: 0.04, g: 0.04, b: 0.04, a: 1}
+    - _Water_F0Color: {r: 0.02, g: 0.02, b: 0.02, a: 1}
     - _WaveDirection: {r: 1, g: 0, b: 0, a: 0}
     - _WaveDirection1_1: {r: 1, g: 0.08, b: 0, a: 0}
     - _WaveDirection2: {r: -1, g: 0.6, b: 0, a: 0}
