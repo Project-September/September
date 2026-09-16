@@ -54,7 +54,7 @@ namespace InGame.Player.Ability
             _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
             _effectID = _effectSpawner.RequestPlayLoopEffect(EffectType.Cursor, Vector3.zero, Quaternion.identity);
             
-            _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.InputLocked);
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
         }
 
         protected override void OnCutInUpdate(float deltaTime)
@@ -101,7 +101,7 @@ namespace InGame.Player.Ability
             _isShoot = false;
             _hatanoSequenceManager.RPC_SetStartTimeline();
             _hatanoWeaponController.RPC_UltEndAttachSocket(_hatanoAbilityStatusManagement.AbilityStatus);
-            _playerManager.RPC_SetControlState(PlayerManager.PlayerControlState.Normal);
+            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
         }
         
         [Rpc(RpcSources.All, RpcTargets.All)]
