@@ -1,6 +1,7 @@
 using Fusion;
 using InGame.Health;
 using September.Common;
+using September.InGame.Effect;
 using UnityEngine;
 
 namespace InGame.Player.Okubo
@@ -12,13 +13,18 @@ namespace InGame.Player.Okubo
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _flyingPower;
         [SerializeField] private Rigidbody _rb;
+        [SerializeField] private EffectType _explosion;
+        [SerializeField] private LayerMask _groundLayer = ~0;
+        [SerializeField] private GameObject _countDownEffect;
 
-        private float _waitTimer;
+        private float _explodeTime;
         private PlayerRef _ownerRef;
+        private EffectSpawner _effectSpawner;
 
         public override void Spawned()
         {
-            _waitTimer = _waitDuration;
+            _explodeTime = Runner.SimulationTime + _waitDuration;
+            _effectSpawner = StaticServiceLocator.Instance.Get<EffectSpawner>();
         }
 
         public void SetData(Vector3 force, PlayerRef ownerRef)
@@ -32,9 +38,8 @@ namespace InGame.Player.Okubo
             if (!HasStateAuthority)
                 return;
 
-            if (_waitTimer > 0f)
+            if (Runner.SimulationTime < _explodeTime)
             {
-                _waitTimer -= Runner.DeltaTime;
                 return;
             }
             Explode();
@@ -49,7 +54,7 @@ namespace InGame.Player.Okubo
                 GameObject hitObject = obj.transform.root.gameObject;
                 if (!hitObject.CompareTag("Player")) continue;
 
-                //ƒqƒbƒg‚µ‚½ƒIƒuƒWƒFƒNƒg‚©‚çPrayerRef‚ðŽæ“¾
+                //ï¿½qï¿½bï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½PrayerRefï¿½ï¿½ï¿½æ“¾
                 foreach (var pair in PlayerDatabase.Instance.PlayerObjectDic)
                 {
                     if (pair.Value.gameObject != hitObject || pair.Key == _ownerRef)
@@ -58,14 +63,14 @@ namespace InGame.Player.Okubo
                     if (!pair.Value.TryGetComponent(out IDamageable damageable))
                         continue;
 
-                    //ƒ_ƒ[ƒWˆ—
+                    //ï¿½_ï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½
                     var hitData = new HitData(HitActionType.Damage, _damageAmount, _ownerRef, damageable.OwnerPlayerRef);
                     damageable.TakeHit(ref hitData);
 
                     if (!pair.Value.TryGetComponent(out PlayerMovement movement))
                         continue;
 
-                    //‚«”ò‚Î‚·ˆ—
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚ï¿½ï¿½ï¿½ï¿½ï¿½
                     var dir = movement.transform.position - transform.position;
                     var distance = dir.magnitude;
 
@@ -74,9 +79,26 @@ namespace InGame.Player.Okubo
                     movement.AddFlyingVelocity(dir.normalized * power);
 
                     break;
+
                 }
             }
+            _effectSpawner.RequestPlayOneShotEffect(_explosion, this.transform.position, Quaternion.identity);
+
             Runner.Despawn(Object);
+
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (IsInLayerMask(collision.gameObject, _groundLayer))
+            {
+                _countDownEffect?.gameObject.SetActive(true);
+            }
+        }
+
+        private bool IsInLayerMask(GameObject target, LayerMask layerMask)
+        {
+            return (layerMask.value & (1 << target.layer)) != 0;
         }
     }
 }
