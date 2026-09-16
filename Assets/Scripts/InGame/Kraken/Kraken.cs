@@ -333,7 +333,7 @@ namespace September.InGame.Kraken
                     .GetControlDescriptionType(playerData.CharacterType);
                 RPC_ChangeDescriptionUI(owner, type);
             }
-            // ダメージエリアを有効化する
+            // ダメージエリアを無効化
             foreach (var damageArea in _damageAreas)
             {
                 damageArea.DisableDamageArea();

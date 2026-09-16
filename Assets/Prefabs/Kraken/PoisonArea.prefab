@@ -9,8 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6570813347428784530}
-  - component: {fileID: 6946944465427217008}
-  - component: {fileID: 788799288577984451}
   - component: {fileID: 3927171093145179607}
   - component: {fileID: 4788586594488616496}
   m_Layer: 0
@@ -43,54 +41,6 @@ Transform:
   - {fileID: 3644683085671764645}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6946944465427217008
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6874658866550773786}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 68.045074, y: 6.990733, z: 59.401573}
-  m_Center: {x: -4.140316, y: -4.2738357, z: 13.712959}
---- !u!54 &788799288577984451
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6874658866550773786}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &3927171093145179607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,6 +64,11 @@ MonoBehaviour:
   - {fileID: 5815633417145665495}
   - {fileID: 1591098170759017503}
   - {fileID: 6915127404811345070}
+  _hitAreaOffset: {x: 2.89, y: -6.03, z: 11.92}
+  _hitAreaSize: {x: 75, y: 9.14, z: 60.7}
+  _hitLayer:
+    serializedVersion: 2
+    m_Bits: 55663
 --- !u!114 &4788586594488616496
 MonoBehaviour:
   m_ObjectHideFlags: 0

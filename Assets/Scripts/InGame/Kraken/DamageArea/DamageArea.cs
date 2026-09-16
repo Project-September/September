@@ -6,15 +6,17 @@ using UnityEngine;
 
 namespace September.InGame.Kraken
 {
-	[RequireComponent(typeof(Rigidbody), typeof(Collider))]
 	public class DamageArea : NetworkBehaviour
 	{
 		[SerializeField] private float _damageInterval;
 		[SerializeField] private int _damage;
 		[SerializeField] private ParticleSystem[] _poisonEffects;
+		[SerializeField] private Vector3 _hitAreaOffset;
+		[SerializeField] private Vector3 _hitAreaSize;
+		[SerializeField] private LayerMask _hitLayer;
 		private TickTimer _tickTimer;
 		private readonly List<IDamageable> _damageableObjects = new();
-		private bool enable = false;
+		private bool _enable = false;
 		private PlayerRef _playerRef;
 
 		public override void Spawned()
@@ -26,7 +28,7 @@ namespace September.InGame.Kraken
 		public void EnableDamageArea(PlayerRef player)
 		{
 			_playerRef = player;
-			enable = true;
+			_enable = true;
 			_tickTimer = TickTimer.CreateFromSeconds(Runner, _damageInterval);
 			RPC_EffectActive(true);
 		}
@@ -34,7 +36,7 @@ namespace September.InGame.Kraken
 		public void DisableDamageArea()
 		{
 			_playerRef = default;
-			enable = false;
+			_enable = false;
 			_tickTimer = default;
 			RPC_EffectActive(false);
 		}
@@ -42,15 +44,30 @@ namespace September.InGame.Kraken
 		public override void FixedUpdateNetwork()
 		{
 			base.FixedUpdateNetwork();
-			if (!HasStateAuthority || !enable) return;
+			if (!HasStateAuthority || !_enable) return;
 			if (!_tickTimer.Expired(Runner)) return;
-
+			// タイマーの更新
 			_tickTimer = TickTimer.CreateFromSeconds(Runner, _damageInterval);
+			FindDamageableObjects(_damageableObjects);
+			// ダメージ処理
 			foreach (var damageableObject in _damageableObjects)
 			{
 				var hit = new HitData(HitActionType.RangedDamage, _damage, _playerRef, damageableObject.OwnerPlayerRef);
 				damageableObject.TakeHit(ref hit);
 			}
+		}
+
+		void FindDamageableObjects(List<IDamageable> damageableObjects)
+		{
+			damageableObjects.Clear();
+			var cols = Physics.OverlapBox(transform.position + _hitAreaOffset, _hitAreaSize * .5f, transform.rotation, _hitLayer);
+			foreach (var col in cols)
+			{
+				var damageable = col.GetComponentInParent<IDamageable>();
+				if (damageable == null) continue;
+				damageableObjects.Add(damageable);
+			}
+			Debug.Log(damageableObjects.Count);
 		}
 
 		[Rpc]
@@ -63,28 +80,17 @@ namespace September.InGame.Kraken
 		{
 			foreach (var poisonEffect in _poisonEffects)
 			{
-				//poisonEffect.gameObject.SetActive(active);
 				if(active)
 					poisonEffect.Play();
 				else
-				{
 					poisonEffect.Stop();
-				}
 			}
 		}
-
-		private void OnTriggerEnter(Collider other)
+		
+		void OnDrawGizmos()
 		{
-			var damageable = other.GetComponentInParent<IDamageable>();
-			if (damageable == null || _damageableObjects.Contains(damageable)) return;
-			_damageableObjects.Add(damageable);
-		}
-
-		private void OnTriggerExit(Collider other)
-		{
-			var damageable = other.GetComponentInParent<IDamageable>();
-			if (damageable == null) return;
-			_damageableObjects.Remove(damageable);
+			Gizmos.color = Color.green;
+			Gizmos.DrawWireCube(transform.position+ _hitAreaOffset, _hitAreaSize);
 		}
 	}
 }
