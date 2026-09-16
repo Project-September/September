@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CRISound;
 using Fusion;
 using Cysharp.Threading.Tasks;
 using InGame.Common;
@@ -113,7 +114,16 @@ namespace InGame.Player.Hatano
             var wasAiming = _aimCameraController.IsAim
                 || (GetInput<PlayerInput>(out var aimInput) && aimInput.Buttons.IsSet(PlayerButtons.Ability2));
             _abilityStatus = GetNextHatanoAbilityStatus();
+            RPC_PlayWeaponChangeSound();
             ChangeAbility(_abilityStatus, wasAiming).Forget();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_PlayWeaponChangeSound()
+        {
+            if (!CuePlayAtomExPlayer.Instance.IsReady) return;
+            var cue = SoundCues.SE.Hatano_Aim;
+            CRIAudio.PlaySE(transform.position, cue.Sheet, cue.Name);
         }
 
         /// <summary>
