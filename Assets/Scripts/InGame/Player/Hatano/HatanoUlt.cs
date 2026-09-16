@@ -43,6 +43,8 @@ namespace InGame.Player.Ability
 
         protected override void OnCutInStart()
         {
+            if (_hatanoWeaponController != null)
+                _hatanoWeaponController.RPC_PlayRocketReadySound();
             _aimCameraController.RPC_CrosshairToggleChange(false);
             _rocketAnimator.SetBool(_rocketAnimName, true);
         }
@@ -173,6 +175,8 @@ namespace InGame.Player.Ability
             if(!Parameter.Owner.HasStateAuthority) return;
             // マズル位置に生成し、移動させる
             var rocket = Runner.Spawn(_bulletPrefab, _muzzle.position, Quaternion.identity);
+            if (_hatanoWeaponController != null)
+                _hatanoWeaponController.RPC_PlayRocketFireSound(_muzzle.position);
             if (rocket.TryGetComponent<RocketBullet>(out var rocketBullet))
             {
                 rocketBullet.Initialization(position, _bulletSpeed, () => RocketLauncherRadius(position));

@@ -18,12 +18,15 @@ namespace InGame.Player.Ability
         [SerializeField] private int _ogreDamage;
         
         private HatanoAbilityStatusManagement _abilityStatusManagement;
+        private HatanoWeaponController _weaponController;
 
         protected override bool ReplayAnimationOnEveryShot => true;
         
         protected override void OnStart()
         {
             base.OnStart();
+            if (_weaponController == null)
+                _weaponController = Parameter.Owner.GetComponentInChildren<HatanoWeaponController>(true);
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = _shotCooldown.ExpiredOrNotRunning(Runner)
@@ -79,12 +82,18 @@ namespace InGame.Player.Ability
             Debug.DrawRay(originLeft, dirLeft * _shootingDistance, Color.blue);
             //右
             var originRight = _muzzlePos[1].position;
-            var dirRight = targetPos - originLeft;
+            var dirRight = targetPos - originRight;
             Debug.DrawRay(originRight, dirRight * _shootingDistance, Color.blue);
             
             //左右のマズルから、ヒットした場所にRayを飛ばす
-            Physics.Raycast(originLeft, dirLeft, out var gunHitInfoLeft, _shootingDistance);
-            Physics.Raycast(originRight, dirRight, out var gunHitInfoRight, _shootingDistance);
+            var hitLeft = Physics.Raycast(originLeft, dirLeft, out var gunHitInfoLeft, _shootingDistance);
+            var hitRight = Physics.Raycast(originRight, dirRight, out var gunHitInfoRight, _shootingDistance);
+            if (_weaponController != null)
+                _weaponController.RPC_PlayGunShot(
+                    originLeft, hitLeft ? gunHitInfoLeft.point : originLeft + dirLeft.normalized * _shootingDistance,
+                    gunHitInfoLeft.normal, hitLeft,
+                    originRight, hitRight ? gunHitInfoRight.point : originRight + dirRight.normalized * _shootingDistance,
+                    gunHitInfoRight.normal, hitRight);
             GetGunHitPointIDamageable(gunHitInfoLeft, gunHitInfoRight);
         }
 
