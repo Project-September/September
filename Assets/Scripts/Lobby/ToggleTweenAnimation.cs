@@ -53,11 +53,12 @@ namespace September.Lobby
         private void Close()
         {
             if (!_currentTask.Status.IsCompleted()) return;
+            // 閉じるアニメーション中に背面の選択画面が入力を奪わないよう、先に操作を止める。
+            _canvasGroup.interactable = false;
+            _canvasGroup.blocksRaycasts = false;
             List<UniTask> tasks = new();
             tasks.Add(_canvasGroup.DOFade(0, 1.5f).OnComplete(() =>
             {
-                _canvasGroup.interactable = false;
-                _canvasGroup.blocksRaycasts = false;
                 EventSystem.current.SetSelectedGameObject(_selectWhenClose.gameObject);
             }).ToUniTask());
             for (int i = 0; i < _rectOffsets.Length; i++)

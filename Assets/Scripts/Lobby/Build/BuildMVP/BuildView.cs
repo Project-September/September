@@ -117,9 +117,11 @@ namespace September.Lobby
                 MoveIndexForButton(0);
                 FocusCurrentBuild();
             }
-            else if (interactive && !_confirming && EventSystem.current &&
-                     !EventSystem.current.currentSelectedGameObject)
+            else if (interactive && !HasCurrentPhaseFocus())
+            {
+                SetPhase(false);
                 FocusCurrentBuild();
+            }
             _wasInteractive = interactive;
             if (interactive && !_confirming) RefreshNavigation();
         }
@@ -215,6 +217,15 @@ namespace September.Lobby
             int index = Mathf.Clamp(_currentSelectIndex, 0, _buildCount - 1);
             var button = _buildObjects[index].Button;
             if (button.isActiveAndEnabled && button.IsInteractable()) button.Select();
+        }
+
+        bool HasCurrentPhaseFocus()
+        {
+            if (!EventSystem.current) return false;
+            var expected = _confirming
+                ? _decisionButton.gameObject
+                : _buildObjects[_currentSelectIndex].Button.gameObject;
+            return EventSystem.current.currentSelectedGameObject == expected;
         }
     }
 }

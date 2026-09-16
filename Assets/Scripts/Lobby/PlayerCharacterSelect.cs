@@ -133,7 +133,10 @@ namespace September.Lobby
                 _navigationWasVisible = false;
                 return;
             }
-            if (!_selectCharacterIcons[0].gameObject.activeInHierarchy)
+            var phaseButton = _isConfirming
+                ? _submitButton
+                : _selectCharacterIcons[_currentCharacterIndex].Button;
+            if (!phaseButton.isActiveAndEnabled || !phaseButton.IsInteractable())
             {
                 _navigationWasVisible = false;
                 return;
@@ -147,11 +150,12 @@ namespace September.Lobby
                 // 表示された最初のフレームに、先頭アイコンへ十字キー操作の選択を合わせる。
                 FocusCurrentCharacter();
             }
-            // キャラ選択中に背景クリックでフォーカスが外れても、十字キー操作を継続する。
-            var eventSystem = UnityEngine.EventSystems.EventSystem.current;
-            if (!_isConfirming && eventSystem && !eventSystem.currentSelectedGameObject &&
-                _selectCharacterIcons[_currentCharacterIndex].Button.IsInteractable())
+            // フォーカス喪失時は確認フェーズも解除し、直前に選んだアイコンから再開する。
+            if (!HasCurrentPhaseFocus())
+            {
+                SetConfirmationPhase(false);
                 FocusCurrentCharacter();
+            }
 
             // パネルを開いた後や画面サイズ変更後に配置が変わった場合だけ再設定する。
             for (int i = 0; i < _navigationPositions.Length; i++)
@@ -280,6 +284,16 @@ namespace September.Lobby
             int index = Mathf.Clamp(_currentCharacterIndex, 0, _selectCharacterIcons.Count - 1);
             var button = _selectCharacterIcons[index].Button;
             if (button.isActiveAndEnabled && button.IsInteractable()) button.Select();
+        }
+
+        private bool HasCurrentPhaseFocus()
+        {
+            var eventSystem = UnityEngine.EventSystems.EventSystem.current;
+            if (!eventSystem) return false;
+            var expected = _isConfirming
+                ? _submitButton.gameObject
+                : _selectCharacterIcons[_currentCharacterIndex].Button.gameObject;
+            return eventSystem.currentSelectedGameObject == expected;
         }
     }
 }
