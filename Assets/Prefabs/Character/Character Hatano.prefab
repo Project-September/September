@@ -5072,7 +5072,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[1502005889970208852]._cooldown
-      value: 3
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[1502006044739502163].IsEnabled
@@ -5662,14 +5662,6 @@ PrefabInstance:
       propertyPath: _audioBroadcaster
       value: 
       objectReference: {fileID: 8495297432313358088}
-    - target: {fileID: 8026515877087289600, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _jewelryPrefabs.keys.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8026515877087289600, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _jewelryPrefabs.values.Array.size
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8355274600117350697, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _camera
       value: 
