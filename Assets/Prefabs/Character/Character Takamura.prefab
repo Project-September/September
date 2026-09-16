@@ -1532,10 +1532,6 @@ PrefabInstance:
       propertyPath: m_StreamingVersion
       value: 20241001
       objectReference: {fileID: 0}
-    - target: {fileID: 7020943087661863767, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _requiredScore
-      value: 1000
-      objectReference: {fileID: 0}
     - target: {fileID: 7325268686366126974, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_PlayableAsset
       value: 
@@ -1857,6 +1853,7 @@ MonoBehaviour:
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _MoveDirection: {x: 0, y: 0}
+  _MoveInput: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
