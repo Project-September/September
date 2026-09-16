@@ -299,7 +299,6 @@ namespace InGame.Player
         /// </summary>
         void FocusStartEffective()
         {
-            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(false);
             _scannerCanvas.gameObject.SetActive(true);
             _scannerCanvas.ChangeImageVisibility(false);
             _cameraController.ChangeOffset(_focusPosition, _cameraMoveDuration);
@@ -321,7 +320,6 @@ namespace InGame.Player
         /// </summary>
         void FocusEndEffective()
         {
-            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(true);
             _cameraController.ResetOffset(_cameraMoveDuration);
             _scannerCanvas.ChangeImageVisibility(false);
             _scannerCanvas.gameObject.SetActive(false);
@@ -482,6 +480,7 @@ namespace InGame.Player
             ScanAnimationActive = true;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
             _movement.CurrentAbilityPhase = ScanAbilityPhase.Scanning;
+            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(false);
         }
 
         /// <summary>
@@ -492,6 +491,7 @@ namespace InGame.Player
             ScanAnimationActive = false;
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             _movement.CurrentAbilityPhase = ScanAbilityPhase.Default;
+            _playerEquipmentManager?.RPC_SetCurrentEquipmentVisible(true);
         }
 
         /// <summary>
