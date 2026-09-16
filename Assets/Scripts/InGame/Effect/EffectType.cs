@@ -33,5 +33,17 @@ public enum EffectType
     HulkUltImpact,
     PenguinHuge,
     KunaiUlt,
+    Thunder,
+    BallistaHit,
+    BallistaShoot,
+    CandleAura,
+    CannonShoot,
+    CannonHit,
+    CannonHitGround,
+    ExcaliburAttack,
+    ExcaliburStamp,
+    ExcaliburHit,
+    ExcaliburImpact,
+    Cursor
 }
 //勝手にEnumを消すな！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！

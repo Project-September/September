@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6082898100035406106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7247099272209880249}
+  - component: {fileID: 3331420025558581912}
+  m_Layer: 0
+  m_Name: Anim_Takamura_UltTimeline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7247099272209880249
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6082898100035406106}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!320 &3331420025558581912
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6082898100035406106}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 11400000, guid: ad78b7473dddaae4cbbe0ff5ac8e049f, type: 2}
+  m_InitialState: 1
+  m_WrapMode: 2
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings:
+  - key: {fileID: 1814666432068830104, guid: ad78b7473dddaae4cbbe0ff5ac8e049f, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -2315596410218434626, guid: ad78b7473dddaae4cbbe0ff5ac8e049f, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -1682072953257961949, guid: ad78b7473dddaae4cbbe0ff5ac8e049f, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 4490145493582879419, guid: ad78b7473dddaae4cbbe0ff5ac8e049f, type: 2}
+    value: {fileID: 0}
+  m_ExposedReferences:
+    m_References:
+    - 031895180bb4b3e42bd4fd798dd4bd04: {fileID: 0}
+    - 35398d02562ec9d4cbaa4ef7c4adaf8f: {fileID: 0}
+    - b81f5fbdc370607438bf420b735b6e99: {fileID: 0}
+    - 4b56eb8e53c498642bf75654d7bbeca3: {fileID: 0}
+    - f51e1bdfce13b054586bf43d06c7513c: {fileID: 0}
+    - 065c174ec3b65314bbc6c305cd90b067: {fileID: 0}
+    - d9518d1d8f727e246ab957a988710732: {fileID: 0}
+    - 70002017ff82b9442b83db02c965ac32: {fileID: 0}
+    - c2e50ed37912a0849ba102ab554cead7: {fileID: 0}

@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using September.InGame.Fields;
 using September.InGame.UI;
 using UnityEngine;
 
@@ -9,7 +10,8 @@ namespace InGame.Player
     public class PlayerRespawn : NetworkBehaviour
     {
         [SerializeField] private float _coolTime;
-        [SerializeField] private float _outFieldHeight;
+        [SerializeField] private PlayerManager _playerManager;
+        [SerializeField] private GameObject _splashEffectPrefab;
 
         [Networked, OnChangedRender(nameof(OnOutFieldStateChanged))]
         private bool IsOutField { get; set; }
@@ -23,10 +25,9 @@ namespace InGame.Player
 
             if (IsOutField) return;
 
-            if (this.transform.position.y <= _outFieldHeight)
-            {
-                IsOutField = true;
-            }
+            if (OutOfFieldArea.I == null) return;
+
+            IsOutField = OutOfFieldArea.I.IsOutOfField(transform.position);
         }
 
         private void OnOutFieldStateChanged()
@@ -38,16 +39,38 @@ namespace InGame.Player
 
             if (IsOutField)
             {
+                PlaySplashEffect();
                 OnOutFieldEvent?.Invoke();
                 RespawnAsync().Forget();
             }
         }
 
+        private void PlaySplashEffect()
+        {
+            if (_splashEffectPrefab == null) return;
+
+            Vector3 splashPosition = transform.position;
+
+            GameObject splashEffect = Instantiate(_splashEffectPrefab, splashPosition, Quaternion.identity);
+            ParticleSystem rootParticleSystem = splashEffect.GetComponent<ParticleSystem>();
+            if (rootParticleSystem == null)
+            {
+                Debug.LogWarning("[PlayerRespawn] 水しぶきエフェクトのルートにParticleSystemがありません。", splashEffect);
+                Destroy(splashEffect);
+                return;
+            }
+
+            var main = rootParticleSystem.main;
+            main.stopAction = ParticleSystemStopAction.Destroy;
+        }
+
         private async UniTaskVoid RespawnAsync()
         {
+            _playerManager.RPC_SetInvisible(true);
             await UniTask.WaitForSeconds(_coolTime);
             OnRevivalFieldEvent?.Invoke();
             IsOutField = false;
+            _playerManager.RPC_SetInvisible(false);
         }
     }
 }
