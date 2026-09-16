@@ -125,12 +125,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 656a8137653e6524e8ee623e989fb9f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _waitDuration: 2
+  _waitDuration: 3
   _range: 2
   _damageAmount: 2
   _flyingPower: 20
   _rb: {fileID: 3522664014191837712}
   _explosion: 43
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 159
+  _countDownEffect: {fileID: 5977900944261905784}
 --- !u!114 &1501947875061406566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,17 +251,33 @@ PrefabInstance:
       propertyPath: looping
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 989208693211480815, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
+      propertyPath: startDelay.scalar
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2649054745756610383, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
       propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2649054745756610383, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
+      propertyPath: startDelay.scalar
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5886444754264786582, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
       propertyPath: looping
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5886444754264786582, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
+      propertyPath: startDelay.scalar
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8208414350829005930, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
       propertyPath: m_Name
       value: VFX_Okubo_EX_Bomb_Count
+      objectReference: {fileID: 0}
+    - target: {fileID: 8208414350829005930, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -267,5 +287,10 @@ PrefabInstance:
 --- !u!4 &2531989172062851422 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 17045576371880012, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
+  m_PrefabInstance: {fileID: 2530988219119587602}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5977900944261905784 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8208414350829005930, guid: ea0dd55e19e1deb48b36a1e5026f98d5, type: 3}
   m_PrefabInstance: {fileID: 2530988219119587602}
   m_PrefabAsset: {fileID: 0}

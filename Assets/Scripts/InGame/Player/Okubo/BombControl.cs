@@ -14,6 +14,8 @@ namespace InGame.Player.Okubo
         [SerializeField] private float _flyingPower;
         [SerializeField] private Rigidbody _rb;
         [SerializeField] private EffectType _explosion;
+        [SerializeField] private LayerMask _groundLayer = ~0;
+        [SerializeField] private GameObject _countDownEffect;
 
         private float _explodeTime;
         private PlayerRef _ownerRef;
@@ -85,6 +87,19 @@ namespace InGame.Player.Okubo
 
             Runner.Despawn(Object);
 
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (IsInLayerMask(collision.gameObject, _groundLayer))
+            {
+                _countDownEffect.gameObject.SetActive(true);
+            }
+        }
+
+        private bool IsInLayerMask(GameObject target, LayerMask layerMask)
+        {
+            return (layerMask.value & (1 << target.layer)) != 0;
         }
     }
 }
