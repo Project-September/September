@@ -30,7 +30,7 @@ namespace InGame.TreasureChest
         private void TriggerRandomEvent()
         {
             var randomEvent = GetRandomEvent();
-            var context = TriggerContext.Create(this.transform.position,Runner);
+            var context = TriggerContext.Create(this.transform.position,Object,Runner);
             randomEvent?.Trigger(context);
         }
 

@@ -16,17 +16,19 @@ namespace InGame.TreasureChest
     public struct TriggerContext
     {
         public readonly Vector3 CenterPosition;
+        public readonly NetworkObject TreasureChestObject;
         public readonly NetworkRunner Runner;
 
-        private TriggerContext(Vector3 centerPosition,NetworkRunner runner)
+        private TriggerContext(Vector3 centerPosition, NetworkObject treasureChest, NetworkRunner runner)
         {
             CenterPosition = centerPosition;
+            TreasureChestObject = treasureChest;
             Runner = runner;
         }
 
-        public static TriggerContext Create(Vector3 centerPosition,NetworkRunner runner)
+        public static TriggerContext Create(Vector3 centerPosition, NetworkObject treasureChest, NetworkRunner runner)
         {
-           return new TriggerContext(centerPosition,runner);
+           return new TriggerContext(centerPosition, treasureChest, runner);
         }
     }
 }
