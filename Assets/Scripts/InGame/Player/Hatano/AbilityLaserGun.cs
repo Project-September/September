@@ -2,6 +2,7 @@ using System;
 using InGame.Interact;
 using InGame.Player.Hatano;
 using InGame.Player.Ability.Effect.Shooting;
+using Fusion;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -47,17 +48,31 @@ namespace InGame.Player.Ability
             if (_phase == AbilityPhase.Ending) return;
             StateDetection();
 
-            PreviewRemoteInteractable();
+            PreviewRemoteInteractable(_aimCameraController.AimOrigin, _aimCameraController.AimDirection);
+        }
+
+        public override void OnUpdateLocal(float deltaTime, GameObject owner)
+        {
+            if (!owner.TryGetComponent<NetworkObject>(out var networkObject) || !networkObject.HasInputAuthority)
+                return;
+            if (!owner.TryGetComponent<HatanoAbilityStatusManagement>(out var statusManagement) ||
+                statusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun ||
+                !owner.TryGetComponent<AimCameraController>(out var aimController) || !aimController.IsAim)
+                return;
+
+            var camera = Camera.main;
+            if (camera != null)
+                PreviewRemoteInteractable(camera.transform.position, camera.transform.forward);
         }
 
         /// <summary>
         /// The laser gun advertises a valid target while aiming; interaction
         /// progress still begins only while the shooting input is held.
         /// </summary>
-        private void PreviewRemoteInteractable()
+        private void PreviewRemoteInteractable(Vector3 aimOrigin, Vector3 aimDirection)
         {
             var origin = _muzzlePos[0].position;
-            var target = ShootingPositionDetection(_aimCameraController.AimOrigin, _aimCameraController.AimDirection);
+            var target = ShootingPositionDetection(aimOrigin, aimDirection);
             var direction = target - origin;
             if (!Physics.Raycast(origin, direction, out var hit, _shootingDistance))
             {

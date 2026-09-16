@@ -61,6 +61,7 @@ namespace InGame.Player
 
         private Rigidbody _rb;
         private IPlayerMovementOverride _movementOverride;
+        private AimCameraController _aimCameraController;
         private PlayerStatus _status;
         private Animator _animator;
 
@@ -187,6 +188,7 @@ namespace InGame.Player
             _rb = GetComponent<Rigidbody>();
             _rb.useGravity = true;
             _movementOverride = GetComponent<IPlayerMovementOverride>();
+            _aimCameraController = GetComponent<AimCameraController>();
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
             // ========== ビルドシステム ==========
@@ -607,6 +609,11 @@ namespace InGame.Player
         {
             direction.y = 0;
             _setDirection = false;
+
+            // Aiming owns facing direction.  Rotating again toward strafe input
+            // competes with the replicated camera direction and causes jitter.
+            if (_aimCameraController != null && _aimCameraController.IsAim)
+                return;
 
             if (direction == Vector3.zero) return;
 

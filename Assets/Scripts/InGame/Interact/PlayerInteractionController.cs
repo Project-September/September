@@ -37,6 +37,7 @@ namespace InGame.Interact
         private float _interactWaitTimer = 0f;
         private readonly Collider[] _hitBuffer = new Collider[32];
         private InteractableBase _focusedObj;
+        private InteractableBase _remotePreviewObject;
         private bool _isExecutingInteraction = false;
         private float _currentInteractTime = 0f;
         private float _requiredInteractTime = 1.0f;
@@ -118,6 +119,11 @@ namespace InGame.Interact
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
+
+            // 射撃Abilityから届く照準中の遠距離候補を、通常の近距離フォーカスより後に描画する。
+            // Script execution order に依存してUIが即座に消えるのを防ぐ。
+            if (!IsRemoting && _remotePreviewObject != null)
+                ShowRemoteInteractionPreview(_remotePreviewObject);
 
             if (_isHoldingInteract)
             {
@@ -245,7 +251,9 @@ namespace InGame.Interact
         /// <summary>Displays the remote-interaction affordance without starting its timer.</summary>
         public void RemoteInteractionPreview(InteractableBase interactableBase)
         {
-            if (_isBot || IsRemoting || !HasInputAuthority) return;
+            if (_isBot || IsRemoting) return;
+
+            _remotePreviewObject = interactableBase;
 
             if (interactableBase == null)
             {
@@ -253,6 +261,12 @@ namespace InGame.Interact
                 return;
             }
 
+            ShowRemoteInteractionPreview(interactableBase);
+        }
+
+        private void ShowRemoteInteractionPreview(InteractableBase interactableBase)
+        {
+            if (interactableBase == null) return;
             var context = new InteractableContext { Interactor = Object.InputAuthority.RawEncoded };
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
@@ -269,6 +283,7 @@ namespace InGame.Interact
         public void RemoteInteractionCancel(ref float timer)
         {
             IsRemoting = false;
+            _remotePreviewObject = null;
             timer = 0;
             RemoteInteractTimer = 0f;
             CancelInteraction();

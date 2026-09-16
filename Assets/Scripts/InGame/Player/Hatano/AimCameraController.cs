@@ -42,16 +42,6 @@ public class AimCameraController : NetworkBehaviour
         {
             AimOrigin = MainCamera.transform.position;
             AimDirection = MainCamera.transform.forward;
-            
-            var camForward = MainCamera.transform.forward;
-            camForward.y = 0;
-
-            // 構え中の前後左右移動時に発生するカクつきを軽減するため、回転を補間させる
-            if (camForward.sqrMagnitude > 0.1f && (!_playerMovement || !_playerMovement.IsEvading))
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(camForward.normalized);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Runner.DeltaTime * _rotationSpeed);
-            }
         }
         RPC_SetAim(MainCamera.transform.position, MainCamera.transform.forward);
     }
@@ -74,8 +64,8 @@ public class AimCameraController : NetworkBehaviour
         {
             var forward = aimDirection;
             forward.y = 0f;
-            if (forward.sqrMagnitude > Mathf.Epsilon)
-                transform.forward = forward.normalized;
+            if (_playerMovement != null && forward.sqrMagnitude > Mathf.Epsilon)
+                _playerMovement.SetRotationImmediately(forward.normalized);
         }
     }
 
