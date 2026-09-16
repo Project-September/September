@@ -43,6 +43,12 @@ namespace InGame.Player.Hatano
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_PlayRemoteInteractionSound(Vector3 position)
+        {
+            PlaySound(SoundCues.SE.Hatano_Shoot, position);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RPC_PlayRocketReadySound()
         {
             PlaySound(SoundCues.SE.Hatano_Ult_1, transform.position);

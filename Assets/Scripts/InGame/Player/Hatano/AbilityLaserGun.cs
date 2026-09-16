@@ -24,10 +24,15 @@ namespace InGame.Player.Ability
         /// </summary>
         private InteractableBase _currentInteractableBase;
         private HatanoAbilityStatusManagement _abilityStatusManagement;
+        private HatanoWeaponController _weaponController;
+        private bool _isFiring;
 
         protected override void OnStart()
         {
             base.OnStart();
+            _isFiring = false;
+            if (_weaponController == null)
+                _weaponController = Parameter.Owner.GetComponentInChildren<HatanoWeaponController>(true);
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = ShootingStateType.Stance;
@@ -104,6 +109,13 @@ namespace InGame.Player.Ability
             var camDir = _aimCameraController.AimDirection;
             var targetPos = ShootingPositionDetection(camOri, camDir);
             var origin = _muzzlePos[0].position; //銃口
+            // 長押し中は初回だけ再生し、入力解除・回避・構え終了で再び再生可能にする。
+            if (!_isFiring)
+            {
+                _isFiring = true;
+                if (_weaponController != null)
+                    _weaponController.RPC_PlayRemoteInteractionSound(origin);
+            }
             var dir = targetPos - origin;
             Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
@@ -157,6 +169,7 @@ namespace InGame.Player.Ability
 
         protected override void OnNoShooting()
         {
+            _isFiring = false;
             _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
@@ -164,6 +177,7 @@ namespace InGame.Player.Ability
 
         protected override void OnStopTheStance()
         {
+            _isFiring = false;
             _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
