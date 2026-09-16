@@ -20,6 +20,8 @@ namespace September.Editor.HumanoidRig
         private readonly Dictionary<string, string> _details = new Dictionary<string, string>();
         private DefaultAsset _scanFolder;
         private string _summary;
+        private string _ignoredPrefixText = string.Empty;
+        private string[] _ignoredPrefixes = Array.Empty<string>();
 
         public AnimationClipUpdateSection(HumanoidRigTargetFolders folders) => _folders = folders;
 
@@ -33,6 +35,24 @@ namespace September.Editor.HumanoidRig
                 MessageType.Info);
             _scanFolder = (DefaultAsset)EditorGUILayout.ObjectField(
                 "対象フォルダ（FBX / .anim）", _scanFolder, typeof(DefaultAsset), false);
+            using (var change = new EditorGUI.ChangeCheckScope())
+            {
+                _ignoredPrefixText = EditorGUILayout.TextField("無視する接頭辞", _ignoredPrefixText);
+                if (change.changed)
+                {
+                    _ignoredPrefixes = _ignoredPrefixText.Split(new[] { ',', '、', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(prefix => prefix.Trim()).Where(prefix => prefix.Length > 0)
+                        .Distinct(StringComparer.Ordinal).OrderByDescending(prefix => prefix.Length).ToArray();
+                    _sources.Clear();
+                    _details.Clear();
+                    _results.Clear();
+                    _list.Clear();
+                    _summary = "接頭辞の設定が変更されました。再スキャンしてください。";
+                }
+            }
+            EditorGUILayout.HelpBox(
+                "例: WpAnim_, Anim_（複数はカンマ区切り）。両側のクリップ名・ファイル名の先頭から、最長の一致を1回だけ除いて照合します。\n" +
+                "大文字・小文字は区別します。実際のアセット名は変更しません。", MessageType.Info);
             string destination = AssetDatabase.GetAssetPath(_scanFolder);
             bool valid = _scanFolder == null || AssetDatabase.IsValidFolder(destination);
             if (!valid) EditorGUILayout.HelpBox("対象にはフォルダを指定してください。", MessageType.Warning);
@@ -72,20 +92,29 @@ namespace September.Editor.HumanoidRig
             return result;
         }
 
-        private static void AddSource(Dictionary<string, List<AnimationClip>> sources, string name, AnimationClip clip)
+        private string MatchName(string name)
         {
+            foreach (string prefix in _ignoredPrefixes)
+                if (name.StartsWith(prefix, StringComparison.Ordinal)) return name.Substring(prefix.Length);
+            return name;
+        }
+
+        private void AddSource(Dictionary<string, List<AnimationClip>> sources, string name, AnimationClip clip)
+        {
+            name = MatchName(name);
+            if (name.Length == 0) return;
             if (!sources.TryGetValue(name, out var matches))
                 sources.Add(name, matches = new List<AnimationClip>());
             if (!matches.Contains(clip)) matches.Add(clip);
         }
 
-        private static List<AnimationClip> FindMatches(Dictionary<string, List<AnimationClip>> sources,
+        private List<AnimationClip> FindMatches(Dictionary<string, List<AnimationClip>> sources,
             string path, AnimationClip target)
         {
             // ファイル名と内部名の両方を確認し、異なる更新元が見つかった場合は重複として扱う。
             var matches = new List<AnimationClip>();
-            if (sources.TryGetValue(target.name, out var byName)) matches.AddRange(byName);
-            if (sources.TryGetValue(Path.GetFileNameWithoutExtension(path), out var byFile)) matches.AddRange(byFile);
+            if (sources.TryGetValue(MatchName(target.name), out var byName)) matches.AddRange(byName);
+            if (sources.TryGetValue(MatchName(Path.GetFileNameWithoutExtension(path)), out var byFile)) matches.AddRange(byFile);
             return matches.Distinct().ToList();
         }
 
@@ -114,7 +143,7 @@ namespace September.Editor.HumanoidRig
                     {
                         missing++;
                         _results.Add(path, ResultFilter.Missing);
-                        _details.Add(path, $"同名 FBX クリップなし\n照合名: {target.name} / ファイル名: {Path.GetFileNameWithoutExtension(path)}");
+                        _details.Add(path, $"同名 FBX クリップなし\n照合名: {MatchName(target.name)} / ファイル名の照合名: {MatchName(Path.GetFileNameWithoutExtension(path))}");
                         continue;
                     }
                     if (matches.Count != 1)
