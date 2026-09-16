@@ -221,6 +221,61 @@ MonoBehaviour:
   defaultLocalRotation: {x: -5.2951663e-23, y: -0.000020864818, z: -0.021377927, w: 0.9997715}
   limit: 40
   twistLimit: 0
+--- !u!1 &361207820785736450
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5421213018088817203}
+  - component: {fileID: 746327664910450909}
+  m_Layer: 0
+  m_Name: Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5421213018088817203
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361207820785736450}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -6.1428576, z: 0}
+  m_LocalScale: {x: 1.4285715, y: 1.4285715, z: 1.4285715}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6514696112518196840}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &746327664910450909
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361207820785736450}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 24.483097
+  m_Height: 60.465614
+  m_Direction: 1
+  m_Center: {x: 0.5, y: 10.763638, z: -6.9470787}
 --- !u!1 &420486384153331679
 GameObject:
   m_ObjectHideFlags: 0
@@ -2502,6 +2557,7 @@ Transform:
   - {fileID: 8466435495373078999}
   - {fileID: 3514646804514168045}
   - {fileID: 7486621594028746031}
+  - {fileID: 5421213018088817203}
   m_Father: {fileID: 331088913545005189}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3340264197327577431
@@ -4235,7 +4291,7 @@ MonoBehaviour:
     m_Bits: 128
   _magicCircleSurfaceOffset: 0.05
   _magicCircle: {fileID: 1153563147967587697}
-  _dealScore: 10
+  _dealScoreMultiplier: 2
   _stayDuration: 20
   _playableDirector: {fileID: 6602018564722246398}
   _inTimeline: {fileID: 11400000, guid: c1316e32a455a584398323e3b2f2c3ed, type: 2}
