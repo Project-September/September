@@ -44,6 +44,11 @@ namespace InGame.Common
         [SerializeField, Min(0f)] private float _aimBlendDuration = 0.15f;
         private bool _aimBlendTarget;
         private float _aimBlendWeight;
+        private bool _isUpperBodyBlending;
+        private float _upperBodyBlendTarget;
+        private float _upperBodyBlendDuration;
+
+        public float AimBlendDuration => _aimBlendDuration;
 
         /// <summary>グラフ評価 (LateUpdate) の直前に呼ばれる。足 IK など出力後処理のパラメータ更新用。</summary>
         public event Action BeforeEvaluate;
@@ -284,6 +289,7 @@ namespace InGame.Common
         public void LateUpdate()
         {
             UpdateAimBlend();
+            UpdateUpperBodyBlend();
             BeforeEvaluate?.Invoke();
             _graph.Evaluate(Time.deltaTime * _graphSpeed);
         }
@@ -384,7 +390,7 @@ namespace InGame.Common
             _layerInfo[slot] = li;
         }
 
-        public void PlayOnUpperBody(AnimationClip clip)
+        public void PlayOnUpperBody(AnimationClip clip, float blendDuration = 0f)
         {
             if (Object.HasStateAuthority)
             {
@@ -394,15 +400,15 @@ namespace InGame.Common
                     index = clipIndex;
                 }
                 // クライアント側で再生する
-                RPC_PlayOnUpperBody(index);
+                RPC_PlayOnUpperBody(index, blendDuration);
             }
 
             // ホスト側で再生する
-            ExecutePlayOnUpperBodyInternal(clip);
+            ExecutePlayOnUpperBodyInternal(clip, blendDuration);
         }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_PlayOnUpperBody(int index)
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+        private void RPC_PlayOnUpperBody(int index, float blendDuration)
         {
             AnimationClip clip = null;
 
@@ -414,10 +420,10 @@ namespace InGame.Common
             }
 
             // クライアント側で再生する
-            ExecutePlayOnUpperBodyInternal(clip);
+            ExecutePlayOnUpperBodyInternal(clip, blendDuration);
         }
 
-        private void ExecutePlayOnUpperBodyInternal(AnimationClip clip)
+        private void ExecutePlayOnUpperBodyInternal(AnimationClip clip, float blendDuration)
         {
             if (!_slotOf.TryGetValue(LayerInfo.LayerType.UpperBody, out var slot))
             {
@@ -433,6 +439,14 @@ namespace InGame.Common
             // 解除要求
             if (clip == null)
             {
+                if (blendDuration > 0f
+                    && _runtimeClips.TryGetValue(LayerInfo.LayerType.UpperBody, out var fading)
+                    && fading.IsValid())
+                {
+                    BeginUpperBodyBlend(0f, blendDuration);
+                    return;
+                }
+
                 _layerMixer.SetInputWeight(slot, 0f);
 
                 if (_runtimeClips.TryGetValue(LayerInfo.LayerType.UpperBody, out var current) && current.IsValid())
@@ -446,16 +460,53 @@ namespace InGame.Common
                 return;
             }
 
+            // 解除途中で同じ構えへ戻る場合は、現在のポーズと重みから反転する。
+            if (blendDuration > 0f && IsCurrentClipOnLayer(LayerInfo.LayerType.UpperBody, clip))
+            {
+                BeginUpperBodyBlend(1f, blendDuration);
+                return;
+            }
+
+            var initialWeight = blendDuration > 0f ? _layerInfo[slot].Weight : 1f;
             if (_runtimeClips.TryGetValue(LayerInfo.LayerType.UpperBody, out var prev) && prev.IsValid())
             {
                 DisconnectAndDestroy(LayerInfo.LayerType.UpperBody, prev, slot);
             }
 
-            Play(clip, LayerInfo.LayerType.UpperBody, 1f, additive: false);
+            Play(clip, LayerInfo.LayerType.UpperBody, initialWeight, additive: false);
 
             var li = _layerInfo[slot];
-            li.Weight = 1f; // Update() で毎フレーム反映されるので内部Weightも更新
+            li.Weight = initialWeight;
             _layerInfo[slot] = li;
+            if (blendDuration > 0f) BeginUpperBodyBlend(1f, blendDuration);
+        }
+
+        private void BeginUpperBodyBlend(float target, float duration)
+        {
+            _upperBodyBlendTarget = target;
+            _upperBodyBlendDuration = duration;
+            _isUpperBodyBlending = true;
+        }
+
+        private void UpdateUpperBodyBlend()
+        {
+            if (!_isUpperBodyBlending || !_graph.IsValid()) return;
+            var layer = LayerInfo.LayerType.UpperBody;
+            if (!_slotOf.TryGetValue(layer, out var slot)
+                || !_runtimeClips.TryGetValue(layer, out var clip) || !clip.IsValid())
+            {
+                _isUpperBodyBlending = false;
+                return;
+            }
+
+            var weight = Mathf.MoveTowards(_layerInfo[slot].Weight,
+                _upperBodyBlendTarget, Time.deltaTime / _upperBodyBlendDuration);
+            SetLayerWeight(layer, weight);
+            if (!Mathf.Approximately(weight, _upperBodyBlendTarget)) return;
+
+            _isUpperBodyBlending = false;
+            if (_upperBodyBlendTarget == 0f)
+                DisconnectAndDestroy(layer, clip, slot);
         }
 
         /// <summary>
@@ -1084,6 +1135,7 @@ namespace InGame.Common
             LayerInfo.Blend blend,
             CancellationToken external = default)
         {
+            if (layer == LayerInfo.LayerType.UpperBody) _isUpperBodyBlending = false;
             if (layer == LayerInfo.LayerType.Base)
             {
                 Debug.LogWarning("Base レイヤーは SetLocoWeight() で制御してください。");
@@ -1168,6 +1220,7 @@ namespace InGame.Common
 
         public void SafeDestroy()
         {
+            _isUpperBodyBlending = false;
             if (!_graph.IsValid()) return;
 
             foreach (var kv in _runtimeClips)
@@ -1240,6 +1293,7 @@ namespace InGame.Common
         /// </summary>
         private CancellationToken TakeLayerControl(LayerInfo.LayerType layer, CancellationToken external = default)
         {
+            if (layer == LayerInfo.LayerType.UpperBody) _isUpperBodyBlending = false;
             if (_weightBlendCts.TryGetValue(layer, out var blend))
             {
                 blend.Cancel();

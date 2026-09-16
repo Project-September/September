@@ -33,7 +33,7 @@ namespace InGame.Player.Ability.Effect.Shooting
                 _playerManager = Parameter.Owner.GetComponent<PlayerManager>();
             
             _animationClipPlayer.SetAim(true);
-            _animationClipPlayer.PlayOnUpperBody(_stanceAnimationClip);
+            _animationClipPlayer.PlayOnUpperBody(_stanceAnimationClip, _animationClipPlayer.AimBlendDuration);
             ApplyCameraState(ShootingStateType.Stance);
         }
 
@@ -54,7 +54,7 @@ namespace InGame.Player.Ability.Effect.Shooting
                 _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
                 ApplyCameraState(ShootingStateType.None);
                 ResetShootingState();
-                EndAnimation();
+                EndAnimation(blend: true);
                 return;
             }
 
@@ -193,10 +193,10 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// <summary>
         /// アニメーションを停止
         /// </summary>
-        private void EndAnimation()
+        private void EndAnimation(bool blend = false)
         {
             _isShootingAnimation = false;
-            _animationClipPlayer.PlayOnUpperBody(null);
+            _animationClipPlayer.PlayOnUpperBody(null, blend ? _animationClipPlayer.AimBlendDuration : 0f);
             _animationClipPlayer.SetAim(false);
         }
     }
