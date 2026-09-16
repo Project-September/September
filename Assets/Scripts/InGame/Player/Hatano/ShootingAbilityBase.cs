@@ -33,7 +33,8 @@ namespace InGame.Player.Ability.Effect.Shooting
                 _playerManager = Parameter.Owner.GetComponent<PlayerManager>();
             
             _animationClipPlayer.SetAim(true);
-            _animationClipPlayer.PlayOnUpperBody(_stanceAnimationClip);
+            _animationClipPlayer.PlayOnUpperBody(_stanceAnimationClip, _animationClipPlayer.AimBlendDuration);
+            ApplyCameraState(ShootingStateType.Stance);
         }
 
         /// <summary>
@@ -41,13 +42,28 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// </summary>
         protected void ShootingInputJudgment()
         {
+            if (_playerManager.IsStun)
+            {
+                ForceEndAbility();
+                return;
+            }
+
             // 構え解除と同時の射撃を受け付けない。
             if (!_playerInput.Buttons.IsSet(PlayerButtons.Ability2))
             {
                 _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
                 ApplyCameraState(ShootingStateType.None);
                 ResetShootingState();
-                EndAnimation();
+                EndAnimation(blend: true);
+                return;
+            }
+
+            // 回避は構えAbilityを終了しない。カメラと構えを維持し、
+            // 攻撃入力と遠距離インタラクトの進行だけを止める。
+            if (_playerManager.GetComponent<PlayerMovement>().IsEvading)
+            {
+                OnNoShooting();
+                _isShootingAnimation = false;
                 return;
             }
 
@@ -89,6 +105,7 @@ namespace InGame.Player.Ability.Effect.Shooting
             if (_playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal)
                 return false;
 
+            _aimCameraController.StopAim();
             ResetShootingState();
             // Ult や展示物側が設定したカメラ・操作状態・モーションを上書きしない。
             if (_animationClipPlayer.IsCurrentClipOnLayer(LayerInfo.LayerType.UpperBody, _stanceAnimationClip)
@@ -119,7 +136,8 @@ namespace InGame.Player.Ability.Effect.Shooting
             if (_shootingType != _lastShootingType)
             {
                 _lastShootingType = _shootingType;
-                ApplyCameraState(ShootingStateType.Stance);
+                ApplyCameraState(_shootingType == ShootingStateType.None
+                    ? ShootingStateType.None : ShootingStateType.Stance);
             }
         }
 
@@ -145,8 +163,21 @@ namespace InGame.Player.Ability.Effect.Shooting
 
         protected override void OnEndAbility()
         {
-            _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
+            EndStance();
             EndAnimation();
+        }
+
+        /// <summary>
+        /// Ends the stance for ability completion, ult and stun; evasion keeps it active.
+        /// Camera/stance cleanup must not unlock the control state owned by respawn or ult.
+        /// </summary>
+        private void EndStance()
+        {
+            _shootingType = ShootingStateType.None;
+            _lastShootingType = ShootingStateType.None;
+            ApplyCameraState(ShootingStateType.None);
+
+            OnStopTheStance();
         }
 
         /// <summary>
@@ -167,10 +198,10 @@ namespace InGame.Player.Ability.Effect.Shooting
         /// <summary>
         /// アニメーションを停止
         /// </summary>
-        private void EndAnimation()
+        private void EndAnimation(bool blend = false)
         {
             _isShootingAnimation = false;
-            _animationClipPlayer.PlayOnUpperBody(null);
+            _animationClipPlayer.PlayOnUpperBody(null, blend ? _animationClipPlayer.AimBlendDuration : 0f);
             _animationClipPlayer.SetAim(false);
         }
     }

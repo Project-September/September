@@ -97,6 +97,12 @@ namespace InGame.Player.Ability
         protected override void OnEndUlt()
         {
             _isShoot = false;
+            _effectSpawner?.StopEffect(_effectID);
+            _effectID = default;
+            _aimCameraController.RPC_NormalCamera();
+            _aimCameraController.RPC_CrosshairToggleChange(false);
+            _rocketAnimator.SetBool(_rocketAnimName, false);
+            _animationClipPlayer?.StopClip(_idleClip);
             _hatanoSequenceManager.RPC_SetStartTimeline();
             _hatanoWeaponController.RPC_UltEndAttachSocket(_hatanoAbilityStatusManagement.AbilityStatus);
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);

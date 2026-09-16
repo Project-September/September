@@ -37,6 +37,7 @@ namespace InGame.Interact
         private float _interactWaitTimer = 0f;
         private readonly Collider[] _hitBuffer = new Collider[32];
         private InteractableBase _focusedObj;
+        private InteractableBase _remotePreviewObject;
         private bool _isExecutingInteraction = false;
         private float _currentInteractTime = 0f;
         private float _requiredInteractTime = 1.0f;
@@ -118,6 +119,11 @@ namespace InGame.Interact
 
             // ローカルでインタラクト対象を毎フレーム検出（カメラ向きで変化するため）
             UpdateFocusedInteractable();
+
+            // 射撃Abilityから届く照準中の遠距離候補を、通常の近距離フォーカスより後に描画する。
+            // Script execution order に依存してUIが即座に消えるのを防ぐ。
+            if (!IsRemoting && _remotePreviewObject != null)
+                ShowRemoteInteractionPreview(_remotePreviewObject);
 
             if (_isHoldingInteract)
             {
@@ -213,12 +219,17 @@ namespace InGame.Interact
             {
                 Interactor = Object.InputAuthority.RawEncoded,
             };
-            if (!interactableBase.ValidateInteraction(context)) return;
+            if (!interactableBase.ValidateInteraction(context))
+            {
+                RemoteInteractionCancel(ref timer);
+                return;
+            }
 
             var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
                 PlayerManager.PlayerControlState.ForcedControl;
             _focusedObj = interactableBase;
-            UIController.I.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj);
+            if (HasInputAuthority && !_isBot)
+                UIController.I?.ShowInteractUI(!isRiding && _focusedObj.ValidateInteraction(context), _focusedObj);
 
             IsRemoting = true;
             RemoteFocusedObject = interactableBase;
@@ -232,14 +243,41 @@ namespace InGame.Interact
                 timer = 0f;
                 RemoteInteractTimer = 0f;
                 CompleteInteraction();
-                UIController.I.ShowInteractUI(false);
+                if (HasInputAuthority && !_isBot) UIController.I?.ShowInteractUI(false);
 
                 //インタラクションに成功したらアビリティを終了
                 abilityPhase = AbilityBase.AbilityPhase.Ending;
                 aimCameraController.RPC_NormalCamera();
                 aimCameraController.RPC_CrosshairToggleChange(false);
             }
-            UIController.I.SetInteractProgress(Mathf.Clamp01(timer / time));
+            if (HasInputAuthority && !_isBot)
+                UIController.I?.SetInteractProgress(time > 0f ? Mathf.Clamp01(timer / time) : 1f);
+        }
+
+        /// <summary>Displays the remote-interaction affordance without starting its timer.</summary>
+        public void RemoteInteractionPreview(InteractableBase interactableBase)
+        {
+            if (_isBot || !HasInputAuthority) return;
+
+            if (IsInteractionBlocked) interactableBase = null;
+            bool hadPreview = _remotePreviewObject != null;
+            _remotePreviewObject = interactableBase;
+
+            if (interactableBase == null && hadPreview && !IsRemoting)
+            {
+                UIController.I?.ShowInteractUI(false);
+            }
+        }
+
+        private void ShowRemoteInteractionPreview(InteractableBase interactableBase)
+        {
+            if (interactableBase == null || !HasInputAuthority || IsInteractionBlocked) return;
+            var context = new InteractableContext { Interactor = Object.InputAuthority.RawEncoded };
+            var isRiding = _playerManager && _playerManager.CurrentPlayerControlState ==
+                PlayerManager.PlayerControlState.ForcedControl;
+            UIController.I?.ShowInteractUI(!isRiding && interactableBase.ValidateInteraction(context),
+                interactableBase);
+            UIController.I?.SetInteractProgress(0f);
         }
 
         /// <summary>
@@ -250,6 +288,8 @@ namespace InGame.Interact
         public void RemoteInteractionCancel(ref float timer)
         {
             IsRemoting = false;
+            // 候補はローカルの照準検出が更新する。射撃していない間もホストでは
+            // 毎Tickここを通るため、進行の中断で候補まで消すとUIが点滅する。
             timer = 0;
             RemoteInteractTimer = 0f;
             CancelInteraction();
@@ -436,7 +476,7 @@ namespace InGame.Interact
         {
             _isExecutingInteraction = false;
             _currentInteractTime = 0f;
-            if (!_isBot)
+            if (!_isBot && HasInputAuthority)
             {
                 UIController.I?.SetInteractProgress(0f);
             }

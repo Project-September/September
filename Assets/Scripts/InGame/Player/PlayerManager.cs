@@ -1,6 +1,7 @@
 using Fusion;
 using Ingame.Tanihira;
 using InGame.Health;
+using InGame.Player.Ability;
 using September.Common;
 using September.InGame.Common;
 using September.InGame.Common.Stats;
@@ -35,6 +36,7 @@ namespace InGame.Player
         CameraController _cameraController;
         PlayerHealth _playerHealth;
         PlayerEffectController _playerEffectController;
+        PlayerAbilityManager _playerAbilityManager;
         Rigidbody _rigidbody;
         private bool _shouldWarp = false;
         private Vector3 _targetPosition;
@@ -153,6 +155,7 @@ namespace InGame.Player
         void InitComponents()
         {
             _playerMovement = GetComponent<PlayerMovement>();
+            _playerAbilityManager = GetComponent<PlayerAbilityManager>();
             _playerEffectController = GetComponentInChildren<PlayerEffectController>();
             _rigidbody = GetComponent<Rigidbody>();
             if (TryGetComponent(out CameraController cameraController))
@@ -406,8 +409,10 @@ namespace InGame.Player
             // ビルドの減衰分を乗算
             StunTickTimer = TickTimer.CreateFromSeconds(Runner, _stunTime * (_playerStatus ? _playerStatus.StunDurationMultiply : 1));
             IsStun = true;
+            _playerAbilityManager?.EndActiveShootingAbilities();
             _playerMovement.ResetHorizontalVelocity();
             RPC_SetPositionLock(true);
+            _playerAbilityManager?.EndActiveUltimates();
             _playerEffectController.PlayStunEffect();
         }
 
@@ -417,7 +422,11 @@ namespace InGame.Player
 
             // 入力が届かない Tick でも搭乗時のロックオンを持ち越さない。
             if (CurrentPlayerControlState != PlayerControlState.Normal)
+            {
                 DisableLockOn();
+                // 落水などの操作制限は、次の入力Tickを待たず構えも終了する。
+                if (HasStateAuthority) _playerAbilityManager?.EndActiveShootingAbilities();
+            }
 
             if (CurrentPlayerControlState == PlayerControlState.ForcedControl)
             {

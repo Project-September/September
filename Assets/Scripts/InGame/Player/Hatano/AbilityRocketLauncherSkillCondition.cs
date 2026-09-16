@@ -25,7 +25,10 @@ namespace InGame.Player.Ability
             if(_abilityStatusManagement.AbilityStatus == HatanoAbilityStatus.None) return false;
 
             // 条件を定義
-            return context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available
+            return !_playerManager.IsStun
+                   && !_playerMovement.IsEvading
+                   && _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal
+                   && context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available
                    && context.AbilityRef.CanStartAbilityOverride()
                    && context.CurrentButtons.GetPressed(context.PreviousButtons)
                        .IsSet(PlayerButtons.Ability2); // 使用するボタンを指定
