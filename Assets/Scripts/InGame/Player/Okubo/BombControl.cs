@@ -47,7 +47,6 @@ namespace InGame.Player.Okubo
 
         private void Explode()
         {
-            Debug.Log("”š”­II");
             var hitObjects = Physics.OverlapSphere(this.transform.position, _range);
 
             foreach (var obj in hitObjects)
@@ -55,7 +54,7 @@ namespace InGame.Player.Okubo
                 GameObject hitObject = obj.transform.root.gameObject;
                 if (!hitObject.CompareTag("Player")) continue;
 
-                //ƒqƒbƒg‚µ‚½ƒIƒuƒWƒFƒNƒg‚©‚çPrayerRef‚ğæ“¾
+                //ï¿½qï¿½bï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½PrayerRefï¿½ï¿½ï¿½æ“¾
                 foreach (var pair in PlayerDatabase.Instance.PlayerObjectDic)
                 {
                     if (pair.Value.gameObject != hitObject || pair.Key == _ownerRef)
@@ -64,14 +63,14 @@ namespace InGame.Player.Okubo
                     if (!pair.Value.TryGetComponent(out IDamageable damageable))
                         continue;
 
-                    //ƒ_ƒ[ƒWˆ—
+                    //ï¿½_ï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½
                     var hitData = new HitData(HitActionType.Damage, _damageAmount, _ownerRef, damageable.OwnerPlayerRef);
                     damageable.TakeHit(ref hitData);
 
                     if (!pair.Value.TryGetComponent(out PlayerMovement movement))
                         continue;
 
-                    //‚«”ò‚Î‚·ˆ—
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚ï¿½ï¿½ï¿½ï¿½ï¿½
                     var dir = movement.transform.position - transform.position;
                     var distance = dir.magnitude;
 
@@ -93,7 +92,7 @@ namespace InGame.Player.Okubo
         {
             if (IsInLayerMask(collision.gameObject, _groundLayer))
             {
-                _countDownEffect.gameObject.SetActive(true);
+                _countDownEffect?.gameObject.SetActive(true);
             }
         }
 
