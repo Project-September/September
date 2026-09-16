@@ -161,6 +161,20 @@ namespace InGame.Player.Ability
             _playerStatus = player.GetComponentInChildren<PlayerStatus>();
         }
 
+        // Capture stun before TakeHit so the hit causing stun still advances the build.
+        public static void ApplyHitAndUpdateAttackBuild(
+            Collider hitInfo, IDamageable damageable, ref HitData hitData, BuildGenerator buildGenerator)
+        {
+            var targetPlayer = hitInfo.GetComponentInParent<PlayerManager>();
+            bool wasStunned = targetPlayer != null && targetPlayer.IsStun;
+
+            damageable.TakeHit(ref hitData);
+            if (!wasStunned)
+            {
+                buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
+            }
+        }
+
         protected virtual void OnHitEnemy(Collider hitInfo, Vector3 hitPosition)
         {
             if (hitInfo.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
@@ -175,14 +189,7 @@ namespace InGame.Player.Ability
                 damage,
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
-            var targetPlayer = hitInfo.GetComponentInParent<PlayerManager>();
-            bool wasStunned = targetPlayer != null && targetPlayer.IsStun;
-
-            damageable.TakeHit(ref hitData);
-            if (!wasStunned)
-            {
-                _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
-            }
+            ApplyHitAndUpdateAttackBuild(hitInfo, damageable, ref hitData, _buildGenerator);
 
             // HitEffectのZ+を攻撃者の前方へ向ける。
             Quaternion hitEffectRotation = _playerMovement.Rigidbody.rotation;

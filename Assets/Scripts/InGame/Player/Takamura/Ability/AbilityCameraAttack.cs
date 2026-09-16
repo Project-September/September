@@ -25,14 +25,7 @@ namespace InGame.Player.Ability
                 damage,
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
-            var targetPlayer = hitInfo.GetComponentInParent<PlayerManager>();
-            bool wasStunned = targetPlayer != null && targetPlayer.IsStun;
-
-            damageable.TakeHit(ref hitData);
-            if (!wasStunned)
-            {
-                _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
-            }
+            ApplyHitAndUpdateAttackBuild(hitInfo, damageable, ref hitData, _buildGenerator);
 
             var playerMovement = hitInfo.GetComponentInParent<PlayerMovement>();
             if (playerMovement != null)
