@@ -71,8 +71,6 @@ namespace September.InGame.Exhibit
 		{
 			var hitData = new HitData(HitActionType.RangedDamage, _damage, usingPlayer,
 				damageable.OwnerPlayerRef);
-			PlayerDatabase.Instance.PlayerDataDic.Get(damageable.OwnerPlayerRef);
-			PlayerDatabase.Instance.PlayerDataDic.Get(usingPlayer);
 			
 			damageable.TakeHit(ref hitData);
 		}
