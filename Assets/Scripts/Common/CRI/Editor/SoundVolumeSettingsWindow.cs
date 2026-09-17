@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using CriWare;
 using UnityEditor;
 using UnityEngine;
@@ -196,3 +197,4 @@ namespace CRISound.Editor
         }
     }
 }
+#endif
