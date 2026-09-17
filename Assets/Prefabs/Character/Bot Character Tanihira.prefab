@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: 1431729810418678186, guid: 4e3821407920e444fa000f0867465095, type: 3}
       propertyPath: _playerManager
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 651478405710694785}
     - target: {fileID: 2346374098746059848, guid: 4e3821407920e444fa000f0867465095, type: 3}
       propertyPath: Flags
       value: 262145
@@ -516,6 +516,7 @@ MonoBehaviour:
   _buildGenerator: {fileID: 1713223934560425713}
   _playerStatus: {fileID: 786117970274265609}
   _CurrentPlayerControlState: 0
+  _IsMovementInputBlocked: 0
   _IsStun:
     _value: 0
   _IsMovable:
