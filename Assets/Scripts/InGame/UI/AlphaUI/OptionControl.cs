@@ -20,6 +20,14 @@ namespace InGame.UI
             Initialize();
         }
 
+        private void Update()
+        {
+            var settings = UserSettings.Get();
+            _bgmVolumeSlider.SetValueWithoutNotify(settings.BGMVolume);
+            _seVolumeSlider.SetValueWithoutNotify(settings.SEVolume);
+            _voiceVolumeSlider.SetValueWithoutNotify(settings.VoiceVolume);
+        }
+
         private void Initialize()
         {
             var settings = UserSettings.Get();
