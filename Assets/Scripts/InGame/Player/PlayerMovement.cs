@@ -41,6 +41,7 @@ namespace InGame.Player
         private float _minimumVaultReachDistance = 0.5f;
         [SerializeField] private float _timeToVault;
         [SerializeField] private AnimationCurve _vaultCurve;
+        [SerializeField, Tooltip("乗り越え終了時の水平速度の最大値")] private float _maxExitSpeed = 3f;
         [Header("Hook")]
         [SerializeField] private float _hookPower = 10f;
         [Header("Bomb")]
@@ -732,6 +733,12 @@ namespace InGame.Player
 
         void EndVault(Vector3 endVelocity)
         {
+            // Keep the original arc and vertical momentum; only cap excessive exit speed.
+            Vector3 horizontalVelocity = new(endVelocity.x, 0f, endVelocity.z);
+            horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, Mathf.Max(0f, _maxExitSpeed));
+            endVelocity.x = horizontalVelocity.x;
+            endVelocity.z = horizontalVelocity.z;
+
             NetworkedMoveVelocity = endVelocity;
             NetworkedAirMoveVelocity = endVelocity;
             _rb.linearVelocity = NetworkedMoveVelocity;
