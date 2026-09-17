@@ -60,5 +60,17 @@ namespace InGame.Player.Hatano
                     break;
             }
         }
+
+        /// <summary>
+        /// 武器切替中に引き継がれた構えアニメーションだけを補間解除する。
+        /// </summary>
+        public void StopAimPoseAnimation()
+        {
+            if (!_animationClipPlayer.IsCurrentClipOnLayer(LayerInfo.LayerType.UpperBody, _doubleAimPoseClip)
+                && !_animationClipPlayer.IsCurrentClipOnLayer(LayerInfo.LayerType.UpperBody, _laserAimPoseClip))
+                return;
+
+            _animationClipPlayer.PlayOnUpperBody(null, _animationClipPlayer.AimBlendDuration);
+        }
     }
 }

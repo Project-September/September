@@ -68,6 +68,7 @@ namespace InGame.Common
         /// </summary>
         private readonly Dictionary<LayerInfo.LayerType, int> _slotOf = new();
         private readonly Dictionary<LayerInfo.LayerType, AnimationClipPlayable> _runtimeClips = new();
+        private readonly Dictionary<LayerInfo.LayerType, ControllableLayerBlend> _controllableBlends = new();
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _layerCts = new();
         private readonly Dictionary<LayerInfo.LayerType, CancellationTokenSource> _weightBlendCts = new();
 
@@ -466,6 +467,7 @@ namespace InGame.Common
             // 止めないと、差し替え前のクリップを待っていた PlayAsync が終了処理としてレイヤー Weight を 0 へ落とし、
             // 差し替え後のクリップ (攻撃中に始めた回避など) が再生されなくなる。
             TakeLayerControl(LayerInfo.LayerType.UpperBody);
+            DetachControllableBlendInternal(LayerInfo.LayerType.UpperBody);
 
             // 解除要求
             if (clip == null)
@@ -510,6 +512,135 @@ namespace InGame.Common
             li.Weight = initialWeight;
             _layerInfo[slot] = li;
             if (blendDuration > 0f) BeginUpperBodyBlend(1f, blendDuration);
+        }
+
+        /// <summary>
+        /// 同一レイヤーへ2クリップを取り付ける。補間比率と出力Weightは呼び出し側が毎フレーム制御する。
+        /// </summary>
+        public bool AttachControllableBlend(
+            AnimationClip firstClip,
+            AnimationClip secondClip,
+            LayerInfo.LayerType layer,
+            float blendWeight,
+            float outputWeight = 1f,
+            float speed = 1f)
+        {
+            if (!firstClip || !secondClip
+                || !TryGetMontageIndex(firstClip, out var firstIndex)
+                || !TryGetMontageIndex(secondClip, out var secondIndex))
+                return false;
+
+            if (Object.HasStateAuthority)
+                RPC_AttachControllableBlend(firstIndex, secondIndex, layer, blendWeight, outputWeight, speed);
+
+            return AttachControllableBlendInternal(
+                firstClip,
+                secondClip,
+                layer,
+                blendWeight,
+                outputWeight,
+                speed);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+        private void RPC_AttachControllableBlend(
+            int firstIndex,
+            int secondIndex,
+            LayerInfo.LayerType layer,
+            float blendWeight,
+            float outputWeight,
+            float speed)
+        {
+            var montages = AnimationClipsContainer.Instance.AnimationMontages;
+            AttachControllableBlendInternal(
+                montages[firstIndex].AnimClip,
+                montages[secondIndex].AnimClip,
+                layer,
+                blendWeight,
+                outputWeight,
+                speed);
+        }
+
+        private bool AttachControllableBlendInternal(
+            AnimationClip firstClip,
+            AnimationClip secondClip,
+            LayerInfo.LayerType layer,
+            float blendWeight,
+            float outputWeight,
+            float speed)
+        {
+            if (!_slotOf.TryGetValue(layer, out var slot))
+            {
+                Debug.LogWarning($"[AnimationClipPlayer] {layer} が設定されていません。_layerInfo の最後に追加してください。");
+                return false;
+            }
+
+            TakeLayerControl(layer);
+            DetachControllableBlendInternal(layer);
+            if (_runtimeClips.TryGetValue(layer, out var current) && current.IsValid())
+                DisconnectAndDestroy(layer, current, slot);
+
+            var blend = new ControllableLayerBlend(
+                _graph,
+                _layerMixer,
+                slot,
+                firstClip,
+                secondClip,
+                !IsFootIKDisabledFor(firstClip),
+                !IsFootIKDisabledFor(secondClip),
+                speed);
+            _controllableBlends[layer] = blend;
+            blend.SetBlendWeight(blendWeight);
+            SetLayerWeight(layer, outputWeight);
+            return true;
+        }
+
+        /// <summary>取り付けた2クリップの補間比率とレイヤー出力Weightを更新する。</summary>
+        public void SetControllableBlendWeights(
+            LayerInfo.LayerType layer,
+            float blendWeight,
+            float outputWeight = 1f)
+        {
+            if (!_controllableBlends.TryGetValue(layer, out var blend) || !blend.IsValid) return;
+
+            blend.SetBlendWeight(blendWeight);
+            SetLayerWeight(layer, outputWeight);
+        }
+
+        public bool IsControllableBlendAttached(LayerInfo.LayerType layer)
+        {
+            return _controllableBlends.TryGetValue(layer, out var blend) && blend.IsValid;
+        }
+
+        public bool IsControllableBlendComplete(LayerInfo.LayerType layer)
+        {
+            return _controllableBlends.TryGetValue(layer, out var blend)
+                   && blend.IsValid
+                   && blend.IsComplete;
+        }
+
+        public void DetachControllableBlend(LayerInfo.LayerType layer)
+        {
+            if (Object.HasStateAuthority)
+                RPC_DetachControllableBlend(layer);
+
+            DetachControllableBlendInternal(layer);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, InvokeLocal = false)]
+        private void RPC_DetachControllableBlend(LayerInfo.LayerType layer)
+        {
+            DetachControllableBlendInternal(layer);
+        }
+
+        private void DetachControllableBlendInternal(LayerInfo.LayerType layer)
+        {
+            if (!_controllableBlends.TryGetValue(layer, out var blend)) return;
+            _controllableBlends.Remove(layer);
+            if (!_slotOf.TryGetValue(layer, out var slot)) return;
+
+            blend.Destroy(_layerMixer, slot);
+            SetLayerWeight(layer, 0f);
         }
 
         private void BeginUpperBodyBlend(float target, float duration)
@@ -839,6 +970,8 @@ namespace InGame.Common
                 Debug.LogWarning($"未定義のレイヤー {layerType}");
                 return;
             }
+
+            DetachControllableBlendInternal(layerType);
 
             // 既存接続の後片付け
             if (_runtimeClips.TryGetValue(layerType, out var prev) && prev.IsValid())
@@ -1270,6 +1403,7 @@ namespace InGame.Common
                 if (kv.Value.IsValid())
                     kv.Value.Destroy();
             _runtimeClips.Clear();
+            _controllableBlends.Clear();
 
             _graph.Destroy();
         }
