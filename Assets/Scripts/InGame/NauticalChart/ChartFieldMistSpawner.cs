@@ -10,7 +10,7 @@ namespace September.InGame.NauticalChart
     public class ChartFieldMistSpawner : MonoBehaviour
     {
         [Header("Prefab参照")]
-        [SerializeField] private GameObject _mistPrefab;
+        [SerializeField] private ParticleSystem _mistPrefab;
 
         [Serializable]
         private struct FieldMistVolume
@@ -34,7 +34,7 @@ namespace September.InGame.NauticalChart
         [Tooltip("高さのばらつき。立ち込め感用")]
         [SerializeField] private float _yRandomRange = 1f;
 
-        private readonly List<GameObject> _mistInstances = new();
+        private readonly List<ParticleSystem> _mistInstances = new();
 
         /// <summary>
         /// ワールド範囲へフィールド霧を格子配置する。位置はクライアントごとにランダムに配置する
@@ -64,7 +64,9 @@ namespace September.InGame.NauticalChart
                         float posY = bounds.center.y + _yOffset + UnityEngine.Random.Range(-_yRandomRange, _yRandomRange);
 
                         // フィールド霧を配置
-                        GameObject mist = Instantiate(_mistPrefab, new Vector3(posX, posY, posZ), _mistPrefab.transform.rotation);
+                        ParticleSystem mist = Instantiate(_mistPrefab, new Vector3(posX, posY, posZ), _mistPrefab.transform.rotation);
+                        var main = mist.main;
+                        main.stopAction = ParticleSystemStopAction.Destroy;
                         _mistInstances.Add(mist);
                     }
                 }
@@ -77,18 +79,11 @@ namespace September.InGame.NauticalChart
         /// </summary>
         public void HideFieldMist()
         {
-            foreach (GameObject mist in _mistInstances)
+            foreach (ParticleSystem mist in _mistInstances)
             {
                 if (mist == null) continue;
-                if (!mist.TryGetComponent(out ParticleSystem root))
-                {
-                    Destroy(mist);
-                    continue;
-                }
 
-                var main = root.main;
-                main.stopAction = ParticleSystemStopAction.Destroy;
-                root.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                mist.Stop(true, ParticleSystemStopBehavior.StopEmitting);
             }
             _mistInstances.Clear();
         }
