@@ -166,5 +166,19 @@ namespace InGame.Player.Hatano
                 }
             }
         }
+
+        /// <summary>
+        /// 武器切替アニメーション終了時に、現在のエイム状態へ上半身モーションを合わせる。
+        /// </summary>
+        public void CompleteWeaponChangeAnimation()
+        {
+            if (_aimCameraController.IsAim)
+            {
+                _changeAnimation.ChangeAimPoseAnimation(_abilityStatus);
+                return;
+            }
+
+            _animClipPlayer.PlayOnUpperBody(null);
+        }
     }
 }
