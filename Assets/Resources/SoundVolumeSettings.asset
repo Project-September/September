@@ -15,323 +15,806 @@ MonoBehaviour:
   _entries:
   - CueName: BGM_Haruku_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Ingame_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Ingame_last_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Koinuma_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Okb_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Result_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_ResultVictory
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Select_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Tanihira_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: BGM_Title_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Ballista_Attack
     Volume: 0.05
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Ballista_Hit
     Volume: 0.1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Ballista_Interact
     Volume: 0.5
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: SE_BeltBall_Roll
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_BeltBall_Shoot
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_BokeBoke_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Candle_Burning
     Volume: 0.891
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Candle_Interact
     Volume: 10
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Cannon_Attack
     Volume: 0.06
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Cannon_Hit
     Volume: 0.035
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Cannon_Interact
     Volume: 0.25
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Car_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Evasion
     Volume: 0.1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Excalibur_Attack
     Volume: 0.3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Excalibur_Hit
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Excalibur_Impact
     Volume: 0.3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Excalibur_Interact
     Volume: 0.15
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: SE_Exhibit_Revive
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Glider_Moving
     Volume: 0.1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Hatano_Aim
     Volume: 1.5
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 15
   - CueName: SE_Hatano_Shoot
     Volume: 3
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 40
   - CueName: SE_Hatano_Ult_1
     Volume: 2.6
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: SE_Hatano_Ult_2
     Volume: 2
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 70
   - CueName: SE_Hulk_Break
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Hulk_Footstep
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Hulk_Land
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Hulk_Ult
     Volume: 2
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Hulk_Yell
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Jewel_PickUp
     Volume: 3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Jewelry_Spawn
     Volume: 0.3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Kraken_Attack
     Volume: 0.04
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Kraken_Impact
     Volume: 0.04
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Kraken_Interact
     Volume: 0.04
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_LondonPhone_EffectLoop
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_LondonPhone_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Muramasa_Attack
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Muramasa_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_NauticalChart
     Volume: 0.138
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_NauticalChart_Interact
     Volume: 3
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: SE_OKB_Footstep
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_OKB_Ult
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Okubo_Aim
     Volume: 0.05
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Okubo_Fire
     Volume: 0.06
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Okubo_Pull
     Volume: 0.3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Okubo_Ult1
     Volume: 0.18
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: SE_Okubo_Ult2
     Volume: 0.18
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: SE_OpticalCamo_Activate
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Painting_Warp_In
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Painting_Warp_Out
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Penguin_Attack
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Penguin_Footstep
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Penguin_Slide
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Player_Footstep_Generic
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Player_Hit_Generic
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Player_Knockout
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Player_Punch_Hit
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Player_Punch_Swing
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Player_Revive
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Pteranodon_AttackFire
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Pteranodon_FlapLoop
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Pteranodon_RideStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Sarutobi_Appear
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Sarutobi_Bomb
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Sarutobi_Grapple_Land
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Sarutobi_Grapple_Move
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Sarutobi_Grapple_Prepare
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Sarutobi_Ult_1
     Volume: 2
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Sarutobi_Ult_2
     Volume: 2
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SatelliteCannon_ChargeGlow
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SatelliteCannon_EnergyBeam
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SatelliteCannon_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SatelliteCannon_LaserCharge
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SatelliteCannon_LaserFire
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SatelliteCannon_LockOn
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Shark_Attack
     Volume: 0.3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Shark_Interact
     Volume: 0.5
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 70
   - CueName: SE_Shark_Moving
     Volume: 0.4
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SpotLight_Long
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_SpotLight_Short
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_StrikeBarricade_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Takamura_Skill
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Takamura_Ult
     Volume: 0.5
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: SE_Tanihira_Footstep
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Tanihira_FriendCall
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Tanihira_Ult_1
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Tanihira_Ult_2
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_TreasureChest_Interact
     Volume: 0.3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Tutankhamen_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Tyranno_Bite
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Tyranno_Footstep
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Tyranno_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_Cancel
     Volume: 3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_CooldownReady
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_CountDown_Count
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_CountDown_End
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_Cursor
     Volume: 3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_GameFinish
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_ModeChange
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_ModeChanged
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_UI_Submit
     Volume: 3
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_Ult_Charge
-    Volume: 0.25
+    Volume: 0.2
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_ZeroFighter_CrashExplosion
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_ZeroFighter_Interact
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_ZeroFighter_PropellerLoop
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_ZeroFighter_RideAction
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_ZeroFighter_RideSpawn
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: SE_ZeroFighter_TakeoffGunFire
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 5
+    MaxDistance: 70
   - CueName: SE_ZipLine_Interact
     Volume: 0.25
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 40
   - CueName: VO_Haru_Attack_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Haru_CharacterSelect
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Haru_Damage_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Haru_GameStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Haru_Interact_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Haru_Win
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Hatano_Attack
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Hatano_CharacterSelect
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Hatano_Damage
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Hatano_InGameStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Hatano_Interact
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Hatano_Result
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Koinuma_Attack_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Koinuma_CharacterSelect
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Koinuma_Damage_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Koinuma_GameStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Koinuma_Grapple
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Koinuma_Interact_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Koinuma_Win
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_OKB_Attack_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_OKB_CharacterSelect
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_OKB_Damage_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_OKB_GameStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_OKB_Interact_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_OKB_Win
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Ookubo_Attack
     Volume: 0.6
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Ookubo_CharacterSelect
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Ookubo_Damage
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Ookubo_InGameStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Ookubo_Interact
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Ookubo_Result
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Takamura_Attack
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Takamura_CharacterSelect
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Takamura_Damage
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Takamura_InGameStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Takamura_Interact
     Volume: 1
+    Override3DDistance: 1
+    MinDistance: 1
+    MaxDistance: 50
   - CueName: VO_Takamura_Result
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Tanihira_Attack_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Tanihira_CharacterSelect
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Tanihira_Damage_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Tanihira_GameStart
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Tanihira_Interact_01
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
   - CueName: VO_Tanihira_Win
     Volume: 1
+    Override3DDistance: 0
+    MinDistance: 1
+    MaxDistance: 20
