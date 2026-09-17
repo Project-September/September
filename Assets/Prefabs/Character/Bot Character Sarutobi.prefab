@@ -159,7 +159,7 @@ PrefabInstance:
     - target: {fileID: 2876581937332795348, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: _playerManager
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5530186531661245486}
     - target: {fileID: 3876495967756343913, guid: d192f0b50976adc4d87efe478ca0ee99, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
@@ -389,13 +389,18 @@ MonoBehaviour:
   _stunTime: 8
   _respawnPosition: {x: 0, y: 0, z: 0}
   _attackWeapon: {fileID: 0}
+  _lockOnSearchRadius: 20
+  _lockOnVerticalRange: 1.5
   _buildGenerator: {fileID: 7323669894483763966}
   _playerStatus: {fileID: 8686498930553855494}
   _CurrentPlayerControlState: 0
+  _IsMovementInputBlocked: 0
   _IsStun:
     _value: 0
   _IsMovable:
     _value: 1
+  _IsLockOnActive:
+    _value: 0
 --- !u!114 &32085770733858679
 MonoBehaviour:
   m_ObjectHideFlags: 0
