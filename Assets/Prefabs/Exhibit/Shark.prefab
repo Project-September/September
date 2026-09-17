@@ -72,7 +72,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1422063660151573839}
   - component: {fileID: 8175028653652493909}
-  - component: {fileID: 2570655971420804403}
   - component: {fileID: 2094543767463565292}
   - component: {fileID: 5704486742883894051}
   m_Layer: 0
@@ -112,68 +111,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cueSheet: ALLCue
---- !u!114 &2570655971420804403
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 596404834238327390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 076425aa117f6da4e8296801168596ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _requiredInteractTimeDictionary:
-    keys: 05000000
-    values:
-    - 2.5
-  _cooldownTimeDictionary:
-    keys: 05000000
-    values:
-    - 10
-  _characterEffects:
-  - rid: 1044499857362387043
-  _type: 15
-  _interactPositionOffset: {x: 0, y: 0, z: 0}
-  _interactAreaCollider: {fileID: 3838804033053361786}
-  _interactEffectOffset: {x: 0, y: 0, z: 0}
-  _cooldownEffectTransform: {fileID: 1422063660151573839}
-  _cooldownEffectOffset: {x: -0.09, y: -2.6, z: 0}
-  _cooldownEffectRotation: {x: 0, y: 90, z: 0}
-  _cooldownEffectScale: {x: 0.88, y: 1, z: 0.56}
-  _interactEffectType: 9
-  _cooldownEffectType: 24
-  _spawnCooldownEffectOnStart: 0
-  _audioBroadcaster: {fileID: 8175028653652493909}
-  _interactSoundCueName: SE_Shark_Interact
-  _interactSoundTrackingType: 0
-  _LastInteractTime: -9999
-  _LastUsedCooldownTime: 0
-  _ForceSetInteractable: 1
-  _debug: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 1044499857362387043
-      type: {class: CompositeInteractEffect, ns: September.InGame.Interact, asm: Scripts}
-      data:
-        _characterType: 5
-        _interactEffects:
-        - rid: 1044499857362387044
-        - rid: 1044499857362387045
-    - rid: 1044499857362387044
-      type: {class: SharkInteractEffect, ns: InGame.Exhibit, asm: Scripts}
-      data:
-        _characterType: 5
-        _interactTime: 10
-        _sharkInteractable: {fileID: 5194508481015096182}
-    - rid: 1044499857362387045
-      type: {class: MountableTimeLimitInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
-      data:
-        _characterType: 5
-        _targetMountable: {fileID: 5194508481015096182}
-        _duration: 20
 --- !u!114 &2094543767463565292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,7 +129,6 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 8175028653652493909}
-  - {fileID: 2570655971420804403}
   ForceRemoteRenderTimeframe: 0
 --- !u!136 &5704486742883894051
 CapsuleCollider:
@@ -316,6 +252,8 @@ GameObject:
   - component: {fileID: -6263480614593985820}
   - component: {fileID: 4711930171390678857}
   - component: {fileID: 5194508481015096182}
+  - component: {fileID: 7559239365940949471}
+  - component: {fileID: 9067222206951372749}
   m_Layer: 11
   m_Name: Shark
   m_TagString: Untagged
@@ -417,6 +355,8 @@ MonoBehaviour:
   - {fileID: -6263480614593985820}
   - {fileID: 4711930171390678857}
   - {fileID: 5194508481015096182}
+  - {fileID: 7559239365940949471}
+  - {fileID: 9067222206951372749}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3466500518305658904
 MonoBehaviour:
@@ -576,7 +516,7 @@ MonoBehaviour:
   _maxHealth: 100
   _getOffPoint: {fileID: 241129730086572620}
   _height: 10
-  _interactable: {fileID: 2570655971420804403}
+  _interactable: {fileID: 9067222206951372749}
   IsEnding: 0
   _invincibleTime: 0.5
   _movementProcessing: {fileID: -6263480614593985820}
@@ -584,12 +524,88 @@ MonoBehaviour:
   _animator: {fileID: 583818805343970227}
   _idleSpeedThreshold: 0.01
   _displayModel: {fileID: 8078080115182993591}
-  _hungSharkObject: {fileID: 2136887078407453736}
+  _hungSharkObject: {fileID: 596404834238327390}
   _ridingColliders:
   - {fileID: 2423329419071984983}
   - {fileID: 4770353196366820648}
+  - {fileID: 3086346988845518643}
   _cameraTransform: {fileID: 914298458122404144}
   _IsSharkInteracting: 0
+--- !u!114 &7559239365940949471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922303140376795393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b672fb587530b64aa46961c5136b388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cueSheet: ALLCue
+--- !u!114 &9067222206951372749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2922303140376795393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 076425aa117f6da4e8296801168596ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredInteractTimeDictionary:
+    keys: 05000000
+    values:
+    - 2.5
+  _cooldownTimeDictionary:
+    keys: 05000000
+    values:
+    - 10
+  _characterEffects:
+  - rid: 1044499857362387043
+  _type: 15
+  _interactPositionOffset: {x: 0, y: 3.46, z: -4.93}
+  _interactAreaCollider: {fileID: 3838804033053361786}
+  _interactEffectOffset: {x: 0, y: 0, z: 0}
+  _cooldownEffectTransform: {fileID: 1422063660151573839}
+  _cooldownEffectOffset: {x: -0.09, y: -2.6, z: 0}
+  _cooldownEffectRotation: {x: 0, y: 90, z: 0}
+  _cooldownEffectScale: {x: 0.88, y: 1, z: 0.56}
+  _interactEffectType: 9
+  _cooldownEffectType: 24
+  _spawnCooldownEffectOnStart: 0
+  _audioBroadcaster: {fileID: 8175028653652493909}
+  _interactSoundCueName: SE_Shark_Interact
+  _interactSoundTrackingType: 0
+  _LastInteractTime: -9999
+  _LastUsedCooldownTime: 0
+  _ForceSetInteractable: 1
+  _debug: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 1044499857362387043
+      type: {class: CompositeInteractEffect, ns: September.InGame.Interact, asm: Scripts}
+      data:
+        _characterType: 5
+        _interactEffects:
+        - rid: 1044499857362387044
+        - rid: 1044499857362387045
+    - rid: 1044499857362387044
+      type: {class: SharkInteractEffect, ns: InGame.Exhibit, asm: Scripts}
+      data:
+        _characterType: 5
+        _interactTime: 10
+        _sharkInteractable: {fileID: 5194508481015096182}
+    - rid: 1044499857362387045
+      type: {class: MountableTimeLimitInteractEffect, ns: September.InGame.Mountable, asm: Scripts}
+      data:
+        _characterType: 5
+        _targetMountable: {fileID: 5194508481015096182}
+        _duration: 20
 --- !u!1 &3617152938281305472
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,11 +895,6 @@ PrefabInstance:
 --- !u!4 &1651818126023157394 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1313765792714837724, guid: 5d867cb6aef6bcc489ddbc64a0010242, type: 3}
-  m_PrefabInstance: {fileID: 348748399630788686}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2136887078407453736 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1833175792627192934, guid: 5d867cb6aef6bcc489ddbc64a0010242, type: 3}
   m_PrefabInstance: {fileID: 348748399630788686}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5676687476575654334
