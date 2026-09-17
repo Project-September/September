@@ -86,8 +86,8 @@ namespace InGame.Player.Ability
             Debug.DrawRay(originRight, dirRight * _shootingDistance, Color.blue);
             
             //左右のマズルから、ヒットした場所にRayを飛ばす
-            var hitLeft = Physics.Raycast(originLeft, dirLeft, out var gunHitInfoLeft, _shootingDistance, _hitLayerMask);
-            var hitRight = Physics.Raycast(originRight, dirRight, out var gunHitInfoRight, _shootingDistance, _hitLayerMask);
+            var hitLeft = TryGetShotHit(originLeft, dirLeft, out var gunHitInfoLeft);
+            var hitRight = TryGetShotHit(originRight, dirRight, out var gunHitInfoRight);
             if (_weaponController != null)
                 _weaponController.RPC_PlayGunShot(
                     originLeft, hitLeft ? gunHitInfoLeft.point : originLeft + dirLeft.normalized * _shootingDistance,

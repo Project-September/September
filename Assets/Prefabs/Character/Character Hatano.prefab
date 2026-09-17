@@ -5373,6 +5373,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3586276104647388170}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[1502005709025574997]._excludedColliders.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: managedReferences[1502005889970208852]._excludedColliders.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[1437790135341285460]._hatanoAbilityStatusManagement
       value: 
       objectReference: {fileID: 452521757601462472}
@@ -5418,7 +5426,7 @@ PrefabInstance:
       objectReference: {fileID: 7400000, guid: bb2b9c1a001f037479eda0c903507452, type: 2}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.data[1].Weight
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.data[1].LayerMask
