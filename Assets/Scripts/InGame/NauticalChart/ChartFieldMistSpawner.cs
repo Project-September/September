@@ -19,7 +19,13 @@ namespace September.InGame.NauticalChart
             public Vector3 Center;
             [Tooltip("XYZ のワールド基準サイズ（メートル）")]
             public Vector3 Size;
+
+            /// <summary>
+            /// ワールド範囲が有効か（X,Zのサイズが正の値か）
+            /// </summary>
+            public bool IsValidVolume => Size is { x: > 0f, z: > 0f };
         }
+
         [Header("発生範囲（ワールド座標）")]
         [SerializeField] private FieldMistVolume[] _volumes;
 
@@ -51,7 +57,7 @@ namespace September.InGame.NauticalChart
 
             foreach (var volume in _volumes)
             {
-                if (!IsValidVolume(volume)) continue;
+                if (!volume.IsValidVolume) continue;
 
                 Bounds bounds = new(volume.Center, volume.Size);
 
@@ -119,20 +125,10 @@ namespace September.InGame.NauticalChart
 
             foreach (var volume in _volumes)
             {
-                if (IsValidVolume(volume)) return true;
+                if (volume.IsValidVolume) return true;
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// ワールド範囲が有効か（X,Zのサイズが正の値か）
-        /// </summary>
-        /// <param name="volume"></param>
-        /// <returns></returns>
-        private static bool IsValidVolume(FieldMistVolume volume)
-        {
-            return volume.Size.x > 0f && volume.Size.z > 0f;
         }
 
 #if UNITY_EDITOR
@@ -145,7 +141,7 @@ namespace September.InGame.NauticalChart
 
             foreach (var volume in _volumes)
             {
-                if (!IsValidVolume(volume)) continue;
+                if (!volume.IsValidVolume) continue;
 
                 Bounds bounds = new(volume.Center, volume.Size);
                 Gizmos.color = new Color(0.55f, 0.8f, 1f, 0.5f);
@@ -173,8 +169,6 @@ namespace September.InGame.NauticalChart
                 Gizmos.DrawLine(new Vector3(bounds.min.x, y, posZ), new Vector3(bounds.max.x, y, posZ));
             }
         }
-
-
 #endif
     }
 }
