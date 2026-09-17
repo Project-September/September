@@ -34,6 +34,7 @@ namespace InGame.Player.Hatano
         private HatanoWeaponController _weaponController;
         private bool _isWeaponChangeAimWeightInitialized;
         private bool _isWeaponChangeBlendComplete;
+        private bool _shouldReconcileWeaponChangeAimAfterCompletion;
         private float _weaponChangeAimWeight;
         private float _weaponChangeOutputWeight;
         [Networked] public NetworkBool IsChangingWeapon { get; private set; }
@@ -75,7 +76,7 @@ namespace InGame.Player.Hatano
             // 入力がなかったら処理を行わない
             if (!GetInput<PlayerInput>(out var input)) return;
 
-            if (HasStateAuthority && IsChangingWeapon)
+            if (HasStateAuthority && (IsChangingWeapon || _shouldReconcileWeaponChangeAimAfterCompletion))
             {
                 var isNormalControl = _playerManager.CurrentPlayerControlState
                     == PlayerManager.PlayerControlState.Normal;
@@ -93,6 +94,12 @@ namespace InGame.Player.Hatano
                     }
                     _animClipPlayer.SetAim(false);
                     _changeAnimation.StopAimPoseAnimation();
+                }
+
+                if (!IsChangingWeapon)
+                {
+                    _shouldReconcileWeaponChangeAimAfterCompletion = false;
+                    IsWeaponChangeAiming = false;
                 }
             }
 
@@ -227,7 +234,12 @@ namespace InGame.Player.Hatano
                         _animClipPlayer.DetachControllableBlend(LayerInfo.LayerType.UpperBody);
                     if (_weaponController != null)
                         _weaponController.RPC_ApplyAbilityWeapon(_abilityStatus);
-                    IsWeaponChangeAiming = false;
+                    // Playable の終了は入力 Tick の直前にも発生する。構えを引き継いだ場合は、
+                    // 切替完了後の最初の入力 Tick でもう一度照合して同時解除を取りこぼさない。
+                    _shouldReconcileWeaponChangeAimAfterCompletion =
+                        blendEndType == EndClipType.Complete && (bool)IsWeaponChangeAiming;
+                    if (!_shouldReconcileWeaponChangeAimAfterCompletion)
+                        IsWeaponChangeAiming = false;
                     IsChangingWeapon = false;
                     _isWeaponChangeBlendComplete = false;
                     _playerManager.SetMovementInputBlocked(false);
