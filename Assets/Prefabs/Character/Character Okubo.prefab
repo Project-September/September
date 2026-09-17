@@ -1871,12 +1871,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2475458012208602023}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 222dc08d484f16869bdd89edd9d368fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Container: {fileID: 0}
+  m_Container: {fileID: 3454141809864283659}
   m_RebuildOnSplineChange: 1
   m_RebuildFrequency: 1000
   m_UpdateColliders: 0
@@ -8450,10 +8450,10 @@ MonoBehaviour:
   _bombPrefab: {fileID: 6301738253428440414, guid: 1442dccdd529a684a982dbf358125118, type: 3}
   _clonePosition: {fileID: 9215235462375019163}
   _throwInterval: 1
-  _throwCount: 5
-  _randomDirectionAmount: 0
-  _throwPower: 3
-  _throwUpAmount: 1
+  _throwCount: 6
+  _randomDirectionAmount: 0.5
+  _throwPower: 15
+  _throwUpAmount: 3
 --- !u!114 &6986284182179614427
 MonoBehaviour:
   m_ObjectHideFlags: 0
