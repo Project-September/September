@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Jewelry;
 using September.Common;
+using September.InGame;
 using September.InGame.Common.Stats;
 using UniRx;
 using UnityEngine;
@@ -67,6 +69,7 @@ namespace InGame.Player
         private AimCameraController _aimCameraController;
         private PlayerStatus _status;
         private Animator _animator;
+        private AudioBroadcaster _audioBroadcaster;
 
         // 予測Tickを巻き戻した際、位置と同じ時点の速度から再計算する。
         // 通常フィールドでは再シミュレーションのたびに重力加算・減衰が重複する。
@@ -196,6 +199,7 @@ namespace InGame.Player
             _aimCameraController = GetComponent<AimCameraController>();
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
+            _audioBroadcaster = GetComponentInChildren<AudioBroadcaster>(true);
             // ========== ビルドシステム ==========
             _moveBuildEnabled = _playerStatus & _buildGenerator;
 #if UNITY_EDITOR
@@ -260,6 +264,10 @@ namespace InGame.Player
             ConsumeEvasionStaminaAndPauseRecovery(_evasionData.StaminaRecoveryInterval);
             Evasion = state;
             Stop();
+
+            // 確定した回避だけを全員へ通知し、予測・再シミュレーションでの二重再生を防ぐ。
+            if (HasStateAuthority && Runner.IsForward && _audioBroadcaster != null)
+                _audioBroadcaster.RPC_PlaySoundFromCode(SoundCues.SE.Evasion.Name, SoundTrackingType.Follow, Object.Id);
         }
 
         /// <summary> 入力無関係のTick UpdateMovementとの呼び出し順序を確定させるためにManagerから呼ばれる </summary>
