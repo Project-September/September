@@ -1,9 +1,9 @@
 ---
-name: Bug Report
-about: バグの詳細な内容を記載してください
+name: Bug Report Template
+about: バグ報告テンプレート
 title: "[BUG] "
 labels: bug
-assignees: IwakiEisuke
+assignees: 
 type: Bug
 
 ---
