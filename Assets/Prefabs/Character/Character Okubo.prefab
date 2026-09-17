@@ -7611,10 +7611,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 846463964584838234, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _splashEffectPrefab
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 2135489851091648443, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.197
@@ -7743,6 +7739,10 @@ PrefabInstance:
       propertyPath: 'NetworkedBehaviours.Array.data[27]'
       value: 
       objectReference: {fileID: 300863833827060737}
+    - target: {fileID: 2520683386849973483, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
+      propertyPath: _jewelryContainerObj
+      value: 
+      objectReference: {fileID: 377787564149873216, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
     - target: {fileID: 2664302539866463009, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: Animator
       value: 
@@ -7913,15 +7913,15 @@ PrefabInstance:
       objectReference: {fileID: 6986284182179614427}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[2115540913739006180]._attackDatas.Array.data[0]._damageAmount
-      value: 10
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[2115540913739006180]._attackDatas.Array.data[1]._damageAmount
-      value: 10
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[2115540913739006180]._attackDatas.Array.data[2]._damageAmount
-      value: 10
+      value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 2779401866583128900, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: managedReferences[2115540913739006180]._attackDatas.Array.data[0]._damageEndFrame
