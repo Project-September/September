@@ -3,7 +3,7 @@ name: Bug Report Template
 about: バグ報告テンプレート
 title: "[BUG] "
 labels: bug
-assignees: 
+assignees: ''
 type: Bug
 
 ---
