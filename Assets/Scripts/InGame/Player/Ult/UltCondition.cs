@@ -21,8 +21,12 @@ namespace InGame.Player.Ult
 
         private bool _wasAvailable;
 
-        public int RemainingScore => Mathf.Clamp(_requiredScore - (_currentScore - PrevScore), 0, _requiredScore);
-        public float Progress => Mathf.Clamp01((float)(_currentScore - PrevScore) / _requiredScore);
+        /// <summary>
+        /// UIをどれくらい表示するかの値
+        /// </summary>
+        public float Progress => _requiredScore <= 0
+            ? 1f
+            : Mathf.Clamp01((float)(CurrentScore - PrevScore) / _requiredScore);
 
         /// <summary>
         /// Prefab交換をまたいでULTの消費状態を維持するため、
@@ -34,13 +38,28 @@ namespace InGame.Player.Ult
 
         public bool IsAvailable()
         {
-            return _currentScore - PrevScore >= _requiredScore;
+            return CurrentScore - PrevScore >= _requiredScore;
         }
 
         public void OnUltActivated()
         {
-            PrevScore = _currentScore;
+            PrevScore = CurrentScore;
             _wasAvailable = false;
+        }
+
+        // PlayerDatabaseの変更通知は描画時に発生するため、State Authorityの
+        // 発動判定ではキャッシュに頼らず、そのTickの最新スコアを使用する。
+        private int CurrentScore
+        {
+            get
+            {
+                if (Object != null && Object.IsValid && HasStateAuthority
+                    && PlayerDatabase.Instance
+                    && PlayerDatabase.Instance.PlayerDataDic.TryGet(Object.InputAuthority, out var playerData))
+                    return playerData.Score;
+
+                return _currentScore;
+            }
         }
 
         /// <summary>
@@ -53,7 +72,6 @@ namespace InGame.Player.Ult
                 return;
 
             PrevScore = consumedScore;
-            OnProgressChanged?.Invoke();
         }
 
         /// <summary>

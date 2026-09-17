@@ -120,6 +120,21 @@ namespace September.Common
             UpdatePlayerScore(actor, tracker);
         }
 
+        /// <summary>
+        /// タカムラの擬態解除攻撃で与えた実ダメージをスコアへ加算する。
+        /// </summary>
+        public void Server_AddTakamuraRevealDamageScore(PlayerRef actor, int damage)
+        {
+            if (!Object.HasStateAuthority || damage <= 0)
+                return;
+
+            if (!_serverTrackers.TryGetValue(actor, out ScoreTracker tracker))
+                _serverTrackers[actor] = tracker = new ScoreTracker(_config);
+
+            tracker.AddTakamuraRevealDamage(damage);
+            UpdatePlayerScore(actor, tracker);
+        }
+
         // 合計スコア取得
         public int Server_GetTotal(PlayerRef actor)
         {
