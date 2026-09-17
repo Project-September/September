@@ -2251,6 +2251,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 5.1070257e-17
       objectReference: {fileID: 0}
+    - target: {fileID: 8994823310309022942, guid: 7c0f597b9de07e548a7e375304bf8e05, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2786,10 +2790,6 @@ PrefabInstance:
       propertyPath: _playerMovement
       value: 
       objectReference: {fileID: 1809326798388321474}
-    - target: {fileID: 2520683386849973483, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
-      propertyPath: _jewelryContainerObj
-      value: 
-      objectReference: {fileID: 377787564149873216, guid: 3ee9166504e283348ad0e0763adc18f5, type: 3}
     - target: {fileID: 2525442923973757293, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: m_Avatar
       value: 
