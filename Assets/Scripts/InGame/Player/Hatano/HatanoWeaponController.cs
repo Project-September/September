@@ -115,16 +115,15 @@ namespace InGame.Player.Hatano
             // Prefab 保存時の姿勢に依存せず、開始時の装備をソケットへ配置する。
             AttachRocketBody();
             var status = GetComponentInParent<HatanoAbilityStatusManagement>();
-            if (status != null && status.AbilityStatus == HatanoAbilityStatus.LaserGun)
-            {
-                AttachLaserGunHand();
-                AttachDoubleGunBody();
-            }
-            else
-            {
-                AttachDoubleGunHand();
-                AttachLaserGunHip();
-            }
+            ApplyAbilityWeapon(status != null
+                ? status.AbilityStatus : HatanoAbilityStatus.DoubleBarreledGun);
+        }
+
+        /// <summary>選択中 Ability と武器ソケットを全 peer で一致させる。</summary>
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void RPC_ApplyAbilityWeapon(HatanoAbilityStatus status)
+        {
+            ApplyAbilityWeapon(status);
         }
         
         #region 二丁拳銃
@@ -184,15 +183,21 @@ namespace InGame.Player.Hatano
         public void RPC_UltEndAttachSocket(HatanoAbilityStatus status)
         {
             AttachRocketBody();
-            if (status == HatanoAbilityStatus.DoubleBarreledGun)
+            ApplyAbilityWeapon(status);
+        }
+
+        private void ApplyAbilityWeapon(HatanoAbilityStatus status)
+        {
+            switch (status)
             {
-                AttachDoubleGunHand();
-                AttachLaserGunHip();
-            }
-            else // レーザー銃
-            {
-                AttachLaserGunHand();
-                AttachDoubleGunBody();
+                case HatanoAbilityStatus.DoubleBarreledGun:
+                    AttachDoubleGunHand();
+                    AttachLaserGunHip();
+                    break;
+                case HatanoAbilityStatus.LaserGun:
+                    AttachLaserGunHand();
+                    AttachDoubleGunBody();
+                    break;
             }
         }
         
