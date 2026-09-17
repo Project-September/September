@@ -5426,7 +5426,7 @@ PrefabInstance:
       objectReference: {fileID: 7400000, guid: bb2b9c1a001f037479eda0c903507452, type: 2}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.data[1].Weight
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3570017578186338863, guid: 1d232b17925a618409af4cee2aad9b7f, type: 3}
       propertyPath: _layerInfo.Array.data[1].LayerMask
@@ -5867,6 +5867,7 @@ MonoBehaviour:
   _ultCamera: {fileID: 4197822218726104451}
   _crosshairPrefab: {fileID: 3758444813883266440, guid: 012a53cb75eae6d42a003f1bb6bd8628, type: 3}
   _rotationSpeed: 15
+  _aimMoveSpeedMultiplier: 0.7
   _AimOrigin: {x: 0, y: 0, z: 0}
   _AimDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &8445276548023723744

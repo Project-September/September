@@ -493,6 +493,10 @@ namespace InGame.Player
 
             result *= _moveBuildEnabled ? _playerStatus.Speed : 1;   // 現在のステータスによる倍率
 
+            // 同期された構え状態から毎回計算し、解除時には通常の速度へ戻す。
+            if (_aimCameraController != null)
+                result *= _aimCameraController.MoveSpeedMultiplier;
+
             return result;
         }
 
