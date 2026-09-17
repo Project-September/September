@@ -72,7 +72,7 @@ namespace InGame.Player.Ability.Effect.Shooting
             if (_shootingType == ShootingStateType.Stance)
             {
                 //射撃入力時、継承先ごとの射撃処理を行う
-                if (_playerInput.Buttons.IsSet(PlayerButtons.Shooting))
+                if (_playerInput.Buttons.IsSet(PlayerButtons.Attack))
                 {
                     OnShooting();
                     if (ReplayAnimationOnEveryShot || !_isShootingAnimation)
