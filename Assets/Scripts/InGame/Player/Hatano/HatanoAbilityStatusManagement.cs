@@ -34,6 +34,10 @@ namespace InGame.Player.Hatano
         private HatanoWeaponController _weaponController;
         private bool _isWeaponChangeAimWeightInitialized;
         private bool _isWeaponChangeBlendComplete;
+
+        /// <summary>
+        /// 武器切替完了後の最初の入力 Tick で、引き継いだエイム状態を再照合する必要があるか。
+        /// </summary>
         private bool _shouldReconcileWeaponChangeAimAfterCompletion;
         private float _weaponChangeAimWeight;
         private float _weaponChangeOutputWeight;
@@ -76,6 +80,7 @@ namespace InGame.Player.Hatano
             // 入力がなかったら処理を行わない
             if (!GetInput<PlayerInput>(out var input)) return;
 
+            // Playable の終了が入力処理より先でも解除を拾えるよう、完了後の最初の入力 Tick まで判定する。
             if (HasStateAuthority && (IsChangingWeapon || _shouldReconcileWeaponChangeAimAfterCompletion))
             {
                 var isNormalControl = _playerManager.CurrentPlayerControlState
