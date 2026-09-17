@@ -1,4 +1,5 @@
 using Common.Extensions;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -65,6 +66,10 @@ namespace September.InGame.Kraken
         [Header("攻撃設定")]
         [SerializeField] private KrakenAttackHandler _attackHandler;
         [SerializeField] private KrakenSettings _settings;
+        
+        [Header("音声設定")] 
+        [SerializeField] private AudioBroadcaster _audioBroadcaster;
+        [SerializeField] private string _cueName;
         
         private DamageArea[] _damageAreas;
 
@@ -152,6 +157,10 @@ namespace September.InGame.Kraken
             ShowMagicCircle();
             Appear().Forget();
             _damageAreas = FindObjectsByType<DamageArea>(FindObjectsSortMode.None);
+            if (_audioBroadcaster != null)
+            {
+                _audioBroadcaster.RPC_PlaySoundFromCode(_cueName, SoundTrackingType.Follow, Object);
+            }
         }
 
         public override void Render()
