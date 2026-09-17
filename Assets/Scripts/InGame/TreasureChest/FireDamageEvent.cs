@@ -10,11 +10,11 @@ using UnityEngine;
 namespace InGame.TreasureChest
 {
     /// <summary>
-    /// 周囲に炎を発生させ、一定間隔でダメージを与える宝箱イベント。
+    /// 蜻ｨ蝗ｲ縺ｫ轤弱ｒ逋ｺ逕溘＆縺帙∽ｸ螳夐俣髫斐〒繝繝｡繝ｼ繧ｸ繧剃ｸ弱∴繧句ｮ晉ｮｱ繧､繝吶Φ繝医�
     /// </summary>
     public class FireDamageEvent : TreasureChestEventBase
     {
-        [SerializeField] private GameObject _fireEffect;
+        [SerializeField] private ParticleSystem _fireEffect;
         [SerializeField] private float _damageRange;
         [SerializeField] private int _damageAmount;
         [SerializeField] private float _damageInterval;
@@ -38,7 +38,7 @@ namespace InGame.TreasureChest
 
         private async UniTask FireDamageAsync(TriggerContext context, CancellationTokenSource cancellationTokenSource, CancellationToken token)
         {
-            _fireEffect.SetActive(true);
+            _fireEffect.Play(true);
 
             try
             {
@@ -65,10 +65,10 @@ namespace InGame.TreasureChest
             }
             finally
             {
-                // 自分が現在実行中のイベントならエフェクトを消す
+                // 閾ｪ蛻�縺檎樟蝨ｨ螳溯｡御ｸｭ縺ｮ繧､繝吶Φ繝医↑繧峨お繝輔ぉ繧ｯ繝医ｒ豸医☆
                 if (_cancellationTokenSource == cancellationTokenSource)
                 {
-                    _fireEffect.SetActive(false);
+                    _fireEffect.Stop(true);
 
                     _cancellationTokenSource.Dispose();
                     _cancellationTokenSource = null;
