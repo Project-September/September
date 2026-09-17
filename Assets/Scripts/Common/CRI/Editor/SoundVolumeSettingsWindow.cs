@@ -52,6 +52,11 @@ namespace CRISound.Editor
             EditorGUILayout.HelpBox(
                 "各値はCRI側で設定された音量への倍率です。September.acfを使用してゲームと同じ音響設定で試聴します。",
                 MessageType.Info);
+            EditorGUILayout.HelpBox(
+                "3D距離を上書きすると、次回の3D再生から適用します（Unity座標の距離）。" +
+                "減衰開始距離までは音量を維持し、最大距離でCRIの最小音量になります。" +
+                "無効時はCRI側の設定を使用します。試聴は2Dのため距離減衰は確認できません。",
+                MessageType.Info);
 
             using (new EditorGUI.DisabledScope(Application.isPlaying && !CuePlayAtomExPlayer.Instance.IsReady))
             {
@@ -78,6 +83,7 @@ namespace CRISound.Editor
                     continue;
                 }
 
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(cueName.stringValue, GUILayout.MinWidth(240f));
                 EditorGUILayout.PropertyField(volume, GUIContent.none, GUILayout.Width(80f));
@@ -92,6 +98,18 @@ namespace CRISound.Editor
                 }
 
                 EditorGUILayout.EndHorizontal();
+                SerializedProperty overrideDistance = entry.FindPropertyRelative("Override3DDistance");
+                EditorGUILayout.PropertyField(overrideDistance, new GUIContent("3D距離を上書き"));
+                using (new EditorGUI.DisabledScope(!overrideDistance.boolValue))
+                {
+                    SerializedProperty minDistance = entry.FindPropertyRelative("MinDistance");
+                    SerializedProperty maxDistance = entry.FindPropertyRelative("MaxDistance");
+                    EditorGUILayout.PropertyField(minDistance, new GUIContent("減衰開始距離"));
+                    EditorGUILayout.PropertyField(maxDistance, new GUIContent("最大距離"));
+                    minDistance.floatValue = Mathf.Max(0f, minDistance.floatValue);
+                    maxDistance.floatValue = Mathf.Max(minDistance.floatValue + 0.01f, maxDistance.floatValue);
+                }
+                EditorGUILayout.EndVertical();
             }
             EditorGUILayout.EndScrollView();
             _serializedSettings.ApplyModifiedProperties();
