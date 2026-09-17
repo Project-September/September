@@ -11,11 +11,12 @@ namespace September.Editor.HumanoidRig
         public const string DialogTitle = "Humanoid Rig Fixer";
 
         /// <summary>確認ダイアログを出してから一括実行する。キャンセルされたら false。</summary>
-        public static bool Run(string title, string message, IReadOnlyList<string> targets, Func<string, string> action)
+        public static bool Run(string title, string message, IReadOnlyList<string> targets, Func<string, string> action,
+            bool batchAssetEditing = true)
         {
             if (!EditorUtility.DisplayDialog(DialogTitle, message, "実行", "キャンセル")) return false;
 
-            var outcome = HumanoidRigBatchRunner.Run(title, targets, action);
+            var outcome = HumanoidRigBatchRunner.Run(title, targets, action, batchAssetEditing);
             if (outcome.Failures.Count > 0)
             {
                 EditorUtility.DisplayDialog(DialogTitle, HumanoidRigBatchRunner.Summarize(title, outcome), "OK");
