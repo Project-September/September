@@ -127,7 +127,7 @@ MonoBehaviour:
     Volume: 0.1
     Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_Excalibur_Attack
     Volume: 0.3
     Override3DDistance: 0
@@ -195,9 +195,9 @@ MonoBehaviour:
     MaxDistance: 20
   - CueName: SE_Hulk_Ult
     Volume: 2
-    Override3DDistance: 0
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_Hulk_Yell
     Volume: 1
     Override3DDistance: 0
@@ -205,9 +205,9 @@ MonoBehaviour:
     MaxDistance: 20
   - CueName: SE_Jewel_PickUp
     Volume: 3
-    Override3DDistance: 0
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 30
   - CueName: SE_Jewelry_Spawn
     Volume: 0.3
     Override3DDistance: 0
@@ -265,9 +265,9 @@ MonoBehaviour:
     MaxDistance: 20
   - CueName: SE_OKB_Ult
     Volume: 1
-    Override3DDistance: 0
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_Okubo_Aim
     Volume: 0.05
     Override3DDistance: 0
@@ -395,14 +395,14 @@ MonoBehaviour:
     MaxDistance: 20
   - CueName: SE_Sarutobi_Ult_1
     Volume: 2
-    Override3DDistance: 0
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_Sarutobi_Ult_2
     Volume: 2
-    Override3DDistance: 0
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_SatelliteCannon_ChargeGlow
     Volume: 1
     Override3DDistance: 0
@@ -464,12 +464,12 @@ MonoBehaviour:
     MinDistance: 1
     MaxDistance: 20
   - CueName: SE_Takamura_Skill
-    Volume: 1
-    Override3DDistance: 0
+    Volume: 0.4
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_Takamura_Ult
-    Volume: 0.5
+    Volume: 0.3
     Override3DDistance: 1
     MinDistance: 1
     MaxDistance: 50
@@ -485,14 +485,14 @@ MonoBehaviour:
     MaxDistance: 20
   - CueName: SE_Tanihira_Ult_1
     Volume: 1
-    Override3DDistance: 0
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_Tanihira_Ult_2
     Volume: 1
-    Override3DDistance: 0
+    Override3DDistance: 1
     MinDistance: 1
-    MaxDistance: 20
+    MaxDistance: 50
   - CueName: SE_TreasureChest_Interact
     Volume: 0.3
     Override3DDistance: 0
