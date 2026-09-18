@@ -159,7 +159,8 @@ namespace September.InGame.Kraken
             _damageAreas = FindObjectsByType<DamageArea>(FindObjectsSortMode.None);
             if (_audioBroadcaster != null)
             {
-                _audioBroadcaster.RPC_PlaySoundFromCode(_cueName, SoundTrackingType.Follow, Object);
+                // Spawned は全クライアントで実行されるため、RPCを送らずローカルで一度だけ再生する。
+                _audioBroadcaster.PlaySoundFromCode(_cueName, SoundTrackingType.Follow, Object);
             }
         }
 

@@ -10,13 +10,14 @@ namespace September.Editor.HumanoidRig
 {
     internal sealed class AnimationClipUpdateSection
     {
-        private enum ResultFilter { All, Ready, Missing, Ambiguous }
-        private static readonly string[] FilterLabels = { "すべて", "更新可能", "同名 FBX クリップなし", "更新元重複" };
+        private enum ResultFilter { All, Ready, Missing, Ambiguous, Create }
+        private static readonly string[] FilterLabels = { "すべて", "更新可能", "同名 FBX クリップなし", "更新元重複 / 作成先競合", "新規作成可能" };
         private readonly Dictionary<string, ResultFilter> _results = new Dictionary<string, ResultFilter>();
         private ResultFilter _filter;
         private readonly HumanoidRigTargetFolders _folders;
         private readonly ModelPathSelectionList _list = new ModelPathSelectionList();
         private readonly Dictionary<string, AnimationClip> _sources = new Dictionary<string, AnimationClip>();
+        private readonly Dictionary<string, AnimationClip> _createSources = new Dictionary<string, AnimationClip>();
         private readonly Dictionary<string, string> _details = new Dictionary<string, string>();
         private DefaultAsset _scanFolder;
         private string _summary;
@@ -33,6 +34,10 @@ namespace September.Editor.HumanoidRig
                 "未指定の場合は上の対象フォルダを使用します。内包クリップが1件の FBX はファイル名でも照合します。\n" +
                 "更新元が同名で複数ある場合は除外します。",
                 MessageType.Info);
+            EditorGUILayout.HelpBox(
+                "同名 .anim がない FBX クリップは新規作成できます（イベント・設定もコピー）。保存先は元 FBX と同じフォルダです。\n" +
+                "単一クリップは FBX 名、複数クリップは内包クリップ名で保存します。接頭辞は保存名から除きません。",
+                MessageType.Info);
             _scanFolder = (DefaultAsset)EditorGUILayout.ObjectField(
                 "対象フォルダ（FBX / .anim）", _scanFolder, typeof(DefaultAsset), false);
             using (var change = new EditorGUI.ChangeCheckScope())
@@ -44,6 +49,7 @@ namespace September.Editor.HumanoidRig
                         .Select(prefix => prefix.Trim()).Where(prefix => prefix.Length > 0)
                         .Distinct(StringComparer.Ordinal).OrderByDescending(prefix => prefix.Length).ToArray();
                     _sources.Clear();
+                    _createSources.Clear();
                     _details.Clear();
                     _results.Clear();
                     _list.Clear();
@@ -65,12 +71,18 @@ namespace September.Editor.HumanoidRig
                 _filter = (ResultFilter)EditorGUILayout.Popup("表示フィルター", (int)_filter, FilterLabels);
                 if (change.changed) ApplyFilter();
             }
-            EditorGUILayout.LabelField($"表示 {_list.Count} 件（更新可能な行のみ選択できます）");
+            EditorGUILayout.LabelField($"表示 {_list.Count} 件（更新可能・新規作成可能な行を選択できます）");
             _list.Draw("更新元 FBX / 詳細", RowInfo,
                 "該当するクリップがありません。未スキャンの場合は対象フォルダを指定してスキャンしてください。",
-                path => _sources.ContainsKey(path));
-            using (new EditorGUI.DisabledScope(_list.SelectedCount == 0 || !valid))
-                if (GUILayout.Button($"選択中 {_list.SelectedCount} 件のクリップを更新（イベント保持）")) Run();
+                path => _sources.ContainsKey(path) || _createSources.ContainsKey(path),
+                path => _createSources.TryGetValue(path, out var source) && source != null
+                    ? source : AssetDatabase.LoadMainAssetAtPath(path));
+            int updateCount = _list.Selected.Count(path => _sources.ContainsKey(path));
+            int createCount = _list.Selected.Count(path => _createSources.ContainsKey(path));
+            using (new EditorGUI.DisabledScope(updateCount == 0 || !valid))
+                if (GUILayout.Button($"選択中 {updateCount} 件のクリップを更新（イベント保持）")) Run();
+            using (new EditorGUI.DisabledScope(createCount == 0 || !valid))
+                if (GUILayout.Button($"選択中 {createCount} 件のクリップを新規作成")) RunCreate();
         }
 
         private Dictionary<string, List<AnimationClip>> FindSources()
@@ -125,6 +137,7 @@ namespace September.Editor.HumanoidRig
         private void Scan()
         {
             _sources.Clear();
+            _createSources.Clear();
             _details.Clear();
             _results.Clear();
             var sources = FindSources();
@@ -160,8 +173,58 @@ namespace September.Editor.HumanoidRig
                         $"保持するイベント: {AnimationUtility.GetAnimationEvents(target).Length} 件");
                 }
             }
+            foreach (var candidate in FindCreationCandidates(sources, folders))
+            {
+                string path = candidate.Key;
+                if (_results.ContainsKey(path)) continue;
+                bool conflict = candidate.Value.Count != 1 || AssetDatabase.LoadMainAssetAtPath(path) != null
+                    || File.Exists(path) || Directory.Exists(path) || File.Exists(path + ".meta");
+                _results.Add(path, conflict ? ResultFilter.Ambiguous : ResultFilter.Create);
+                _details.Add(path, (conflict ? "作成先が既存アセットまたは別の候補と競合しています:\n" : "新規作成元:\n") +
+                    string.Join("\n", candidate.Value.Select(clip => $"{AssetDatabase.GetAssetPath(clip)} / {clip.name}")));
+                if (!conflict) _createSources.Add(path, candidate.Value[0]);
+                else ambiguous++;
+            }
             ApplyFilter();
-            _summary = $"更新可能 {_sources.Count} 件 / 同名 FBX クリップなし {missing} 件 / 更新元重複で除外 {ambiguous} 件";
+            _summary = $"更新可能 {_sources.Count} 件 / 新規作成可能 {_createSources.Count} 件 / 同名 FBX クリップなし {missing} 件 / 競合で除外 {ambiguous} 件";
+        }
+
+        private Dictionary<string, List<AnimationClip>> FindCreationCandidates(
+            Dictionary<string, List<AnimationClip>> sources, string[] folders)
+        {
+            // 重複で更新できない場合も、対応する .anim がある元クリップは新規作成しない。
+            var matched = new HashSet<AnimationClip>();
+            if (folders.Length > 0)
+                foreach (string path in AssetDatabase.FindAssets("t:AnimationClip", folders)
+                    .Select(AssetDatabase.GUIDToAssetPath).Distinct()
+                    .Where(path => string.Equals(Path.GetExtension(path), ".anim", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var target = AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
+                    if (target != null) matched.UnionWith(FindMatches(sources, path, target));
+                }
+
+            var result = new Dictionary<string, List<AnimationClip>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var group in sources.Values.SelectMany(clips => clips).Distinct()
+                .GroupBy(AssetDatabase.GetAssetPath))
+            {
+                var clips = group.ToList();
+                foreach (var clip in clips.Where(clip => !matched.Contains(clip)))
+                {
+                    string name = clips.Count == 1 ? Path.GetFileNameWithoutExtension(group.Key) : clip.name;
+                    // 内包名のパス区切りやファイル名禁止文字は置換してフォルダ外への出力を防ぐ。
+                    name = string.Concat(name.Select(c => char.IsControl(c) || "<>:\"/\\|?*".IndexOf(c) >= 0 ? '_' : c)).TrimEnd(' ', '.');
+                    if (string.IsNullOrEmpty(name)) name = "AnimationClip";
+                    string path = Path.GetDirectoryName(group.Key).Replace('\\', '/') + "/" + name + ".anim";
+                    if (!result.TryGetValue(path, out var candidates))
+                        result.Add(path, candidates = new List<AnimationClip>());
+                    candidates.Add(clip);
+                    // 作成後に同じ照合規則で一意に更新できることも確認する。
+                    var matches = FindMatches(sources, path, clip);
+                    foreach (var match in matches)
+                        if (!candidates.Contains(match)) candidates.Add(match);
+                }
+            }
+            return result;
         }
 
         private void ApplyFilter()
@@ -177,6 +240,8 @@ namespace September.Editor.HumanoidRig
             {
                 case ResultFilter.Ready:
                     return new ModelRowInfo("更新可能", Color.green, _details[path]);
+                case ResultFilter.Create:
+                    return new ModelRowInfo("新規作成", Color.cyan, _details[path]);
                 case ResultFilter.Missing:
                     return new ModelRowInfo("該当なし", Color.yellow, _details[path]);
                 default:
@@ -217,6 +282,43 @@ namespace September.Editor.HumanoidRig
             {
                 Undo.CollapseUndoOperations(undoGroup);
             }
+            Scan();
+        }
+
+        private void RunCreate()
+        {
+            var targets = _list.Selected.Where(path => _createSources.ContainsKey(path)).ToList();
+            if (targets.Count == 0) return;
+            var candidates = FindCreationCandidates(FindSources(), ScanFolders());
+            HumanoidRigBatchPrompt.Run("クリップ新規作成",
+                $"選択中 {targets.Count} 件の .anim を一覧のパスに新規作成します。\n" +
+                "FBX のアニメーション・イベント・設定をコピーします。既存ファイルは上書きしません。",
+                targets, path =>
+                {
+                    if (!candidates.TryGetValue(path, out var matches) || matches.Count != 1
+                        || matches[0] == null || matches[0] != _createSources[path])
+                        throw new InvalidOperationException("作成元または対象フォルダが変更されています。再スキャンしてください。");
+                    if (AssetDatabase.LoadMainAssetAtPath(path) != null || File.Exists(path)
+                        || Directory.Exists(path) || File.Exists(path + ".meta"))
+                        throw new InvalidOperationException("作成先が既に存在します。再スキャンしてください。");
+                    var clip = new AnimationClip();
+                    try
+                    {
+                        EditorUtility.CopySerialized(matches[0], clip);
+                        // 内包名も保持し、ファイル名を置換した場合も次回スキャンで照合できるようにする。
+                        clip.name = matches[0].name;
+                        clip.hideFlags = HideFlags.None;
+                        AssetDatabase.CreateAsset(clip, path);
+                        if (AssetDatabase.LoadAssetAtPath<AnimationClip>(path) == null)
+                            throw new InvalidOperationException($"保存したクリップを読み込めませんでした: {path}");
+                    }
+                    finally
+                    {
+                        if (!AssetDatabase.Contains(clip)) UnityEngine.Object.DestroyImmediate(clip);
+                    }
+                    return "FBX から新規作成";
+                // CreateAsset 後の検証はインポート完了後に行う。編集バッチ内では登録が遅延する。
+                }, batchAssetEditing: false);
             Scan();
         }
 

@@ -12,6 +12,8 @@ public class AimCameraController : NetworkBehaviour
     [Header("CrosshairPrefab(照準のUI)")]
     [SerializeField] private GameObject _crosshairPrefab;
     [Header("回転のスムーズさ"), SerializeField] private float _rotationSpeed = 15f;
+    [SerializeField, Range(0f, 1f), Tooltip("エイム中の移動速度倍率")]
+    private float _aimMoveSpeedMultiplier = 0.5f;
     private GameObject _crosshair;
     public Camera MainCamera { get; private set; }
     
@@ -25,6 +27,7 @@ public class AimCameraController : NetworkBehaviour
     [Networked] private NetworkBool IsUltAiming { get; set; }
     public bool IsAim => IsAiming;
     public bool IsFacingCamera => IsAiming || IsUltAiming;
+    public float MoveSpeedMultiplier => IsAim ? Mathf.Clamp01(_aimMoveSpeedMultiplier) : 1f;
 
     public override void Spawned()
     {

@@ -131,6 +131,25 @@ namespace September.InGame
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RPC_PlaySoundFromCode(string cueName, SoundTrackingType trackingType = default, NetworkId sourceObjId = default, PlayerRef playerRef = default, NetworkObject networkObj = default)
         {
+            PlaySoundFromCode(cueName, trackingType, sourceObjId, playerRef, networkObj);
+        }
+
+        /// <summary>
+        /// スクリプトから直接呼び出す再生
+        /// 音源の位置となるオブジェクトを指定可能(指定する場合は NetworkObject or NetworkId)
+        /// ローカル→2D再生、その他→3D再生
+        /// <remarks>
+        /// このメソッドはローカル上でのみ実行されます。RPCだと重複して再生されてしまう場合に使用してください。
+        /// </remarks>
+        /// </summary>
+        /// <param name="cueName"> キューの名前 </param>
+        /// <param name="trackingType"> 短い音→ Spot(0)、移動しながら鳴る音→ Follow(1) </param>
+        /// <param name="sourceObjId"> 発声元のオブジェクト NetworkId </param>
+        /// <param name="playerRef"> 2D再生対象のプレイヤー </param>
+        /// <param name="networkObj"> 発声元のオブジェクト NetworkObject </param>
+        public void PlaySoundFromCode(string cueName, SoundTrackingType trackingType = default, NetworkId sourceObjId = default, PlayerRef playerRef = default, NetworkObject networkObj = default)
+        {
+            Debug.Log($"RPC_PlaySoundFromCode: {cueName}");
             if (cueName.IsNullOrEmpty()) return;
             // 2D再生用のプレイヤーも音源もわからない場合 → 3D再生のみ
             if (playerRef.IsNone && (!sourceObjId.IsValid && Object))
@@ -150,7 +169,7 @@ namespace September.InGame
                 {
                     Play3DSound(sourceObjId, cueName, trackingType);
                 }
-                    
+
             }
             // プレイヤー指定がある 音源あり or なし
             else if (!playerRef.IsNone)
@@ -216,6 +235,7 @@ namespace September.InGame
                 else if (trackingType == SoundTrackingType.Follow)
                 {
                     var sePlayer = CRIAudio.PlaySE(followTramsform.position, _cueSheet, cueName); // 3D再生
+                    if (sePlayer == null) return;
                     var followSound = new FollowEntry(followTramsform, sePlayer);
                     _followingList.Add(followSound);                                              // 追跡リストに追加、LateUpdateで位置更新
                 }
@@ -242,6 +262,7 @@ namespace September.InGame
             if (cueName.IsNullOrEmpty()) return;
 
             var sePlayer = CRIAudio.PlaySE(obj.transform.position, sheetName, cueName);
+            if (sePlayer == null) return;
             var followSound = new FollowEntry(obj.transform, sePlayer);
             _followingList.Add(followSound);
         }

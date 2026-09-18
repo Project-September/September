@@ -1,3 +1,4 @@
+using CRISound;
 using Fusion;
 using InGame.Health;
 using September.Common;
@@ -16,6 +17,7 @@ namespace InGame.Player.Okubo
         [SerializeField] private EffectType _explosion;
         [SerializeField] private LayerMask _groundLayer = ~0;
         [SerializeField] private GameObject _countDownEffect;
+        [SerializeField] private string _explodeSoundName;
 
         private float _explodeTime;
         private PlayerRef _ownerRef;
@@ -83,6 +85,7 @@ namespace InGame.Player.Okubo
                 }
             }
             _effectSpawner.RequestPlayOneShotEffect(_explosion, this.transform.position, Quaternion.identity);
+            CRIAudio.PlaySE(transform.position, "ALLCue", _explodeSoundName);
 
             Runner.Despawn(Object);
 
@@ -99,6 +102,12 @@ namespace InGame.Player.Okubo
         private bool IsInLayerMask(GameObject target, LayerMask layerMask)
         {
             return (layerMask.value & (1 << target.layer)) != 0;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, _range);
         }
     }
 }

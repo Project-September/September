@@ -1,5 +1,4 @@
 using System;
-using NaughtyAttributes;
 using UnityEngine;
 
 namespace September.InGame.Jewelry.Drop.Strategies.Chances
@@ -8,7 +7,7 @@ namespace September.InGame.Jewelry.Drop.Strategies.Chances
     public class ContainsDropChance : IJewelryDropChance
     {
         [Header("所持宝石スコアに応じたドロップ確率")]
-        [SerializeField, CurveRange(0f, 0f, 20f, 1f, EColor.Red)]
+        [SerializeField]
         private AnimationCurve _containerDropRate = AnimationCurve.Linear(0, 0, 11, 1);
 
         public float GetChance(in JewelryDropContext context)
