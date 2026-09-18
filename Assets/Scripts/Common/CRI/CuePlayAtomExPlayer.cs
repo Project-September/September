@@ -265,7 +265,14 @@ namespace CRISound
                 public CriAtomExPlayback CriAtomExPlayback3D => _criAtomExPlayback3D;
                 private string _currentCueName;
 
-                public bool IsBusy => _atomExPlayer3D.GetStatus() == CriAtomExPlayer.Status.Playing;
+                public bool IsBusy
+                {
+                    get
+                    {
+                        var status = _atomExPlayer3D.GetStatus();
+                        return status == CriAtomExPlayer.Status.Prep || status == CriAtomExPlayer.Status.Playing;
+                    }
+                }
                 public string CurrentCueName => _currentCueName;
 
                 public void Dispose()
