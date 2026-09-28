@@ -171,8 +171,8 @@ Material:
     - _Surface: 0
     - _WaterDepth: 10
     - _WaveHeight: 1.5
-    - _WaveHeight1_1: 0.9
-    - _WaveHeight2: 0.4
+    - _WaveHeight1_1: 2
+    - _WaveHeight2: 0.2
     - _WaveHeight3: 0.3
     - _WaveHeight4: 0.04
     - _WaveHeight5: 0.1
@@ -180,14 +180,14 @@ Material:
     - _WaveHeight7: 0.03
     - _WaveHeight8: 0.1
     - _WaveLength: 0.09
-    - _WaveLength1_1: 30
-    - _WaveLength2: 27
+    - _WaveLength1_1: 20
+    - _WaveLength2: 5
     - _WaveLength3: 5
     - _WaveLength4: 6
     - _WaveLength5: 9
     - _WaveLength6: 0.6
-    - _WaveLength7: 2
-    - _WaveLength8: 3
+    - _WaveLength7: 1
+    - _WaveLength8: 2
     - _WaveSharpness: -100
     - _WaveSharpness1_1: 0.8
     - _WaveSharpness2: 0.06
@@ -211,7 +211,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DeepWaterColor: {r: 0.025216522, g: 0.13151515, b: 0.15723255, a: 0.7882353}
+    - _DeepWaterColor: {r: 0.041829813, g: 0.24045618, b: 0.2830189, a: 0.8156863}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FoamColor: {r: 0.74213827, g: 0.74213827, b: 0.74213827, a: 1}
     - _HeightFoamColor: {r: 1, g: 1, b: 1, a: 1}
@@ -220,7 +220,7 @@ Material:
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Water_F0Color: {r: 0.02, g: 0.02, b: 0.02, a: 1}
     - _WaveDirection: {r: 1, g: 0, b: 0, a: 0}
-    - _WaveDirection1_1: {r: 1, g: 0.2, b: 0, a: 0}
+    - _WaveDirection1_1: {r: 0.6, g: 0.2, b: 0, a: 0}
     - _WaveDirection2: {r: 0.966, g: -2.18, b: 0, a: 0}
     - _WaveDirection3: {r: 0.94, g: -0.342, b: 0, a: 0}
     - _WaveDirection4: {r: 0.866, g: 0.5, b: 0, a: 0}

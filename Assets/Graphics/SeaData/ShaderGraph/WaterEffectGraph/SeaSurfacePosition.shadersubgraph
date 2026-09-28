@@ -2702,89 +2702,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "12c3c52a81e64a90a75fd491205dfc92",
-    "m_Group": {
-        "m_Id": "c4bf3dd0d4e612114e6d5267dc882cf3"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2294.666748046875,
-            "y": 381.333251953125,
-            "width": 271.3333740234375,
-            "height": 449.3333740234375
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "391490373c104a4e9fc43491b9ef41b0"
-        },
-        {
-            "m_Id": "18bce7fc15d1426fa3249f2990c03462"
-        },
-        {
-            "m_Id": "f7cd90e54ed5408f84fab020ca050edf"
-        },
-        {
-            "m_Id": "8167b9f7d3fd4d8f835a2a399e383aab"
-        },
-        {
-            "m_Id": "91c2eee5175d487fbce03a7dc433355a"
-        },
-        {
-            "m_Id": "31c1d80dacc24813a25fcf38c5312b55"
-        },
-        {
-            "m_Id": "9240ed6ac4b649b88bd3f55f0f08f4b2"
-        },
-        {
-            "m_Id": "685b0f0b85844543a75efca60ad3f280"
-        },
-        {
-            "m_Id": "c21976e194a144f0b819a198598cb9b4"
-        },
-        {
-            "m_Id": "80efb04ebd9548ec84417e5dc33669ad"
-        },
-        {
-            "m_Id": "b6c78d13d9404facac59cd6d7a297b83"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "12c3c52a81e64a90a75fd491205dfc92",
+    "m_Group":  {
+                    "m_Id":  "c4bf3dd0d4e612114e6d5267dc882cf3"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2294.666748046875,
+                                           "y":  381.333251953125,
+                                           "width":  271.3333740234375,
+                                           "height":  449.3333740234375
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "391490373c104a4e9fc43491b9ef41b0"
+                    },
+                    {
+                        "m_Id":  "18bce7fc15d1426fa3249f2990c03462"
+                    },
+                    {
+                        "m_Id":  "f7cd90e54ed5408f84fab020ca050edf"
+                    },
+                    {
+                        "m_Id":  "8167b9f7d3fd4d8f835a2a399e383aab"
+                    },
+                    {
+                        "m_Id":  "91c2eee5175d487fbce03a7dc433355a"
+                    },
+                    {
+                        "m_Id":  "31c1d80dacc24813a25fcf38c5312b55"
+                    },
+                    {
+                        "m_Id":  "9240ed6ac4b649b88bd3f55f0f08f4b2"
+                    },
+                    {
+                        "m_Id":  "685b0f0b85844543a75efca60ad3f280"
+                    },
+                    {
+                        "m_Id":  "c21976e194a144f0b819a198598cb9b4"
+                    },
+                    {
+                        "m_Id":  "80efb04ebd9548ec84417e5dc33669ad"
+                    },
+                    {
+                        "m_Id":  "b6c78d13d9404facac59cd6d7a297b83"
+                    },
+                    {
+                        "m_Id":  "39379f78e75b49d090995c5f41f6f390"
+                    },
+                    {
+                        "m_Id":  "e12b277034e84c8aa6602d79239bd851"
+                    },
+                    {
+                        "m_Id":  "9f65cf1a27334e208e39d39b99cb1805"
+                    },
+                    {
+                        "m_Id":  "0a9f84ee351043728e3bc5bc8bf27069"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          100,
+                          101,
+                          102,
+                          103,
+                          104,
+                          105,
+                          106,
+                          107,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -3030,7 +3054,7 @@
     "m_ObjectId": "1872fd53830841bba5740864a8f541be",
     "m_Title": "GerstnerGroup(2)",
     "m_Position": {
-        "x": -2791.33349609375,
+        "x": -2791.0,
         "y": -810.0
     }
 }
@@ -3365,7 +3389,7 @@
     "m_ObjectId": "20cf98bf1b764e019f0f8e6beeee87ae",
     "m_Title": "GerstnerGroup(8)",
     "m_Position": {
-        "x": -2792.666748046875,
+        "x": -2792.0,
         "y": 2622.0
     }
 }
@@ -3556,18 +3580,19 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "279f693c56204b12a6e2a6874d7954c2",
-    "m_Id": 1039328831,
-    "m_DisplayName": "Rotation",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "_Rotation",
-    "m_StageCapability": 3,
-    "m_Value": 1.570796012878418,
-    "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "279f693c56204b12a6e2a6874d7954c2",
+    "m_Id":  1039328831,
+    "m_DisplayName":  "Rotation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_Rotation",
+    "m_StageCapability":  3,
+    "m_Value":  1.2740903539558606,
+    "m_DefaultValue":  0.0,
+    "m_Labels":  [
+                 ]
 }
 
 {
@@ -4481,89 +4506,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "47753388b9fb4d82b610c13c2b2b04d9",
-    "m_Group": {
-        "m_Id": "1872fd53830841bba5740864a8f541be"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2291.3330078125,
-            "y": -751.3333129882813,
-            "width": 271.3331298828125,
-            "height": 449.3333740234375
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "ad0bf59265dd439aa9e1e9f03bf60a21"
-        },
-        {
-            "m_Id": "207b6f0ee732424abf0461a9f43fe644"
-        },
-        {
-            "m_Id": "16dc16b686014c3099c5ab9b90b14df8"
-        },
-        {
-            "m_Id": "a3bc7690e1554400bfde55111bc2bdf8"
-        },
-        {
-            "m_Id": "25112432b038474097a59ed3d746fbae"
-        },
-        {
-            "m_Id": "3ab9b48fc27c4d24a1b62f031c0bcb4e"
-        },
-        {
-            "m_Id": "65b95b3727974a2aa94bb6005f3e4c42"
-        },
-        {
-            "m_Id": "bfe7b7f2e2d248bbbce381e9cba4bfe3"
-        },
-        {
-            "m_Id": "a00657ff7ea14249b877a509ee7d51a5"
-        },
-        {
-            "m_Id": "156ad8a5d77c41ffa157bf098a4be92d"
-        },
-        {
-            "m_Id": "a45d7b7f1cf34ba2995bfb4ab3a74a97"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "47753388b9fb4d82b610c13c2b2b04d9",
+    "m_Group":  {
+                    "m_Id":  "1872fd53830841bba5740864a8f541be"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2291.3330078125,
+                                           "y":  -751.3333129882813,
+                                           "width":  271.3331298828125,
+                                           "height":  449.3333740234375
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "ad0bf59265dd439aa9e1e9f03bf60a21"
+                    },
+                    {
+                        "m_Id":  "207b6f0ee732424abf0461a9f43fe644"
+                    },
+                    {
+                        "m_Id":  "16dc16b686014c3099c5ab9b90b14df8"
+                    },
+                    {
+                        "m_Id":  "a3bc7690e1554400bfde55111bc2bdf8"
+                    },
+                    {
+                        "m_Id":  "25112432b038474097a59ed3d746fbae"
+                    },
+                    {
+                        "m_Id":  "3ab9b48fc27c4d24a1b62f031c0bcb4e"
+                    },
+                    {
+                        "m_Id":  "65b95b3727974a2aa94bb6005f3e4c42"
+                    },
+                    {
+                        "m_Id":  "bfe7b7f2e2d248bbbce381e9cba4bfe3"
+                    },
+                    {
+                        "m_Id":  "a00657ff7ea14249b877a509ee7d51a5"
+                    },
+                    {
+                        "m_Id":  "156ad8a5d77c41ffa157bf098a4be92d"
+                    },
+                    {
+                        "m_Id":  "a45d7b7f1cf34ba2995bfb4ab3a74a97"
+                    },
+                    {
+                        "m_Id":  "339fd8ba4c2c47a6b62a3ae0aaecef60"
+                    },
+                    {
+                        "m_Id":  "3139d10b910f4a67a7f0975fe600b471"
+                    },
+                    {
+                        "m_Id":  "a7eb92574a19476986e2c605ff38c304"
+                    },
+                    {
+                        "m_Id":  "39bb9d82773844e2a164425d82862286"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          100,
+                          101,
+                          102,
+                          103,
+                          104,
+                          105,
+                          106,
+                          107,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -6678,8 +6727,8 @@
     "m_ObjectId": "7e311bd6d54b4a99a7ce1d90ea4948bb",
     "m_Title": "GerstnerGroup(3)",
     "m_Position": {
-        "x": -2796.6669921875,
-        "y": -256.6666259765625
+        "x": -2796.0,
+        "y": -257.0
     }
 }
 
@@ -6728,8 +6777,8 @@
     "m_ObjectId": "7fd851a3f98a3b6df0d0833f5f641c38",
     "m_Title": "GerstnerGroup(5)",
     "m_Position": {
-        "x": -2791.33349609375,
-        "y": 893.9999389648438
+        "x": -2791.0,
+        "y": 894.0
     }
 }
 
@@ -7266,89 +7315,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "8b6ab4554bbe4203bd0795c0d4bba483",
-    "m_Group": {
-        "m_Id": "20cf98bf1b764e019f0f8e6beeee87ae"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2293.999755859375,
-            "y": 2680.66650390625,
-            "width": 270.6666259765625,
-            "height": 449.333251953125
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "7601ec68c1c043689659d329762c72a1"
-        },
-        {
-            "m_Id": "187058d575e24212926672c5b09ce52c"
-        },
-        {
-            "m_Id": "3ee3c6ee3da44e089e58c953c6d73576"
-        },
-        {
-            "m_Id": "b4adc575ac634a5a92e8692e58452bd8"
-        },
-        {
-            "m_Id": "c43d21b594084c4395506ef076960c4d"
-        },
-        {
-            "m_Id": "0c142a7f194840ba96e4406230b935cc"
-        },
-        {
-            "m_Id": "4eef3225c95f4020a97ec2ff27ae1d56"
-        },
-        {
-            "m_Id": "5bf0839ba43d41da98c255771271fd25"
-        },
-        {
-            "m_Id": "51722daa50cd4b66afe08be7a08da3e8"
-        },
-        {
-            "m_Id": "3c31f0aa538b40c297bd4002c291bfa1"
-        },
-        {
-            "m_Id": "a1f2d841fba4468bac8e8ab055839a80"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        823474255,
-        1947704961,
-        1510140361,
-        -215327549,
-        -564087688,
-        1527755794,
-        -841987312,
-        1039328831
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "8b6ab4554bbe4203bd0795c0d4bba483",
+    "m_Group":  {
+                    "m_Id":  "20cf98bf1b764e019f0f8e6beeee87ae"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2293.999755859375,
+                                           "y":  2680.66650390625,
+                                           "width":  270.6666259765625,
+                                           "height":  449.333251953125
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "7601ec68c1c043689659d329762c72a1"
+                    },
+                    {
+                        "m_Id":  "187058d575e24212926672c5b09ce52c"
+                    },
+                    {
+                        "m_Id":  "3ee3c6ee3da44e089e58c953c6d73576"
+                    },
+                    {
+                        "m_Id":  "b4adc575ac634a5a92e8692e58452bd8"
+                    },
+                    {
+                        "m_Id":  "c43d21b594084c4395506ef076960c4d"
+                    },
+                    {
+                        "m_Id":  "0c142a7f194840ba96e4406230b935cc"
+                    },
+                    {
+                        "m_Id":  "4eef3225c95f4020a97ec2ff27ae1d56"
+                    },
+                    {
+                        "m_Id":  "5bf0839ba43d41da98c255771271fd25"
+                    },
+                    {
+                        "m_Id":  "51722daa50cd4b66afe08be7a08da3e8"
+                    },
+                    {
+                        "m_Id":  "3c31f0aa538b40c297bd4002c291bfa1"
+                    },
+                    {
+                        "m_Id":  "a1f2d841fba4468bac8e8ab055839a80"
+                    },
+                    {
+                        "m_Id":  "978326bf9a644419b0935b5d60032bc4"
+                    },
+                    {
+                        "m_Id":  "759feeb86dba42399e6c88951dfeab76"
+                    },
+                    {
+                        "m_Id":  "f5fbe760f2a54396a4b4abd89852c316"
+                    },
+                    {
+                        "m_Id":  "fdd897eab4914c5a9c0ccac16000f184"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          823474255,
+                          1947704961,
+                          1510140361,
+                          -215327549,
+                          -564087688,
+                          1527755794,
+                          -841987312,
+                          1039328831,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -7447,18 +7520,19 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "8d110507af6842dba5d9d12ea322bf30",
-    "m_Id": 107,
-    "m_DisplayName": "Rotation",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "_Rotation",
-    "m_StageCapability": 3,
-    "m_Value": 1.570796012878418,
-    "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "8d110507af6842dba5d9d12ea322bf30",
+    "m_Id":  107,
+    "m_DisplayName":  "Rotation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_Rotation",
+    "m_StageCapability":  3,
+    "m_Value":  0.95993108859688125,
+    "m_DefaultValue":  0.0,
+    "m_Labels":  [
+                 ]
 }
 
 {
@@ -7674,89 +7748,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "936efaf6e8b8484a83df155da52a830f",
-    "m_Group": {
-        "m_Id": "f562709c05cc40e6b278cfb753b17e1f"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2308.66650390625,
-            "y": -1302.666748046875,
-            "width": 271.3333740234375,
-            "height": 449.3333740234375
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "f0bdfb51b7084555b9a928c671ba719b"
-        },
-        {
-            "m_Id": "07d72e6ca8c84ceaa5651e5a6f8f9183"
-        },
-        {
-            "m_Id": "9480d99aa7fc4466b4374ee3cd2c97d9"
-        },
-        {
-            "m_Id": "9af5ca6f893f4e46b9562f9af27db156"
-        },
-        {
-            "m_Id": "10e4ca19d0dd453ebeca0c3977ce83f8"
-        },
-        {
-            "m_Id": "12aab42c47e2475baaa8f974d4d156cf"
-        },
-        {
-            "m_Id": "666b4b7dbc4049bb899bcf5cd84f33ab"
-        },
-        {
-            "m_Id": "8d110507af6842dba5d9d12ea322bf30"
-        },
-        {
-            "m_Id": "98d5e3010a3c40579a679c65acbea19e"
-        },
-        {
-            "m_Id": "bc905d11c9e841eb8eb92eee75f3045d"
-        },
-        {
-            "m_Id": "6c9d4c3215d6422faf441bfa0c960696"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "936efaf6e8b8484a83df155da52a830f",
+    "m_Group":  {
+                    "m_Id":  "f562709c05cc40e6b278cfb753b17e1f"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2308.66650390625,
+                                           "y":  -1302.666748046875,
+                                           "width":  271.3333740234375,
+                                           "height":  449.3333740234375
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "f0bdfb51b7084555b9a928c671ba719b"
+                    },
+                    {
+                        "m_Id":  "07d72e6ca8c84ceaa5651e5a6f8f9183"
+                    },
+                    {
+                        "m_Id":  "9480d99aa7fc4466b4374ee3cd2c97d9"
+                    },
+                    {
+                        "m_Id":  "9af5ca6f893f4e46b9562f9af27db156"
+                    },
+                    {
+                        "m_Id":  "10e4ca19d0dd453ebeca0c3977ce83f8"
+                    },
+                    {
+                        "m_Id":  "12aab42c47e2475baaa8f974d4d156cf"
+                    },
+                    {
+                        "m_Id":  "666b4b7dbc4049bb899bcf5cd84f33ab"
+                    },
+                    {
+                        "m_Id":  "8d110507af6842dba5d9d12ea322bf30"
+                    },
+                    {
+                        "m_Id":  "98d5e3010a3c40579a679c65acbea19e"
+                    },
+                    {
+                        "m_Id":  "bc905d11c9e841eb8eb92eee75f3045d"
+                    },
+                    {
+                        "m_Id":  "6c9d4c3215d6422faf441bfa0c960696"
+                    },
+                    {
+                        "m_Id":  "85b10c1ac75942ebb9455b850efc7b38"
+                    },
+                    {
+                        "m_Id":  "63d24d72301b4d2ab9950d853738ee7b"
+                    },
+                    {
+                        "m_Id":  "e709de811e754b4e9598875ed311fe8a"
+                    },
+                    {
+                        "m_Id":  "6cd0a4e200fa47de81d5b0834cf61a81"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          100,
+                          101,
+                          102,
+                          103,
+                          104,
+                          105,
+                          106,
+                          107,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -7904,89 +8002,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "9993a7281fe9489eb7a0d4904768649d",
-    "m_Group": {
-        "m_Id": "cbdba92fda994a9aa1bd643ff40bfce0"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2294.0,
-            "y": 1556.6666259765625,
-            "width": 270.6668701171875,
-            "height": 449.333251953125
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "5804250fdc9c4c2a89ff3dbe86d8ade2"
-        },
-        {
-            "m_Id": "04e98ab2a1244436ae31cba88994b412"
-        },
-        {
-            "m_Id": "562edf5c7d854687a5cefc9e356be130"
-        },
-        {
-            "m_Id": "acd3e6aef6464a85a036f1d2c263e309"
-        },
-        {
-            "m_Id": "8ac4f9eefad842d2b33dddaf67c53530"
-        },
-        {
-            "m_Id": "24897cf71b1149679f60c46b7c15015b"
-        },
-        {
-            "m_Id": "e78fae7e897f425eb327980da812ba84"
-        },
-        {
-            "m_Id": "279f693c56204b12a6e2a6874d7954c2"
-        },
-        {
-            "m_Id": "b3eb40cf642241b4912285d568d21f2c"
-        },
-        {
-            "m_Id": "a0f035090fee4ab794ec058f0bcfde43"
-        },
-        {
-            "m_Id": "1e895092c7bc4880b31843874503d95e"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        823474255,
-        1947704961,
-        1510140361,
-        -215327549,
-        -564087688,
-        1527755794,
-        -841987312,
-        1039328831
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "9993a7281fe9489eb7a0d4904768649d",
+    "m_Group":  {
+                    "m_Id":  "cbdba92fda994a9aa1bd643ff40bfce0"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2294.0,
+                                           "y":  1556.6666259765625,
+                                           "width":  270.6668701171875,
+                                           "height":  449.333251953125
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "5804250fdc9c4c2a89ff3dbe86d8ade2"
+                    },
+                    {
+                        "m_Id":  "04e98ab2a1244436ae31cba88994b412"
+                    },
+                    {
+                        "m_Id":  "562edf5c7d854687a5cefc9e356be130"
+                    },
+                    {
+                        "m_Id":  "acd3e6aef6464a85a036f1d2c263e309"
+                    },
+                    {
+                        "m_Id":  "8ac4f9eefad842d2b33dddaf67c53530"
+                    },
+                    {
+                        "m_Id":  "24897cf71b1149679f60c46b7c15015b"
+                    },
+                    {
+                        "m_Id":  "e78fae7e897f425eb327980da812ba84"
+                    },
+                    {
+                        "m_Id":  "279f693c56204b12a6e2a6874d7954c2"
+                    },
+                    {
+                        "m_Id":  "b3eb40cf642241b4912285d568d21f2c"
+                    },
+                    {
+                        "m_Id":  "a0f035090fee4ab794ec058f0bcfde43"
+                    },
+                    {
+                        "m_Id":  "1e895092c7bc4880b31843874503d95e"
+                    },
+                    {
+                        "m_Id":  "dc39f03c7957483ea08766dc27a520d9"
+                    },
+                    {
+                        "m_Id":  "fd40555a04e2441599cf52cc2c3bda38"
+                    },
+                    {
+                        "m_Id":  "54c9798536af458b8526051ca88f1587"
+                    },
+                    {
+                        "m_Id":  "89ae5cffbfd449c6a46f40e6a38f7a2e"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          823474255,
+                          1947704961,
+                          1510140361,
+                          -215327549,
+                          -564087688,
+                          1527755794,
+                          -841987312,
+                          1039328831,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -8461,7 +8583,7 @@
     "m_ObjectId": "a64730108de44d248c6a9f4ad2ac5405",
     "m_Title": "GerstnerGroup(7)",
     "m_Position": {
-        "x": -2792.000244140625,
+        "x": -2792.0,
         "y": 2064.0
     }
 }
@@ -9170,89 +9292,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "c1aecee5b5fb4a72a26463514bc1898d",
-    "m_Group": {
-        "m_Id": "7e311bd6d54b4a99a7ce1d90ea4948bb"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2294.6669921875,
-            "y": -198.0,
-            "width": 271.3333740234375,
-            "height": 449.3333435058594
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "554e8595b30a444bbb048b17ed449d89"
-        },
-        {
-            "m_Id": "42b2a68bb2f14e76965544ed1ba46352"
-        },
-        {
-            "m_Id": "37fc9fe293a04d40b5133cab4af10213"
-        },
-        {
-            "m_Id": "ba791df35b1c4b88b35a3c2950fe81b5"
-        },
-        {
-            "m_Id": "1aa194d4d2d14a0d901b2520bee52392"
-        },
-        {
-            "m_Id": "211391a2b16e469ea34c5d6cb0342e5f"
-        },
-        {
-            "m_Id": "3359d024282b43d7a06930638bac2647"
-        },
-        {
-            "m_Id": "0640652c8e1947658141596f8c79ac49"
-        },
-        {
-            "m_Id": "9177a95111124b639bebb5f485c96ca8"
-        },
-        {
-            "m_Id": "da5d72e4aa2847b8bc393b1c2eac3adb"
-        },
-        {
-            "m_Id": "34d18aa8fc244e42ac617d9adbc4c3d6"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "c1aecee5b5fb4a72a26463514bc1898d",
+    "m_Group":  {
+                    "m_Id":  "7e311bd6d54b4a99a7ce1d90ea4948bb"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2294.6669921875,
+                                           "y":  -198.0,
+                                           "width":  271.3333740234375,
+                                           "height":  449.3333435058594
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "554e8595b30a444bbb048b17ed449d89"
+                    },
+                    {
+                        "m_Id":  "42b2a68bb2f14e76965544ed1ba46352"
+                    },
+                    {
+                        "m_Id":  "37fc9fe293a04d40b5133cab4af10213"
+                    },
+                    {
+                        "m_Id":  "ba791df35b1c4b88b35a3c2950fe81b5"
+                    },
+                    {
+                        "m_Id":  "1aa194d4d2d14a0d901b2520bee52392"
+                    },
+                    {
+                        "m_Id":  "211391a2b16e469ea34c5d6cb0342e5f"
+                    },
+                    {
+                        "m_Id":  "3359d024282b43d7a06930638bac2647"
+                    },
+                    {
+                        "m_Id":  "0640652c8e1947658141596f8c79ac49"
+                    },
+                    {
+                        "m_Id":  "9177a95111124b639bebb5f485c96ca8"
+                    },
+                    {
+                        "m_Id":  "da5d72e4aa2847b8bc393b1c2eac3adb"
+                    },
+                    {
+                        "m_Id":  "34d18aa8fc244e42ac617d9adbc4c3d6"
+                    },
+                    {
+                        "m_Id":  "a026abd6256f492aabae5e05db3d9f53"
+                    },
+                    {
+                        "m_Id":  "bed5c3c5bf444527a23a48dcbdbc38d9"
+                    },
+                    {
+                        "m_Id":  "a5adb555af354fc4b1de3197115e2067"
+                    },
+                    {
+                        "m_Id":  "254adb63134b4f4980aeee33ccb65a2c"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          100,
+                          101,
+                          102,
+                          103,
+                          104,
+                          105,
+                          106,
+                          107,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -9388,8 +9534,8 @@
     "m_ObjectId": "c4bf3dd0d4e612114e6d5267dc882cf3",
     "m_Title": "GerstnerGroup(4)",
     "m_Position": {
-        "x": -2793.33349609375,
-        "y": 322.66668701171877
+        "x": -2793.0,
+        "y": 322.0
     }
 }
 
@@ -9570,8 +9716,8 @@
     "m_ObjectId": "cbdba92fda994a9aa1bd643ff40bfce0",
     "m_Title": "GerstnerGroup(6)",
     "m_Position": {
-        "x": -2792.666748046875,
-        "y": 1498.0001220703125
+        "x": -2792.0,
+        "y": 1498.0
     }
 }
 
@@ -9699,89 +9845,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "cfec7c0a7a254c34a1c58e1c03e3fa7b",
-    "m_Group": {
-        "m_Id": "7fd851a3f98a3b6df0d0833f5f641c38"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2294.666748046875,
-            "y": 983.333251953125,
-            "width": 270.6668701171875,
-            "height": 449.3333740234375
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "7de24673ec5a4520aa3311666352e34c"
-        },
-        {
-            "m_Id": "4720555c50dc4e51800986e6cb5deded"
-        },
-        {
-            "m_Id": "9baad3c5b7d340878f4556a98a9c81dd"
-        },
-        {
-            "m_Id": "8e6e9b3c45254571942956deee97ea44"
-        },
-        {
-            "m_Id": "aede5eec117a4ac0989aad31f7bb0ce3"
-        },
-        {
-            "m_Id": "bf2bfb285b804841b9ff9b93d081ffab"
-        },
-        {
-            "m_Id": "ccb39f693f5c4ed4b1de2a91e6bee24f"
-        },
-        {
-            "m_Id": "92d1a4b523aa4124859c763a16207c27"
-        },
-        {
-            "m_Id": "10b9e0767bc64114aa15284435409331"
-        },
-        {
-            "m_Id": "25b562b390234bab99ba42b0fce7cb41"
-        },
-        {
-            "m_Id": "44a6e4ef62a2400584ef7c380182da27"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "cfec7c0a7a254c34a1c58e1c03e3fa7b",
+    "m_Group":  {
+                    "m_Id":  "7fd851a3f98a3b6df0d0833f5f641c38"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2294.666748046875,
+                                           "y":  983.333251953125,
+                                           "width":  270.6668701171875,
+                                           "height":  449.3333740234375
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "7de24673ec5a4520aa3311666352e34c"
+                    },
+                    {
+                        "m_Id":  "4720555c50dc4e51800986e6cb5deded"
+                    },
+                    {
+                        "m_Id":  "9baad3c5b7d340878f4556a98a9c81dd"
+                    },
+                    {
+                        "m_Id":  "8e6e9b3c45254571942956deee97ea44"
+                    },
+                    {
+                        "m_Id":  "aede5eec117a4ac0989aad31f7bb0ce3"
+                    },
+                    {
+                        "m_Id":  "bf2bfb285b804841b9ff9b93d081ffab"
+                    },
+                    {
+                        "m_Id":  "ccb39f693f5c4ed4b1de2a91e6bee24f"
+                    },
+                    {
+                        "m_Id":  "92d1a4b523aa4124859c763a16207c27"
+                    },
+                    {
+                        "m_Id":  "10b9e0767bc64114aa15284435409331"
+                    },
+                    {
+                        "m_Id":  "25b562b390234bab99ba42b0fce7cb41"
+                    },
+                    {
+                        "m_Id":  "44a6e4ef62a2400584ef7c380182da27"
+                    },
+                    {
+                        "m_Id":  "c16362530e524dc984a1f49ab5699bb8"
+                    },
+                    {
+                        "m_Id":  "b9636cdb8c5343cfaa383f63535f8ee6"
+                    },
+                    {
+                        "m_Id":  "ae00381d06e54e86b930f293c16d2666"
+                    },
+                    {
+                        "m_Id":  "507fd71648ad417f929aa8bbdd2a762c"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          100,
+                          101,
+                          102,
+                          103,
+                          104,
+                          105,
+                          106,
+                          107,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -10452,89 +10622,113 @@
 }
 
 {
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
-    "m_ObjectId": "e882d5a5208d4019b97557c812ac3cff",
-    "m_Group": {
-        "m_Id": "a64730108de44d248c6a9f4ad2ac5405"
-    },
-    "m_Name": "CrossWave",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": -2294.666748046875,
-            "y": 2122.666748046875,
-            "width": 270.6668701171875,
-            "height": 449.3330078125
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "cb81c111934849cfaf85a8a8c3b5a1b1"
-        },
-        {
-            "m_Id": "8614b6944e234d00ac3b9049391ea897"
-        },
-        {
-            "m_Id": "24a532a31bea47ac9134ef87ba3910ca"
-        },
-        {
-            "m_Id": "e213802a16a14e76b9dd2f939a7ed9e5"
-        },
-        {
-            "m_Id": "2501ae1674ba478cac9884be04ce196d"
-        },
-        {
-            "m_Id": "e38d97f9440b41d29a61964baff6c941"
-        },
-        {
-            "m_Id": "92040f756e0149a2b9e3362a15579536"
-        },
-        {
-            "m_Id": "d746d9dd3b60441994afb7c5c2158f0b"
-        },
-        {
-            "m_Id": "0446126c0eca4350890af4269f85e153"
-        },
-        {
-            "m_Id": "54b8e41783fb4e3383da25b08a4ef9ed"
-        },
-        {
-            "m_Id": "59320ecaa4ea406ea5b2ce2442ee5367"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
-    "m_PropertyGuids": [
-        "33193392-fb6d-4d08-b47b-bff4048bbbbb",
-        "b7a98abb-b799-42b1-b798-047b143b0bfa",
-        "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
-        "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
-        "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
-        "9c75a925-8c40-4d44-a968-460bdef97881",
-        "a9277a19-72a9-473b-a7d4-87c907974bea",
-        "d96bb2b2-2f58-4fbd-807c-b73a55079391"
-    ],
-    "m_PropertyIds": [
-        823474255,
-        1947704961,
-        1510140361,
-        -215327549,
-        -564087688,
-        1527755794,
-        -841987312,
-        1039328831
-    ],
-    "m_Dropdowns": [],
-    "m_DropdownSelectedEntries": []
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId":  "e882d5a5208d4019b97557c812ac3cff",
+    "m_Group":  {
+                    "m_Id":  "a64730108de44d248c6a9f4ad2ac5405"
+                },
+    "m_Name":  "CrossWave",
+    "m_DrawState":  {
+                        "m_Expanded":  true,
+                        "m_Position":  {
+                                           "serializedVersion":  "2",
+                                           "x":  -2294.666748046875,
+                                           "y":  2122.666748046875,
+                                           "width":  270.6668701171875,
+                                           "height":  449.3330078125
+                                       }
+                    },
+    "m_Slots":  [
+                    {
+                        "m_Id":  "cb81c111934849cfaf85a8a8c3b5a1b1"
+                    },
+                    {
+                        "m_Id":  "8614b6944e234d00ac3b9049391ea897"
+                    },
+                    {
+                        "m_Id":  "24a532a31bea47ac9134ef87ba3910ca"
+                    },
+                    {
+                        "m_Id":  "e213802a16a14e76b9dd2f939a7ed9e5"
+                    },
+                    {
+                        "m_Id":  "2501ae1674ba478cac9884be04ce196d"
+                    },
+                    {
+                        "m_Id":  "e38d97f9440b41d29a61964baff6c941"
+                    },
+                    {
+                        "m_Id":  "92040f756e0149a2b9e3362a15579536"
+                    },
+                    {
+                        "m_Id":  "d746d9dd3b60441994afb7c5c2158f0b"
+                    },
+                    {
+                        "m_Id":  "0446126c0eca4350890af4269f85e153"
+                    },
+                    {
+                        "m_Id":  "54b8e41783fb4e3383da25b08a4ef9ed"
+                    },
+                    {
+                        "m_Id":  "59320ecaa4ea406ea5b2ce2442ee5367"
+                    },
+                    {
+                        "m_Id":  "0b2fcaf3624a4202a91cf0a07d90411e"
+                    },
+                    {
+                        "m_Id":  "ef4daea2d33d4b13b7c87bc14f898ce7"
+                    },
+                    {
+                        "m_Id":  "3a62e3af728749dda1faf3e82dcd0be2"
+                    },
+                    {
+                        "m_Id":  "5234cd7cf45a4860a017352c3e158e37"
+                    }
+                ],
+    "synonyms":  [
+                 ],
+    "m_Precision":  0,
+    "m_PreviewExpanded":  true,
+    "m_DismissedVersion":  0,
+    "m_PreviewMode":  0,
+    "m_CustomColors":  {
+                           "m_SerializableColors":  [
+                                                    ]
+                       },
+    "m_SerializedSubGraph":  "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"b9f6bf7144497924cb3b6ed0c05fc94e\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids":  [
+                            "33193392-fb6d-4d08-b47b-bff4048bbbbb",
+                            "b7a98abb-b799-42b1-b798-047b143b0bfa",
+                            "822bfb06-bb9d-46ea-a360-8839f1c94ba7",
+                            "a42ef0d2-1fc8-4dcd-9058-110b49ebd811",
+                            "9c4db61f-ad57-4ffd-92bd-ba51a2126a5c",
+                            "9c75a925-8c40-4d44-a968-460bdef97881",
+                            "a9277a19-72a9-473b-a7d4-87c907974bea",
+                            "d96bb2b2-2f58-4fbd-807c-b73a55079391",
+                            "d2c8e3c7-a185-4727-9f2b-67fb16c3c703",
+                            "5bd96482-7477-4e71-8300-d788179c1040",
+                            "f1a87e26-60d0-4b1b-ad9b-c213dcd2babf",
+                            "75dc8f8d-4ca8-4d59-adba-56eef807f1c2"
+                        ],
+    "m_PropertyIds":  [
+                          823474255,
+                          1947704961,
+                          1510140361,
+                          -215327549,
+                          -564087688,
+                          1527755794,
+                          -841987312,
+                          1039328831,
+                          340632803,
+                          -122803533,
+                          1400386946,
+                          1869922838
+                      ],
+    "m_Dropdowns":  [
+                    ],
+    "m_DropdownSelectedEntries":  [
+                                  ]
 }
 
 {
@@ -10736,8 +10930,8 @@
     "m_ObjectId": "f562709c05cc40e6b278cfb753b17e1f",
     "m_Title": "GerstnerGroup(1)",
     "m_Position": {
-        "x": -2790.000244140625,
-        "y": -1361.33349609375
+        "x": -2790.0,
+        "y": -1362.0
     }
 }
 
@@ -11070,3 +11264,514 @@
     }
 }
 
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "39379f78e75b49d090995c5f41f6f390",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "e12b277034e84c8aa6602d79239bd851",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "9f65cf1a27334e208e39d39b99cb1805",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "0a9f84ee351043728e3bc5bc8bf27069",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "339fd8ba4c2c47a6b62a3ae0aaecef60",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "3139d10b910f4a67a7f0975fe600b471",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "a7eb92574a19476986e2c605ff38c304",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "39bb9d82773844e2a164425d82862286",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "978326bf9a644419b0935b5d60032bc4",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "759feeb86dba42399e6c88951dfeab76",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "f5fbe760f2a54396a4b4abd89852c316",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "fdd897eab4914c5a9c0ccac16000f184",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "85b10c1ac75942ebb9455b850efc7b38",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1.37,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "63d24d72301b4d2ab9950d853738ee7b",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0.5,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "e709de811e754b4e9598875ed311fe8a",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "6cd0a4e200fa47de81d5b0834cf61a81",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "dc39f03c7957483ea08766dc27a520d9",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1.37,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "fd40555a04e2441599cf52cc2c3bda38",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0.5,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "54c9798536af458b8526051ca88f1587",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  37.1,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "89ae5cffbfd449c6a46f40e6a38f7a2e",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "a026abd6256f492aabae5e05db3d9f53",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "bed5c3c5bf444527a23a48dcbdbc38d9",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "a5adb555af354fc4b1de3197115e2067",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "254adb63134b4f4980aeee33ccb65a2c",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "c16362530e524dc984a1f49ab5699bb8",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "b9636cdb8c5343cfaa383f63535f8ee6",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "ae00381d06e54e86b930f293c16d2666",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "507fd71648ad417f929aa8bbdd2a762c",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "0b2fcaf3624a4202a91cf0a07d90411e",
+    "m_Id":  340632803,
+    "m_DisplayName":  "CrossLengthMultiplier",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossLengthMultiplier",
+    "m_StageCapability":  3,
+    "m_Value":  1,
+    "m_DefaultValue":  1,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "ef4daea2d33d4b13b7c87bc14f898ce7",
+    "m_Id":  -122803533,
+    "m_DisplayName":  "CrossBlendVariation",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossBlendVariation",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "3a62e3af728749dda1faf3e82dcd0be2",
+    "m_Id":  1400386946,
+    "m_DisplayName":  "CrossNoiseOffset",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseOffset",
+    "m_StageCapability":  3,
+    "m_Value":  0,
+    "m_DefaultValue":  0,
+    "m_Labels":  [
+                 ]
+}
+
+{
+    "m_SGVersion":  0,
+    "m_Type":  "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId":  "5234cd7cf45a4860a017352c3e158e37",
+    "m_Id":  1869922838,
+    "m_DisplayName":  "CrossNoiseScale",
+    "m_SlotType":  0,
+    "m_Hidden":  false,
+    "m_ShaderOutputName":  "_CrossNoiseScale",
+    "m_StageCapability":  3,
+    "m_Value":  0.15,
+    "m_DefaultValue":  0.15,
+    "m_Labels":  [
+                 ]
+}

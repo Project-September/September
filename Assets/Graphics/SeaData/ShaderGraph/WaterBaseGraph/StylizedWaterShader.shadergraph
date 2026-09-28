@@ -3546,6 +3546,20 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
+                    "m_Id": "b89d3bdfeb324d9c815d9c38912e133b"
+                },
+                "m_SlotId": 3
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "04d9427ebc284c14b86c118ca99954d8"
+                },
+                "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
                     "m_Id": "b8f7442981444b78845a81a1567bf2fa"
                 },
                 "m_SlotId": 2
@@ -8069,8 +8083,8 @@
     "m_ObjectId": "1b896e57c12b4760a514f67cb210d407",
     "m_Title": "FadeWaterMove",
     "m_Position": {
-        "x": -1438.0,
-        "y": -1782.6666259765625
+        "x": -1438.000244140625,
+        "y": -1783.0
     }
 }
 
@@ -8670,8 +8684,8 @@
     "m_ObjectId": "252ccbac6cf047ff874e67656c73e864",
     "m_Title": "GerstnerGroup(1)",
     "m_Position": {
-        "x": -3208.0,
-        "y": -5053.333984375
+        "x": -3207.999267578125,
+        "y": -5054.0
     }
 }
 
@@ -10860,7 +10874,7 @@
     "m_WorkflowMode": 1,
     "m_NormalDropOffSpace": 0,
     "m_ClearCoat": false,
-    "m_BlendModePreserveSpecular": false
+    "m_BlendModePreserveSpecular": true
 }
 
 {
@@ -11002,7 +11016,7 @@
     "m_Title": "WaterColorGroup",
     "m_Position": {
         "x": -338.0,
-        "y": -330.66650390625
+        "y": -331.0
     }
 }
 
@@ -12290,8 +12304,8 @@
     "m_ObjectId": "5cd66039fa6844a298a7c934f8b96975",
     "m_Title": "FresnelGroup",
     "m_Position": {
-        "x": 1490.6666259765625,
-        "y": 36.666748046875
+        "x": 1491.0,
+        "y": 36.000003814697269
     }
 }
 
@@ -15493,8 +15507,8 @@
     "m_ObjectId": "821728db5a404ea5bcb064b0d5fc0373",
     "m_Title": "FoamGroup",
     "m_Position": {
-        "x": 482.6666259765625,
-        "y": 946.666748046875
+        "x": 482.9998779296875,
+        "y": 946.0000610351563
     }
 }
 
@@ -15504,8 +15518,8 @@
     "m_ObjectId": "8236d5060bdc4df3a8716f73bbfd3cce",
     "m_Title": "WaterMoveGroup",
     "m_Position": {
-        "x": -3521.333251953125,
-        "y": -2205.3330078125
+        "x": -3521.0,
+        "y": -2206.0
     }
 }
 
@@ -17254,8 +17268,8 @@
     "m_ObjectId": "966bc60ad1684221b6536fbbedf18518",
     "m_Title": "GerstnerGroup(2)",
     "m_Position": {
-        "x": -3212.0,
-        "y": -4216.66650390625
+        "x": -3211.999267578125,
+        "y": -4217.00048828125
     }
 }
 
@@ -19008,8 +19022,8 @@
     "m_ObjectId": "acef2ef3d4f047daae72aa86fde4a5d0",
     "m_Title": "GerstnerGroup(3)",
     "m_Position": {
-        "x": -3212.0,
-        "y": -3362.666748046875
+        "x": -3211.999267578125,
+        "y": -3363.000244140625
     }
 }
 
@@ -19142,8 +19156,8 @@
     "m_ObjectId": "ae42d0a54e098ff0f7ebed3c24c2e751",
     "m_Title": "HeightFoam",
     "m_Position": {
-        "x": 254.6666259765625,
-        "y": -1536.6666259765625
+        "x": 255.0,
+        "y": -1537.0
     }
 }
 
@@ -20343,7 +20357,7 @@
     "m_ObjectId": "c0aa3542a1a448809e74b122f8beb606",
     "m_Title": "NormalGroup(Gerstner)",
     "m_Position": {
-        "x": 244.0001220703125,
+        "x": 243.99984741210938,
         "y": -5536.0
     }
 }
