@@ -116,9 +116,6 @@ Material:
     - _Active3: 1
     - _Active4: 1
     - _Active5: 1
-    - _Active6: 1
-    - _Active7: 1
-    - _Active8: 1
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
@@ -159,7 +156,7 @@ Material:
     - _ReflectionStrength: 0.02
     - _RefractionScale: 1
     - _RefractionSpeed: 1
-    - _RefractionStrength: 1
+    - _RefractionStrength: 10
     - _RefrectionScale: 1
     - _RefrectionSpeed: 0.05
     - _RefrectionStrength: 11.18
@@ -171,47 +168,35 @@ Material:
     - _Surface: 0
     - _WaterDepth: 10
     - _WaveHeight: 1.5
-    - _WaveHeight1_1: 0.9
-    - _WaveHeight2: 0.4
-    - _WaveHeight3: 0.3
-    - _WaveHeight4: 0.04
-    - _WaveHeight5: 0.1
-    - _WaveHeight6: 0.025
-    - _WaveHeight7: 0.03
-    - _WaveHeight8: 0.1
+    - _WaveHeight1_1: 0.4
+    - _WaveHeight2: 0.9
+    - _WaveHeight3: 0.02
+    - _WaveHeight4: 0.1
+    - _WaveHeight5: 0.25
     - _WaveLength: 0.09
-    - _WaveLength1_1: 30
-    - _WaveLength2: 27
-    - _WaveLength3: 5
-    - _WaveLength4: 6
-    - _WaveLength5: 9
-    - _WaveLength6: 0.6
-    - _WaveLength7: 2
-    - _WaveLength8: 3
+    - _WaveLength1_1: 16
+    - _WaveLength2: 32.4
+    - _WaveLength3: 11
+    - _WaveLength4: 4
+    - _WaveLength5: 7.7
     - _WaveSharpness: -100
-    - _WaveSharpness1_1: 0.8
-    - _WaveSharpness2: 0.06
-    - _WaveSharpness3: 0.4
-    - _WaveSharpness4: 0.1
+    - _WaveSharpness1_1: 0.9
+    - _WaveSharpness2: 0.1
+    - _WaveSharpness3: 0.9
+    - _WaveSharpness4: 0
     - _WaveSharpness5: 0.1
-    - _WaveSharpness6: 0.6
-    - _WaveSharpness7: 0.1
-    - _WaveSharpness8: 0.2
     - _WaveSpeed: 0.03
-    - _WaveSpeed1_1: 1
+    - _WaveSpeed1_1: 0.9
     - _WaveSpeed2: 1
-    - _WaveSpeed3: 1
+    - _WaveSpeed3: 0.3
     - _WaveSpeed4: 0.7
-    - _WaveSpeed5: 0.6
-    - _WaveSpeed6: 1
-    - _WaveSpeed7: 0.6
-    - _WaveSpeed8: 1
+    - _WaveSpeed5: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DeepWaterColor: {r: 0.025216522, g: 0.13151515, b: 0.15723255, a: 0.7882353}
+    - _DeepWaterColor: {r: 0.025216522, g: 0.13151518, b: 0.15723258, a: 0.8117647}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FoamColor: {r: 0.74213827, g: 0.74213827, b: 0.74213827, a: 1}
     - _HeightFoamColor: {r: 1, g: 1, b: 1, a: 1}
@@ -220,13 +205,10 @@ Material:
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Water_F0Color: {r: 0.02, g: 0.02, b: 0.02, a: 1}
     - _WaveDirection: {r: 1, g: 0, b: 0, a: 0}
-    - _WaveDirection1_1: {r: 1, g: 0.2, b: 0, a: 0}
-    - _WaveDirection2: {r: 0.966, g: -2.18, b: 0, a: 0}
-    - _WaveDirection3: {r: 0.94, g: -0.342, b: 0, a: 0}
-    - _WaveDirection4: {r: 0.866, g: 0.5, b: 0, a: 0}
-    - _WaveDirection5: {r: 0.985, g: -0.174, b: 0, a: 0}
-    - _WaveDirection6: {r: 0.5, g: 0.8660254, b: 0, a: 0}
-    - _WaveDirection7: {r: 0.819, g: -0.574, b: 0, a: 0}
-    - _WaveDirection8: {r: 0.707, g: 0.707, b: 0, a: 0}
+    - _WaveDirection1_1: {r: 1, g: 0.08, b: 0, a: 0}
+    - _WaveDirection2: {r: -1, g: 0.6, b: 0, a: 0}
+    - _WaveDirection3: {r: 0.8, g: -0.9, b: 0, a: 0}
+    - _WaveDirection4: {r: -0.9, g: -1.1, b: 0, a: 0}
+    - _WaveDirection5: {r: 2, g: -0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
