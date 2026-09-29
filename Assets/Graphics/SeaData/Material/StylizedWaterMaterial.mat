@@ -125,6 +125,7 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
+    - _CastShadows: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -148,6 +149,7 @@ Material:
     - _GlossyReflections: 0
     - _HeightFoamStrength: 0
     - _HeightFoamTiling: 0.1
+    - _LOD: 0.6
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -207,7 +209,9 @@ Material:
     - _WaveSpeed7: 0.6
     - _WaveSpeed8: 1
     - _WorkflowMode: 1
+    - _ZTest: 4
     - _ZWrite: 1
+    - _ZWriteControl: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
@@ -221,7 +225,7 @@ Material:
     - _Water_F0Color: {r: 0.02, g: 0.02, b: 0.02, a: 1}
     - _WaveDirection: {r: 1, g: 0, b: 0, a: 0}
     - _WaveDirection1_1: {r: 0.6, g: 0.2, b: 0, a: 0}
-    - _WaveDirection2: {r: 0.966, g: -2.18, b: 0, a: 0}
+    - _WaveDirection2: {r: 0.966, g: -1, b: 0, a: 0}
     - _WaveDirection3: {r: 0.94, g: -0.342, b: 0, a: 0}
     - _WaveDirection4: {r: 0.866, g: 0.5, b: 0, a: 0}
     - _WaveDirection5: {r: 0.985, g: -0.174, b: 0, a: 0}
