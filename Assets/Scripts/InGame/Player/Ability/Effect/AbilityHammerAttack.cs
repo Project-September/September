@@ -38,8 +38,7 @@ namespace InGame.Player.Ability.Effect
                     damage,
                     Parameter.Owner.InputAuthority,
                     damageable.OwnerPlayerRef);
-                damageable.TakeHit(ref hitData);
-                _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
+                ApplyHitAndUpdateAttackBuild(hitInfo, damageable, ref hitData, _buildGenerator);
             }
 
             if (interactable

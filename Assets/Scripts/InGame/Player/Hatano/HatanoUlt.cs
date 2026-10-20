@@ -16,6 +16,9 @@ namespace InGame.Player.Ability
         [SerializeField] private HatanoSequenceManager _hatanoSequenceManager;
         [SerializeField] private HatanoAbilityStatusManagement _hatanoAbilityStatusManagement;
         [SerializeField] private HatanoWeaponController _hatanoWeaponController;
+        [Header("必殺技開始から構えSEまでの秒数"), SerializeField, Min(0f)]
+        private float _readySoundDelay = 0.3f;
+        private TickTimer _readySoundTimer;
         [Header("待機"), SerializeField] private AnimationClip _idleClip;
         [Header("必殺技終了時間"), SerializeField] private float _duration;
         [Header("ロケランの弾"), SerializeField] private GameObject _bulletPrefab;
@@ -43,6 +46,9 @@ namespace InGame.Player.Ability
 
         protected override void OnCutInStart()
         {
+            _readySoundTimer = TickTimer.CreateFromSeconds(Runner, Mathf.Max(0f, _readySoundDelay));
+            UpdateReadySound();
+            _aimCameraController.RPC_CrosshairToggleChange(false);
             _rocketAnimator.SetBool(_rocketAnimName, true);
         }
 
@@ -55,10 +61,13 @@ namespace InGame.Player.Ability
             _effectID = _effectSpawner.RequestPlayLoopEffect(EffectType.Cursor, Vector3.zero, Quaternion.identity);
             
             _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
+
+            _animationClipPlayer.PlayClipLoop(_idleClip);
         }
 
         protected override void OnCutInUpdate(float deltaTime)
         {
+            UpdateReadySound();
             if (!_hatanoSequenceManager.IsSequencePlaying())
             {
                 EndCutIn();
@@ -78,13 +87,9 @@ namespace InGame.Player.Ability
                 return;
             }
             
-            if (!_animationClipPlayer.IsPlayingTargetClip(_idleClip))
-            {
-                _animationClipPlayer.PlayClip(_idleClip);
-            }
-            
             if (_playerInput.Buttons.IsSet(PlayerButtons.Attack))
             {
+                _readySoundTimer = default;
                 _isShoot = true;
                 _effectSpawner?.StopEffect(_effectID);
                 _aimCameraController.RPC_NormalCamera();
@@ -93,12 +98,28 @@ namespace InGame.Player.Ability
                 RPC_Shooting();
             }
             
+            if (!_isShoot) UpdateReadySound();
             UpdateEffectPosition();
+        }
+
+        private void UpdateReadySound()
+        {
+            if (!_readySoundTimer.Expired(Runner)) return;
+            _readySoundTimer = default;
+            if (_hatanoWeaponController != null)
+                _hatanoWeaponController.RPC_PlayRocketReadySound();
         }
 
         protected override void OnEndUlt()
         {
+            _readySoundTimer = default;
             _isShoot = false;
+            _effectSpawner?.StopEffect(_effectID);
+            _effectID = default;
+            _aimCameraController.RPC_NormalCamera();
+            _aimCameraController.RPC_CrosshairToggleChange(false);
+            _rocketAnimator.SetBool(_rocketAnimName, false);
+            _animationClipPlayer?.StopClip(_idleClip);
             _hatanoSequenceManager.RPC_SetStartTimeline();
             _hatanoWeaponController.RPC_UltEndAttachSocket(_hatanoAbilityStatusManagement.AbilityStatus);
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
@@ -169,6 +190,8 @@ namespace InGame.Player.Ability
             if(!Parameter.Owner.HasStateAuthority) return;
             // マズル位置に生成し、移動させる
             var rocket = Runner.Spawn(_bulletPrefab, _muzzle.position, Quaternion.identity);
+            if (_hatanoWeaponController != null)
+                _hatanoWeaponController.RPC_PlayRocketFireSound(_muzzle.position);
             if (rocket.TryGetComponent<RocketBullet>(out var rocketBullet))
             {
                 rocketBullet.Initialization(position, _bulletSpeed, () => RocketLauncherRadius(position));

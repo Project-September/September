@@ -54,7 +54,9 @@ namespace September.InGame.NauticalChart
                 _headMistInstances.Add(headMist);
             }
         }
-
+        /// <summary>
+        /// 頭のもやもやを消す
+        /// </summary>
         public void HideHeadMist()
         {
             foreach (GameObject headMist in _headMistInstances)

@@ -26,6 +26,8 @@ namespace InGame.Player.Hatano
         [Rpc]
         public void RPC_SetStartTimeline()
         {
+            // 再生中の終了演出も、気絶時には即座に止める。
+            _director.Stop();
             _director.playableAsset = _startTimeline;
         }
     }

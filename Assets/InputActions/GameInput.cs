@@ -227,15 +227,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Shooting"",
-                    ""type"": ""Button"",
-                    ""id"": ""2c0c0453-b712-48c8-9428-72f2a6155d18"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Ultimate"",
                     ""type"": ""Button"",
                     ""id"": ""6fc35f62-23e6-4bad-8cc8-e8509adc5ac7"",
@@ -771,17 +762,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Ultimate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""b6708e9c-917f-4315-ae7f-075d4d840a5a"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Shooting"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1714,7 +1694,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Player_Warp = m_Player.FindAction("Warp", throwIfNotFound: true);
         m_Player_AirplaneForward = m_Player.FindAction("AirplaneForward", throwIfNotFound: true);
         m_Player_AirPlaneBack = m_Player.FindAction("AirPlaneBack", throwIfNotFound: true);
-        m_Player_Shooting = m_Player.FindAction("Shooting", throwIfNotFound: true);
         m_Player_Ultimate = m_Player.FindAction("Ultimate", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -1838,7 +1817,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Warp;
     private readonly InputAction m_Player_AirplaneForward;
     private readonly InputAction m_Player_AirPlaneBack;
-    private readonly InputAction m_Player_Shooting;
     private readonly InputAction m_Player_Ultimate;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
@@ -1911,10 +1889,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/AirPlaneBack".
         /// </summary>
         public InputAction @AirPlaneBack => m_Wrapper.m_Player_AirPlaneBack;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/Shooting".
-        /// </summary>
-        public InputAction @Shooting => m_Wrapper.m_Player_Shooting;
         /// <summary>
         /// Provides access to the underlying input action "Player/Ultimate".
         /// </summary>
@@ -1990,9 +1964,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @AirPlaneBack.started += instance.OnAirPlaneBack;
             @AirPlaneBack.performed += instance.OnAirPlaneBack;
             @AirPlaneBack.canceled += instance.OnAirPlaneBack;
-            @Shooting.started += instance.OnShooting;
-            @Shooting.performed += instance.OnShooting;
-            @Shooting.canceled += instance.OnShooting;
             @Ultimate.started += instance.OnUltimate;
             @Ultimate.performed += instance.OnUltimate;
             @Ultimate.canceled += instance.OnUltimate;
@@ -2052,9 +2023,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @AirPlaneBack.started -= instance.OnAirPlaneBack;
             @AirPlaneBack.performed -= instance.OnAirPlaneBack;
             @AirPlaneBack.canceled -= instance.OnAirPlaneBack;
-            @Shooting.started -= instance.OnShooting;
-            @Shooting.performed -= instance.OnShooting;
-            @Shooting.canceled -= instance.OnShooting;
             @Ultimate.started -= instance.OnUltimate;
             @Ultimate.performed -= instance.OnUltimate;
             @Ultimate.canceled -= instance.OnUltimate;
@@ -2721,13 +2689,6 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAirPlaneBack(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Shooting" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnShooting(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Ultimate" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

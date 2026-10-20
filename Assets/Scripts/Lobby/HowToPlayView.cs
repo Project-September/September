@@ -6,11 +6,14 @@ namespace September.Lobby
 {
     public class HowToPlayView : MonoBehaviour
     {
+        [SerializeField] GameObject _backGround;
         [SerializeField] GameObject _howToPlayPanel;
         [SerializeField] Button _closeButton;
         [SerializeField] Selectable _selectWhenShow;
         [SerializeField] Selectable _selectWhenHide;
         private GameInput _gameInput;
+
+        public bool IsOpen => _howToPlayPanel.activeInHierarchy;
 
         private void Awake()
         {
@@ -19,9 +22,16 @@ namespace September.Lobby
             EventSystem.current.SetSelectedGameObject(_closeButton.gameObject);
         }
 
+        private void LateUpdate()
+        {
+            if (!IsOpen || !EventSystem.current) return;
+            if (EventSystem.current.currentSelectedGameObject == _closeButton.gameObject) return;
+            EventSystem.current.SetSelectedGameObject(_closeButton.gameObject);
+        }
+
         private void Update()
         {
-            if (_gameInput.UI.Option.triggered || _gameInput.Debug.Title.triggered)
+            if (IsOpen && (_gameInput.UI.Option.triggered || _gameInput.Debug.Title.triggered))
             {
                 CloseHowToPlayPanel();
             }
@@ -35,13 +45,21 @@ namespace September.Lobby
         public void OpenHowToPlayPanel()
         {
             _howToPlayPanel.SetActive(true);
+            _backGround.SetActive(true);
             EventSystem.current.SetSelectedGameObject(_selectWhenShow.gameObject);
         }
 
         public void CloseHowToPlayPanel()
         {
+            if (!IsOpen) return;
             _howToPlayPanel.SetActive(false);
+            _backGround.SetActive(false);
             EventSystem.current.SetSelectedGameObject(_selectWhenHide.gameObject);
+        }
+
+        public void SetSelectWhenHide(Selectable selectable)
+        {
+            _selectWhenHide = selectable;
         }
     }
 }

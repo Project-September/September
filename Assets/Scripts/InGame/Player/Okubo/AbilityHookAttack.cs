@@ -6,6 +6,7 @@ using September.Common;
 using September.InGame.UI;
 using UnityEngine;
 using UnityEngine.Splines;
+using UnityEngine.UI;
 
 namespace InGame.Player.Okubo
 {
@@ -45,6 +46,8 @@ namespace InGame.Player.Okubo
         [Header("Camera")]
         [SerializeField] private Vector3 _stanceCameraOffset;
         [SerializeField] private float _changeOffsetDuration;
+        [Header("UI")]
+        [SerializeField] private Image _aimImage;
 
         private HookAttackState _currentState;
         private float _currentHookLength;
@@ -58,6 +61,7 @@ namespace InGame.Player.Okubo
         public override void Spawned()
         {
             _wireMesh.gameObject.SetActive(false);
+            SetAimImageActive(false);
             _ownerRef = Object.InputAuthority;
         }
 
@@ -127,10 +131,12 @@ namespace InGame.Player.Okubo
                     _playerMovement.IsHookLocked = true;
                     _playerManager.SetControlState(PlayerManager.PlayerControlState.InputLocked);
                     RPC_ChangeDescriptionUI(ControlDescriptionType.OkuboAiming);
+                    RPC_SetAimImageActive(true);
                     _animationClipPlayer.PlayClipLoop(_aimClip);
                     RPC_ChangeCameraPosition(true);
                     break;
                 case HookAttackState.Stretching:
+                    RPC_SetAimImageActive(false);
                     RPC_ChangeWireActive(true);
                     _targetData.Clear();
                     _currentHookLength = 0;
@@ -173,8 +179,21 @@ namespace InGame.Player.Okubo
         {
             _playerMovement.IsHookLocked = false;
             RPC_ChangeDescriptionUI(ControlDescriptionType.Okubo);
+            RPC_SetAimImageActive(false);
             _playerManager.SetControlState(PlayerManager.PlayerControlState.Normal);
             RPC_ChangeCameraPosition(false);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+        private void RPC_SetAimImageActive(bool active)
+        {
+            SetAimImageActive(active);
+        }
+
+        private void SetAimImageActive(bool active)
+        {
+            if (_aimImage)
+                _aimImage.enabled = active;
         }
 
         /// <summary>

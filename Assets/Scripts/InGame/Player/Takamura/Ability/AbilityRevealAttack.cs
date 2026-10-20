@@ -117,6 +117,14 @@ namespace InGame.Player.Ability
                 damageable.OwnerPlayerRef);
             damageable.TakeHit(ref hitData);
 
+            // TakeHit後のAmountは、無敵や残り体力を反映した実ダメージ量。
+            if (hitData.Amount > 0)
+            {
+                PlayerDatabase.Instance?.Server_AddTakamuraRevealDamageScore(
+                    Parameter.Owner.InputAuthority,
+                    hitData.Amount);
+            }
+
             var playerMovement = hitInfo.GetComponentInParent<PlayerMovement>();
             if (playerMovement != null)
             {

@@ -365,8 +365,7 @@ namespace InGame.Player.Ability
                 Parameter.Owner.InputAuthority,
                 damageable.OwnerPlayerRef);
 
-            damageable.TakeHit(ref hitData);
-            _buildGenerator?.UpdateBuild(BuildRouteType.AttackPower);
+            AbilityNormalAttack.ApplyHitAndUpdateAttackBuild(hitInfo, damageable, ref hitData, _buildGenerator);
 
             //エフェクトの再生
             _effectSpawner.RequestPlayOneShotEffect(_hitEffect, hitInfo.ClosestPoint(hitInfo.bounds.ClosestPoint(hitPosition)), Quaternion.identity);

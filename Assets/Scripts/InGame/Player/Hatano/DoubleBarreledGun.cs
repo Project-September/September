@@ -11,30 +11,41 @@ namespace InGame.Player.Ability
     [Serializable]
     public class DoubleBarreledGun : ShootingAbilityBase
     {
-        [Header("射撃インターバル")] 
-        [SerializeField] private float _shootingInterval;
-        private float _shootingIntervalTimer;
+        private TickTimer _shotCooldown;
         [Header("通常時のダメージ")]
         [SerializeField] private int _damage;
         [Header("鬼の時のダメージ")] 
         [SerializeField] private int _ogreDamage;
-        
+
         private HatanoAbilityStatusManagement _abilityStatusManagement;
+        private HatanoWeaponController _weaponController;
+
+        protected override bool ReplayAnimationOnEveryShot => true;
         
         protected override void OnStart()
         {
             base.OnStart();
+            if (_weaponController == null)
+                _weaponController = Parameter.Owner.GetComponentInChildren<HatanoWeaponController>(true);
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
-            _shootingType = ShootingStateType.Stance;
+            _shootingType = _shotCooldown.ExpiredOrNotRunning(Runner)
+                ? ShootingStateType.Stance : ShootingStateType.Shooting;
         }
 
         protected override void OnUpdate(float deltaTime)
         {
-            if(_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.DoubleBarreledGun) return;
+            if (StopIfControlLocked()) return;
+
+            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.DoubleBarreledGun)
+            {
+                ResetShootingState();
+                return;
+            }
             
-            ShootingInputJudgment();
             GunInterval();
+            ShootingInputJudgment();
+            if (_phase != AbilityPhase.Active) return;
             StateDetection();
         }
 
@@ -43,15 +54,14 @@ namespace InGame.Player.Ability
         /// </summary>
         private void GunInterval()
         {
-            //撃つステートの場合、タイマーを加算していく
+            // 構え直しても、直前の発射からのクールタイムは維持する。
             if (_shootingType == ShootingStateType.Shooting)
             {
-                _shootingIntervalTimer += Runner.DeltaTime;
                 //タイマーが時間を超えたら再度、構えステートに変更
-                if (_shootingIntervalTimer >= _shootingInterval)
+                // Inspector のクールタイムを射撃間隔にも使用する。
+                if (_shotCooldown.ExpiredOrNotRunning(Runner))
                 {
                     _shootingType = ShootingStateType.Stance;
-                    _shootingIntervalTimer = 0;
                 }
             }
         }
@@ -72,12 +82,18 @@ namespace InGame.Player.Ability
             Debug.DrawRay(originLeft, dirLeft * _shootingDistance, Color.blue);
             //右
             var originRight = _muzzlePos[1].position;
-            var dirRight = targetPos - originLeft;
+            var dirRight = targetPos - originRight;
             Debug.DrawRay(originRight, dirRight * _shootingDistance, Color.blue);
             
             //左右のマズルから、ヒットした場所にRayを飛ばす
-            Physics.Raycast(originLeft, dirLeft, out var gunHitInfoLeft, _shootingDistance);
-            Physics.Raycast(originRight, dirRight, out var gunHitInfoRight, _shootingDistance);
+            var hitLeft = TryGetShotHit(originLeft, dirLeft, out var gunHitInfoLeft);
+            var hitRight = TryGetShotHit(originRight, dirRight, out var gunHitInfoRight);
+            if (_weaponController != null)
+                _weaponController.RPC_PlayGunShot(
+                    originLeft, hitLeft ? gunHitInfoLeft.point : originLeft + dirLeft.normalized * _shootingDistance,
+                    gunHitInfoLeft.normal, hitLeft,
+                    originRight, hitRight ? gunHitInfoRight.point : originRight + dirRight.normalized * _shootingDistance,
+                    gunHitInfoRight.normal, hitRight);
             GetGunHitPointIDamageable(gunHitInfoLeft, gunHitInfoRight);
         }
 
@@ -89,10 +105,12 @@ namespace InGame.Player.Ability
         private void GetGunHitPointIDamageable(RaycastHit hitLeft, RaycastHit hitRight)
         {
             //自身に当たった場合、処理を行わない
-            if(hitLeft.collider.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
-            if(hitRight.collider.GetComponentInParent<NetworkObject>() == Parameter.Owner) return;
-            var damageableL = hitLeft.collider.GetComponentInParent<IDamageable>();
-            var damageableR = hitRight.collider.GetComponentInParent<IDamageable>();
+            var damageableL = hitLeft.collider != null
+                && hitLeft.collider.GetComponentInParent<NetworkObject>() != Parameter.Owner
+                ? hitLeft.collider.GetComponentInParent<IDamageable>() : null;
+            var damageableR = hitRight.collider != null
+                && hitRight.collider.GetComponentInParent<NetworkObject>() != Parameter.Owner
+                ? hitRight.collider.GetComponentInParent<IDamageable>() : null;
             GunDamage(damageableL);
             GunDamage(damageableR);
         }
@@ -117,6 +135,7 @@ namespace InGame.Player.Ability
         protected override void OnShooting()
         {
             GunShootingDetection();
+            _shotCooldown = TickTimer.CreateFromSeconds(Runner, Mathf.Max(0f, _cooldown));
             _shootingType = ShootingStateType.Shooting;
         }
     }

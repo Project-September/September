@@ -331,7 +331,7 @@ PrefabInstance:
     - target: {fileID: 8047176546845843456, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: _playerManager
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 3756915935459013970}
     - target: {fileID: 8311267244690643726, guid: 9d61ba56a4ca57a47b9aa55b7e1ef928, type: 3}
       propertyPath: SortKey
       value: 1829188589
@@ -455,6 +455,7 @@ MonoBehaviour:
   _buildGenerator: {fileID: 3590047751524659484}
   _playerStatus: {fileID: 3241513518113312228}
   _CurrentPlayerControlState: 0
+  _IsMovementInputBlocked: 0
   _IsStun:
     _value: 0
   _IsMovable:

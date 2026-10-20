@@ -347,9 +347,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 615bbd9e4395fbc4eac3c8144ad3f962, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mistPrefab: {fileID: 364519087004515219, guid: ab31f475304632c4dbec752c2c0e12ce, type: 3}
-  _worldCenter: {x: 0, y: 6.7, z: -6.5}
-  _worldSize: {x: 103.5, y: 4, z: 69.35}
+  _mistPrefab: {fileID: 208861346062367205, guid: ab31f475304632c4dbec752c2c0e12ce, type: 3}
+  _volumes:
+  - Center: {x: 0, y: 6.7, z: 0}
+    Size: {x: 103.5, y: 4, z: 69.35}
   _gridCountX: 5
   _gridCountZ: 5
   _minSpacing: 10

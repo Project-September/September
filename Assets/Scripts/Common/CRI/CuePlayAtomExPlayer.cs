@@ -265,7 +265,14 @@ namespace CRISound
                 public CriAtomExPlayback CriAtomExPlayback3D => _criAtomExPlayback3D;
                 private string _currentCueName;
 
-                public bool IsBusy => _atomExPlayer3D.GetStatus() == CriAtomExPlayer.Status.Playing;
+                public bool IsBusy
+                {
+                    get
+                    {
+                        var status = _atomExPlayer3D.GetStatus();
+                        return status == CriAtomExPlayer.Status.Prep || status == CriAtomExPlayer.Status.Playing;
+                    }
+                }
                 public string CurrentCueName => _currentCueName;
 
                 public void Dispose()
@@ -277,6 +284,13 @@ namespace CRISound
                 public void Play3D(Vector3 playPos, string cueSheet, string cueName, float volume)
                 {
                     _currentCueName = cueName;
+                    // プール再利用時に前のキューの距離設定を引き継がない。
+                    _criAtomEx3DSource.ResetParameters();
+                    if (SoundVolumeSettings.TryGet3DDistance(cueName, out float minDistance, out float maxDistance))
+                    {
+                        _criAtomEx3DSource.SetAttenuationDistanceSetting(true);
+                        _criAtomEx3DSource.SetMinMaxDistance(minDistance, maxDistance);
+                    }
                     _criAtomEx3DSource.SetPosition(playPos.x, playPos.y, playPos.z);
                     _criAtomEx3DSource.Update();
 

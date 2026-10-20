@@ -442,6 +442,7 @@ MonoBehaviour:
   _iconImage: {fileID: 7305262563338799571}
   _selectedframe: {fileID: 5651361997533509461}
   _check: {fileID: 473677398432212276}
+  _scaleTarget: {fileID: 5626042588454110536}
 --- !u!1001 &160308887568449270
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -454,10 +455,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Arrow
       objectReference: {fileID: 0}
+    - target: {fileID: 79847211916323235, guid: d4c33151b09f9ed479f6eb8e5681bd63, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7233916282451181130, guid: d4c33151b09f9ed479f6eb8e5681bd63, type: 3}
+      propertyPath: _arrowImage
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7233916282451181130, guid: d4c33151b09f9ed479f6eb8e5681bd63, type: 3}
       propertyPath: _selectFrameImage
       value: 
-      objectReference: {fileID: 5651361997533509461}
+      objectReference: {fileID: 0}
     - target: {fileID: 7233916282451181130, guid: d4c33151b09f9ed479f6eb8e5681bd63, type: 3}
       propertyPath: _targetSelectable
       value: 

@@ -48,7 +48,7 @@ namespace InGame.Player.Ability
             Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
             //hitした場所に向かってRayを飛ばす（プレイヤー（マズル位置）からのRay）
-            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance);
+            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance, _hitLayerMask);
             //ヒットしたところにロケットランチャーを発射
             RocketLauncherRadius(laserHitInfo.point);
         }

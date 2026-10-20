@@ -10,25 +10,27 @@ namespace InGame.Player.Ability
         public string TargetAbilityName => nameof(AbilityLaserGun);
 
         // キャッシュ用
-        private PlayerMovement _playerMovement;
         private PlayerManager _playerManager;
         private HatanoAbilityStatusManagement _abilityStatusManagement;
 
         public bool IsConditionMatch(in TriggerEventContext context)
         {
             if (!context.Owner) return false;
-            if (!_playerMovement) _playerMovement = context.Owner.GetComponent<PlayerMovement>();
             if (!_playerManager) _playerManager = context.Owner.GetComponent<PlayerManager>();
 
             if (_abilityStatusManagement == null) _abilityStatusManagement = 
                 context.Owner.GetComponent<HatanoAbilityStatusManagement>();
-            if(_abilityStatusManagement.AbilityStatus == HatanoAbilityStatus.None) return false;
+            if (!_abilityStatusManagement ||
+                _abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun) return false;
 
             // 条件を定義
-            return context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available
+            return _playerManager.CurrentPlayerControlState == PlayerManager.PlayerControlState.Normal
+                   && !_playerManager.IsStun && _playerManager.IsMovable
+                   && !_abilityStatusManagement.IsChangingWeapon
+                   && !context.CurrentButtons.IsSet(PlayerButtons.Ultimate)
+                   && context.AbilityRef.Phase == AbilityBase.AbilityPhase.Available
                    && context.AbilityRef.CanStartAbilityOverride()
-                   && context.CurrentButtons.GetPressed(context.PreviousButtons)
-                       .IsSet(PlayerButtons.Ability2); // 使用するボタンを指定
+                   && context.CurrentButtons.IsSet(PlayerButtons.Ability2);
         }
     }
 }

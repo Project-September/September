@@ -1,4 +1,5 @@
 using Common.Extensions;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Health;
@@ -48,7 +49,7 @@ namespace September.InGame.Kraken
         [Networked] private NetworkBool MagicCircleFinished { get; set; }
 
         [Header("ダメージ設定")]
-        [SerializeField] private int _dealScore = 10;
+        [SerializeField] private int _dealScoreMultiplier = 1;
 
         [Header("出現時間設定")]
         [Tooltip("誰にもインタラクトされなかった場合に自動的に退場するまでの時間")]
@@ -65,6 +66,12 @@ namespace September.InGame.Kraken
         [Header("攻撃設定")]
         [SerializeField] private KrakenAttackHandler _attackHandler;
         [SerializeField] private KrakenSettings _settings;
+        
+        [Header("音声設定")] 
+        [SerializeField] private AudioBroadcaster _audioBroadcaster;
+        [SerializeField] private string _cueName;
+        
+        private DamageArea[] _damageAreas;
 
         private InputWrapper _attack;
 
@@ -149,6 +156,12 @@ namespace September.InGame.Kraken
         {
             ShowMagicCircle();
             Appear().Forget();
+            _damageAreas = FindObjectsByType<DamageArea>(FindObjectsSortMode.None);
+            if (_audioBroadcaster != null)
+            {
+                // Spawned は全クライアントで実行されるため、RPCを送らずローカルで一度だけ再生する。
+                _audioBroadcaster.PlaySoundFromCode(_cueName, SoundTrackingType.Follow, Object);
+            }
         }
 
         public override void Render()
@@ -267,6 +280,12 @@ namespace September.InGame.Kraken
 
             // 搭乗中は展示物用の操作説明を表示する。
             RPC_ChangeDescriptionUI(owner, ControlDescriptionType.Exhibit);
+            
+            // ダメージエリアを有効化する
+            foreach (var damageArea in _damageAreas)
+            {
+                damageArea.EnableDamageArea(owner);
+            }
 
             _interactable.ForceSetInteractable = false;
 
@@ -323,6 +342,11 @@ namespace September.InGame.Kraken
                 var type = CharacterDataContainer.Instance
                     .GetControlDescriptionType(playerData.CharacterType);
                 RPC_ChangeDescriptionUI(owner, type);
+            }
+            // ダメージエリアを無効化
+            foreach (var damageArea in _damageAreas)
+            {
+                damageArea.DisableDamageArea();
             }
 
             OwnerPlayerRef = default;
@@ -386,9 +410,9 @@ namespace September.InGame.Kraken
 
         public void TakeHit(ref HitData hitData)
         {
-            if (HasStateAuthority && OwnerPlayerRef.IsRealPlayer && hitData.HitActionType == HitActionType.Damage)
+            if (HasStateAuthority && hitData.HitActionType != HitActionType.Heal)
             {
-                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, _dealScore);
+                PlayerDatabase.Instance.Server_AddKrakenDamageScore(hitData.ExecutorRef, hitData.Amount * _dealScoreMultiplier);
             }
         }
 

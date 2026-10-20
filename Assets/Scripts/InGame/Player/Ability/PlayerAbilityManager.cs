@@ -117,6 +117,28 @@ namespace InGame.Player.Ability
             }
         }
 
+        /// <summary>Immediately stops active firearm stances before another exclusive action starts.</summary>
+        public void EndActiveShootingAbilities()
+        {
+            foreach (var ability in _abilities)
+            {
+                if (ability is Effect.Shooting.ShootingAbilityBase &&
+                    ability.Phase is AbilityBase.AbilityPhase.Started or AbilityBase.AbilityPhase.Active or AbilityBase.AbilityPhase.Ending)
+                    ability.ForceEndAbility();
+            }
+        }
+
+        /// <summary>Immediately ends active ultimates when the owner is stunned.</summary>
+        public void EndActiveUltimates()
+        {
+            foreach (var ability in _abilities)
+            {
+                if (ability is Effect.AbilityUltBase &&
+                    ability.Phase is AbilityBase.AbilityPhase.Started or AbilityBase.AbilityPhase.Active or AbilityBase.AbilityPhase.Ending)
+                    ability.ForceEndAbility();
+            }
+        }
+
         public void AddAbility(AbilityBase abilityBase, IAbilityExecuteCondition condition)
         {
             string abilityName = abilityBase.GetType().Name;
