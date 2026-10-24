@@ -38,6 +38,7 @@ public class InteractableBaseEditor : UnityEditor.Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
+        DrawLessonGuide();
         DrawDefaultInspector();
 
         var newEffectType = GetSelectedEffectType();
@@ -48,6 +49,35 @@ public class InteractableBaseEditor : UnityEditor.Editor
         }
 
         UpdatePreviewTransform();
+    }
+
+    private void DrawLessonGuide()
+    {
+        var effects = serializedObject.FindProperty("_characterEffects");
+        if (effects == null) return;
+
+        for (int index = 0; index < effects.arraySize; index++)
+        {
+            var effectType = effects.GetArrayElementAtIndex(index).managedReferenceFullTypename;
+            if (effectType?.Contains("LessonSpeedInteractEffect") == true)
+            {
+                EditorGUILayout.HelpBox(
+                    "授業用：超加速展示物\n" +
+                    "Character Effectsの『効果時間』と『移動速度の倍率』を設定します。" +
+                    "インタラクトするとPlayerMovementのSpeedが変わり、時間が過ぎると戻ります。" +
+                    "CandleInteractInvokerやHazardTrailEmitterは使いません。",
+                    MessageType.Info);
+            }
+            else if (effectType?.Contains("LessonVisualInteractEffect") == true)
+            {
+                EditorGUILayout.HelpBox(
+                    "授業用：見た目変化展示物\n" +
+                    "Character Effectsの『見た目を変える展示物』に、同じPrefabのLessonVisualExhibitを指定します。" +
+                    "色を変える場合はLessonVisualExhibitのRendererも指定してください。" +
+                    "色・大きさ・回転の選択はLessonVisualExhibit.csで行います。",
+                    MessageType.Info);
+            }
+        }
     }
 
     private void OnSceneGUI()

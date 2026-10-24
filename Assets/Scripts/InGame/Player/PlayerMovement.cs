@@ -168,6 +168,24 @@ namespace InGame.Player
         // Gizmo
         private List<CapsuleCastData> _capsuleCastData = new();
 
+        /// <summary>展示物などから直接変更できる移動速度の倍率。通常は1。</summary>
+        [Networked] public float Speed { get; set; } = 1f;
+        [Networked] private TickTimer SpeedResetTimer { get; set; }
+
+        /// <summary>直接変更した移動速度を指定秒数後に元へ戻す。</summary>
+        public void ResetSpeedAfter(float duration)
+        {
+            SpeedResetTimer = TickTimer.CreateFromSeconds(Runner, Mathf.Max(0.1f, duration));
+        }
+
+        public override void FixedUpdateNetwork()
+        {
+            if (!SpeedResetTimer.Expired(Runner)) return;
+
+            Speed = 1f;
+            SpeedResetTimer = TickTimer.None;
+        }
+
         public float WalkSpeed => GetCurrentMoveSpeed();
         public float DashMoveSpeed => GetCurrentDashSpeed();
         public bool IsGround => (_isGround || GroundedGraceRemaining > 0) && !_knockBackActive;
@@ -500,6 +518,7 @@ namespace InGame.Player
             var result = 1f;    // 計算結果
 
             result *= _moveBuildEnabled ? _playerStatus.Speed : 1;   // 現在のステータスによる倍率
+            result *= Speed;
 
             // 同期された構え状態から毎回計算し、解除時には通常の速度へ戻す。
             if (_aimCameraController != null)

@@ -21,6 +21,7 @@ public class EffectDatabase : ScriptableObject
         if (_map != null) return; // 既に初期化済みなら何もしない
         
         _map = new Dictionary<EffectType, EffectData>();
+        if (_effects == null) return;
         foreach (var effect in _effects)
         {
             if (effect.Guid != null)
@@ -32,6 +33,7 @@ public class EffectDatabase : ScriptableObject
 
     public EffectData GetEffectData(EffectType effectType)
     {
+        if (_map == null) OnEnable();
         _map.TryGetValue(effectType, out EffectData data);
         return data;
     }
