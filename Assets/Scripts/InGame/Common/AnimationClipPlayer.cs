@@ -993,8 +993,7 @@ namespace InGame.Common
             {
                 // AnimationClipPlayableの再生時間をループさせるPlayableを接続する
                 // AnimationClipPlayable -> loopPlayable -> Mixer
-                var loopPlayable = ScriptPlayable<LoopAnimationClipPlayableBehaviour>.Create(_graph, inputCount: 1);
-                loopPlayable.GetBehaviour().AnimationClipPlayable = p;
+                var loopPlayable = ScriptPlayable<LoopPlayableBehaviour>.Create(_graph, inputCount: 1);
                 loopPlayable.ConnectInput(0, p, 0);
                 _layerMixer.ConnectInput(slot, loopPlayable, 0);
             }
