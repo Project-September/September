@@ -10,6 +10,7 @@ namespace InGame.Player.Hatano
 {
     /// <summary>
     /// ハタノ・エリクソンのAbility選択状態を管理する
+    /// Ability切り替えに伴うアニメーション処理
     /// </summary>
     public class HatanoAbilityStatusManagement : NetworkBehaviour
     {
@@ -39,10 +40,36 @@ namespace InGame.Player.Hatano
         /// 武器切替完了後の最初の入力 Tick で、引き継いだエイム状態を再照合する必要があるか。
         /// </summary>
         private bool _shouldReconcileWeaponChangeAimAfterCompletion;
-        private float _weaponChangeAimWeight;
-        private float _weaponChangeOutputWeight;
+
+        /// <summary>
+        /// 通常時と構え時の武器切り替えモーションのBlendに関するweight
+        /// 0=>通常, 1=>構え(エイム)
+        /// </summary>
+        public float WeaponChangeAimWeight { get; private set; }
+
+        /// <summary>
+        /// 武器切り替えモーションの出力weight
+        /// </summary>
+        public float WeaponChangeOutputWeight { get; private set; }
+
+        /// <summary>
+        /// 武器切り替えモーションの再生が完了するまでの残り秒数。モーション未再生の場合は0を返す
+        /// </summary>
+        public float WeaponChangeRemainingDuration => WeaponChangeOutputWeight > 0f ? _animClipPlayer.GetControllableBlendDuration(LayerInfo.LayerType.UpperBody) : 0;
+
+        /// <summary>
+        /// 武器切り替え中かどうか
+        /// </summary>
         [Networked] public NetworkBool IsChangingWeapon { get; private set; }
+
+        /// <summary>
+        /// 武器切り替え中にエイム状態になっているかどうか
+        /// </summary>
         [Networked] private NetworkBool IsWeaponChangeAiming { get; set; }
+
+        /// <summary>
+        /// 武器切り替えモーション終了後のブレンド中か
+        /// </summary>
         [Networked] private NetworkBool IsWeaponChangeBlendingOut { get; set; }
 
         private void Awake()
@@ -101,6 +128,7 @@ namespace InGame.Player.Hatano
                     _changeAnimation.StopAimPoseAnimation();
                 }
 
+                // 武器切り替え中でなければ一部のフラグを初期値に強制する
                 if (!IsChangingWeapon)
                 {
                     _shouldReconcileWeaponChangeAimAfterCompletion = false;
@@ -139,6 +167,9 @@ namespace InGame.Player.Hatano
                    && !_playerMovement.IsEvading && !_playerMovement.DoingVault;
         }
 
+        /// <summary>
+        /// 現在のアビリティステータスを見て、次のアビリティに切り替える
+        /// </summary>
         private void ChangeAbilityStatus()
         {
             if (!CanChangeWeapon()) return;
@@ -201,6 +232,8 @@ namespace InGame.Player.Hatano
             try
             {
                 _animClipPlayer.PlayOnUpperBody(null);
+                // 武器切り替え中にエイム状態が切り替わった際に対応するため、ControllableBlendで再生を開始する。
+                // Updateのタイミングでエイム状態に応じてweightを変更する。
                 if (!_animClipPlayer.AttachControllableBlend(
                         normalClip,
                         aimClip,
@@ -208,6 +241,7 @@ namespace InGame.Player.Hatano
                         wasAiming ? 1f : 0f))
                     return;
 
+                // 武器切り替えモーションの終了を待機
                 await UniTask.WaitUntil(
                     () => !_animClipPlayer.IsControllableBlendAttached(LayerInfo.LayerType.UpperBody)
                           || _animClipPlayer.IsControllableBlendComplete(LayerInfo.LayerType.UpperBody),
@@ -220,11 +254,14 @@ namespace InGame.Player.Hatano
 
                 if (blendEndType == EndClipType.Complete && !(bool)IsWeaponChangeAiming)
                 {
+                    // 武器切り替えモーションの終了後、ブレンドアウトする
                     IsWeaponChangeBlendingOut = true;
+
+                    // 武器切り替えモーションの影響が無くなるまで待機
                     await UniTask.WaitUntil(
                         () => (bool)IsWeaponChangeAiming
                               || !_animClipPlayer.IsControllableBlendAttached(LayerInfo.LayerType.UpperBody)
-                              || Mathf.Approximately(_weaponChangeOutputWeight, 0f),
+                              || Mathf.Approximately(WeaponChangeOutputWeight, 0f),
                         cancellationToken: this.GetCancellationTokenOnDestroy());
                 }
             }
@@ -252,6 +289,10 @@ namespace InGame.Player.Hatano
             }
         }
 
+        #region Animation
+        /// <summary>
+        /// 武器切り替えモーションに関するWeightを更新する
+        /// </summary>
         private void UpdateWeaponChangeAimWeight()
         {
             var isBlendAttached = IsChangingWeapon
@@ -266,27 +307,27 @@ namespace InGame.Player.Hatano
             var targetOutputWeight = (bool)IsWeaponChangeBlendingOut ? 0f : 1f;
             if (!_isWeaponChangeAimWeightInitialized || _animClipPlayer.AimBlendDuration <= 0f)
             {
-                _weaponChangeAimWeight = targetAimWeight;
-                _weaponChangeOutputWeight = targetOutputWeight;
+                WeaponChangeAimWeight = targetAimWeight;
+                WeaponChangeOutputWeight = targetOutputWeight;
                 _isWeaponChangeAimWeightInitialized = true;
             }
             else
             {
                 var maxDelta = Time.deltaTime / _animClipPlayer.AimBlendDuration;
-                _weaponChangeAimWeight = Mathf.MoveTowards(
-                    _weaponChangeAimWeight,
+                WeaponChangeAimWeight = Mathf.MoveTowards(
+                    WeaponChangeAimWeight,
                     targetAimWeight,
                     maxDelta);
-                _weaponChangeOutputWeight = Mathf.MoveTowards(
-                    _weaponChangeOutputWeight,
+                WeaponChangeOutputWeight = Mathf.MoveTowards(
+                    WeaponChangeOutputWeight,
                     targetOutputWeight,
                     maxDelta);
             }
 
             _animClipPlayer.SetControllableBlendWeights(
                 LayerInfo.LayerType.UpperBody,
-                _weaponChangeAimWeight,
-                _weaponChangeOutputWeight);
+                WeaponChangeAimWeight,
+                WeaponChangeOutputWeight);
         }
 
         /// <summary>
@@ -306,5 +347,6 @@ namespace InGame.Player.Hatano
                 _changeAnimation.ChangeAimPoseAnimation(_abilityStatus);
             }
         }
+        #endregion
     }
 }
