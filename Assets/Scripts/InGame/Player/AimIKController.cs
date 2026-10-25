@@ -16,6 +16,7 @@ namespace September.InGame.Player
 
         public Transform RightAim { set => _aim.solver.transform = value; }
         public Transform LeftAim { set => _leftAim.solver.transform = value; }
+        public Vector3 Target { set => _look.solver.IKPosition = value; }
 
         private Quaternion leftHandRotationRelative;
 
@@ -30,7 +31,11 @@ namespace September.InGame.Player
             _look.enabled = false;
         }
 
-        private void LateUpdate()
+        private void LateUpdate() => InternalUpdate();
+
+        public void ManualUpdate() => InternalUpdate();
+
+        private void InternalUpdate()
         {
             _aim.solver.IKPositionWeight = Weight;
             _leftAim.solver.IKPositionWeight = Weight;
