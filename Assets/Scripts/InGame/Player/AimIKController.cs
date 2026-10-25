@@ -9,6 +9,8 @@ namespace September.InGame.Player
         [SerializeField] private AimIK _leftAim;
         [SerializeField] private FullBodyBipedIK _ik;
         [SerializeField] private LookAtIK _look;
+        [SerializeField] private Transform _aimOrigin;
+        [SerializeField] private Vector3 _aimAxis;
 
         [Range(0, 1)] public float Weight = 1f;
 
@@ -46,6 +48,13 @@ namespace September.InGame.Player
             Vector3 toLeftHandRelative = RightHand.bone.InverseTransformDirection(toLeftHand);
 
             leftHandRotationRelative = Quaternion.Inverse(RightHand.bone.rotation) * LeftHand.bone.rotation;
+
+            // 射撃時の反動アニメーション等を反映させるための処理
+            // 任意のTransform(_aimOrigin)の任意の軸(_aimAxis)を正面とし、反動などで銃の照準(_aim.solver.transform)が正面を向いていない場合でも、
+            // 照準からみた正面の向きをIKに知らせることで、元のアニメーションとIKを両立させる
+            Vector3 axis = _aimOrigin.rotation * _aimAxis;
+            if (_aim.solver.transform) _aim.solver.axis = _aim.solver.transform.InverseTransformDirection(axis);
+            if (_leftAim.solver.transform) _leftAim.solver.axis = _leftAim.solver.transform.InverseTransformDirection(axis);
 
             _aim.solver.IKPosition = _look.solver.IKPosition;
             _aim.solver.Update();
