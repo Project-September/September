@@ -43,7 +43,7 @@ namespace InGame.Common
         [Networked] private NetworkBool IsAimAnimation { get; set; }
         [SerializeField, Min(0f)] private float _aimBlendDuration = 0.15f;
         private bool _aimBlendTarget;
-        private float _aimBlendWeight;
+        public float AimBlendWeight { get; private set; }
         private bool _isUpperBodyBlending;
         private float _upperBodyBlendTarget;
         private float _upperBodyBlendDuration;
@@ -52,6 +52,9 @@ namespace InGame.Common
         private AnimationClip _pendingUpperBodyClip;
         private float _pendingUpperBodyBlendDuration;
 
+        /// <summary>
+        /// エイム歩行モーションと通常歩行モーションの切り替え時と、武器切り替えモーションのブレンド時間
+        /// </summary>
         public float AimBlendDuration => _aimBlendDuration;
 
         /// <summary>グラフ評価 (LateUpdate) の直前に呼ばれる。足 IK など出力後処理のパラメータ更新用。</summary>
@@ -517,6 +520,7 @@ namespace InGame.Common
         /// <summary>
         /// 同一レイヤーへ2クリップを取り付ける。補間比率と出力Weightは呼び出し側が毎フレーム制御する。
         /// </summary>
+        /// <returns>再生の開始に成功した場合true、失敗した場合false</returns>
         public bool AttachControllableBlend(
             AnimationClip firstClip,
             AnimationClip secondClip,
@@ -617,6 +621,16 @@ namespace InGame.Common
             return _controllableBlends.TryGetValue(layer, out var blend)
                    && blend.IsValid
                    && blend.IsComplete;
+        }
+
+        public float GetControllableBlendDuration(LayerInfo.LayerType layer)
+        {
+            if (_controllableBlends.TryGetValue(layer, out var blend))
+            {
+                return blend.TotalDuration - blend.CurrentTime;
+            }
+
+            return 0;
         }
 
         public void DetachControllableBlend(LayerInfo.LayerType layer)
@@ -1223,10 +1237,10 @@ namespace InGame.Common
         {
             if (!_baseMixer.IsValid()) return;
             var target = _aimBlendTarget ? 1f : 0f;
-            _aimBlendWeight = _aimBlendDuration <= 0f ? target
-                : Mathf.MoveTowards(_aimBlendWeight, target, Time.deltaTime / _aimBlendDuration);
-            _baseMixer.SetInputWeight(0, 1f - _aimBlendWeight);
-            _baseMixer.SetInputWeight(1, _aimBlendWeight);
+            AimBlendWeight = _aimBlendDuration <= 0f ? target
+                : Mathf.MoveTowards(AimBlendWeight, target, Time.deltaTime / _aimBlendDuration);
+            _baseMixer.SetInputWeight(0, 1f - AimBlendWeight);
+            _baseMixer.SetInputWeight(1, AimBlendWeight);
         }
 
         public float GetTargetLayerWeight(LayerInfo.LayerType layer)

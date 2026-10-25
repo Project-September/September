@@ -1,6 +1,7 @@
 using System.Collections;
 using CRISound;
 using Fusion;
+using September.InGame.Player;
 using UnityEngine;
 
 namespace InGame.Player.Hatano
@@ -24,6 +25,13 @@ namespace InGame.Player.Hatano
         [SerializeField] private Transform _rocketPrefabTransform;
         [SerializeField] private Transform[] _doublePrefabTransform;
         [SerializeField] private Transform _laserPrefabTransform;
+        [Header("照準位置（二丁拳銃）")]
+        [SerializeField] private Transform _doubleAimPointL;
+        [SerializeField] private Transform _doubleAimPointR;
+        [Header("照準位置（レーザー銃）")]
+        [SerializeField] private Transform _laserAimPoint;
+        [Header("IK")]
+        [SerializeField] private AimIKController _aimIKController;
 
         [Header("二丁拳銃エフェクト（未設定なら再生しない）")]
         [SerializeField] private GameObject _muzzleFlashPrefab;
@@ -138,6 +146,8 @@ namespace InGame.Player.Hatano
         {
             AttachSocket(_doublePrefabTransform[0], _doubleSocketHand[0]);
             AttachSocket(_doublePrefabTransform[1], _doubleSocketHand[1]);
+            AttachAimPoint(_doubleAimPointR, _doubleAimPointL);
+            _aimIKController.TwoHanded = false;
         }
 
         #endregion
@@ -152,6 +162,8 @@ namespace InGame.Player.Hatano
         public void AttachLaserGunHand()
         {
             AttachSocket(_laserPrefabTransform, _laserSocketHand);
+            AttachAimPoint(_laserAimPoint);
+            _aimIKController.TwoHanded = true;
         }
 
         #endregion
@@ -208,6 +220,14 @@ namespace InGame.Player.Hatano
             prefab.localPosition = Vector3.zero;
             prefab.localRotation = Quaternion.identity;
             prefab.localScale = Vector3.one;
+        }
+
+        private void AttachAimPoint(Transform aimPointR, Transform aimPointL = null)
+        {
+            _aimIKController.RightAim = aimPointR;
+            _aimIKController.LeftAim = aimPointL;
+
+            _aimIKController.TwoHanded = aimPointL == null;
         }
     }
 }

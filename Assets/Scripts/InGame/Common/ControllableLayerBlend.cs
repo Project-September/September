@@ -20,6 +20,10 @@ namespace InGame.Common
 
         public bool IsComplete => IsClipComplete(_firstPlayable) && IsClipComplete(_secondPlayable);
 
+        public float TotalDuration => Mathf.Max((float)_firstPlayable.GetDuration(), (float)_secondPlayable.GetDuration());
+
+        public float CurrentTime => Mathf.Max((float)_firstPlayable.GetTime(), (float)_secondPlayable.GetTime());
+
         public ControllableLayerBlend(
             PlayableGraph graph,
             AnimationLayerMixerPlayable layerMixer,
