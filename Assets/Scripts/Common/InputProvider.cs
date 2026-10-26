@@ -19,7 +19,6 @@ namespace September.Common
         Warp,
         AirplaneForward,
         AirPlaneBack,
-        Shooting,
         Evasion,
         LockOn
     }
@@ -104,7 +103,6 @@ namespace September.Common
                     playerInput.Buttons.Set(PlayerButtons.Ability1, playerActions.Ability1.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Ability2, playerActions.Ability2.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.Interact, playerActions.Interact.IsPressed());
-                    playerInput.Buttons.Set(PlayerButtons.Shooting, playerActions.Shooting.IsPressed());
                     playerInput.Buttons.Set(PlayerButtons.LockOn, playerActions.LockOn.IsPressed());
                 }
                 else
@@ -113,7 +111,6 @@ namespace September.Common
                     playerInput.Buttons.Set(PlayerButtons.Ability1, false);
                     playerInput.Buttons.Set(PlayerButtons.Ability2, false);
                     playerInput.Buttons.Set(PlayerButtons.Interact, false);
-                    playerInput.Buttons.Set(PlayerButtons.Shooting, false);
                     playerInput.Buttons.Set(PlayerButtons.LockOn, false);
                 }
 

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using CRISound;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using InGame.Jewelry;
 using September.Common;
+using September.InGame;
 using September.InGame.Common.Stats;
 using UniRx;
 using UnityEngine;
@@ -30,6 +32,8 @@ namespace InGame.Player
         [SerializeField] private float _staminaConsumption;
         [Header("Rotation")]
         [SerializeField, Tooltip("degree/s")] private float _rotationSpeed = 5f;
+        [SerializeField, Min(0f), Tooltip("回避終了後にエイム方向へ向き直る時間（秒）")]
+        private float _evasionAimBlendDuration = 0.15f;
         [Header("Vault")]
         [SerializeField, Tooltip("最大高さ")] private float _maxLedgeHeight;
         [SerializeField, Tooltip("最小高さ")] private float _minLedgeHeight;
@@ -39,6 +43,7 @@ namespace InGame.Player
         private float _minimumVaultReachDistance = 0.5f;
         [SerializeField] private float _timeToVault;
         [SerializeField] private AnimationCurve _vaultCurve;
+        [SerializeField, Tooltip("乗り越え終了時の水平速度の最大値")] private float _maxExitSpeed = 3f;
         [Header("Hook")]
         [SerializeField] private float _hookPower = 10f;
         [Header("Bomb")]
@@ -61,8 +66,10 @@ namespace InGame.Player
 
         private Rigidbody _rb;
         private IPlayerMovementOverride _movementOverride;
+        private AimCameraController _aimCameraController;
         private PlayerStatus _status;
         private Animator _animator;
+        private AudioBroadcaster _audioBroadcaster;
 
         // 予測Tickを巻き戻した際、位置と同じ時点の速度から再計算する。
         // 通常フィールドでは再シミュレーションのたびに重力加算・減衰が重複する。
@@ -95,6 +102,8 @@ namespace InGame.Player
         private PlayerEvasion _playerEvasion;
         /// <summary> 回避の同期状態。Tick 基準なので入力権限側の予測でも決定的に再計算できる </summary>
         [Networked, HideInInspector] public EvasionState Evasion { get; private set; }
+        [Networked] private Quaternion EvasionEndRotation { get; set; }
+        [Networked] private NetworkBool IsReturningToAim { get; set; }
         public const int MaxEvasionStamina = 3;
         public int EvasionStamina => _status.CurrentEvasionStamina;
         [Networked] private TickTimer RecoveryTimer { get; set; }
@@ -147,6 +156,7 @@ namespace InGame.Player
         public event Action OnStartVault;
         [Networked, HideInInspector] public Vector3 NetworkVelocity { get; private set; }
         [Networked] public Vector2 MoveDirection { get; private set; }
+        [Networked] public Vector2 MoveInput { get; private set; }
         private bool _isHookFollow;
         private Transform _hookTarget;
         private float _vaultTimer;
@@ -188,8 +198,10 @@ namespace InGame.Player
             _rb = GetComponent<Rigidbody>();
             _rb.useGravity = true;
             _movementOverride = GetComponent<IPlayerMovementOverride>();
+            _aimCameraController = GetComponent<AimCameraController>();
             _status = GetComponent<PlayerStatus>();
             _animator = GetComponentInChildren<Animator>();
+            _audioBroadcaster = GetComponentInChildren<AudioBroadcaster>(true);
             // ========== ビルドシステム ==========
             _moveBuildEnabled = _playerStatus & _buildGenerator;
 #if UNITY_EDITOR
@@ -207,7 +219,7 @@ namespace InGame.Player
         public virtual void UpdateMovement(Vector2 moveInput, bool isDash, float cameraYaw, bool isJump, bool isEvasion, float deltaTime)
         {
             CheckGroundManual();
-
+            MoveInput = moveInput;
             MoveDirection = GetMoveDirection(moveInput, cameraYaw);
 
             if (_isHookFollow)
@@ -254,6 +266,10 @@ namespace InGame.Player
             ConsumeEvasionStaminaAndPauseRecovery(_evasionData.StaminaRecoveryInterval);
             Evasion = state;
             Stop();
+
+            // 確定した回避だけを全員へ通知し、予測・再シミュレーションでの二重再生を防ぐ。
+            if (HasStateAuthority && Runner.IsForward && _audioBroadcaster != null)
+                _audioBroadcaster.RPC_PlaySoundFromCode(SoundCues.SE.Evasion.Name, SoundTrackingType.Follow, Object.Id);
         }
 
         /// <summary> 入力無関係のTick UpdateMovementとの呼び出し順序を確定させるためにManagerから呼ばれる </summary>
@@ -330,6 +346,8 @@ namespace InGame.Player
 
             if (_playerEvasion.HasEnded(in state, tick, dt))
             {
+                EvasionEndRotation = _rb.rotation;
+                IsReturningToAim = _aimCameraController != null && _aimCameraController.IsFacingCamera;
                 state.IsEvading = false;
                 state.LastEndTick = tick;
                 Evasion = state;
@@ -485,6 +503,10 @@ namespace InGame.Player
 
             result *= _moveBuildEnabled ? _playerStatus.Speed : 1;   // 現在のステータスによる倍率
 
+            // 同期された構え状態から毎回計算し、解除時には通常の速度へ戻す。
+            if (_aimCameraController != null)
+                result *= _aimCameraController.MoveSpeedMultiplier;
+
             return result;
         }
 
@@ -609,9 +631,41 @@ namespace InGame.Player
             direction.y = 0;
             _setDirection = false;
 
+            // Aiming owns facing direction.  Rotating again toward strafe input
+            // competes with the replicated camera direction and causes jitter.
+            if (!IsEvading && _aimCameraController != null && _aimCameraController.IsFacingCamera)
+            {
+                // 入力欠落だけでは復帰補間を解除せず、現在の姿勢を保持する。
+                if (GetInput<PlayerInput>(out var input))
+                    RotateToAim(input.DesiredLookDirection);
+                return;
+            }
+
+            // 構え解除・次の回避で、前回の復帰補間を持ち越さない。
+            IsReturningToAim = false;
             if (direction == Vector3.zero) return;
 
             _rb.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), _rotationSpeed * deltaTime);
+        }
+
+        private void RotateToAim(Vector3 direction)
+        {
+            direction.y = 0f;
+            if (direction.sqrMagnitude <= Mathf.Epsilon) return;
+
+            var target = Quaternion.LookRotation(direction);
+            if (!IsReturningToAim)
+            {
+                _rb.rotation = target;
+                return;
+            }
+
+            // 終了姿勢と開始Tickを同期し、ホストと入力所有者が同じ補間を再計算する。
+            var elapsed = (Runner.Tick - Evasion.LastEndTick) * Runner.DeltaTime;
+            var progress = _evasionAimBlendDuration > 0f
+                ? Mathf.Clamp01(elapsed / _evasionAimBlendDuration) : 1f;
+            _rb.rotation = Quaternion.Slerp(EvasionEndRotation, target, Mathf.SmoothStep(0f, 1f, progress));
+            if (progress >= 1f) IsReturningToAim = false;
         }
 
         /// <summary> 条件付きでスタミナを回復させる </summary>
@@ -693,6 +747,12 @@ namespace InGame.Player
 
         void EndVault(Vector3 endVelocity)
         {
+            // Keep the original arc and vertical momentum; only cap excessive exit speed.
+            Vector3 horizontalVelocity = new(endVelocity.x, 0f, endVelocity.z);
+            horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, Mathf.Max(0f, _maxExitSpeed));
+            endVelocity.x = horizontalVelocity.x;
+            endVelocity.z = horizontalVelocity.z;
+
             NetworkedMoveVelocity = endVelocity;
             NetworkedAirMoveVelocity = endVelocity;
             _rb.linearVelocity = NetworkedMoveVelocity;

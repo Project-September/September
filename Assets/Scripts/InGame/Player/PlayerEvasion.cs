@@ -52,7 +52,7 @@ namespace InGame.Player
             state.RollDuration = _evasionData.RollDuration / speedCoefficient;
             // 向き変更がロールより長いと移動方向を向き切らないままロールが終わり、モーションの向きと実際の移動方向がずれる
             state.TurnDuration = Mathf.Min(_evasionData.MaxTurnDuration * turnProgress / speedCoefficient, state.RollDuration);
-            state.RollDistance = _evasionData.RollDistance * distanceCoefficient;
+            state.RollDistance = CalculateRollDistance(distanceCoefficient);
             state.MoveDirection = moveDirection;
             state.StartDirection = currentForward;
 
@@ -111,6 +111,14 @@ namespace InGame.Player
 
             float t = Mathf.Clamp01(ElapsedTime(in state, currentTick, tickDeltaTime) / state.RollDuration);
             return _evasionData.RollSpeedCurve.Evaluate(t);
+        }
+
+        /// <summary> 重量補正後の回避距離。宝石を多く持っても下限距離を下回らない </summary>
+        private float CalculateRollDistance(float distanceCoefficient)
+        {
+            // 下限が基本距離を超えていると、宝石を持つほど距離が伸びる逆転が起きるため基本距離で頭打ちにする
+            float minDistance = Mathf.Min(_evasionData.MinRollDistance, _evasionData.RollDistance);
+            return Mathf.Max(_evasionData.RollDistance * distanceCoefficient, minDistance);
         }
 
         /// <summary> 宝石所持数から、速度または距離用の重量係数を求める </summary>

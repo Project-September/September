@@ -20,10 +20,11 @@ namespace September.Editor.HumanoidRig
         }
 
         /// <param name="action">1 モデルに対する処理。戻り値はログに残す補足 (null 可)。</param>
-        public static Outcome Run(string title, IReadOnlyList<string> assetPaths, Func<string, string> action)
+        public static Outcome Run(string title, IReadOnlyList<string> assetPaths, Func<string, string> action,
+            bool batchAssetEditing = true)
         {
             var outcome = new Outcome();
-            AssetDatabase.StartAssetEditing();
+            if (batchAssetEditing) AssetDatabase.StartAssetEditing();
             try
             {
                 for (int i = 0; i < assetPaths.Count; i++)
@@ -45,7 +46,7 @@ namespace September.Editor.HumanoidRig
             }
             finally
             {
-                AssetDatabase.StopAssetEditing();
+                if (batchAssetEditing) AssetDatabase.StopAssetEditing();
                 EditorUtility.ClearProgressBar();
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();

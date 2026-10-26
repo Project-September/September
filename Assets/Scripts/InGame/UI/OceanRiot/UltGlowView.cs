@@ -10,6 +10,9 @@ namespace September
     public class UltGlowView : MonoBehaviour
     {
         [SerializeField] private List<GameObject> _glowObjects;
+        private InGameManager _inGameManager;
+        private UltCondition _model;
+
         private void Start()
         {
             for (int i = 0; i < _glowObjects.Count; i++)
@@ -17,33 +20,37 @@ namespace September
                 _glowObjects[i].SetActive(false);
             }
 
-            var inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
+            _inGameManager = StaticServiceLocator.Instance.Get<InGameManager>();
 
             // プレイヤーがスポーンされた後に処理を行う
-            inGameManager.GameStarted += () =>
-            {
-                var runner = inGameManager.Runner;
+            _inGameManager.GameStarted += BindCurrentPlayer;
+        }
 
-                if (runner == null)
-                {
-                    Debug.LogError("[UltUI] No runner found");
-                    return;
-                }
+        private void Update()
+        {
+            BindCurrentPlayer();
+        }
 
-                if (!runner.TryGetPlayerObject(runner.LocalPlayer, out var player))
-                {
-                    Debug.LogError("[UltUI] No player found");
-                    return;
-                }
+        private void BindCurrentPlayer()
+        {
+            var runner = _inGameManager?.Runner;
+            if (runner == null || !runner.TryGetPlayerObject(runner.LocalPlayer, out var player)) return;
+            if (!player.TryGetComponent(out UltCondition nextModel) || nextModel == _model) return;
 
-                if (!player.gameObject.TryGetComponent<UltCondition>(out var model))
-                {
-                    Debug.LogError("[UltUI] No UltCondition found");
-                    return;
-                }
+            if (_model) _model.OnProgressChanged -= Refresh;
+            _model = nextModel;
+            _model.OnProgressChanged += Refresh;
+            Refresh();
+        }
 
-                model.OnProgressChanged += () => SetGlowObject(model.Progress >= 1f);
-            };
+        private void OnDestroy()
+        {
+            if (_model) _model.OnProgressChanged -= Refresh;
+        }
+
+        private void Refresh()
+        {
+            if (_model) SetGlowObject(_model.Progress >= 1f);
         }
 
         private void SetGlowObject(bool isActive)

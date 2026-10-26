@@ -19,30 +19,51 @@ namespace InGame.Player
 #if UNITY_EDITOR
             Debug.Log($"{GetInstanceID()} : 擬態");
 #endif
-            _character?.gameObject.SetActive(false);
-
             // 擬態オブジェクトの生成
-            var mimicTarget = Instantiate(target, transform);
-            _currentMimicTarget = mimicTarget.gameObject;
+            var sourceRoot = target.VisualRoot;
+            var sourceTargets = sourceRoot.GetComponentsInChildren<TakamuraScanTarget>(true);
+            var targetIndex = Array.IndexOf(sourceTargets, target);
+            if (targetIndex < 0)
+            {
+                Debug.LogError("擬態のVisual Rootには対象のTakamuraScanTargetを含めてください。", target);
+                return;
+            }
+
+            var mimicTransform = Instantiate(sourceRoot, transform);
+            var mimicTarget = mimicTransform.GetComponentsInChildren<TakamuraScanTarget>(true)[targetIndex];
+            if (_currentMimicTarget)
+            {
+                _currentMimicTarget.SetActive(false);
+                Destroy(_currentMimicTarget);
+            }
+            _currentMimicTarget = mimicTransform.gameObject;
+            _character?.SetActive(false);
+
+            // ボーン配下も含め、複製側の当たり判定だけを取り除く。
+            foreach (var mimicCollider in mimicTransform.GetComponentsInChildren<Collider>(true))
+            {
+                mimicCollider.enabled = false;
+                Destroy(mimicCollider);
+            }
 
             // 擬態オブジェクトのTransform調整
-            var mimicTransform = mimicTarget.transform;
 
-            var sourceScale = target.transform.lossyScale;
+            var sourceScale = sourceRoot.lossyScale;
             var destinationParentScale = mimicTransform.parent.lossyScale;
             mimicTransform.localScale = new Vector3(
                 DivideScale(sourceScale.x, destinationParentScale.x),
                 DivideScale(sourceScale.y, destinationParentScale.y),
                 DivideScale(sourceScale.z, destinationParentScale.z));
 
-            mimicTransform.rotation = target.transform.rotation;
+            mimicTransform.rotation = sourceRoot.rotation;
 
             var destinationForward = _character != null
                 ? _character.transform.forward
                 : transform.forward;
             AlignForward(mimicTransform, mimicTarget.GetPivotForward(), destinationForward);
 
-            var pivotOffset = mimicTarget.GetPivotOffset();
+            var pivotOffset = mimicTarget.GetPivotOffset()
+                              + mimicTransform.position - mimicTarget.transform.position;
             mimicTransform.position = transform.position + pivotOffset;
         }
 

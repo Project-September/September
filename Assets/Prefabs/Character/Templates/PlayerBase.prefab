@@ -5687,6 +5687,7 @@ MonoBehaviour:
   _DoingVault: 0
   _NetworkVelocity: {x: 0, y: 0, z: 0}
   _MoveDirection: {x: 0, y: 0}
+  _MoveInput: {x: 0, y: 0}
   _IsGroundNet:
     _value: 0
   _IgnoreMoveInput: 0
@@ -5894,6 +5895,11 @@ MonoBehaviour:
   _wait: {fileID: 0}
   _walk: {fileID: 0}
   _run: {fileID: 0}
+  _aimWait: {fileID: 0}
+  _aimFrontWalk: {fileID: 0}
+  _aimBackWalk: {fileID: 0}
+  _aimRightWalk: {fileID: 0}
+  _aimLeftWalk: {fileID: 0}
   _locoWeight: 0
   _animator: {fileID: 2525442923973757293}
 --- !u!114 &2447315062394318487
@@ -6157,7 +6163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bf0feaffd3a44cbbc9c8f3292f0c948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requiredScore: 1000
+  _requiredScore: 500
 --- !u!114 &8782963132285940316
 MonoBehaviour:
   m_ObjectHideFlags: 0

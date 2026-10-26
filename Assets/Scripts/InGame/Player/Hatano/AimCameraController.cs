@@ -1,16 +1,19 @@
 using Fusion;
+using InGame.Player;
+using September.Common;
 using Unity.Cinemachine;
 using UnityEngine;
 
 public class AimCameraController : NetworkBehaviour
 {
-    [Header("通常のカメラ")]
-    [SerializeField] private CinemachineVirtualCamera _normalCamera;
-    [Header("AIM用のカメラ")]
-    [SerializeField] private CinemachineVirtualCamera _aimCamera;
-    
+    [Header("通常のカメラ"), SerializeField] private CinemachineVirtualCamera _normalCamera;
+    [Header("AIM用のカメラ"), SerializeField] private CinemachineVirtualCamera _aimCamera;
+    [Header("ULT用のカメラ"), SerializeField] private CinemachineVirtualCamera _ultCamera;
     [Header("CrosshairPrefab(照準のUI)")]
     [SerializeField] private GameObject _crosshairPrefab;
+    [Header("回転のスムーズさ"), SerializeField] private float _rotationSpeed = 15f;
+    [SerializeField, Range(0f, 1f), Tooltip("エイム中の移動速度倍率")]
+    private float _aimMoveSpeedMultiplier = 0.5f;
     private GameObject _crosshair;
     public Camera MainCamera { get; private set; }
     
@@ -20,7 +23,11 @@ public class AimCameraController : NetworkBehaviour
     /// <summary>
     /// true：構えている状態　false：構えていない状態
     /// </summary>
-    public bool IsAim { get; private set; }
+    [Networked] private NetworkBool IsAiming { get; set; }
+    [Networked] private NetworkBool IsUltAiming { get; set; }
+    public bool IsAim => IsAiming;
+    public bool IsFacingCamera => IsAiming || IsUltAiming;
+    public float MoveSpeedMultiplier => IsAim ? Mathf.Clamp01(_aimMoveSpeedMultiplier) : 1f;
 
     public override void Spawned()
     {
@@ -34,27 +41,29 @@ public class AimCameraController : NetworkBehaviour
     
     public override void FixedUpdateNetwork()
     {
-        if(!HasInputAuthority || MainCamera == null) return;
-        if (IsAim)
-        {
-            var camForward = MainCamera.transform.forward;
-            camForward.y = 0;
-            transform.forward = camForward;
-        }
-        
-        RPC_SetAim(MainCamera.transform.position, MainCamera.transform.forward);
+        if (!GetInput<PlayerInput>(out var input)) return;
+        AimOrigin = input.CameraPosition;
+        AimDirection = input.DesiredLookDirection;
     }
 
     /// <summary>
-    /// カメラの位置等をクライアントから送信しホスト側で変更
+    /// 同期された構え状態を所有プレイヤーのカメラに適用する。
     /// </summary>
-    /// <param name="aimOrigin">カメラ場所</param>
-    /// <param name="aimDirection">カメラのForward</param>
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_SetAim(Vector3 aimOrigin, Vector3 aimDirection)
+    public override void Render()
     {
-        AimOrigin = aimOrigin;
-        AimDirection = aimDirection;
+        if (!HasInputAuthority) return;
+        _normalCamera.gameObject.SetActive(!IsFacingCamera);
+        _aimCamera.gameObject.SetActive(IsAim);
+        _ultCamera.gameObject.SetActive(IsUltAiming);
+    }
+
+    /// <summary>Ends aiming and restores the normal camera/UI for every peer.</summary>
+    public void StopAim()
+    {
+        if (!IsAim) return;
+
+        RPC_NormalCamera();
+        RPC_CrosshairToggleChange(false);
     }
 
     /// <summary>
@@ -64,9 +73,9 @@ public class AimCameraController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_NormalCamera()
     {
-        IsAim = false;
-        _normalCamera.gameObject.SetActive(true);
-        _aimCamera.gameObject.SetActive(false);
+        if (!HasStateAuthority) return;
+        IsAiming = false;
+        IsUltAiming = false;
     }
     
     /// <summary>
@@ -76,15 +85,20 @@ public class AimCameraController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_AimCamera()
     {
-        IsAim = true;
-        if (HasInputAuthority)
-        {
-            _normalCamera.gameObject.SetActive(false);
-            _aimCamera.gameObject.SetActive(true);
-        }
-        var camForward = AimDirection;
-        camForward.y = 0;
-        gameObject.transform.forward = camForward;
+        if (!HasStateAuthority) return;
+        IsAiming = true;
+        IsUltAiming = false;
+    }
+
+    /// <summary>
+    /// ULTカメラに変更する
+    /// </summary>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_ULTCamera()
+    {
+        if (!HasStateAuthority) return;
+        IsAiming = false;
+        IsUltAiming = true;
     }
 
     /// <summary>

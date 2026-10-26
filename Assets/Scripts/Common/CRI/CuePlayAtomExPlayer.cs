@@ -50,7 +50,7 @@ namespace CRISound
 
         private bool _isReady = false;
         private readonly Dictionary<string, SoundDic> _soundDic = new();
-        private List<Tuple<SoundType, string, string>> _defaultSoundList = new();
+        private List<Tuple<SoundType, string, string, float, float>> _defaultSoundList = new();
 
         public bool IsReady => _isReady;
 
@@ -108,15 +108,16 @@ namespace CRISound
 
             foreach (var s in _defaultSoundList)
             {
-                _soundPlayer[(int)s.Item1].Play(s.Item2, s.Item3);
+                _soundPlayer[(int)s.Item1].Play(s.Item2, s.Item3, s.Item4, s.Item5);
             }
 
             _defaultSoundList.Clear();
         }
 
-        public void PlayQueue(SoundType type, string acb, string name)
+        public void PlayQueue(SoundType type, string acb, string name, float delay, float volumeScale)
         {
-            _instance._defaultSoundList.Add(new Tuple<SoundType, string, string>(type, acb, name));
+            _instance._defaultSoundList.Add(
+                new Tuple<SoundType, string, string, float, float>(type, acb, name, delay, volumeScale));
         }
 
         public void ResetCategoryVolume()
@@ -196,20 +197,35 @@ namespace CRISound
 
             public virtual CriAtomExPlayback Play(string cueSheet, string cueName, float delay = 0.0f)
             {
+                return Play(cueSheet, cueName, delay, SoundVolumeSettings.GetVolume(cueName));
+            }
+
+            public virtual CriAtomExPlayback Play(
+                string cueSheet,
+                string cueName,
+                float delay,
+                float volumeScale)
+            {
                 _currentCueName = cueName;
+                volumeScale = Mathf.Max(0f, volumeScale);
 
                 if (!_instance.IsReady)
                 {
                     Debug.LogWarning($"[SoundPlayer:Queue] Not ready. Queued: {_type}, {cueSheet}/{cueName}");
-                    _instance.PlayQueue(_type, cueSheet, cueName);
+                    _instance.PlayQueue(_type, cueSheet, cueName, delay, volumeScale);
                     return default;
                 }
 
                 CueInfo info = _instance._soundDic[cueSheet].GetCueInfo(cueName);
                 _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), info.id);
                 _atomExPlayer.SetPreDelayTime(delay);
+                _atomExPlayer.SetVolume(_volume * volumeScale);
 
                 var playback = _atomExPlayer.Start();
+
+                // 個別倍率を次回以降の再生に引き継がない。
+                // Updateを呼ばないため、再生済みの音量は変更されない。
+                _atomExPlayer.SetVolume(_volume);
                 
                 var cueId = info.id;
                 _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), cueId);
@@ -249,7 +265,14 @@ namespace CRISound
                 public CriAtomExPlayback CriAtomExPlayback3D => _criAtomExPlayback3D;
                 private string _currentCueName;
 
-                public bool IsBusy => _atomExPlayer3D.GetStatus() == CriAtomExPlayer.Status.Playing;
+                public bool IsBusy
+                {
+                    get
+                    {
+                        var status = _atomExPlayer3D.GetStatus();
+                        return status == CriAtomExPlayer.Status.Prep || status == CriAtomExPlayer.Status.Playing;
+                    }
+                }
                 public string CurrentCueName => _currentCueName;
 
                 public void Dispose()
@@ -258,9 +281,16 @@ namespace CRISound
                     _criAtomEx3DSource.Dispose();
                 }
 
-                public void Play3D(Vector3 playPos, string cueSheet, string cueName)
+                public void Play3D(Vector3 playPos, string cueSheet, string cueName, float volume)
                 {
                     _currentCueName = cueName;
+                    // プール再利用時に前のキューの距離設定を引き継がない。
+                    _criAtomEx3DSource.ResetParameters();
+                    if (SoundVolumeSettings.TryGet3DDistance(cueName, out float minDistance, out float maxDistance))
+                    {
+                        _criAtomEx3DSource.SetAttenuationDistanceSetting(true);
+                        _criAtomEx3DSource.SetMinMaxDistance(minDistance, maxDistance);
+                    }
                     _criAtomEx3DSource.SetPosition(playPos.x, playPos.y, playPos.z);
                     _criAtomEx3DSource.Update();
 
@@ -269,6 +299,7 @@ namespace CRISound
                     _atomExPlayer3D.SetPanType(CriAtomEx.PanType.Pos3d);
                     _atomExPlayer3D.Set3dSource(_criAtomEx3DSource);
                     _atomExPlayer3D.Set3dListener(_instance._sePlayer.Listener);
+                    _atomExPlayer3D.SetVolume(volume);
                     _atomExPlayer3D.UpdateAll();
                     _criAtomExPlayback3D = _atomExPlayer3D.Start();
                 }
@@ -384,7 +415,7 @@ namespace CRISound
                     return null;
                 }
 
-                player.Play3D(playPos, cueSheet, cueName);
+                player.Play3D(playPos, cueSheet, cueName, SoundVolumeSettings.GetVolume(cueName));
                 return player;
             }
 

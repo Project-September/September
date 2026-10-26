@@ -126,7 +126,7 @@ namespace September.InGame.Exhibit
 		[Rpc]
 		private void RPC_InitializedProjectile(Projectile projectile)
 		{
-			projectile.Initialized(_projectileEffectPrefab.gameObject, _hitLayer);
+			projectile?.Initialized(_projectileEffectPrefab.gameObject, _hitLayer);
 		}
 
 		[Rpc]

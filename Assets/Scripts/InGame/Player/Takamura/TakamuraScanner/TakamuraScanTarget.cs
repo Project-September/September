@@ -7,7 +7,10 @@ namespace InGame.Interact
     {
         [SerializeField] Transform _pivot;
         [SerializeField] Transform _scanPos;
+        [SerializeField, Tooltip("Meshと全ボーンを含む複製元。未設定ならこのオブジェクトを複製する")]
+        Transform _visualRoot;
         public Transform ScanPos => _scanPos;
+        public Transform VisualRoot => _visualRoot ? _visualRoot : transform;
 
         /// <summary>
         /// PivotからMeshまでのワールド座標上の差分を返すメソッド

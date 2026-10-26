@@ -1,0 +1,458 @@
+using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Fusion;
+using September.Common;
+using September.InGame.Common;
+using September.InGame.Common.Stats;
+using September.InGame.Fields;
+using September.InGame.Rules;
+using UnityEngine;
+
+namespace InGame.Player.Takamura.Mimic
+{
+    /// <summary>
+    /// プレイヤーPrefabの交換と時間切れによる復帰を管理する。
+    /// 交換元のPlayerと一緒に消えないようNetworkRunner上へ動的に生成される。
+    /// </summary>
+    public sealed class MimicTransformationService : MonoBehaviour
+    {
+        /// <summary>擬態予約を順番に保存するためのコレクション</summary>
+        private readonly Queue<TransformRequest> _pendingRequests = new();
+        /// <summary>擬態中のプレイヤー情報を保持するためのコレクション</summary>
+        private readonly Dictionary<PlayerRef, ActiveTransformation> _activeTransformations = new();
+        /// <summary>擬態に関する処理を実行中のプレイヤーを保持するコレクション</summary>
+        private readonly HashSet<PlayerRef> _processingPlayers = new();
+
+        private NetworkRunner _runner;
+
+        /// <summary>擬態のリクエスト用DTO</summary>
+        private readonly struct TransformRequest
+        {
+            public readonly PlayerRef Player;
+            public readonly PlayerRef TargetPlayer;
+            public readonly CharacterType TargetCharacterType;
+            public readonly float Duration;
+            public readonly int ExecuteTick;
+
+            public TransformRequest(
+                PlayerRef player,
+                PlayerRef targetPlayer,
+                CharacterType targetCharacterType,
+                float duration,
+                int executeTick)
+            {
+                Player = player;
+                TargetPlayer = targetPlayer;
+                TargetCharacterType = targetCharacterType;
+                Duration = duration;
+                ExecuteTick = executeTick;
+            }
+        }
+
+        /// <summary>擬態中のプレイヤーの情報を持つDTO</summary>
+        private readonly struct ActiveTransformation
+        {
+            public readonly NetworkPrefabRef OriginalPrefab;
+            public readonly ControlDescriptionType OriginalDescriptionType;
+            public readonly float ExpireTime;
+
+            public ActiveTransformation(
+                NetworkPrefabRef originalPrefab,
+                ControlDescriptionType originalDescriptionType,
+                float expireTime)
+            {
+                OriginalPrefab = originalPrefab;
+                OriginalDescriptionType = originalDescriptionType;
+                ExpireTime = expireTime;
+            }
+        }
+
+        /// <summary>
+        /// 擬態の予約をする静的メソッド
+        /// </summary>
+        /// <param name="owner">プレイヤー</param>
+        /// <param name="duration">擬態有効時間</param>
+        public static void ReserveTransform(
+            NetworkObject owner,
+            PlayerRef targetPlayer,
+            CharacterType targetCharacterType,
+            float duration)
+        {
+            if (!owner || !owner.HasStateAuthority || owner.Runner == null)
+                return;
+
+            // このクラスをRunnerに逃がすことで安全にオブジェクトの入れ替えを行う
+            var service = owner.Runner.GetComponent<MimicTransformationService>();
+            if (!service)
+                service = owner.Runner.gameObject.AddComponent<MimicTransformationService>();
+
+            service.Initialize(owner.Runner);
+            service.Enqueue(owner.InputAuthority, targetPlayer, targetCharacterType, duration);
+        }
+
+        private void Initialize(NetworkRunner runner)
+        {
+            _runner ??= runner;
+        }
+
+        /// <summary>
+        /// 擬態の予約をコレクションに追加するメソッド
+        /// </summary>
+        /// <param name="player">プレイヤー</param>
+        /// <param name="targetCharacterType">擬態するキャラクターの種類</param>
+        /// <param name="duration">擬態有効時間</param>
+        private void Enqueue(
+            PlayerRef player,
+            PlayerRef targetPlayer,
+            CharacterType targetCharacterType,
+            float duration)
+        {
+            if (_activeTransformations.ContainsKey(player) || _processingPlayers.Contains(player))
+                return;
+
+            _pendingRequests.Enqueue(new TransformRequest(
+                player,
+                targetPlayer,
+                targetCharacterType,
+                duration,
+                _runner.Tick + 1)); // 次のTickに予約
+        }
+
+        private void Update()
+        {
+            if (_runner == null || !_runner.IsRunning || !_runner.IsServer)
+                return;
+
+            ProcessPendingRequests();
+            ProcessExpiredTransformations();
+        }
+
+        /// <summary>
+        /// 擬態リクエスト実行メソッド
+        /// </summary>
+        private void ProcessPendingRequests()
+        {
+            if (_pendingRequests.Count == 0)
+                return;
+
+            var request = _pendingRequests.Peek();
+            if (_runner.Tick < request.ExecuteTick)
+                return;
+
+            // リクエストが指定するのTick以降になったら実行
+            _pendingRequests.Dequeue();
+            TransformAsync(request).Forget();
+        }
+
+        /// <summary>
+        /// 擬態終了リクエスト実行メソッド
+        /// </summary>
+        private void ProcessExpiredTransformations()
+        {
+            if (_activeTransformations.Count == 0)
+                return;
+
+            var expiredPlayers = new List<PlayerRef>();
+            foreach (var pair in _activeTransformations)
+            {
+                if (_runner.SimulationTime < pair.Value.ExpireTime
+                    || _processingPlayers.Contains(pair.Key))
+                    continue;
+
+                if (!TryGetCurrentPlayer(pair.Key, out var currentPlayer))
+                    continue;
+
+                // スタン・搭乗中や空中では交換せず、降車・着地してから復帰する。
+                if (ShouldDeferRestore(currentPlayer))
+                    continue;
+
+                expiredPlayers.Add(pair.Key);
+            }
+
+            // 終了条件を満たしたプレイヤーに対して順に擬態解除を実行
+            foreach (var player in expiredPlayers)
+                RestoreAsync(player, _activeTransformations[player]).Forget();
+        }
+
+        /// <summary>
+        /// 擬態を実行するメソッド
+        /// </summary>
+        /// <param name="request">擬態予約の情報</param>
+        /// <returns></returns>
+        private async UniTaskVoid TransformAsync(TransformRequest request)
+        {
+            // 擬態関連の処理中の場合は無視
+            if (!_processingPlayers.Add(request.Player))
+                return;
+
+            try
+            {
+                // 現在操作しているキャラクターを取得できなかったら終了
+                if (!TryGetCurrentPlayer(request.Player, out var oldPlayer))
+                    return;
+
+                var container = CharacterDataContainer.Instance;
+                if (!container)
+                {
+                    Debug.LogError("[Mimic] CharacterDataContainerが読み込まれていません。");
+                    return;
+                }
+
+                // 擬態対象のプレハブ参照を取得
+                var copiedPrefab = container.GetCharacterData(request.TargetCharacterType).Prefab;
+                if (copiedPrefab == default)
+                {
+                    Debug.LogError(
+                        $"[Mimic] {request.TargetCharacterType}のPrefabが未登録です。");
+
+                    return;
+                }
+
+                if (!PlayerDatabase.Instance.PlayerDataDic.TryGet(request.Player, out var playerData))
+                {
+                    Debug.LogError($"[Mimic] {request.Player} のSessionPlayerDataが見つかりません。");
+                    return;
+                }
+
+                // 自分自身のプレハブ参照を取得
+                var originalPrefab = container.GetCharacterData(playerData.CharacterType).Prefab;
+                var originalDescriptionType = container.GetControlDescriptionType(playerData.CharacterType);
+                var copiedDescriptionType = container.GetControlDescriptionType(request.TargetCharacterType);
+                // 現在のプレイヤーの情報を保存
+                var snapshot = PlayerTransformationSnapshot.Capture(oldPlayer);
+
+                // 擬態対象プレハブ参照をもとにオブジェクトを生成
+                var newPlayer = await _runner.SpawnAsync(
+                    copiedPrefab,
+                    snapshot.Position,
+                    snapshot.Rotation,
+                    inputAuthority: request.Player);    // 入力権限を移動
+
+                // 擬態前の情報を反映
+                snapshot.ApplyTo(newPlayer);
+                SetMimicDisplayName(newPlayer, request.TargetPlayer);
+                // 新しく生成したオブジェクトが正常に動作するようにする
+                InitializeReplacementPlayer(request.Player, newPlayer);
+                // 操作するキャラクターの参照を置き換える
+                ReplacePlayerReferences(request.Player, newPlayer);
+                InitializeAfterMimicSpawn(newPlayer);
+                ChangeDescriptionUI(request.Player, newPlayer, copiedDescriptionType);
+                CleanupBeforeDespawn(oldPlayer);
+                // 擬態前のオブジェクトを削除
+                _runner.Despawn(oldPlayer);
+
+                // 操作主に対して擬態前プレハブと擬態有効時間を保存
+                _activeTransformations[request.Player] = new ActiveTransformation(
+                    originalPrefab,
+                    originalDescriptionType,
+                    _runner.SimulationTime + request.Duration);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+            finally
+            {
+                // 擬態関連の処理中フラグを解除
+                _processingPlayers.Remove(request.Player);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="transformation"></param>
+        /// <returns></returns>
+        private async UniTaskVoid RestoreAsync(PlayerRef player, ActiveTransformation transformation)
+        {
+            // 擬態関連の処理中の場合は無視
+            if (!_processingPlayers.Add(player))
+                return;
+
+            try
+            {
+                if (!TryGetCurrentPlayer(player, out var copiedPlayer))
+                    return;
+                if (ShouldDeferRestore(copiedPlayer))
+                    return;
+
+                // 擬態解除前の情報を保存
+                var snapshot = PlayerTransformationSnapshot.Capture(copiedPlayer);
+                // 擬態前のオブジェクトを生成
+                var restoredPlayer = await _runner.SpawnAsync(
+                    transformation.OriginalPrefab,
+                    snapshot.Position,
+                    snapshot.Rotation,
+                    inputAuthority: player);
+
+                // SpawnAsyncを待つ間に離陸・搭乗・スタン・操作キャラクターの変更が起きる場合がある。
+                // まだ参照を置き換えていない生成物だけ破棄し、変身情報は残して後から再試行する。
+                if (!TryGetCurrentPlayer(player, out var currentPlayer)
+                    || currentPlayer != copiedPlayer || ShouldDeferRestore(currentPlayer))
+                {
+                    if (restoredPlayer)
+                        _runner.Despawn(restoredPlayer);
+                    return;
+                }
+
+                // 待機中の移動や降車位置・ステータス変化を反映する。
+                snapshot = PlayerTransformationSnapshot.Capture(copiedPlayer);
+                // 擬態解除前の情報を反映
+                snapshot.ApplyTo(restoredPlayer);
+                // 擬態解除した時のオブジェクトが正常に動作するようにする
+                InitializeReplacementPlayer(player, restoredPlayer);
+                // 操作キャラクターの参照を置き換える
+                ReplacePlayerReferences(player, restoredPlayer);
+                InitializeAfterMimicSpawn(restoredPlayer);
+                CleanupBeforeDespawn(copiedPlayer);
+                // 擬態解除前のオブジェクトを削除
+                _runner.Despawn(copiedPlayer);
+                // 擬態先のフォーカス解除処理が操作説明を変更することがあるため、
+                // すべての後処理が完了した最後に元キャラクターの説明へ戻す。
+                ChangeDescriptionUI(player, restoredPlayer, transformation.OriginalDescriptionType);
+                // 旧Prefabのfalse通知が描画されずにDespawnされても、交換完了後に本人のUIを消す。
+                if (restoredPlayer.TryGetComponent<TakamuraScanner>(out var scanner))
+                    scanner.RPC_OnCharacterMimicRestored();
+                // 擬態中の情報を削除
+                _activeTransformations.Remove(player);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+            finally
+            {
+                // 擬態関連の処理中フラグを解除
+                _processingPlayers.Remove(player);
+            }
+        }
+
+        private static bool ShouldDeferRestore(NetworkObject player)
+        {
+            if (!player) return true;
+            // 落下通知がまだ描画されていない瞬間も、場外なら交換を保留する。
+            if (OutOfFieldArea.I && OutOfFieldArea.I.IsOutOfField(player.transform.position)) return true;
+            var movement = player.GetComponent<PlayerMovement>();
+            // 接地を確認できない間は、時間切れでも変身情報を残して再試行する。
+            if (!movement || !movement.IsGround) return true;
+            var manager = player.GetComponent<PlayerManager>();
+            // IsMovableは落下時にfalse、復帰時にtrueになる既存の同期状態を使う。
+            return manager && (!manager.IsMovable || manager.IsStun
+                || manager.CurrentPlayerControlState == PlayerManager.PlayerControlState.ForcedControl);
+        }
+
+        /// <summary>
+        /// 現在操作しているキャラクターを取得する静的メソッド
+        /// </summary>
+        /// <param name="player">操作主</param>
+        /// <param name="playerObject">現在操作しているキャラクター</param>
+        /// <returns>取得できたか</returns>
+        private static bool TryGetCurrentPlayer(PlayerRef player, out NetworkObject playerObject)
+        {
+            playerObject = null;
+            return PlayerDatabase.Instance != null
+                   && PlayerDatabase.Instance.PlayerObjectDic.TryGet(player, out playerObject)
+                   && playerObject;
+        }
+
+        /// <summary>
+        /// プレイヤーが操作するキャラクターの参照を置き換えるメソッド
+        /// </summary>
+        /// <param name="player">操作主</param>
+        /// <param name="newPlayer">新しく操作するキャラクター</param>
+        private void ReplacePlayerReferences(PlayerRef player, NetworkObject newPlayer)
+        {
+            PlayerDatabase.Instance.AddPlayerObject(player, newPlayer);
+            _runner.SetPlayerObject(player, newPlayer);
+
+            if (StaticServiceLocator.Instance.TryGet<InGameManager>(out var inGameManager))
+                inGameManager.AddPlayerObject(player, newPlayer);
+        }
+
+        /// <summary>
+        /// 新しく生成したキャラクターオブジェクトが正常に動作するための初期化処理メソッド
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="newPlayer"></param>
+        private static void InitializeReplacementPlayer(PlayerRef player, NetworkObject newPlayer)
+        {
+            if (PlayerDatabase.Instance.PlayerDataDic.TryGet(player, out var playerData))
+            {
+                var buildGenerator = newPlayer.GetComponentInChildren<BuildGenerator>();
+                if (buildGenerator)
+                    buildGenerator.GenerateBuild(playerData.BuildType);
+            }
+
+            if (!StaticServiceLocator.Instance.TryGet<InGameManager>(out var inGameManager))
+                return;
+
+            var playerHealth = newPlayer.GetComponent<PlayerHealth>();
+            if (!playerHealth)
+                return;
+
+            var killUseCase = new PlayerKillUseCase(inGameManager.GameRule.PlayerKilledStrategy);
+            playerHealth.OnDeath += hitData =>
+            {
+                inGameManager.PlayerKilled?.Invoke(hitData.ExecutorRef, hitData.TargetRef);
+                killUseCase.Execute(hitData);
+            };
+        }
+
+        /// <summary>
+        /// プレハブ削除時に後処理するメソッド
+        /// </summary>
+        /// <param name="playerObject">後処理するオブジェクト</param>
+        private static void CleanupBeforeDespawn(NetworkObject playerObject)
+        {
+            if (!playerObject)
+                return;
+
+            foreach (var cleanup in playerObject.GetComponentsInChildren<IMimicCleanup>(true))
+                cleanup.CleanupBeforeMimicDespawn();
+        }
+
+        /// <summary>
+        /// プレハブ生成時に初期化するメソッド
+        /// </summary>
+        /// <param name="playerObject">初期化するオブジェクト</param>
+        private static void InitializeAfterMimicSpawn(NetworkObject playerObject)
+        {
+            if (!playerObject)
+                return;
+
+            foreach (var initializer in playerObject.GetComponentsInChildren<IMimicInitialize>(true))
+                initializer.InitializeAfterMimicSpawn();
+        }
+
+        /// <summary>
+        /// Prefab交換が完了したことを操作主へ通知し、操作キャラクターに対応する説明UIへ切り替える。
+        /// UI更新はRPCの受信先でLocalPlayerを確認するため、他プレイヤーの画面には影響しない。
+        /// </summary>
+        private static void ChangeDescriptionUI(
+            PlayerRef player,
+            NetworkObject playerObject,
+            ControlDescriptionType descriptionType)
+        {
+            if (!playerObject || !playerObject.TryGetComponent<PlayerManager>(out var playerManager))
+                return;
+
+            playerManager.RPC_ChangeMimicDescriptionUI(player, descriptionType);
+        }
+
+        /// <summary>
+        /// 擬態後Prefabの頭上表示名を、擬態対象プレイヤーの名前へ切り替える。
+        /// 名前そのものではなくPlayerRefを同期するため、重複名の連番も既存データから取得できる。
+        /// </summary>
+        private static void SetMimicDisplayName(NetworkObject playerObject, PlayerRef targetPlayer)
+        {
+            if (!playerObject || targetPlayer == PlayerRef.None)
+                return;
+
+            var playerNameUI = playerObject.GetComponentInChildren<PlayerNameUI>(true);
+            if (playerNameUI)
+                playerNameUI.SetMimicDisplayNameOwner(targetPlayer);
+        }
+    }
+}

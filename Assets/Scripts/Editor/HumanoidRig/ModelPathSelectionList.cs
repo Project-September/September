@@ -30,7 +30,8 @@ namespace September.Editor.HumanoidRig
     /// </summary>
     internal sealed class ModelPathSelectionList
     {
-        private const float PathColumnWidth = 320f;
+        private const float MinPathColumnWidth = 320f;
+        private const float MinDetailColumnWidth = 320f;
         private const float StatusColumnWidth = 64f;
 
         private readonly List<string> _paths = new List<string>();
@@ -56,22 +57,28 @@ namespace September.Editor.HumanoidRig
             _selected.Clear();
         }
 
-        public void Draw(string detailHeader, Func<string, ModelRowInfo> rowInfo, string emptyMessage)
+        public void Draw(string detailHeader, Func<string, ModelRowInfo> rowInfo, string emptyMessage,
+            Func<string, bool> canSelect = null, Func<string, UnityEngine.Object> resolveAsset = null)
         {
+            if (canSelect != null) _selected.RemoveWhere(path => !canSelect(path));
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 if (GUILayout.Button("全選択", EditorStyles.toolbarButton, GUILayout.Width(60f)))
                 {
-                    foreach (var path in _paths) _selected.Add(path);
+                    foreach (var path in _paths)
+                        if (canSelect == null || canSelect(path)) _selected.Add(path);
                 }
                 if (GUILayout.Button("全解除", EditorStyles.toolbarButton, GUILayout.Width(60f)))
                 {
                     _selected.Clear();
                 }
-                GUILayout.Label("パス", GUILayout.Width(PathColumnWidth));
-                GUILayout.Label("状態", GUILayout.Width(StatusColumnWidth));
-                GUILayout.Label(detailHeader);
+                GUILayout.FlexibleSpace();
             }
+
+            float pathColumnWidth = MinPathColumnWidth;
+            foreach (string path in _paths)
+                pathColumnWidth = Mathf.Max(pathColumnWidth,
+                    EditorStyles.linkLabel.CalcSize(new GUIContent(path)).x + 8f);
 
             using (var scroll = new EditorGUILayout.ScrollViewScope(_scroll))
             {
@@ -81,32 +88,50 @@ namespace September.Editor.HumanoidRig
                     EditorGUILayout.HelpBox(emptyMessage, MessageType.Info);
                     return;
                 }
-                foreach (var path in _paths) DrawRow(path, rowInfo(path));
+                // 見出しも同じスクロール領域に置き、横移動しても各列と揃える。
+                using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
+                {
+                    GUILayout.Space(22f);
+                    GUILayout.Label("パス", GUILayout.Width(pathColumnWidth));
+                    GUILayout.Label("状態", GUILayout.Width(StatusColumnWidth));
+                    GUILayout.Label(detailHeader, GUILayout.MinWidth(MinDetailColumnWidth));
+                }
+                foreach (var path in _paths)
+                    DrawRow(path, rowInfo(path), canSelect == null || canSelect(path), pathColumnWidth, resolveAsset);
             }
         }
 
-        private void DrawRow(string path, ModelRowInfo info)
+        private void DrawRow(string path, ModelRowInfo info, bool canSelect, float pathColumnWidth,
+            Func<string, UnityEngine.Object> resolveAsset)
         {
             using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
             {
                 bool selected = _selected.Contains(path);
-                bool now = EditorGUILayout.Toggle(selected, GUILayout.Width(18f));
+                bool now;
+                using (new EditorGUI.DisabledScope(!canSelect))
+                    now = EditorGUILayout.Toggle(selected, GUILayout.Width(18f));
                 if (now != selected)
                 {
                     if (now) _selected.Add(path);
                     else _selected.Remove(path);
                 }
 
-                if (GUILayout.Button(path, EditorStyles.linkLabel, GUILayout.Width(PathColumnWidth)))
+                if (GUILayout.Button(path, EditorStyles.linkLabel, GUILayout.Width(pathColumnWidth)))
                 {
-                    EditorGUIUtility.PingObject(AssetDatabase.LoadMainAssetAtPath(path));
+                    var asset = resolveAsset != null ? resolveAsset(path) : AssetDatabase.LoadMainAssetAtPath(path);
+                    if (asset != null)
+                    {
+                        Selection.activeObject = asset;
+                        EditorGUIUtility.PingObject(asset);
+                    }
                 }
 
                 var style = new GUIStyle(EditorStyles.label);
                 style.normal.textColor = info.StatusColor;
                 GUILayout.Label(info.Status, style, GUILayout.Width(StatusColumnWidth));
 
-                EditorGUILayout.LabelField(info.Detail, EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField(info.Detail, EditorStyles.wordWrappedLabel,
+                    GUILayout.MinWidth(MinDetailColumnWidth));
             }
         }
     }

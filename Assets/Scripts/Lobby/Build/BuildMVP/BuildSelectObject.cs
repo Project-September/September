@@ -12,9 +12,15 @@ namespace September.Lobby
         [SerializeField] Image _iconImage;
         [SerializeField] Image _selectedframe;
         [SerializeField] Image _check;
+        [SerializeField] float _selectedScaleMultiplier = 1.2f;
+        [SerializeField] Transform _scaleTarget;
+        Vector3 _originalScale;
+        public Button Button => _icon;
 
         public void Init()
         {
+            if (!_scaleTarget) _scaleTarget = transform.parent ? transform.parent : transform;
+            _originalScale = _scaleTarget.localScale;
             _selectedframe.enabled = false;
             _check.enabled = false;
         }
@@ -42,8 +48,11 @@ namespace September.Lobby
         /// </summary>
         public void Select()
         {
-            EventSystem.current.SetSelectedGameObject(_icon.gameObject);
-            _check.enabled = true;
+            // フォーカスが決定ボタンに移っても、選択中の表示を維持する。
+            // アイコン・背景・枠を含む選択項目全体を拡大する。
+            _scaleTarget.localScale = _originalScale * _selectedScaleMultiplier;
+            _selectedframe.enabled = true;
+            _check.enabled = false;
         }
 
         /// <summary>
@@ -52,6 +61,8 @@ namespace September.Lobby
         public void Unselect()
         {
             _check.enabled = false;
+            _selectedframe.enabled = false;
+            _scaleTarget.localScale = _originalScale;
         }
 
         /// <summary>

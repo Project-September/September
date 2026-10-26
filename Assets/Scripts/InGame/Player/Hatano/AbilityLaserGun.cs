@@ -2,6 +2,7 @@ using System;
 using InGame.Interact;
 using InGame.Player.Hatano;
 using InGame.Player.Ability.Effect.Shooting;
+using Fusion;
 using UnityEngine;
 
 namespace InGame.Player.Ability
@@ -9,7 +10,6 @@ namespace InGame.Player.Ability
     [Serializable]
     public class AbilityLaserGun : ShootingAbilityBase
     {
-        [Header("参照")]
         [Header("PlayerInteractionController")]
         [SerializeField] private PlayerInteractionController _playerInteractionController;
         [Space(30)]
@@ -18,16 +18,21 @@ namespace InGame.Player.Ability
         private float _interactionTimer;
         [Header("判定を取るためのBoxの大きさ")]
         [SerializeField] private Vector3 _judgmentBoxSize;
-
+        
         /// <summary>
         /// 現在、インタラクション中のオブジェクトを保持
         /// </summary>
         private InteractableBase _currentInteractableBase;
         private HatanoAbilityStatusManagement _abilityStatusManagement;
+        private HatanoWeaponController _weaponController;
+        private bool _isFiring;
 
         protected override void OnStart()
         {
             base.OnStart();
+            _isFiring = false;
+            if (_weaponController == null)
+                _weaponController = Parameter.Owner.GetComponentInChildren<HatanoWeaponController>(true);
             if(_abilityStatusManagement == null) _abilityStatusManagement = 
                 Parameter.Owner.GetComponent<HatanoAbilityStatusManagement>();
             _shootingType = ShootingStateType.Stance;
@@ -35,11 +40,67 @@ namespace InGame.Player.Ability
 
         protected override void OnUpdate(float deltaTime)
         {
+            if (StopIfControlLocked()) return;
+
             //現在のAbilityがレーザー銃でない場合、処理をしない
-            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun) return;
+            if (_abilityStatusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun)
+            {
+                ResetShootingState();
+                return;
+            }
             
             ShootingInputJudgment();
+            if (_phase != AbilityPhase.Active) return;
             StateDetection();
+        }
+
+        public override void OnUpdateLocal(float deltaTime, GameObject owner)
+        {
+            if (!owner.TryGetComponent<NetworkObject>(out var networkObject) || !networkObject.HasInputAuthority)
+                return;
+            if (!owner.TryGetComponent<HatanoAbilityStatusManagement>(out var statusManagement) ||
+                statusManagement.AbilityStatus != HatanoAbilityStatus.LaserGun ||
+                statusManagement.IsChangingWeapon ||
+                !owner.TryGetComponent<AimCameraController>(out var aimController) || !aimController.IsAim ||
+                !owner.TryGetComponent<PlayerManager>(out var playerManager) || playerManager.IsStun ||
+                playerManager.CurrentPlayerControlState != PlayerManager.PlayerControlState.Normal ||
+                (owner.TryGetComponent<PlayerMovement>(out var movement) && movement.IsEvading))
+            {
+                _playerInteractionController.RemoteInteractionPreview(null);
+                return;
+            }
+
+            var camera = Camera.main;
+            if (camera != null)
+                PreviewRemoteInteractable(camera.transform.position, camera.transform.forward);
+        }
+
+        /// <summary>
+        /// The laser gun advertises a valid target while aiming; interaction
+        /// progress still begins only while the shooting input is held.
+        /// </summary>
+        private void PreviewRemoteInteractable(Vector3 aimOrigin, Vector3 aimDirection)
+        {
+            var origin = _muzzlePos[0].position;
+            var target = ShootingPositionDetection(aimOrigin, aimDirection);
+            var direction = target - origin;
+            if (!Physics.Raycast(origin, direction, out var hit, _shootingDistance, _hitLayerMask))
+            {
+                _playerInteractionController.RemoteInteractionPreview(null);
+                return;
+            }
+
+            InteractableBase interactable = null;
+            foreach (var collider in Physics.OverlapBox(hit.point, _judgmentBoxSize, Quaternion.identity))
+            {
+                var obj = collider.gameObject;
+                interactable = obj.GetComponentInParent<InteractableBase>()
+                    ?? obj.GetComponent<InteractableBase>()
+                    ?? obj.GetComponentInChildren<InteractableBase>();
+                if (interactable != null) break;
+            }
+
+            _playerInteractionController.RemoteInteractionPreview(interactable);
         }
 
         protected override void OnShooting()
@@ -48,11 +109,18 @@ namespace InGame.Player.Ability
             var camDir = _aimCameraController.AimDirection;
             var targetPos = ShootingPositionDetection(camOri, camDir);
             var origin = _muzzlePos[0].position; //銃口
+            // 長押し中は初回だけ再生し、入力解除・回避・構え終了で再び再生可能にする。
+            if (!_isFiring)
+            {
+                _isFiring = true;
+                if (_weaponController != null)
+                    _weaponController.RPC_PlayRemoteInteractionSound(origin);
+            }
             var dir = targetPos - origin;
             Debug.DrawRay(origin, dir * _shootingDistance, Color.blue);
             
             //hitした場所に向かってRayを飛ばす
-            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance);
+            var laserPoint = Physics.Raycast(origin, dir, out var laserHitInfo, _shootingDistance, _hitLayerMask);
             if (laserPoint)
             {
                 //Rayが当たった場所のColliderを取得して、小さいインタラクションオブジェクトも取得出来るようにする
@@ -101,6 +169,7 @@ namespace InGame.Player.Ability
 
         protected override void OnNoShooting()
         {
+            _isFiring = false;
             _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);
@@ -108,6 +177,7 @@ namespace InGame.Player.Ability
 
         protected override void OnStopTheStance()
         {
+            _isFiring = false;
             _currentInteractableBase = null;
             //遠距離インタラクションを終了する
             _playerInteractionController.RemoteInteractionCancel(ref _interactionTimer);

@@ -14,6 +14,7 @@ namespace Result
         private int _grapplingHookCount;
         private int _friendExhibitCount;
         private int _krakenDamageScore;
+        private int _takamuraRevealDamageScore;
         
         private readonly Dictionary<ExhibitType, int> _destroyedExhibitCounts = new();
 
@@ -21,11 +22,13 @@ namespace Result
         public void AddGrapplingHook() => _grapplingHookCount++;
         public void AddFriendExhibit() => _friendExhibitCount++;
         public void AddKrakenDamage(int score) => _krakenDamageScore += score;
+        public void AddTakamuraRevealDamage(int score) => _takamuraRevealDamageScore += score;
 
         public int GrapplingHookCount => _grapplingHookCount;
         // 時間ないからこっちは使わない
         public int FriendExhibitCount => _friendExhibitCount;
         public int KrakenDamageScore => _krakenDamageScore;
+        public int TakamuraRevealDamageScore => _takamuraRevealDamageScore;
 
         public ScoreTracker(ExhibitScoreConfig config)
         {
@@ -81,6 +84,9 @@ namespace Result
             
             // クラーケンへのダメージ
             sum += _krakenDamageScore;
+
+            // タカムラの擬態解除攻撃で与えたダメージ
+            sum += _takamuraRevealDamageScore;
             
             return sum;
         }
@@ -92,6 +98,7 @@ namespace Result
             _grapplingHookCount = 0;
             _friendExhibitCount = 0;
             _krakenDamageScore = 0;
+            _takamuraRevealDamageScore = 0;
         }
     }
 }

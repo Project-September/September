@@ -8,6 +8,8 @@ namespace September.InGame.NauticalChart
     {
         [SerializeField] private float _duration = 3.0f;
         [SerializeField] private StormManager _stormManager;
+        [SerializeField] private ChartFieldMistSpawner _mistSpawner;
+        [SerializeField] private ChartHeadMistApplier _headMistApplier;
         [SerializeReference, SubclassSelector] private IFogController _fogController;
 
         [Networked] private TickTimer TickTimer { get; set; }
@@ -30,6 +32,10 @@ namespace September.InGame.NauticalChart
             }
 
             _stormManager.StartStorm(_duration, _duration); // 全員に嵐の表示
+            
+            _mistSpawner.ShowFieldMist(); // 全員にフィールド霧の表示
+
+            _headMistApplier.ShowHeadMist(interactPlayerRef);// 頭に霧を表示
 
             if (HasStateAuthority)
             {
@@ -50,11 +56,17 @@ namespace September.InGame.NauticalChart
         private void RPC_OnInteractEnd()
         {
             Debug.Log("RPC_OnInteractEnd");
+
+            // 画面霧を出したクライアントだけ Hide する
             if (_isFogActive)
             {
                 _fogController.HideFog();
                 _isFogActive = false;
             }
+
+            // フィールド霧と頭は全員分を止める
+            _mistSpawner.HideFieldMist();
+            _headMistApplier.HideHeadMist();
         }
     }
 }

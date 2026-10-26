@@ -97,6 +97,55 @@ namespace CRISound
             public static readonly CueData BokeBoke_Interact = new CueData(SheetName, "SE_BokeBoke_Interact");
             public static readonly CueData UI_CountDown_End = new CueData(SheetName, "SE_UI_CountDown_End");
             public static readonly CueData Car_Interact = new CueData(SheetName, "SE_Car_Interact");
+            public static readonly CueData Hatano_Aim = new CueData(SheetName, "SE_Hatano_Aim");
+            public static readonly CueData Hatano_Shoot = new CueData(SheetName, "SE_Hatano_Shoot");
+            public static readonly CueData Hatano_Ult_1 = new CueData(SheetName, "SE_Hatano_Ult_1");
+            public static readonly CueData Hatano_Ult_2 = new CueData(SheetName, "SE_Hatano_Ult_2");
+            public static readonly CueData Candle_Interact = new CueData(SheetName, "SE_Candle_Interact");
+            public static readonly CueData Candle_Burning = new CueData(SheetName, "SE_Candle_Burning");
+            public static readonly CueData Kraken_Interact = new CueData(SheetName, "SE_Kraken_Interact");
+            public static readonly CueData Kraken_Attack = new CueData(SheetName, "SE_Kraken_Attack");
+            public static readonly CueData Excalibur_Interact = new CueData(SheetName, "SE_Excalibur_Interact");
+            public static readonly CueData Excalibur_Attack = new CueData(SheetName, "SE_Excalibur_Attack");
+            public static readonly CueData Excalibur_Hit = new CueData(SheetName, "SE_Excalibur_Hit");
+            public static readonly CueData Excalibur_Impact = new CueData(SheetName, "SE_Excalibur_Impact");
+            public static readonly CueData TreasureChest_Interact = new CueData(SheetName, "SE_TreasureChest_Interact");
+            public static readonly CueData NauticalChart_Interact = new CueData(SheetName, "SE_NauticalChart_Interact");
+            public static readonly CueData NauticalChart = new CueData(SheetName, "SE_NauticalChart");
+            public static readonly CueData Glider_Moving = new CueData(SheetName, "SE_Glider_Moving");
+            public static readonly CueData Shark_Attack = new CueData(SheetName, "SE_Shark_Attack");
+            public static readonly CueData Shark_Moving = new CueData(SheetName, "SE_Shark_Moving");
+            public static readonly CueData Ballista_Hit = new CueData(SheetName, "SE_Ballista_Hit");
+            public static readonly CueData Ballista_Attack = new CueData(SheetName, "SE_Ballista_Attack");
+            public static readonly CueData Cannon_Attack = new CueData(SheetName, "SE_Cannon_Attack");
+            public static readonly CueData Cannon_Hit = new CueData(SheetName, "SE_Cannon_Hit");
+            public static readonly CueData Ballista_Interact = new CueData(SheetName, "SE_Ballista_Interact");
+            public static readonly CueData Cannon_Interact = new CueData(SheetName, "SE_Cannon_Interact");
+            public static readonly CueData Kraken_Impact = new CueData(SheetName, "SE_Kraken_Impact");
+            public static readonly CueData Shark_Interact = new CueData(SheetName, "SE_Shark_Interact");
+            public static readonly CueData ZipLine_Interact = new CueData(SheetName, "SE_ZipLine_Interact");
+            public static readonly CueData Hulk_Ult = new CueData(SheetName, "SE_Hulk_Ult");
+            public static readonly CueData Jewel_PickUp = new CueData(SheetName, "SE_Jewel_PickUp");
+            public static readonly CueData OKB_Ult = new CueData(SheetName, "SE_OKB_Ult");
+            public static readonly CueData Sarutobi_Ult_1 = new CueData(SheetName, "SE_Sarutobi_Ult_1");
+            public static readonly CueData Sarutobi_Ult_2 = new CueData(SheetName, "SE_Sarutobi_Ult_2");
+            public static readonly CueData SpotLight_Long = new CueData(SheetName, "SE_SpotLight_Long");
+            public static readonly CueData SpotLight_Short = new CueData(SheetName, "SE_SpotLight_Short");
+            public static readonly CueData Tanihira_Ult_1 = new CueData(SheetName, "SE_Tanihira_Ult_1");
+            public static readonly CueData Tanihira_Ult_2 = new CueData(SheetName, "SE_Tanihira_Ult_2");
+            public static readonly CueData UI_Cancel = new CueData(SheetName, "SE_UI_Cancel");
+            public static readonly CueData UI_Cursor = new CueData(SheetName, "SE_UI_Cursor");
+            public static readonly CueData UI_Submit = new CueData(SheetName, "SE_UI_Submit");
+            public static readonly CueData Ult_Charge = new CueData(SheetName, "SE_Ult_Charge");
+            public static readonly CueData Takamura_Skill = new CueData(SheetName, "SE_Takamura_Skill");
+            public static readonly CueData Takamura_Ult = new CueData(SheetName, "SE_Takamura_Ult");
+            public static readonly CueData Okubo_Fire = new CueData(SheetName, "SE_Okubo_Fire");
+            public static readonly CueData Okubo_Pull = new CueData(SheetName, "SE_Okubo_Pull");
+            public static readonly CueData Okubo_Ult_1 = new CueData(SheetName, "SE_Okubo_Ult1");
+            public static readonly CueData Okubo_Ult_2 = new CueData(SheetName, "SE_Okubo_Ult2");
+            public static readonly CueData Okubo_Aim = new CueData(SheetName, "SE_Okubo_Aim");
+            public static readonly CueData Evasion = new CueData(SheetName, "SE_Evasion");
+            public static readonly CueData Jewelry_Spawn = new CueData(SheetName, "SE_Jewelry_Spawn");
         }
 
         public static class VOICE
@@ -123,6 +172,24 @@ namespace CRISound
             public static readonly CueData Tanihira_Damage_01 = new CueData(SheetName, "VO_Tanihira_Damage_01");
             public static readonly CueData Tanihira_Interact_01 = new CueData(SheetName, "VO_Tanihira_Interact_01");
             public static readonly CueData Tanihira_Win = new CueData(SheetName, "VO_Tanihira_Win");
+            public static readonly CueData Hatano_CharacterSelect = new CueData(SheetName, "VO_Hatano_CharacterSelect");
+            public static readonly CueData Hatano_InGameStart = new CueData(SheetName, "VO_Hatano_InGameStart");
+            public static readonly CueData Hatano_Attack = new CueData(SheetName, "VO_Hatano_Attack");
+            public static readonly CueData Hatano_Damage = new CueData(SheetName, "VO_Hatano_Damage");
+            public static readonly CueData Hatano_Interact = new CueData(SheetName, "VO_Hatano_Interact");
+            public static readonly CueData Hatano_Result = new CueData(SheetName, "VO_Hatano_Result");
+            public static readonly CueData Okubo_CharacterSelect = new CueData(SheetName, "VO_Ookubo_CharacterSelect");
+            public static readonly CueData Okubo_InGameStart = new CueData(SheetName, "VO_Ookubo_InGameStart");
+            public static readonly CueData Okubo_Attack = new CueData(SheetName, "VO_Ookubo_Attack");
+            public static readonly CueData Okubo_Damage = new CueData(SheetName, "VO_Ookubo_Damage");
+            public static readonly CueData Okubo_Interact = new CueData(SheetName, "VO_Ookubo_Interact");
+            public static readonly CueData Okubo_Result = new CueData(SheetName, "VO_Ookubo_Result");
+            public static readonly CueData Takamura_CharacterSelect = new CueData(SheetName, "VO_Takamura_CharacterSelect");
+            public static readonly CueData Takamura_InGameStart = new CueData(SheetName, "VO_Takamura_InGameStart");
+            public static readonly CueData Takamura_Attack = new CueData(SheetName, "VO_Takamura_Attack");
+            public static readonly CueData Takamura_Damage = new CueData(SheetName, "VO_Takamura_Damage");
+            public static readonly CueData Takamura_Interact = new CueData(SheetName, "VO_Takamura_Interact");
+            public static readonly CueData Takamura_Result = new CueData(SheetName, "VO_Takamura_Result");
         }
     }
 }

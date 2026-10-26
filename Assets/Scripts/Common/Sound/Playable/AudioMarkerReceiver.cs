@@ -19,11 +19,11 @@ namespace September.NewResult
         {
             if (_audioBroadcaster == null)
             {
-                CRIAudio.PlaySE(_cueSheet, cueName);
+                CRIAudio.PlaySE(transform.position, _cueSheet, cueName);
                 return;
             }
 
-            _audioBroadcaster.RPC_PlaySoundFromCode(cueName, trackingType, Object, Runner.LocalPlayer);
+            _audioBroadcaster.PlaySoundFromCode(cueName, trackingType, Object, Object.InputAuthority);
         }
 
         public void OnNotify(Playable origin, INotification notification, object context)

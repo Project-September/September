@@ -53,6 +53,7 @@ namespace InGame.Player
         private Vector3 _rideOffset;
         private Vector3 _ridePivotOffset;
         private Vector3 _savedPivotLocalPosition;
+        private readonly RaycastHit[] _rideCameraHits = new RaycastHit[32];
 
         // カメラのローカル位置と本体からのオフセットを保存し、追従先の台車を設定する。
         public void BeginRideView(Transform target, Vector3 offset)
@@ -169,9 +170,13 @@ namespace InGame.Player
         /// <summary> 障害物に応じてカメラの距離を変える </summary>
         void CheckCameraDistance()
         {
-            var isHit = Physics.Linecast(_cameraPivot.position, _cameraPivot.position + _cameraPivot.TransformDirection(_currentOffset),
-                out var hit, _collideAgainst);
-            
+            Vector3 destination = _cameraPivot.position + _cameraPivot.TransformDirection(_currentOffset);
+            RaycastHit hit;
+            // 乗車中だけ自分の当たり判定を除外する。通常時は従来の判定を使用する。
+            bool isHit = _rideTarget != null
+                ? TryGetRideCameraObstacle(destination, out hit)
+                : Physics.Linecast(_cameraPivot.position, destination, out hit, _collideAgainst);
+
             if (isHit)
             {
                 Vector3 sphereCenter = hit.point + hit.normal * _cameraRadius;
@@ -181,6 +186,33 @@ namespace InGame.Player
             {
                 _cameraTf.localPosition = _currentOffset;
             }
+        }
+
+        private bool TryGetRideCameraObstacle(Vector3 destination, out RaycastHit nearest)
+        {
+            nearest = default;
+            Vector3 delta = destination - _cameraPivot.position;
+            float distance = delta.magnitude;
+            if (distance <= Mathf.Epsilon) return false;
+            Vector3 direction = delta / distance;
+            int count = Physics.RaycastNonAlloc(_cameraPivot.position, direction, _rideCameraHits,
+                distance, _collideAgainst, QueryTriggerInteraction.UseGlobal);
+            // 件数が上限に達した場合は全件を調べ、壁などの判定を取りこぼさない。
+            var hits = count == _rideCameraHits.Length
+                ? Physics.RaycastAll(_cameraPivot.position, direction, distance, _collideAgainst,
+                    QueryTriggerInteraction.UseGlobal)
+                : _rideCameraHits;
+            if (hits != _rideCameraHits) count = hits.Length;
+            float nearestDistance = float.PositiveInfinity;
+            for (int i = 0; i < count; i++)
+            {
+                // 自分の階層に属するColliderだけを除外し、台車や他プレイヤーは残す。
+                if (hits[i].collider.transform.IsChildOf(transform)) continue;
+                if (hits[i].distance >= nearestDistance) continue;
+                nearest = hits[i];
+                nearestDistance = hits[i].distance;
+            }
+            return !float.IsPositiveInfinity(nearestDistance);
         }
 
         /// <summary> カメラを指定方向に回転させる </summary>
