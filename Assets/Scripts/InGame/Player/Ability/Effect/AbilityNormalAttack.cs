@@ -188,7 +188,8 @@ namespace InGame.Player.Ability
                 HitActionType.Damage,
                 damage,
                 Parameter.Owner.InputAuthority,
-                damageable.OwnerPlayerRef);
+                damageable.OwnerPlayerRef,
+                this);
             ApplyHitAndUpdateAttackBuild(hitInfo, damageable, ref hitData, _buildGenerator);
 
             // HitEffectのZ+を攻撃者の前方へ向ける。
@@ -361,4 +362,3 @@ namespace InGame.Player.Ability
         */
     }
 }
-

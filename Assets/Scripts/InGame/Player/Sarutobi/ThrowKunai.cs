@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace InGame.Player.Sarutobi
 {
-    public class ThrowKunai : NetworkBehaviour, IAfterTick, IMimicCleanup, IMimicInitialize
+    public class ThrowKunai : NetworkBehaviour, IAfterTick, IHitExecutor, IMimicCleanup, IMimicInitialize
     {
         [SerializeField] private float _cooldown;
         [SerializeField] private int _damage;
@@ -70,7 +70,6 @@ namespace InGame.Player.Sarutobi
                 if (!_grapplingHook) _grapplingHook = GetComponent<AbilityGrapplingHook>();
                 _crosshair = Instantiate(_crosshairPrefab);
                 _crosshair.SetActive(false);
-
             }
         }
 
@@ -259,7 +258,7 @@ namespace InGame.Player.Sarutobi
                 bool isRange = Mathf.Abs(screenPoint.x - center.x) <= _homingRange.x &&
                                Mathf.Abs(screenPoint.y - center.y) <= _homingRange.y;
                 bool isView = isScreen && isRange;
-                if(!isView) continue;
+                if (!isView) continue;
 
                 // 画面中央からプレイヤーの距離を計算
                 float distance = Vector2.Distance(new Vector2(screenPoint.x, screenPoint.y), center);
@@ -310,7 +309,7 @@ namespace InGame.Player.Sarutobi
             {
                 Rpc_EndStance();
             }
-            if(HasStateAuthority)
+            if (HasStateAuthority)
             {
                 RPC_ChangeDescriptionUI(ControlDescriptionType.Sarutobi);
             }
@@ -373,7 +372,7 @@ namespace InGame.Player.Sarutobi
                     bool enableData = PlayerDatabase.Instance.PlayerDataDic.TryGet(Object.InputAuthority, out var sessionData);
                     var hitData = new HitData(HitActionType.RangedDamage,
                         enableData ? sessionData.IsOgre ? _ogreDamage : _damage : _damage, Object.InputAuthority,
-                        damageable.OwnerPlayerRef, null, damageable);
+                        damageable.OwnerPlayerRef, this);
                     damageable.TakeHit(ref hitData);
                 }
             }
@@ -396,6 +395,11 @@ namespace InGame.Player.Sarutobi
         void SetCooldownTimer()
         {
             if (_cooldownTimer > 0) _cooldownTimer -= Runner.DeltaTime;
+        }
+
+        public void HitExecution(HitData hitData)
+        {
+            throw new System.NotImplementedException();
         }
 
         public enum KunaiStateType

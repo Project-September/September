@@ -39,6 +39,10 @@ namespace InGame.Interact
         private InteractableBase _focusedObj;
         private InteractableBase _remotePreviewObject;
         private bool _isExecutingInteraction = false;
+        /// <summary>
+        /// チュートリアルの判定のため
+        /// </summary>
+        public bool IsExecutingInteraction => _isExecutingInteraction;
         private float _currentInteractTime = 0f;
         private float _requiredInteractTime = 1.0f;
         [SerializeField] private bool _isHoldingInteract = false;
